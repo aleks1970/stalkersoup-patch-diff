@@ -1,0 +1,41 @@
+;АКМ «Призрак»
+[wpn_akm_metro]:wpn_akm
+$spawn              	= "weapons\akm_m2"					
+description				= enc_weapons_wpn_akm_metro
+cost					= 12000				
+ammo_class				= ammo_5.45x39_fmj, ammo_5.45x39_ap, ammo_5.45x39_izomorf     								
+
+inv_name	        	= wpn_akm_metro							
+inv_name_short			= wpn_akm_metro	
+inv_weight			    = 3.3								
+inv_grid_x				= 39  
+inv_grid_y				= 71
+
+cam_dispersion_inc			= 0.3		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac			= 0.9		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+
+fire_dispersion_condition_factor 	= 5	    	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		        = 0.003	    ;вероятность осечки при максимальном износе 
+condition_shot_dec 			        = 0.0001	;увеличение износа при каждом выстреле
+
+hit_power                	= 2.21		
+hit_impulse		 			= 180		
+time_to_aim					= 1.0	
+
+hud                      	= wpn_akm_m2_hud				
+visual         		        = weapons\akm_m2\wpn_akm		
+
+snd_draw					= weapons\akm_m2\draw
+snd_holster					= weapons\akm_m2\holster
+snd_shoot					= weapons\akm_m2\shot0
+snd_shoot1					= weapons\akm_m2\shot1
+snd_shoot2					= weapons\akm_m2\shot2
+snd_shoot3					= weapons\akm_m2\shot3		
+snd_empty					= weapons\akm_m2\empty
+snd_reload					= weapons\akm_m2\reload
+snd_shoot_grenade			= weapons\akm_m2\grenshoot
+snd_reload_grenade			= weapons\akm_m2\grenload
+snd_switch					= weapons\akm_m2\switch
+ 
+[wpn_akm_m2_hud]:wpn_akm_hud
+visual                  	= weapons\akm_m2\wpn_akm_hud.ogf

@@ -1,0 +1,63 @@
+<!-- TB3D 1.0.9.9.4.0 new inventory and dialogs-->
+<xml>
+<!---------------------------Darkscape----------------------->
+<!----------------trader tweed in the farmhouse----------------------->
+	<specific_character id="ds_tweed" team_default = "1">
+		<name>Tweed</name>
+		<icon>ui_npc_tweed</icon>
+		<map_icon x="1" y="0"></map_icon>
+          <bio>sim_bandit_master</bio>
+		<class>ds_tweed</class>
+		<community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>914</rank>
+    <reputation>160</reputation>
+		<snd_config>characters_voice\human_01\woman\</snd_config>
+		<crouch_type>-1</crouch_type>
+		<panic_treshold>0</panic_treshold>
+		<visual>actors\neytral\unic\tweed</visual>
+#include "inventory\tweed_items.xml"
+#include "gameplay\character_criticals_6.xml"     
+#include "dialogs\tweed_ds.xml"
+	</specific_character>
+
+<!---------------------------Courtyards----------------------->
+<!--------------Deserter (bar informant) in building----------------------->
+	<specific_character id="dd_informator" team_default = "1">
+		<name>bar_informer_name</name>
+    <icon>ui_arhara_osvedomitel</icon>
+    <map_icon x="0" y="0"></map_icon>
+		<bio>bar_informer_bio</bio>
+		<class>dd_informator</class>
+		<community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<money min="600" max="1000" infinitive="0"></money>
+		<rank>500</rank>
+		<reputation>0</reputation>
+		<visual>actors\neytral\unic\bar_informator</visual>			
+		<snd_config>characters_voice\human_01\stalker\</snd_config>
+		<crouch_type>-1</crouch_type>
+#include "inventory\ds_traitor_items.xml"
+#include "gameplay\character_criticals_6.xml"     
+#include "dialogs\traitor_ds.xml"
+	</specific_character>
+
+<!---------------------------dead Marshes----------------------->
+<!----------------trader karina in scientist's house----------------------->
+	<specific_character id="karina" team_default = "1">
+		<name>Karina</name>
+		<icon>ui_npc_karina</icon>
+		<map_icon x="1" y="0"></map_icon>
+          <bio>sim_bandit_master</bio>
+		<class>karina</class>
+		<community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>914</rank>
+    <reputation>160</reputation>
+		<snd_config>characters_voice\human_01\woman\</snd_config>
+		<crouch_type>-1</crouch_type>
+		<panic_treshold>0</panic_treshold>
+		<visual>actors\neytral\unic\karina</visual>
+#include "inventory\karina_items.xml"
+#include "gameplay\character_criticals_6.xml"     
+#include "dialogs\karina_dm.xml"
+	</specific_character>
+
+</xml>
