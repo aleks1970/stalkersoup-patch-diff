@@ -1,0 +1,357 @@
+--TB3D 1.0.9.9.3.0
+function my_ver() return "1.0.9.9.3.0" end
+--Vergas Clock-timer, not hud clock
+
+local lost_id = -1			-- hard to explain, but the thing is necessary. ID, in short
+local timer_set = nil		-- string of the clock (HH: MM)
+local timer_flag  	   		--the flag timer 
+local sek_flag				--flag start the stopwatch
+local counter_sek = 0  		--simulated seconds
+local timer_mm        		-- set the timer in minutes
+local time_t_old	  		-- minutes, the previous function call show_time_timer()
+local sch					-- just a counter
+local snd_obj = {}
+snd_obj = xr_sound.get_safe_sound_object([[soundtrack\escape_theme]])
+
+
+
+function lose_item(obj)
+--Called from bind_stalker.script (function actor_binder:on_item_drop (obj))
+--monitors the disappearance of hours from inventory
+
+	--loss of hours (went from stock)
+	if obj:section() == "timer" then
+		lost_id = obj:id() --indication that the object is watch
+	else
+		lost_id = -1       --indication that the object is not watch
+	end
+end
+
+function used_item()
+-- Called from xr_detector.script (function actor_detector:update())
+-- tracks usage hours
+
+	if (lost_id > 0) and (alife():object(lost_id)==nil) then 
+		used_timer()	-- open hours in the inventory
+	end
+	
+end
+
+function used_timer() 
+--hours of use (view, setting a timer or a stopwatch)
+
+	lost_id = -1
+	local spwn=ui_cheat_timer.cheat(get_hud())
+	level.start_stop_menu(spwn,true)		--run ui_cheat_timer.script
+end
+
+--function spawn_item_in_inv(spawn_item,npc) 
+-- restoration of hours in inventory
+
+--	if npc==nil then 
+--		npc=db.actor 
+--	end
+--	return alife():create(spawn_item, 
+--	npc:position(),
+--	npc:level_vertex_id(),  
+--	npc:game_vertex_id(),
+--	npc:id())
+--end
+
+function show_time_timer()
+-- called from sak.script
+--generates time display, timer and stopwatch in Hude
+	
+	--output the time
+	local hud = get_hud()
+    local cs = hud:GetCustomStatic("hud_show_time")
+	local cs_t = hud:GetCustomStatic("hud_show_timer")
+	
+	-- Condition: is there a HS clock?
+	if db.actor:object("timer") == nil then
+		if cs ~= nil then		
+			hud:RemoveCustomStatic("hud_show_time")  -- tidy statistical time
+		end
+		if cs_t ~= nil then		
+			hud:RemoveCustomStatic("hud_show_timer")  -- tidy statistical timer
+		end
+		return	    	-- hours at the HS there, time, timer, do not show do not show
+	end
+	
+	if cs ~= nil then		-- tidy statistical time
+		hud:RemoveCustomStatic("hud_show_time")
+	end
+	
+    hud:AddCustomStatic("hud_show_time", true)
+    cs = hud:GetCustomStatic("hud_show_time")
+	local time_h = level.get_time_hours()
+	local time_m = level.get_time_minutes()
+	local str = timer_str(time_m, time_h)
+	
+	cs:wnd():SetText("Time  "..str)
+	
+	-- output the timer or stopwatch
+	local cs_t = hud:GetCustomStatic("hud_show_timer")
+			
+	--Condition: a run if the stopwatch timer Ali?
+	if (timer_flag == 0) and (sek_flag == 0) then --timer is not running and sekunder identity
+		if cs_t ~= nil then		
+			hud:RemoveCustomStatic("hud_show_timer")  -- tidy statistical timer
+		end
+	end
+	-- Kruchu timer
+	if timer_flag == 1 then   --timer is running
+		if cs_t ~= nil then		-- tidy statistical timer
+			hud:RemoveCustomStatic("hud_show_timer")
+		end
+	
+		hud:AddCustomStatic("hud_show_timer", true)
+		cs_t = hud:GetCustomStatic("hud_show_timer")
+	
+		--handler in timer
+		-- Catch the change in the testimony of minutes of time
+		if time_m ~= time_t_old then
+			timer_mm = timer_mm - 1
+			time_t_old = time_m
+			--=============================================
+			--there must be sound
+			s_play([[device\pda\timer]])
+			--=============================================
+		end
+		
+		if timer_mm > 0 then     							--timer is running
+			local timer_set = h_m_from_mm() 
+			cs_t:wnd():SetText("Next Emission "..timer_set)
+		else
+			cs_t:wnd():SetText("EMISSION THREAT DETECTED!!")			-- timer has finished
+			if timer_mm == 0 then
+				sch = level.get_time_minutes()
+				timer_mm = timer_mm - 1
+			--=============================================
+			--there must be sound
+			s_play([[device\pda\pda_sos]])
+			--=============================================
+			else
+				if sch ~= level.get_time_minutes() then
+					sch = level.get_time_minutes()
+					--=============================================
+					--there must be sound
+					s_play([[device\pda\pda_sos]])
+					--=============================================
+				end
+				
+			end
+		end
+	end
+	
+	-- Kruchu stopwatch
+	if sek_flag == 1 then   --stopwatch is running
+		if cs_t ~= nil then		-- tidy statistical timer
+			hud:RemoveCustomStatic("hud_show_timer")
+		end
+	
+		hud:AddCustomStatic("hud_show_timer", true)
+		cs_t = hud:GetCustomStatic("hud_show_timer")
+
+		--Processor stopwatch
+		-- Catch the change in the testimony of minutes of time
+		if time_m ~= time_t_old then
+			timer_mm = timer_mm+1
+			time_t_old = time_m
+			--=============================================
+			--there must be sound
+			s_play([[device\pda\timer]])
+			--=============================================
+		end
+		local timer_set = h_m_from_mm() 
+		cs_t:wnd():SetText("Stop Watch"..timer_set)
+	end
+end
+
+function h_m_from_mm()
+-- calculates the number of hours and minutes of the general number of minutes
+	local m_t
+	local h_t
+	if timer_mm <0 then
+		m_t = 0
+		h_t = 0
+	else
+		m_t = timer_mm%60  						-- minutes
+		h_t = (timer_mm -m_t)/60 					-- watch
+	end
+	local t_set = timer_str(m_t, h_t)
+	return t_set
+end
+function timer_flag_in_cheat(kl)
+	if kl == 1 then
+		return timer_flag
+	elseif kl == 2 then
+		return sek_flag
+	end
+end
+
+function timer_str(m, h) --returns the string time format (HH: MM)
+	local hm_str
+	
+	if h < 10 then
+		if m < 10 then
+			hm_str = string.format("0%d:0%d", h, m)
+		else
+			hm_str = string.format("0%d:%d", h, m)
+		end
+	else
+		if m < 10 then
+			hm_str = string.format("%d:0%d", h, m)
+		else
+			hm_str = string.format("%d:%d", h, m)
+		end
+	end
+	return hm_str
+end
+
+function imitation_sek(h,m) 
+-- mimics the second time in testimony at Hood hours
+	local sek = 0
+	if h > m then
+		sek = h - m
+	else
+		sek = m - h
+	end
+	counter_sek = counter_sek + 1
+	if counter_sek >59 then
+		counter_sek = 0
+	end
+	sek = sek + counter_sek
+	if sek > 59 then
+		sek = sek - 60
+	end
+	if sek > 9 then
+		str_sek = ":"..sek
+	else
+		str_sek = ":0"..sek
+	end
+	return str_sek
+end 
+
+function set_timer_flag(r,fl,h,m)
+--control flag and start the timer, stopwatch
+
+	if r == 1 then		--timer mode
+		if fl == 1 then --timer is running
+			timer_flag = 1
+			timer_mm = h*60+m
+			time_t_old = level.get_time_minutes()
+		else
+			timer_flag = 0
+			timer_mm  = 0		   --timer reset
+			time_t_old = 0
+		end
+	end
+	
+	if r == 2 then  --Stopwatch Mode
+		if fl == 1 then
+			sek_flag = 1
+			timer_mm = 0
+			timer_old = level.get_time_minutes()
+		else
+			sek_flag = 0		--timer reset
+			timer_mm = 0
+			timer_old = 0
+		end
+	end
+end
+
+function s_play(path)
+	local snd_obj = xr_sound.get_safe_sound_object(path)
+	snd_obj:play_at_pos(db.actor, vector ():set (0, 0, 0), 0, sound_object.s2d)
+end
+
+
+function save(packet)
+--Called from bind_stalker.script (function actor_binder:save_old(packet))
+--writes to variables
+	if timer_flag ~= nil then
+		save_variable("timer_flag_var", timer_flag)
+	end
+	
+	if sek_flag ~= nil then
+		save_variable("sek_flag_var", sek_flag)
+	end
+	if timer_mm ~= nil and time_t_old ~= nil then	
+		save_variable("timer_mm_var", timer_mm)
+		save_variable("time_t_old_var", time_t_old)
+	end
+
+end
+
+function load(reader)
+--Called from amk.script (function on_game_load())
+--Loads recorded variables
+	
+	local s_flag = load_variable("sek_flag_var", nil)
+	local t_flag = load_variable("timer_flag_var", nil)
+	local t_mm = load_variable("timer_mm_var", nil)
+	local t_old = load_variable("time_t_old_var", nil)
+
+	if t_flag ~= nil then
+		timer_flag = t_flag												   
+		del_variable("timer_flag_var")
+	end
+	
+	if s_flag ~= nil then
+		sek_flag = s_flag												   
+		del_variable("sek_flag_var")
+	end
+	if t_mm ~= nil and t_old ~= nil then 
+		timer_mm = t_mm
+		del_variable("timer_mm_var")
+		time_t_old = t_old
+		del_variable("time_t_old_var")
+	end
+end
+
+function save_variable(variable_name, value)
+  if value==nil then					--write variable, timers only
+    del_variable(variable_name)
+  else
+    local vn=amk.compress_name(variable_name)
+    if vn == nil then
+		TB3D_Services.info_alert("timer v: save_variable[nil]")
+	else
+		if db.storage then
+			if db.storage[db.actor:id()] then
+				if db.storage[db.actor:id()].pstor == nil then
+					db.init_my_pstor(db.actor)
+				end
+				db.set_pstor(db.actor, vn, value)
+			else
+				if TB3D_Modders.use_abort_message == true then TB3D_Services.info_alert("timer v: pstor_store["..utils.to_str(varname).."] no storage for actor!!!!!!!!!") end
+			end
+		else
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.info_alert("timer v: pstor_store["..utils.to_str(varname).."] no storage!!!!!!!!!!!") end
+		end
+	end
+  end
+end
+
+function load_variable(variable_name, value_if_not_found)--load variable, timers only
+	local vn=amk.compress_name(variable_name)
+	if db.actor and db.storage and db.storage[db.actor:id()] then
+		if db.storage[db.actor:id()].pstor ~= nil then
+			local val = db.storage[db.actor:id()].pstor[vn]
+			if val then return val end
+		end
+	else
+		TB3D_Services.info_alert("timer v: load variable["..utils.to_str(variable_name).."] no storage for actor!!!!!")
+	end
+	return value_if_not_found
+end
+
+function del_variable(variable_name)--delete variable, timers only
+  if db.storage[db.actor:id()].pstor[variable_name] then
+	db.set_pstor(db.actor, variable_name, nil)
+  end
+end
+
+
+

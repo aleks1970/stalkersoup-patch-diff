@@ -1,0 +1,915 @@
+--TB3D 1.0.9.9.5.0     cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+-- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
+-- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
+-- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions
+function my_ver() return "1.0.9.9.5.0" end
+--[[------------------------------------------------------------------------------------------------------------------
+Author: Ruslan Didenko (Stohe)
+how to call methods of Binder:
+reload
+reinit
+load
+net_spawn
+--------------------------------------------------------------------------------------------------------------------]]
+--memtsg = {} --' temporary table
+--lasthealth = 0
+--lastime = nil
+local table_remove = table.remove
+local string_find = string.find
+local particles={}
+local loadout_checked = false
+--local hit_table = {}
+local hit_max = 1 + TB3D_Modders.hits_to_kill_invuln
+local hit_head = 1 + (TB3D_Modders.hits_to_kill_invuln / TB3D_Modders.hits_to_head_invuln)
+----------------------------------------------------------------------------------------------------------------------
+prefetch("sr_territory")
+prefetch("death_manager")
+
+class "motivator_binder" (object_binder)
+
+function motivator_binder:__init (obj) super(obj)
+	self.loaded = false
+	self.last_update = 0
+	self.prev_ammo = -1
+  ----memusage.collect_info(self.object, "__init")
+    self.first_update = false
+	self.treasure_processed = false
+	self.particles = {}
+end
+
+function motivator_binder:extrapolate_callback(cur_pt)
+	if self.object == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: extrapolate[Nil self.object]") end
+		return
+	end
+	if self.st.active_section then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "extrapolate_callback")
+		self.st.move_mgr:extrapolate_callback(self.object)
+	end
+	if patrol(self.object:patrol()):flags(cur_pt):get() == 0 then
+		return true
+	end
+	return false
+end
+
+function motivator_binder:reinit()
+	if self.object == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: reinit[Nil self.object]") end
+		return
+	end
+	object_binder.reinit(self)
+	--memusage.collect_info(self.object, "reinit_start")
+	--printf("motivator_binder:reinit(): self.object:name()='%s'", self.object:name())
+    -- Callback is posed NOT! It is still unknown the active circuit.
+    -- Put in a callback method update in the distinguished commentary site.
+    local char_ini = self.object:spawn_ini() or ini_file("scripts\\dummy.ltx")
+	---------------------------------------------------------------------------------
+	-- Common scripts
+	---------------------------------------------------------------------------------
+    db.storage[self.object:id()] = {  followers = {} }
+    self.st = db.storage[self.object:id()]
+    --' Creating a manager controls provisions of the body
+    --memusage.collect_info(self.object, "before_statemgr")
+	self.st.state_mgr = state_mgr.bind_manager(self.object)
+	self.st.move_mgr = move_mgr.move_mgr(self.object)
+	self.st.move_mgr:initialize()
+	--memusage.collect_info(self.object, "after_statemgr")
+	--memusage.collect_info(self.object, "reinit_end")
+end
+----------------------------------------------------------------------------------------------------------------------
+function motivator_binder:net_spawn(sobject)
+	if TB3D_modders.Global_Debug then
+		TB3D_Services.packet_alert("XR MOTIVATOR: net_spawn["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	end
+	--memusage.collect_info(self.object, "netspawn_start")
+	if sobject and self and self.object then
+		local sim = alife()
+		local npc = self.object
+		local lname = level:name()
+		local sname = amk.load_variable("level_on_save", lname)
+		if npc then
+			local npc_name = npc:name()
+			local npc_id = npc:id()
+			local is_alive = npc.alive and npc:alive()
+			if is_alive == false and lname ~= sname then
+				if TB3D_Services.can_remove_dead(lname) == true				--now interactive corpse cleaner
+				  and protected_items.obj_has_protected_item(npc) == false
+				  and not string_find(npc_name, "dead_korchagin_military") then
+					if TB3D_modders.use_spawn_message or TB3D_Modders.pop_spawn_message then
+						TB3D_Services.packet_alert("XR MOTIVATOR: dead["..npc_name.."] removed")
+					end
+					alife():release(alife():object(npc_id))
+					return false
+				end
+			end
+			if object_binder.net_spawn(self, sobject) ~= nil then
+				if TB3D_modders.use_spawn_message or TB3D_Modders.pop_spawn_message then
+					TB3D_Services.packet_alert("XR MOTIVATOR: net_spawn["..npc_name.."]")
+				end
+				if TB3D_Modders.zombie_team == true then 
+					local zomb=amk.load_table("zombies")
+					if zomb then
+						for k,v in pairs(zomb) do
+							if (k) and (v) and k==npc_id then
+								if (v.master) and sim:object(v.master) and sim:object(v.master).alive and (not sim:object(v.master):alive()) then
+									if amk_mod.dezombify(k,v) then
+										zomb[k]=nil
+									end
+								end
+							end
+						end
+						--TB3D_Services.packet_alert("XR MOTIVATOR: saving zombies["..npc_name.."]["..utils.to_str(zomb).."]")
+						amk.save_table("zombies",zomb)
+					--else
+						--zomb = {}
+					end
+					local char_ini = npc:spawn_ini()
+					if char_ini and char_ini:section_exist("dont_spawn_online") then
+						--TB3D_Services.packet_alert("XR MOTIVATOR: net_spawn["..npc_name.."] zombied offline")
+						sim:object(npc_id).dont_spawn_online = true
+					end
+				end
+				if sim:object(npc_id) then
+					local sid = sim:object(npc_id).m_story_id
+					if sid then
+						if sid ~= 4294967296 then									--just key npc
+							--TB3D_Services.packet_alert("XR MOTIVATOR: net spawn["..utils.to_str(sobject:name()).."] sid["..utils.to_str(sid).."]")
+							dmx_mod.mapspot_npc(sid,npc_id)
+						end
+					else
+						if TB3D_modders.use_packet_message then TB3D_Services.packet_alert("XR MOTIVATOR: net spawn["..utils.to_str(sobject:name()).."] id["..utils.to_str(sobject.id).."] not in story registry") end
+					end
+				end
+				db.spawn_stalker(npc)									--109940
+				-- All CALLBACK-and put here:
+				npc:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
+				npc:set_callback(callback.hit, motivator_binder.hit_callback, self)
+				npc:set_callback(callback.death, motivator_binder.death_callback, self)
+				npc:set_callback(callback.use_object, motivator_binder.use_callback, self)
+				--memusage.collect_info(npc, "after__callback")
+				if TB3D_Modders.use_perception_message == true then
+					npc:set_callback(callback.sound, motivator_binder.hear_callback, self)
+				end
+				--' Download stories for the camp.
+				if self.loaded == false then
+					local char_ini = npc:spawn_ini() or ini_file("scripts\\dummy.ltx")
+					xr_info.loadInfo(npc, char_ini)
+				end
+				------------------- TB3D - USED for DEBUGGING ------------------------------
+				--if npc:name() == "dcity_nach_oxran" then TB3D_Services.jump_to_npc(npc) end
+				----------------------------------------------------------------------------
+				local particle_param = getIniValueString(npc:section(), "bones_particles", nil, nil)
+				if not is_alive then
+					if TB3d_Modders.use_spawn_message then TB3D_Services.info_alert("XR MOTIVATOR: net spawn["..npc_name.."] dead") end
+					if particle_param and system_ini():section_exist(particle_param) then
+						local tmp=amk.parse_ini_section_to_array_new(nil,particle_param)
+						local t = {}
+						for k,v in pairs(tmp) do
+							t = {}
+							t = amk.parse_ini_section_to_array_new(nil, v)
+							if t ~= nil then
+								t.obj = npc
+								if not t.stop_on_death then play_particle(npc, t) end
+							end
+						end
+					end
+					if TB3D_Services.is_collector() then
+						if xr_companion.is_companion(self.object:id()) then
+							xr_companion.save_var_companion(self.object:id(), "is_companion", 0)
+						end
+					end
+					return true
+				end
+				-- tell all non-npc to not evade anomolies
+				local commun = npc:character_community()
+				--[ [
+				if TB3D_Modders.ai_anomoly_evade == false or				-- no one evades them
+					npc_name == "bar_ecolog_professor" or			-- for wild territory tunnel
+					commun == "nebo" or			--!!!!TB3D causes CTDs in swamp
+					commun == "zombied"	
+				--] ]				
+				--[[												-- for isolation testing
+				if TB3D_Modders.ai_anomoly_evade == true and
+					commun ~= "lastday" and
+					commun ~= "ecolog" and
+					commun ~= "sniper" and
+					--commun ~= "nebo" and		--!!!!TB3D causes CTDs in swamp
+					commun ~= "dolg" and
+					commun ~= "green" and
+					commun ~= "freedom" and
+					commun ~= "bandit" and
+					commun ~= "military" and
+					commun ~= "killer" and
+					commun ~= "stalker" and
+					commun ~= "monolith"
+					--]]
+				then
+					local manager = npc:motivation_action_manager()
+					manager:remove_evaluator(stalker_ids.property_anomaly)
+					manager:add_evaluator(stalker_ids.property_anomaly, property_evaluator_const(false))
+				end
+				if TB3D_Services.is_collector() then			--109950 ogse
+					local manager = self.object:motivation_action_manager()
+					manager:add_evaluator(xr_companion.property_need_companion, property_evaluator_const(false))
+					manager:add_evaluator(xr_companion.property_need_run, property_evaluator_const(false))
+				end
+				if ogsm_hideout then							--109950 ogse
+					local manager = self.object:motivation_action_manager()
+					manager:add_evaluator(ogsm_hideout.property_blowout, property_evaluator_const(false))
+					manager:add_evaluator(ogsm_hideout.property_hideout_lost, property_evaluator_const(false))
+					manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))
+					manager:add_evaluator(ogsm_hideout.property_psyzoned, property_evaluator_const(false))
+				end
+				--memusage.collect_info(npc, "before_soundmgr")
+				xr_sound.load_sound(npc)				--' Loading Voice
+				--memusage.collect_info(npc, "after_soundmgr_netspawn_end")
+				xr_gulag.setup_gulag_and_logic_on_spawn( npc, self.st, sobject, modules.stype_stalker, self.loaded )
+				--if TB3d_Modders.use_packet_message then TB3D_Services.info_alert("XR MOTIVATOR: net spawn gulag done "..npc_name) end
+				amk.on_npc_spawn(npc)
+				amk.on_net_spawn(npc)
+				if particle_param and system_ini():section_exist(particle_param) then
+					local tmp=amk.parse_ini_section_to_array_new(nil,particle_param)
+					local t = {}
+					for k,v in pairs(tmp) do
+						t = {}
+						t = amk.parse_ini_section_to_array_new(nil, v)
+						if t ~= nil then
+							t.obj = npc
+							play_particle(npc, t)
+						end
+					end
+				end
+				local hit_em = 0
+				if lname == "l04_pogost" then									--prevent initial path error
+					if string_find(npc_name, "stalker_ctar_") then hit_em = 4 end
+				elseif lname == "k01_darkscape" then									--prevent initial path error
+					if string_find(npc_name, "bandit_veteran") then hit_em = 4 end
+				elseif lname == "l01_krasivay" then									--prevent initial path error
+					if string_find(npc_name, "l01_stalker")
+					  or string_find(npc_name, "tb3dm_killer") then hit_em = 7 end
+				elseif lname == "promzone" then									--prevent initial path error
+					if string_find(npc_name, "soldier_vdv") then hit_em = 7 end
+				elseif lname == "level_f-1" then									--prevent initial path error
+					if string_find(npc_name, "controller") then hit_em = 5 end
+				end
+				if hit_em > 0 then TB3D_Hit_Styles.small_hit(npc, hit_em) end
+				if TB3d_Modders.Global_Debug then
+					TB3D_Services.packet_alert("XR MOTIVATOR: net spawn["..npc_name.."]["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done[true]")
+				end
+				if TB3D_Services.is_collector() then			--109950 ogse
+					if xr_companion.is_companion(self.object:id()) then
+						if db.actor then
+							db.actor:give_game_news("Your companion's PDA signal found. "..npc:character_name() .. " is in proximity!", "ui\\ui_iconsTotal", Frect():set(0,235,83,47), 0, 15000)
+						end
+						sobject:smart_terrain_task_deactivate()
+					end
+				end
+				return true
+			end
+			TB3D_Services.packet_alert("XR MOTIVATOR: net_spawn  [failed]") -- for["..utils.to_strn(sobject.id).."]")
+		else
+			TB3D_Services.packet_alert("XR MOTIVATOR: net_spawn  [npc nil]")
+		end
+	else
+		TB3D_Services.packet_alert("XR MOTIVATOR: net_spawn  [sobject nil]")
+	end
+	if TB3D_modders.Global_Debug then
+		TB3D_Services.packet_alert("XR MOTIVATOR: net_spawn["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done[false]")
+	end
+	return false
+end
+
+function motivator_binder:net_destroy()
+	if self.object == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: net destroy[Nil self.object]") end
+		return
+	end
+	if TB3D_Modders.use_destroy_message then
+		TB3D_Services.packet_alert("xr motivator_binder:net_destroy["..self.object:name().."]")
+	end
+  if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.npc_net_destroy(self.object) end
+  rx_ai.npc_switch_offline(self.object)
+	if #self.particles > 0 then
+		for kk,vv in pairs(self.particles) do
+			if not vv:is_finished() then
+				vv:stop()
+				self.particles[kk]=nil
+			end
+		end
+	end
+	-- added by xStream for AMK miniSDK
+	amk.on_npc_go_offline(self.object)
+	-- end of addition
+	local st = db.storage[self.object:id()]
+	if st.active_scheme then
+		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy", self.object)
+	end
+	-- DMX MOD on
+	local sid = alife():object(self.object:id()) and alife():object(self.object:id()).m_story_id
+	if sid then dmx_mod.remove_mapspot_npc(sid,self.object:id()) end
+	-- DMX MOD off
+	db.destroy_stalker(self.object)				--109940
+	self:clear_callbacks()
+	self.object:set_callback(callback.use_object, nil)
+	if TB3D_Modders.use_perception_message == true then
+		self.object:set_callback(callback.hear, nil)
+	end
+	-- AMK. Cleaning restrictor
+	local id=self.object:id()
+	object_binder.net_destroy(self)
+	local sobj=alife():object(id)
+	if sobj then
+		local tbl=amk.read_stalker_params(sobj)
+		tbl.crvu32u16u2={}
+		amk.write_stalker_params(tbl,sobj)
+	else
+		-- Exit game.
+	end
+	-- packet_table.clear_packet(self.object)
+	if TB3D_Modders.use_destroy_message then
+		TB3D_Services.packet_alert("xr motivator_binder:net_destroy["..self.object:name().."] done")
+	end
+end
+
+function motivator_binder:clear_callbacks()
+	if self.object == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: clear callbacks[Nil self.object]") end
+		return
+	end
+	self.object:set_patrol_extrapolate_callback(nil)
+	self.object:set_callback(callback.hit, nil)
+	self.object:set_callback(callback.death, nil)
+	if TB3D_Modders.use_perception_message == true then
+		self.object:set_callback(callback.hear, nil)
+	end
+end
+
+-------health CANNOT be changed here as it can cause update errors
+function motivator_binder:hit_callback(obj, amnt, local_direction, who, bone_index)
+	--TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK["..obj:name().."]")
+	if obj and self.object then
+		if TB3D_Services.is_collector() then			--109950 ogse
+			if xr_companion.is_companion(self.object:id()) and amount < 0.3 then
+				xr_sound.set_sound(self.object, nil)
+				stop_play_sound(self.object)
+			end
+		end
+		local amount = amnt or 0
+		local bone_group = 0
+		local se_obj = alife():object(obj:name())
+		if se_obj and (IAmAStalker[se_obj:clsid()]) then
+			if who and who.object and se_obj.community then
+				local se_who = alife():object(who:name())
+				if se_who and se_who.community and se_obj:community() == se_who:community() then
+					--TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK done [C=C]")
+					return
+				end			-- don't bother with it
+			end
+			--TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK["..obj:name().."] by["..who:name().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."]")
+			if TB3D_Services.is_immortal(obj) == true then					--immortals, give full health then drop to reatcions section
+				if TB3D_Modders.show_hit_invulnerable == true then
+					TB3D_Services.packet_alert("xr motivator: immortal["..obj:name().."] amount["..utils.to_str(amount).."] by["..who:name().."]")
+				end
+			else
+				-- use bone groups to check armor/gloves/helmets to adjust amount and hp before issuing events
+				if bone_index == 0 then											--armor
+					if amount > 0 then 											--penetrated
+						bone_group = 10
+					else
+						--TB3D_Services.packet_alert("xr motivator: npc["..obj:name().."] by["..who:name().."] bone[0] hit[0] condition")
+						--if who:id() == db.actor:id() then return end
+						--TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK done [0-0]")
+						return
+					end
+				elseif bone_index > 10 and bone_index < 18 then						--head
+					--check helmet here
+					bone_group = 1
+				elseif bone_index == 10 or bone_index == 18 or bone_index == 31 then	--chest
+					--check armor here
+					bone_group = 2
+				elseif bone_index == 9 then										--waist
+					--check armor here
+					bone_group = 3
+				elseif bone_index < 9 then										-- legs
+					--check armor here
+					bone_group = 4
+				elseif bone_index == 19 or bone_index == 20 then				-- left arm
+					--check armor here
+					bone_group = 5
+				elseif bone_index == 32 or bone_index == 33 then				-- right arm
+					--check armor here
+					bone_group = 6
+				elseif bone_index > 20 and bone_index < 31 then					-- left hand
+					--check gloves here
+					bone_group = 7
+				elseif bone_index > 33 and bone_index < 44 then					-- right hand
+					--check gloves here
+					bone_group = 8
+				end
+				if TB3D_Modders.use_combat_message then
+					TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK["..obj:name().."] by["..who:name().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."]")
+				end
+				if TB3D_Services.is_invulnerable(obj) == true then
+					if TB3D_Modders.show_hit_invulnerable == true then
+						TB3D_Services.packet_alert("xr motivator: invulnerable["..obj:name().."] bone group["..utils.to_str(bone_group).."] amount["..utils.to_str(amount).."]  by["..who:name().."]")
+					end
+					if db.stalker[obj:id()].hits or TB3D_Services.check_invuln_can_die(obj) == true then		-- if quest to kill him
+					--if (hit_table[obj:id()]) or TB3D_Services.check_invuln_can_die(obj) == true then			-- if quest to kill him
+						if bone_group == 1 then									--head shot
+							if db.stalker[obj:id()].hits then --hit_table[obj:id()] then
+								--hit_table[obj:id()] = hit_table[obj:id()] + hit_head
+								db.stalker[obj:id()].hits = db.stalker[obj:id()].hits + hit_head
+								if TB3D_Modders.show_hit_invulnerable == true then
+									--TB3D_Services.packet_alert("xr motivator: invulnerable["..obj:name().."] hit table inc["..utils.to_str(hit_table[obj:id()]).."] by["..who:name().."]")
+									TB3D_Services.packet_alert("xr motivator: invulnerable["..obj:name().."] hit table inc["..utils.to_str(db.stalker[obj:id()].hits).."] by["..who:name().."]")
+								end
+							else
+								--hit_table[obj:id()] = hit_head
+								db.stalker[obj:id()].hits = hit_head
+							end
+						elseif bone_group > 1 then
+							if db.stalker[obj:id()].hits then --hit_table[obj:id()] then
+								--hit_table[obj:id()] = hit_table[obj:id()] + 1
+								db.stalker[obj:id()].hits = db.stalker[obj:id()].hits + 1
+								if TB3D_Modders.show_hit_invulnerable == true then
+									--TB3D_Services.packet_alert("xr motivator: invulnerable["..obj:name().."] hit table inc["..utils.to_str(db.stalker[obj:id()].hits).."] by["..who:name().."]")
+									TB3D_Services.packet_alert("xr motivator: invulnerable["..obj:name().."] hit table inc["..utils.to_str(hit_table[obj:id()]).."] by["..who:name().."]")
+								end
+							else
+								--hit_table[obj:id()] = 1
+								db.stalker[obj:id()].hits = 1
+							end
+						end
+						--if hit_table[obj:id()] and hit_table[obj:id()] > hit_max then
+						if db.stalker[obj:id()].hits and db.stalker[obj:id()].hits > hit_max then
+							obj:kill(obj)
+							--hit_table[obj:id()] = nil
+							db.stalker[obj:id()].hits = nil
+						end
+					elseif bone_group == 1 and who:id() == db.actor:id() then						--actor wants him dead so make mortal
+						--hit_table[obj:id()] = hit_head
+						db.stalker[obj:id()].hits = hit_head
+					end
+					if string_find(obj:name(), "esc_shustryi") then
+						amount = 0																	--skip reaction, shustry will react to bandits otherwise
+					end
+				elseif self.object:section() == "stalker_monolith" then
+					if bone_group == 1 then															--head shot
+						if db.stalker[obj:id()].hits then --hit_table[obj:id()] then
+							--hit_table[obj:id()] = hit_table[obj:id()] + hit_head
+							db.stalker[obj:id()].hits = db.stalker[obj:id()].hits + hit_head
+							if TB3D_Modders.show_hit_invulnerable == true then
+								--TB3D_Services.packet_alert("xr motivator: monolith["..obj:name().."] hit table inc["..utils.to_str(hit_table[obj:id()]).."] by["..who:name().."]")
+								TB3D_Services.packet_alert("xr motivator: monolith["..obj:name().."] hit table inc["..utils.to_str(db.stalker[obj:id()].hits).."] by["..who:name().."]")
+							end
+						else
+							--hit_table[obj:id()] = hit_head
+							db.stalker[obj:id()].hits = hit_head
+						end
+					elseif bone_group > 1 then
+						if db.stalker[obj:id()].hits then --hit_table[obj:id()] then
+							--hit_table[obj:id()] = hit_table[obj:id()] + 1
+							db.stalker[obj:id()].hits = db.stalker[obj:id()].hits + 1
+							if TB3D_Modders.show_hit_invulnerable == true then
+								--TB3D_Services.packet_alert("xr motivator: monolith["..obj:name().."] hit table inc["..utils.to_str(hit_table[obj:id()]).."] by["..who:name().."]")
+								TB3D_Services.packet_alert("xr motivator: monolith["..obj:name().."] hit table inc["..utils.to_str(db.stalker[obj:id()].hits).."] by["..who:name().."]")
+							end
+						else
+							--hit_table[obj:id()] = 1
+							db.stalker[obj:id()].hits = 1
+						end
+					end
+					--if hit_table[obj:id()] and hit_table[obj:id()] > hit_max then
+					if db.stalker[obj:id()].hits and db.stalker[obj:id()].hits > hit_max then
+						obj:kill(obj)
+						--hit_table[obj:id()] = nil
+						db.stalker[obj:id()].hits = nil
+					end
+				else -- not invulnerable or monolith
+					--TB3D_Services.packet_alert("xr motivator: not invulnerable["..obj:name().."] by["..who:name().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."]")
+					-- random weapon dropping if shot in arm or hand 				--- By dAVROs --19073, redone 109932 TB3D
+					local need_drop = false
+					if bone_group == 5 or bone_group == 6 then 						-- right or left arm hit 
+						if bone_index > 33 or bone_index == 20 then 				-- forearm hit 
+							need_drop = (math.random(20)<2)			--fore arm		-- moderate chance
+						else
+							need_drop = (math.random(40)<2)			--upper arm		-- low chance
+						end
+					elseif bone_group == 7 or bone_group == 8 then 	--hand 			-- Either hand/fingers hit
+						need_drop = (math.random(10)<5)								-- high chance
+					elseif bone_group == 10 then									-- hit protection
+						if who:id() == db.actor:id() then return end				-- if actor then aiming condition so trash it
+					end
+					if need_drop and amount > 0 then
+						local act_item = self.object:active_item()
+						if act_item then self.object:drop_item(act_item) end
+					end
+				end --is_invulnerable
+			end	--is_immortal
+			-- set active circuits in scheme, reactions section, 0 amount still gets relation change
+			if TB3D_Modders.use_combat_message then
+				TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK["..obj:name().."] by["..who:name().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."] set reactions")
+			end
+			if self.st.active_section then
+				xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "hit_callback", obj, amount, local_direction, who, bone_index)
+			end
+			if self.st.combat_ignore then
+				xr_logic.issue_event(self.object, self.st.combat_ignore, "hit_callback", obj, amount, local_direction, who, bone_index)
+			end
+			if self.st.combat then
+				xr_logic.issue_event(self.object, self.st.combat, "hit_callback", obj, amount, local_direction, who, bone_index)
+			end
+			if self.st.hit then
+				xr_logic.issue_event(self.object, self.st.hit, "hit_callback", obj, amount, local_direction, who, bone_index)
+			end																										-- set active circuits done
+			if TB3D_Services.is_collector() then			--109950 ogse
+				if xr_companion.is_companion(self.object:id()) then
+					xr_companion.we_are_hit(self.object, who, true)
+				end	
+			end
+			--TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK["..obj:name().."] by["..who:name().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."] set relations")
+			if amount > 0 or bone_group > 0 then
+				--blowout_scheme.hit_callback(obj)			--done in blowout scheme if hit_npc_blowout = true, TB3D 109932
+				if sr_territory then sr_territory.issue_event(self.object, "hit_callback", obj, amount, local_direction, who, bone_index) else TB3D_Services.packet_alert("xr motivator: death callback sr_territory[nil]") end	--determine enemy relation
+				xr_wounded.hit_callback(self.object:id())																--medkit use and physcological state
+				rx_ai.npc_hit(obj,amount,local_direction,who,bone_index,self.object)									--set rx callbacks
+				amk.on_npc_hit(obj, amount, local_direction, who, bone_index)											--calc adrenaline
+			end
+		end	--se_obj
+	elseif TB3D_Modders.use_abort_message == true then
+		TB3D_Services.abort_alert("xr motivator: [self.object] [Nil] !!!!")
+	end
+	--TB3D_Services.packet_alert("xr motivator: HIT_CALLBACK done")
+end
+
+function motivator_binder:death_callback(victim, who)
+	if TB3D_Modders.use_combat_message then
+		TB3D_Services.packet_alert("xr motivator: death["..utils.to_str(self.object:name()).."] victim["..utils.to_str(victim:name()).."] who["..utils.to_str(who:name()).."]")
+	end
+	if self.object == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: death[Nil self.object]") end
+		return
+	end
+	db.del_stalker(self.object)			-- remove from the Soul Cube register
+	--if victim:id() == who:id() or victim:id() == self.object:id() then	--garbage bandits and creatures
+		--if TB3D_Modders.use_combat_message then TB3D_Services.abort_alert("xr motivator: death["..utils.to_str(self.object:name()).."] bled to death!!!!") end
+	--end
+	--dmx_mod.shnura_fix(self.object)		--!!!!TB3D   dmx135, done in killed by actor
+	--if who == nil then
+		--if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: death["..utils.to_str(self:name()).."] who[Nil]") end
+		--return
+	--end
+	--if victim == nil then
+		--if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: death["..utils.to_str(self:name()).."] victim[Nil]") end
+		--return
+	--end
+		--TB3D_Services.info_alert("xr motivator: death callback 1")
+	bb_mod.npcondeath(victim, who)		-- BB Mod
+	if TB3D_Modders.use_xtrm_ai then xrs_ai.npc_death_callback(self.object) end
+	rx_ai.npc_death(self.object,who)
+	if who:id() == db.actor:id() then
+		dmx_mod.blood_hud_will(victim)		--!!!!TB3D   dmx135
+		xr_statistic.addKillCount(self.object)
+		if bind_soul_cube then bind_soul_cube.add_soul() end		-- Cube Shadow
+	end
+	if self.st.death then
+		xr_logic.issue_event(self.object, self.st.death, "death_callback", victim, who)
+	end
+	if self.st.active_section then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who)
+	end
+		--TB3D_Services.info_alert("xr motivator: death callback 2")
+	if sr_territory then sr_territory.issue_event(self.object, "death_callback", victim, who) else TB3D_Services.packet_alert("xr motivator: death callback sr_territory[nil]") end
+	sr_light.check_light(self.object)
+	smart_terrain.on_death( self.object:id() )
+	amk.on_death(victim, who)										-- added by xStream for AMK miniSDK
+	local se_obj = alife():object(self.object:id())
+	if se_obj and se_obj.death_droped == false then
+		if death_manager then 												--some npc do not get this class attached
+			death_manager.drop_manager(self.object):check_dead_weapons()	--randomly changes condition
+			death_manager.drop_manager(self.object):check_dead_items()		--see if all.spawn npc with no inventory except pda
+			death_manager.drop_manager(self.object):check_dead_info()		--give death infos
+		end
+		se_obj.death_droped = true
+	end
+	if TB3D_Modders.death_hit == true then TB3D_hit_styles.death_hit(victim, self.object) end	--' Draw little momentum forward.
+	self:clear_callbacks()
+	if #self.particles > 0 then
+		for kk,vv in pairs(self.particles) do
+			vv:on_death()
+		end
+	end
+	if actor_stats.remove_from_ranking~=nil then
+		local community = self.object:character_community()
+		if community == "zombied"
+		  or community == "monolith"
+		  or community == "arena_enemy" then
+			--not registered
+		  else
+			actor_stats.remove_from_ranking(self.object:id())
+		end
+	end
+	if TB3D_Services.is_collector() then xr_companion.companion_death(self.object) end		--109950 ogse	
+	if TB3D_Modders.use_combat_message then
+		TB3D_Services.packet_alert("xr motivator: death callback done")
+	end
+end
+
+function motivator_binder:use_callback(obj, who)
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("xr motivator: callback") end
+	if self.object == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: use[Nil self.object]") end
+		return
+	end
+	if self.object:alive() then
+		xr_use.notify_on_use(obj, who)
+		if self.st.active_section then
+			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
+		end
+	else
+		if self.treasure_processed == false then
+			treasure_manager:get_treasure_manager():use(self.object)
+			self.treasure_processed = true
+		end
+	end
+	if self.object ~= nil then
+		if string.find(self.object:section(),"zombie") ~= nil then
+			sak.zombie_checkup()
+		end
+	end
+	amk.on_use(obj, who)	-- added by xStream for AMK miniSDK
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("xr motivator: callback done") end
+end
+
+function motivator_binder:update(delta)
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("xr   motivator: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta["..utils.to_str(delta).."]")
+	end
+	if amk.oau_watchdog~=0 then TB3D_Services.crash_alert() end
+	if _g.is_disconnecting then return end
+	if self.object == nil or self.object:id() == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: update[Nil self.object]") end
+		return
+	end
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("xr   motivator: updating["..utils.to_str(self.object:name()).."]") end
+	local self_object_id = self.object:id()
+	object_binder.update(self, delta)
+	--TB3D_Services.packet_alert("xr_motivator: updating2["..utils.to_str(self.object:name()).."] id["..utils.to_str(self.object:id()).."]")
+	if particles[self_object_id] and #particles[self_object_id] > 0 then
+		for kk,vv in pairs(particles[self_object_id]) do
+			table.insert(self.particles,amk_particle.amk_particle(vv))
+			table_remove(particles[self_object_id],kk)
+		end
+	end
+    if #self.particles > 0 then
+        for kk,vv in pairs(self.particles) do
+            if vv then
+                if vv:is_finished() then
+                    self.particles[kk]=nil
+                else
+                    vv:update(delta)
+                end
+            end
+        end
+    end
+	--TB3D_Services.packet_alert("xr_motivator: updating3["..utils.to_str(self.object:name()).."] id["..utils.to_str(self.object:id()).."]")
+	local lname = level:name()
+	local sname = amk.load_variable("level_on_save", lname)
+	if self.object:alive() then
+		if self.first_update == false then
+			self.last_update = 0											--force relation update
+			self.first_update = true
+			if death_manager then death_manager.drop_manager(self.object):check_npc_loadout() end
+			self.loadout_checked = true
+		end
+		if self.loadout_checked == false then							--check to see if needs changing
+			if sname ~= lname then
+				if death_manager then death_manager.drop_manager(self.object):check_npc_loadout() end
+			end
+			self.loadout_checked = true
+		end
+		if self.last_update < time_global() then
+			self.last_update = time_global() + 11
+			if amk.get_npc_relation(self.object,db.actor)=="enemy" and self.object.health > 0.01 then
+				if self.object:see(db.actor) then
+					amk.enemy_see_actor(self.object,"npc")
+				end
+				if db.actor:see(self.object) then
+					amk.actor_see_enemy(self.object,"npc")
+				end
+			end
+			sr_light.check_light(self.object)
+		end
+		if self.st.state_mgr then
+			--TB3D_Services.info_alert("xr_motivator: calling state mngr update for ["..self.object:name().."]")
+			self.st.state_mgr:update()
+			-- Trade Update
+			if self.st.state_mgr.combat == false and self.st.state_mgr.alife == false then
+				--TB3D_Services.info_alert("xr_motivator: calling trade mngr update for ["..self.object:name().."]")
+				trade_manager.update(self.object)
+			end
+		end
+		--TB3D_Services.packet_alert("xr_motivator: updating6["..utils.to_str(self.object:name()).."] id["..utils.to_str(self.object:id()).."]")
+		local wpn = utils.wpn_info_get(self.object)
+		if wpn["ammo"]~=nil then
+			local enemy = self.object:best_enemy()
+			if enemy and enemy:id()==db.actor:id() and self.object:see(db.actor) and self.prev_ammo>wpn["ammo"] then
+				amk.npc_shot_actor(self.object)
+			end
+		end
+		self.prev_ammo = wpn["ammo"] or 0
+		xr_sound.update(self.object)
+		if self.object:is_talk_enabled() then
+			self.object:set_tip_text("character_use")
+		else
+			self.object:set_tip_text("")
+		end
+		self.object:info_clear()
+		local best_enemy = self.object:best_enemy()
+		if best_enemy then
+			self.object:info_add('enemy -- ' .. best_enemy:name())
+		end
+		local active_section = db.storage[self_object_id].active_section
+		if active_section then
+			self.object:info_add('section -- ' .. active_section)
+		end
+		self.object:info_add('name -- ' .. self.object:name())
+		if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.npc_update(self) end
+		rx_ai.npc_update(self.object,self.st)
+		if dmx_cars.actor_inside_btr() then
+			if dmx_cars.actor_target(self.object) then
+				dmx_cars.set_target(self.object:id())
+			end
+		end	
+	else																	--dead dude
+		if self.first_update == false then
+			sr_light.check_light(self.object)
+			self.first_update = true
+			local se_obj = alife():object(self_object_id)						--spawned dead so won't trigger death callback
+			if se_obj and se_obj.death_droped == false then						--adds loot if needed
+				--TB3D_Services.packet_alert("xr motivator: ["..utils.to_str(self.object:name()).."] spawned dead")
+				death_manager.drop_manager(self.object):check_dead_weapons()	--randomly changes condition
+				death_manager.drop_manager(self.object):check_dead_items()		--see if all.spawn npc with no inventory except pda
+				death_manager.drop_manager(self.object):check_dead_info()		--give death infos
+				se_obj.death_droped = true
+			end
+		end
+		if self.st.state_mgr then												--Update manager states of the body
+			--TB3D_Services.info_alert("xr_motivator: calling state mngr update for dead["..self.object:name().."]")
+			self.st.state_mgr:update()
+			--self.st.state_mgr = nil			--do not do here, dead bodies are re-entrant
+		end
+		self.object:set_tip_text_default()
+		--self.object:set_tip_text("character_use")
+		self.object:info_clear()
+	end
+	if TB3D_Services.is_collector() then xr_companion.process_enemy(self.object) end		--109950 ogse	
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("xr   motivator: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
+	end
+end
+
+function motivator_binder:reload(section)
+	--memusage.collect_info(self.object, "reload_start")
+	object_binder.reload(self, section)
+	--printf("motivator_binder:reload(): self.object:name()='%s'", self.object:name())
+	--self.object:set_pda_callback(pda_callback)
+	--memusage.collect_info(self.object, "reload_end")
+end
+
+function motivator_binder:net_save_relevant()
+	--printf("motivator_binder:net_save_relevant(): self.object:name()='%s'", self.object:name())
+	return true
+end
+
+function motivator_binder:save(packet)
+	if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr motivator: binder:save["..utils.to_str(self.object:name()).."]") end
+	object_binder.save(self, packet)
+	packet:w_bool(self.treasure_processed)
+	xr_logic.save_obj(self.object, packet)
+	dialog_manager.save(self.object, packet)
+	trade_manager.save(self.object, packet)
+end
+
+function motivator_binder:load(reader)
+	self.loaded = true
+	if TB3D_Modders.use_packet_message then
+		TB3D_Services.packet_alert("xr motivator: binder:load["..utils.to_str(self.object:name()).."]")
+	end
+	object_binder.load(self, reader)
+	if reader:r_eof() then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("motivator: binder:load["..self.object:name().."] SAVE FILE IS CORRUPT!!!!") end
+		remove_zavis.remove_obj(self.object)
+		if not self.object then
+			return
+		end
+	end
+	self.treasure_processed = reader:r_bool()
+	xr_logic.load_obj(self.object, reader)
+	if alife():object(self.object:id()) then
+		self.npc_script_version = alife():object(self.object:id()).script_version		--TB3D!!!!
+	end
+	if self.npc_script_version == nil or self.npc_script_version < 4 or self.npc_script_version > 7 then
+		self.npc_script_version = TB3D_Services.dm_flag_version
+	end
+	dialog_manager.load(self.object, reader, self.npc_script_version)
+	trade_manager.load(self.object, reader)
+end
+
+function motivator_binder:hear_callback(self, who, sound_type, sound_position, sound_power)
+	if who:id() == db.actor:id() then
+		local type = "NIL"
+		if sound_type then
+			if sound_type == 134217856 then							--collision like landing or hitting an object 
+				type = "Collision"
+			elseif bit_and(sound_type, snd_type.weapon) == snd_type.weapon then
+				type = "WPN"
+				if bit_and(sound_type, snd_type.weapon_shoot) == snd_type.weapon_shoot then
+				  type = "WPN_shoot"
+				elseif bit_and(sound_type, snd_type.weapon_empty) == snd_type.weapon_empty then
+				  type = "WPN_empty"
+				elseif bit_and(sound_type, snd_type.weapon_bullet_hit) == snd_type.weapon_bullet_hit then
+				  type = "WPN_hit"
+				elseif bit_and(sound_type, snd_type.weapon_reload) == snd_type.weapon_reload then
+				  type = "WPN_reload"
+				end
+			elseif bit_and(sound_type, snd_type.item) == snd_type.item then
+				type = "ITM"
+				if bit_and(sound_type, snd_type.item_pick_up) == snd_type.item_pick_up then
+				  type = "ITM_pckup"
+				elseif bit_and(sound_type, snd_type.item_drop) == snd_type.item_drop then
+				  type = "ITM_drop"
+				elseif bit_and(sound_type, snd_type.item_hide) == snd_type.item_hide then
+				  type = "ITM_hide"
+				elseif bit_and(sound_type, snd_type.item_take) == snd_type.item_take then
+				  type = "ITM_take"
+				elseif bit_and(sound_type, snd_type.item_use) == snd_type.item_use then
+				  type = "ITM_use"
+				end
+			elseif bit_and(sound_type, snd_type.monster) == snd_type.monster then
+				type = "MST"
+				if bit_and(sound_type, snd_type.monster_die) == snd_type.monster_die then
+				  type = "MST_die"
+				elseif bit_and(sound_type, snd_type.monster_injure) == snd_type.monster_injure then
+				  type = "MST_damage"
+				elseif bit_and(sound_type, snd_type.monster_step) == snd_type.monster_step then
+				  type = "MST_step"
+				elseif bit_and(sound_type, snd_type.monster_talk) == snd_type.monster_talk then
+				  type = "MST_talk"
+				elseif bit_and(sound_type, snd_type.monster_attack) == snd_type.monster_attack then
+				  type = "MST_attack"
+				elseif bit_and(sound_type, snd_type.monster_eat) == snd_type.monster_eat then
+				  type = "MST_eat"
+				end
+			else
+				type = sound_type
+			end
+		end
+		TB3D_Services.packet_alert("xr motivator: npc["..utils.to_str(self:name()).."] heard["..utils.to_str(who:name()).."] type["..utils.to_str(type).."] dist["..utils.to_str(self:position():distance_to(who:position())).."] power["..utils.to_str(sound_power).."]")
+	end
+end
+
+function AddToMotivator(npc)		--just the actor
+	if alife() then
+		npc:bind_object(this.motivator_binder(npc))
+	end
+end
+
+-- Evaluatory that have higher priority, and thus interrupt the other scripts are
+function addCommonPrecondition(action)
+	--action:add_precondition (world_property(xr_evaluators_id.reaction,false))
+	action:add_precondition (world_property(xr_evaluators_id.stohe_meet_base + 1,false))
+	action:add_precondition (world_property(xr_evaluators_id.sidor_wounded_base + 0,  false))
+	action:add_precondition (world_property(xr_evaluators_id.chugai_heli_hunter_base, false))
+	action:add_precondition (world_property(xr_evaluators_id.abuse_base, false))
+	action:add_precondition (world_property(m_bar.evid_bar_facer, false)) -- DMX MOD
+	action:add_precondition (world_property(blowout_scheme.evid_outside, false))
+	action:add_precondition (world_property(blowout_scheme.evid_blowout, false))
+	action:add_precondition (world_property(blowout_scheme.evid_preblowout, false))
+	action:add_precondition(world_property(blowout_scheme.evid_anomaly, false))
+	if ricochet_scheme then
+		action:add_precondition(world_property(ricochet_scheme.evid_ricochet_danger, false))
+	end
+	if ogsm_hideout then			--109950
+		action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
+		action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
+		action:add_precondition(world_property(ogsm_hideout.property_inhide, false))
+		action:add_precondition(world_property(ogsm_hideout.property_psyzoned, false))
+	end
+	action:add_precondition(world_property(watcher_act.evid_see_stuff, false))
+	if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.addCommonPrecondition(action) end
+	rx_ai.addCommonPrecondition(action)
+	if anomaly_evader then			--109950
+		action:add_precondition (world_property(1099,false))
+	end	
+end
+
+function play_particle(obj,params)
+    if obj then
+        local id = obj:id()
+        if not particles[id] then
+             particles[id]={}
+        end
+        particles[id][#particles[id]+1] = params
+    end
+end

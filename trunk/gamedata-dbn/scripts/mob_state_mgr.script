@@ -1,0 +1,28 @@
+--TB3D 1.0.9.9.2.5 added 10/15/12
+function my_ver() return "1.0.9.9.2.5" end
+
+function get_state(ini, section, obj)
+	local state  = utils.cfg_get_string(ini, section, "state", obj, false, "", "")
+	if (state == "") then
+		return nil
+	end
+	return state
+end
+
+function set_state(obj, actor, state)
+	if state and state ~= "" then
+		local obj_clsid = get_clsid(obj)
+		if obj_clsid == clsid.bloodsucker_s then
+			if state == "invis" then
+				--TB3D_Services.info_alert("mob state mgr: set_state inv[true] for["..utils.to_str(obj:name()).."]")
+				 if TB3D_Modders.invisible == true then obj:set_invisible(true) else obj:set_invisible(false) end
+			elseif state == "vis" then
+				--TB3D_Services.info_alert("mob state mgr: set_state inv[false] for["..utils.to_str(obj:name()).."]")
+				obj:set_invisible(false)
+			else
+				TB3D_Services.abort_alert("mob state mgr: unknown state["..utils.to_str(state).."] for["..utils.to_str(obj:name()).."]")
+			end
+		end
+	end
+end
+

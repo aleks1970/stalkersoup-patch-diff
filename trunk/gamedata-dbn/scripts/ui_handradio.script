@@ -1,0 +1,173 @@
+--TB3D 1.0.9.9.5.0 adapted from OGSE companion mod
+function my_ver() return "1.0.9.9.5.0" end
+--/ ui_handradio.script /--
+--/ Hand radio module /--
+--/ OGS Evolution Team 2009-2010 /--
+--/ Модуль использования рации - hand_radio_f /--
+-----------------------------------
+-- Кнопки
+-----------------------------------
+-- 1. Слушать общий канал
+-- 2. Подозвать напарника к себе
+-- 3. Приказать напарнику оставаться на месте
+-- 4. Приказать напарнику спрятаться
+-----------------------------------
+
+local friend = nil
+
+function open_radio_dialog(pid)
+	if alife():object(pid) == nil then
+		local spwn = handradio(get_hud())
+		level.start_stop_menu(spwn,true)	
+	end
+end
+
+class "handradio" (CUIScriptWnd)
+
+function handradio:__init(owner) super()
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function handradio:__finalize() end
+
+function handradio:InitControls()
+	self:Init(50,50,550,450)
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_handradio.xml")
+	xml:InitStatic("back_video", self)
+	xml:InitStatic("background", self)
+	self:Register(xml:Init3tButton("window_name", self),"window_name")
+	self:Register(xml:Init3tButton("caption", self),"caption")
+	self.btn_1 = xml:Init3tButton("btn_1", self)
+	self:Register(self.btn_1, "btn_1")
+	self.btn_1:Enable(false)	
+	self.btn_2 = xml:Init3tButton("btn_2", self)
+	self:Register(self.btn_2, "btn_2")
+	self.btn_2:Enable(false)	
+	self.btn_3 = xml:Init3tButton("btn_3", self)
+	self:Register(self.btn_3, "btn_3")
+	self.btn_3:Enable(false)	
+	self.btn_4 = xml:Init3tButton("btn_4", self)
+	self:Register(self.btn_4, "btn_4")
+	self.btn_4:Enable(false)	
+	self:Register(xml:Init3tButton("btn_quit", self),"btn_quit")
+	self.btn_1:Enable(true)
+	local obj
+	for id=first_object,last_object do
+		obj = level.object_by_id(id)
+		if obj and obj:alive() and IsStalker(obj) and xr_companion.is_companion(obj:id()) then
+			self.btn_2:Enable(true)
+			self.btn_3:Enable(true)
+			self.btn_4:Enable(true)
+			friend = obj
+			break
+		end	
+	end
+end
+
+function handradio:InitCallBacks()
+	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.listen, self)
+	self:AddCallback("btn_2", ui_events.BUTTON_CLICKED, self.call_friend, self)
+	self:AddCallback("btn_3", ui_events.BUTTON_CLICKED, self.stay_friend, self)
+	self:AddCallback("btn_4", ui_events.BUTTON_CLICKED, self.hide_friend, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit, self)
+end
+
+function handradio:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_quit()
+		end
+		if dik == DIK_keys.DIK_NUMPAD1 then
+			self:listen()
+		end
+		if dik == DIK_keys.DIK_NUMPAD2 then
+			self:call_friend()
+		end
+		if dik == DIK_keys.DIK_NUMPAD3 then
+			self:stay_friend()
+		end
+		if dik == DIK_keys.DIK_NUMPAD4 then
+			self:hide_friend()
+		end			
+	end
+	return true
+end
+
+function handradio:listen()
+	if TB3D_Services.is_collector() then
+		local snd
+		local i
+		local length
+		if level_weathers.is_indoor(level.name()) then
+			snd = sound_object("script_replics\\radio\\message\\radio_noise_2")
+			length = snd:length()
+		--elseif level.name() == "l10_radar" and not has_alife_info("secret_talk") then
+			--snd = sound_object("script_replics\\radio\\message\\radio_voice_secret")
+			--length = snd:length()
+			--amk.start_timer("scr", length/1000)		--secret_talk and spawns fn2000
+		else
+			if math.random()<0.45 then
+				i = math.random(1,12)
+				snd = sound_object("script_replics\\radio\\message\\radio_voice_"..i)
+				length = snd:length()
+			else
+				i = math.random(1,2)
+				snd = sound_object("script_replics\\radio\\message\\radio_noise_"..i)
+				length = snd:length()
+			end
+		end
+		if snd and not snd:playing() then
+			snd:play_no_feedback(db.actor,sound_object.s2d, 0, vector():set(0, 0, 0), 1.0)
+		end
+		amk.spawn_item_in_inv("hand_radio_f")
+		self:GetHolder():start_stop_menu (self,true)
+	end
+end
+
+function handradio:call_friend()
+	if friend then
+		local st = db.storage[friend:id()]
+		if st and st.companion then
+			st.companion.behavior = xr_companion.beh_walk_simple
+			xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
+			xr_companion.save_var_companion(friend:id(),"w_lvl",nil)
+		end
+	end
+	amk.spawn_item_in_inv("hand_radio_f")	
+	self:GetHolder():start_stop_menu (self,true)
+end
+
+function handradio:stay_friend()
+	if friend then
+		local st = db.storage[friend:id()]
+		if st and st.companion then
+			st.companion.behavior = xr_companion.beh_wait_simple
+			xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
+			xr_companion.save_var_companion(friend:id(),"w_lvl",level.name())
+		end
+	end
+	amk.spawn_item_in_inv("hand_radio_f")	
+	self:GetHolder():start_stop_menu (self,true)
+end
+
+function handradio:hide_friend()
+	if friend then
+		local st = db.storage[friend:id()]
+		if st and st.companion then
+			st.companion.behavior = xr_companion.beh_hide_ignore
+			xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
+			xr_companion.save_var_companion(friend:id(),"w_lvl",level.name())
+		end
+	end
+	amk.spawn_item_in_inv("hand_radio_f")	
+	self:GetHolder():start_stop_menu (self,true)
+end
+
+function handradio:on_quit()
+	amk.spawn_item_in_inv("hand_radio_f")
+	self:GetHolder():start_stop_menu (self,true)
+end

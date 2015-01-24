@@ -1,0 +1,468 @@
+--TB3D 1.0.9.9.5.0 localized hit styles, actor blowout, show_hit_actions, dynamite, small_hit, level 5
+function my_ver() return "1.0.9.9.5.0" end
+-- bone = "bip01_spine" will force armor to be considered when hit
+
+local string_find = string.find
+
+function strike(source, target, bone, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: strike["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.strike
+		if not bone then h:bone("bip01_spine") else h:bone(bone) end
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function double_strike(source, target, bone, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: double strike["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.strike
+		if not bone then h:bone("bip01_spine") else h:bone(bone) end
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+		target:hit(h)
+	end
+end
+
+function wound(source, target, bone, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: wound["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.wound
+		if not bone then h:bone("bip01_spine") else h:bone(bone) end
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function shock(source, target, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: shock["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.shock
+		h:bone("bip01_spine")
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function explode(source, target, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: expl["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.explode
+		h:bone("bip01_pelvis")
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function burn(source, target, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: burn["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.fire_wound
+		h:bone("bip01_pelvis")
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function radiation(source, target, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: rad["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.radiation
+		h:bone("bip01_spine")
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function chemical(source, target, bone, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: chem["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.chemical_burn
+		if not bone then h:bone("bip01_pelvis") else h:bone(bone) end
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function telepatic(source, target, bone, power, impulse, dir)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: tele["..utils.to_str(target:name()).."] by["..utils.to_str(source:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] dir["..utils.to_str(direction).."]") end
+	if target then
+		local h = hit()
+		if source then h.draftsman = source else h.draftsman = target end
+		h.type = hit.telepatic
+		if not bone then h:bone("bip01_pelvis") else h:bone(bone) end
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if dir then h.direction = dir else h.direction = vector():set( 1, 0, 0 ) end
+		target:hit(h)
+	end
+end
+
+function artifact_hit(type, power, impulse)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: artifact_hit type["..utils.to_str(type).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."]") end
+	local h = hit()
+	h.draftsman = db.actor
+	h:bone("bip01_spine")
+	h.direction = vector():set(0,0,0)
+	h.power = power or 1
+	h.impulse = impulse or 1
+	if type then h.type = type else h.type = hit.radiation end
+	local cameffs ={"hit_front","hit_back","hit_front_left","hit_back_left","hit_front_right","hit_back_right"}
+	level.add_cam_effector("camera_effects\\"..cameffs[math.random(#cameffs)]..".anm", 999, false, "")
+	db.actor:hit(h)
+end
+
+function double_hit(dist) --zombie_blow, weapon_flame
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: double_hit["..utils.to_str(dist).."]") end
+	local h = hit()
+	if dist == nil or not (dist > 0) then dist = 1 end
+	h.impulse = 0
+	h.draftsman = db.actor
+	h.direction = vector():set(0,0,0)
+	h:bone("bip01_spine")
+	h.power = 1/dist
+	h.type = hit.strike
+	db.actor:hit(h)
+	h.power = 15/dist
+	h.type = hit.chemical_burn
+	db.actor:hit(h)
+end
+
+function monster_chimera(dist)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: chimera_hit["..utils.to_str(dist).."]") end
+	local h = hit()
+	if dist == nil or not (dist > 0) then dist = 1 end
+	h.impulse = 0 
+	h.draftsman = db.actor 
+	h.direction = vector():set(0,0,0) 
+	h:bone("bip01_spine")
+	h.power = 1/dist 
+	h.type = hit.strike
+	db.actor:hit(h) 
+	h.power = 6/dist 
+	h.type = hit.shock 
+	db.actor:hit(h) 
+end 
+
+function horror_hit(rad, shock)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: horror_hit rad["..utils.to_str(rad).."] shock["..utils.to_str(shock).."]") end
+	local h = hit()
+	h:bone("bip01_spine")
+	h.direction = vector():set(0,0,0)
+	h.impulse = 0.3
+	h.power = 0.4
+	h.type = hit.telepatic
+	h.draftsman = db.actor
+	db.actor:hit(h)
+	h.impulse = 0
+	h.power = rad or 1
+	h.type = hit.radiation
+	db.actor:hit(h)
+	h.power = shock or 1
+	h.type = hit.shock
+	db.actor:hit(h)
+end
+
+function blowout_actor(prot_val, phase, outfit, helmet)
+	if db.actor and db.actor:alive() then
+		if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: blowout_actor prot["..utils.to_str(prot_val).."]") end
+		local power = TB3D_Modders.blowout_rad_val
+		if prot_val > 0 and math.random(phase) > 1 then			--2=50%, 3=66%, 4=75%, 5=80% chance of getting hit
+			local h = hit()
+			power = power * prot_val							--apply the hideout protection
+			h.impulse = 0
+			h.draftsman = db.actor
+			h.direction = vector():set(0,0,0)
+			h:bone("bip01_spine")
+			h.power = power
+			if helmet then
+				if not string_find(helmet, "psy") then
+					if outfit and string_find(outfit, "psy") then
+						--block psy
+					else
+						h.type = hit.telepatic
+						db.actor:hit(h)
+					end
+				end
+				power = power * 0.1													--reduce power
+			end
+			if outfit then power = art_hit.apply_protection(outfit, power) end		--get suit protection
+			if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: blowout_actor hit power["..utils.to_str(power).."]") end
+			if power > 0 then
+				h.power = power
+				h.type = hit.strike
+				db.actor:hit(h)
+				h.type = hit.radiation
+				db.actor:hit(h)
+			end
+		end
+	end
+end
+
+function blowout_amk(npc, power)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: blowout_amk["..utils.to_str(npc:name()).."] pwr["..utils.to_str(power).."]") end
+	if npc then
+		local h = hit()
+		h.power = power
+		h.impulse = 0
+		h.draftsman = npc
+		h.direction = vector():set(0,0,0)
+		h:bone("bip01_spine")
+		h.type = hit.strike
+		npc:hit(h)
+		h.type = hit.telepatic
+		npc:hit(h)
+		h.type = hit.radiation
+		npc:hit(h)
+	end
+end
+
+function blowout_crows()
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: crows") end
+	local cr
+	local h = hit()
+	h:bone("")
+	h.type = hit.strike
+	for a=first_object,last_object,1 do
+		cr=level.object_by_id(a)
+		if cr~=nil and cr:section()=="m_crow" and math.random(0,100)<70 then
+			h.draftsman = cr
+			h.direction = cr:direction()
+			h.power = 1000
+			h.impulse = 1000
+			cr:hit(h)
+			cr:hit(h)
+			cr:hit(h)
+		end
+	end
+end
+
+function particle_hit(vv)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: particle_hit["..utils.to_str(vv:name()).."] by["..utils.to_str(vv.target).."] dir["..utils.to_str(vv.dir).."]") end
+	if vv then
+		local h = hit()
+		h.impulse = 0 
+		h.draftsman = vv.target 
+		h.direction = vv.dir 
+		h:bone("bip01_spine")
+		h.power = math.random(10,50)*0.01
+		h.type = hit.strike
+		vv.target:hit(h) 
+		h.power = math.random(10,50)*0.01 
+		h.type = hit.chemical_burn 
+		vv.target:hit(h)  
+	end
+end
+
+function agro_skirmish(actor, gulag)
+	if actor and gulag and gulag.object then
+		if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: agro_skirmish["..utils.to_str(actor:name()).."] by["..utils.to_str(gulag).."]") end
+		local h = hit()
+		h:bone("bip01_spine")
+		h.power     = 0.01
+		h.direction = vector():set( 1, 0, 0 )
+		h.draftsman = actor
+		h.impulse   = 1
+		h.type      = hit.wound
+		for k, v in pairs(gulag.object) do
+			if v ~= true then
+				v:hit( h )
+			end
+		end
+	end
+end
+
+function zombie_checkup(power)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: zombie_checkup pwr["..utils.to_str(power).."]") end
+	local h = hit()
+	h:bone("bip01_pelvis")
+	h.draftsman = db.actor
+	h.type = hit.telepatic
+	h.power = power or 1
+	h.impulse = 1.0
+	db.actor:hit(h)
+	h.type = hit.strike
+	db.actor:hit(h)
+	h.type = hit.radiation
+	db.actor:hit(h)
+end
+
+function death_hit(victim, obj)			--hit upwards slightly to prevent lost bodies as pelvis falls below frustum
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: death_hit["..utils.to_str(victim:name()).."] by["..utils.to_str(obj:name()).."]") end
+	local corpse
+	if victim then
+		corpse = victim
+	elseif obj then
+		corpse = obj
+	end
+	if corpse then
+		local h = hit()
+		h.draftsman = corpse
+		h.type = hit.explosion
+		h.direction = vector():set(0,1,0) --victim:position():sub(h.draftsman:position())
+		h:bone("bip01_pelvis")
+		h.power = 1.0
+		h.impulse = 1.0
+		corpse:hit(h)
+	end
+end
+
+function combat_hit(st, npc, bone, power, impulse, direction, type)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: combat_hit["..utils.to_str(npc:name()).."] bone["..utils.to_str(bone).."] pwr["..utils.to_str(power).."] imp["..utils.to_str(impulse).."] type["..utils.to_str(type).."]") end
+	if st then
+		local h = hit()
+		if bone then h:bone(bone) else h:bone("bip01_spine") end
+		if type then h.type = type else h.type = hit.strike end
+		h.power = power or 1
+		h.impulse = impulse or 1
+		if npc then h.draftsman = npc else h.draftsman = st.target end
+		if direction then h.direction = direction else h.direction = vector():set( 1, 0, 0 ) end
+		st.target:hit(h)
+	end
+end
+
+function amk_health_hit(prev_health)		--alchohol and bad edibles
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: amk_health_hit, previous health["..utils.to_str(prev_health).."]") end
+	local h = hit()
+	h:bone("bip01_pelvis")
+	h.draftsman = db.actor
+	h.type = hit.telepatic
+	h.power = prev_health or 0.001
+	h.impulse = 0.001
+	db.actor:hit(h)
+	h.type = hit.strike
+	db.actor:hit(h)
+	h.type = hit.radiation
+	db.actor:hit(h)
+end
+
+function dynamite(source, power, impulse)
+	if TB3D_Modders.show_hit_actions == true then TB3D_Services.packet_alert("hit: dynamite["..utils.to_str(source:name()).."] power["..utils.to_str(power).."] impulse["..utils.to_str(impulse).."]") end
+    local h = hit ()
+	h:bone("bip01_pelvis")
+    h.power = power
+    h.direction = vector():set( 1, 0, 0 )
+    h.impulse = impulse
+    h.draftsman = source
+    h.type = hit.chemical_burn
+--  h.type = hit.fire_wound
+    source:hit(h)
+end
+
+function small_hit(obj, power)
+	local sim = alife()
+	--[[
+	local obj_id = obj:id()
+	if sim and obj_id then
+		sim:set_switch_online(obj_id,false)
+		sim:set_switch_offline(obj_id,true)
+		xr_gulag.clearJob(obj)
+		sim:set_switch_online(obj_id,true)
+		sim:set_switch_offline(obj_id,false)
+	end
+	]]--
+	local hit_power, impulse = 3.0, 0.0001		--hardest
+	if power == 10 then							--harder
+		hit_power = 2.8
+		--impulse = 1.1
+	elseif power == 9 then						--harder
+		hit_power = 2.7
+		--impulse = 0.1
+	elseif power == 8 then							--harder
+		hit_power = 2.6
+		--impulse = 0.05
+	elseif power == 7 then						--hard
+		hit_power = 2.3
+		--impulse = 0.01
+	elseif power == 6 then						--med
+		hit_power = 2.2
+		--impulse = 0.005	--700
+	elseif power == 5 then						--med
+		hit_power = 2.1
+		--impulse = 0.001	--700
+	elseif power == 4 then						--med
+		hit_power = 2.0
+		--impulse = 0.0005
+	elseif power == 3 then						--tushkano, rat, cat strong
+		hit_power = 1.2
+		impulse = 0.00001
+	elseif power == 2 then						--tushkano, rat, cat normal
+		hit_power = 1.1
+		impulse = 0.00001
+	elseif power == 1 then						--tushkano, rat, cat weak
+		hit_power = 1.0
+		impulse = 0.00001
+	end
+	if TB3D_Modders.show_hit_actions == true then
+		TB3D_Services.packet_alert("tb3d hit styles: small hit["..obj:name().."] power["..utils.to_str(hit_power).."] impulse["..utils.to_str(impulse).."]")
+	end
+	obj.health = 4
+	local h = hit()
+	h.draftsman = db.actor
+	h.type = hit.explosion
+	h.direction = vector():set(0,1,0) --obj:position():sub(h.draftsman:position())
+	h:bone("bip01_spine")
+	h.power = hit_power
+	h.impulse = impulse
+	obj:hit(h)
+end
+
+function hit_companion(npc, who, power)
+	if TB3D_Modders.show_hit_actions == true then
+		TB3D_Services.packet_alert("tb3d hit styles: companion hit["..npc:name().."] who["..who:name().."] power["..utils.to_str(power).."]")
+	end
+	local h = hit()	
+	h.type = hit.fire_wound
+	h.impulse = 0.1
+	h.draftsman = who
+	h.power = power
+	h.direction = vector():set(who:bone_position("bip01_head"))		
+	npc:hit(h)	
+end
+
+function hit_car(obj)
+	if TB3D_Modders.show_hit_actions == true then
+		TB3D_Services.packet_alert("tb3d hit styles: car hit["..obj:name().."]")
+	end
+	local h = hit()	
+	h.type = hit.explosion
+	h.impulse = 0.001
+	h.draftsman = db.actor
+	h.power = 0
+	h.direction = vector():set(0,0,0)		
+	obj:hit(h)	
+end
+

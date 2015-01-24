@@ -1,0 +1,782 @@
+--TB3D 1.0.9.9.1.8 fixed spawn={} in loop 
+function my_ver() return "1.0.9.9.1.8" end
+-- solid_list based on Linspiro Addon v1.1
+
+
+local rare_list = {
+ novice_section = {
+ "wpn_toz34",
+ "wpn_ak74",
+ "wpn_aps_sk1",
+ "wpn_m4super90",
+ "wpn_mp5_m1",
+ "wpn_colt_m1",
+ "wpn_mp5_m2",
+ "wpn_walther_m1",
+ "scientific_outfit",
+ "stalker_outfit_v3",
+ "specops_outfit",
+ "dolg_gaz_outfit_m1",
+ "ammo_vog-25p",
+ "ammo_m209",
+ "ammo_12x70_buck",
+ "ammo_5.45x39_fmj",
+ "ammo_9x39_pab9",
+ "ammo_9x39_ap",
+ "ammo_9x39_sp5",
+ "mutant_flesh_eye",		
+ "mutant_boar_leg",		
+ "mutant_dog_tail",		  			
+ "mutant_zombie_hand",		
+ "mutant_face_tushkano",		
+ "mutant_tail_cat",				   
+ "mutant_spleen_rat",
+ "af_medusa",
+ "af_vyvert",
+ "af_blood",
+ "af_electra_sparkler",
+ "af_rusty_thorn",
+ "af_ameba_slime",
+ "af_drops",      	
+ "af_ameba_mica",
+ "af_soul",
+ "af_night_star",
+ "af_electra_moonlight",
+ "af_gravi",
+ "af_cristall_flower",
+ "af_mincer_meat",
+ "af_electra_flash",
+ "af_rusty_kristall",
+ "af_ameba_slug",
+ "af_fireball",
+ "medkit_army",
+ "medkit_elite"
+  },
+ experienced_section = {
+ "ammo_7.62x54_7h1",
+ "ammo_7.62x54_ap",
+ "ammo_7.62x54_7h14",
+ "ammo_og-7b",
+ "mutant_zombie_hand",
+ "mutant_snork_leg",				
+ "mutant_poltergeist_glas",				
+ "mutant_fracture_hand", 
+ "mutant_boar_leg",  
+ "wpn_m16a2_sk1",
+ "wpn_sg552_sk1",
+ "wpn_wincheaster1300",
+ "wpn_m4",
+ "wpn_ppsh41_sk2",
+ "wpn_abakan_m1",
+ "wpn_fort_m1",
+ "wpn_winchester_m1",
+ "wpn_l85_m1",
+ "wpn_l85_m2",
+ "wpn_beretta_m1",
+ "military_outfit",
+ "svoboda_heavy_outfit",
+ "dolg_scientific_outfit",
+ "freedom_scientific_outfit",
+ "merc_scientific_outfit",
+ "monolit_scientific_outfit",
+ "nebo_scientific_outfit",
+ "outfit_dolg_m1",
+ "outfit_killer_m1",
+ "af_fuzz_kolobok",
+ "af_rusty_sea-urchin",
+ "af_ameba_mica",
+ "af_soul",
+ "af_night_star",
+ "af_dummy_glassbeads",
+ "af_dummy_pellicle",
+ "af_dummy_battery",
+ "af_dummy_dummy",
+ "af_dummy_spring",
+ "af_babka_1",
+ "af_spirit_1",
+ "medkit_army"
+ },
+ veteran_section = {
+ "af_dummy_dummy",
+ "af_fuzz_kolobok",
+ "af_spirit_1",        
+ "af_spirit_2",       
+ "af_cry_1",
+ "af_babka_1",
+ "af_pudd_1",
+ "af_pudd_2",
+ "af_dik_1",
+ "af_kol_1",
+ "af_armor_1",
+ "af_armor_2",
+ "af_dummy_dummy",
+ "af_dummy_spring",
+ "af_eye_voron",
+ "ammo_og-7b",
+ "ammo_vog-25p",	
+ "mutant_krovosos_jaw",		
+ "mutant_burer_hand",
+ "mutant_zombie_hand",	
+ "mutant_hand_kontroler",			
+ "mutant_psevdogigant_hand",			
+ "mutant_chimera_kogot",		
+ "wpn_spas12_m1",
+ "wpn_sig_m1",
+ "wpn_spas12",
+ "wpn_vintorez",	
+ "wpn_rpg7",
+ "wpn_g36",
+ "wpn_m1891_30_scope",
+ "wpn_pkm",	
+ "wpn_groza",
+ "medkit_army"
+  },
+master_section = {
+ "wpn_vintorez",
+ "wpn_svu",
+ "wpn_svd",
+ "wpn_rg6_m1",
+ "wpn_val_m1",
+ "wpn_rpg7",
+ "wpn_fn2000",
+ "wpn_protecta",	
+ "mutant_krovosos_jaw",		
+ "mutant_burer_hand",		
+ "mutant_hand_kontroler",				
+ "mutant_psevdogigant_hand",					
+ "mutant_chimera_kogot",		
+ "af_simbion",        
+ "svoboda_exoskeleton",
+ "monolit_exoskeleton",
+ "nebo_exo_outfit",
+ "exo_bandit_outfit",
+ "exo_outfit",    
+ "af_spirit_2",         
+ "af_cry_2",
+ "af_babka_2",
+ "af_pudd_2",
+ "af_babka_3",
+ "af_dik_2",
+ "af_kol_2",
+ "af_kol_3",
+ "af_armor_2", 
+ "af_armor_3",
+ "medkit_army",
+ "medkit_scientic",
+ "medkit_elite" 
+ }
+}
+
+local solid_list = {
+ novice_section = {
+ --Artifacts--
+ "af_drops",
+ "af_ameba_slime",
+ "af_rusty_thorn",
+ "af_electra_sparkler",
+ "af_blood",
+ "af_vyvert",
+ "af_medusa",
+ --Ammo--
+ "grenade_rgd5",
+ "ammo_12x70_buck",     
+ "ammo_9x19_fmj",
+ "ammo_9x19_pbp",
+ "ammo_9x18_pmm",
+ "ammo_9x18_fmj",
+ --Weapons--
+ "wpn_addon_silencer",
+ "wpn_mp5",
+ "wpn_bm16",
+ "wpn_fort",
+ "wpn_pb",
+ "wpn_pm",
+ --Miscellaneous--
+ "bread",
+ "bandage",
+ "kolbasa",
+ "medkit",
+ "vodka",
+ "sigaret",
+ "conserva"
+ },
+
+experienced_section = {
+--Artifacts--
+ "af_cristall_flower",
+ "af_gravi",
+ "af_mincer_meat",
+ "af_electra_flash",
+ "af_rusty_kristall",
+ "af_ameba_slug",
+ "af_fireball",
+ --Ammo--
+ "grenade_rgd5",
+ "grenade_gd-05",
+ "grenade_f1",     
+ "ammo_9x19_pbp",
+ "ammo_9x18_pmm",
+ "ammo_5.45x39_fmj",
+ "ammo_11.43x23_fmj",
+ "ammo_5.56x45_ss190",
+ --Guns--
+ "wpn_addon_scope",
+ "wpn_mp5",
+ "wpn_ak74u",
+ "wpn_ak74u_m1",
+ "wpn_walther",
+ --Miscellaneous--
+ "mutant_dog_tail",
+ "mutant_boar_leg",
+ "kolbasa",
+ "medkit",
+ "antirad",
+ "energy_drink",
+ "conserva"
+ },
+ veteran_section = {
+ --Artifacts--
+ "af_night_star",
+ "af_gold_fish",
+ "af_soul",
+ "af_electra_moonlight",
+ "af_rusty_sea-urchin",
+ "af_ameba_mica",
+ "af_cristall",
+ --Ammo--
+ "grenade_f1",
+ "ammo_vog-25",     
+ "ammo_m209",
+ "ammo_5.45x39_ap",
+ "ammo_11.43x23_hydro",
+ "ammo_9x39_pab9",
+ "ammo_5.56x45_ss190",
+ "ammo_12x76_zhekan",
+ --Guns--
+ "wpn_addon_scope_susat",
+ "wpn_addon_grenade_launcher",
+ "wpn_beretta",
+ "wpn_sig550",
+ "wpn_toz34",
+ "wpn_abakan_m2",
+ "wpn_desert_eagle",
+ --Miscellaneous--
+ "mutant_psevdodog_tail",
+ "mutant_snork_leg",
+ "medkit_army",
+ "antirad"
+ },
+ master_section = {
+ --Artifacts--
+ "af_dummy_glassbeads",
+ "af_dummy_pellicle",
+ "af_dummy_battery",
+ "af_dummy_dummy",
+ "af_dummy_spring",
+ "af_fuzz_kolobok",
+ --Ammo--
+ "ammo_m209",
+ "ammo_vog-25p",     
+ "ammo_9x39_ap",
+ "ammo_12x76_dart",
+ "ammo_7.62x54_7h14",
+ "ammo_9x39_sp5",
+ "ammo_5.56x45_ap",
+ "ammo_7.62x54_7h1",
+ --Guns--
+ "wpn_addon_grenade_launcher_m203",
+ "wpn_colt1911",
+ "wpn_spas12",
+ "wpn_l85",
+ "wpn_lr300",
+ "wpn_groza",
+ "wpn_groza_m1",
+ --Miscellaneous--
+ "mutant_krovosos_jaw",
+ "mutant_burer_hand",
+ "medkit_army",
+ "medkit_scientic",
+ "medkit_elite"
+ }
+}
+
+local treasure_manager = nil
+local n_rank 
+
+function parse_spawns(line)
+	if line == nil then
+		return {}
+	end
+	--' if the default-s is greater than the values ??in the ini, then the score, missing the last value from the ini
+	local t = se_respawn.parse_names(line)
+	local n = table.getn(t)
+	local ret_table = {}
+	local k = 1
+	local spawn = {}
+	local p
+	while k <= n do
+		spawn = {}			--TB3D 109917
+		spawn.section = t[k]
+		-- Check that this is not the last record
+		if t[k+1] ~= nil then
+			p = tonumber(t[k+1])
+			-- check that the second number specifies the probability, rather than another section spawn
+			if p then
+				-- hammering number
+				spawn.prob = p
+				k = k + 2
+			else
+				-- hammered defaulted 1
+				spawn.prob = 1
+				k = k + 1
+			end
+		else
+			spawn.prob = 1
+			k = k + 1
+		end
+		table.insert(ret_table, spawn)
+	end
+	return ret_table
+end
+
+function take_treasure(box, box_story_id)
+	get_treasure_manager():treasure_empty(box, box_story_id)
+end
+
+class "CTreasure"
+function CTreasure:__init()
+	--' At Designer proofreads LTX and create a piece of quests.
+	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure init") end
+	local iniFileName = "misc\\treasure_manager.ltx"
+	self.ini = ini_file(iniFileName)
+	--' We iterate over all settings phrases
+	if not iniLineSectionExist("list",iniFileName) then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("TRSR MGR: There is no section [list] in treasure_manager.ltx") end
+	end
+	local n = iniLinesCount("list",iniFileName)
+	local id, value = "",""
+	--' initial setup
+	self.treasure_info = {}
+	for i=0,n-1 do
+		result, id, value	= getIniLine("list",i,"","",iniFileName)
+		self.treasure_info[id] = {}
+		self.treasure_info[id].target		= utils.cfg_get_number(self.ini, id, "target", nil, true)
+		--self.treasure_info[id].target		= getIniValueFloat(id, "target", nil, iniFileName)
+		self.treasure_info[id].name			= utils.cfg_get_string(self.ini, id, "name", nil, true, "")
+		--self.treasure_info[id].name			= getIniValueString(id, "name", "", iniFileName)
+		self.treasure_info[id].description	= utils.cfg_get_string(self.ini, id, "description", nil, true, "")
+		--self.treasure_info[id].description	= getIniValueString(id, "description", "", iniFileName)
+		self.treasure_info[id].items		= parse_spawns(utils.cfg_get_string(self.ini, id, "items", nil, true, ""))
+		--self.treasure_info[id].items		= parse_spawns(getIniValueString(id, "items", "", iniFileName))
+		local community	= parse_names(getIniValueString(id, "community", "stalker, bandit, dolg, freedom", iniFileName))
+		self.treasure_info[id].community = {}
+		for k,v in pairs(community) do
+			self.treasure_info[id].community[v] = true
+		end
+		if self.treasure_info[id].items == nil then
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("TRSR MGR: cant find 'items' in  "..id) end
+		end
+		self.treasure_info[id].condlist		= xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", getIniValueString(id, "condlist", "", iniFileName))
+		--' It should be noted as a new cache
+		self.treasure_info[id].active = false
+		self.treasure_info[id].done = false
+		--if TB3D_Modders.show_tables then show_tables(self.treasure_info, nil, "treasuer mgr") end
+	end
+	--' Auxiliary tables for easy retrieval
+	self.treasure_by_target = {}
+	for k,v in pairs(self.treasure_info) do
+		self.treasure_by_target[v.target] = k	
+	end
+	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure init DONE") end
+end
+--' Yuzanie initiator (to issue a cache)
+function CTreasure:use(npc)
+	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TREASURE MGR: use") end
+	if npc ~= nil then	--must make sure he still exists
+		if TB3D_Modders.money_decoder == true and db.actor:object("device_warning_module") then -- decoder			---!!!!TB3D in 133, passes obj.id not a boolean
+			--TB3D_Services.packet_alert("lootmoney: has module")
+			if not string.find(npc:section(),"arena") and npc:character_community()~= "arena_enemy" then
+				lootmoney(npc)
+			end
+		end
+		local rarets 
+		n_rank = npc:character_rank()
+		-- if you have selected a rare type of caches, it will reduce its loss overoyatnost
+		if amk.load_variable("option_treasure", 0) == 2 then 
+		  rarets = 97
+		else 
+		  rarets = 90
+		end
+		if TB3D_Modders.Global_Debug then
+			rarets=0
+		end
+		if math.random(100) < rarets then 
+		  return
+		end
+		--' Need to randomly select one of the caches.
+		local avail = {}
+		local tr_sum = 0
+		local treasure_prob
+		for k,v in pairs(self.treasure_info) do
+			if v.done == false and v.active == false and v.community[npc:character_community()] == true then
+				treasure_prob = xr_logic.pick_section_from_condlist(db.actor, npc, v.condlist)
+				if treasure_prob == "" or treasure_prob == nil then
+					treasure_prob = 0
+				end
+				if tonumber(treasure_prob) >= 0
+					and	v.community[npc:character_community()] == true
+					and v.active == false then
+						if tonumber(treasure_prob) == 100 then
+							self:give_treasure(k)
+						else
+							table.insert(avail, {k = k, prob = treasure_prob})
+							tr_sum = tr_sum + treasure_prob
+						end
+				end
+			end
+		end
+		if tr_sum == 0 or
+			math.random(100) < 65
+		then
+			return
+		end
+		local tr_w = math.random(tr_sum)
+		for k,v in pairs(avail) do
+			tr_w = tr_w - v.prob
+			if tr_w <= 0 then
+				--' Cache issue
+				self:give_treasure(v.k)
+				break
+			end
+		end
+	end
+end
+--' Conservation
+function CTreasure:check()
+	--' Check caches
+	for k,v in pairs(self.treasure_info) do
+		--' Cache issue
+		self:give_treasure(k)
+	end
+end
+--' Issue Cache
+function CTreasure:give_treasure(k)
+	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TREASURE MGR: give treasure") end
+	local v = self.treasure_info[k]
+	local obj = alife():story_object(v.target)
+	if obj ~= nil then
+		news_manager.send_treasure(v.name)
+		--'Mark on the map		
+		local text = TB3D_Services.get_text_color("treasure")..game.translate_string(v.name).."\\n%c[default]"..game.translate_string(v.description)
+		if level.map_has_object_spot(obj.id,"treasure") == 0 then
+			level.map_add_object_spot_ser(obj.id, "treasure", text)
+		end
+        -- check what type of cache is selected
+		-- if the cache is not a classic, and not nominal, then replace the contents
+		if amk.load_variable("option_treasure", 0) ~= 0 and self:named_treasure(v) == false then
+		   v.items = self:give_item_list()
+		end  
+		--' Generate things
+		for kk,vv in pairs(v.items) do
+			if ammo_section[vv.section] == true then
+				se_respawn.create_ammo(vv.section,	
+						obj.position,
+						obj.m_level_vertex_id,	
+						obj.m_game_vertex_id,
+						obj.id,
+						vv.prob)
+			else
+				for i=1,vv.prob do
+					alife():create(vv.section,
+							obj.position,
+							obj.m_level_vertex_id,	
+							obj.m_game_vertex_id,
+							obj.id)
+				end
+			end
+		end
+		--' Mark the cache as issued
+		self.treasure_info[k].active = true
+		self.treasure_info[k].done = true
+    -- Send in an offline cache
+    local sim = alife ()
+    if sim ~= nil and obj.online then
+       sim:set_switch_online  (obj.id, false)
+       sim:set_switch_offline (obj.id, true)
+--       sim:set_switch_online  (obj.id, true)
+--       sim:set_switch_offline (obj.id, false)
+       amk.convert_npc[obj.id]=1 -- put in place for withdrawal in the online
+    end
+	else
+		--printf("TREASURE %s, target doesnt exist", k)
+	end
+end
+--' Remove the checkmark from the cache
+function CTreasure:treasure_empty(box, box_story_id)
+	--printf("!!! treasure empty")
+	local k = self.treasure_by_target[box_story_id]
+	if k == nil or self.treasure_info[k] == nil then 
+		return
+	end
+	self.treasure_info[k].active = false
+	-- if the cache is not nominal, then transferred it to the line for the next issue
+	if self:named_treasure(self.treasure_info[k]) == false then
+	  self.treasure_info[k].done = false
+	end
+  level.map_remove_object_spot(box:id(), "treasure")
+end
+--' Conservation
+function CTreasure:save(p)
+	if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("TREASURE MGR: save packet") end
+	--' Save the table size
+	local size = 0
+	for k,v in pairs(self.treasure_info) do
+		size = size + 1
+	end
+	p:w_u16(size)
+	for k,v in pairs(self.treasure_info) do
+		p:w_u16(v.target)
+		p:w_bool(v.active)
+		p:w_bool(v.done)
+	end
+end
+--' Download
+function CTreasure:load(p)
+	if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("TREASURE MGR: load packet") end
+	local t = p:r_u16()
+	local k
+	for i = 1,t do
+		k = self.treasure_by_target[p:r_u16()]
+		self.treasure_info[k].active = p:r_bool()
+		self.treasure_info[k].done = p:r_bool()
+	end
+end
+
+function CTreasure:give_item_list()
+ local rank = 1
+ local tabla = {}
+ -- How many types of items will be in the cache
+ local i = math.random(1, 4)
+-- consider user preferences
+ local opt = amk.load_variable("option_treasure", 0)
+  --~ -- define the rank nepisya
+ --~ if nepis~= nil then
+--   rank = n_rank --nepis.character_rank ()
+   if n_rank == nil then n_rank = math.random(1, 9)*100 end
+   if n_rank <= 300 then
+     rank = 1
+	elseif n_rank <=600 then
+     rank = 2
+    elseif n_rank <= 900 then
+     rank = 3
+    else 
+     rank = 4
+    end	 
+ --~ else
+   --~ rank = 1
+ --~ end
+   local cnt = 0
+   local spawn = {}
+ for j = 1, i, 1 do
+  -- determine from which section to take things, and what  
+   if  opt == 1 then
+		if rank == 1 then
+			spawn.section = solid_list.novice_section[math.random(table.getn(solid_list.novice_section))]
+		elseif rank == 2 then
+			spawn.section = solid_list.experienced_section[math.random(table.getn(solid_list.experienced_section))]
+		elseif rank == 3 then
+			spawn.section = solid_list.veteran_section[math.random(table.getn(solid_list.veteran_section))]
+		else
+			spawn.section = solid_list.master_section[math.random(table.getn(solid_list.master_section))]
+		end
+   else
+		if rank == 1 then
+			spawn.section = rare_list.novice_section[math.random(table.getn(rare_list.novice_section))]
+		elseif rank == 2 then
+			spawn.section = rare_list.experienced_section[math.random(table.getn(rare_list.experienced_section))]
+		elseif rank == 3 then
+			spawn.section = rare_list.veteran_section[math.random(table.getn(rare_list.veteran_section))]
+		else
+			spawn.section = rare_list.master_section[math.random(table.getn(rare_list.master_section))]
+		end
+   end	 
+  -- Installation count of items, depending on the section  
+   if ammo_section[spawn.section] == true then
+      local ini = system_ini()
+      local num_in_box = ini:r_u32(spawn.section, "box_size")
+      local h = math.random(1, 5)
+	  -- Cartridges do not give out pieces, and bundles
+	  cnt = math.random(1, h) * num_in_box
+   else
+      local s = tostring(spawn.section)
+	  if string.find(s, "outfit") ~= nil or string.find(s, "wpn") ~= nil then
+	     cnt = 1
+	  elseif string.find(s, "addon") ~= nil or string.find(s, "af") ~= nil or string.find(s, "mutant") ~= nil then
+         cnt = math.random(1,2)
+      else 
+	     cnt = math.random(1,5)
+	  end   
+   end
+  -- Old store the current object
+  spawn.prob = cnt
+  table.insert(tabla, spawn)
+ end
+ return tabla
+end
+
+function CTreasure:named_treasure(v)
+ -- checking whether a cache named. If so, what its content is not changed
+ if   v.name == "agr_secret_0000_name" --Cache Gray
+   or v.name == "bar_secret_0011_name" --Arnie's stash
+   or v.name == "esc_secret_0013_name" --Cache Vorpala
+   or v.name == "gar_secret_0002_name" --Things Grizzlies
+   or v.name == "gar_secret_0011_name" --Warehouse Group Arrow
+   or v.name == "gar_secret_0021_name" --Backpack Dohlyaka
+   or v.name == "pri_secret_0003_name" --Khabar Fang
+   or v.name == "pri_secret_0004_name" --Stocks Liberty Leader
+   or v.name == "rad_secret_0000_name" --GOLD surly
+   or v.name == "rad_secret_0004_name" --Reserve team desperate
+   or v.name == "ros_secret_0015_name" --Cache Lucky
+   or v.name == "ros_secret_0018_name" --Medicine chest
+   or v.name == "val_secret_0028_name" --Hog's stash
+   or v.name == "x18_secret_0000_name" --Smoked stash
+   or v.name == "yan_secret_0011_name" --Cache scientist
+   or v.name == "agr_krysyk_secret_name"
+   or v.name == "agr_krysyk_secret_name"
+   or v.name == "mil_borov_secret_name"
+   or v.name == "aver_arhara_secret_1" --Cache Arkhara
+   or v.name == "aver_arhara_secret_2" --Cache Pilgrim
+   or v.name == "aver_arhara_secret_3" --Cache of the Hermit
+   or v.name == "aver_arhara_secret_4" --Cache Astrologer
+   or v.name == "aver_arhara_secret_5" --Cache of Old Man
+   or v.name == "warlab_arhara_secret_1" --Stash 
+   or v.name == "warlab_arhara_secret_2" --Stash 
+   or v.name == "warlab_arhara_secret_3" --Stash
+   or v.name == "village_arhara_secret_1" --Micah's stash
+   or v.name == "village_arhara_secret_2" --Local cache
+   or v.name == "village_arhara_secret_3" --Backpack Captain
+   or v.name == "village_arhara_secret_4" --Cache Lieutenant
+   or v.name == "generators_arhara_secret_1" --Backpack Monolith
+   or v.name == "generators_arhara_secret_2" --Cache countryman
+   or v.name == "generators_arhara_secret_3" --Khabar guard
+   or v.name == "generators_arhara_secret_4" --Fritz's stash
+   or v.name == "generators_arhara_secret_5" --Unknown Cache
+   or v.name == "atp_arhara_secret_1" --Cache inveterate spy
+   or v.name == "atp_arhara_secret_2" --Stash Shnyrov
+   or v.name == "atp_arhara_secret_3" --Khabar China
+   or v.name == "dead_city_secret_1" --Stash fugitive
+   or v.name == "dead_city_secret_2" --Things zombie
+   or v.name == "dead_city_secret_3" --Nychka Swoon
+   or v.name == "dead_city_secret_4" --Caches old-timer
+   or v.name == "dead_city_secret_5" --Dedkiny things 
+   or v.name == "esc_secret_0010_name" --Stash of beer
+ then
+   return true
+ else
+   return false
+ end    
+end
+
+function get_treasure_manager()
+	if treasure_manager == nil then
+		treasure_manager = CTreasure()
+		if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRSR MGR: ctreasure get = ctreasure") end
+	end
+	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRSR MGR: ctreasure get DONE") end
+	return treasure_manager
+end
+
+function save(p)
+	get_treasure_manager():save(p)
+end
+function load(p)
+	get_treasure_manager():load(p)
+end
+function clear_treasure_manager()		--called from _g.script
+	treasure_manager = nil
+end
+
+function CTreasure:dialog(npc)
+	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure dialog") end
+	if npc ~= nil then
+	  n_rank = npc:character_rank()
+	 else 
+      n_rank = 0
+	end
+	local avail = {}
+	local tr_sum = 0
+	local treasure_prob
+	for k,v in pairs(self.treasure_info) do
+		if v.done == false and v.active == false and v.community[npc:character_community()] == true then
+			treasure_prob = xr_logic.pick_section_from_condlist(db.actor, npc, v.condlist)
+			if treasure_prob == "" or treasure_prob == nil then
+				treasure_prob = 0
+			end
+			if tonumber(treasure_prob) >= 0 and
+			v.community[npc:character_community()] == true and
+			v.active == false
+			then
+				if tonumber(treasure_prob) == 100 then
+					self:give_treasure(k)
+				else
+					table.insert(avail, {k = k, prob = treasure_prob})
+					tr_sum = tr_sum + treasure_prob
+				end
+			end
+		end
+	end
+	if tr_sum == 0 then
+		return
+	end
+	local tr_w = math.random(tr_sum)
+	for k,v in pairs(avail) do
+		tr_w = tr_w - v.prob
+		if tr_w <= 0 then
+			self:give_treasure(v.k)
+			break
+		end
+	end
+	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure dialog DONE") end
+end
+
+function lootmoney(npc)
+	if TB3D_Modders.use_news_message == true then TB3D_Services.packet_alert("lootmoney: lootmoney") end
+	--if TB3D_Modders.money_decoder == true and db.actor:object("device_warning_module") then -- decoder			---!!!!TB3D in 133, passes obj.id not a boolean
+		--TB3D_Services.packet_alert("lootmoney: has module")
+		--if npc ~= nil and not string.find(npc:section(),"arena") and npc:character_community()~= "arena_enemy" then
+			local money = npc:money()
+			if money ~= nil and money > 1 then
+				--TB3D_Services.packet_alert("lootmoney: money["..utils.to_str(money).."]")
+				local deadmoney = money
+				local npc_rank
+				if TB3D_Services.is_collector() == true then
+					deadmoney=math.random(1,money)    
+				else
+					npc_rank = ranks.get_obj_rank_name(npc)
+					if npc_rank ~= nil then
+						if npc_rank == "novice" then
+							deadmoney = money * 0.25 						---and money >=70 then deadmoney=math.random(25,70)    
+						elseif npc_rank == "experienced" then
+							deadmoney = money * 0.5 						--- and money >=150 then deadmoney=math.random(50,150)  
+						elseif npc_rank == "veteran" then
+							deadmoney = money * 0.75 						--- and money >=220 then deadmoney=math.random(100,220) 
+						else
+							deadmoney = money       						---if npc_rank == "master" and money >=300 then deadmoney=math.random(200,300)  
+						end
+					else
+						deadmoney = money*0.25
+					end
+				end
+				if TB3D_Modders.money_scarce == true then deadmoney = deadmoney * 0.5 end
+				if deadmoney > 1 then deadmoney=math.random(1,deadmoney) end
+				local news_texti = TB3D_Services.get_text_color("name").."Name: %c[default]"..npc:character_name().."\\n"..TB3D_Services.get_text_color("money").."Money Found: %c[default]"..game.translate_string(tostring(deadmoney)).." Ru"
+				news_manager.give_game_news(news_texti, "ui\\ui_iconsTotal", Frect():set(0,0,83,47), 1, 4000)
+				db.actor:give_money(deadmoney)
+				if TB3D_Modders.log_game_stats == true then game_stats.money_quest_update(deadmoney) end
+				npc:give_money(-money)
+				if TB3D_Modders.log_game_stats == true then game_stats.money_quest_update(-money) end
+			end		---!!!!
+		--end
+	--end
+	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("lootmoney: lootmoney done") end
+end

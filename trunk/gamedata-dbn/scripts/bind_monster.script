@@ -1,0 +1,884 @@
+-- TB3D 1.0.9.9.5.0 added COP options to modders script, removed empty calls to utils, dmx135, death_hit,
+-- dmx blood vice amk, hit style, net spawn check, bad char in spawn chk, alife() index protection, display delta
+-- death callback, db calls, kill the rats, zombie team, monster spots, stall hits, level 5
+function my_ver() return "1.0.9.9.5.0" end
+-----------------------------------------------------------------------------------
+-- Monster binding
+-----------------------------------------------------------------------------------
+local particles={}
+local string_find = string.find
+
+-- DMX MOD on
+local DirActor = false
+local DogNum, BurerNum
+local NextAttack, RestoreActor, DogTimer, BurerTimer = 0,0,0,0
+-- DMX MOD off
+ 
+function bind(obj)      
+   local new_binder = generic_object_binder(obj) 
+   obj:bind_object(new_binder) 
+end 
+
+------------------------------------------------------------------------------------
+class "generic_object_binder" (object_binder) 
+
+function generic_object_binder:__init(obj) super(obj) 
+	self.loaded = false 
+	self.chtime = 0 
+	self.last_update = 0 
+	self.particles = {} 
+	self.MonsterEffector = meceniy_mutants_manager.MonsterEffector()	--mutant handler
+end 
+
+function generic_object_binder:reload(section) 
+	object_binder.reload(self, section) 
+end 
+
+function generic_object_binder:reinit() 
+	object_binder.reinit(self) 
+	if self.object:clsid() ~= clsid.script_trader then 							-- At the merchant does not support moving
+		self.object:set_patrol_extrapolate_callback(generic_object_binder.extrapolate_callback, self) 
+	end 
+	db.init_my_storage(self.object)
+	self.st = db.storage[self.object:id()] 
+	self.object:set_callback(callback.patrol_path_in_point, self.waypoint_callback, self) 
+	self.object:set_callback(callback.hit, self.hit_callback, self) 
+	self.object:set_callback(callback.death, self.death_callback, self) 
+end 
+
+prevent_gulag_registration_for_id=0 
+
+function generic_object_binder:update(delta)
+	if _g.is_disconnecting then return end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("bind   monster: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta["..utils.to_str(delta).."]")
+	end
+	--if TB3D_Modders.display_delta then TB3D_Services.packet_alert("bind monster: update delta["..utils.to_str(delta).."]") end
+	object_binder.update(self, delta) 
+	if particles[self.object:id()] and table.getn(particles[self.object:id()])>0 then 
+		for kk,vv in pairs(particles[self.object:id()]) do 
+			table.insert(self.particles,amk_particle.amk_particle(vv))
+			table.remove(particles[self.object:id()],kk) 
+		end 
+	end 
+	if table.getn(self.particles)>0 then 
+		for kk,vv in pairs(self.particles) do 
+			if vv:is_finished() then 
+				self.particles[kk]=nil 
+			else 
+				vv:update(delta)
+				if vv.give_dmg and vv.target then                                 
+					if vv:get_pos():distance_to(vv.target:bone_position("bip01_spine"))<1 then 
+						if TB3D_Modders.default_hit == true then TB3D_hit_styles.particle_hit(vv) end
+						vv:stop() 
+					end 
+				end 
+			end 
+		end 
+	end 
+	if TB3D_services.is_collector() then xr_companion.process_enemy(self.object) end				--109950
+	if self.object:alive() then 
+		--TB3D_Services.packet_alert("bind monster: update delta["..utils.to_str(delta).."]")
+		 if self.object:clsid() == clsid.script_trader then 		-- Trade Update
+			trade_manager.update(self.object) 
+		 end 
+		local oTarget = self.object:get_enemy()
+		if self.object:is_talk_enabled() then 
+			self.object:set_tip_text("character_use") 
+		else 
+			self.object:set_tip_text("") 
+		end 
+		if oTarget and oTarget:id()==0 and amk.load_variable("option_cop", 1) > 0 then		
+			-- The kiss of blood sucker (Authors: Artos, Charsi, Shadows)
+			if self.object:clsid()==clsid.bloodsucker_s and self.object:section()~="bloodsucker_effector" then
+				if self.object:see(oTarget) then
+					local iDist = self.object:position():distance_to(oTarget:position())
+					if iDist <= 3 then
+						local iTime = time_global()
+						if (self.timer_anim or 0) < iTime then
+							self.timer_anim = iTime + 2000
+							if NextAttack < iTime and self.object.health < 0.5 then
+								NextAttack = iTime + 18000
+								RestoreActor = iTime + 4500
+								DirActor = true
+								bind_stalker.hide_weapon()		--just put away
+								level.disable_input() 
+								level.hide_indicators()
+								level.add_call(bloodsucker_vampire_timer,bloodsucker_actor_release)
+								level.add_pp_effector("escape.ppe",1975,true)
+								level.add_cam_effector("camera_effects\\drunk.anm",1978,false,"")
+								local oSnd = sound_object("monsters\\bloodsucker\\vampire_sucking")
+								if not (oSnd and oSnd:playing()) then oSnd:play_no_feedback(oTarget,sound_object.s2d,0,vector(),5.0) end
+							end
+							if DirActor then
+								local pos = self.object:position()
+								local vDir = pos:sub(oTarget:position())
+								db.actor:set_actor_direction(-vDir:getH())
+								vDir:normalize()
+								local pos = self.object:position():sub(vDir)
+								db.actor:set_actor_position(pos)
+							end
+						end
+						if self.timer_anim and self.timer_anim >= iTime and DirActor then
+							db.actor.health = -0.002	--take from actor
+							self.object.health = 0.008	--give to bloodsucker
+						end
+					end
+				end
+			elseif self.object:clsid()==clsid.pseudodog_s then
+				if DogTimer < time_global() then			-- from the build 1935 (Author: Charsi)
+ --TB3D_Services.packet_alert("bind monster: psidog[start]")
+					local actor = db.actor
+					local v1 = self.object:direction()
+					local v2 = actor:direction()
+					if (v1.x*v2.x)+(v1.z*v2.z)<-0.6 and self.object:see(actor) and self.object:position():distance_to(actor:position())<20 then
+						DogNum = 1
+						level.add_cam_effector("camera_effects\\pseudodog_effect.anm",396,false,"")
+						level.add_pp_effector("psy_antenna.ppe",395,false)
+						level.add_pp_effector("duality_circle.ppe",397,false)
+						TB3D_hit_styles.telepatic(self.object, actor, nil, 0.2, 0, vector():set(0,0,0))
+						xr_sound.get_safe_sound_object("monsters\\pseudodog\\psy_affect_0",sound_object.s2d):play_at_pos(actor,actor:position())
+						local aitem = actor:active_item()
+						if aitem and math.random()<0.2 and (actor:active_slot()==1 or actor:active_slot()==2) then actor:drop_item(aitem) end
+						DogTimer = time_global() + 2500*(1+math.random(-0.2,0.2)) + 700
+					end
+ --TB3D_Services.packet_alert("bind monster: psidog[done1]")
+				elseif DogNum and DogTimer < time_global() + 2500 then
+					level.remove_pp_effector(395) DogNum = nil
+ --TB3D_Services.packet_alert("bind monster: psidog[done2]")
+				end
+			elseif self.object:clsid()==clsid.burer_s then
+				if BurerTimer < time_global() then	-- Attack of the burer of call of Pripyat (Authors: Shadows and Charsi)
+					local actor = db.actor
+					local v1 = self.object:direction()
+					local v2 = actor:direction()
+					if (v1.x*v2.x)+(v1.z*v2.z)<-0.6 and self.object:see(actor) and self.object:position():distance_to(actor:position())<25 then
+						BurerNum = 1 actor.power = -1.0
+						local active_slot = actor:active_slot()
+						if active_slot==1 or active_slot==2 then actor:drop_item(actor:active_item()) end
+						BurerTimer = time_global() + 6000*(1+math.random(-0.2,0.2))
+					end
+				elseif BurerNum and BurerTimer < time_global() + 6000 then
+					BurerNum = nil
+				end
+			end
+		elseif oTarget and oTarget:id()~=0 and self.object:clsid()==clsid.bloodsucker_s and self.object:section()~="bloodsucker_effector" then
+			if self.object:position():distance_to(db.actor:position()) < 3 then
+				sound_object("monsters\\bloodsucker\\vampire_sucking"):play_at_pos(db.actor,vector():set(0,0,1),0,sound_object.s2d)
+			end
+		else
+			self.object:set_tip_text("character_use") 
+			--self.object:set_tip_text_default() 
+		end 
+		--TB3D_Services.packet_alert("bind monster: anomoly evade")
+		self:anomaly_evade() 
+	--end
+		local act_scheme = db.storage[self.object:id()].active_section or "" 
+		local is_fake = string_find(act_scheme, "mob_fake_death") or false 
+	--[[------------------------------------------------------------------------------ZOMBIE BEEE
+		if self.object:section()=="zombie_beee" and time_global()>(self.charge_time or 0)+5000 and 3>(self.charges_done or 0) and not is_fake and self.object.health>0.1 then
+			local target = self.object:get_enemy() or db.actor
+			local dist = target:position():distance_to(self.object:position())
+			if dist < 10 and self.object:see(target) then
+				local dir=self.object:direction()
+				local delta=vector():set(self.object:position()):sub(target:position())
+				local scalarmul=(delta.x*dir.x+delta.z*dir.z)/math.sqrt(delta.x*delta.x+delta.z*delta.z) 
+				if scalarmul < -0.8 then
+					bind_monster.play_particle(self.object,
+					{
+						obj=self.object,
+						particle="amk\\zomb_beee",
+						pos=self.object:bone_position("bip01_head"),
+						dir=amk.sub(target:bone_position("bip01_head"),self.object:bone_position("bip01_head")),
+						gravity=vector():set(0,-0.01,0),
+						len=10,
+						life_time=2000,
+						give_dmg=true,
+						target=target,
+						sound="monsters\\zombie\\zombie_take_damage_3"
+					})
+					self.charge_time=time_global()
+					self.charges_done=(self.charges_done or 0) + 1
+				end
+			end
+		end
+	-----------------------------------------------------------------------------------------------]]--
+		if TB3D_Modders.zombie_team and self.chtime<time_global() then 
+			self.chtime=time_global()+2000 
+			if self.object:clsid()==clsid.controller_s then 
+				local npc=self.object:get_enemy() 
+				if npc then 
+					if npc:id()~=db.actor:id()
+						and npc:clsid()==clsid.script_stalker
+						and self.object:see(npc)
+						and npc:character_community()~="zombied"
+						and self.object:position():distance_to(npc:position())<30 then 
+							local sobj=alife():object( npc:id() ) 
+							if sobj and sobj.online then 
+								local zomb=amk.load_table("zombies") 
+								zomb[sobj.id]={master=self.object:id(),comm=npc:character_community(),gw=npc:goodwill(db.actor)} 
+								--TB3D_Services.packet_alert("bind monster: zombied["..utils.to_str(self.object:name()).."] comm["..utils.to_str(zomb[sobj.id].comm).."] attitude["..utils.to_str(zomb[sobj.id].gw).."]")
+								amk.save_table("zombies",zomb) 
+								TB3D_Services.set_community(npc, "zombied", 0, 0)
+								--npc:set_character_community("zombied",0,0) 
+								local orgtbl=amk.read_stalker_params(sobj) 
+								if (not string_find(orgtbl.profile,"_zombi")) then 
+									orgtbl.profile=orgtbl.profile.."_zombi" 
+								end 
+								amk.write_stalker_params(orgtbl,sobj) 
+							end 
+					end 
+				end 
+			end 
+			self.MonsterEffector:update(self.object)
+			if self.object:clsid()==clsid.dog_s and self.object.health>0.05 then         
+				local npc=self.object:get_enemy() 
+				if npc then 
+					if npc:id()==db.actor:id() and db.actor:see(self.object) and self.object:see(db.actor) and math.random()<0.2 then 
+						level.add_pp_effector("radiation.ppe", 2012, false) 
+						if TB3D_Modders.default_hit == true then
+							TB3D_hit_styles.telepatic(db.actor, self.object, "bip01_spine", 0.02, 0, self.object:direction())
+							if math.random()<0.02 then 
+								local active_item = db.actor:active_item() 
+								if active_item and (db.actor:active_slot()==1 or db.actor:active_slot()==2) then 
+									db.actor:drop_item(active_item) 
+								end 
+							end
+						end
+					end 
+				end 
+			end 
+		end 
+		--TB3D_Services.packet_alert("bind monster: check monster enenmy")
+		if self.object and IAmAMonster[self.object:clsid()]
+		  and time_global() - self.last_update > 1000
+		  and not is_fake then 
+			if self.object.health>0.03 then
+				if self.object:see(db.actor) and db.actor:position():distance_to(self.object:position())<40 then 
+					amk.enemy_see_actor(self.object,"monster")                         
+				end 
+				if db.actor:see(self.object) and db.actor:position():distance_to(self.object:position())<80 then 
+					amk.actor_see_enemy(self.object,"monster") 
+				end 
+			end 
+			self.last_update = time_global() 
+		end 
+		local blowout=amk.load_variable("blowout",0) 
+		if blowout==3 and (not self.control_override) then 
+			if not self.object:action() then 
+				xr_logic.mob_capture(self.object,true) 
+				self.control_override=true 
+			end 
+		elseif self.control_override and blowout==3 then 
+			if not self.object:action() then 
+				local snds={sound.take_damage,sound.panic,sound.idle} 
+				local snd=snds[math.random(1,table.getn(snds))] 
+				action(self.object, anim(anim.lie_idle, 0), sound(snd), cond(cond.sound_end)) 
+			end 
+		elseif self.control_override and blowout~=3 then 
+			self.control_override=nil 
+			xr_logic.mob_release(self.object) 
+		elseif self.st.active_section ~= nil then 
+			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta) 
+		end 
+		if dmx_cars.actor_inside_btr() then
+			if dmx_cars.actor_target(self.object) then
+				dmx_cars.set_target(self.object:id())
+			end
+		end	
+	else	--dead
+		self.object:set_tip_text("character_use") 
+	end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("bind   monster: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
+	end
+end 
+
+function generic_object_binder:anomaly_evade() 
+    local npc=self.object 
+    if npc:story_id()==29 then return end -- Training flesh pancake
+    if not self.prev_pos then 
+		self.prev_pos=vector():set(0,-100,0) 
+    end 
+    if self.prev_pos:distance_to(npc:position())>20 then 
+		self.prev_pos=npc:position() 
+		local list=amk_anoms.get_anomaly_list(npc,30) 
+		for i,o in ipairs(list) do 
+			amk_anoms.add_restriction(npc,o.id,o.name) 
+       end 
+    end 
+	if amk_anoms.have_pending_sync(npc) then 
+		amk_anoms.syncronize(npc) 
+	end 
+end 
+
+function generic_object_binder:extrapolate_callback() 
+	if (self.object == nil) then 
+		return false 
+	end 
+	local cur_pt = self.object:get_current_point_index() 
+	if self.object:get_script() == false then 
+		return false 
+	end 
+	if patrol(self.object:patrol()):flags(cur_pt):get() == 0 then
+		--printf("_bp: generic_object_binder: extrapolate_callback: cur_pt = %d: true", cur_pt)
+		return true
+	end
+	--printf("_bp: generic_object_binder: extrapolate_callback: cur_pt = %d: false", cur_pt)
+	return false
+end 
+
+function generic_object_binder:waypoint_callback(obj, action_type, index) 
+	if self.st.active_section ~= nil then 
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "waypoint_callback", obj, action_type, index) 
+	end 
+end 
+
+function generic_object_binder:death_callback(victim, who) 
+	if (self.object == nil) then 
+		return 
+	end 
+	if TB3D_Modders.use_combat_message then
+		TB3D_Services.packet_alert("bind monster: DEATH_CALLBACK["..victim:name().."]["..self.object:section().."] killed by["..utils.to_str(who:name()).."]")
+	end
+	local community = xr_statistic.get_monster_spot(victim)							--cslid not available here
+	if community then
+		if community=="controller" then
+			level.map_remove_object_spot(victim:id(), "kontroler_spot")
+		elseif community=="bloodsucker" then
+			level.map_remove_object_spot(victim:id(), "bloodsucker_spot")
+		elseif community=="pseudo_gigant" then
+			level.map_remove_object_spot(victim:id(), "pseudo_gigant_spot")
+		end
+	end
+	db.del_monster(self.object) -- remove from the online live (DMX MOD)
+	bb_mod.npcondeath(victim, who)
+	if who:id() == db.actor:id() then 
+		dmx_mod.blood_hud_will(victim)
+		xr_statistic.addKillCount(self.object) 
+		if bind_soul_cube then
+			bind_soul_cube.add_soul()
+		end
+		arc_main.on_monster_kill(victim,who)
+	end
+	if self.st.mob_death then 
+		xr_logic.issue_event(self.object, self.st.mob_death, "death_callback", victim, who) 
+	end 
+	if self.st.active_section then 
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who) 
+	end 
+	smart_terrain.on_death( self.object:id() ) 
+	--Draw little momentum forward.
+	if TB3D_Modders.death_hit == true then TB3D_hit_styles.death_hit(self.object, self.object) end
+	if TB3D_Modders.zombie_team then
+		local mob=self.object 
+		if mob:clsid()==clsid.controller_s then 
+		   local zomb=amk.load_table("zombies") 
+			for k,v in pairs(zomb) do 
+			   if v.master==mob:id() then 
+					if amk_mod.dezombify(k,v) then 
+					   zomb[k]=nil 
+					end 
+				end 
+			end 
+			amk.save_table("zombies",zomb) 
+		end 
+	end
+	if table.getn(self.particles)>0 then 
+		for kk,vv in pairs(self.particles) do 
+			vv:on_death() 
+		end 
+	end 
+	self.MonsterEffector:on_death(self.object)
+	amk.on_death(victim, who)
+	if string_find(victim:name(),"marsh_controller") then
+       	TB3D_Services.give_info("marsh_controller_dead")
+    elseif string_find(victim:name(),"rad_red_burer1") then
+       TB3D_Services.give_info("rad_red_burer1_dead")
+    elseif string_find(victim:name(),"rad_red_krovosos1") then
+       TB3D_Services.give_info("rad_red_krovosos1_dead")
+    elseif string_find(victim:name(),"mil_red_burer1") then
+       TB3D_Services.give_info("mil_red_burer1_dead")
+    elseif string_find(victim:name(),"mil_red_krovosos1") then
+       TB3D_Services.give_info("mil_red_krovosos1_dead")
+    elseif string_find(victim:name(),"agr_red_burer1") then
+       TB3D_Services.give_info("agr_red_burer1_dead")
+    elseif string_find(victim:name(),"agr_red_krovosos1") then
+       TB3D_Services.give_info("agr_red_krovosos1_dead")
+    elseif string_find(victim:name(),"val_red_burer1") then
+       TB3D_Services.give_info("val_red_burer1_dead")
+    elseif string_find(victim:name(),"val_red_krovosos1") then
+       TB3D_Services.give_info("val_red_krovosos1_dead")
+    end
+	smart_monster_parts.death_spawn(victim)	-- DMX MOD
+	if TB3D_Modders.use_combat_message then
+		TB3D_Services.packet_alert("bind monster: DEATH_CALLBACK["..victim:name().."] done")
+	end
+end 
+
+function generic_object_binder:hit_callback(obj, amnt, local_direction, who, bone_index)
+	local amount = amnt
+	if amount == 0 then
+		--TB3D_Services.packet_alert("bind monster: HIT_CALLBACK["..obj:name().."]["..obj:section().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."] who["..who:name().."]")
+		if who:id() == db.actor:id() then amount = 0.15 end		--valid bone so hit
+	end
+	if amount > 0 then
+		if TB3D_Modders.use_combat_message then
+			TB3D_Services.packet_alert("bind monster: HIT_CALLBACK["..obj:name().."]["..obj:section().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."] who["..who:name().."] dir["..utils.to_str(local_direction.x).."]["..utils.to_str(local_direction.y).."]["..utils.to_str(local_direction.z).."]")
+		end
+		if string_find(obj:section(),"bloodsucker") then
+			if bone_index==14 and TB3D_Modders.default_hit == true then
+				local power = 100*local_direction.x*local_direction.x*local_direction.x*local_direction.x
+				TB3D_hit_styles.burn(who, obj, power, power, vector():set(0,-1,0))
+			end
+		elseif obj:section()=="electro_chimera" then
+			if time_global()>(self.charge_time or 0)+3000 then 
+				--amk_particle.amk_particle({particle="anomaly2\\electra2_blast",pos=obj:bone_position("bip01_spine"),sound="anomaly\\electra_blast1"}) 
+				if TB3D_Modders.default_hit == true then
+					local dist = db.actor:position():distance_to(obj:bone_position("bip01_spine")) 
+					if dist < 6 then TB3D_hit_styles.monster_chimera(dist) end
+				end
+				self.charge_time=time_global() 
+			end
+		elseif string_find(obj:section(), "rat_") then
+			if who:id() == db.actor:id() then
+				--TB3D_Services.packet_alert("BIND MONSTER: kill the rat")
+				obj:kill(obj)
+			end 
+		end
+		if self.st.active_section then
+			--if TB3D_Modders.use_combat_message then TB3D_Services.packet_alert("bind monster: HIT_CALLBACK st_as["..obj:name().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."]") end
+			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "hit_callback", obj, amount, local_direction, who, bone_index)
+		end
+		if self.st.hit then
+			--if TB3D_Modders.use_combat_message then TB3D_Services.packet_alert("bind monster: HIT_CALLBACK st_hit["..obj:name().."] amount["..utils.to_str(amount).."] bone["..utils.to_str(bone_index).."]") end
+			xr_logic.issue_event(self.object, self.st.hit, "hit_callback", obj, amount, local_direction, who, bone_index)
+		end
+		amk.on_monster_hit(obj, amount, local_direction, who, bone_index)	-- added by xStream for AMK miniSDK
+		--smart_monster_parts.main_check(obj, amount, local_direction, who, bone_index)		-- DMX MOD
+	end
+	if TB3D_Modders.use_combat_message then
+		TB3D_Services.packet_alert("bind monster: HIT_CALLBACK["..obj:name().."] done")
+	end
+end 
+
+function generic_object_binder:net_spawn(sobject) 
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("BIND MONSTER: net spawn") end
+	if not sobject then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("BIND_MONSTER: net spawn sobject[nil] !!!!") end
+		return false
+	end
+	if not object_binder.net_spawn(self, sobject) then 
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("BIND_MONSTER: net spawn["..self.object:name().."] DID NOT SPAWN") end
+		return false 
+	end 
+	if self.object then
+		if self.object.id then
+			if TB3D_Modders.use_spawn_message or TB3D_Modders.pop_spawn_message then
+				TB3D_Services.packet_alert("BIND MONSTER: net spawn["..self.object:name()..":"..self.object:section().."]")
+			end
+			local sobj = self.object:id()
+			if sobj then
+				local obj_name = self.object:name()
+				local lname = level:name()
+				local sname = amk.load_variable("level_on_save", lname)
+				if self.object.alive and self.object:alive() == false and lname ~= sname then
+					if TB3D_Services.can_remove_dead(lname) == true	then			--now interactive corpse cleaner
+						if TB3D_modders.use_spawn_message or TB3D_Modders.pop_spawn_message then
+							TB3D_Services.packet_alert("bind monster: dead["..obj_name.."] removed")
+						end
+						alife():release(alife():object(sobj))
+						return false
+					end
+				end
+				if alife():object(sobj) then
+					if alife():object(sobj).m_story_id then
+						local sid = alife():object(sobj).m_story_id    -- Tags
+						if sid then
+							if sid ~= 4294967296 then									--just key npc
+								dmx_mod.mapspot_npc(sid,sobj)
+							end
+						end
+					else
+						TB3D_Services.packet_alert("bind monster: net spawn ["..obj_name.."][no sid]")
+					end
+				else
+					TB3D_Services.packet_alert("bind monster: net spawn ["..obj_name.."][not registered in alife]")
+					return false
+				end
+				--TB3D_Services.packet_alert("bind monster: net spawn2")
+				db.spawn_monster(self.object)									--109940
+				--TB3D_Services.packet_alert("bind monster: net spawn3")
+				xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded ) 
+				amk.on_net_spawn(self.object) 
+				local particle_param = getIniValueString(self.object:section(), "bones_particles", nil, nil) 
+				--TB3D_Services.packet_alert("bind monster: net spawn4")
+				if self.object:alive() then
+					local community = xr_statistic.get_monster_spot(self.object)							--clsid may not be available here
+					if community then
+						if community=="controller" and has_alife_info("have_kontroler_spot")  then
+							if level.map_has_object_spot(sobj, "kontroler_spot") == 0 then level.map_add_object_spot(sobj, "kontroler_spot", "Controller") end
+						elseif community=="bloodsucker" and has_alife_info("have_bloodsucker_spot")  then
+							if level.map_has_object_spot(sobj, "bloodsucker_spot") == 0 then level.map_add_object_spot(sobj, "bloodsucker_spot", "Bloodsucker") end
+						elseif community=="pseudo_gigant" and has_alife_info("have_pseudo_gigant_spot")  then
+							if level.map_has_object_spot(sobj, "pseudo_gigant_spot") == 0 then level.map_add_object_spot(sobj, "pseudo_gigant_spot", "Pseudogiant") end
+						end
+					end
+					local hit_em = 0											--start with no hit
+					if lname == "peshera" then									--prevent initial path error
+						if string_find(obj_name, "snork") then
+							hit_em = 4
+						end
+					elseif lname == "av_peshera" then
+						if string_find(obj_name, "pseudodog") then
+							hit_em = 10
+						elseif string_find(obj_name, "blood") then
+							hit_em = 4
+						elseif string_find(obj_name, "snork") then
+							hit_em = 4
+						elseif string_find(obj_name, "rat") then
+							hit_em = 1
+						end
+					elseif lname == "l01_escape" then
+						--if string_find(obj_name, "boar_weak_0006") then
+							--hit_em = 11
+						--end
+					elseif lname == "l05_bar" then
+						if string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "l06_rostok" then
+						if string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "l07_military" then
+						if string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "atp_for_test22" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "l11_pripyat" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "marsh" then
+						if string_find(obj_name, "snork") then
+							hit_em = 4			--light hit
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "jupiter" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "jupiter_underground" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						end
+					elseif lname == "l03u_agr_underground" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						end
+					elseif lname == "l04u_labx18" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						end
+					elseif lname == "l08u_brainlab" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						end
+					elseif lname == "zaton" then
+						if string_find(obj_name, "rat") then
+							hit_em = 1			--light hit
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "k01_darkscape" then
+						--if string_find(obj_name, "tushkano") then			--removed smt
+							--hit_em = 1			--light hit
+						if string_find(obj_name, "flesh") then
+							hit_em = 3
+						elseif string_find(obj_name, "ds_dog") then
+							hit_em = 3
+						elseif string_find(obj_name, "ds_chimera") then
+							hit_em = 4
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						--elseif string_find(obj_name, "bloodsucker") then		--removed smt
+							--hit_em = 4
+						end
+					elseif lname == "generators" then
+						if string_find(obj_name, "tushkano")
+						  or string_find(obj_name, "snork") then
+							hit_em = 4
+						elseif string_find(obj_name, "flesh") then
+							hit_em = 4
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "red_forest" then
+						if string_find(obj_name, "red_dog_") then
+							hit_em = 4
+						end
+					elseif lname == "swamp_old" then
+						if string_find(obj_name, "tushkano")
+						  or string_find(obj_name, "cat") then
+							hit_em = 1
+						elseif string_find(obj_name, "flesh")
+						  or string_find(obj_name, "dog") then
+							hit_em = 4
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "dark_forest" then
+						if string_find(obj_name, "tushkano")
+						  or string_find(obj_name, "cat")
+						  or string_find(obj_name, "rat") then
+							hit_em = 1
+						elseif string_find(obj_name, "flesh")
+						  or string_find(obj_name, "dog") then
+							hit_em = 4
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						elseif string_find(obj_name, "snork") then
+							hit_em = 4
+						end
+					elseif lname == "yantar_old" then
+						if string_find(obj_name, "tushkano")
+						  or string_find(obj_name, "rat") then
+							hit_em = 1
+						elseif string_find(obj_name, "flesh") then
+							hit_em = 4
+						elseif string_find(obj_name, "zombie") then
+							hit_em = 4
+						end
+					elseif lname == "promzone" then
+						if string_find(obj_name, "tushkano")
+						  or string_find(obj_name, "rat") then
+							hit_em = 1
+						elseif string_find(obj_name, "dog")
+						  or string_find(obj_name, "snork")
+						  or string_find(obj_name, "zombie")
+						  or string_find(obj_name, "pseudodog") then
+							hit_em = 4
+						elseif string_find(obj_name, "flesh") then
+							hit_em = 4
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "hiding_road" then
+						if string_find(obj_name, "tushkano") then
+							hit_em = 1
+						elseif string_find(obj_name, "dog") then
+							hit_em = 4
+						elseif string_find(obj_name, "flesh") then
+							hit_em = 4
+						end
+					elseif lname == "dead_city" then
+						if string_find(obj_name, "boar") then
+							hit_em = 7
+						end
+					elseif lname == "predbannik" then
+						if string_find(obj_name, "tushkano") then
+							hit_em = 1
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "aver" then
+						if string_find(obj_name, "dog") then
+							hit_em = 4
+						end
+					elseif lname == "lost_village" then
+						if string_find(obj_name, "dog") then
+							hit_em = 4
+						elseif string_find(obj_name, "boar") then
+							hit_em = 6
+						end
+					elseif lname == "puzir" then
+						if string_find(obj_name, "dog") then
+							hit_em = 4
+						end
+					elseif lname == "level_f-1" then
+						if string_find(obj_name, "tushkano")
+						  or string_find(obj_name, "rat") then
+							hit_em = 1
+						elseif string_find(obj_name, "dog")
+						  or string_find(obj_name, "snork")
+						  or string_find(obj_name, "pseudodog") then
+							hit_em = 4
+						elseif string_find(obj_name, "flesh")
+						  or string_find(obj_name, "boar") then
+							hit_em = 6
+						elseif string_find(obj_name, "controller") then
+							hit_em = 4
+						end
+					end
+					if hit_em > 0 then
+						if not string_find(obj_name, "cat") then
+							if string_find(obj_name, "normal")
+							  or string_find(self.object:section(), "normal") then hit_em = hit_em + 1
+							elseif string_find(obj_name, "strong")
+							  or string_find(self.object:section(), "strong") then hit_em = hit_em + 2
+							end
+						end
+						TB3D_Hit_Styles.small_hit(self.object, hit_em)
+					end
+					if particle_param and system_ini():section_exist(particle_param) then 
+						local tmp=amk.parse_ini_section_to_array_new(nil,particle_param) 
+						local t = {}
+						for k,v in pairs(tmp) do 
+							t = {}
+							t = amk.parse_ini_section_to_array_new(nil, v) 
+							t.obj = self.object 
+							if t ~= nil then
+								play_particle(self.object, t) 
+							end 
+						end 
+					end
+				else									--dead
+					if particle_param and system_ini():section_exist(particle_param) then 
+						local tmp=amk.parse_ini_section_to_array_new(nil,particle_param) 
+						local t = {}
+						for k,v in pairs(tmp) do 
+							t = {}
+							t = amk.parse_ini_section_to_array_new(nil, v) 
+							t.obj = self.object 
+							if t ~= nil and not t.stop_on_death then 
+								play_particle(self.object, t) 
+							end 
+						end 
+					end 
+				end
+			else
+				TB3D_Services.packet_alert("bind monster: net spawn[no object id] !!!!")
+				return false
+			end
+		else
+			TB3D_Services.packet_alert("bind monster: net spawn [no id] !!!!")
+			return false
+		end
+	else
+		TB3D_Services.packet_alert("bind monster: net spawn [no object] !!!!")
+		return false
+	end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.info_alert("BIND MONSTER: net spawn done")
+	end
+	return true 
+end 
+
+function generic_object_binder:net_destroy() 
+	if TB3D_Modders.use_destroy_message then
+		TB3D_Services.packet_alert("bind monster: net destroy["..utils.to_str(self.object:name()).."]")
+	end
+	local community = xr_statistic.get_monster_spot(self.object)							--cslid not available here
+	if community then
+		if community=="controller" then
+			level.map_remove_object_spot(self.object:id(), "kontroler_spot")
+		elseif community=="bloodsucker" then
+			level.map_remove_object_spot(self.object:id(), "bloodsucker_spot")
+		elseif community=="pseudo_gigant" then
+			level.map_remove_object_spot(self.object:id(), "pseudo_gigant_spot")
+		end
+	end
+	if table.getn(self.particles)>0 then 
+		for kk,vv in pairs(self.particles) do 
+			if not vv:is_finished() then 
+				vv:stop() 
+				self.particles[kk]=nil 
+			end 
+		end 
+	end 
+	amk.on_monster_go_offline(self.object) 
+	self.object:set_callback(callback.death, nil) 
+	self.object:set_callback(callback.patrol_path_in_point, nil) 
+	self.object:set_callback(callback.hit, nil) 
+	local st = db.storage[self.object:id()]  
+	if st and st.active_scheme then 
+		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy") 
+	end 
+	local sid = alife():object(self.object:id()) and alife():object(self.object:id()).m_story_id	-- Tags
+    if sid and sid ~= 4294967296 then dmx_mod.remove_mapspot_npc(sid,self.object:id()) end
+	db.destroy_monster(self.object)																	--109940
+	local id=self.object:id() 
+	object_binder.net_destroy(self) 	-- AMK. Cleaning restrictor
+	local sobj=alife():object(id)          
+	if sobj and IAmAMonster[sobj:clsid()] then 
+		local tbl=amk.read_monster_params(sobj) 
+		tbl.crvu32u16u2={} 
+		amk.write_monster_params(tbl,sobj) 
+	elseif TB3D_Modders.use_spawn_message then							--esc_trader 
+		TB3D_Services.packet_alert("bind monster: net destroy["..utils.to_str(self.object:name()).."] sobj[nil] or not monster clsid!!!!")
+	end 
+	if TB3D_Modders.use_destroy_message then
+		TB3D_Services.packet_alert("bind monster: net destroy["..utils.to_str(self.object:name()).."] done")
+	end
+end 
+
+function generic_object_binder:reload(section) 
+	object_binder.reload(self, section) 
+	--printf("generic_object_binder:reload(): self.object:name()='%s'", self.object:name())
+end
+
+function generic_object_binder:net_save_relevant()
+	--printf("generic_object_binder:net_save_relevant(): self.object:name()='%s'", self.object:name())
+	return true
+end 
+
+function generic_object_binder:save(packet)
+	--printf("generic_object_binder:save(): self.object:name()='%s'", self.object:name())          
+	object_binder.save(self, packet) 
+	xr_logic.save_obj(self.object, packet) 
+	if self.object:clsid() == clsid.script_trader then 
+		trade_manager.save(self.object, packet) 
+	end 
+end 
+
+function generic_object_binder:load(reader) 
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("bind monster: load["..self.object:name().."]")
+	end
+	self.loaded = true 
+	object_binder.load(self, reader) 
+	if reader:r_eof() then 
+		TB3D_Services.abort_alert("BIND_MONSTER: generic_object_binder:load error for["..utils.to_str(self.object:name()).."]")
+		remove_zavis.remove_obj(self.object)
+		return
+	end 
+	xr_logic.load_obj(self.object, reader) 
+	if self.object:clsid() == clsid.script_trader then 
+		trade_manager.load(self.object, reader) 
+	end 
+	if IAmAStalker[self.object:clsid()] then TB3D_Services.check_has_weapon(self.object) end
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind monster: load["..self.object:name().."] done")  end
+end 
+
+function play_particle(obj,params) 
+	local id = obj:id()
+	if not particles[id] then 
+		particles[id]={} 
+	end 
+	table.insert(particles[obj:id()],params) 
+end 
+
+function bloodsucker_vampire_timer()
+    return time_global() > RestoreActor
+end
+
+function bloodsucker_actor_release()
+    DirActor = false
+    bind_stalker.restore_weapon()
+    level.enable_input()
+	level.show_indicators()
+	level.remove_pp_effector(1975)
+	level.remove_cam_effector(1978)
+	dmx_mod.play_sound([[monsters\bloodsucker\vampire_hit]])
+end

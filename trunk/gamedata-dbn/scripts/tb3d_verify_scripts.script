@@ -1,0 +1,699 @@
+---TB3D 1.0.9.9.5.0 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
+-- removed din_rad and added use_rad_fields, TB3D_net_manager, added items, tb3d_dav_hunt
+local vers = "1.0.9.9.5.0"
+-- following removed from the mod ------------------------------------------------------------------------------------------------------------------------
+	--if valerich_dialog then TB3D_Services.packet_alert("valerich_dialog ok") else TB3D_Services.packet_alert("valerich_dialog failed!!!!") end
+	--if valerich_treasures then TB3D_Services.packet_alert("valerich_treasures ok") else TB3D_Services.packet_alert("valerich_treasures failed!!!!") end
+	--if x_spawn_actions then TB3D_Services.packet_alert("x_spawn_actions ok") else TB3D_Services.packet_alert("x_spawn_actions failed!!!!") end
+	--if u3_utils then TB3D_Services.packet_alert("u3_utils ok") else TB3D_Services.packet_alert("u3_utils failed!!!!") end
+	--if table_treasure_l then TB3D_Services.packet_alert("table_treasure_l ok") else TB3D_Services.packet_alert("table_treasure_l failed!!!!") end
+	--if ms_ai then TB3D_Services.packet_alert("ms_ai ok") else TB3D_Services.packet_alert("ms_ai failed!!!!") end
+	--if monnoroch_options then TB3D_Services.packet_alert("monnoroch_options ok") else TB3D_Services.packet_alert("monnoroch_options failed!!!!") end
+	--if meceniy_npc_manager then TB3D_Services.packet_alert("meceniy_npc_manager ok") else TB3D_Services.packet_alert("meceniy_npc_manager failed!!!!") end
+	--if dunin_ammo then TB3D_Services.packet_alert("dunin_ammo ok") else TB3D_Services.packet_alert("dunin_ammo failed!!!!") end
+	--if amk_modders then TB3D_Services.packet_alert("amk_modders ok") else TB3D_Services.packet_alert("amk_modders failed!!!!") end
+	--if amk_target then TB3D_Services.packet_alert("amk_target ok") else TB3D_Services.packet_alert("amk_target failed!!!!") end
+	--if amk_ver then TB3D_Services.packet_alert("amk_ver ok") else TB3D_Services.packet_alert("amk_ver failed!!!!") end
+	--if xrs_utils then TB3D_Services.packet_alert("xrs_utils: "..xrs_utils.my_ver()) else TB3D_Services.packet_alert("xrs_utils failed!!!!") end
+	--if ded_moroz then TB3D_Services.packet_alert("ded_moroz ok") else TB3D_Services.packet_alert("ded_moroz failed!!!!") end
+	--if lootmoney then TB3D_Services.packet_alert("lootmoney: "..lootmoney.my_ver()) else TB3D_Services.packet_alert("lootmoney failed!!!!") end
+	--if meceniy_helpfunc then TB3D_Services.packet_alert("meceniy_helpfunc ok") else TB3D_Services.packet_alert("meceniy_helpfunc failed!!!!") end
+	--if fake_net_packet then TB3D_Services.packet_alert("fake_net_packet ok") else TB3D_Services.packet_alert("fake_net_packet failed!!!!") end
+	--if my_proxy then TB3D_Services.packet_alert("my_proxy ok") else TB3D_Services.packet_alert("my_proxy failed!!!!") end	
+	--if weap then TB3D_Services.packet_alert("weap: "..weap.my_ver()) else TB3D_Services.packet_alert("weap failed!!!!") end
+	--if sim_statistic then TB3D_Services.packet_alert("sim_statistic: "..sim_statistic.my_ver()) else TB3D_Services.packet_alert("sim_statistic failed!!!!") end
+	--if sak_off_corpses then TB3D_Services.packet_alert("sak_off_corpses: "..sak_off_corpses.my_ver()) else TB3D_Services.packet_alert("sak_off_corpses failed!!!!") end
+	--if amk_dolg then TB3D_Services.packet_alert("amk_dolg: "..amk_dolg.my_ver()) else TB3D_Services.packet_alert("amk_dolg failed!!!!") end
+	--if amk_freedom then TB3D_Services.packet_alert("amk_freedom: "..amk_freedom.my_ver()) else TB3D_Services.packet_alert("amk_freedom failed!!!!") end
+-----------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+function verify_files()
+	TB3D_Services.packet_alert("TB3D_Verify_Scripts["..vers.."] found: checking script files...")
+	if _g then TB3D_Services.packet_alert("_g: ".._g.my_ver()) else TB3D_Services.packet_alert("_g failed!!!!") end
+	
+	if actor_need_help then TB3D_Services.packet_alert("actor_need_help: "..actor_need_help.my_ver()) else TB3D_Services.packet_alert("actor_need_help failed!!!!") end
+	if actor_proxy then TB3D_Services.packet_alert("actor_proxy: "..actor_proxy.my_ver()) else TB3D_Services.packet_alert("actor_proxy failed!!!!") end
+	
+	if aem_bind then TB3D_Services.packet_alert("aem_bind: "..aem_bind.my_ver()) else TB3D_Services.packet_alert("aem_bind failed!!!!") end
+	if aem_grenade then TB3D_Services.packet_alert("aem_grenade: "..aem_grenade.my_ver()) else TB3D_Services.packet_alert("aem_grenade failed!!!!") end
+	if aem_lights then TB3D_Services.packet_alert("aem_lights: "..aem_lights.my_ver()) else TB3D_Services.packet_alert("aem_lights failed!!!!") end	--bad lights, need fix!!!!!
+	if aem_manager then TB3D_Services.packet_alert("aem_manager: "..aem_manager.my_ver()) else TB3D_Services.packet_alert("aem_manager failed!!!!") end
+
+	if agroprom_dialog then TB3D_Services.packet_alert("agroprom_dialog: "..agroprom_dialog.my_ver()) else TB3D_Services.packet_alert("agroprom_dialog failed!!!!") end
+	if agroprom_tasks then TB3D_Services.packet_alert("agroprom_tasks: "..agroprom_tasks.my_ver()) else TB3D_Services.packet_alert("agroprom_tasks failed!!!!") end
+	
+	if amk then TB3D_Services.packet_alert("amk: "..amk.my_ver()) else TB3D_Services.packet_alert("amk failed!!!!") end
+	if amk_alcohol then TB3D_Services.packet_alert("amk_alcohol: "..amk_alcohol.my_ver()) else TB3D_Services.packet_alert("amk_alcohol failed!!!!") end
+	if amk_anoms then TB3D_Services.packet_alert("amk_anoms: "..amk_anoms.my_ver()) else TB3D_Services.packet_alert("amk_anoms failed!!!!") end
+	if amk_dialogs then TB3D_Services.packet_alert("amk_dialogs: "..amk_dialogs.my_ver()) else TB3D_Services.packet_alert("amk_dialogs failed!!!!") end
+	if amk_hideouts then TB3D_Services.packet_alert("amk_hideouts: "..amk_hideouts.my_ver()) else TB3D_Services.packet_alert("amk_hideouts failed!!!!") end
+	if amk_mod then TB3D_Services.packet_alert("amk_mod: "..amk_mod.my_ver()) else TB3D_Services.packet_alert("amk_mod failed!!!!") end
+	if amk_music then TB3D_Services.packet_alert("amk_music: "..amk_music.my_ver()) else TB3D_Services.packet_alert("amk_music failed!!!!") end
+	if amk_offline_alife then TB3D_Services.packet_alert("amk_offline_alife: "..amk_offline_alife.my_ver()) else TB3D_Services.packet_alert("amk_offline_alife failed!!!!") end
+	if amk_particle then TB3D_Services.packet_alert("amk_particle: "..amk_particle.my_ver()) else TB3D_Services.packet_alert("amk_particle failed!!!!") end
+	if amk_spawn then TB3D_Services.packet_alert("amk_spawn: "..amk_spawn.my_ver()) else TB3D_Services.packet_alert("amk_spawn failed!!!!") end
+	if amk_utils then TB3D_Services.packet_alert("amk_utils: "..amk_utils.my_ver()) else TB3D_Services.packet_alert("amk_utils failed!!!!") end
+	if amkII_launcher then TB3D_Services.packet_alert("amkII_launcher: "..amkII_launcher.my_ver()) else TB3D_Services.packet_alert("amkII_launcher failed!!!!") end
+	if amkII_transmutator then TB3D_Services.packet_alert("amkII_transmutator: "..amkII_transmutator.my_ver()) else TB3D_Services.packet_alert("amkII_transmutator failed!!!!") end
+	
+	if anom then TB3D_Services.packet_alert("anom: "..anom.my_ver()) else TB3D_Services.packet_alert("anom failed!!!!") end
+	if anom_remover then TB3D_Services.packet_alert("anom_remover: "..anom_remover.my_ver()) else TB3D_Services.packet_alert("anom_remover failed!!!!") end
+	
+	if ar_sleep then TB3D_Services.packet_alert("ar_sleep: "..ar_sleep.my_ver()) else TB3D_Services.packet_alert("ar_sleep failed!!!!") end
+	
+	if arc then TB3D_Services.packet_alert("arc: "..arc.my_ver()) else TB3D_Services.packet_alert("arc failed!!!!") end
+	if arc_1containers then TB3D_Services.packet_alert("arc_1containers: "..arc_1containers.my_ver()) else TB3D_Services.packet_alert("arc_1containers failed!!!!") end
+	if arc_8containers then TB3D_Services.packet_alert("arc_8containers: "..arc_8containers.my_ver()) else TB3D_Services.packet_alert("arc_8containers failed!!!!") end
+	if arc_arts then TB3D_Services.packet_alert("arc_arts: "..arc_arts.my_ver()) else TB3D_Services.packet_alert("arc_arts failed!!!!") end
+	if arc_ballast then TB3D_Services.packet_alert("arc_ballast: "..arc_ballast.my_ver()) else TB3D_Services.packet_alert("arc_ballast failed!!!!") end
+	if arc_containers then TB3D_Services.packet_alert("arc_containers: "..arc_containers.my_ver()) else TB3D_Services.packet_alert("arc_containers failed!!!!") end
+	if arc_diary then TB3D_Services.packet_alert("arc_diary: "..arc_diary.my_ver()) else TB3D_Services.packet_alert("arc_diary failed!!!!") end
+	if arc_main then TB3D_Services.packet_alert("arc_main: "..arc_main.my_ver()) else TB3D_Services.packet_alert("arc_main failed!!!!") end
+	if arc_radiation then TB3D_Services.packet_alert("arc_radiation: "..arc_radiation.my_ver()) else TB3D_Services.packet_alert("arc_radiation failed!!!!") end
+	if arc_ui_1container_menu then TB3D_Services.packet_alert("arc_ui_1container_menu: "..arc_ui_1container_menu.my_ver()) else TB3D_Services.packet_alert("arc_ui_1container_menu failed!!!!") end
+	if arc_ui_8container_menu then TB3D_Services.packet_alert("arc_ui_8container_menu: "..arc_ui_8container_menu.my_ver()) else TB3D_Services.packet_alert("arc_ui_8container_menu failed!!!!") end
+	if arc_ui_container_menu then TB3D_Services.packet_alert("arc_ui_container_menu: "..arc_ui_container_menu.my_ver()) else TB3D_Services.packet_alert("arc_ui_container_menu failed!!!!") end
+	
+	if arhara_dialog then TB3D_Services.packet_alert("arhara_dialog: "..arhara_dialog.my_ver()) else TB3D_Services.packet_alert("arhara_dialog failed!!!!") end
+	if arhara1_dialog1 then TB3D_Services.packet_alert("arhara1_dialog1: "..arhara1_dialog1.my_ver()) else TB3D_Services.packet_alert("arhara1_dialog1 failed!!!!") end
+	
+	if art_hit then TB3D_Services.packet_alert("art_hit: "..art_hit.my_ver()) else TB3D_Services.packet_alert("art_hit failed!!!!") end
+	
+	if babah then TB3D_Services.packet_alert("babah: "..babah.my_ver()) else TB3D_Services.packet_alert("babah failed!!!!") end
+	
+	if bar_dialogs then TB3D_Services.packet_alert("bar_dialogs: "..bar_dialogs.my_ver()) else TB3D_Services.packet_alert("bar_dialogs failed!!!!") end
+	if bar_rostok_tasks then TB3D_Services.packet_alert("bar_rostok_tasks: "..bar_rostok_tasks.my_ver()) else TB3D_Services.packet_alert("bar_rostok_tasks failed!!!!") end
+	
+	if bb_mod then TB3D_Services.packet_alert("bb_mod: "..bb_mod.my_ver()) else TB3D_Services.packet_alert("bb_mod failed!!!!") end
+	
+	if belt_ammo then TB3D_Services.packet_alert("belt_ammo: "..belt_ammo.my_ver()) else TB3D_Services.packet_alert("belt_ammo failed!!!!") end
+	if belt_grenade then TB3D_Services.packet_alert("belt_grenade: "..belt_grenade.my_ver()) else TB3D_Services.packet_alert("belt_grenade failed!!!!") end
+	
+	if bind_det_arts then TB3D_Services.packet_alert("bind_det_arts: "..bind_det_arts.my_ver()) else TB3D_Services.packet_alert("bind_det_arts failed!!!!") end
+	if bind_ggun then TB3D_Services.packet_alert("bind_ggun: "..bind_ggun.my_ver()) else TB3D_Services.packet_alert("bind_ggun failed!!!!") end
+	if bind_heli then TB3D_Services.packet_alert("bind_heli: "..bind_heli.my_ver()) else TB3D_Services.packet_alert("bind_heli failed!!!!") end
+	if bind_monster then TB3D_Services.packet_alert("bind_monster: "..bind_monster.my_ver()) else TB3D_Services.packet_alert("bind_monster failed!!!!") end
+	if bind_mteleport then TB3D_Services.packet_alert("bind_mteleport: "..bind_mteleport.my_ver()) else TB3D_Services.packet_alert("bind_mteleport failed!!!!") end
+	if bind_physic_object then TB3D_Services.packet_alert("bind_physic_object: "..bind_physic_object.my_ver()) else TB3D_Services.packet_alert("bind_physic_object failed!!!!") end
+	if bind_respawn then TB3D_Services.packet_alert("bind_respawn: "..bind_respawn.my_ver()) else TB3D_Services.packet_alert("bind_respawn failed!!!!") end
+	if bind_restrictor then TB3D_Services.packet_alert("bind_restrictor: "..bind_restrictor.my_ver()) else TB3D_Services.packet_alert("bind_restrictor failed!!!!") end
+	if bind_smart_terrain then TB3D_Services.packet_alert("bind_smart_terrain: "..bind_smart_terrain.my_ver()) else TB3D_Services.packet_alert("bind_smart_terrain failed!!!!") end
+	if bind_soul_cube then TB3D_Services.packet_alert("bind_soul_cube: "..bind_soul_cube.my_ver()) else TB3D_Services.packet_alert("bind_soul_cube failed!!!!") end
+	if bind_stalker then TB3D_Services.packet_alert("bind_stalker: "..bind_stalker.my_ver()) else TB3D_Services.packet_alert("bind_stalker failed!!!!") end
+	
+	if biodetector then TB3D_Services.packet_alert("biodetector: "..biodetector.my_ver()) else TB3D_Services.packet_alert("biodetector failed!!!!") end
+	
+	if blowout_scheme then TB3D_Services.packet_alert("blowout_scheme: "..blowout_scheme.my_ver()) else TB3D_Services.packet_alert("blowout_scheme failed!!!!") end
+	
+	if bolt_binder then TB3D_Services.packet_alert("bolt_binder: "..bolt_binder.my_ver()) else TB3D_Services.packet_alert("bolt_binder failed!!!!") end
+	if bolt_ending then TB3D_Services.packet_alert("bolt_ending: "..bolt_ending.my_ver()) else TB3D_Services.packet_alert("bolt_ending failed!!!!") end
+	
+	if braad_test then TB3D_Services.packet_alert("braad_test: "..braad_test.my_ver()) else TB3D_Services.packet_alert("braad_test failed!!!!") end
+	
+	if ce_switcher then TB3D_Services.packet_alert("ce_switcher: "..ce_switcher.my_ver()) else TB3D_Services.packet_alert("ce_switcher failed!!!!") end
+	if class_registrator then TB3D_Services.packet_alert("class_registrator: "..class_registrator.my_ver()) else TB3D_Services.packet_alert("class_registrator failed!!!!") end
+
+	if dar_dialogs then TB3D_Services.packet_alert("dar_dialogs: "..dar_dialogs.my_ver()) else TB3D_Services.packet_alert("dar_dialogs failed!!!!") end
+	if darkvalley_tasks then TB3D_Services.packet_alert("darkvalley_tasks: "..darkvalley_tasks.my_ver()) else TB3D_Services.packet_alert("darkvalley_tasks failed!!!!") end
+
+	if dav_ldk then TB3D_Services.packet_alert("dav_ldk: "..dav_ldk.my_ver()) else TB3D_Services.packet_alert("dav_ldk failed!!!!") end
+	
+	if db then TB3D_Services.packet_alert("db: "..db.my_ver()) else TB3D_Services.packet_alert("db failed!!!!") end
+	
+	if death_manager then TB3D_Services.packet_alert("death_manager: "..death_manager.my_ver()) else TB3D_Services.packet_alert("death_manager failed!!!!") end
+	
+	if dialog_manager then TB3D_Services.packet_alert("dialog_manager: "..dialog_manager.my_ver()) else TB3D_Services.packet_alert("dialog_manager failed!!!!") end
+	if dialogs then TB3D_Services.packet_alert("dialogs: "..dialogs.my_ver()) else TB3D_Services.packet_alert("dialogs failed!!!!") end
+	if dialogs_aes then TB3D_Services.packet_alert("dialogs_aes: "..dialogs_aes.my_ver()) else TB3D_Services.packet_alert("dialogs_aes failed!!!!") end
+	if dialogs_darkvalley then TB3D_Services.packet_alert("dialogs_darkvalley: "..dialogs_darkvalley.my_ver()) else TB3D_Services.packet_alert("dialogs_darkvalley failed!!!!") end
+	if dialogs_military then TB3D_Services.packet_alert("dialogs_military: "..dialogs_military.my_ver()) else TB3D_Services.packet_alert("dialogs_military failed!!!!") end
+	if dialogs_yantar then TB3D_Services.packet_alert("dialogs_yantar: "..dialogs_yantar.my_ver()) else TB3D_Services.packet_alert("dialogs_yantar failed!!!!") end
+	
+	if difficulty_manager then TB3D_Services.packet_alert("difficulty_manager: "..difficulty_manager.my_ver()) else TB3D_Services.packet_alert("difficulty_manager failed!!!!") end
+	
+	if dmx_box_menu then TB3D_Services.packet_alert("dmx_box_menu: "..dmx_box_menu.my_ver()) else TB3D_Services.packet_alert("dmx_box_menu failed!!!!") end
+	if dmx_cars then TB3D_Services.packet_alert("dmx_cars: "..dmx_cars.my_ver()) else TB3D_Services.packet_alert("dmx_cars failed!!!!") end
+	if dmx_inv_weight_static then TB3D_Services.packet_alert("dmx_inv_weight_static: "..dmx_inv_weight_static.my_ver()) else TB3D_Services.packet_alert("dmx_inv_weight_static failed!!!!") end
+	if dmx_medicines then TB3D_Services.packet_alert("dmx_medicines: "..dmx_medicines.my_ver()) else TB3D_Services.packet_alert("dmx_medicines failed!!!!") end
+	if dmx_mod then TB3D_Services.packet_alert("dmx_mod: "..dmx_mod.my_ver()) else TB3D_Services.packet_alert("dmx_mod failed!!!!") end
+	if dmx_pda_buttons then TB3D_Services.packet_alert("dmx_pda_buttons: "..dmx_pda_buttons.my_ver()) else TB3D_Services.packet_alert("dmx_pda_buttons failed!!!!") end
+	if dmx_pda_dialogs then TB3D_Services.packet_alert("dmx_pda_dialogs: "..dmx_pda_dialogs.my_ver()) else TB3D_Services.packet_alert("dmx_pda_dialogs failed!!!!") end
+	if dmx_pda_notepad then TB3D_Services.packet_alert("dmx_pda_notepad: "..dmx_pda_notepad.my_ver()) else TB3D_Services.packet_alert("dmx_pda_notepad failed!!!!") end
+	if dmx_sleep_binder then TB3D_Services.packet_alert("dmx_sleep_binder: "..dmx_sleep_binder.my_ver()) else TB3D_Services.packet_alert("dmx_sleep_binder failed!!!!") end
+	if dmx_sleep_menu then TB3D_Services.packet_alert("dmx_sleep_menu: "..dmx_sleep_menu.my_ver()) else TB3D_Services.packet_alert("dmx_sleep_menu failed!!!!") end
+	if dmx_treasure then TB3D_Services.packet_alert("dmx_treasure: "..dmx_treasure.my_ver()) else TB3D_Services.packet_alert("dmx_treasure failed!!!!") end
+	
+	if doc_viewer then TB3D_Services.packet_alert("doc_viewer: "..doc_viewer.my_ver()) else TB3D_Services.packet_alert("doc_viewer failed!!!!") end
+	
+	if dream then TB3D_Services.packet_alert("dream: "..dream.my_ver()) else TB3D_Services.packet_alert("dream failed!!!!") end
+
+	if drrr then TB3D_Services.packet_alert("drrr: "..drrr.my_ver()) else TB3D_Services.packet_alert("drrr failed!!!!") end
+	
+	if dualweapon then TB3D_Services.packet_alert("dualweapon: "..dualweapon.my_ver()) else TB3D_Services.packet_alert("dualweapon failed!!!!") end
+	
+	if embrion_binder then TB3D_Services.packet_alert("embrion_binder: "..embrion_binder.my_ver()) else TB3D_Services.packet_alert("embrion_binder failed!!!!") end
+	
+	if escape_dialog then TB3D_Services.packet_alert("escape_dialog: "..escape_dialog.my_ver()) else TB3D_Services.packet_alert("escape_dialog failed!!!!") end
+	if escape_tasks then TB3D_Services.packet_alert("escape_tasks: "..escape_tasks.my_ver()) else TB3D_Services.packet_alert("escape_tasks failed!!!!") end
+	
+	if flamethrower then TB3D_Services.packet_alert("flamethrower: "..flamethrower.my_ver()) else TB3D_Services.packet_alert("flamethrower failed!!!!") end
+	
+	if game_registrator then TB3D_Services.packet_alert("game_registrator: "..game_registrator.my_ver()) else TB3D_Services.packet_alert("game_registrator failed!!!!") end
+	if game_stats then TB3D_Services.packet_alert("game_stats: "..game_stats.my_ver()) else TB3D_Services.packet_alert("game_stats failed!!!!") end
+	if game_totalizator then TB3D_Services.packet_alert("game_totalizator: "..game_totalizator.my_ver()) else TB3D_Services.packet_alert("game_totalizator failed!!!!") end
+	if game_types then TB3D_Services.packet_alert("game_types: "..game_types.my_ver()) else TB3D_Services.packet_alert("game_types failed!!!!") end
+
+	if garbage_dialogs then TB3D_Services.packet_alert("garbage_dialogs: "..garbage_dialogs.my_ver()) else TB3D_Services.packet_alert("garbage_dialogs failed!!!!") end
+	if garbage_tasks then TB3D_Services.packet_alert("garbage_tasks: "..garbage_tasks.my_ver()) else TB3D_Services.packet_alert("garbage_tasks failed!!!!") end
+	
+	if gps_habar then TB3D_Services.packet_alert("gps_habar: "..gps_habar.my_ver()) else TB3D_Services.packet_alert("gps_habar failed!!!!") end
+	
+	if gulag_agroprom then TB3D_Services.packet_alert("gulag_agroprom: "..gulag_agroprom.my_ver()) else TB3D_Services.packet_alert("gulag_agroprom failed!!!!") end
+	if gulag_agroprom_underground then TB3D_Services.packet_alert("gulag_agroprom_underground: "..gulag_agroprom_underground.my_ver()) else TB3D_Services.packet_alert("gulag_agroprom_underground failed!!!!") end
+	if gulag_amk then TB3D_Services.packet_alert("gulag_amk: "..gulag_amk.my_ver()) else TB3D_Services.packet_alert("gulag_amk failed!!!!") end
+	if gulag_bar then TB3D_Services.packet_alert("gulag_bar: "..gulag_bar.my_ver()) else TB3D_Services.packet_alert("gulag_bar failed!!!!") end
+	if gulag_dd then TB3D_Services.packet_alert("gulag_dd: "..gulag_dd.my_ver()) else TB3D_Services.packet_alert("gulag_dd failed!!!!") end
+	if gulag_dark_valley then TB3D_Services.packet_alert("gulag_dark_valley: "..gulag_dark_valley.my_ver()) else TB3D_Services.packet_alert("gulag_dark_valley failed!!!!") end
+	if gulag_escape then TB3D_Services.packet_alert("gulag_escape: "..gulag_escape.my_ver()) else TB3D_Services.packet_alert("gulag_escape failed!!!!") end
+	if gulag_garbage then TB3D_Services.packet_alert("gulag_garbage: "..gulag_garbage.my_ver()) else TB3D_Services.packet_alert("gulag_garbage failed!!!!") end
+	if gulag_general then TB3D_Services.packet_alert("gulag_general: "..gulag_general.my_ver()) else TB3D_Services.packet_alert("gulag_general failed!!!!") end
+	if gulag_kishka then TB3D_Services.packet_alert("gulag_kishka: "..gulag_kishka.my_ver()) else TB3D_Services.packet_alert("gulag_kishka failed!!!!") end
+	if gulag_krasivay then TB3D_Services.packet_alert("gulag_krasivay: "..gulag_krasivay.my_ver()) else TB3D_Services.packet_alert("gulag_krasivay failed!!!!") end
+	if gulag_labx18 then TB3D_Services.packet_alert("gulag_labx18: "..gulag_labx18.my_ver()) else TB3D_Services.packet_alert("gulag_labx18 failed!!!!") end
+	if gulag_military then TB3D_Services.packet_alert("gulag_military: "..gulag_military.my_ver()) else TB3D_Services.packet_alert("gulag_military failed!!!!") end
+	if gulag_new then TB3D_Services.packet_alert("gulag_new: "..gulag_new.my_ver()) else TB3D_Services.packet_alert("gulag_new failed!!!!") end
+	if gulag_pogost then TB3D_Services.packet_alert("gulag_pogost: "..gulag_pogost.my_ver()) else TB3D_Services.packet_alert("gulag_pogost failed!!!!") end
+	if gulag_pripyat then TB3D_Services.packet_alert("gulag_pripyat: "..gulag_pripyat.my_ver()) else TB3D_Services.packet_alert("gulag_pripyat failed!!!!") end
+	if gulag_radar then TB3D_Services.packet_alert("gulag_radar: "..gulag_radar.my_ver()) else TB3D_Services.packet_alert("gulag_radar failed!!!!") end
+	if gulag_radar_u then TB3D_Services.packet_alert("gulag_radar_u: "..gulag_radar_u.my_ver()) else TB3D_Services.packet_alert("gulag_radar_u failed!!!!") end
+	if gulag_rinok then TB3D_Services.packet_alert("gulag_rinok: "..gulag_rinok.my_ver()) else TB3D_Services.packet_alert("gulag_rinok failed!!!!") end
+	if gulag_sarcofag then TB3D_Services.packet_alert("gulag_sarcofag: "..gulag_sarcofag.my_ver()) else TB3D_Services.packet_alert("gulag_sarcofag failed!!!!") end
+	if gulag_tasks then TB3D_Services.packet_alert("gulag_tasks: "..gulag_tasks.my_ver()) else TB3D_Services.packet_alert("gulag_tasks failed!!!!") end
+	if gulag_vokzal then TB3D_Services.packet_alert("gulag_vokzal: "..gulag_vokzal.my_ver()) else TB3D_Services.packet_alert("gulag_vokzal failed!!!!") end
+	if gulag_yantar then TB3D_Services.packet_alert("gulag_yantar: "..gulag_yantar.my_ver()) else TB3D_Services.packet_alert("gulag_yantar failed!!!!") end
+	
+	if heli_combat then TB3D_Services.packet_alert("heli_combat: "..heli_combat.my_ver()) else TB3D_Services.packet_alert("heli_combat failed!!!!") end
+	if heli_move then TB3D_Services.packet_alert("heli_move: "..heli_move.my_ver()) else TB3D_Services.packet_alert("heli_move failed!!!!") end
+	if heli_snd then TB3D_Services.packet_alert("heli_snd: "..heli_snd.my_ver()) else TB3D_Services.packet_alert("heli_snd failed!!!!") end
+	
+	if hidden_slots then TB3D_Services.packet_alert("hidden_slots: "..hidden_slots.my_ver()) else TB3D_Services.packet_alert("hidden_slots failed!!!!") end
+	
+	if inventory then TB3D_Services.packet_alert("inventory: "..inventory.my_ver()) else TB3D_Services.packet_alert("inventory failed!!!!") end
+	
+	if keylogger then TB3D_Services.packet_alert("keylogger: "..keylogger.my_ver()) else TB3D_Services.packet_alert("keylogger failed!!!!") end
+	
+	if kostya_dialog then TB3D_Services.packet_alert("kostya_dialog: "..kostya_dialog.my_ver()) else TB3D_Services.packet_alert("kostya_dialog failed!!!!") end
+	
+	if level_new then TB3D_Services.packet_alert("level_new: "..level_new.my_ver()) else TB3D_Services.packet_alert("level_new failed!!!!") end
+	if level_tasks then TB3D_Services.packet_alert("level_tasks: "..level_tasks.my_ver()) else TB3D_Services.packet_alert("level_tasks failed!!!!") end
+	if level_weathers then TB3D_Services.packet_alert("level_weathers: "..level_weathers.my_ver()) else TB3D_Services.packet_alert("level_weathers failed!!!!") end
+	
+	if linspiro then TB3D_Services.packet_alert("linspiro: "..linspiro.my_ver()) else TB3D_Services.packet_alert("linspiro failed!!!!") end
+	
+	if m_bar then TB3D_Services.packet_alert("m_bar: "..m_bar.my_ver()) else TB3D_Services.packet_alert("m_bar failed!!!!") end
+	
+	if meceniy_art then TB3D_Services.packet_alert("meceniy_art: "..meceniy_art.my_ver()) else TB3D_Services.packet_alert("meceniy_art failed!!!!") end
+	if meceniy_dinrad then TB3D_Services.packet_alert("meceniy_dinrad: "..meceniy_dinrad.my_ver()) else TB3D_Services.packet_alert("meceniy_dinrad failed!!!!") end
+	if meceniy_in_hell then TB3D_Services.packet_alert("meceniy_in_hell: "..meceniy_in_hell.my_ver()) else TB3D_Services.packet_alert("meceniy_in_hell failed!!!!") end
+	if meceniy_intellectual then TB3D_Services.packet_alert("meceniy_intellectual: "..meceniy_intellectual.my_ver()) else TB3D_Services.packet_alert("meceniy_intellectual failed!!!!") end
+	if meceniy_mutants_manager then TB3D_Services.packet_alert("meceniy_mutants_manager: "..meceniy_mutants_manager.my_ver()) else TB3D_Services.packet_alert("meceniy_mutants_manager failed!!!!") end
+	if meceniy_outfit then TB3D_Services.packet_alert("meceniy_outfit: "..meceniy_outfit.my_ver()) else TB3D_Services.packet_alert("meceniy_outfit failed!!!!") end
+	if meceniy_spawn then TB3D_Services.packet_alert("meceniy_spawn: "..meceniy_spawn.my_ver()) else TB3D_Services.packet_alert("meceniy_spawn failed!!!!") end
+	if meceniy_utils then TB3D_Services.packet_alert("meceniy_utils: "..meceniy_utils.my_ver()) else TB3D_Services.packet_alert("meceniy_utils failed!!!!") end
+	if meceniy_work then TB3D_Services.packet_alert("meceniy_work: "..meceniy_work.my_ver()) else TB3D_Services.packet_alert("meceniy_work failed!!!!") end
+	if meceniy_wpn then TB3D_Services.packet_alert("meceniy_wpn: "..meceniy_wpn.my_ver()) else TB3D_Services.packet_alert("meceniy_wpn failed!!!!") end
+	
+	if mil_tasks then TB3D_Services.packet_alert("mil_tasks: "..mil_tasks.my_ver()) else TB3D_Services.packet_alert("mil_tasks failed!!!!") end
+
+	if mob_alife_mgr then TB3D_Services.packet_alert("mob_alife_mgr: "..mob_alife_mgr.my_ver()) else TB3D_Services.packet_alert("mob_alife_mgr failed!!!!") end
+	if mob_camp then TB3D_Services.packet_alert("mob_camp: "..mob_camp.my_ver()) else TB3D_Services.packet_alert("mob_camp failed!!!!") end
+	if mob_combat then TB3D_Services.packet_alert("mob_combat: "..mob_combat.my_ver()) else TB3D_Services.packet_alert("mob_combat failed!!!!") end
+	if mob_death then TB3D_Services.packet_alert("mob_death: "..mob_death.my_ver()) else TB3D_Services.packet_alert("mob_death failed!!!!") end
+	if mob_eluder then TB3D_Services.packet_alert("mob_eluder: "..mob_eluder.my_ver()) else TB3D_Services.packet_alert("mob_eluder failed!!!!") end
+	if mob_fake_death then TB3D_Services.packet_alert("mob_fake_death: "..mob_fake_death.my_ver()) else TB3D_Services.packet_alert("mob_fake_death failed!!!!") end
+	if mob_home then TB3D_Services.packet_alert("mob_home: "..mob_home.my_ver()) else TB3D_Services.packet_alert("mob_home failed!!!!") end
+	if mob_jump then TB3D_Services.packet_alert("mob_jump: "..mob_jump.my_ver()) else TB3D_Services.packet_alert("mob_jump failed!!!!") end
+	if mob_kicker then TB3D_Services.packet_alert("mob_kicker: "..mob_kicker.my_ver()) else TB3D_Services.packet_alert("mob_kicker failed!!!!") end
+	if mob_panic then TB3D_Services.packet_alert("mob_panic: "..mob_panic.my_ver()) else TB3D_Services.packet_alert("mob_panic failed!!!!") end
+	if mob_sound then TB3D_Services.packet_alert("mob_sound: "..mob_sound.my_ver()) else TB3D_Services.packet_alert("mob_sound failed!!!!") end
+	if mob_state_mgr then TB3D_Services.packet_alert("mob_state_mgr: "..mob_state_mgr.my_ver()) else TB3D_Services.packet_alert("mob_state_mgr failed!!!!") end
+	if mob_trade then TB3D_Services.packet_alert("mob_trade: "..mob_trade.my_ver()) else TB3D_Services.packet_alert("mob_trade failed!!!!") end
+	if mob_trader then TB3D_Services.packet_alert("mob_trader: "..mob_trader.my_ver()) else TB3D_Services.packet_alert("mob_trader failed!!!!") end
+	if mob_walker then TB3D_Services.packet_alert("mob_walker: "..mob_walker.my_ver()) else TB3D_Services.packet_alert("mob_walker failed!!!!") end
+	
+	if modules then TB3D_Services.packet_alert("modules: "..modules.my_ver()) else TB3D_Services.packet_alert("modules failed!!!!") end
+	
+	if monnoroch then TB3D_Services.packet_alert("monnoroch: "..monnoroch.my_ver()) else TB3D_Services.packet_alert("monnoroch failed!!!!") end
+	
+	if move_mgr then TB3D_Services.packet_alert("move_mgr: "..move_mgr.my_ver()) else TB3D_Services.packet_alert("move_mgr failed!!!!") end
+	
+	if netpacket_pda_binder then TB3D_Services.packet_alert("netpacket_pda_binder: "..netpacket_pda_binder.my_ver()) else TB3D_Services.packet_alert("netpacket_pda_binder failed!!!!") end
+	if netpacket_pda_create then TB3D_Services.packet_alert("netpacket_pda_create: "..netpacket_pda_create.my_ver()) else TB3D_Services.packet_alert("netpacket_pda_create failed!!!!") end
+	
+	if new_dialog then TB3D_Services.packet_alert("new_dialog: "..new_dialog.my_ver()) else TB3D_Services.packet_alert("new_dialog failed!!!!") end
+	if new_spawn then TB3D_Services.packet_alert("new_spawn: "..new_spawn.my_ver()) else TB3D_Services.packet_alert("new_spawn failed!!!!") end
+	
+	if news_data then TB3D_Services.packet_alert("news_data: "..news_main.my_ver()) else TB3D_Services.packet_alert("news_data failed!!!!") end
+	if news_main then TB3D_Services.packet_alert("news_main: "..news_main.my_ver()) else TB3D_Services.packet_alert("news_main failed!!!!") end
+	if news_manager then TB3D_Services.packet_alert("news_manager: "..news_manager.my_ver()) else TB3D_Services.packet_alert("news_manager failed!!!!") end
+
+	if particle_flame then TB3D_Services.packet_alert("particle_flame: "..particle_flame.my_ver()) else TB3D_Services.packet_alert("particle_flame failed!!!!") end
+
+	if pda_art_mod then TB3D_Services.packet_alert("pda_art_mod: "..pda_art_mod.my_ver()) else TB3D_Services.packet_alert("pda_art_mod failed!!!!") end
+	
+	if ph_appforce then TB3D_Services.packet_alert("ph_appforce: "..ph_appforce.my_ver()) else TB3D_Services.packet_alert("ph_appforce failed!!!!") end
+	if ph_button then TB3D_Services.packet_alert("ph_button: "..ph_button.my_ver()) else TB3D_Services.packet_alert("ph_button failed!!!!") end
+	if ph_car then TB3D_Services.packet_alert("ph_car: "..ph_car.my_ver()) else TB3D_Services.packet_alert("ph_car failed!!!!") end
+	if ph_code then TB3D_Services.packet_alert("ph_code: "..ph_code.my_ver()) else TB3D_Services.packet_alert("ph_code failed!!!!") end
+	if ph_death then TB3D_Services.packet_alert("ph_death: "..ph_death.my_ver()) else TB3D_Services.packet_alert("ph_death failed!!!!") end
+	if ph_door then TB3D_Services.packet_alert("ph_door: "..ph_door.my_ver()) else TB3D_Services.packet_alert("ph_door failed!!!!") end
+	if ph_gate then TB3D_Services.packet_alert("ph_gate: "..ph_gate.my_ver()) else TB3D_Services.packet_alert("ph_gate failed!!!!") end
+	if ph_hit then TB3D_Services.packet_alert("ph_hit: "..ph_hit.my_ver()) else TB3D_Services.packet_alert("ph_hit failed!!!!") end
+	if ph_idle then TB3D_Services.packet_alert("ph_idle: "..ph_idle.my_ver()) else TB3D_Services.packet_alert("ph_idle failed!!!!") end
+	if ph_impulse then TB3D_Services.packet_alert("ph_impulse: "..ph_impulse.my_ver()) else TB3D_Services.packet_alert("ph_impulse failed!!!!") end
+	if ph_minigun then TB3D_Services.packet_alert("ph_minigun: "..ph_minigun.my_ver()) else TB3D_Services.packet_alert("ph_minigun failed!!!!") end
+	if ph_on_hit then TB3D_Services.packet_alert("ph_on_hit: "..ph_on_hit.my_ver()) else TB3D_Services.packet_alert("ph_on_hit failed!!!!") end
+	if ph_oscillate then TB3D_Services.packet_alert("ph_oscillate: "..ph_oscillate.my_ver()) else TB3D_Services.packet_alert("ph_oscillate failed!!!!") end
+	if ph_sound then TB3D_Services.packet_alert("ph_sound: "..ph_sound.my_ver()) else TB3D_Services.packet_alert("ph_sound failed!!!!") end
+
+	if phantom_manager then TB3D_Services.packet_alert("phantom_manager: "..phantom_manager.my_ver()) else TB3D_Services.packet_alert("phantom_manager failed!!!!") end
+
+	if player_ogg then TB3D_Services.packet_alert("player_ogg: "..player_ogg.my_ver()) else TB3D_Services.packet_alert("player_ogg failed!!!!") end
+	
+	if positioninformer then TB3D_Services.packet_alert("positioninformer: "..positioninformer.my_ver()) else TB3D_Services.packet_alert("positioninformer failed!!!!") end
+	
+	if pripyat_tasks then TB3D_Services.packet_alert("pripyat_tasks: "..pripyat_tasks.my_ver()) else TB3D_Services.packet_alert("pripyat_tasks failed!!!!") end
+	
+	if protected_items then TB3D_Services.packet_alert("protected_items: "..protected_items.my_ver()) else TB3D_Services.packet_alert("protected_items failed!!!!") end
+	
+	if pstor_custom_impl then TB3D_Services.packet_alert("pstor_custom_impl: "..pstor_custom_impl.my_ver()) else TB3D_Services.packet_alert("pstor_custom_impl failed!!!!") end
+	
+	if rad_dialogs then TB3D_Services.packet_alert("rad_dialogs: "..rad_dialogs.my_ver()) else TB3D_Services.packet_alert("rad_dialogs failed!!!!") end
+	if radar_tasks then TB3D_Services.packet_alert("radar_tasks: "..radar_tasks.my_ver()) else TB3D_Services.packet_alert("radar_tasks failed!!!!") end
+
+	if ranks then TB3D_Services.packet_alert("ranks: "..ranks.my_ver()) else TB3D_Services.packet_alert("ranks failed!!!!") end
+	
+	if razgruzka_v then TB3D_Services.packet_alert("razgruzka_v: "..razgruzka_v.my_ver()) else TB3D_Services.packet_alert("razgruzka_v failed!!!!") end
+	
+	if remove_zavis then TB3D_Services.packet_alert("remove_zavis: "..remove_zavis.my_ver()) else TB3D_Services.packet_alert("remove_zavis failed!!!!") end
+	
+	if repair_check then TB3D_Services.packet_alert("repair_check: "..repair_check.my_ver()) else TB3D_Services.packet_alert("repair_check failed!!!!") end
+	
+	if restriction_stock then TB3D_Services.packet_alert("restriction_stock: "..restriction_stock.my_ver()) else TB3D_Services.packet_alert("restriction_stock failed!!!!") end
+	
+	if rul then TB3D_Services.packet_alert("rul: "..rul.my_ver()) else TB3D_Services.packet_alert("rul failed!!!!") end
+	
+	if rx_addons then TB3D_Services.packet_alert("rx_addons: "..rx_addons.my_ver()) else TB3D_Services.packet_alert("rx_addons failed!!!!") end
+	if rx_ai then TB3D_Services.packet_alert("rx_ai: "..rx_ai.my_ver()) else TB3D_Services.packet_alert("rx_ai failed!!!!") end
+	if rx_facer then TB3D_Services.packet_alert("rx_facer: "..rx_facer.my_ver()) else TB3D_Services.packet_alert("rx_facer failed!!!!") end
+	if rx_gl then TB3D_Services.packet_alert("rx_gl: "..rx_gl.my_ver()) else TB3D_Services.packet_alert("rx_gl failed!!!!") end
+	if rx_karavan then TB3D_Services.packet_alert("rx_karavan: "..rx_karavan.my_ver()) else TB3D_Services.packet_alert("rx_karavan failed!!!!") end
+	if rx_reload then TB3D_Services.packet_alert("rx_reload: "..rx_reload.my_ver()) else TB3D_Services.packet_alert("rx_reload failed!!!!") end
+	if rx_shoot_enable then TB3D_Services.packet_alert("rx_shoot_enable: "..rx_shoot_enable.my_ver()) else TB3D_Services.packet_alert("rx_shoot_enable failed!!!!") end
+	if rx_utils then TB3D_Services.packet_alert("rx_utils: "..rx_utils.my_ver()) else TB3D_Services.packet_alert("rx_utils failed!!!!") end
+	if rx_wmgr then TB3D_Services.packet_alert("rx_wmgr: "..rx_wmgr.my_ver()) else TB3D_Services.packet_alert("rx_wmgr failed!!!!") end
+	
+	if sak then TB3D_Services.packet_alert("sak: "..sak.my_ver()) else TB3D_Services.packet_alert("sak failed!!!!") end
+	if sak_dialog then TB3D_Services.packet_alert("sak_dialog: "..sak_dialog.my_ver()) else TB3D_Services.packet_alert("sak_dialog failed!!!!") end
+	
+	if se_artefact then TB3D_Services.packet_alert("se_artefact: "..se_artefact.my_ver()) else TB3D_Services.packet_alert("se_artefact failed!!!!") end
+	if se_car then TB3D_Services.packet_alert("se_car: "..se_car.my_ver()) else TB3D_Services.packet_alert("se_car failed!!!!") end
+	if se_item then TB3D_Services.packet_alert("se_item: "..se_item.my_ver()) else TB3D_Services.packet_alert("se_item failed!!!!") end
+	if se_monster then TB3D_Services.packet_alert("se_monster: "..se_monster.my_ver()) else TB3D_Services.packet_alert("se_monster failed!!!!") end
+	if se_respawn then TB3D_Services.packet_alert("se_respawn: "..se_respawn.my_ver()) else TB3D_Services.packet_alert("se_respawn failed!!!!") end
+	if se_stalker then TB3D_Services.packet_alert("se_stalker: "..se_stalker.my_ver()) else TB3D_Services.packet_alert("se_stalker failed!!!!") end
+	if se_switcher then TB3D_Services.packet_alert("se_switcher: "..se_switcher.my_ver()) else TB3D_Services.packet_alert("se_switcher failed!!!!") end
+	if se_zones then TB3D_Services.packet_alert("se_zones: "..se_zones.my_ver()) else TB3D_Services.packet_alert("se_zones failed!!!!") end
+	
+	if sleep_manager then TB3D_Services.packet_alert("sleep_manager: "..sleep_manager.my_ver()) else TB3D_Services.packet_alert("sleep_manager failed!!!!") end
+	
+	if smart_monster_parts then TB3D_Services.packet_alert("smart_monster_parts: "..smart_monster_parts.my_ver()) else TB3D_Services.packet_alert("smart_monster_parts failed!!!!") end
+	
+	if smart_terrain then TB3D_Services.packet_alert("smart_terrain: "..smart_terrain.my_ver()) else TB3D_Services.packet_alert("smart_terrain failed!!!!") end
+	if smart_terrain_params then TB3D_Services.packet_alert("smart_terrain_params: "..smart_terrain_params.my_ver()) else TB3D_Services.packet_alert("smart_terrain_params failed!!!!") end
+	
+	if sound_prefetch then TB3D_Services.packet_alert("sound_prefetch: "..sound_prefetch.my_ver()) else TB3D_Services.packet_alert("sound_prefetch failed!!!!") end
+	if sound_theme then TB3D_Services.packet_alert("sound_theme: "..sound_theme.my_ver()) else TB3D_Services.packet_alert("sound_theme failed!!!!") end
+	if soundtrack then TB3D_Services.packet_alert("soundtrack: "..soundtrack.my_ver()) else TB3D_Services.packet_alert("soundtrack failed!!!!") end
+	
+	if spawn_level_changer then TB3D_Services.packet_alert("spawn_level_changer: "..spawn_level_changer.my_ver()) else TB3D_Services.packet_alert("spawn_level_changer failed!!!!") end	
+	if spawn_restrictor then TB3D_Services.packet_alert("spawn_restrictor: "..spawn_restrictor.my_ver()) else TB3D_Services.packet_alert("spawn_restrictor failed!!!!") end	
+	if spawn_teleport then TB3D_Services.packet_alert("spawn_teleport: "..spawn_teleport.my_ver()) else TB3D_Services.packet_alert("spawn_teleport failed!!!!") end	
+	if spawn_zombi then TB3D_Services.packet_alert("spawn_zombi: "..spawn_zombi.my_ver()) else TB3D_Services.packet_alert("spawn_zombi failed!!!!") end
+	
+	if sr_aes_deadzone then TB3D_Services.packet_alert("sr_aes_deadzone: "..sr_aes_deadzone.my_ver()) else TB3D_Services.packet_alert("sr_aes_deadzone failed!!!!") end
+	if sr_cutscene then TB3D_Services.packet_alert("sr_cutscene: "..sr_cutscene.my_ver()) else TB3D_Services.packet_alert("sr_cutscene failed!!!!") end
+	if sr_danger then TB3D_Services.packet_alert("sr_danger: "..sr_danger.my_ver()) else TB3D_Services.packet_alert("sr_danger failed!!!!") end
+	if sr_idle then TB3D_Services.packet_alert("sr_idle: "..sr_idle.my_ver()) else TB3D_Services.packet_alert("sr_idle failed!!!!") end
+	if sr_light then TB3D_Services.packet_alert("sr_light: "..sr_light.my_ver()) else TB3D_Services.packet_alert("sr_light failed!!!!") end
+	if sr_mapspot then TB3D_Services.packet_alert("sr_mapspot: "..sr_mapspot.my_ver()) else TB3D_Services.packet_alert("sr_mapspot failed!!!!") end
+	if sr_no_weapon then TB3D_Services.packet_alert("sr_no_weapon: "..sr_no_weapon.my_ver()) else TB3D_Services.packet_alert("sr_no_weapon failed!!!!") end
+	if sr_particle then TB3D_Services.packet_alert("sr_particle: "..sr_particle.my_ver()) else TB3D_Services.packet_alert("sr_particle failed!!!!") end
+	if sr_postprocess then TB3D_Services.packet_alert("sr_postprocess: "..sr_postprocess.my_ver()) else TB3D_Services.packet_alert("sr_postprocess failed!!!!") end
+	if sr_psy_antenna then TB3D_Services.packet_alert("sr_psy_antenna: "..sr_psy_antenna.my_ver()) else TB3D_Services.packet_alert("sr_psy_antenna failed!!!!") end
+	if sr_sleep then TB3D_Services.packet_alert("sr_sleep: "..sr_sleep.my_ver()) else TB3D_Services.packet_alert("sr_sleep failed!!!!") end
+	if sr_sound then TB3D_Services.packet_alert("sr_sound: "..sr_sound.my_ver()) else TB3D_Services.packet_alert("sr_sound failed!!!!") end
+	if sr_sound2d then TB3D_Services.packet_alert("sr_sound2d: "..sr_sound2d.my_ver()) else TB3D_Services.packet_alert("sr_sound2d failed!!!!") end
+	if sr_teleport then TB3D_Services.packet_alert("sr_teleport: "..sr_teleport.my_ver()) else TB3D_Services.packet_alert("sr_teleport failed!!!!") end
+	if sr_territory then TB3D_Services.packet_alert("sr_territory: "..sr_territory.my_ver()) else TB3D_Services.packet_alert("sr_territory failed!!!!") end
+	if sr_timer then TB3D_Services.packet_alert("sr_timer: "..sr_timer.my_ver()) else TB3D_Services.packet_alert("sr_timer failed!!!!") end
+	if sr_tip then TB3D_Services.packet_alert("sr_tip: "..sr_tip.my_ver()) else TB3D_Services.packet_alert("sr_tip failed!!!!") end
+
+	if stalker_generic then TB3D_Services.packet_alert("stalker_generic: "..stalker_generic.my_ver()) else TB3D_Services.packet_alert("stalker_generic failed!!!!") end
+
+	if start then TB3D_Services.packet_alert("start: "..start.my_ver()) else TB3D_Services.packet_alert("start failed!!!!") end
+	
+	if state_lib then TB3D_Services.packet_alert("state_lib: "..state_lib.my_ver()) else TB3D_Services.packet_alert("state_lib failed!!!!") end
+	if state_mgr then TB3D_Services.packet_alert("state_mgr: "..state_mgr.my_ver()) else TB3D_Services.packet_alert("state_mgr failed!!!!") end
+	if state_mgr_animation then TB3D_Services.packet_alert("state_mgr_animation: "..state_mgr_animation.my_ver()) else TB3D_Services.packet_alert("state_mgr_animation failed!!!!") end
+	if state_mgr_animation_list then TB3D_Services.packet_alert("state_mgr_animation_list: "..state_mgr_animation_list.my_ver()) else TB3D_Services.packet_alert("state_mgr_animation_list failed!!!!") end
+	if state_mgr_animstate then TB3D_Services.packet_alert("state_mgr_animstate: "..state_mgr_animstate.my_ver()) else TB3D_Services.packet_alert("state_mgr_animstate failed!!!!") end
+	if state_mgr_bodystate then TB3D_Services.packet_alert("state_mgr_bodystate: "..state_mgr_bodystate.my_ver()) else TB3D_Services.packet_alert("state_mgr_bodystate failed!!!!") end
+	if state_mgr_direction then TB3D_Services.packet_alert("state_mgr_direction: "..state_mgr_direction.my_ver()) else TB3D_Services.packet_alert("state_mgr_direction failed!!!!") end
+	if state_mgr_goap then TB3D_Services.packet_alert("state_mgr_goap: "..state_mgr_goap.my_ver()) else TB3D_Services.packet_alert("state_mgr_goap failed!!!!") end
+	if state_mgr_mental then TB3D_Services.packet_alert("state_mgr_mental: "..state_mgr_mental.my_ver()) else TB3D_Services.packet_alert("state_mgr_mental failed!!!!") end
+	if state_mgr_movement then TB3D_Services.packet_alert("state_mgr_movement: "..state_mgr_movement.my_ver()) else TB3D_Services.packet_alert("state_mgr_movement failed!!!!") end
+	if state_mgr_weapon then TB3D_Services.packet_alert("state_mgr_weapon: "..state_mgr_weapon.my_ver()) else TB3D_Services.packet_alert("state_mgr_weapon failed!!!!") end
+	
+	if stco then TB3D_Services.packet_alert("stco: "..stco.my_ver()) else TB3D_Services.packet_alert("stco failed!!!!") end
+	
+	if tag_spb then TB3D_Services.packet_alert("tag_spb: "..tag_spb.my_ver()) else TB3D_Services.packet_alert("tag_spb failed!!!!") end
+	
+	if task_manager then TB3D_Services.packet_alert("task_manager: "..task_manager.my_ver()) else TB3D_Services.packet_alert("task_manager failed!!!!") end
+	
+	if taynik_spawn then TB3D_Services.packet_alert("taynik_spawn: "..taynik_spawn.my_ver()) else TB3D_Services.packet_alert("taynik_spawn failed!!!!") end
+	
+	if TB3D_Collector then TB3D_Services.packet_alert("TB3D_Collector: "..TB3D_Collector.my_ver()) else TB3D_Services.packet_alert("TB3D_Collector failed!!!!") end
+	if TB3D_Collector_dialog then TB3D_Services.packet_alert("TB3D_Collector_dialog: "..TB3D_Collector_dialog.my_ver()) else TB3D_Services.packet_alert("TB3D_Collector_dialog failed!!!!") end
+	if tb3d_dav_hunt then TB3D_Services.packet_alert("tb3d_dav_hunt: "..tb3d_dav_hunt.my_ver()) else TB3D_Services.packet_alert("tb3d_dav_hunt failed!!!!") end
+	if tb3d_dialog then TB3D_Services.packet_alert("tb3d_dialog: "..tb3d_dialog.my_ver()) else TB3D_Services.packet_alert("tb3d_dialog failed!!!!") end
+	if TB3D_dyn_spawn then TB3D_Services.packet_alert("TB3D_dyn_spawn: "..TB3D_dyn_spawn.my_ver()) else TB3D_Services.packet_alert("TB3D_dyn_spawn failed!!!!") end
+	if TB3D_FIXER then TB3D_Services.packet_alert("TB3D_FIXER: "..TB3D_FIXER.my_ver()) else TB3D_Services.packet_alert("TB3D_FIXER failed!!!!") end
+	if TB3D_hit_styles then TB3D_Services.packet_alert("TB3D_hit_styles: "..TB3D_hit_styles.my_ver()) else TB3D_Services.packet_alert("TB3D_hit_styles failed!!!!") end
+	if TB3D_levels then TB3D_Services.packet_alert("TB3D_levels: "..TB3D_levels.my_ver()) else TB3D_Services.packet_alert("TB3D_Levels failed!!!!") end
+	if TB3D_Modders then TB3D_Services.packet_alert("TB3D_Modders: "..TB3D_Modders.my_ver()) else TB3D_Services.packet_alert("TB3D_Modders failed!!!!") end	
+	
+		TB3D_Services.packet_alert("opt_start["
+		..utils.to_str(TB3D_Modders.default_portal_spawn).."]["..utils.to_str(TB3D_Modders.default_items).."]["
+		..utils.to_str(TB3D_Modders.use_ammo_belt).."]["..utils.to_str(TB3D_Modders.use_DMX_cars).."]")
+
+		TB3D_Services.packet_alert("opt_alife["..utils.to_str(TB3D_Modders.open_alife_in_SOC).."]["
+		..utils.to_str(TB3D_Modders.start_alife_option).."]["..utils.to_str(TB3D_Modders.alife_slice_mult).."]["
+		..utils.to_str(TB3D_Modders.look_radius).."]["..utils.to_str(TB3D_Modders.look_radius_box).."]["
+		..utils.to_str(TB3D_Modders.search_intensivity).."]["..utils.to_str(TB3D_Modders.to_actor).."]["
+		..utils.to_str(TB3D_Modders.max_rounds).."]["..utils.to_str(TB3D_Modders.health_wound).."]["
+		..utils.to_str(TB3D_Modders.health_wound_set).."]["..utils.to_str(TB3D_Modders.base_fp).."]["
+		..utils.to_str(TB3D_Modders.dist_coeff).."]["..utils.to_str(TB3D_Modders.damage_mult).."]["
+		..utils.to_str(TB3D_Modders.sell_limit).."]["..utils.to_str(TB3D_Modders.rate_kill_base).."]["
+		..utils.to_str(TB3D_Modders.rate_art_found).."]")
+		
+		TB3D_Services.packet_alert("opt_respawn["..utils.to_str(TB3D_Modders.smt_stay_time_mult).."]["
+		..utils.to_str(TB3D_Modders.smt_spawn_radius_min).."]["..utils.to_str(TB3D_Modders.smt_spawn_rank_min).."]["
+		..utils.to_str(TB3D_Modders.smt_spawn_rank_max).."]["..utils.to_str(TB3D_Modders.use_level_cleaner).."]")
+
+		TB3D_Services.packet_alert("opt_max_spawns["
+		..utils.to_str(TB3D_Modders.max_bibliotekar).."]["..utils.to_str(TB3D_Modders.max_bloodsuckers).."]["
+		..utils.to_str(TB3D_Modders.max_boars).."]["..utils.to_str(TB3D_Modders.max_burers).."]["
+		..utils.to_str(TB3D_Modders.max_cats).."]["..utils.to_str(TB3D_Modders.max_chimera).."]["
+		..utils.to_str(TB3D_Modders.max_controllers).."]["..utils.to_str(TB3D_Modders.max_crows).."]["
+		..utils.to_str(TB3D_Modders.max_dogs).."]["..utils.to_str(TB3D_Modders.max_flesh).."]["
+		..utils.to_str(TB3D_Modders.max_fractures).."]["..utils.to_str(TB3D_Modders.max_ghouls).."]["
+		..utils.to_str(TB3D_Modders.max_gigants).."]["..utils.to_str(TB3D_Modders.max_phantoms).."]["
+		..utils.to_str(TB3D_Modders.max_poltergeist).."]["..utils.to_str(TB3D_Modders.max_pseudodogs).."]["
+		..utils.to_str(TB3D_Modders.max_rats).."]["..utils.to_str(TB3D_Modders.max_scelets).."]["
+		..utils.to_str(TB3D_Modders.max_snorks).."]["..utils.to_str(TB3D_Modders.max_tarakans).."]["
+		..utils.to_str(TB3D_Modders.max_tushkanos).."]["..utils.to_str(TB3D_Modders.max_werewolves).."]["
+		..utils.to_str(TB3D_Modders.max_zombies).."]")
+
+		TB3D_Services.packet_alert("opt_game["
+		..utils.to_str(TB3D_Modders.give_items_on_spawn).."]["..utils.to_str(TB3D_Modders.unlimited_bolts).."]["
+		..utils.to_str(TB3D_Modders.hide_weapon).."]")
+		
+		TB3D_Services.packet_alert("opt_ai["..utils.to_str(TB3D_Modders.use_tb3d_wmgr).."]["
+		..utils.to_str(TB3D_Modders.use_xtrm_ai).."]["..utils.to_str(TB3D_Modders.sniper_aim_ratio).."]["
+		..utils.to_str(TB3D_Modders.sniper_aim_min).."]["..utils.to_str(TB3D_Modders.ai_anomoly_evade).."]")
+		
+		TB3D_Services.packet_alert("opt_news["
+		..utils.to_str(TB3D_Modders.show_death_news).."]["..utils.to_str(TB3D_Modders.show_spawn_news).."]["
+		..utils.to_str(TB3D_Modders.show_abuse_news).."]["..utils.to_str(TB3D_Modders.show_hero_news).."]["
+		..utils.to_str(TB3D_Modders.show_blowout_news).."]["..utils.to_str(TB3D_Modders.show_info_news).."]["
+		..utils.to_str(TB3D_Modders.offline_alife_trade).."]")
+		
+		TB3D_Services.packet_alert("opt_hit["..utils.to_str(TB3D_Modders.use_hits).."]["
+		..utils.to_str(TB3D_Modders.default_hit).."]["..utils.to_str(TB3D_Modders.amk_style_hit).."]["
+		..utils.to_str(TB3D_Modders.blowout_crows).."]["..utils.to_str(TB3D_Modders.blowout_npc).."]["
+		..utils.to_str(TB3D_Modders.blowout_rad_val).."]["..utils.to_str(TB3D_Modders.horror_hit).."]["
+		..utils.to_str(TB3D_Modders.meet_hit).."]["..utils.to_str(TB3D_Modders.sleep_hit).."]["
+		..utils.to_str(TB3D_Modders.wound_hit).."]["..utils.to_str(TB3D_Modders.death_hit).."]["
+		..utils.to_str(TB3D_Modders.animation_hit).."]["..utils.to_str(TB3D_Modders.alcohol_hit).."]["
+		..utils.to_str(TB3D_Modders.artefact_hit).."]["..utils.to_str(TB3D_Modders.art_hit_multiplier).."]["
+		..utils.to_str(TB3D_Modders.teleport_hit).."]["..utils.to_str(TB3D_Modders.mutator_hit).."]["
+		..utils.to_str(TB3D_Modders.radiation_hit).."]["..utils.to_str(TB3D_Modders.zavis_hit).."]")
+		
+		TB3D_Services.packet_alert("opt_diff["
+		..utils.to_str(TB3D_Modders.cave_no_big_electros).."]["..utils.to_str(TB3D_Modders.cave_hard).."]["
+		..utils.to_str(TB3D_Modders.heli_attack).."]["..utils.to_str(TB3D_Modders.default_sleep).."]["
+		..utils.to_str(TB3D_Modders.die_in_sleep).."]["..utils.to_str(TB3D_Modders.guns_can_explode).."]["
+		..utils.to_str(TB3D_Modders.head_bob).."]["..utils.to_str(TB3D_Modders.head_sway_power).."]["
+		..utils.to_str(TB3D_Modders.loadout_rand_cond).."]["..utils.to_str(TB3D_Modders.radiation_factor).."]["
+		..utils.to_str(TB3D_Modders.zombie).."]["..utils.to_str(TB3D_Modders.invisible).."]["
+		..utils.to_str(TB3D_Modders.teleporter_use).."]["..utils.to_str(TB3D_Modders.effector_spawn).."]["
+		..utils.to_str(TB3D_Modders.night_creatures).."]["..utils.to_str(TB3D_Modders.hits_to_kill_invuln).."]["
+		..utils.to_str(TB3D_Modders.hits_to_head_invuln).."]["..utils.to_str(TB3D_Modders.check_bad_weapons).."]["
+		..utils.to_str(TB3D_Modders.hardcore_mobs).."]")
+
+		TB3D_Services.packet_alert("opt_loot["..utils.to_str(TB3D_Modders.money_decoder).."]["
+		..utils.to_str(TB3D_Modders.money_scarce).."]["..utils.to_str(TB3D_Modders.loot_option).."]")
+
+		TB3D_Services.packet_alert("opt_env["
+		..utils.to_str(TB3D_Modders.use_fog).."]["..utils.to_str(TB3D_Modders.use_swamp_mist).."]["
+		..utils.to_str(TB3D_Modders.use_smoke).."]["..utils.to_str(TB3D_Modders.use_campfire_smoke).."]["
+		..utils.to_str(TB3D_Modders.use_heat_vapors).."]["..utils.to_str(TB3D_Modders.use_heat_distorts).."]["
+		..utils.to_str(TB3D_Modders.use_emi_fields).."]["..utils.to_str(TB3D_Modders.use_rad_fields).."]["
+		..utils.to_str(TB3D_Modders.use_insect_infests).."]")
+		
+		TB3D_Services.packet_alert("opt_dyn["
+		..utils.to_str(TB3D_Modders.use_random_tanks).."]["..utils.to_str(TB3D_Modders.use_rat_infests).."]["
+		..utils.to_str(TB3D_Modders.use_roach_infests).."]["..utils.to_str(TB3D_Modders.use_tarakan_infests).."]["
+		..utils.to_str(TB3D_Modders.use_random_packs).."]["..utils.to_str(TB3D_Modders.use_random_herds).."]["
+		..utils.to_str(TB3D_Modders.use_random_mutants).."]["..utils.to_str(TB3D_Modders.use_dyn_cars).."]")
+		
+		TB3D_Services.packet_alert("opt_sounds["
+		..utils.to_str(TB3D_Modders.swamp_sounds).."]["..utils.to_str(TB3D_Modders.cooling_sounds).."]")
+		
+		TB3D_Services.packet_alert("opt_day["
+		..utils.to_str(TB3D_Modders.day_start).."]["..utils.to_str(TB3D_Modders.day_end).."]")
+		
+		TB3D_Services.packet_alert("opt_anoms["..utils.to_str(TB3D_Modders.least_anomolies).."]["
+		..utils.to_str(TB3D_Modders.hardcore_anomolies).."]["..utils.to_str(TB3D_Modders.easy_anomolies).."]["
+		..utils.to_str(TB3D_Modders.Cadet_level_anomolies).."]")
+		
+		TB3D_Services.packet_alert("opt_arts["..utils.to_str(TB3D_Modders.arts_total).."]["
+		..utils.to_str(TB3D_Modders.arts_max).."]["..utils.to_str(TB3D_Modders.less_arts).."]")
+		
+		TB3D_Services.packet_alert("opt_blowout["
+		..utils.to_str(TB3D_Modders.run_blowout_pp).."]["..utils.to_str(TB3D_Modders.zombie_team).."]["
+		..utils.to_str(TB3D_Modders.surge_day_effect).."]["..utils.to_str(TB3D_Modders.phantom_spawn).."]["
+		..utils.to_str(TB3D_Modders.blow_time_basis).."]["..utils.to_str(TB3D_Modders.blow_time_shift).."]["
+		..utils.to_str(TB3D_Modders.blow_phase_basis).."]["..utils.to_str(TB3D_Modders.blow_phase_shift).."]["
+		..utils.to_str(TB3D_Modders.blow_phase_max).."]["..utils.to_str(TB3D_Modders.hell).."]["
+		..utils.to_str(TB3D_Modders.hell_spawn).."]["..utils.to_str(TB3D_Modders.hell_hour_alarm).."]")
+		
+		TB3D_Services.packet_alert("opt_system["
+		..utils.to_str(TB3D_Modders.fires_always_on).."]["..utils.to_str(TB3D_Modders.aem_light_style).."]["
+		..utils.to_str(TB3D_Modders.bar_music).."]["..utils.to_str(TB3D_Modders.display_compass).."]["
+		..utils.to_str(TB3D_Modders.CopKeys).."]["
+		..utils.to_str(TB3D_Modders.menu_char_height).."]["..utils.to_str(TB3D_Modders.menu_date_start).."]["
+		..utils.to_str(TB3D_Modders.menu_show_keys).."]["..utils.to_str(TB3D_Modders.fov_nv).."]["
+		..utils.to_str(TB3D_Modders.advanced_nightvision).."]["..utils.to_str(TB3D_Modders.ddof_mode).."]["
+		..utils.to_str(TB3D_Modders.ddof_kernel_C).."]["..utils.to_str(TB3D_Modders.ddof_kernel_G).."]["
+		..utils.to_str(TB3D_Modders.motion_blur).."]["..utils.to_str(TB3D_Modders.bio_map_pulse).."]["
+		..utils.to_str(TB3D_Modders.biodetect_all).."]["..utils.to_str(TB3D_Modders.bioradar_max_count).."]["
+		..utils.to_str(TB3D_Modders.auto_levels).."]["..utils.to_str(TB3D_Modders.level_set_max).."]["
+		..utils.to_str(TB3D_Modders.delta_critical).."]["..utils.to_str(TB3D_Modders.delta_moderate).."]["
+		..utils.to_str(TB3D_Modders.delta_low).."]["..utils.to_str(TB3D_Modders.delta_lowest).."]")
+		
+		TB3D_Services.packet_alert("opt_debug1["
+		..utils.to_str(TB3D_Modders.Global_Debug).."]["..utils.to_str(TB3D_Modders.use_abort_message).."]["
+		..utils.to_str(TB3D_Modders.use_task_message).."]["..utils.to_str(TB3D_Modders.use_scheme_message).."]["
+		..utils.to_str(TB3D_Modders.use_packet_message).."]["..utils.to_str(TB3D_Modders.use_spawn_message).."]["
+		..utils.to_str(TB3D_Modders.use_respawn_message).."]["..utils.to_str(TB3D_Modders.use_alife_message).."]["
+		..utils.to_str(TB3D_Modders.use_environment_message).."]")
+		TB3D_Services.packet_alert("opt_debug2["
+		..utils.to_str(TB3D_Modders.use_lc_message).."]["..utils.to_str(TB3D_Modders.use_sak_message).."]["
+		..utils.to_str(TB3D_Modders.use_logic_message).."]["..utils.to_str(TB3D_Modders.use_smh1_message).."]["
+		..utils.to_str(TB3D_Modders.use_smh2_message).."]["..utils.to_str(TB3D_Modders.use_smh3_message).."]["
+		..utils.to_str(TB3D_Modders.use_combat_message).."]")
+		TB3D_Services.packet_alert("opt_debug3["
+		..utils.to_str(TB3D_Modders.use_rxai_message).."]["..utils.to_str(TB3D_Modders.use_news_message).."]["
+		..utils.to_str(TB3D_Modders.use_counter_message).."]["..utils.to_str(TB3D_Modders.use_conditions_message).."]["
+		..utils.to_str(TB3D_Modders.use_arena_message).."]["..utils.to_str(TB3D_Modders.use_inventory_message).."]["
+		..utils.to_str(TB3D_Modders.use_weapon_message).."]["..utils.to_str(TB3D_Modders.use_fastcall_message).."]["
+		..utils.to_str(TB3D_Modders.use_perception_message).."]["..utils.to_str(TB3D_Modders.use_sound_message).."]")
+		TB3D_Services.packet_alert("opt_debug4["
+		..utils.to_str(TB3D_Modders.show_tables).."]["
+		..utils.to_str(TB3D_Modders.show_smart_packets).."]["..utils.to_str(TB3D_Modders.use_slice_message).."]["
+		..utils.to_str(TB3D_Modders.show_news_spots).."]["..utils.to_str(TB3D_Modders.use_fast_news_debug).."]["
+		..utils.to_str(TB3D_Modders.log_game_stats).."]["..utils.to_str(TB3D_Modders.show_hit_actions).."]["
+		..utils.to_str(TB3D_Modders.show_hit_invulnerable).."]["..utils.to_str(TB3D_Modders.use_cleaner_message).."]["
+		..utils.to_str(TB3D_Modders.use_population_report).."]["..utils.to_str(TB3D_Modders.use_loadout_message).."]["
+		..utils.to_str(TB3D_Modders.use_info_message).."]["..utils.to_str(TB3D_Modders.display_delta).."]["
+		..utils.to_str(TB3D_Modders.use_state_message).."]["..utils.to_str(TB3D_Modders.use_setup_message).."]["
+		..utils.to_str(TB3D_Modders.npc_to_log).."]["..utils.to_str(TB3D_Modders.test_without_npc).."]["
+		..utils.to_str(TB3D_Modders.test_without_creatures).."]["..utils.to_str(TB3D_Modders.use_binder_message).."]["
+		..utils.to_str(TB3D_Modders.use_wmgr_messages).."]["..utils.to_str(TB3D_Modders.gg_show_spots).."]["
+		..utils.to_str(TB3D_Modders.use_offline_alife).."]")
+		
+	if TB3D_net_manager then TB3D_Services.packet_alert("TB3D_net_manager: "..TB3D_net_manager.my_ver()) else TB3D_Services.packet_alert("TB3D_net_manager	failed!!!!") end
+
+	if TB3D_Population_Control then TB3D_Services.packet_alert("TB3D_Population_Control: "..TB3D_Population_Control.my_ver()) else TB3D_Services.packet_alert("TB3D_Population_Control	failed!!!!") end
+
+	if TB3D_Services then
+		TB3D_Services.packet_alert("TB3D_Services: "..TB3D_Services.my_ver().." major version["..utils.to_str(TB3D_Services.major_version).."] dm flag["..utils.to_str(TB3D_Services.dm_flag_version).."]")
+	 else
+		TB3D_Services.packet_alert("TB3D_Services failed!!!!")
+	 end
+	if TB3D_Shaders then TB3D_Services.packet_alert("TB3D_Shaders: "..TB3D_Shaders.my_ver()) else TB3D_Services.packet_alert("TB3D_Shaders failed!!!!") end
+	if TB3D_Spots then TB3D_Services.packet_alert("TB3D_Spots: "..TB3D_Spots.my_ver()) else TB3D_Services.packet_alert("TB3D_Spots failed!!!!") end
+	if TB3D_Stalker then TB3D_Services.packet_alert("TB3D_Stalker: "..TB3D_Stalker.my_ver()) else TB3D_Services.packet_alert("TB3D_Stalker failed!!!!") end
+	if TB3D_Triggers then TB3D_Services.packet_alert("TB3D_Triggers: "..TB3D_Triggers.my_ver()) else TB3D_Services.packet_alert("TB3D_Triggers failed!!!!") end
+	if TB3D_Update then TB3D_Services.packet_alert("TB3D_Update: "..TB3D_Update.my_ver()) else TB3D_Services.packet_alert("TB3D_Update failed!!!!") end
+	
+	if terrorizm then TB3D_Services.packet_alert("terrorizm: "..terrorizm.my_ver()) else TB3D_Services.packet_alert("terrorizm failed!!!!") end
+	
+	if timer_v then TB3D_Services.packet_alert("timer_v: "..timer_v.my_ver()) else TB3D_Services.packet_alert("timer_v failed!!!!") end
+	
+	if trade_manager then TB3D_Services.packet_alert("trade_manager: "..trade_manager.my_ver()) else TB3D_Services.packet_alert("trade_manager failed!!!!") end
+	if trade_treasure_manager then TB3D_Services.packet_alert("trade_treasure_manager: "..trade_treasure_manager.my_ver()) else TB3D_Services.packet_alert("trade_treasure_manager failed!!!!") end
+	if treasure_manager then TB3D_Services.packet_alert("treasure_manager: "..treasure_manager.my_ver()) else TB3D_Services.packet_alert("treasure_manager failed!!!!") end
+
+	if turret_firmware then TB3D_Services.packet_alert("turret_firmware: "..turret_firmware.my_ver()) else TB3D_Services.packet_alert("turret_firmware failed!!!!") end
+	if turret_mgun then TB3D_Services.packet_alert("turret_mgun: "..turret_mgun.my_ver()) else TB3D_Services.packet_alert("turret_mgun failed!!!!") end
+	if turret_spawn then TB3D_Services.packet_alert("turret_spawn: "..turret_spawn.my_ver()) else TB3D_Services.packet_alert("turret_spawn failed!!!!") end
+	
+	if ui_amk_options then TB3D_Services.packet_alert("ui_amk_options: "..ui_amk_options.my_ver()) else TB3D_Services.packet_alert("ui_amk_options failed!!!!") end
+	if ui_atlas2 then TB3D_Services.packet_alert("ui_atlas2: "..ui_atlas2.my_ver()) else TB3D_Services.packet_alert("ui_atlas2 failed!!!!") end
+	if ui_atlas3 then TB3D_Services.packet_alert("ui_atlas3: "..ui_atlas3.my_ver()) else TB3D_Services.packet_alert("ui_atlas3 failed!!!!") end
+	if ui_base_dialog then TB3D_Services.packet_alert("ui_base_dialog: "..ui_base_dialog.my_ver()) else TB3D_Services.packet_alert("ui_base_dialog failed!!!!") end
+	if ui_cheat then TB3D_Services.packet_alert("ui_cheat: "..ui_cheat.my_ver()) else TB3D_Services.packet_alert("ui_cheat failed!!!!") end
+	if ui_cheat_player then TB3D_Services.packet_alert("ui_cheat_player: "..ui_cheat_player.my_ver()) else TB3D_Services.packet_alert("ui_cheat_player failed!!!!") end
+	if ui_cheat_razgruzka then TB3D_Services.packet_alert("ui_cheat_razgruzka: "..ui_cheat_razgruzka.my_ver()) else TB3D_Services.packet_alert("ui_cheat_razgruzka failed!!!!") end
+	if ui_cheat_spawner then TB3D_Services.packet_alert("ui_cheat_spawner: "..ui_cheat_spawner.my_ver()) else TB3D_Services.packet_alert("ui_cheat_spawner failed!!!!") end
+	if ui_cheat_timer then TB3D_Services.packet_alert("ui_cheat_timer: "..ui_cheat_timer.my_ver()) else TB3D_Services.packet_alert("ui_cheat_timer failed!!!!") end
+
+	if ui_comm then TB3D_Services.packet_alert("ui_comm: "..ui_comm.my_ver()) else TB3D_Services.packet_alert("ui_comm failed!!!!") end
+	--if ui_dots then TB3D_Services.packet_alert("ui_dots: "..ui_dots.my_ver()) else TB3D_Services.packet_alert("ui_dots failed!!!!") end
+	--if ui_game_arcanoid then TB3D_Services.packet_alert("ui_game_arcanoid: "..ui_game_arcanoid.my_ver()) else TB3D_Services.packet_alert("ui_game_arcanoid failed!!!!") end
+	--if ui_game_bulldozer then TB3D_Services.packet_alert("ui_game_bulldozer: "..ui_game_bulldozer.my_ver()) else TB3D_Services.packet_alert("ui_game_bulldozer failed!!!!") end
+	--if ui_game_saper then TB3D_Services.packet_alert("ui_game_saper: "..ui_game_saper.my_ver()) else TB3D_Services.packet_alert("ui_game_saper failed!!!!") end
+	if ui_gps_trade then TB3D_Services.packet_alert("ui_gps_trade: "..ui_gps_trade.my_ver()) else TB3D_Services.packet_alert("ui_gps_trade failed!!!!") end
+	if ui_load_dialog then TB3D_Services.packet_alert("ui_load_dialog: "..ui_load_dialog.my_ver()) else TB3D_Services.packet_alert("ui_load_dialog failed!!!!") end
+	if ui_main_base_tab then TB3D_Services.packet_alert("ui_main_base_tab: "..ui_main_base_tab.my_ver()) else TB3D_Services.packet_alert("ui_main_base_tab failed!!!!") end
+	if ui_main_main_tab then TB3D_Services.packet_alert("ui_main_main_tab: "..ui_main_main_tab.my_ver()) else TB3D_Services.packet_alert("ui_main_main_tab failed!!!!") end
+	if ui_main_menu then TB3D_Services.packet_alert("ui_main_menu: "..ui_main_menu.my_ver()) else TB3D_Services.packet_alert("ui_main_menu failed!!!!") end
+	if ui_main_multi_tab then TB3D_Services.packet_alert("ui_main_multi_tab: "..ui_main_multi_tab.my_ver()) else TB3D_Services.packet_alert("ui_main_multi_tab failed!!!!") end
+	if ui_main_new_tab then TB3D_Services.packet_alert("ui_main_new_tab: "..ui_main_new_tab.my_ver()) else TB3D_Services.packet_alert("ui_main_new_tab failed!!!!") end
+
+	if ui_mm_mp_join then TB3D_Services.packet_alert("ui_mm_mp_join: "..ui_mm_mp_join.my_ver()) else TB3D_Services.packet_alert("ui_mm_mp_join failed!!!!") end
+	if ui_mm_mp_options then TB3D_Services.packet_alert("ui_mm_mp_options: "..ui_mm_mp_options.my_ver()) else TB3D_Services.packet_alert("ui_mm_mp_options failed!!!!") end
+	if ui_mm_mp_server then TB3D_Services.packet_alert("ui_mm_mp_server: "..ui_mm_mp_server.my_ver()) else TB3D_Services.packet_alert("ui_mm_mp_server failed!!!!") end
+	if ui_mm_opt_controls then TB3D_Services.packet_alert("ui_mm_opt_controls: "..ui_mm_opt_controls.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_controls failed!!!!") end
+	if ui_mm_opt_gameplay then TB3D_Services.packet_alert("ui_mm_opt_gameplay: "..ui_mm_opt_gameplay.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_gameplay failed!!!!") end
+	if ui_mm_opt_main then TB3D_Services.packet_alert("ui_mm_opt_main: "..ui_mm_opt_main.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_main failed!!!!") end
+	if ui_mm_opt_sound then TB3D_Services.packet_alert("ui_mm_opt_sound: "..ui_mm_opt_sound.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_sound failed!!!!") end
+	if ui_mm_opt_video then TB3D_Services.packet_alert("ui_mm_opt_video: "..ui_mm_opt_video.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_video failed!!!!") end
+	if ui_mm_opt_video_adv then TB3D_Services.packet_alert("ui_mm_opt_video_adv: "..ui_mm_opt_video_adv.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_video_adv failed!!!!") end
+	if ui_mp_main then TB3D_Services.packet_alert("ui_mp_main: "..ui_mp_main.my_ver()) else TB3D_Services.packet_alert("ui_mp_main failed!!!!") end
+	if ui_multiplayer_base then TB3D_Services.packet_alert("ui_multiplayer_base: "..ui_multiplayer_base.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_base failed!!!!") end
+	if ui_multiplayer_base_tab then TB3D_Services.packet_alert("ui_multiplayer_base_tab: "..ui_multiplayer_base_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_base_tab failed!!!!") end
+	if ui_multiplayer_create then TB3D_Services.packet_alert("ui_multiplayer_create: "..ui_multiplayer_create.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_create failed!!!!") end
+	if ui_multiplayer_create_map_tab then TB3D_Services.packet_alert("ui_multiplayer_create_map_tab: "..ui_multiplayer_create_map_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_create_map_tab failed!!!!") end
+	if ui_multiplayer_dialog then TB3D_Services.packet_alert("ui_multiplayer_dialog: "..ui_multiplayer_dialog.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_dialog failed!!!!") end
+	if ui_multiplayer_find then TB3D_Services.packet_alert("ui_multiplayer_find: "..ui_multiplayer_find.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_find failed!!!!") end
+	if ui_multiplayer_gametype_tab then TB3D_Services.packet_alert("ui_multiplayer_gametype_tab: "..ui_multiplayer_gametype_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_gametype_tab failed!!!!") end
+	if ui_multiplayer_map_tab then TB3D_Services.packet_alert("ui_multiplayer_map_tab: "..ui_multiplayer_map_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_map_tab failed!!!!") end
+	if ui_multiplayer_options_tab then TB3D_Services.packet_alert("ui_multiplayer_options_tab: "..ui_multiplayer_options_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_options_tab failed!!!!") end
+
+	if ui_numpad then TB3D_Services.packet_alert("ui_numpad: "..ui_numpad.my_ver()) else TB3D_Services.packet_alert("ui_numpad failed!!!!") end
+	if ui_options_base_tab then TB3D_Services.packet_alert("ui_options_base_tab: "..ui_options_base_tab.my_ver()) else TB3D_Services.packet_alert("ui_options_base_tab failed!!!!") end
+	if ui_options_controls_tab then TB3D_Services.packet_alert("ui_options_controls_tab: "..ui_options_controls_tab.my_ver()) else TB3D_Services.packet_alert("ui_options_controls_tab failed!!!!") end
+	if ui_options_dialog then TB3D_Services.packet_alert("ui_options_dialog: "..ui_options_dialog.my_ver()) else TB3D_Services.packet_alert("ui_options_dialog failed!!!!") end
+	if ui_options_game_tab then TB3D_Services.packet_alert("ui_options_game_tab: "..ui_options_game_tab.my_ver()) else TB3D_Services.packet_alert("ui_options_game_tab failed!!!!") end
+	if ui_options_profiles_tab then TB3D_Services.packet_alert("ui_options_profiles_tab: "..ui_options_profiles_tab.my_ver()) else TB3D_Services.packet_alert("ui_options_profiles_tab failed!!!!") end
+	if ui_options_sound_tab then TB3D_Services.packet_alert("ui_options_sound_tab: "..ui_options_sound_tab.my_ver()) else TB3D_Services.packet_alert("ui_options_sound_tab failed!!!!") end
+	if ui_options_video_tab then TB3D_Services.packet_alert("ui_options_video_tab: "..ui_options_video_tab.my_ver()) else TB3D_Services.packet_alert("ui_options_video_tab failed!!!!") end
+	if ui_pda_art_mod then TB3D_Services.packet_alert("ui_pda_art_mod: "..ui_pda_art_mod.my_ver()) else TB3D_Services.packet_alert("ui_pda_art_mod failed!!!!") end
+	if ui_rad then TB3D_Services.packet_alert("ui_rad: "..ui_rad.my_ver()) else TB3D_Services.packet_alert("ui_rad failed!!!!") end
+	if ui_registrator then TB3D_Services.packet_alert("ui_registrator: "..ui_registrator.my_ver()) else TB3D_Services.packet_alert("ui_registrator failed!!!!") end
+	if ui_save_dialog then TB3D_Services.packet_alert("ui_save_dialog: "..ui_save_dialog.my_ver()) else TB3D_Services.packet_alert("ui_save_dialog failed!!!!") end
+	if ui_si then TB3D_Services.packet_alert("ui_si: "..ui_si.my_ver()) else TB3D_Services.packet_alert("ui_si failed!!!!") end
+	if ui_TB3D_Teleport then TB3D_Services.packet_alert("ui_TB3D_Teleport: "..ui_TB3D_Teleport.my_ver()) else TB3D_Services.packet_alert("ui_TB3D_Teleport failed!!!!") end
+	if ui_weapon_upgrade then TB3D_Services.packet_alert("ui_weapon_upgrade: "..ui_weapon_upgrade.my_ver()) else TB3D_Services.packet_alert("ui_weapon_upgrade failed!!!!") end
+	if ui_weather then TB3D_Services.packet_alert("ui_weather: "..ui_weather.my_ver()) else TB3D_Services.packet_alert("ui_weather failed!!!!") end
+	if ui_wpn_params then TB3D_Services.packet_alert("ui_wpn_params: "..ui_wpn_params.my_ver()) else TB3D_Services.packet_alert("ui_wpn_params failed!!!!") end
+
+	if utils then TB3D_Services.packet_alert("utils: "..utils.my_ver()) else TB3D_Services.packet_alert("utils failed!!!!") end
+	if utils2 then TB3D_Services.packet_alert("utils2: "..utils2.my_ver()) else TB3D_Services.packet_alert("utils2 failed!!!!") end
+	
+	if watcher_act then TB3D_Services.packet_alert("watcher_act: "..watcher_act.my_ver()) else TB3D_Services.packet_alert("watcher_act failed!!!!") end
+	
+	if wawka then TB3D_Services.packet_alert("wawka: "..wawka.my_ver()) else TB3D_Services.packet_alert("wawka failed!!!!") end
+	if wawka_dialog then TB3D_Services.packet_alert("wawka_dialog: "..wawka_dialog.my_ver()) else TB3D_Services.packet_alert("wawka_dialog failed!!!!") end
+
+	if xr_abuse then TB3D_Services.packet_alert("xr_abuse: "..xr_abuse.my_ver()) else TB3D_Services.packet_alert("xr_abuse failed!!!!") end
+	if xr_actions_id then TB3D_Services.packet_alert("xr_actions_id: "..xr_actions_id.my_ver()) else TB3D_Services.packet_alert("xr_actions_id failed!!!!") end
+	if xr_assistance then TB3D_Services.packet_alert("xr_assistance: "..xr_assistance.my_ver()) else TB3D_Services.packet_alert("xr_assistance failed!!!!") end
+	if xr_attendant then TB3D_Services.packet_alert("xr_attendant: "..xr_attendant.my_ver()) else TB3D_Services.packet_alert("xr_attendant failed!!!!") end
+	if xr_box then TB3D_Services.packet_alert("xr_box: "..xr_box.my_ver()) else TB3D_Services.packet_alert("xr_box failed!!!!") end
+	if xr_camper then TB3D_Services.packet_alert("xr_camper: "..xr_camper.my_ver()) else TB3D_Services.packet_alert("xr_camper failed!!!!") end
+	if xr_combat then TB3D_Services.packet_alert("xr_combat: "..xr_combat.my_ver()) else TB3D_Services.packet_alert("xr_combat failed!!!!") end
+	if xr_combat_camper then TB3D_Services.packet_alert("xr_combat_camper: "..xr_combat_camper.my_ver()) else TB3D_Services.packet_alert("xr_combat_camper failed!!!!") end
+	if xr_combat_ignore then TB3D_Services.packet_alert("xr_combat_ignore: "..xr_combat_ignore.my_ver()) else TB3D_Services.packet_alert("xr_combat_ignore failed!!!!") end
+	if xr_combat_monolith then TB3D_Services.packet_alert("xr_combat_monolith: "..xr_combat_monolith.my_ver()) else TB3D_Services.packet_alert("xr_combat_monolith failed!!!!") end
+	if xr_combat_zombied then TB3D_Services.packet_alert("xr_combat_zombied: "..xr_combat_zombied.my_ver()) else TB3D_Services.packet_alert("xr_combat_zombied failed!!!!") end
+	if xr_companion then TB3D_Services.packet_alert("xr_companion: "..xr_companion.my_ver()) else TB3D_Services.packet_alert("xr_companion failed!!!!") end
+	if xr_conditions then TB3D_Services.packet_alert("xr_conditions: "..xr_conditions.my_ver()) else TB3D_Services.packet_alert("xr_conditions failed!!!!") end
+	if xr_conditions_impl then TB3D_Services.packet_alert("xr_conditions_impl: "..xr_conditions_impl.my_ver()) else TB3D_Services.packet_alert("xr_conditions_impl failed!!!!") end
+	if xr_danger then TB3D_Services.packet_alert("xr_danger: "..xr_danger.my_ver()) else TB3D_Services.packet_alert("xr_danger failed!!!!") end
+	if xr_death then TB3D_Services.packet_alert("xr_death: "..xr_death.my_ver()) else TB3D_Services.packet_alert("xr_death failed!!!!") end
+	if xr_detector then TB3D_Services.packet_alert("xr_detector: "..xr_detector.my_ver()) else TB3D_Services.packet_alert("xr_detector failed!!!!") end
+	if xr_dialogs then TB3D_Services.packet_alert("xr_dialogs: "..xr_dialogs.my_ver()) else TB3D_Services.packet_alert("xr_dialogs failed!!!!") end
+	if xr_effects then TB3D_Services.packet_alert("xr_effects: "..xr_effects.my_ver()) else TB3D_Services.packet_alert("xr_effects failed!!!!") end
+	if xr_evaluators_id then TB3D_Services.packet_alert("xr_evaluators_id: "..xr_evaluators_id.my_ver()) else TB3D_Services.packet_alert("xr_evaluators_id failed!!!!") end
+	if xr_garmon then TB3D_Services.packet_alert("xr_garmon: "..xr_garmon.my_ver()) else TB3D_Services.packet_alert("xr_garmon failed!!!!") end
+	if xr_giditara then TB3D_Services.packet_alert("xr_giditara: "..xr_giditara.my_ver()) else TB3D_Services.packet_alert("xr_giditara failed!!!!") end
+	if xr_gulag then TB3D_Services.packet_alert("xr_gulag: "..xr_gulag.my_ver()) else TB3D_Services.packet_alert("xr_gulag failed!!!!") end
+	if xr_heli_hunter then TB3D_Services.packet_alert("xr_heli_hunter: "..xr_heli_hunter.my_ver()) else TB3D_Services.packet_alert("xr_heli_hunter failed!!!!") end
+	if xr_hit then TB3D_Services.packet_alert("xr_hit: "..xr_hit.my_ver()) else TB3D_Services.packet_alert("xr_hit failed!!!!") end
+	if xr_info then TB3D_Services.packet_alert("xr_info: "..xr_info.my_ver()) else TB3D_Services.packet_alert("xr_info failed!!!!") end
+	if xr_kamp then TB3D_Services.packet_alert("xr_kamp: "..xr_kamp.my_ver()) else TB3D_Services.packet_alert("xr_kamp failed!!!!") end
+	if xr_light then TB3D_Services.packet_alert("xr_light: "..xr_light.my_ver()) else TB3D_Services.packet_alert("xr_light failed!!!!") end
+	if xr_logic then TB3D_Services.packet_alert("xr_logic: "..xr_logic.my_ver()) else TB3D_Services.packet_alert("xr_logic failed!!!!") end
+	if xr_meet then TB3D_Services.packet_alert("xr_meet: "..xr_meet.my_ver()) else TB3D_Services.packet_alert("xr_meet failed!!!!") end
+	if xr_motivator then TB3D_Services.packet_alert("xr_motivator: "..xr_motivator.my_ver()) else TB3D_Services.packet_alert("xr_motivator failed!!!!") end
+	if xr_patrol then TB3D_Services.packet_alert("xr_patrol: "..xr_patrol.my_ver()) else TB3D_Services.packet_alert("xr_patrol failed!!!!") end
+	if xr_racya then TB3D_Services.packet_alert("xr_racya: "..xr_racya.my_ver()) else TB3D_Services.packet_alert("xr_racya failed!!!!") end
+	if xr_reach_task then TB3D_Services.packet_alert("xr_reach_task: "..xr_reach_task.my_ver()) else TB3D_Services.packet_alert("xr_reach_task failed!!!!") end
+	if xr_remark then TB3D_Services.packet_alert("xr_remark: "..xr_remark.my_ver()) else TB3D_Services.packet_alert("xr_remark failed!!!!") end
+	if xr_rest then TB3D_Services.packet_alert("xr_rest: "..xr_rest.my_ver()) else TB3D_Services.packet_alert("xr_rest failed!!!!") end
+	if xr_sleeper then TB3D_Services.packet_alert("xr_sleeper: "..xr_sleeper.my_ver()) else TB3D_Services.packet_alert("xr_sleeper failed!!!!") end
+	if xr_smoking then TB3D_Services.packet_alert("xr_smoking: "..xr_smoking.my_ver()) else TB3D_Services.packet_alert("xr_smoking failed!!!!") end
+	if xr_sound then TB3D_Services.packet_alert("xr_sound: "..xr_sound.my_ver()) else TB3D_Services.packet_alert("xr_sound failed!!!!") end
+	if xr_spawner then TB3D_Services.packet_alert("xr_spawner: "..xr_spawner.my_ver()) else TB3D_Services.packet_alert("xr_spawner failed!!!!") end
+	if xr_state then TB3D_Services.packet_alert("xr_state: "..xr_state.my_ver()) else TB3D_Services.packet_alert("xr_state failed!!!!") end
+	if xr_use then TB3D_Services.packet_alert("xr_use: "..xr_use.my_ver()) else TB3D_Services.packet_alert("xr_use failed!!!!") end
+	if xr_wounded then TB3D_Services.packet_alert("xr_wounded: "..xr_wounded.my_ver()) else TB3D_Services.packet_alert("xr_wounded failed!!!!") end
+	if xr_zones then TB3D_Services.packet_alert("xr_zones: "..xr_zones.my_ver()) else TB3D_Services.packet_alert("xr_zones failed!!!!") end
+	
+	if xrs_ai then TB3D_Services.packet_alert("xrs_ai: "..xrs_ai.my_ver()) else TB3D_Services.packet_alert("xrs_ai failed!!!!") end
+	if xrs_armor then TB3D_Services.packet_alert("xrs_armor: "..xrs_armor.my_ver()) else TB3D_Services.packet_alert("xrs_armor failed!!!!") end
+	if xrs_grenade then TB3D_Services.packet_alert("xrs_grenade: "..xrs_grenade.my_ver()) else TB3D_Services.packet_alert("xrs_grenade failed!!!!") end
+	if xrs_medic then TB3D_Services.packet_alert("xrs_medic: "..xrs_medic.my_ver()) else TB3D_Services.packet_alert("xrs_medic failed!!!!") end
+
+	if yantar_dialog then TB3D_Services.packet_alert("yantar_dialog: "..yantar_dialog.my_ver()) else TB3D_Services.packet_alert("yantar_dialog failed!!!!") end
+	if yantar_tasks then TB3D_Services.packet_alert("yantar_tasks: "..yantar_tasks.my_ver()) else TB3D_Services.packet_alert("yantar_tasks failed!!!!") end
+
+	if zamok then TB3D_Services.packet_alert("zamok: "..zamok.my_ver()) else TB3D_Services.packet_alert("zamok failed!!!!") end
+	
+	TB3D_Services.info_alert("TB3D_Verify_Scripts: done")
+end

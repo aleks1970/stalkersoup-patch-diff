@@ -1,0 +1,30 @@
+--TB3D 1.0.9.9.3.0, moved effector spawn flag
+function my_ver() return "1.0.9.9.3.0" end
+--\\* Module "Spawn effectors" ... Spot (Shooter)
+--nafig rewritten all but invisible by Monnoroch
+local effectors = "bloodsucker_effector"
+
+function respawn(info)
+	--if TB3D_Modders.effector_spawn == true then
+		--Spawn. Creatures of the Swamp with the existing 10 hands zombie
+		if info == "have_a_hand" or info == "have_a_doc" or info == "have_a_doc_p" then
+			effector_spawn(effectors)
+			return
+		end
+		--Spawn. 2e Swamp Critters in existing 3yh documents
+		if has_alife_info("have_a_doc_p_s_1") and has_alife_info("have_a_doc_p_s_2") and has_alife_info("have_a_doc_p_s_3") and has_alife_info("have_a_doc_p_s_4") then
+			effector_spawn(effectors) 
+			effector_spawn(effectors)
+		end
+	--end
+end
+
+--Spawn near the actor
+function effector_spawn(effector)
+	local p = db.actor:position()
+	local l = db.actor:level_vertex_id()
+	local g = db.actor:game_vertex_id()
+	local x = math.random(5,50)
+	local z = math.random(10,100)
+	alife():create(effector, vector():set( p.x + x, p.y, p.z + z ), l,g)
+end

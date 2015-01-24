@@ -1,0 +1,55 @@
+--TB3D 1.0.9.9.1 added my_ver 
+function my_ver() return "1.0.9.9.1" end
+class "se_artefact"	(cse_alife_item_artefact)
+
+function se_artefact:__init (section) super (section)
+    if section == "af_electra_flash" or 
+       section == "af_electra_moonlight" or
+       section == "af_electra_sparkler" or 
+	   section == "af_night_star" or
+	   section == "af_gold_fish" or
+	   section == "af_soul" or
+	   section == "af_dummy_pellicle" then
+       self.is_day_night = true
+    else
+       self.is_day_night = false
+    end 
+end
+--------------------
+function se_artefact:can_switch_offline ()
+     return cse_alife_item_artefact.can_switch_offline (self)
+end
+--------------------
+function se_artefact:can_switch_online ()
+    if self.is_day_night == false then
+       return cse_alife_item_artefact.can_switch_online (self)
+    end
+    -- to handle the situation when the actor gave an oak or absent
+    if db.actor == nil or db.actor:alive () == false then
+       return self.online  --just return the current state. 
+    end
+    --printf ("CAN_SWITCH_ONLINE called")
+    -- if there is a parent, nothing will break.
+    if self.parent_id ~= expendable_object then
+       return true 
+    end   
+    if self.online == true then --to handle the situation when the artifact Online
+       --if the night (or an actor or not he gave an oak, then we are in online and remain 
+       if utils.electro_art_enabled () == true then 
+          return true
+       end   
+       if not amk_offline_alife.sobj_is_far(self, 50) then
+          return true  --if the actor is too close, then leave it as is
+       end
+       return false -- Actor far - in-line.
+    else --to handle the situation when arefakt Offline
+       if utils.electro_art_enabled () == false then --if the day, then do not do anything
+          return false
+       end 
+       if not amk_offline_alife.sobj_is_far(self, 50) then
+          return false  --if the actor is too close, then leave it as is
+       end
+       return true -- Actor away - online.
+    end   
+end
+--------------------

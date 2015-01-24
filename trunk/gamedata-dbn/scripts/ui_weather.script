@@ -1,0 +1,82 @@
+--TB3D 1.0.9.9.4.4 changed to dynamic weather
+function my_ver() return "1.0.9.9.4.4" end
+class "ui_ms_weather" (CUIScriptWnd)
+
+function ui_ms_weather:__init(owner) super()
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function ui_ms_weather:__finalize() 
+
+end
+
+function ui_ms_weather:InitControls()
+	self:Init(50,50,550,450)
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_ms.xml")
+	--xml:InitStatic("back_video", self)
+	xml:InitStatic("background", self)
+	self:Register(xml:Init3tButton("caption", self),"caption")
+	self:Register(xml:Init3tButton("caption0", self),"caption0")
+	self:Register(xml:Init3tButton("caption1", self),"caption1")
+	self:Register(xml:Init3tButton("caption2", self),"caption2")
+	self:Register(xml:Init3tButton("caption3", self),"caption3")
+	self:Register(xml:Init3tButton("caption4", self),"caption4")
+	self:Register(xml:Init3tButton("caption5", self),"caption5")
+	self:Register(xml:Init3tButton("caption6", self),"caption6")
+	self:Register(xml:Init3tButton("caption7", self),"caption7")
+	self:Register(xml:Init3tButton("caption8", self),"caption8")
+	self:Register(xml:Init3tButton("caption9", self),"caption9")
+	self:Register(xml:Init3tButton("caption10", self),"caption10")
+	self:Register(xml:Init3tButton("btn_1", self),"btn_1")
+	self:Register(xml:Init3tButton("btn_quit", self),"btn_quit")
+	self:Register(xml:InitEditBox("edit_box", self), "edit_box")
+	--local caption = self:GetButton("caption")
+	local btn_1 = self:GetButton("btn_1")
+	--caption:SetText("Change Weather")
+	btn_1:SetText("Change")
+end
+
+function ui_ms_weather:InitCallBacks()
+	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.set, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_close, self)
+end
+
+function ui_ms_weather:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_close()
+		end		
+	end
+	return true
+end
+
+function ui_ms_weather:set()
+	local text = self:GetEditBox("edit_box"):GetText()
+	if text~="" then
+		if amk_mod.blowout() == false then
+			self:set_weather(text)
+		else
+			news_manager.send_tip_txt(db.actor,"Not during a blowout, sorry",nil,nil,1000)
+			self:on_close()	
+		end
+	end
+end
+
+function ui_ms_weather:set_weather(str)
+	if system_ini():line_exist("weathers",str) then	
+		level_weathers.set_new_weather(str)
+		TB3D_services.give_info("tb3d_force_weather")
+		news_manager.send_tip_txt(db.actor,"Installed weather:"..str,nil,nil,1000)
+	else
+		news_manager.send_tip_txt(db.actor,"No such section:"..str,nil,nil,1000)
+	end
+	self:on_close()	
+end
+
+function ui_ms_weather:on_close()
+	self:GetHolder():start_stop_menu (self,true)
+end

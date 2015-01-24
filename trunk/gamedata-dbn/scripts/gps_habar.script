@@ -1,0 +1,825 @@
+--TB3D 1.0.9.9.2.6 
+function my_ver() return "1.0.9.9.2.6" end
+--[[
+File:  gps_habar.script
+Copyright by Idler (and AMK TEAM 2007-2008 places :)
+rev: 10/11/08.02
+]]
+local table_remove = table.remove
+local table_sort = table.sort
+local string_find = string.find
+local string_gsub = string.gsub
+
+local max_comments_strings_on_screen = 38 -- how many lines of comments as climbs into the screen on the PDA
+
+local labels = {} -- Table references to caches marked beacons, as well as details of beacon (time to charge, etc.). always contains the current value
+local items_in_box = {}
+
+--  variables from the config  misc\gps_habar.ltx
+local activity_time = 0
+local warning_time = 0
+local warning_icons_time = 0
+local habar_list_mode = true
+local auto_recharge = true
+local is_show_quantity = true
+local is_update_on_time = true
+local is_set_label_on_npc = true
+local is_show_health = false
+local is_warning_on_death = false
+local is_color_and_sort_list = true
+
+local is_gps_update_in_process = false -- to resolve conflicts when "on_actor_upade"
+
+function toboolean(_str)
+	if string_find(string.lower(_str), "true") or _str == "1" then
+		return true
+	end
+	return false
+end
+
+function objinfo(obj)
+	local text = ""
+	if TB3D_Modders.global_debug == true and obj then
+		if IsGameObject(obj) then
+			text = "G-OBJ:"
+			if obj.id then
+				text = text .. "[" .. tostring(obj:id()) .. "] "
+			end
+			if obj.section then
+				text = text .. ", s_name=" .. tostring(obj:section())
+			end
+			if obj.character_name then
+				text = text .. ", c_name=" .. tostring(obj:character_name())
+			end
+			if obj.health then
+				text = text .. ", health=" .. tostring(obj.health)
+			end
+		else
+			text = "A-OBJ:"
+			if obj.id then
+				text = text .. "[" .. tostring(obj.id) .. "] "
+			end
+			if obj.section_name then
+				text = text .. ", s_name=" .. tostring(obj:section_name())
+			end
+			if obj.character_name then
+				text = text .. ", c_name=" .. tostring(obj:character_name())
+			end
+			if obj.parent_id then
+				text = text .. ", p_id=" .. tostring(obj.parent_id)
+			end
+			if obj.health then
+				text = text .. ", health=" .. tostring(obj:health())
+			end
+		end
+	end
+	return text
+end
+
+function tableinfo(tbl)
+	if TB3D_Modders.global_debug == true and tbl then
+		return amk.pack_array_to_string(tbl)
+	end
+	return ""
+end
+
+function IsHuman(object, class_id)
+	local actor = db.actor
+    local id = class_id
+	if not id and object then 
+		id = object:clsid()
+	end
+    if id == clsid.actor or id == clsid.script_stalker or id == clsid.script_trader then
+       return true
+    end
+    return false
+end
+
+function IsGameObject(obj)
+	local bResult = false
+	if (obj and obj.fov) then
+		bResult = true
+	end
+	return bResult
+end
+
+-- Id get the cache object if we know it lies
+function get_inventory_box_id(obj)
+	if not obj then
+		return
+	end
+	local aobj = alife():object(obj:id())
+	if aobj and aobj.parent_id then
+		return aobj.parent_id
+	end
+end
+
+function get_health(npc)
+	if npc then
+		if IsGameObject(npc) then
+			-- mylog("GET_HEALTH: " .. objinfo(npc))
+			return npc.health
+		elseif npc.health then
+			-- mylog("GET_HEALTH: " .. objinfo(npc))
+			return npc:health()
+		end
+	end
+	
+	return nil
+end
+
+function get_health_str(npc)
+	if get_health(npc) <= 0 then
+		return "died"
+	end
+	
+	return "alive"
+end
+
+-- looking for the Fox item in the cache box
+function is_find_item(boxId, itemId)
+	if boxId and itemId and items_in_box and items_in_box[boxId] then
+		for i, v in pairs(items_in_box[boxId]) do
+			if v.id == itemId then
+				return true
+			end
+		end
+	end
+	
+	return false
+end
+
+-- put something in the cache. Check if is relevant to us, we will add to the list. 
+function insert_item(boxId, item)
+	if boxId and boxId ~= 0 and boxId < last_object and item then
+		if not is_find_item(boxId, item.id) then 
+			if not items_in_box[boxId] then items_in_box[boxId] = {} end
+			table.insert(items_in_box[boxId], {id = item.id, name=item:name()})
+			-- mylog("INSERT_ITEM: added items_in_box[" .. boxId .. "] subject:" .. objinfo(item))
+		end
+	end
+end
+
+-- something was taken from its hiding place, clean our table with swag
+function remove_item(boxId, item, is_need_msg_warning)
+	local is_msg_warning = false
+
+	if is_need_msg_warning == nil then
+		is_need_msg_warning = true
+	end
+	
+	if boxId and item then
+		local itemId = item.id
+		if boxId and itemId and items_in_box[boxId] then
+			if labels[boxId] then
+				is_msg_warning = true
+			end
+			
+			for i, v in pairs(items_in_box[boxId]) do
+				if v.id == itemId then
+				-- mylog("REMOVE_ITEM: Removed from items_in_box[" .. boxId .. "] subject: " .. objinfo(item))
+				table_remove(items_in_box[boxId], i)
+				end
+			end
+		end
+	end
+	
+	-- if there was a robbery and there is no fashion Mined caches warn HS
+	if is_need_msg_warning and is_msg_warning and not amk_offline_alife.item_cost then
+		local lvname = ""
+		if boxId then
+			lvname = TB3D_Services.get_obj_level(alife():object(boxId).m_game_vertex_id)
+		end
+		news_manager.gps_send_tip(game.translate_string(TB3D_Services.get_text_color("alert").."On location " .. lvname .. " robbed cache!"), nil, nil, 5)
+		update_gps(nil, nil, boxId)
+	end
+end
+
+-- count the number of beacons in the cache
+function get_gps_count(boxId)
+	if not boxId then
+		return 0
+	end
+	if boxId == 0 or boxId == expendable_object then 
+		return 0 
+	end
+
+	local locObj
+	local gps_count = 0
+	
+	if items_in_box[boxId] then
+		local sim = alife()
+		for i, v in pairs(items_in_box[boxId]) do
+			locObj = sim:object(v.id)
+			if locObj and locObj:section_name() == "amk_metka" then
+				gps_count = gps_count + 1
+			end
+		end
+	end
+	
+	-- mylog("GET_GPS_COUNT: in the cache[" .. boxId .. "] found Beacons: " .. tostring(gps_count))
+	return gps_count
+end
+
+-- sostvyalem table things in caches.
+function load_items()
+	local sim = alife()
+	for i = first_object, last_object do 
+		aobj =  sim:object(i)
+		if aobj and aobj.parent_id and aobj.parent_id ~= 0 and aobj.parent_id ~=expendable_object then
+			if not items_in_box[aobj.parent_id] then items_in_box[aobj.parent_id] = {} end
+			table.insert(items_in_box[aobj.parent_id], {id = aobj.id, name=aobj:name()})
+			-- mylog("added items_in_box[" .. aobj.parent_id .. "] subject Id:" .. aobj.id)
+		end
+	end
+end
+
+function get_local_time(gtime)
+	gdays = math.floor(gtime / 24);
+	ghours = gtime - gdays * 24;
+	
+	local res = ""
+	if gdays > 0 then
+		res = tostring(gdays) .. "days "
+	end
+	if ghours > 0 then
+		res = res .. tostring(ghours) .. "h"
+	end
+	
+	return amk.trim(res)
+end
+
+function get_npc_name(box)
+	if box then
+		if news_main then
+			return tostring(news_main.get_npc_name(box))
+		elseif m_amk_news then
+			return tostring(m_amk_news.get_npc_name(box))
+		end
+	end
+	
+	return "'Unknown'"
+end
+
+function get_npc_presentation(box)
+	if box then
+		if news_main then
+			return tostring(news_main.get_npc_name(box) .. " (" .. game.translate_string(news_main.get_npc_community(box)) .. ", " .. game.translate_string(news_main.get_npc_rank(box)))
+		elseif m_amk_news then
+			return tostring(m_amk_news.get_npc_name(box) .. " (" .. game.translate_string(m_amk_news.get_npc_community(box)) .. ", " .. game.translate_string(m_amk_news.get_npc_rank(box)))
+		end
+	end
+	
+	return get_npc_name(box)
+end
+
+-- remove the labels relating to the list of swag from the box
+function remove_all_spots(boxId)
+	if boxId then
+		amk.remove_spot_from_map(boxId, "habar_location")
+		amk.remove_spot_from_map(boxId, "habar_clear_location")
+		amk.remove_spot_from_map(boxId, "habar_location_w")
+		amk.remove_spot_from_map(boxId, "habar_clear_location_w")
+		amk.remove_spot_from_map(boxId, "gps_stalker")
+	end
+end
+
+-- remove the box from the table caches with labels
+function remove_label(boxId)
+	if boxId then
+		--labels[boxId] = nil
+		table_remove(labels, boxId)
+		-- mylog("REMOVE_LABEL: remove the tag from the cache [" .. boxId .. "]. Left:" .. tableinfo(labels))
+	end
+end
+
+-- will clean the cache of remote things.
+function reinit_box(boxId)
+	if not boxId or boxId == 0 or boxId == expendable_object or not items_in_box then
+		return
+	end
+	
+	if items_in_box[boxId] then
+		local aobj
+		local sim = alife()
+		for i, v in pairs(items_in_box[boxId]) do
+			if v.id then
+				aobj = sim:object(v.id)
+				if not aobj then
+					table_remove(items_in_box[boxId], i)
+				elseif aobj.parent_id ~= boxId then
+					table_remove(items_in_box[boxId], i)
+				end
+			end
+		end
+	end
+end
+
+-- recharge Beacon
+function recharge_gps(item, box)
+	if not auto_recharge then
+		return
+	end
+	
+	if not box then return end
+	
+	-- if unknown cache, get it out of the subject
+	local boxId = nil
+	if box then
+		boxId = box:id()
+	else
+		boxId = get_inventory_box_id(item)
+	end
+	
+	-- if the object is not in cache and not from the cache - not the case
+	if not boxId then
+		return
+	end
+	if boxId == 0 or boxId == expendable_object then 
+		return 
+	end
+	
+	-- if the label is not on the cache, reloading nothing
+	if not labels[boxId] then
+		return
+	end
+	
+	-- perezaryaka new values
+	labels[boxId].at = activity_time
+	labels[boxId].wr = 0 -- were not warned about the discharge message
+	labels[boxId].wi = 0 -- were not warned about the discharge color
+	labels[boxId].wt = warning_time
+	labels[boxId].wit = warning_icons_time
+	labels[boxId].gt = amk.game_hours()
+	labels[boxId].upd = amk.game_minutes()
+	labels[boxId].wh = 0 -- were not warned about the death of npc
+	
+	amk.save_table("gps_labels", labels)
+	-- mylog("RECHARGE_GPS: Beacon reloaded in the cache [" .. tostring(boxId) .. "]")
+end
+
+-- Update the list of swag, knowing or object or a box
+function update_gps(item, box, boxId, is_new_metka)
+
+	is_gps_update_in_process = true
+
+	-- if unknown cache, get it out of the subject
+	if not boxId then
+		if box then
+			boxId = box:id()
+		else
+			boxId = get_inventory_box_id(item)
+		end
+	end
+
+	if boxId then
+		box = alife():object(boxId)
+	end
+	
+	-- if the object is not in cache and not from the cache - not the case
+	if not boxId then
+		is_gps_update_in_process = false
+		return
+	end
+
+	if not box then
+		-- NPC could die, well, or stash could have destroyed (probably)
+		local aobj = alife():object(boxId)
+		if not aobj then
+			remove_label(boxId)
+		end
+		
+		is_gps_update_in_process = false
+		return
+	end
+	
+	if boxId == 0 or boxId == expendable_object then 
+		is_gps_update_in_process = false
+		return
+	end
+
+	if IsHuman(box) then
+		-- mylog("UPDATE_GPS: started updating tags stalker " .. objinfo(box))
+		update_gps_stalker(box, boxId, is_new_metka)
+	else
+		-- mylog("UPDATE_GPS: started updating tag swag " .. objinfo(box))
+		update_gps_habar(boxId)
+	end
+	
+	is_gps_update_in_process = false
+end
+
+function update_gps_stalker(box, boxId, is_new_metka)
+	local gps_count = get_gps_count(boxId)
+	local is_save_table = false
+	
+	if gps_count > 0 then
+		local fl_send_tip_msg = false
+		local text_metki = ""
+		local gm = amk.game_minutes()
+		local gh = amk.game_hours()
+		
+		-- new label, add to the table
+		if not labels[boxId] then
+			-- no team mark stalker
+			if is_new_metka ~= true then
+				return
+			end
+			
+			fl_send_tip_msg = true -- must inform you that we put a new label
+			labels[boxId] = {wr = 0, wi = 0, gt = gh, wt = warning_time, at = activity_time, wit = warning_icons_time, upd = gm, wh = 0}
+			is_save_table = true
+			-- mylog("UPDATE_GPS_STALKER: mouth. Tag a stalker " .. objinfo(box) .. ". " .. tableinfo(labels[boxId]))
+		end
+
+		local npc_name = get_npc_name(box)
+		
+		-- labeled died, warned HS
+		local aobj = alife():object(boxId)
+		if is_warning_on_death and aobj and get_health(aobj) <= 0 and labels[boxId].wh == 0 then
+			labels[boxId].wh = 1
+			is_save_table = true
+			news_manager.gps_send_tip(game.translate_string(TB3D_Services.get_text_color("alert").."Killed Stalker " .. npc_name .. " with GPS-beacon"), nil, nil, 5)
+		end
+		
+		-- a stalker hang tags other than the cache
+		local text_health = ""
+		if is_show_health then
+			text_health = ", " .. get_health_str(box)
+		end
+		text_metki = get_npc_presentation(box) .. text_health .. ")."
+		
+		local location = "gps_stalker"
+		if fl_send_tip_msg then
+			news_manager.gps_send_tip("Tagged by stalker " .. get_npc_name(box), nil, nil, 5)
+		end
+
+		--Update List
+		remove_all_spots(boxId)
+		amk.add_spot_on_map(boxId, location, text_metki)
+	else
+		remove_all_spots(boxId)
+		remove_label(boxId)
+		is_save_table = true
+	end
+	
+	if is_save_table then
+		amk.save_table("gps_labels", labels)
+	end
+end
+
+function correct_name(inv_name)
+	if inv_name then
+		if string_find(inv_name, "Ammunition") == 1 then
+			return amk.trim(string_gsub(inv_name, "Ammunition", "P:"))
+		elseif string_find(inv_name, "Overalls") == 1 then
+			return amk.trim(string_gsub(inv_name, "Overalls", "Combes"))
+		elseif string_find(inv_name, "Anti-radiation drugs") == 1 or string_find(inv_name, "Anti-Radiation drugs") == 1 then
+			return "Antirad"
+		elseif string_find(inv_name, "The joy of the tourist") then
+			return "Conservatives"
+		elseif string_find(inv_name, "Sausage") == 1 then
+			return "Sausage"
+		elseif string_find(inv_name, "Energy") == 1 or string_find(inv_name, "Energetic") == 1 then
+			return "Energetic"
+		end
+	else
+		return ""
+	end
+	
+	return inv_name
+end
+
+function get_color(secName)
+	if not secName or string.len(secName) == 0 then
+		return "%c[default]"
+	end
+	local lsecName = string.lower(secName)
+	if string_find(lsecName, "wpn_") == 1 then -- found weapons
+		return "%c[254,243,122,11]" -- orange
+	elseif string_find(lsecName, "ammo_") == 1 or string_find(lsecName, "grenade_") == 1 then -- Cartridges found
+		return "%c[254,129,129,11]" -- khaki
+	elseif string_find(lsecName, "mutant_") then -- found part of a monster
+		return "%c[208,100,100,255]" --  blue
+	elseif string_find(lsecName, "af_") == 1 then -- found an artifact
+		return "%c[207,200,1,1]" -- red
+	elseif string_find(lsecName, "outfit") or string_find(lsecName, "exo") then -- found Bronicas
+		return "%c[100,200,200,1]" -- yellow
+	elseif string_find(lsecName, "pda") or string_find(lsecName, "flash") then -- find your PDA
+		return "%c[50,1,150,1]" -- Green
+	end
+	return "%c[default]"
+end
+
+function spawn_m_inv()
+	local sim = alife()
+	for i = first_object, last_object do 
+		aobj =  sim:object(i)
+		if aobj and aobj.section_name and aobj:section_name() == "m_inventory_box" then
+			amk.add_spot_on_map(aobj.id, "red_location", "backpack")
+		end
+	end
+end
+
+function update_gps_habar(boxId)
+--	spawn_m_inv()
+	-- If a cache has a label, updates or set list. otherwise, remove the marker
+	local gps_count = get_gps_count(boxId)
+	if gps_count > 0 then
+		local fl_send_tip_msg = false
+		local text_metki = ""
+		local gm = amk.game_minutes()
+		local gh = amk.game_hours()
+		
+		-- new label, add to the table
+		if not labels[boxId] then
+			fl_send_tip_msg = true -- must inform you that we put a new label
+			labels[boxId] = {wr = 0, wi = 0, gt = gh, wt = warning_time, at = activity_time, wit = warning_icons_time, upd = gm, wh = 0}
+			amk.save_table("gps_labels", labels)
+			-- mylog("UPDATE_GPS_HABAR: mouth. new label with the swag in the cache. " .. tableinfo(labels[boxId]))
+		end
+
+		--compile a list of items
+		if items_in_box[boxId] then
+			local secName, invName, locObj
+			local itemsbox = {}
+			local is_yes
+			local sim = alife()
+			
+			for i, v in pairs(items_in_box[boxId]) do
+--				if table.getn(itemsbox) > 51 then
+--					break
+--				end
+				
+				locObj = sim:object(v.id)
+				if locObj and locObj:section_name() then
+					secName = locObj:section_name()
+					--invName = correct_name(game.translate_string(system_ini():r_string(secName, "inv_name")))
+					invName = correct_name(game.translate_string(getIniValueString(secName, "inv_name","",nil)))
+					
+					is_yes = false
+					-- mylog("itemsbox = " .. table.getn(itemsbox))
+					for k, kk in pairs(itemsbox) do
+						-- mylog("k = " .. k)
+						if kk.sn == secName then
+							kk.cnt = kk.cnt + 1
+							is_yes = true
+							--break
+						end
+					end
+					
+					if not is_yes then
+						table.insert(itemsbox, {sn = secName, inv = invName, cnt = 1, clr = get_color(secName)})
+					end
+				end
+			end
+			
+			-- sort by section_name, that the list of swag was received with some regularity, but not in disarray.
+			table_sort(	itemsbox, 
+						function(a,b)
+							return (a.clr > b.clr)
+						end
+			)
+			
+			-- there is only myachok, we believe that the cache is empty
+			if #itemsbox == 1 and itemsbox[1].sn == "amk_metka" and itemsbox[1].cnt == 1 then
+			else
+--				local items_count = 0
+				local is_one_item_on_string = true
+				
+				-- if a lot of items off mode, "one item per line"
+				if #itemsbox > max_comments_strings_on_screen then
+					is_one_item_on_string = false
+				end
+				
+				-- form the text of the label
+				local all_cnt = 0
+				local color_code  = ""
+				for i, v in pairs(itemsbox) do
+					--mylog("i = " .. i .. " name = " .. v.sn)
+					if not (v.sn == "amk_metka" and v.cnt == 1) then
+--						items_count = items_count + 1
+						
+--						if items_count > 50 then
+--							text_metki = text_metki .. ", ..."
+--							break
+--						end
+
+						if is_color_and_sort_list then
+							color_code = v.clr
+						end
+						
+						if is_one_item_on_string then
+							if text_metki ~= "" then 
+								text_metki = text_metki .. "\\n"
+							end
+							text_metki = text_metki .. color_code .. v.inv
+						else
+							if text_metki ~= "" then 
+								text_metki = text_metki .. ", "
+							end
+							text_metki = text_metki .. game.translate_string(color_code .. v.inv)
+						end
+						
+						if is_show_quantity then 
+							text_metki = text_metki .. "(" .. tostring(v.cnt) .. ")" 
+							all_cnt = all_cnt + v.cnt
+						end
+					end
+				end
+
+				if is_show_quantity then 
+					text_metki = text_metki .. "\\n%c[255,255,255,255]Total " .. tostring(all_cnt) .. " the subject" 
+				end
+			end
+		end
+
+		-- mylog("List of swag: " .. text_metki)
+	
+		--Consider the color of icons are
+		local is_warning = false
+		local labels_item = labels[boxId]
+		if habar_list_mode and labels_item.at > 0 and labels_item.wit > 0 and ((gh - labels_item.gt) >= (labels_item.at - labels_item.wit)) then
+			is_warning = true
+		end
+		
+		local location = ""
+		-- Consider an empty cache or is there something else?
+		if text_metki == "" then
+			if fl_send_tip_msg then
+				news_manager.gps_send_tip("No loot in stash. Tagged empty stash.", nil, nil, 5)
+			end
+			if is_warning then
+				location = "habar_clear_location_w"
+			else
+				location = "habar_clear_location"
+			end
+			
+			text_metki = "Empty Cache."
+		else
+			text_metki = text_metki .. "."
+			if fl_send_tip_msg then
+				news_manager.gps_send_tip("Tagged with a list of wares.", nil, nil, 5)
+			end
+			if is_warning then
+				location = "habar_location_w"
+			else
+				location = "habar_location"
+			end
+		end
+		
+		-- add Old on discharge
+		if habar_list_mode and labels_item.at > 0 then
+			text_metki = get_local_time(labels_item.gt + labels_item.at - gh) .. ". " .. text_metki
+		end
+		
+		--Update List
+		remove_all_spots(boxId)
+		amk.add_spot_on_map(boxId, location, text_metki)
+	else
+		remove_all_spots(boxId)
+		remove_label(boxId)
+		amk.save_table("gps_labels", labels)
+	end
+end
+
+function update_gps_state()
+	if habar_list_mode then														-- if the discharge yuzaem Beacons
+		local aobj, lvname
+		local is_save_table = false
+		local new_labels = {}
+		local gm = amk.game_minutes()
+		local gh = amk.game_hours()
+		local sim = alife()
+		local gps_count = 0
+		for i, v in pairs(labels) do
+			if v and v.at and v.wt and v.wr and v.gt and v.upd and v.wi and v.wit then
+				gps_count = gps_count + 1
+				if v.at > 0 and v.wt > 0 and v.wr == 0 and gh - v.gt > v.at - v.wt then		-- if it is necessary to warn against a weak message
+					aobj = sim:object(i)
+					lvname = ""
+					if aobj then
+						lvname = TB3D_Services.get_obj_level(aobj)
+					end
+					v.wr = 1
+					news_manager.gps_send_tip(game.translate_string(TB3D_Services.get_text_color("system").."Through ".. tostring(gh - v.gt) .. " hrs. on beacon location" .. lvname .. " need to change battery."), nil, nil, 5)
+					is_save_table = true
+				end
+				if (gm - v.upd > 3 and is_update_on_time) or (v.wit > 0 and v.wi == 0 and gh - v.gt > v.at - v.wit) then
+					v.wi = 1	-- update information every 3 minutes, or if it is necessary to warn against a weak change of icons
+					v.upd = gm	--;
+					if not is_gps_update_in_process then
+						update_gps(nil, nil, i)
+					end
+					is_save_table = true
+				end
+				if v.at > 0 and gh - v.gt > v.at then			-- if the time is up, switch off the mark
+					aobj = sim:object(i)
+					lvname = TB3D_Services.get_obj_level(aobj)
+					news_manager.gps_send_tip(game.translate_string(TB3D_Services.get_text_color("system").."At the beacon location " .. lvname .. " no battery. Connection lost."), nil, nil, 5)
+					remove_all_spots(i)
+					remove_label(i)
+					is_save_table = true
+				end
+				new_labels[i] = labels[i]
+			else
+				--TB3D_Services.packet_alert("gps habar: maxed out at["..utils.to_str(gps_count).."]")
+				is_save_table = true
+				break
+			end
+		end
+		if is_save_table then
+			amk.save_table("gps_labels", new_labels)
+		end
+	end
+end
+
+function show_dlg_dots_npc(obj)
+	if not obj or not is_set_label_on_npc then
+		return
+	end
+
+	-- it is not beacon or beacon, but lies in the street or at the HS in the inventory, we conclude
+	local secName = obj:section()
+	local boxId = get_inventory_box_id(obj)
+	if not boxId or boxId == 0 or boxId == expendable_object or not secName or secName ~= "amk_metka" then
+		return
+	end
+	
+	-- Beacon got not a stalker or a label is already installed, finish.
+	local box = alife():object(boxId)
+	if not box then 
+		return
+	end
+	if not IsHuman(box) or labels[boxId] then
+		return
+	end
+	
+	local spwn=ui_gps_trade.gps_trade(get_hud(), boxId)
+	level.start_stop_menu(spwn,true)
+end
+
+-- call from amk.script
+-- when loading the game
+function on_game_load()
+	-- mylog("Initialization of module variables gps_habar.")
+	local gps_ini = ini_file("misc\\gps_habar.ltx")
+	activity_time = tonumber(gps_ini:r_string("amk_metka", "activity_time"))
+	warning_time = tonumber(gps_ini:r_string("amk_metka", "warning_time"))
+	warning_icons_time = tonumber(gps_ini:r_string("amk_metka", "warning_icons_time"))
+	habar_list_mode = toboolean(gps_ini:r_string("amk_metka", "habar_list_mode"))
+	auto_recharge = toboolean(gps_ini:r_string("amk_metka", "auto_recharge"))
+	is_show_quantity = toboolean(gps_ini:r_string("amk_metka", "show_quantity"))
+	is_update_on_time = toboolean(gps_ini:r_string("amk_metka", "update_on_time"))
+	is_color_and_sort_list = toboolean(gps_ini:r_string("amk_metka", "color_and_sort_list"))
+	-- marks on stalkers
+	is_set_label_on_npc = toboolean(gps_ini:r_string("amk_metka", "set_label_on_npc"))
+	is_show_health = toboolean(gps_ini:r_string("amk_metka", "show_health"))
+	is_warning_on_death = toboolean(gps_ini:r_string("amk_metka", "warning_on_death"))
+	-- load the table binding boxes to label.
+	labels = amk.load_table("gps_labels")
+	--TB3D_Services.packet_alert("gps habar: Download the table tags["..amk.pack_array_to_string(labels).."]") -- tableinfo(labels))
+end
+
+--kolbek to capture the object in your inventory HS
+-- call from amk.script
+function on_item_take(item)
+	-- if you have a label, check all marked. Suddenly Muku bought one of them.
+	if item and item:section() and item:section() == "amk_metka" then
+		for i, v in pairs(labels) do
+			reinit_box(i)
+			update_gps(nil, nil, i)
+		end
+	end
+end
+
+function on_item_take_from_box(box, item)
+	-- mylog("ON_ITEM_TAKE_FROM_BOX: take object " .. objinfo(item) .. ". From the box. Id: " .. tostring(boxId))
+	-- if removed from the box will clean items_in_box
+	if item and item:id() and box and box:id() then
+		remove_item(box:id(), alife():object(item:id()), false)
+	end
+	
+	recharge_gps(item, box)
+	update_gps(item, box, nil)
+end
+
+--kolbek subject to loss from inventory HS
+-- call from amk.script
+function on_item_drop(obj)
+
+	-- mylog("ON_ITEM_DROP: the object was lost: " .. objinfo(obj))
+	if obj and obj:id() then
+		insert_item(get_inventory_box_id(obj), alife():object(obj:id()))
+	end
+
+	show_dlg_dots_npc(obj)
+	recharge_gps(obj, nil)
+	update_gps(obj, nil, nil)
+end
+
+--kolbek to update HS (good for testing conditions, as called constantly, can not be overloaded, and it will lag)
+-- call from amk.script
+function on_actor_upade(delta)
+	update_gps_state()
+end
