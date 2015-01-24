@@ -1,0 +1,306 @@
+----<!-- TB3D 1.0.9.9.3.3  dmx135
+function my_ver() return "1.0.9.9.3.3" end
+--[[---------------------------------------------------------
+ File         : dmx_box_menu.script
+ Description  : Button to sort items in their class when you move the box
+ Copyright    : DMX MOD
+ Author       : Charsi (Thanks: Malandrinus, Erlik)
+ LastUpdate   : 28.03.2011
+--]]-----------------------------------------------------------------------------------------
+
+local debug = false	 -- system placement of buttons (true - incl. \ false - off).
+local rec_wnd        = nil
+local initial        = false
+local TBtn           = {}
+local slots          = {{46,230},{101,230},{156,230},{211,230},{266,230}}
+local box_id,box,pm
+local items_in_box   = {["weapon"]={},["ammo"]={},["outfit"]={},["other"]={}}
+local items_in_slots = {}
+local timer          = 0
+local time_shift     = 1000
+local no_drop_items  = {["separator"]=true, ["remontnyi_box"]=true, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true, ["amk_metka"]=true, ["fake_bolt"]=true}
+
+class "BkgrWnd" (CUIScriptWnd)
+
+function BkgrWnd:__init(owner) super()
+   self.owner = owner
+   self:Init(0, 0, 1024, 768)
+   self.ClickBtn={}
+
+self.ClickBtn[1]=function() -- weapon
+	if timer<time_global() then timer=time_global() + time_shift action_transfer("weapon") end
+end
+
+self.ClickBtn[2]=function() -- Ammunition
+	if timer<time_global() then timer=time_global() + time_shift action_transfer("ammo") end
+end
+
+self.ClickBtn[3]=function() -- first aid kits and artefacts
+	if timer<time_global() then timer=time_global() + time_shift action_transfer("other") end
+end
+
+self.ClickBtn[4]=function() -- Bronicas
+	if timer<time_global() then timer=time_global() + time_shift action_transfer("outfit") end
+end
+
+self.ClickBtn[5]=function() -- show all
+	if timer<time_global() then timer=time_global() + time_shift return_items() items_in_box={["weapon"]={},["ammo"]={},["outfit"]={},["other"]={}} end
+end
+    self:InitControls()
+end
+
+function BkgrWnd:__finalize() end
+function BkgrWnd:InitControls()
+	if self and self.owner then
+		self.bkgr_static=CUIStatic()
+		self.bkgr_static:Init("ui\\ui_disk_io",10, 0, 1024, 100)
+		self.bkgr_static:SetStretchTexture(true)
+		self.bkgr_static:SetOriginalRect(0, 0, 1024, 100)
+
+		self.stat = CUIStatic()
+		self.stat:AttachChild(self.bkgr_static)
+		self.stat:Init(0, 0, 1024, 768)
+		self.owner:AttachChild(self.stat)
+
+		for k,v in pairs (slots) do
+		   local name="check_button_"..k
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName(name) 
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   TBtn[name]= self.btn
+		   init_btn(k)
+		   self:AddCallback(name,ui_events.BUTTON_CLICKED, self.ClickBtn[k], self)
+		end
+
+		if debug then
+		   self.num_btn = 1 -- Number buttons moved
+		   self.step = 32  -- step in pixels
+
+		-- step+
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName("btn_step_up")
+		   self.btn:SetText("step +")
+		   self.btn:Init(-40+1024/2,-60+768,40,20)
+		   self.btn:InitTexture("ui\\ui_common")
+		   self.btn:SetOriginalRect(130,80,40,20)
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   self:AddCallback("btn_step_up",ui_events.BUTTON_CLICKED, self.ClickBtnStepUp, self)
+
+		-- step-
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName("btn_step_dn")
+		   self.btn:SetText("step -")
+		   self.btn:Init(1024/2,-60+768,40,20)
+		   self.btn:InitTexture("ui\\ui_common")
+		   self.btn:SetOriginalRect(130,80,40,20)
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   self:AddCallback("btn_step_dn",ui_events.BUTTON_CLICKED, self.ClickBtnStepDn, self)
+
+		-- Button up
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName("btn_up")
+		   self.btn:Init(-40+1024/2,768-20-20,40,20)
+		   self.btn:InitTexture("ui\\ui_common")
+		   self.btn:SetOriginalRect(770,110,40,20)
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   self:AddCallback("btn_up",ui_events.BUTTON_CLICKED, self.ClickBtnUp, self)
+
+		-- button down
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName("btn_dwn")
+		   self.btn:Init(-40+1024/2,768-20,40,20)
+		   self.btn:InitTexture("ui\\ui_common")
+		   self.btn:SetOriginalRect(900,110,40,20)
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   self:AddCallback("btn_dwn",ui_events.BUTTON_CLICKED, self.ClickBtnDwn, self)
+
+		-- button to the left
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName("btn_lft")
+		   self.btn:Init(1024/2,768-20-20,40,20)
+		   self.btn:InitTexture("ui\\ui_common")
+		   self.btn:SetOriginalRect(800,80,40,20)
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   self:AddCallback("btn_lft",ui_events.BUTTON_CLICKED, self.ClickBtnLft, self)
+
+		-- button to the right
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName("btn_rt")
+		   self.btn:Init(1024/2,768-20,40,20)
+		   self.btn:InitTexture("ui\\ui_common")
+		   self.btn:SetOriginalRect(930,80,40,20)
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   self:AddCallback("btn_rt",ui_events.BUTTON_CLICKED, self.ClickBtnRt, self)
+
+		-- select the next button
+		   self.btn = CUIButton()
+		   self.btn:SetAutoDelete(false)
+		   self.btn:SetWindowName("next_btn")
+		   self.btn:SetText("button "..self.num_btn.." step "..self.step)
+		   self.btn:Init(-50+1024/2,-80+768,100,20)
+		   self.btn:InitTexture("ui\\ui_common")
+		   self.btn:SetOriginalRect(20,180,70,20)
+		   self.btn:SetStretchTexture(true)
+		   self:Register(self.btn)
+		   self.stat:AttachChild(self.btn)  
+		   self:AddCallback("next_btn",ui_events.BUTTON_CLICKED, self.ClickNxtBtn, self)
+		end
+		initial = true
+	end
+end
+
+function BkgrWnd:ClickBtnStepUp()
+	self.step=self.step*2
+	if self.step>200 then self.step=128 end
+	self.btn:SetText("button "..self.num_btn.." step "..self.step)
+end
+
+function BkgrWnd:ClickBtnStepDn()
+	self.step=self.step/2
+	if self.step==1 then self.step=2 end
+	self.btn:SetText("button "..self.num_btn.." step "..self.step)
+end
+
+function BkgrWnd:ClickNxtBtn()
+	self.num_btn=self.num_btn+1
+	if self.num_btn>#slots then self.num_btn=1 end
+	self.btn:SetText("button "..self.num_btn.." step "..self.step)
+end
+
+function BkgrWnd:ClickBtnUp()
+	slots[self.num_btn][2]=slots[self.num_btn][2]-self.step
+	if slots[self.num_btn][2]<0 then slots[self.num_btn][2]=768+slots[self.num_btn][2] end
+	init_btn(self.num_btn)
+end
+
+function BkgrWnd:ClickBtnDwn()
+	slots[self.num_btn][2]=slots[self.num_btn][2]+self.step
+	if slots[self.num_btn][2]>768 then slots[self.num_btn][2]=-768+slots[self.num_btn][2] end
+	init_btn(self.num_btn)
+end
+
+function BkgrWnd:ClickBtnLft()
+	slots[self.num_btn][1]=slots[self.num_btn][1]-self.step
+	if slots[self.num_btn][1]<0 then slots[self.num_btn][1]=1024+slots[self.num_btn][1] end
+	init_btn(self.num_btn)
+end
+
+function BkgrWnd:ClickBtnRt()
+	slots[self.num_btn][1]=slots[self.num_btn][1]+self.step
+	if slots[self.num_btn][1]>1024 then slots[self.num_btn][1]=-1024+slots[self.num_btn][1] end
+	init_btn(self.num_btn)
+end
+
+function init_btn(num)
+    local xywh={{1054,7},{1154,7},{1054,107},{1154,107},{1254,7}}
+    local btn=TBtn["check_button_"..num]
+    btn:InitTexture("ui\\ui_common")
+    btn:SetOriginalRect(xywh[num][1],xywh[num][2],92,89)
+    btn:SetStretchTexture(true)
+    btn:Show(true)
+    btn:Init(slots[num][1],slots[num][2],40,40)
+if debug then
+    get_console():execute("button_"..num..":x="..slots[num][1].."_y="..slots[num][2])
+end
+end
+
+function BkgrWnd:ShowWnd()
+if initial and rec_wnd.stat~= nil then
+	rec_wnd.stat:Show(true)
+end
+end 
+
+function BkgrWnd:HideWnd()
+if initial and rec_wnd.stat~= nil then
+	rec_wnd.stat:Show(false)
+end
+end 
+
+function BkgrWnd:DetachWnd()
+	self.owner:DetachChild(self.stat)
+	initial = false
+end
+
+function on_info(info_id)
+	if info_id == "ui_car_body" then
+        if not initial then	
+            rec_wnd = BkgrWnd(level.main_input_receiver())
+		end
+    	if not rec_wnd.stat:IsShown() then
+			rec_wnd:ShowWnd()
+		end
+		local sobj = alife():create("dmx_box_nevedimka",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+		pm=alife():create("wpn_pm",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(),sobj.id)
+		box_id=sobj.id
+		items_in_box={["weapon"]={},["ammo"]={},["outfit"]={},["other"]={}}
+	elseif info_id == "ui_car_body_hide" then	
+		if rec_wnd then
+       		rec_wnd:DetachWnd()
+		end
+		if box_id then remove_pm() return_items() clear_table(items_in_slots) clear_table(items_in_box) end
+ 	end
+end
+
+function return_items()
+    box=level.object_by_id(box_id)
+    local level_object_by_id=level.object_by_id
+    local actor=db.actor
+    for k,id in ipairs (items_in_box["other"]) do box:transfer_item(level_object_by_id(id),actor) end	--TB3D chg _ to k
+    for k,id in ipairs (items_in_box["weapon"]) do box:transfer_item(level_object_by_id(id),actor) end
+    for k,id in ipairs (items_in_box["ammo"]) do box:transfer_item(level_object_by_id(id),actor) end
+    for k,id in ipairs (items_in_box["outfit"]) do box:transfer_item(level_object_by_id(id),actor) end
+end
+
+function init_items_in_slots()
+	box=level.object_by_id(box_id)
+	items_in_slots={}
+	local slots={0,1,2,4,5,6}
+	local item
+	for k,i in ipairs (slots) do	--TB3D chg _ to k
+		item = db.actor:item_in_slot(i)
+		if item then items_in_slots[item:id()]=true end
+	end
+end
+
+function action_transfer(type)
+    init_items_in_slots()
+	local ti={}
+    db.actor:iterate_inventory(function (dummy,item)
+		ti=test_items(item)
+		if ti~=type and items_in_slots[item:id()]~=true and inventory.belt_id[item:id()]~=true and no_drop_items[item:section()]~=true and protected_items.obj_is_protected(item,"items_protected","exactly")~=true then
+			db.actor:transfer_item(item,box) --get_console():execute("load ~~~portable "..ti)
+			table.insert(items_in_box[ti],item:id())
+		end
+    end,nil)
+    for k,id in ipairs (items_in_box[type]) do	--TB3D chg _ to k
+	    box:transfer_item(level.object_by_id(id),db.actor)
+    end
+    items_in_box[type]={}
+end
+
+function test_items(item)
+    local res="other"
+    if ammo_section[item:section()]==true then res="ammo"
+        elseif isWeapon(item) then res="weapon"
+        elseif system_ini():r_string(item:section(),"class")=="E_STLK" then res="outfit"
+    end
+    return res
+end
+
+function remove_pm()
+	if pm then alife():release(pm, true) end
+end

@@ -1,0 +1,152 @@
+--TB3D 1.0.9.9.3.2  Radio, takes place of hud while open, chgd/added options, added ddof and alife, news, cop, weather option in place of alife
+function my_ver() return "1.0.9.9.3.2" end
+--/amk_rel_1/
+-- initialization
+
+class "amk_options" (CUIScriptWnd)
+ 
+function amk_options:__init(owner) super()
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function amk_options:__finalize() end
+	
+function amk_options:InitControls()
+	self:Init(0,0,1024,768)
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_amk_options_wnd.xml")
+	xml:InitStatic("background",				self)	
+	self.form = xml:InitStatic("form",			self)
+	xml:InitStatic("form:caption",				self.form)
+	ctrl = xml:Init3tButton("form:btn_quit", 	self.form)
+	self:Register(ctrl, "btn_quit")
+	
+	local helmets_snd = xml:InitTab("form:radio_helmets_sound", self.form)	--pda sounds
+	self:Register(helmets_snd, "radio_helmets_sound")
+	helmets_snd:SetNewActiveTab(amk.load_variable("option_helmets_snd",1))
+	
+	local AutoSave = xml:InitTab("form:radio_autosave", self.form)
+	self:Register(AutoSave, "radio_autosave")
+	AutoSave:SetNewActiveTab(amk.load_variable("option_autosave",1))
+	
+	local ShootEffect = xml:InitTab("form:radio_shoot_effect", self.form)
+	self:Register(ShootEffect, "radio_shoot_effect")
+	ShootEffect:SetNewActiveTab(amk.load_variable("option_shoot_eff",1))
+
+	local radio_hud = xml:InitTab("form:radio_amk_hud", self.form)
+	self:Register(radio_hud, "radio_amk_hud")	
+	self.radio_hud = radio_hud
+	radio_hud:SetNewActiveTab(amk.load_variable("option_hud",3))
+	
+	local radio_mus = xml:InitTab("form:radio_amk_mus", self.form)
+	self:Register(radio_mus, "radio_amk_mus")	
+	self.radio_mus = radio_mus
+	radio_mus:SetNewActiveTab(amk.load_variable("option_mus",1))
+
+	local radio_treasure = xml:InitTab("form:radio_amk_treasure", self.form)
+	self:Register(radio_treasure, "radio_amk_treasure")	
+	self.radio_treasure = radio_treasure
+	radio_treasure:SetNewActiveTab(amk.load_variable("option_treasure",0))
+
+	local radio_ddof = xml:InitTab("form:radio_amk_ddof", self.form)
+	self:Register(radio_ddof, "radio_amk_ddof")	
+	self.radio_ddof = radio_ddof
+	radio_ddof:SetNewActiveTab(amk.load_variable("option_ddof",3))
+
+	local radio_weather = xml:InitTab("form:radio_amk_weather", self.form)
+	self:Register(radio_weather, "radio_amk_weather")	
+	self.radio_weather = radio_weather
+	radio_weather:SetNewActiveTab(amk.load_variable("option_weather",0))
+
+	local radio_news = xml:InitTab("form:radio_amk_news", self.form)
+	self:Register(radio_news, "radio_amk_news")	
+	self.radio_news = radio_news
+	radio_news:SetNewActiveTab(amk.load_variable("option_news",1))
+
+	local radio_cop = xml:InitTab("form:radio_amk_cop", self.form)
+	self:Register(radio_cop, "radio_amk_cop")	
+	self.radio_cop = radio_cop
+	radio_cop:SetNewActiveTab(amk.load_variable("option_cop",1))
+	
+	local radio_nv = xml:InitTab("form:radio_amk_nv", self.form)
+	self:Register(radio_nv, "radio_amk_nv")	
+	self.radio_nv = radio_nv
+	radio_nv:SetNewActiveTab(amk.load_variable("option_nv",1))
+
+	local radio_auto = xml:InitTab("form:radio_amk_auto", self.form)
+	self:Register(radio_auto, "radio_amk_auto")	
+	self.radio_auto = radio_auto
+	radio_auto:SetNewActiveTab(amk.load_variable("option_auto",1))
+
+	local radio_megafone = xml:InitTab("form:radio_amk_megafone", self.form)
+	self:Register(radio_megafone, "radio_amk_megafone")	
+	self.radio_megafone = radio_megafone
+	radio_megafone:SetNewActiveTab(amk.load_variable("option_megafone",1))
+	
+	self:Register(xml:Init3tButton("form:btn_okay", self.form),"btn_okay")
+
+end
+
+function amk_options:InitCallBacks()
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit, self)
+	self:AddCallback("btn_okay", ui_events.BUTTON_CLICKED, self.on_okay, self)
+end
+
+function amk_options:on_okay()
+
+	local radio_mus = self:GetTabControl("radio_amk_mus")
+	local radio_hud = self:GetTabControl("radio_amk_hud")
+	local radio_treasure = self:GetTabControl("radio_amk_treasure")
+	local radio_ddof = self:GetTabControl("radio_amk_ddof")
+	local radio_weather = self:GetTabControl("radio_amk_weather")
+	local radio_news = self:GetTabControl("radio_amk_news")
+	local radio_cop = self:GetTabControl("radio_amk_cop")
+	local radio_nv = self:GetTabControl("radio_amk_nv")
+	local radio_auto = self:GetTabControl("radio_amk_auto")
+	local radio_megafone = self:GetTabControl("radio_amk_megafone")
+	
+	amk.save_variable("option_mus", radio_mus:GetActiveIndex() )
+	amk.save_variable("option_hud", radio_hud:GetActiveIndex() )
+	amk.save_variable("option_treasure", radio_treasure:GetActiveIndex() )
+	amk.save_variable("option_ddof", radio_ddof:GetActiveIndex() )
+	TB3D_Shaders.set_dof(radio_ddof:GetActiveIndex())
+	amk.save_variable("option_weather", radio_weather:GetActiveIndex() )
+	amk.save_variable("option_news", radio_news:GetActiveIndex() )
+	amk.save_variable("option_cop", radio_cop:GetActiveIndex() )
+	amk.save_variable("option_nv", radio_nv:GetActiveIndex() )
+	amk.save_variable("option_auto", radio_auto:GetActiveIndex() )
+	amk.save_variable("option_megafone", radio_megafone:GetActiveIndex() )
+	amk.save_variable("option_helmets_snd",self:GetTabControl("radio_helmets_sound"):GetActiveIndex())
+	amk.save_variable("option_autosave",self:GetTabControl("radio_autosave"):GetActiveIndex())
+	amk.save_variable("option_shoot_eff",self:GetTabControl("radio_shoot_effect"):GetActiveIndex())
+	self:on_quit()
+	
+end
+
+function amk_options:on_quit()
+	local console = get_console()
+	self:GetHolder():start_stop_menu (self.owner, true)
+	self:GetHolder():start_stop_menu (self,true)
+	--self.owner:Show	(true)
+
+	if level.present() and (db.actor ~= nil) and db.actor:alive() then
+		console:execute("main_menu off")
+	end
+end
+
+function amk_options:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+-- to hang out Esc
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_quit()
+		end
+		if dik == DIK_keys.DIK_RETURN then
+			self:on_okay()
+		end
+	end
+	return true
+end
+

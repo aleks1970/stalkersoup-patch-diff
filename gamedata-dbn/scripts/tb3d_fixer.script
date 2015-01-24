@@ -1,0 +1,1178 @@
+-- TB3D 1.0.9.9.5.0 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
+-- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
+-- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
+-- atp_brigada1, dead removal, travka, val bloodsucker, rad_curve, val_sniper3, turret, labx18 bad ameba,
+-- redone for new 'can go on line', sak_book4, f1 to dyn content, hog
+function my_ver() return "1.0.9.9.5.0" end
+-- be careful to remove items only after they are no longer needed.
+-- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
+
+--{"wpn_lr30053522", "wpn_lr30058409"} -- "wpn_lr30025601", "wpn_lr30028817", "wpn_lr30033589"
+--{"atp_sedoy_delete_restrictor"}		--!!!!allows the atp bandits to free roam!!!!
+--{"sarc_arhara_zombied_respawn_154797", "sarc_arhara_zombied_respawn_149048"}
+--{"sarc_niz_zomb_2", "sarc_niz_zomb_1"}
+--{"vkluchit_generator_done")			--bad type passed from all.spawn 7865
+--[wpn_abakan_m1:wpn_abakan_m158374] [7526]
+--[wpn_abakan_m1:wpn_abakan_m158374] id_entity [55064][wpn_fake_missile:] [7526]
+
+local string_find = string.find
+
+function force_fixes(lname, sname)
+	TB3D_Services.packet_alert("tb3d fixer: ver["..utils.to_str(my_ver()).."]: start")
+	local obj_level, level_name = ""
+	local obj
+	local is_fixed, is_skip
+	local snil_count = 0
+	local nil_count = 0
+	local junk_count = 0
+	local wpn_count = 0
+	local skip_count = 0
+	local fixed_count = 0
+	local respawn_count = 0
+	local dyn_count = 0
+	local obj_name
+	local sect
+	local contrlr = false
+	local is_collector = TB3D_Services.is_collector()
+	for a=first_object,last_object,1 do		--skip actor (0)
+		obj = alife():story_object(a)
+		if obj then
+			--if a == "agr_zaz" and has_alife_info("agr_find_gunslinger_cache_final") then
+			--if a == 17005 or a == 17006 then		--stuck teleports in cave and village
+				--alife():release(obj, true)
+				--news_manager.send_tip(db.actor,"TB3D: spot Released")
+			--end
+			--TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] story obj["..utils.to_str(obj.id).."]["..utils.to_str(obj:name()).."]")
+		else
+			--TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] story obj - nil")
+			snil_count = snil_count + 1
+		end
+		obj = alife():object(a)
+		is_fixed = false
+		is_skip = is_fixed
+		if obj then
+			if obj.name then obj_name = obj:name() else obj_name = "NIL" end
+			if obj.section_name then sect = obj:section_name() else sect = "NIL" end
+			if obj_name == "NIL" then
+				TB3D_Services.packet_alert("tb3d fixer: obj name[nil] !!!!!!!!!")
+				is_fixed = true
+			elseif obj_name == "" then										--ph_skeleton_obj has no name but does have a section name
+				if sect == "NIL" then
+					is_fixed = true											--bad respawns with blank object name
+				else
+					is_skip = true
+				end
+			elseif sect == "inventory_box" or sect == "smart_terrain" then
+				if string_find(obj_name, "ds_bandit_stoy_inventory_box") then
+					if has_alife_info("tweed_zep3_start") then
+						is_skip = true
+					else
+						is_fixed = true
+					end
+				else
+					is_skip = true
+				end
+			elseif sect == "physic_destroyable_object" or sect == "physic_object" then
+				if string_find(obj_name, "aes_physic_destroyable_object")
+				  or string_find(obj_name, "pol_hamm") then
+					if is_collector then
+						is_fixed = true
+					else
+						is_skip = true
+					end
+				elseif string_find(obj_name,"x16_physic_destroyable_object_0000") then				--grate can fall shut in an explosion
+					if has_alife_info("yantar_tunnel_finish") then
+						is_fixed = true
+					else
+						is_skip = true
+					end
+				elseif string_find(obj_name, "monolith_generator_000") then
+					if is_collector then
+						is_fixed = true
+					else
+						is_skip = true
+					end
+				elseif string_find(obj_name, "_oso_generator") then					--generators
+					if is_collector then
+						is_fixed = true
+					else
+						is_skip = true
+					end
+				else
+					is_skip = true
+				end
+			elseif sect == "smart_terrain" then
+				is_skip = true
+			elseif sect == "lights_hanging_lamp" then
+				if is_collector then
+					if string_find(obj_name, "_light_oso_verh")
+					  or string_find(obj_name, "antenna_zenter_lights")
+					  or string_find(obj_name, "generator1_lights")
+					  or string_find(obj_name, "generator2_lights")
+					  or string_find(obj_name, "generator3_lights") then
+						is_fixed = true
+					else
+						is_skip = true
+					end
+				else
+					is_skip = true
+				end
+			elseif sect == "respawn"
+			  or string_find(obj_name, "respawn") then
+				is_skip = true
+			end
+			if not is_fixed and not is_skip then																	--check by level
+				if (string_find(obj_name, "werewolf") or string_find(sect, "werewolf"))
+				  and not string_find(obj_name, "_kogot") then									--clear them if daytime
+					if TB3D_Services.is_night() == true then is_skip = true else is_fixed = true end
+				elseif string_find(obj_name, "binocular_a") then															--used for bag of weed (travka)
+					is_fixed = true
+				elseif string_find(obj_name, "wpn_soulcube") then															--collector loses it on start
+					if is_collector and not has_alife_info("tb3d_cube_spawned") then
+						is_fixed = true
+					else
+						is_skip = true
+					end
+				elseif game_graph():valid_vertex_id(obj.m_game_vertex_id) then
+					obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
+					level_name = alife():level_name(obj_level)	
+					--TB3D_Services.packet_alert("tb3d fixer: level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."]")
+					if not is_skip and not is_fixed then
+						if obj_level < 1 then																					--fatal error
+							TB3D_Services.packet_alert("tb3d fixer: invalid level["..utils.to_str(obj_level).."] !!!!!!!!!")
+							is_fixed = true
+						elseif string.sub(obj_name, 1, 6) == "tb3dm_" then														-- TB3D Dynamic Mobs
+							if level_name == lname then						--remove all but same level
+								if string_find(obj_name, "zombied_") then	--keep count of those on this level
+									TB3D_Mobs.increment(8)
+								elseif string_find(obj_name, "bandit") then
+									TB3D_Mobs.increment(0)
+								elseif string_find(obj_name, "stalker") then
+									TB3D_Mobs.increment(1)
+								elseif string_find(obj_name, "ecolog") then
+									TB3D_Mobs.increment(2)
+								elseif string_find(obj_name, "mil_") then
+									TB3D_Mobs.increment(3)
+								elseif string_find(obj_name, "mon_") then
+									TB3D_Mobs.increment(4)
+								elseif string_find(obj_name, "killer") then
+									TB3D_Mobs.increment(5)
+								elseif string_find(obj_name, "rat") then
+									TB3D_Mobs.increment(10)
+								else
+									TB3D_Mobs.increment(9)					--all creatures
+								end
+								is_skip = true
+							else
+								is_fixed = true
+							end
+						elseif obj_level < 9							--only levels with dyn content
+						  or (obj_level > 10 and obj_level < 13)		--skip 10, 13, 14
+						  or obj_level == 15
+						  or (obj_level > 16 and obj_level < 21)		--skip 16, 21 thru 24
+						  or obj_level == 25
+						  or (obj_level > 25 and obj_level < 34)		--skip 26 thru 29
+						  or obj_level == 35							--skip 34
+						  or obj_level == 40							--skip 36 thru 38, (39 not used)
+						  or obj_level == 43							--skip 44
+						  or obj_level == 45							--skip 46, (47 not used)
+						  or obj_level == 48 then						--skip 49 thru 54, (55 not used)
+							if (string_find(obj_name, "zone_radioactive_tb3d") and not string_find(sect, "zone_radioactive_tb3d")) 
+								or string_find(obj_name, "zone_tuman_cop") or string_find(sect, "zone_tuman_cop")
+								or string_find(obj_name, "zone_fog_cigarette") or string_find(sect, "zone_fog_cigarette") 
+								or string_find(obj_name, "zone_fog_indoor") or string_find(sect, "zone_fog_indoor") 
+								or string_find(obj_name, "zone_roaches_tb3d") or string_find(sect, "zone_roaches_tb3d") 
+								or string_find(obj_name, "zone_burning_tb3d") or string_find(sect, "zone_burning_tb3d") 
+								or string_find(obj_name, "zone_fire_tb3d") or string_find(sect, "zone_fire_tb3d") 
+								or string_find(obj_name, "zone_fire_small_tb3d") or string_find(sect, "zone_fire_small_tb3d") 
+								or string_find(obj_name, "zone_fire_med_tb3d") or string_find(sect, "zone_flame_fire_med_tb3d") 
+								or string_find(obj_name, "zone_flame_grill_tb3d") or string_find(sect, "zone_flame_grill_tb3d") 
+								or string_find(obj_name, "zone_fountain_tb3d") or string_find(sect, "zone_fountain_tb3d") 
+								or string_find(obj_name, "zone_emi_tb3d") or string_find(sect, "zone_emi_tb3d") 
+								or string_find(obj_name, "zone_campfire_tb3d") or string_find(sect, "zone_campfire_tb3d") 
+								or string_find(obj_name, "zone_small_low_fog_tb3d") or string_find(sect, "zone_small_low_fog_tb3d") 
+								or string_find(obj_name, "zone_large_slow_fog_tb3d") or string_find(sect, "zone_large_slow_fog_tb3d") 
+								or string_find(obj_name, "zone_large_fast_fog_tb3d") or string_find(sect, "zone_large_fast_fog_tb3d") 
+								or string_find(obj_name, "zone_green_smoke_signal_tb3d") or string_find(sect, "zone_green_smoke_signal_tb3d") 
+								or string_find(obj_name, "zone_large_heat_distort_tb3d") or string_find(sect, "zone_large_heat_distort_tb3d") 
+								or string_find(obj_name, "zone_no_gravity_tb3d") or string_find(sect, "zone_no_gravity_tb3d")
+								--or string_find(obj_name, "zone_anti_grav_tb3d") or string_find(sect, "zone_anti_grav_tb3d") 			--killing zones - cannot be dynamic
+								or string_find(sect, "zone_radioactive_dyn")															--TB3D fixed radiation zones
+								or string_find(sect, "turret_")	then																		--fixed turrets: army, nato, mgun, kptv
+								--or (string_find(obj_name, "vehicle_tb3d_btr") and dmx_cars.actor_inside_btr() == false) then			--usable tanks: btr, btr_80, btr_80camo, btr_80uniq, btr_90
+									if sname ~= lname then
+										is_fixed = true
+										if TB3D_Modders.use_cleaner_message == true then TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] removed") end
+										dyn_count = dyn_count + 1
+									else
+										is_skip = true
+									end
+							elseif string_find(obj_name, "testsak")	then		--old arts marker obsolete
+								if TB3D_Modders.use_cleaner_message == true then
+									TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] removed")
+								end
+								is_fixed = true
+							end
+						end
+						if not is_fixed and not is_skip then
+							if sect == "restrictor" or sect == "space_restrictor" then
+								if string_find(obj_name, "camp_fire")
+								  or string_find(obj_name,"esc_space_restrictor")
+								  or string_find(obj_name,"amk_embankment_restrictor")
+								  or string_find(obj_name, "bar_") then
+									is_skip = true
+								elseif string_find(obj_name,"bar_help_professor_restrictor")
+								  or string_find(obj_name,"rostok_scientist_guard_restrictor")
+								  or string_find(obj_name,"rostok_space_restrictor")
+								  --or string_find(obj_name,"rostok_sniper_killer_restrictor")
+								  or string_find(obj_name,"rostok_sniper_space_restrictor_01")
+								  or string_find(obj_name,"rostok_sniper_space_restrictor_0001")
+								  or string_find(obj_name,"rostok_start_killer_combat")
+								  or string_find(obj_name,"rostok_chase_restrictor")
+								  or string_find(obj_name,"rosros_cutscene")
+								  or string_find(obj_name,"rostok_heli_scene_start_restr") then
+									if has_alife_info("bar_ambush_dead")		--things respawning from all.spawn that shouldn't
+									  or is_collector then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								elseif string_find(obj_name,"yan_ucheniy_talk") then								--yan_actor_talk_ucheniy and yan_scientist_point_to_1 toggles
+									is_fixed = true
+								elseif string_find(obj_name,"privyzka_generatorov_restrictor") then					--fails to trigger black doc sms, done in code
+									is_fixed = true
+								elseif string_find(obj_name, "aes_space_restrictor_timer")
+									  or string_find(obj_name, "aes_space_restrictor_sound_battle")
+									  or string_find(obj_name, "aes_space_restrictor_road")
+									  or string_find(obj_name, "aes_space_restrictor_gate")
+									  or string_find(obj_name, "aes_space_restrictor_actor_ready")
+									  or string_find(obj_name, "aes_explosive_dinamit") then
+										if is_collector
+										  or has_alife_info("tb3d_chaes_done") then				--see if made it to sarc and completed monolith or oc
+											is_fixed = true
+										else
+											is_skip = true
+										end								  
+								elseif string_find(obj_name,"pri_monolith_sniper_to_walker_zone") 
+									or string_find(obj_name,"aes_space_restrictor_task_0000") then
+										if has_alife_info("pri_wave7_end") or has_alife_info("pri_followers_all_dead") then		--things respawning from all.spawn that shouldn't
+											is_fixed = true
+										end
+								elseif string_find(obj_name,"pri_monolith_base_restr") or string_find(obj_name,"pri_hotel_zone") then
+									if has_alife_info("pri_stadium_reached") or has_alife_info("pri_stadium_scene_start") then		--things respawning from all.spawn that shouldn't
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								 elseif string_find(obj_name, "esc_prison") then
+									if is_collector
+									  or has_alife_info("esc_darklab_documents_read")
+									  or has_alife_info("esc_darklab_documents_gain") then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								elseif is_collector then
+									if string_find(obj_name, "pda_slom_")								--broken pda
+									  or string_find(obj_name,"rostok_tunnel_restrictor")
+									  or string_find(obj_name,"rostok_tunel_insider")
+									  or string_find(obj_name, "yantar_moroz_restrictor")
+									  or string_find(obj_name, "spawn_cern_stalk_restrictor")
+									  or string_find(obj_name, "snayperka_zombi_restrictor")
+									  or string_find(obj_name, "ynt_after_perexod_sms_restrictor")
+									  or string_find(obj_name, "spawn_chernomor_restrictor")
+									  or string_find(obj_name, "baty_otlet_heli_restrictor")
+									  or string_find(obj_name, "yantar_rostok_band5_prerestrictor")
+									  or string_find(obj_name, "yantar_sms_barmen_restrictor")
+									  or string_find(obj_name, "sms_barm_otvet_restr")
+									  --or string_find(obj_name, "yan_spawn_snork_")
+									  or string_find(obj_name, "yantar_space_restrictor_0000")
+									  or string_find(obj_name, "test_space_restrictor")
+									  or string_find(obj_name, "yan_zombie_zone_mapspot")
+									  or string_find(obj_name, "yan_mapspot_from_vasiliev")
+									  or string_find(obj_name, "yantar_psi_radiotion_30")
+									  or string_find(obj_name, "yantar_psi_radiotion_5")
+									  or string_find(obj_name, "yantar_tunnel_start")
+									  or string_find(obj_name, "yantar_tunnel_finish")
+									  --or string_find(obj_name, "yantar_tunnel_restrictor_")
+									  or string_find(obj_name, "dovel_chernomora_restrictor")
+									  or string_find(obj_name, "yan_no_weapon_restr")
+									  or string_find(obj_name, "yan_space_restrictor")
+									  or string_find(obj_name, "yan_ecolog_spam_space_restrictor")
+									  or string_find(obj_name, "yan_ucheniy_talk")
+									  or string_find(obj_name, "yan_to_deadcity_restrictor")
+									  or string_find(obj_name, "yan_helmet")
+									  or string_find(obj_name, "yan_spawn_giand_1")
+									  or string_find(obj_name, "yan_helicopter_")
+									  or string_find(obj_name,"rostok_zombied_spawner")
+									  or string_find(obj_name,"rostok_kruglov_finish_mapspot")
+									  or string_find(obj_name,"rostok_volkodav_talking")
+									  or string_find(obj_name,"rostok_volkodav_fire_sound")
+									  or string_find(obj_name,"rostok_volkodav_band_mapspot")
+									  or string_find(obj_name,"rostok_secret_way_mapspot")
+									  or string_find(obj_name, "x16_space_restrictor_0000")				--yan dream and message from scientist
+									  or string_find(obj_name, "aes2_space_restrictor_particle")
+									  or string_find(obj_name, "aes2_space_restrictor_ambush")
+									  --or string_find(obj_name, "aes2_space_restrictor_0000")		--aes_final_movie, used as tp in collector
+									  or string_find(obj_name, "aes2_space_restrictor_first_ambush")
+									  or string_find(obj_name, "_sms_restrictor")
+									  or string_find(obj_name, "aes2_final_roof_restr")
+									  or string_find(obj_name, "mono_kabina_truba_spawn_restrictor")
+									  or string_find(obj_name, "mono_chaes2_truba_1_restrictor")
+									  or string_find(obj_name, "mono_chaes2_truba_2_restrictor")
+									  or string_find(obj_name, "mesto_gg_na_chaes2_restrictor")
+									  or string_find(obj_name, "_arhara_spawn_restrictor")
+									  or string_find(obj_name, "chaes2_musik_restrictor")
+									  or string_find(obj_name, "kluk_pogib_restrictor")
+									  or string_find(obj_name, "chaes_spawn_vse_restrictor")
+									  or string_find(obj_name, "atp_torgovetz_sms_restrictor")
+									  or string_find(obj_name, "video_black_first_restrictor")
+									  or string_find(obj_name, "sms_k_generalu_restrictor")
+									  or string_find(obj_name, "poshel_bazar_otsek_restrictor")
+									  or string_find(obj_name, "nachalo_bazara_restrictor")
+									  or string_find(obj_name, "sms_k_muhe_restrictor")
+									  or string_find(obj_name, "sms_k_prizraku1_restrictor")
+									  or string_find(obj_name, "dokor_first_spawn_restrictor")
+									  or string_find(obj_name, "video_finish_dopa_restrictor")
+									  or string_find(obj_name, "teleport_podval_ok_restrictor")
+									  or string_find(obj_name, "tele_na_vuxpod_restrictor")
+									  or string_find(obj_name, "sp_zaschita_podval_restrictor")
+									  or string_find(obj_name, "limansk_spawn_tele_krusha_restrictor")
+									  or string_find(obj_name, "lim_teleport_restr")
+										or string_find(obj_name, "baza_doza_timer_restrictor")
+										or string_find(obj_name, "video_kursk_space_restrictor")
+										or string_find(obj_name, "dok_otlet_gen_restrictor")
+										or string_find(obj_name, "spasibo_frits_restrictor")
+										or string_find(obj_name, "mu_opozdaly_restrictor")
+										or string_find(obj_name, "podgotovka_zahvata_restrictor")
+										or string_find(obj_name, "plan_zahvata_restrictor")
+										or string_find(obj_name, "vertuhi_poshli_restrictor")
+										or string_find(obj_name, "predesant_black_heli_restrictor")
+										or string_find(obj_name, "antenna_restrictor")
+										or string_find(obj_name, "gener_sekretnuy_vuhod_restrictor")
+										or string_find(obj_name, "gener_musik_restrictor")
+										or string_find(obj_name, "gener_spawn_zvez_restrictor")
+										or string_find(obj_name, "gener_spawn_pant_restrictor")
+										or string_find(obj_name, "zvezd_vert_otlet_restrictor")
+										or string_find(obj_name, "molniy_posle_foto_restrictor")
+										or string_find(obj_name, "sms_preduprezhd_odnonogogo_restrictor")
+										or string_find(obj_name, "sms_preduprezhd1_odnonogogo1_restrictor")
+										or string_find(obj_name, "sms_preduprezhd2_odnonogogo2_restrictor")
+										or string_find(obj_name, "anders_put_warlab_restrictor")
+										or string_find(obj_name, "pereh_warlab_na_gener_restrictor")
+										or string_find(obj_name, "gener_no_weapon_zone_restrictor")
+										or string_find(obj_name, "gen_hit_heli_hit_sms_restrictor")
+										or string_find(obj_name, "gen_hit1_heli1_hit1_sms_restrictor")
+										or string_find(obj_name, "restrictor_art_buluz_generators")
+										or string_find(obj_name, "vkluch_video_vzleta_generators")
+										or string_find(obj_name, "video_vzlet_gen_restrictor")
+										or string_find(obj_name, "podstanziy_doza_timer_restrictor")
+										or string_find(obj_name, "u_tretego_generatora_restrictor")
+										or string_find(obj_name, "u_shlagbauma_space_restrictor")
+										or string_find(obj_name, "sv_chern_peregovor_restrictor")
+										or string_find(obj_name, "saps_forever_restrictor")
+										or string_find(obj_name, "vitamin_posrednik_restrictor")
+										or string_find(obj_name, "sapsan1_othod_restrictor")
+										or string_find(obj_name, "krov_gener_spawn1_restrictor")
+										or string_find(obj_name, "idu_na_nz_restrictor")
+										or string_find(obj_name, "idu_na_nz_restrictor")
+										or string_find(obj_name, "gen_trupak_restrictor")
+										or string_find(obj_name, "dok_podvox_restrictor")
+										or string_find(obj_name, "spawn_sklad_space_restrictor")
+										or string_find(obj_name, "dell_uchen_gen_povtorno_restrictor")
+										or string_find(obj_name, "oso_space_restrictor")
+										or string_find(obj_name, "sms_restrictor")
+										or string_find(obj_name, "privyzka_generatorov_restrictor")
+									  or string_find(obj_name,"spawn_nach_oxran_restrictor")
+									  or string_find(obj_name,"actor_v_dead_city_restrictor")
+									  or string_find(obj_name,"sms_parfumer1_restrictor")
+									  or string_find(obj_name,"dcity_bandosu_doza_timer_restrictor")
+									  or string_find(obj_name,"parfum_sms_kontrik_restrictor")
+									  or string_find(obj_name,"babki_hutor_restrictor")
+									  or string_find(obj_name,"dcity_spawn_ludi_hutor_restrictor")
+									  or string_find(obj_name,"sms_obmorok_restrictor")
+									  or string_find(obj_name,"strelka_obmorok_restrictor")
+									  or string_find(obj_name,"dcity_gorod_doza_timer_restrictor")
+									  or string_find(obj_name,"dcity_gorod1_doza1_timer_restrictor")
+									  or string_find(obj_name,"dcity_zenter_doza_timer_restrictor")
+									  or string_find(obj_name,"pomoshnik_timer_zenter_doza_restrictor")
+									  or string_find(obj_name,"pomoshnik1_timer_zenter1_doza_restrictor")
+									  or string_find(obj_name,"dcity_zenter1_doza_timer_restrictor")
+									  or string_find(obj_name,"dcity_rastrell_restrictor")
+									  or string_find(obj_name,"poziciy_cherdak_zanyta_restrictor")
+									  or string_find(obj_name,"pomoshnik4_timer_zenter4_doza_restrictor")
+									  or string_find(obj_name,"dcity_zenter4_doza_timer_restrictor")
+									  or string_find(obj_name,"pomoshnik3_timer_zenter3_doza_restrictor")
+									  or string_find(obj_name,"dcity_zenter3_doza_timer_restrictor")
+									  or string_find(obj_name,"pomoshnik2_timer_zenter2_doza_restrictor")
+									  or string_find(obj_name,"dcity_tarakashki_restrictor")
+									  or string_find(obj_name,"parfumer_shtab_restrictor")
+									  or string_find(obj_name,"sms_zlobnomu_rasstrel_restrictor")
+									  or string_find(obj_name,"dcity_plendok_doza_timer_restrictor")
+									  or string_find(obj_name,"pomoshnik_timer_plendok_doza_restrictor")
+									  or string_find(obj_name,"dcity_otvet_ok_obmor_restrictor")
+									  or string_find(obj_name,"dcity_duda_zvonok_restrictor")
+									  or string_find(obj_name,"dcity_iskra_zvonok_restrictor")
+									  or string_find(obj_name,"dcity_nachalnik_zvonok_restrictor")
+									  or string_find(obj_name,"prevraschenie_dok_restrictor")
+									  or string_find(obj_name,"dcity_gg_neytral_restrictor")
+									  or string_find(obj_name,"dcity_sp_dok_vid_restrictor")
+									  or string_find(obj_name,"dcity_otkl_zona_shtab_restrictor")
+									  or string_find(obj_name,"sniper1_spawn_krusha1_restrictor")
+									  or string_find(obj_name,"actor_chely_shtab_restrictor")
+									  or string_find(obj_name,"chely1_shtab1_lestnisa_restrictor")
+									  or string_find(obj_name,"dokor_first_spawn_restrictor")
+									  or string_find(obj_name,"esc_suicidal_flash_restrictor")
+									  or string_find(obj_name,"sms_doc_letit_restrictor")
+									  or string_find(obj_name,"sms_k_generalu_restrictor")
+									  or string_find(obj_name,"sms_kuznets_restrictor")
+									  or string_find(obj_name,"sms_girl3_nachalo_restrictor")
+									  or string_find(obj_name,"sms_k_muhe_restrictor")
+									  or string_find(obj_name,"sms_k_prizraku1_restrictor")
+									  or string_find(obj_name,"warlab_sms1_space_restrictor")
+									  or string_find(obj_name,"warlab_sms2_space_restrictor")
+									  or string_find(obj_name,"village_sms_kap_restrictor")
+									  or string_find(obj_name,"pantera_space_restrictor_timer")
+									  or string_find(obj_name,"esc_tutorial_trigger")
+									  or string_find(obj_name,"esc_return_from_dv")
+									  or string_find(obj_name,"val_escort_start_zone")
+									  or string_find(obj_name,"val_trader_tip_zone")
+									  or string_find(obj_name,"spawn_foto_monolitovets_restrictor")
+									  or string_find(obj_name,"x16_space_restrictor_ghost_pda")
+									  or string_find(obj_name,"x16_timer_restrictor")
+									  or string_find(obj_name,"rad_trig1_mil_vs_mon")
+									  or string_find(obj_name,"pri_wave")
+									  or string_find(obj_name,"_followers_")
+									  or string_find(obj_name,"pri_helicopters2_start_zone")
+									  or string_find(obj_name,"prip_dell_dok_restrictor")
+									  or string_find(obj_name,"rad_barman_spam")
+									  or string_find(obj_name,"rad_freedom_vs_dolg_spamer")
+									  or string_find(obj_name,"rad_start_ambush_before_tramplin")
+									  or string_find(obj_name,"rad_start_ambush_after_valley")
+									  or string_find(obj_name,"rad_after_tramplin_ambush_starter")
+									  or string_find(obj_name,"rad_far_road_ambush_starter")
+									  or string_find(obj_name,"agro_final")
+									  or string_find(obj_name,"final_agro")
+									  or string_find(obj_name,"esc_tips_fox")
+									  or string_find(obj_name,"esc_dogs_fox_attack")
+									  or string_find(obj_name,"spawn_molniy2_restrictor")
+									  or string_find(obj_name,"dinam_nevid_vzryv_restrictor")
+									  or string_find(obj_name,"kanaliy_imitator_hit_restrictor")
+									  or string_find(obj_name,"kanaliy_dinamit_nevid_vzryv_restrictor")
+									  or string_find(obj_name,"kanaliy_dinamit1_vzryv_restrictor")
+									  or string_find(obj_name,"kanaliy_dinamit2_vzryv_restrictor")
+									  or string_find(obj_name,"dcity_zenter2_doza_timer_restrictor") then
+										is_fixed = true
+									else
+										--TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] restrictor["..utils.to_str(obj_name).."] level["..utils.to_str(obj_level).."] gv["..utils.to_str(obj.m_game_vertex_id).."] skiped")
+										is_skip = true
+									end
+								else
+									is_skip = true
+								end
+							elseif obj_level == 1 then												--l01_escape
+								if string_find(obj_name, "esc_outfit_bandit_m1")					--nimble quest
+								  or string_find(obj_name, "esc_shustryi")
+								  or string_find(obj_name, "val_kocherga")
+								  or string_find(obj_name, "gar_seryi")								--gar_seryi_drug
+								  or string_find(obj_name, "gar_seriywff")
+								  or string_find(obj_name, "gar_sniper_bandit")
+								  or string_find(obj_name, "gar_stalker_0009")						--bandit
+								  or string_find(obj_name, "pre_guard")
+								  or string_find(obj_name, "pre_lager_")
+								  or string_find(obj_name, "esc_novice_attacker")
+								  or string_find(obj_name, "esc_factory_bandit")
+								  or string_find(obj_name, "esc_pantera_bomba")
+								  or string_find(obj_name, "svalka_plot_stalk")
+								  or string_find(obj_name, "esc_father_pant")
+								  or string_find(obj_name, "esc_vagon_wounded")						--tolik
+								  or string_find(obj_name, "xalyava")
+								  or string_find(obj_name, "esc_provodnik")							--guide
+								  or string_find(obj_name, "foto")									--esc_foto_muzhik and restrictors
+								  or string_find(obj_name, "dead_military_esc")
+								  or string_find(obj_name, "esc_dog_swarm_")
+								  or string_find(obj_name, "doktor1")
+								  or string_find(obj_name, "val_bandit_krisyk")
+								  or string_find(obj_name, "esc_arhara_desant_heli") then
+									if is_collector then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								elseif string_find(obj_name, "_bandit_respawn") then	
+									if has_alife_info("esc_darklab_documents_read") then			--keep them out until cordon story quests are done
+										is_skip = true
+									else
+										is_fixed = true
+									end
+								elseif string_find(obj_name, "esc_pseudodog_strong") then			--motivator crash
+									if is_collector then
+										is_fixed = true
+									elseif sname == "l04_darkvalley" then
+										is_fixed = true
+									end
+								elseif string_find(sect,"witches_galantine")						--kills railroad guards
+								  and not string_find(obj_name, "_00") then
+									is_fixed = true
+								end
+							elseif obj_level == 2 then												--l02_garbage
+								  if string_find(obj_name, "gar_dm_")								--yurik and bandits
+									or string_find(obj_name, "wpn_mp5_m1")							--yurik mp5
+								    or string_find(obj_name, "svalka_plot_stalk")
+									or string_find(obj_name, "tamaz_ohr") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 3 then												--l03_agroprom
+								if is_collector then
+									if sect == "stalker" or sect == "stalker_sakharov"
+									  or sect == "stalker_sniper" or sect == "stalker_monolith"
+									  or sect == "helicopter" then
+										if string_find(obj_name, "sak_military_stalker")
+										  or string_find(obj_name, "agro_military")
+										  or string_find(obj_name, "svalka_plot_stalk")
+										  or string_find(obj_name, "road_patrol")
+										  or string_find(obj_name, "_tower")
+										  --or string_find(obj_name, "_stalker")
+										  or string_find(obj_name, "_nii_")							--sak chopper
+										  or string_find(obj_name, "agro_adrenalin") then
+											is_skip = true
+										else
+											is_fixed = true
+										end
+									elseif string_find(obj_name, "agr_red_") then
+										is_fixed = true
+									elseif string_find(obj_name, "zone_") then						--radiation zones
+										is_skip = true
+									end
+								end
+							elseif obj_level == 4 then												--l03u_agr_underground
+								if string_find(obj_name,"kat_") then								--strelok's weapon, suit
+									is_skip = true 													--this keeps it from the cleaner
+								elseif obj.m_story_id==9660	then									--stalker_agro_und
+									is_skip = true
+								end
+							elseif obj_level == 5 then												--l04_darkvalley
+								if sect == "m_car" or sect == "zone_ameba1" then
+									is_skip = true
+								elseif string_find(obj_name, "val_wpn_rpg_") 
+								  or string_find(obj_name, "svalka_plot_stalk")
+								  or string_find(obj_name, "val_wpn_mp5") 
+								  or string_find(obj_name, "val_bandit_outfit_")
+								  or string_find(obj_name, "val_sniper") 
+								  or string_find(obj_name, "val_stalker") 
+								  or string_find(obj_name, "val_sacrifice") 
+								  or string_find(obj_name, "val_sos") 
+								  or string_find(obj_name, "val_exit") 
+								  or string_find(obj_name, "val_bs") 
+								  or string_find(obj_name, "val_raid") 
+								  or string_find(obj_name, "val_escort") 
+								  or string_find(obj_name, "val_bandit_trader") 
+								  or string_find(obj_name, "val_lager_bandits_borov") 
+								  or string_find(obj_name, "val_bandit_rpg_dead") 
+								  or string_find(obj_name, "dead_korchagin_military") 
+								  or string_find(obj_name, "val_prisoner") 
+								  or string_find(obj_name, "val_rob") 
+								  or string_find(obj_name, "dar_m_poltergeist") 
+								  or (string_find(obj_name, "dark_") and not string_find(obj_name, "gravity"))
+								  or string_find(obj_name, "dt_gigant_strong1")						--behind the door
+								  or string_find(obj_name, "bland_") then
+									if is_collector then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								end
+							elseif obj_level == 6 then												--l04u_labX18
+								if string_find(obj_name, "af_ameba_slug") then
+									is_fixed = true
+								elseif string_find(obj_name, "dar_wpn_ak74") 
+								  or string_find(obj_name, "dar_wpn_rpg7") then
+									if is_collector then
+										is_fixed = true
+									else
+										is_skip = true 												--this keeps it from the cleaner
+									end
+								end
+							elseif obj_level == 7 then												--l05_bar
+								if string_find(obj_name,"bkot")
+								  or string_find(obj_name,"kluk_bar")
+								  or string_find(obj_name, "svalka_plot_stalk")
+								  or string_find(obj_name,"bar_dolg_regular_5")
+								  or string_find(obj_name,"piligrim_bar") then
+									if is_collector then
+										is_fixed = true
+									else
+										is_skip = true 
+									end
+								 end
+							elseif obj_level == 8 then												--l06_rostok
+								if string_find(obj_name,"rostok_stalker")
+								  or string_find(obj_name,"rostok_naemnik")
+								  or string_find(obj_name,"mil_dolg_stalker") then
+									if has_alife_info("bar_ambush_dead") then						--things respawning from all.spawn that shouldn't
+										is_fixed = true
+									end
+								elseif string_find(obj_name,"rostok_stalker_zombied")
+								  or string_find(obj_name,"rost_siv")
+								  or string_find(obj_name,"ros_sniper")
+								  or string_find(obj_name,"rost_naemnik")
+								  or string_find(obj_name,"rostok_bandit")
+								  or string_find(obj_name,"naem_zahar")
+								  or string_find(obj_name,"_dead") then
+									if is_collector then
+										is_fixed = true
+									end
+								end
+							elseif obj_level == 9 then												--l08_yantar
+								if string_find(obj_name,"af_rusty") then							--yantar art bad vertex
+									is_fixed = true
+								elseif string_find(obj_name,"_na_yantare")
+								  or string_find(obj_name, "yantar_heli_")
+								  or string_find(obj_name, "yantar_baty")
+								  or string_find(obj_name, "yantar_semenov")
+								  or string_find(obj_name, "arhara_ecolog_guard")
+								  or string_find(obj_name, "yantar_chernomor")
+								  or string_find(obj_name, "sim_stalker_prapor")
+								  or string_find(obj_name, "scientist_help")
+								  or string_find(obj_name, "ekolog_zombi")
+								  or string_find(obj_name, "yan_home")
+								  or string_find(obj_name, "chernomor_zombi")
+								  or string_find(obj_name, "yantar_kontroller_yazva")
+								  or string_find(obj_name, "yantar_m_gigant_e_0000")
+								  or string_find(obj_name, "yantar_stalker_zombied_")
+								  or string_find(obj_name, "foto_monolitovets") then
+									if is_collector then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								elseif obj.m_story_id==48800										--yan_ecolog_respawn_2  with docs
+								  or obj.m_story_id==48801											--yan_ecolog_respawn_2
+								  or obj.m_story_id==48802 then										--yan_ecolog_respawn_2  with pda
+									if has_alife_info("dcity_kontrik_done") then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								end
+							elseif obj_level == 10 then												--l08u_brainlab
+								if string_find(obj_name,"x16_physic_destroyable_object_0000") then	--grate can fall shut in an explosion
+									if has_alife_info("yantar_tunnel_finish") then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								elseif string_find(obj_name,"home_snork_0013") then
+									is_fixed = true								--ctd on offline
+								elseif string_find(obj_name,"brainlab_ecolog_trupik")
+								  or string_find(obj_name, "yan_controller_respawn_01")				--controller with ghost's body
+								  or string_find(obj_name, "x16_m_controller")						--controller with ghost's body
+								  or string_find(obj_name, "x16_stalker_ghost")
+								  or string_find(obj_name, "x16_home_snork")						--causes prolog/storage error on exit
+								  or string_find(obj_name, "x16_snork")								--causes prolog/storage error on exit
+								  or string_find(obj_name, "brain_snork")							--causes prolog/storage error on exit
+								  or string_find(obj_name, "x16_zombied")
+								  or string_find(obj_name, "x16_exozombied")
+								  or string_find(obj_name, "burer_strong")							--causes prolog/storage error on exit
+								  or string_find(obj_name, "x16_stalker_zombied")
+								  or string_find(obj_name, "foto_monolitovets") then
+									if is_collector then
+										is_fixed = true
+									elseif string_find(obj_name, "_snork_0013") then		--ctd on going offline
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								end
+							elseif obj_level == 11 then												--l07_military
+								if string_find(obj_name,"fotomuzhik")
+								  or string_find(obj_name,"mil_wpn_lr300_m1")
+								  or string_find(obj_name,"mil_patrol_stalker") then
+									if is_collector then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								else
+									is_skip = true
+								end
+							elseif obj_level == 12 then												--l10_radar
+								if string_find(obj_name,"tramplin_")
+								  or string_find(obj_name, "freedom_vs_duty")
+								  --or string_find(obj_name, "after_valley")
+								  --or string_find(obj_name, "snork_jumper")
+								  or string_find(obj_name, "radar_vitamin")
+								  or string_find(obj_name, "road_kamper")
+								  or string_find(obj_name, "road_patroler")
+								  --or string_find(obj_name, "zombied_")
+								  or string_find(obj_name, "svoboda_")
+								  or string_find(obj_name, "road_guard")
+								  or string_find(obj_name,"_monolith")
+								  or string_find(obj_name,"rad_curve_")
+								  or string_find(obj_name,"_antenna_")
+								  or string_find(obj_name,"_dead") then
+									if is_collector then
+										is_fixed = true
+									end
+								end
+							elseif obj_level == 13 then												--l11_pripyat
+								if string_find(obj_name,"_help_stalker")
+									or string_find(obj_name,"_helicopter")
+									or string_find(obj_name,"mil_blockpost_freedomstalker")
+									or string_find(obj_name,"pri_decoder")
+									or string_find(obj_name,"pripyt_kluk")						--canine
+									or string_find(obj_name,"pri_stalker")
+									or string_find(obj_name,"stalk_hos")
+									or string_find(obj_name,"_sniper")
+									or string_find(obj_name,"_wave")
+									or string_find(obj_name,"_corner")
+									or string_find(obj_name,"_followers_") then
+										if is_collector then
+											is_fixed = true
+										end
+								elseif string_find(obj_name,"mil_pseudodog_") then
+									is_fixed = true
+								elseif string_find(obj_name,"sak_book4") then						--protect from duplicating
+									TB3D_Services.give_info("tb3d_sak_book4")
+									is_skip = true
+								elseif string_find(obj_name,"_respawn") then					--remove any migrated ones to reduce population
+									if has_alife_info("pri_stadium_reached") or has_alife_info("pri_stadium_scene_start") then
+										is_fixed = true
+									end
+								end
+							elseif obj_level == 14 then												--l12_stancia
+								if string_find(obj_name, "aes_helicopter")
+								  or string_find(obj_name, "aes_explosive_dinamit")
+								  or string_find(obj_name, "aes_stalker")
+								  or string_find(obj_name, "aes_soldier")
+								  or string_find(obj_name, "aes_monolit") then
+									if is_collector or has_alife_info("tb3d_chaes_done") then				--see if made it to sarc and completed monolith or oc
+										is_fixed = true
+									end
+								end
+							elseif obj_level == 15 then												--l12u_sarcofag
+							elseif obj_level == 16 then												--l12u_control_monolith
+							elseif obj_level == 17 then												--l12_stancia_2
+								if string_find(obj_name, "aes2_stalker")
+								  or string_find(obj_name, "aes2_snork")
+								  or string_find(obj_name, "aes2_monolit") then
+									if is_collector then							--see if made it to sarc and completed monolith or oc
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								else
+									is_skip = true
+								end
+							elseif obj_level == 18 then												--l10u_bunker
+								  if string_find(obj_name, "bun_stalker_monolith")
+								   or string_find(obj_name, "rad_a")
+								   or string_find(obj_name, "rad_p")
+								   or string_find(obj_name, "bun_bloodsucker") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 19 then												--atp_for_test22
+								  if string_find(obj_name, "atp_flesh_strong")
+								   or string_find(obj_name, "yan_old")
+								   or string_find(obj_name, "atp_dog1")
+								   or string_find(obj_name, "arhara_atp_voyka")
+								   or string_find(obj_name, "atp_mobil_torgovetz")
+								   or string_find(obj_name, "atp_sedoy_heli")
+								   or string_find(obj_name, "atp_bandit_shnura")
+								   or string_find(obj_name, "atp_gonets")
+								   or string_find(obj_name, "atp_soldat_attakker")
+								   or string_find(obj_name, "atp_trupak_disk")
+								   or string_find(obj_name, "atp_presled_last")
+								  or string_find(obj_name, "atp_monolit")
+								  or string_find(obj_name, "atp_kalinin")
+								  or string_find(obj_name, "atp_brigada") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 20 then												--peshera
+								if TB3D_Modders.cave_no_big_electros then							--if present and true
+									if string_find(sect,"witches_galantine_strong") then
+										is_fixed = true
+									end
+								end
+								if string_find(obj_name,"af_ameba_") then							--cave crash
+									is_fixed = true
+								end
+							elseif obj_level == 21 then												--puzir
+								  if string_find(obj_name, "puzir_dog_strong")
+								   or string_find(obj_name, "puzir_boar_strong") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 22 then												--aver
+								  if string_find(obj_name, "aver_arhara_heli")
+								   or string_find(obj_name, "pantera_vertuha_aver")
+								   or string_find(obj_name, "general_heli")
+								   or string_find(obj_name, "tehnik_golograma") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 23 then												--av_peshera
+								  if string_find(obj_name, "av_pesh_grot_controller")
+								   or string_find(obj_name, "dead_mono_labirint") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 24 then												--limansk
+								  if string_find(obj_name, "borman")
+								   or string_find(obj_name, "_dead")
+								   or string_find(obj_name, "kot_hos")								--feral cat
+								   --or string_find(obj_name, "lim_zone_teleport")
+								   or string_find(obj_name, "stalk_semetskiy") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 25 then												--hospital
+								  if string_find(obj_name, "black_doctor")
+									or string_find(obj_name, "black_hos")
+									or string_find(obj_name, "kolba_pustay")						--flask in generator
+									or string_find(obj_name, "hospital_bl_dok")
+									or string_find(obj_name, "hos_no_gulag_")
+									or string_find(obj_name, "hospital_black_")
+									or string_find(obj_name, "hospital_sapsan")
+									or string_find(obj_name, "hos_black_")
+									or string_find(obj_name, "hospital_pantera")
+									or string_find(obj_name, "hospital_muha_")
+									or string_find(obj_name, "muha_hosp")
+									or string_find(obj_name, "hosp_real_bl_dok")
+									or string_find(obj_name, "hosp_father")
+									or string_find(obj_name, "hos_father_new")
+									or string_find(obj_name, "hos_new_panterka") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+									end
+							elseif obj_level == 26 then												--generators
+								  if string_find(obj_name, "generators_heli")
+									or string_find(obj_name, "_psevdopda")
+									or string_find(obj_name, "generators_burer1")
+									or string_find(obj_name, "gener_electro")
+									or string_find(obj_name, "generators_flesh_strong")
+									or string_find(obj_name, "gen_boar_gulag")
+									or string_find(obj_name, "gener_heli_zvez_pobeg")
+									or string_find(obj_name, "gener_frit")
+									or string_find(obj_name, "gen_frit")
+									or string_find(obj_name, "generators_udav")
+									or string_find(obj_name, "gen_prizrak")
+									or string_find(obj_name, "generators_prizrak")
+									or string_find(obj_name, "generators_black")
+									or string_find(obj_name, "generators_pantera")
+									or string_find(obj_name, "generators_zvezdochet")
+									or string_find(obj_name, "black_generators")
+									or string_find(obj_name, "gener_shlagbaum")
+									or string_find(obj_name, "gener_dok_stalk")
+									or string_find(obj_name, "gen_solvador")
+									or string_find(obj_name, "gen_andersen")
+									or string_find(obj_name, "gen_pantera")
+									or string_find(obj_name, "gen_svoboda")
+									or string_find(obj_name, "gen_sapsan")
+									or string_find(obj_name, "gener_desant")
+									or string_find(obj_name, "generators_monolit")
+								   or string_find(obj_name, "gener_bl_doktor") then
+										if string_find(obj_name, "koster_") then
+											is_skip = true
+										elseif is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								 end
+							elseif obj_level == 27 then												--warlab
+								  if string_find(obj_name, "pantera")
+									or string_find(obj_name, "imitator_tele_final1")
+									or string_find(obj_name, "shesterka_") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								elseif string_find(obj_name, "warlab_") then
+									if string_find(obj_name, "freedom")
+									  or string_find(obj_name, "boss")
+									  or string_find(obj_name, "andersen")
+									  or string_find(obj_name, "_oso")
+									  or string_find(obj_name, "sekret_ekolog")
+									  or string_find(obj_name, "_naemnik")
+									  or string_find(obj_name, "golograma")
+									  or string_find(obj_name, "solvador")
+									  or string_find(obj_name, "vitamin")
+									  or string_find(obj_name, "dead") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+									else
+										is_skip = true
+									end
+								end
+							elseif obj_level == 28 then												--red_forest
+								  if string_find(obj_name, "for_killer")
+									or string_find(obj_name, "for_freedom")
+									--or string_find(obj_name, "shadowman")
+								   or string_find(obj_name, "for_nebo") then
+										if is_collector then
+											is_fixed = true
+										else
+											is_skip = true
+										end
+								  end
+							elseif obj_level == 29 then												--lost_village
+								if string_find(obj_name,"af_rusty_") then							--cave crash
+									is_fixed = true
+								elseif is_collector then
+									if string_find(obj_name,"lost_village_heli")
+									  or string_find(obj_name,"after_foto_")
+									  or string_find(obj_name,"village_pantera")
+									  or string_find(obj_name,"kolmogor")
+									  or string_find(obj_name,"village_plennuy")
+									  or string_find(obj_name,"village_piligrim")
+									  or string_find(obj_name,"village_brat_dead")
+									  or string_find(obj_name,"village_kapatel")
+									  or string_find(obj_name,"village_attaks_")
+									  or string_find(obj_name,"village_gulag_")
+									  or string_find(obj_name,"village_bandit")
+									  or string_find(obj_name,"village_zaschita_")
+									  or string_find(obj_name,"village_obsled_")			--creature restrictors
+									  or string_find(obj_name,"village_nachalo_")
+									  or string_find(obj_name,"village_stalk")
+									  or string_find(obj_name,"village_xolm_")
+									  or string_find(obj_name,"village_magazin_") then
+										is_fixed = true
+									end
+								end
+							elseif obj_level == 30 then												--marsh
+								if string_find(obj_name,"marsh_heli_dok")				--chopper at gen lc
+								  or string_find(obj_name,"marsh_controller")			--nw village
+								  or string_find(obj_name,"kot")
+								  or string_find(obj_name,"kashei")
+								  or string_find(obj_name,"esc_saha")
+								  or string_find(obj_name,"nebo_exit")
+								  or string_find(obj_name,"marsh_dan")
+								  or string_find(obj_name,"ferma_band")
+								  or string_find(obj_name,"marsh_ohotnik")
+								  or string_find(obj_name,"blizn_krug")
+								  or string_find(obj_name,"marsh_sych")			--ne village
+								  or string_find(obj_name,"marsh_kosoi")		--ne village
+								  or string_find(obj_name,"brat_luis")			--ne village
+								  or string_find(obj_name,"marsh_pantera") then			--panther
+									if is_collector then
+										is_fixed = true
+									else
+										is_skip = true
+									end
+								end
+							elseif obj_level == 31 then												--dead_city
+								if string_find(obj_name,"otkr_perex_zaton")
+								  or string_find(obj_name,"dead_city_zlobnuy")
+								  or string_find(obj_name,"dcity_last_vhod_")
+								  or string_find(obj_name,"city_starshoy")
+								  or string_find(obj_name,"dcity_neytral")
+								  or string_find(obj_name,"dcity_parfumer")
+								  or string_find(obj_name,"city_tema_likvidator")
+								  or string_find(obj_name,"dcity_dozor_stalk")
+								  or string_find(obj_name,"dcity_kontrol_stalk")
+								  or string_find(obj_name,"dcity_kontr_last")
+								  or string_find(obj_name,"_obmorok")
+								  or string_find(obj_name,"dcity_bandit")
+								  or string_find(obj_name,"dcity_naemnik")
+								  or string_find(obj_name,"_oxran")
+								  or string_find(obj_name,"dcity_dok")
+								  or string_find(obj_name,"last_dokplen")
+								  or string_find(obj_name,"dcity_last_rasstrel")
+								  or string_find(obj_name,"bloodsucker_most")
+								  or string_find(obj_name,"mg_bandit")
+								  or string_find(obj_name,"dcity2_dok")
+								  or string_find(obj_name,"chasovoy")
+								  or string_find(obj_name,"kultorg")
+								  or string_find(obj_name,"patrul_")
+								  or string_find(obj_name,"snayper")
+								  or string_find(obj_name,"dcity_sniper")
+								  or string_find(obj_name,"dead_city_molniy")
+								  or string_find(obj_name,"last_nevid")
+								  or string_find(obj_name,"dcity_poltergeist") then
+									if is_collector then
+										is_fixed = true
+									end
+								end
+							elseif obj_level == 32 then												--zaton
+							elseif obj_level == 33 then												--jupiter
+							elseif obj_level == 34 then												--pripyat
+							elseif obj_level == 35 then												--jupiter_underground
+							elseif obj_level == 36 then												--labx8
+							elseif obj_level == 37 then												--cs agro under
+							elseif obj_level == 38 then												--predbennik
+								if string_find(obj_name,"predbannik_m_trader") then					--MODEL: can't find cycles
+									is_fixed = true
+								end
+							--elseif obj_level == 39 then											--old garbage same as promzone
+							elseif obj_level == 40 then												--old yantar
+								--if string_find(obj_name,"yan_old_inventory_box_0004") then							--bad vertex
+									--is_fixed = true
+								--end
+							elseif obj_level == 41 then												--old swamp
+								if string_find(obj_name, "af_") then								--mass spawning
+									is_fixed = true
+								end
+							elseif obj_level == 42 then												--hiding road
+							elseif obj_level == 43 then												--darkscape
+								--if string_find(obj_name,"ds_tushkano") then							--path errors
+									--is_fixed = true
+								--end
+							elseif obj_level == 44 then												--dark forest
+							elseif obj_level == 45 then												--f-1
+								if string_find(obj_name, "af_") then								--mass spawning
+									is_fixed = true
+								end
+							elseif obj_level == 46 then												--promzone
+							--elseif obj_level == 47 then											--deadcity			--109940 dead_city used instead
+							elseif obj_level == 48 then												--krasivay
+							elseif obj_level == 49 then												--dd
+								if string_find(obj_name, "af_ameba_slug") or string_find(obj_name, "af_medusa") then
+									is_fixed = true
+								end
+							elseif obj_level == 50 then												--rinok
+							elseif obj_level == 51 then												--pogost
+							elseif obj_level == 52 then												--vokzal
+							elseif obj_level == 53 then												--digger stash
+							elseif obj_level == 54 then												--labx14
+								if string_find(obj_name, "event_horizont") or string_find(obj_name, "zone_event") then						--experiment
+									is_skip = true
+								end
+							--elseif obj_level == 55 then											--collector22, part of x14
+							elseif obj_level == 56 then												--l01_poligon
+								if string_find(obj_name, "pol_hamm") then
+									is_fixed = true
+								end
+							else																	-- >56 does not exist
+								TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] invalid level for["..utils.to_str(obj_name).."] level["..utils.to_str(obj_level).."] gv["..utils.to_str(obj.m_game_vertex_id).."] removed")
+								is_fixed = true
+							end
+						end
+					end
+				else --bad gv
+					TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] invalid gv for["..utils.to_str(obj_name).."] level["..utils.to_str(obj_level).."] gv["..utils.to_str(obj.m_game_vertex_id).."] removed")
+					is_fixed = true
+				end --valid gv
+			end	--is_fixed/is_skip
+			if is_fixed == true then	--end fixer, if not fixed then if new level then apply cleaner
+				if TB3D_Modders.use_cleaner_message == true then
+					TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] removed")
+				end
+				alife():release(obj, true)
+				fixed_count = fixed_count + 1
+				nil_count = nil_count + 1
+			elseif is_skip == false then
+				if level_name == lname then					--if on same level
+					--TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(lname).."]["..utils.to_str(level_name).."] check pop control")
+					if string_find(sect, "breakable_object") or string_find(sect, "climable_object")
+					  or string_find(sect, "physic_") or string_find(sect, "hanging_lamp")
+					  or string_find(sect, "zone_") or string_find(sect, "smart_terrain")
+					  or string_find(sect, "_restrictor") or string_find(sect, "helicopter")
+					  or string_find(sect, "device_") or string_find(sect, "level_")
+					  or string_find(sect, "mutant_") or string_find(sect, "explosive_")
+					  or string_find(sect, "document") or string_find(sect, "_box")
+					  or string_find(sect, "_sleep") or string_find(sect, "turret_")
+					  or string_find(sect, "vehicle_") or string_find(sect, "amk_")
+					  or string_find(sect, "mushroom") or string_find(sect, "af_")
+					  or string_find(sect, "teleport") or string_find(sect, "playboy") then
+						skip_count = skip_count + 1
+					elseif TB3D_population_control.population_control(obj, sect) == true then	--see if over populated
+						if protected_items.obj_has_protected_item(obj) == false then
+							if TB3D_Modders.use_cleaner_message == true then TB3D_Services.packet_alert("tb3d pop control: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] removed") end
+							alife():release(obj, true)
+							nil_count = nil_count + 1
+						else
+							skip_count = skip_count + 1
+						end
+					elseif sect == "respawn" then --obj.m_story_id == 4294967296 and sect == "respawn" then				--respawner object gets reused
+						if TB3D_Modders.use_cleaner_message == true then TB3D_Services.packet_alert("tb3d cleaner: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] respawn object") end
+						respawn_count = respawn_count + 1
+					elseif TB3D_Modders.use_level_cleaner == true and lname ~= sname then		--changing levels, cleanup time
+						if obj.parent_id then													--if has parent then see if expendable
+							--TB3D_Services.packet_alert("tb3d cleaner: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."]")
+							if obj.parent_id == expendable_object then
+								if string_find(obj_name,"wpn_") or string_find(obj_name,"grenade_") then
+									if protected_items.obj_is_protected(obj,"tabl_wpn_keep","like") == false then
+										if TB3D_Modders.use_cleaner_message == true then TB3D_Services.packet_alert("tb3d cleaner: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] weapon removed") end
+										alife():release(obj, true)
+										wpn_count = wpn_count + 1
+										nil_count = nil_count + 1
+									else
+										skip_count = skip_count + 1
+									end
+								end
+							else
+								skip_count = skip_count + 1
+							end
+						elseif sect == "stalker" or sect == "stalker_monolith" then			--now done in motivator
+							skip_count = skip_count + 1
+						elseif protected_items.obj_is_protected(obj,"tabl_items_keep","like") == false then	--loose item, try to remove it
+							if TB3D_Modders.use_cleaner_message == true then TB3D_Services.packet_alert("tb3d cleaner: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] junk removed") end
+							alife():release(obj, true)
+							junk_count = junk_count + 1
+							nil_count = nil_count + 1
+						else
+							skip_count = skip_count + 1
+						end
+					else									--level check, cleaner
+						skip_count = skip_count + 1
+					end
+				else									--same level
+					skip_count = skip_count + 1
+				end
+			else 										--is skip
+				skip_count = skip_count + 1
+			end 										--is fixed
+		else
+			--TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] nil obj")
+			nil_count = nil_count + 1
+		end --no obj
+	end --loop
+	TB3D_Services.packet_alert("tb3d fixer: fixed objects["..utils.to_str(fixed_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: skipped objects["..utils.to_str(skip_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: respawn objects["..utils.to_str(respawn_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: dynamic objects["..utils.to_str(dyn_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: empty story objs["..utils.to_str(snil_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: done - empty object slots["..utils.to_str(nil_count).."]")
+	TB3D_Services.packet_alert("tb3d cleaner: removed junk["..utils.to_str(junk_count).."]")
+	TB3D_Services.packet_alert("tb3d cleaner: removed weapons["..utils.to_str(wpn_count).."]")
+	TB3D_population_control.population_report()
+	if nil_count < 5000 then
+		TB3D_Services.packet_alert("tb3d fixer: available object slots critical["..utils.to_str(nil_count).."] available!!!")
+	elseif TB3D_Modders.gg_show_spots then 
+		TB3D_Services.show_game_graph()
+	end
+	--collectgarbage("collect")									-- force memory cleanup
+end

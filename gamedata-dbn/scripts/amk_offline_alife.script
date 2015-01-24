@@ -1,0 +1,2038 @@
+-- TB3D 1.0.9.9.4.3, look radius to 160, higher values cause issues, must be <= alife.ltx, search int back to 60, added GC
+-- pump_it_up fix, globalized protected table, pop control, missing param checks, npc health, removed items from trade
+function my_ver() return "1.0.9.9.4.3" end
+-- file from the mod "People Salsola 2009" from 14.06. Adapted for fashion 'label with swag 2.1.4' 06/07/2009
+-- Adapted to the Manager of weapons. Rulix aka Bak from 2.07.09
+-- Adatiroval: Idler.
+
+--globals-----------------
+tables_ready = false
+off_npcs={}
+items={}
+relation_matrix={}
+--------------------------
+
+local table_sort = table.sort
+local table_remove = table.remove
+local math_random = math.random
+local math_floor = math.floor
+local math_abs = math.abs
+local math_ceil = math.ceil
+local string_find = string.find
+
+local sell_table = {}
+local item_dependence = {}
+--local always_keep_item = {}		--TB3D 1099321 - redundant, use protected items instead
+local wpn_fp = {}
+local monster_params = {}
+
+local bFlag = false-- It's time to do an update
+local iCounter = 0-- Number of the last waste Object
+local initialized = false
+
+protected = {	-- for boxes, keeps them from being robbed
+	names = {},		-- names of objects (standing only add unique names!)
+	ids = {},		-- ID Objects
+	story_ids = {	-- story ID Objects
+	5008,
+	5013,
+	5014,
+	5041,
+	5065,
+	5084,
+	5104,
+	5205,
+	5222,
+	5226,
+	5237,
+	5238,
+	5243,
+	5244,
+	5245,
+	5246,
+	5247,
+	5248,
+	5249,
+	5250,
+	5254,
+	5255,
+	5408,
+	5413,
+	5428,
+	5433,
+	5434,
+	5444,
+	5446,
+	5470,
+	5471,
+	5472,
+	5473,
+	5474,
+	573
+	}
+}
+
+local smart_filters = {
+	"esc_bridge", "esc_blokpost"
+}
+
+local rel_enemy,rel_friend
+
+function init()
+	if TB3D_Modders.use_alife_message == true then TB3D_Services.info_alert("amk_off_line: init started") end
+	if (initialized == false) then
+		build_tables()
+		initialized = true
+	end
+	if TB3D_Modders.use_alife_message then TB3D_Services.info_alert("amk_off_line: init done") end
+end
+
+--non essential objects have m_story_id == 4294967296, allowable to respawn
+--on_death - do not kill!
+--on_hit - do not handle!
+function add_fresh_meat(obj)
+	--if TB3D_Modders.use_alife_message == true then TB3D_Services.info_alert("amk_off_line: add fresh meat started") end
+	if obj and db.actor and db.actor:id() ~= obj.id
+	  and not protected_items.obj_is_protected(obj, "items_protected", "exactly") then
+		local map=TB3D_Services.get_obj_level(obj)
+		if map ~= "" then
+			if not off_npcs[map] then off_npcs[map]={monsters={},stalkers={},weapons={},artefacts={},inv_boxes={}} end
+			if IAmAMonster[obj:clsid()] and obj.alive and obj:alive()
+			  and obj.health and obj:health()>0
+			  and obj.m_story_id == 4294967296 then
+				local flags = get_flags(obj.id)
+				if flags == 0 or flags == 2 then 											--Remove those who have on_hit.
+					--TB3D_Services.packet_alert("amk_off_line: add fresh meat monster name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
+					table.insert(off_npcs[map].monsters, {id = obj.id, name = obj:name()})
+				end
+			elseif IAmAStalker[obj:clsid()] and obj.alive and obj:alive()
+			  and obj.health and obj:health()>0
+			  and obj.m_story_id == 4294967296 then
+				local flags = get_flags(obj.id)
+				if flags == 0 or flags == 2 then 										--Remove those who have on_hit.
+					if obj:community()~="zombied" then
+						--TB3D_Services.packet_alert("amk_off_line: add fresh meat stalker name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
+						table.insert(off_npcs[map].stalkers, {id = obj.id, name = obj:name()})
+					else
+						--TB3D_Services.packet_alert("amk_off_line: add fresh meat zombie name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
+						table.insert(off_npcs[map].monsters, {id = obj.id, name = obj:name()})
+					end
+				end
+			elseif IAmAWeapon[obj:clsid()] then
+				if obj.m_story_id == 4294967296 then
+					if obj.parent_id then
+						local p_obj = alife():object(obj.parent_id)
+						if p_obj then
+							--if p_obj.m_game_vertex_id and game_graph():valid_vertex_id(p_obj.m_game_vertex_id) then
+								--if p_obj:section_name()=="inventory_box" and box_is_protected(p_obj)==true then
+								--if p_obj:section_name()=="inventory_box" then
+								if p_obj:clsid() == clsid.inventory_box then
+									-- NPCs can not see "this
+									map = ""
+								else
+									local p_map = TB3D_Services.get_obj_level(p_obj)
+									if p_map ~= "" and p_map ~= map then
+										if not off_npcs[p_map] then off_npcs[p_map]={monsters={},stalkers={},weapons={},artefacts={}, inv_boxes={}} end
+										map = p_map
+									end	
+								end
+							--end
+						end
+					end
+					--TB3D_Services.packet_alert("amk_off_line: add fresh meat weapon name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
+					if map ~= "" then table.insert(off_npcs[map].weapons, {id=obj.id, name = obj:name()}) end
+				end
+			elseif string_find(obj:section_name(),"^af_") then
+				if obj.parent_id then
+					local p_obj = alife():object(obj.parent_id)
+					if p_obj then
+						--if p_obj.m_game_vertex_id and game_graph():valid_vertex_id(p_obj.m_game_vertex_id) then
+							--if p_obj:section_name()=="inventory_box" and box_is_protected(p_obj)==true then
+							--if p_obj:section_name()=="inventory_box" then
+							if p_obj:clsid() == clsid.inventory_box then
+								map = ""													-- NPCs cannot detect
+							else
+								local p_map = TB3D_Services.get_obj_level(p_obj)
+							if p_map ~= "" and p_map ~= map then
+								if not off_npcs[p_map] then off_npcs[p_map]={monsters={},stalkers={},weapons={},artefacts={}, inv_boxes={}} end
+								map = p_map
+								end	
+							end
+						--end
+					end
+				end
+				--TB3D_Services.packet_alert("amk_off_line: add fresh meat artefact name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
+				if map ~= "" then table.insert(off_npcs[map].artefacts, {id = obj.id, name = obj:name()}) end
+			elseif obj:clsid() == clsid.inventory_box and not box_is_protected(obj) then
+				--TB3D_Services.packet_alert("amk_off_line: add fresh meat inv box name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
+				table.insert(off_npcs[map].inv_boxes, {id = obj.id, name = obj:name()})
+			end
+			if obj.parent_id and obj.m_story_id == 4294967296 and not IAmAMonster[obj:clsid()] and not IAmAStalker[obj:clsid()] then
+				local zz = alife():object(obj.parent_id)
+				if zz then
+					if not items[obj.parent_id] then items[obj.parent_id] = {} end
+					table.insert(items[obj.parent_id], {id = obj.id, name=obj:name()})
+					gps_habar.insert_item(obj.parent_id, obj) 									-- Idler++-- adjust the loot in the recesses of labeled
+					--TB3D_Services.packet_alert("amk_off_line: add fresh meat gps name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
+				end
+			end
+		end
+	end
+	--if TB3D_Modders.use_alife_message == true then TB3D_Services.info_alert("amk_off_line: add fresh meat done") end
+end
+
+--construct a table of NPCs, monsters, and weapons
+function build_tables()
+	-- Will clean the table
+--	off_npcs={}	
+--	local obj
+--	for a=first_object,last_object do
+--		obj = alife():object(a)
+--		add_fresh_meat(obj)
+--	end
+	-- rel_enemy,rel_friend = utils.cfg_get_number(system_ini(), "game_relations", "goodwill_enemy", nil, false, -1000), utils.cfg_get_number(system_ini(), "game_relations", "goodwill_friend", nil, false, 1000)
+	-- local s_comm_list = utils.cfg_get_string(system_ini(), "game_relations", "communities", nil, false, "", "")
+	rel_enemy,rel_friend = getIniValueFloat("game_relations", "goodwill_enemy", -1000, nil), getIniValueFloat("game_relations", "goodwill_friend", 1000, nil)
+	local s_comm_list = getIniValueString("game_relations", "communities", "", nil)
+	local comm_list = {}
+	local s_value = amk.str_explode(",", amk.trim(s_comm_list), true)
+	for a=1, #s_value, 2 do
+		table.insert(comm_list, s_value[a])
+	end
+	local tmp={}
+	local result, id, value = nil, nil, nil
+	local n = iniLinesCount("communities_relations",nil)
+	for a=0,n-1 do
+		result, id, value = getIniLine("communities_relations",a,"","",nil)
+		if id~=nil and amk.trim(id)~="" and amk.trim(id)~=nil then
+			relation_matrix[amk.trim(id)]={}
+			table.insert(tmp, amk.trim(id))
+		end
+	end
+	local value
+	local idx
+	local idx2 = {}
+	local v = ""
+	local m_value
+	for a=1,#tmp do
+		-- value = utils.cfg_get_string(system_ini(), "communities_relations", tmp[a], nil, false, "", "")
+		value = getIniValueString("communities_relations", tmp[a], "", nil)
+		idx = tmp[a]
+		m_value = amk.str_explode(",", amk.trim(value), true)
+		for i=1, #m_value do
+			idx2 = {}
+			v = nil
+			idx2 = comm_list[i]
+			v = m_value[i]
+			if relation_matrix[idx] and idx2~=nil and v ~= nil then
+				relation_matrix[idx][idx2]=tonumber(amk.trim(v))
+			end
+		end
+	end
+	if TB3D_Modders.offline_alife_trade == true then
+		sell_table = {}
+		local iniFileName = "misc\\trade_generic.ltx"
+		local sini = ini_file(iniFileName)
+		-- local cfg_sell = utils.cfg_get_string(sini, "trader", "sell_condition", npc, false, false, "")
+		local cfg_sell = getIniValueString("trader", "sell_condition", "", iniFileName)
+		-- amk.dump_table(iniLines)
+		if sini and iniLineSectionExist(cfg_sell, iniFileName) then
+			local result, id, value
+			for a=0,iniLinesCount(cfg_sell, iniFileName)-1 do
+				result, id, value = nil, nil, nil
+				result, id, value = getIniLine(cfg_sell,a,"","", iniFileName)
+				if id~=nil and amk.trim(id)~="" and amk.trim(id)~=nil and amk.trim(value)~="" and amk.trim(value)~=nil then
+					-- Add to a table that can be sold.
+					sell_table[id] = true
+				end
+			end
+		end
+	end
+	iniFileName = "misc\\death_generic.ltx"
+	--local death_ini = ini_file(iniFileName)
+    --' Fill the table dependencies
+	item_dependence = {}
+	local n = iniLinesCount("item_dependence", iniFileName)
+	local id, value = "", ""
+	local vvv = {}
+	for i=0,n-1 do
+		vvv = {}
+		result, id, value	= getIniLine("item_dependence",i,"","", iniFileName)
+		item_dependence[id] = {}
+		vvv = parse_names(value)
+		for k,v in pairs(vvv) do
+			item_dependence[id][v] = true
+		end
+	end
+ 	--[[' Items that can not sell (Quest for instance)
+	always_keep_item = {}
+    local n = iniLinesCount("keep_items", iniFileName)
+	for i=0,n-1 do
+		result, id, value	= getIniLine("keep_items",i,"","", iniFileName)
+        if value == "true" then
+            always_keep_item[id] = true
+        end
+    end]]--
+	tables_ready = true
+end
+
+function update_npc_tables()		--called by amk_mod:check_spawn to create tables
+	off_npcs={}	
+	local obj
+	local sim = alife()
+	for a=first_object,last_object do
+		obj = sim:object(a)
+		if obj then
+			add_fresh_meat(obj)
+			if TB3D_Modders.offline_alife_trade == true then process_trade(obj)	end	--!!!!TB3D
+		end
+	end
+	bFlag = false
+	iCounter = 1
+end
+
+function update_trade()		--called by amk_mod:check_spawn
+	local sim = alife()
+	local obj
+	for a=0,last_object do
+		obj = sim:object(a)
+		if obj then
+			process_trade(obj)		--!!!!TB3D
+		end
+	end
+end
+
+function update_tables(level)	--actor_binder:take_item_from_box, zamok:on_drop
+	off_npcs[level]={monsters={},stalkers={},weapons={},artefacts={}, inv_boxes={}}	--clear tables and repopulate
+	local obj, p_obj
+	--local ggraph = game_graph()
+	local glevel = ""
+	local sim = alife()
+	for a=first_object,last_object do
+		obj = sim:object(a)
+		if obj then
+			glevel = TB3D_Services.get_obj_level(obj)
+			if glevel ~= "" and glevel == level then
+				add_fresh_meat(obj)
+			elseif obj.parent_id then
+				p_obj = sim:object(obj.parent_id)
+				if p_obj then
+					glevel = TB3D_Services.get_obj_level(p_obj)
+					if glevel ~= "" and glevel == level then
+						add_fresh_meat(obj)
+					end
+				end
+			end
+		end
+	end	
+end
+
+--generate offline events, control areas to protect quests and key players
+function update()				--called by bind stalker
+	if _g.is_disconnecting then return end
+	local now = game.get_game_time()
+	--if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("amk_off_line: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	--end
+	local lname = TB3D_Population_Control.get_rnd_level()
+	local st = 0
+	if off_npcs[lname] then st = #off_npcs[lname].stalkers end
+	if st>0 then
+		local rnd
+		local victim
+		local vdata
+		for search = 1,TB3D_Modders.search_intensivity do		--if something found then quit looking
+			rnd = math_random(st)
+			if off_npcs[lname].stalkers[rnd] then 
+				victim = alife():object(off_npcs[lname].stalkers[rnd].id)
+				if victim and not victim.online and victim.health and victim.can_switch_online
+				and victim:health()>0 and victim:can_switch_online() and victim:name() == off_npcs[lname].stalkers[rnd].name then
+					if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] time["..now:timeToString(1).."]") end
+					vdata = {}
+					vdata = collect_info(victim,lname)
+					if #vdata.enemies>0 then
+						--is enemy - fighting tries!
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] enemy found") end
+						on_enemies_found(victim, vdata)
+						break	--interrupt the cycle - the event worked out
+					elseif #vdata.monsters>0 then
+						--is monster seen, heard, killed, dead...
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] monster found") end
+						on_monsters_found(victim, vdata)
+						break	--interrupt the cycle - the event worked out
+					elseif #vdata.corpses.stalkers>0 then
+						--is dead stalker
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] npc corpse") end
+						on_npc_corpses_found(victim, vdata)
+						break	--interrupt the cycle - the event worked out
+					elseif #vdata.corpses.monsters>0 then
+						--a corpse monster
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] monster corpse") end
+						on_monster_corpses_found(victim, vdata)
+						break	--interrupt the cycle - the event worked out
+					elseif #vdata.weapons.seen>0 then
+						--is unattended weapon
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] weapon found") end
+						on_weapons_found(victim, vdata)
+						break	--interrupt the cycle - the event worked out
+					elseif #vdata.artefacts>0 then
+						--artifact
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] artifact found") end
+						on_artifacts_found(victim, vdata)
+						break	--interrupt the cycle - the event worked out
+					elseif #vdata.inv_boxes>0 then
+						--there are containers. Should be searched.
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] box found") end
+						on_inv_boxes_found(victim, vdata)
+						break	--interrupt the cycle - the event worked out
+					elseif items[victim.id] and #items[victim.id] > 0 then
+						--try to sell any
+						if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: update - npc["..tostring(victim:name()).."] level["..tostring(lname).."] trade") end
+						if TB3D_Modders.offline_alife_trade == true then process_trade(victim) end
+						break
+					end
+				end
+			end
+		end
+	end
+	--if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("amk_off_line: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
+	--end
+end
+
+--Old collect about NPCs
+function collect_info(victim,map)
+	--if TB3D_Modders.use_alife_message then TB3D_Services.info_alert("amk_off_line: collect info for ["..victim:name().."]") end
+	local vdata = {}
+	vdata.rank = victim:rank()														--rank
+	vdata.health = victim:health()													--Surveillance Survey
+	vdata.community = victim:community()											--grouping
+	local wp = #off_npcs[map].weapons												--trying to determine the gun
+	vdata.fire_power = 0															--conventional firepower
+	local sim = alife()
+	vdata.weapons={own={},seen={}}
+	if wp>0 then	-- if you have guns in their pockets looking for the best (according to the conditional power)
+		local fp
+		local www = {}
+		for w=1,wp do
+			if off_npcs[map].weapons[w] then
+				www = {}
+				www = sim:object(off_npcs[map].weapons[w].id)
+				if www and www:name()==off_npcs[map].weapons[w].name then
+					if www.parent_id == victim.id then
+						table.insert(vdata.weapons.own, {id = www.id, name = www:name()})
+						fp = get_weapon_firepower(www)
+						if vdata.fire_power<fp then vdata.fire_power=fp end
+					elseif www:can_switch_online() and victim.position:distance_to(www.position)<TB3D_Modders.look_radius and sobj_is_far(www, TB3D_Modders.to_actor) then
+						if www.parent_id==nil or www.parent_id==expendable_object or (sim:object(www.parent_id) and sim:object(www.parent_id):clsid() == clsid.inventory_box) then
+							table.insert(vdata.weapons.seen, {id = www.id, name = www:name()})
+						end
+					end
+				end
+			end
+		end
+	end
+	--compile lists of friends and enemies in the area of visibility
+	-- For those with a smart filter - do not collect enemies
+	-- For the rest - do not take into account the enemies of smarts
+	local npc_peaceful = npc_smart_is_peaceful(victim)
+	vdata.friends={}
+	vdata.enemies={}
+	vdata.corpses={monsters={},stalkers={}}
+	if #off_npcs[map].stalkers>0 then
+		local rel
+		local opponent = {}
+		for a=1,#off_npcs[map].stalkers do
+			if off_npcs[map].stalkers[a] then
+				opponent = {}
+				opponent = sim:object(off_npcs[map].stalkers[a].id)
+				if opponent and opponent.id~=victim.id and opponent.health and opponent.can_switch_online and opponent:can_switch_online() and opponent:name() == off_npcs[map].stalkers[a].name  then
+					if victim.position:distance_to(opponent.position)<TB3D_Modders.look_radius then
+						if opponent:health()>0 then
+							rel = relation_check(victim,opponent)
+							if rel>=rel_friend then
+								table.insert(vdata.friends, {id = opponent.id, name = opponent:name()})
+							elseif rel<=rel_enemy then
+								if npc_peaceful == false and npc_smart_is_peaceful(opponent) == false then
+									table.insert(vdata.enemies, {id = opponent.id, name = opponent:name()})
+								end
+							end
+						else
+							if (sobj_is_far(opponent, TB3D_Modders.to_actor)) then
+								table.insert(vdata.corpses.stalkers, {id = opponent.id, name = opponent:name()})
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	--compile a list of monsters in the area of visibility
+	vdata.monsters={}
+	local monster = {}
+	if off_npcs[map].monsters then
+		if #off_npcs[map].monsters>0 then
+			for a=1,#off_npcs[map].monsters do
+				if off_npcs[map].monsters[a] then
+					monster = {}
+					monster = sim:object(off_npcs[map].monsters[a].id)
+					if monster and monster.health and monster.can_switch_online and monster:can_switch_online() and monster:name() == off_npcs[map].monsters[a].name and victim.position:distance_to(monster.position)<TB3D_Modders.look_radius then
+						if monster:health()>0 then
+							table.insert(vdata.monsters, {id = monster.id, name = monster:name()})
+						else
+							if (sobj_is_far(monster, TB3D_Modders.to_actor)) then
+								table.insert(vdata.corpses.monsters, {id = monster.id, name = monster:name()})
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	--compile a list of arts in the area of visibility
+	vdata.artefacts={}
+	local artefact = {}
+	if off_npcs[map].artefacts then
+		if #off_npcs[map].artefacts>0 then
+			for a=1,#off_npcs[map].artefacts do
+				if off_npcs[map].artefacts[a] then
+					artefact = {}
+					artefact = sim:object(off_npcs[map].artefacts[a].id)
+					if (artefact and artefact.can_switch_online and artefact:can_switch_online() and artefact:name() == off_npcs[map].artefacts[a].name and victim.position:distance_to(artefact.position)<TB3D_Modders.look_radius and sobj_is_far(artefact, TB3D_Modders.to_actor)) then
+						if artefact.parent_id==nil or artefact.parent_id==expendable_object or (sim:object(artefact.parent_id) and (sim:object(artefact.parent_id):clsid() == clsid.inventory_box or amk_anoms.is_anomaly(sim:object(artefact.parent_id):clsid()))) then
+							table.insert(vdata.artefacts, {id = artefact.id, name = artefact:name()})
+						end
+					end
+				end
+			end
+		end
+	end
+	--compile a list of containers in the area of visibility
+	vdata.inv_boxes={}
+	if off_npcs[map].inv_boxes then
+		if #off_npcs[map].inv_boxes>0 then
+			local inv_box = {}
+			local zdist
+			for a=1,#off_npcs[map].inv_boxes do
+				if off_npcs[map].inv_boxes[a] then
+					inv_box = {}
+					inv_box = sim:object(off_npcs[map].inv_boxes[a].id)
+					if (inv_box and inv_box.can_switch_online and inv_box:can_switch_online() and inv_box:name() == off_npcs[map].inv_boxes[a].name and victim.position:distance_to(inv_box.position)<=TB3D_Modders.look_radius_box and sobj_is_far(inv_box, TB3D_Modders.to_actor)) then
+						zdist = victim.position:distance_to(inv_box.position)/TB3D_Modders.look_radius_box
+						if math_random() > zdist then
+							if inv_box.parent_id==nil or inv_box.parent_id==expendable_object then
+								table.insert(vdata.inv_boxes, {id = inv_box.id, name = inv_box:name()})
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return vdata
+end
+
+-- obtain the relevant groups to NPCs, in fact, still offline personal relationships NPCs
+function relation_check(victim,opponent)
+	if relation_matrix[opponent:community()] and relation_matrix[opponent:community()][victim:community()] then
+		return relation_matrix[opponent:community()][victim:community()]
+	else
+		return 0
+	end
+end
+
+-- Enemies around! What to do ..
+function on_enemies_found(victim, vdata)
+	if (victim == nil or vdata == nil) then return end
+	if TB3D_Modders.use_alife_message then
+		local lname = news_main.get_object_levelname(victim)
+		local s = "amk_off_line: found enemy ("..#vdata.enemies..") for "..victim.id.." ["..victim:community().."] on map "..lname
+		TB3D_Services.packet_alert(s)
+	end
+	local obj, v_obj
+	local team_A = {}
+	local team_B = {}
+	-- Collect weapons
+	-- Consider rank, weapon, distance...
+	local wpn = get_npc_weapon(victim)
+	local rank = victim:rank()
+	local health = victim:health()
+	local firepower = get_weapon_firepower(wpn)
+	local player = {player = victim, weapon = wpn, rank = rank, health = health, firepower = firepower, flags = get_flags(victim.id)}
+	table.insert(team_A, player)
+	if (vdata.friends and #vdata.friends > 0) then
+		for i=1, #vdata.friends do
+			v_obj = vdata.friends[i]
+			if v_obj then
+				obj = alife():object(v_obj.id)
+				if (obj and obj:name()==v_obj.name) then
+					wpn = get_npc_weapon(obj)
+					rank = obj:rank()
+					health = obj:health()
+					firepower = get_weapon_firepower(wpn)
+					player = {player = obj, weapon = wpn, rank = rank, health = health, firepower = firepower, flags = get_flags(obj.id)}
+					table.insert(team_A, player)
+				end
+			end
+		end
+	end
+	for i=1, #vdata.enemies do
+		v_obj = vdata.enemies[i]
+		obj = alife():object(v_obj.id)
+		if (obj and obj:name() == v_obj.name) then
+			wpn = get_npc_weapon(obj)
+			if (wpn == nil) then
+				list_npc_items(obj)
+			end
+			rank = obj:rank()
+			health = obj:health()
+			firepower = get_weapon_firepower(wpn)
+			player = {player = obj, weapon = wpn, rank = rank, health = health, firepower = firepower, flags = get_flags(obj.id)}
+			table.insert(team_B, player)
+		end
+	end
+	local distances = {}
+	local from, to,dist, fp_a, fp_b
+	for a=1, #team_A do
+		from = team_A[a].player
+		distances[from.id] = {}
+		for b=1, #team_B do
+			to = team_B[b].player
+			distances[to.id] = {}
+			if (from and to and from.id and to.id) then
+				dist = math_floor(from.position:distance_to(to.position))
+				fp_A = math_floor(team_A[a].firepower / (dist / TB3D_Modders.dist_coeff))
+				fp_B = math_floor(team_B[b].firepower / (dist / TB3D_Modders.dist_coeff))
+				--local item = {distance = dist, fpA = fp_A, fpB = fp_B}
+				distances[from.id][to.id] = {distance = dist, fp = fp_A}
+				distances[to.id][from.id] = {distance = dist, fp = fp_B}
+			end
+		end
+	end
+	-- Take those with the highest rank and mines. distance
+	table_sort(team_A, function(a,b) return a.rank > b.rank end)
+	table_sort(team_B, function(a,b) return a.rank > b.rank end)
+	-- 10 Rounds
+	local size_A = #team_A
+	local size_B = #team_B
+	local died_A = 0
+	local died_B = 0
+	local index = #team_A
+	local attacker
+	local defender 
+	local attack_info 
+	local rank_hit_chance
+	local distance_hit_chance
+	local hit_chance			
+	local m_comm = ""
+	local mm, coeff
+	local itB, v_itB
+	local l_objB
+	local itA, v_itA
+	local l_objA
+	for i=1, TB3D_Modders.max_rounds do
+		if (#team_A >0 and #team_B > 0) then
+			index = #team_A
+			if (#team_B > index) then index = #team_B end
+			for j = 1, index do
+				attacker = nil
+				defender = nil
+				attacker = team_A[j]
+				defender = team_B[math_random(#team_B)]
+				if (attacker and defender and attacker.player and defender.player and attacker.health>0 and defender.health>0 and distances[attacker.player.id][defender.player.id]) then
+					--amk.mylog(attacker.player:name().." [team_A] attacks "..defender.player:name().." [team_B] ("..defender.health..")")
+					attack_info = distances[attacker.player.id][defender.player.id]
+					-- Hit or not? Depend on: distance ranks
+					-- master to novice - 30% max
+					-- 100 m - 33% 10 m - 100% 1 meter - 115% Each meter - minus 1.5% fall.
+					rank_hit_chance = math_floor((attacker.rank - defender.rank) / 50)
+					distance_hit_chance = 100 - math_floor((attack_info.distance) / 1.5)					
+					hit_chance = distance_hit_chance + rank_hit_chance
+					if ((math_random() * 100) < hit_chance) then			-- Hit again, bastard. Let's see how much.
+						if (attack_info.fp >= TB3D_Modders.base_fp) then
+							defender.health = 0													-- All killed.
+						else
+							defender.health = defender.health - (attack_info.fp / TB3D_Modders.base_fp)
+							if (defender.health < 0 ) then defender.health = 0 end							
+						end
+						if (defender.health <= 0) then
+							if (defender.flags >= 2) then
+								defender.health = TB3D_Modders.health_wound
+							else						-- If a stalker - we give experience.
+								if attacker.player and IAmAStalker[attacker.player:clsid()] and attacker.player.community then
+									m_comm  = attacker.player:community()
+									if (m_comm == "stalker" or m_comm == "dolg" or m_comm == "freedom") then
+					
+										coeff = 1														-- Will now be experienced.
+										if (defender.rank < attacker.rank) then coeff = 0.5 end
+										if (defender.rank > attacker.rank) then coeff = 2 end
+										attacker.player:set_rank(attacker.player:rank() + math_floor(TB3D_Modders.rate_kill_base * coeff))
+									end
+								end
+								-- amk.mylog("on_offline_death - "..defender.player:name()..", "..attacker.player:name()..", "..attacker.weapon:name())
+								news_main.on_offline_death(defender.player, attacker.player, attacker.weapon)
+								if (items[defender.player.id] and #items[defender.player.id] > 0) then			--take away from the corpse
+									-- amk.mylog("In the corpse "..defender.player:name().." "..#items[defender.player.id].." veshchichek.")
+									for a=1,#items[defender.player.id] do
+										v_itA = items[defender.player.id][a]
+										if (v_itA) then
+											itA = alife():object(v_itA.id)
+											if (itA and itA:name()==v_itA.name and itA.parent_id == defender.player.id) then
+												if protected_items.obj_is_protected(itA, "items_protected", "exactly") == false then
+													if protected_items.obj_is_protected(itA, "items_protected", "exactly") == false then
+														l_objA = pick_item(attacker.player, itA)
+													end
+												end
+											else
+												if(itA) then
+													mm = itA.parent_id
+													if mm == nil then mm = "nil" end
+													-- amk.mylog("In the corpse "..defender.player:name().." strange veshchichki - "..itA:name().." parent_id="..mm)
+												end
+											end	
+										end
+									end
+								end
+								if TB3D_Modders.offline_alife_trade == true then process_trade(attacker.player) end
+							end
+						end
+						--amk.mylog(attacker.player:name().." [team_A] fell into "..defender.player:name().." [team_B] ("..defender.health..")")
+					else
+						--amk.mylog(attacker.player:name().." [team_A] missed in "..defender.player:name().." [team_B] ("..defender.health..")")
+					end
+				end
+				if (team_B[j] ~= nil) then				-- team_B - protected
+					attacker = nil
+					defender = nil
+					attacker = team_B[j]
+					defender = team_A[math_random(#team_A)]
+					if (attacker and defender and attacker.player and defender.player and attacker.health>0 and defender.health>0 and distances[attacker.player.id][defender.player.id]) then
+						--amk.mylog(attacker.player:name().." [team_B] attacks "..defender.player:name().." [team_A] ("..defender.health..")")
+						attack_info = distances[attacker.player.id][defender.player.id]
+						-- Hit or not? Depend on: distance ranks
+						-- master to novice - 30% max
+						-- 100 m - 33% 10 m - 100% 1 meter - 115% Each meter - minus 1.5% fall.
+						rank_hit_chance = math_floor((attacker.rank - defender.rank) / 50)
+						distance_hit_chance = 100 - math_floor((attack_info.distance) / 1.5)					
+						hit_chance = distance_hit_chance + rank_hit_chance
+						if math_random() * 100 < hit_chance then				-- Hit again, bastard. Let's see how much.
+							if attack_info.fp >= TB3D_Modders.base_fp then
+								defender.health = 0					-- All killed.
+							else
+								defender.health = defender.health - (attack_info.fp / TB3D_Modders.base_fp)
+								if (defender.health < 0 ) then defender.health = 0 end
+							end
+							if (defender.health <= 0) then
+								if (defender.flags >= 2) then
+									defender.health = TB3D_Modders.health_wound
+								else					-- If a stalker - we give experience.								
+									if attacker.player and IAmAStalker[attacker.player:clsid()] and attacker.player.community then
+										m_comm  = attacker.player:community()
+										if (m_comm == "stalker" or m_comm == "dolg" or m_comm == "freedom") then
+											coeff = 1						-- Will now be experienced.
+											if (defender.rank < attacker.rank) then coeff = 0.5 end
+											if (defender.rank > attacker.rank) then coeff = 2 end
+											attacker.player:set_rank(attacker.player:rank() + math_floor(TB3D_Modders.rate_kill_base * coeff))							
+										end
+									end
+									-- amk.mylog("on_offline_death - "..defender.player:name()..", "..attacker.player:name()..", "..attacker.weapon:name())
+									news_main.on_offline_death(defender.player, attacker.player, attacker.weapon)
+									-- Veshchichki take away from the corpse
+									if (items[defender.player.id] and #items[defender.player.id] > 0) then
+										-- amk.mylog("In the corpse "..defender.player:name().." "..#items[defender.player.id].." veshchichek.")
+										for a=1,#items[defender.player.id] do
+											v_itB = items[defender.player.id][a]
+											if (v_itB) then
+												itB = alife():object(v_itB.id)
+												if (itB and itB:name() == v_itB.name and itB.parent_id == defender.player.id) then
+													if protected_items.obj_is_protected(itB, "items_protected", "exactly") == false then
+														l_objB = pick_item(attacker.player, itB)
+													end
+												else
+													if(itB) then
+														mm = itB.parent_id
+														if mm == nil then mm = "nil" end
+														-- amk.mylog("In the corpse "..defender.player:name().." strange veshchichki - "..itB:name().." parent_id="..mm)													
+													end
+												end
+											end
+										end
+									end
+									if TB3D_Modders.offline_alife_trade == true then process_trade(attacker.player) end
+								end
+							end
+							--amk.mylog(attacker.player:name().." [team_B] fell into "..defender.player:name().." [team_A] ("..defender.health..")")
+						else
+							--amk.mylog(attacker.player:name().." [team_B] missed in "..defender.player:name().." [team_A] ("..defender.health..")")
+						end
+					end
+				end
+			end
+		else
+			-- Now the event can be generated for the news
+			break
+		end
+		-- Will clean the table from cadavers
+		for kk, vv in pairs(team_A) do
+			if (vv.health <=0) then
+				-- amk.mylog("A team member was killed. "..vv.player:name())			
+				--set_npc_health(vv.player, 0)
+				table_remove(team_A, kk)
+				died_A = died_A + 1
+				on_death(vv.player)
+			elseif (vv.health <= TB3D_Modders.health_wound and vv.health > 0) then
+				-- amk.mylog("A team member injured. "..vv.player:name())
+				--set_npc_health(vv.player, TB3D_Modders.health_wound_set)
+				news_main.on_offline_wound(vv.player)
+				table_remove(team_A, kk)
+			end
+		end
+		for kk, vv in pairs(team_B) do
+			if (vv.health <=0) then
+				-- amk.mylog("B team member was killed. "..vv.player:name())
+				--set_npc_health(vv.player, 0)
+				table_remove(team_B, kk)
+				died_B = died_B + 1
+				on_death(vv.player)
+			elseif (vv.health <= TB3D_Modders.health_wound and vv.health > 0) then
+				-- amk.mylog("B team member injured. "..vv.player:name())
+				--set_npc_health(vv.player, TB3D_Modders.health_wound_set)
+				news_main.on_offline_wound(vv.player)
+				table_remove(team_B, kk)
+			end
+		end		
+	end
+	-- amk.mylog("Fight over. Team A - has been "..size_A.." left "..size_A-died_A..". B team - was "..size_B.." left "..size_B-died_B..".")
+end
+
+-- Around the monsters! What to do..
+function on_monsters_found(victim, vdata)
+	if (victim == nil or vdata == nil) then return end
+	if TB3D_Modders.use_alife_message then
+		local lname = news_main.get_object_levelname(victim)
+		local s = "amk_off_line: found monsters ("..#vdata.monsters..") for "..victim.id.." ["..victim:community().."] on map "..lname
+		TB3D_Services.packet_alert(s)
+		--if TB3D_Modders.show_news_spots then amk.add_spot_on_map(victim.id,"red_location", s) end
+	end
+	-- Around the monsters! What to do
+	local obj, v_obj
+	local team_A = {}
+	local team_B = {}
+	local wpn = get_npc_weapon(victim)
+	local rank = victim:rank()
+	local health = victim:health()
+	local firepower = get_weapon_firepower(wpn)
+	local player = {player = victim, weapon = wpn, rank = rank, health = health, firepower = firepower, flags = get_flags(victim.id)}
+	table.insert(team_A, player)
+	if (vdata.friends and #vdata.friends > 0) then
+		for i=1, #vdata.friends do
+			v_obj = vdata.friends[i]
+			obj = alife():object(v_obj.id)
+			if (obj and obj:name()==v_obj.name) then
+				wpn = get_npc_weapon(obj)
+				rank = obj:rank()
+				health = obj:health()
+				firepower = get_weapon_firepower(wpn)
+				player = {player = obj, weapon = wpn, rank = rank, health = health, firepower = firepower, flags = get_flags(obj.id)}
+				table.insert(team_A, player)
+			end
+		end
+	end
+	local params
+	for i=1, #vdata.monsters do
+		v_obj = vdata.monsters[i]
+		obj = alife():object(v_obj.id)
+		if (obj and obj:name() == v_obj.name) then
+			params = {}
+			params = get_monster_params(obj)
+			if (params) then
+				rank = obj:rank()
+				health = obj:health()
+				firepower = params.attack * TB3D_Modders.base_fp
+				player = {player = obj, speed = params.speed, attack_dist = params.dist, immunity = params.immunity, rank = rank, health = health, firepower = firepower, flags = get_flags(obj.id) }
+				table.insert(team_B, player)
+			else
+				-- amk.mylog("get_monster_params returns nil for "..obj:name())
+			end
+		end
+	end
+	local distances = {}
+	local from = {}
+	local to = {}
+	local dist, fp_A, fp_B
+	for a=1, #team_A do
+		from = {}
+		from = team_A[a].player
+		distances[from.id] = {}
+		for b=1, #team_B do
+			to = {}
+			to = team_B[b].player
+			distances[to.id] = {}
+			if (from and to and from.id and to.id) then
+				dist = math_floor(from.position:distance_to(to.position))
+				fp_A = math_floor(team_A[a].firepower / (dist / TB3D_Modders.dist_coeff))
+				fp_B = math_floor(team_B[b].firepower)
+				--local item = {distance = dist, fpA = fp_A, fpB = fp_B}
+				distances[from.id][to.id] = {distance = dist, fp = fp_A}
+				distances[to.id][from.id] = {distance = dist, fp = fp_B}
+			end
+		end
+	end
+	-- Take those with the highest rank and mines. distance
+	table_sort(team_A, function(a,b) return a.rank > b.rank end)
+	table_sort(team_B, function(a,b) return a.rank > b.rank end)
+	local size_A = #team_A
+	local size_B = #team_B
+	local index = #team_A
+	local died_A = 0
+	local died_B = 0
+	local attacker, defender, attack_info, rank_hit_chance, distance_hit_chance, hit_chance, dii
+	local m_comm  = ""
+	local coeff	
+	local itA, v_itA
+	local l_objA
+	local mm
+	for i=1, TB3D_Modders.max_rounds do
+		if (#team_A >0 and #team_B > 0) then
+			index = #team_A
+			if (#team_B > index) then index = #team_B end
+			for j = 1, index do
+				attacker = nil
+				defender = nil
+				attacker = team_A[j]
+				defender = team_B[math_random(#team_B)]
+				if (attacker and defender and attacker.player and defender.player and attacker.health>0 and defender.health>0 and distances[attacker.player.id][defender.player.id]) then
+					-- amk.mylog(attacker.player:name().." [team_A] attacks "..defender.player:name().." [team_B] ("..defender.health..")")
+					attack_info = distances[attacker.player.id][defender.player.id]
+					-- Hit or not? Depend on: distance ranks
+					rank_hit_chance = math_floor((attacker.rank - defender.rank) / 50)
+					dii = math_floor(attack_info.distance - defender.speed * i * 5)
+					if (dii <=8) then dii = 45 end -- Near another, and FIG will enter...
+					distance_hit_chance = 100 - math_floor(dii / 1.5)					
+					hit_chance = distance_hit_chance + rank_hit_chance
+					if ((math_random() * 100) < hit_chance) then
+						-- Hit again, bastard. Let's see how much.
+						if ( math_floor(attack_info.fp * defender.immunity) >= TB3D_Modders.base_fp) then
+							-- All killed.
+							defender.health = 0
+						else
+							defender.health = defender.health - (attack_info.fp / TB3D_Modders.base_fp) * defender.immunity
+							if (defender.health < 0 ) then defender.health = 0 end							
+						end
+						if (defender.health <= 0) then
+							if defender.flags >= 2 then
+								defender.health = TB3D_Modders.health_wound
+							else
+								-- If a stalker - we give experience.
+								if attacker.player and IAmAStalker[attacker.player:clsid()] and attacker.player.community then
+									m_comm  = attacker.player:community()
+									if (m_comm == "stalker" or m_comm == "dolg" or m_comm == "freedom") then
+										-- Will now be experienced.
+										coeff = 1
+										if (defender.rank < attacker.rank) then coeff = 0.5 end
+										if (defender.rank > attacker.rank) then coeff = 2 end
+										attacker.player:set_rank(attacker.player:rank() + math_floor(TB3D_Modders.rate_kill_base * coeff))
+									end
+								end
+								-- amk.mylog("on_offline_death - "..defender.player:name()..", "..attacker.player:name()..", "..attacker.weapon:name())
+								news_main.on_offline_death(defender.player, attacker.player, attacker.weapon)
+								-- Veshchichki take away from the corpse
+								if (items[defender.player.id] and #items[defender.player.id] > 0) then
+									-- amk.mylog("In the corpse "..defender.player:name().." "..#items[defender.player.id].." veshchichek.")
+									for a=1,#items[defender.player.id] do
+										v_itA = items[defender.player.id][a]
+										if (v_itA) then
+											itA = alife():object(v_itA.id)
+											if (itA and itA:name()==v_itA.name and itA.parent_id == defender.player.id) then
+												if protected_items.obj_is_protected(itA, "items_protected", "exactly") == false then
+													l_objA = pick_item(attacker.player, itA)
+												end
+											else
+												if(itA) then
+													mm = itA.parent_id
+													if mm == nil then mm = "nil" end
+													-- amk.mylog("In the corpse "..defender.player:name().." strange veshchichki - "..itA:name().." parent_id="..mm)
+												end											
+											end			
+										end
+									end
+								end
+								if TB3D_Modders.offline_alife_trade == true then process_trade(attacker.player) end
+							end
+						end
+						--amk.mylog(attacker.player:name().." [team_A] fell into "..defender.player:name().." [team_B] ("..defender.health..")")
+					else
+						--amk.mylog(attacker.player:name().." [team_A] missed in "..defender.player:name().." [team_B] ("..defender.health..")")
+					end
+				end
+				-- team_B - protected
+				if (team_B[j] ~= nil) then
+					attacker = nil
+					defender = nil
+					attacker = team_B[j]
+					defender = team_A[math_random(#team_A)]
+					if (attacker and defender and attacker.player and defender.player and attacker.health>0 and defender.health>0 and distances[attacker.player.id][defender.player.id]) then
+						-- amk.mylog(attacker.player:name().." [team_B] attacks "..defender.player:name().." [team_A] ("..defender.health..")")
+						attack_info = distances[attacker.player.id][defender.player.id]
+						-- We should start to learn, ran a distance of monsters to attack.
+						if (attack_info.distance - attacker.speed * i * 5 < attacker.attack_dist) then
+							rank_hit_chance = math_floor((attacker.rank - defender.rank) / 50)
+							distance_hit_chance = 100
+							hit_chance = distance_hit_chance + rank_hit_chance
+							if math_random() * 100 < hit_chance then
+								-- Hit again, bastard. Let's see how much.
+								if attack_info.fp >= TB3D_Modders.base_fp then
+									-- All killed.
+									defender.health = 0
+								else
+									defender.health = defender.health - (attack_info.fp / TB3D_Modders.base_fp)
+									if (defender.health < 0 ) then defender.health = 0 end
+								end
+								if (defender.health == 0) then
+									if defender.flags >= 2 then
+										defender.health = TB3D_Modders.health_wound
+									else
+										coeff = 1
+										if (defender.rank < attacker.rank) then coeff = 0.5 end
+										if (defender.rank > attacker.rank) then coeff = 2 end
+										-- amk.mylog("on_offline_death - "..defender.player:name()..", "..attacker.player:name()..", nil")
+										news_main.on_offline_death(defender.player, attacker.player, nil)
+										-- Zabitrat veshchichki from a corpse will not. Although some may kleptomany ...
+										-- But the corpse bang ... We need to think :)
+									end
+								end
+								--amk.mylog(attacker.player:name().." [team_B] fell into "..defender.player:name().." [team_A] ("..defender.health..")")
+							else
+								--amk.mylog(attacker.player:name().." [team_B] missed in "..defender.player:name().." [team_A] ("..defender.health..")")
+							end
+						else
+							-- amk.mylog(attacker.player:name().." [team_B] still ran"..(attack_info.distance - attacker.speed * i * 5).." meters to "..defender.player:name().." [team_A] ("..defender.health..")")
+						end
+					end
+				end
+			end
+		else
+			-- Now the event can be generated for the news
+			break
+		end
+		-- Will clean the table from cadavers
+		for kk, vv in pairs(team_A) do
+			if (vv.health <=0) then
+				-- amk.mylog("A team member was killed. "..vv.player:name())			
+				--set_npc_health(vv.player, 0)
+				table_remove(team_A, kk)
+				died_A = died_A + 1
+				on_death(vv.player)
+			elseif (vv.health <= TB3D_Modders.health_wound and vv.health > 0) then
+				-- amk.mylog("A team member injured. "..vv.player:name())
+				--set_npc_health(vv.player, TB3D_Modders.health_wound_set)
+				news_main.on_offline_wound(vv.player)
+				table_remove(team_A, kk)
+			end
+		end
+		for kk, vv in pairs(team_B) do
+			if (vv.health <=0) then
+				-- amk.mylog("B team member was killed. "..vv.player:name())
+				--set_npc_health(vv.player, 0)
+				table_remove(team_B, kk)
+				died_B = died_B + 1
+				on_death(vv.player)
+			elseif (vv.health <= TB3D_Modders.health_wound and vv.health > 0) then
+				-- amk.mylog("B team member injured. "..vv.player:name())
+				--set_npc_health(vv.player, TB3D_Modders.health_wound_set)
+				news_main.on_offline_wound(vv.player)
+				table_remove(team_B, kk)
+			end
+		end		
+	end	
+	-- amk.mylog("Fight monsters over. Team A - has been "..size_A.." left "..size_A-died_A..". Team B - were "..size_B.." left "..size_B-died_B..".")
+end
+
+-- Oh, the corpse. Right now we shmonat.
+function on_npc_corpses_found(victim, vdata)
+	if (victim == nil or vdata == nil) then return end
+	if (vdata.corpses == nil) then return end
+	if (vdata.corpses.stalkers == nil) then return end
+	if TB3D_Modders.use_alife_message then
+		local lname = news_main.get_object_levelname(victim)
+		TB3D_Services.info_alert("amk_off_line: found stalker's corpse for["..tostring(victim.id).."] ["..victim:community().."] on map ["..lname.."]")
+	end
+	local obj, v_obj
+	local id, itA
+	local v_id = victim.id
+	local corpse
+	local v_itA
+	local l_objA
+	for i=1, #vdata.corpses.stalkers do
+		v_obj = vdata.corpses.stalkers[i]
+		corpse = alife():object(v_obj.id)
+		if (corpse and corpse:name() == v_obj.name) then
+			news_main.on_offline_corpse_found(victim, corpse)
+			id = corpse.id
+			if (id and items[id]) then
+				for a=1, #items[id] do
+					v_itA = nil
+					v_itA = items[id][a]
+					if (v_itA) then
+						itA = alife():object(v_itA.id)
+						if (itA and itA:name() == v_itA.name and itA.parent_id == id) then
+							if protected_items.obj_is_protected(itA, "items_protected", "exactly") == false then
+								l_objA = pick_item(victim, itA)
+							end
+						end			
+					end
+				end
+			end
+		end
+	end
+	--if TB3D_Modders.use_alife_message then TB3D_Services.info_alert("amk_off_line: process trade ["..#vdata.corpses.stalkers.."]") end
+	if TB3D_Modders.offline_alife_trade == true then process_trade(victim) end
+	--if TB3D_Modders.use_alife_message then TB3D_Services.info_alert("amk_off_line: process trade ["..#vdata.corpses.stalkers.."] done") end
+end
+
+-- Oh, the monster corpse. We will shmonat?
+function on_monster_corpses_found(victim, vdata)
+	if (victim == nil or vdata == nil) then return end
+	if (vdata.corpses == nil) then return end
+	if (vdata.corpses.monsters == nil) then return end
+	if TB3D_Modders.use_alife_message then
+		local lname = news_main.get_object_levelname(victim)
+		TB3D_Services.info_alert("amk_off_line: found monster's corpse for["..victim.id.."] ["..victim:community().."] on map["..lname.."]")
+	end
+	local obj, v_obj
+	local object
+	local id, corpse, itA
+	local v_id = victim.id
+	local v_itA
+	local l_objA
+	for i=1, #vdata.corpses.monsters do
+		v_obj = vdata.corpses.monsters[i]
+		corpse = alife():object(v_obj.id)
+		if (corpse and corpse:name() == v_obj.name) then
+			news_main.on_offline_corpse_found(victim, corpse)		
+			id = corpse.id
+			if (id and items[id]) then
+				for a=1, #items[id] do
+					v_itA = {}
+					v_itA = items[id][a]
+					if (v_itA) then
+						itA = alife():object(v_itA.id)
+						if (itA and itA:name() == v_itA.name and itA.parent_id == id) then
+							if protected_items.obj_is_protected(itA, "items_protected", "exactly") == false then
+								l_objA = pick_item(victim, itA)
+							end
+						end			
+					end
+				end
+			end
+		end
+	end
+	if TB3D_Modders.offline_alife_trade == true then process_trade(victim) end
+end
+
+-- Nice gun - will not interfere.
+function on_weapons_found(victim, vdata)
+	if (victim == nil or vdata == nil) then return end
+	if TB3D_Modders.use_alife_message then
+		local lname = news_main.get_object_levelname(victim)
+		TB3D_Services.info_alert("amk_off_line: found weapons for["..victim.id.."] on map["..lname.."]")
+	end
+	local obj, v_obj
+	local object
+	local v_id = victim.id
+	for i=1, #vdata.weapons.seen do
+		v_obj = vdata.weapons.seen[i]
+		if (v_obj) then
+			object = alife():object(v_obj.id)
+			if (object and object:name() == v_obj.name) then
+				if protected_items.obj_is_protected(object, "items_protected", "exactly") == false then
+					obj = pick_item(victim, object)
+				end
+			end
+		end
+	end
+	if TB3D_Modders.offline_alife_trade == true then process_trade(victim) end
+end
+
+-- My prelessst
+function on_artifacts_found(victim, vdata)
+	if (victim == nil or vdata == nil) then return end
+	local obj, v_obj
+	local object
+	local v_id = victim.id
+	local b_stalker = false
+	-- If a stalker - we give experience.
+	if victim and IAmAStalker[victim:clsid()] and victim.community then
+		local m_comm  = victim:community()
+		if (m_comm == "stalker" or m_comm == "dolg" or m_comm == "freedom") then
+			b_stalker = true
+		end
+	end
+	for i=1, #vdata.artefacts do
+		v_obj = vdata.artefacts[i]
+		if (v_obj) then
+			object = alife():object(v_obj.id)
+			if (object and object:name() == v_obj.name) then
+				obj = pick_item(victim, object)
+				if (obj) then
+					if (b_stalker == true) then
+						victim:set_rank(victim:rank() + TB3D_Modders.rate_art_found)
+					end
+				end
+			end
+		end
+	end
+	if TB3D_Modders.offline_alife_trade == true then process_trade(victim) end
+end
+
+-- Oh, nychka - is gud.
+-- Idler ++
+-- check and see if the NPC dolezt to the cache.
+-- if there are anomalies in a radius of 20m, less likely, or if the cache is high, too, not the fact that dolezet.
+function inv_box_is_avail(victim, box)
+	if (victim == nil or box == nil or box.id == 0) then return false end
+	--math.randomseed(math_floor(device():time_global() / box.id))
+	local n_rnd
+	if victim.position and box.position then 
+		n_rnd = math_random(3, 10)
+		--get_console():execute("load ~~~ NPC tries to get to the cache " .. tostring(box.id) .. ". npc.y = " .. tostring(victim.position.y) .. " box.y = " .. tostring(box.position.y) .. " rnd = " .. tostring(n_rnd))
+		if math_abs(box.position.y - victim.position.y) > n_rnd then
+			--get_console():execute("load ~~~ Not reached. High")
+			return false
+		end 
+	end
+	local anom_list=amk_anoms.get_anomaly_list_for_pos(box.position,20) 
+	local n_anoms = #anom_list
+	n_rnd = math_random(1, 100)
+	--get_console():execute("load ~~~ NPC tries to get to the cache " .. tostring(box.id) .. ". Close " .. tostring(n_anoms) .. " anomalies. " .. tostring(n_rnd))
+	if n_rnd < n_anoms * 20 then -- Consider the possibility. The more anomalies, the less likely. At 5 - just before the box will not reach
+		--get_console():execute("load ~~~ Decided not to go into anomalies.")
+		return false
+	end
+	--get_console():execute("load ~~~ Dolez stubborn")
+	return true
+end
+-- Idler --
+
+function on_inv_boxes_found(victim, vdata)
+	if (victim == nil or vdata == nil) then return end
+	local obj, v_obj
+	local object, itA
+	local v_id = victim.id
+	local b_stalker = false
+	local v_itA
+	local l_objA
+	-- If a stalker - we give experience.
+	if victim and IAmAStalker[victim:clsid()] and victim.community then
+		local m_comm  = victim:community()
+		if (m_comm == "stalker" or m_comm == "dolg" or m_comm == "freedom") then
+			b_stalker = true
+		end
+	end
+	for i=1, #vdata.inv_boxes do
+		v_obj = vdata.inv_boxes[i]
+		if (v_obj) then
+			object = alife():object(v_obj.id)
+			if (object and object:name() == v_obj.name) then
+				if inv_box_is_avail(victim, object) then  -- Idler ++-- nychka if available - can shmonat
+					if items[v_obj.id] and #items[v_obj.id]>0 then
+						for a=1,#items[v_obj.id] do
+							v_itA = {}
+							v_itA = items[v_obj.id][a]
+							if (v_itA) then
+								itA = alife():object(v_itA.id)
+								if (itA and itA:name()==v_itA.name and itA.parent_id == v_obj.id) then
+									--news_main.trace("on_inv_boxes_found - found "..itA:section_name().." in "..object:name())
+									-- Decide whether or not we choose?
+									if is_valuable(itA) then						--tests for protected items
+										l_objA = pick_item(victim, itA)
+									end
+								--else
+									--if(itA) then
+										--local mm = itA.parent_id
+										--if mm == nil then mm = "nil" end
+										-- amk.mylog("In container "..object:name().." strange veshchichki - "..itA:name().." parent_id="..mm)
+									--end											
+								end			
+							end
+						end					
+					end
+				end
+			end
+		end
+		if (b_stalker == true) then
+			victim:set_rank(victim:rank() + TB3D_Modders.rate_art_found)
+		end
+	end
+	if TB3D_Modders.offline_alife_trade == true then process_trade(victim) end
+end
+
+function pick_item(npc, obj)
+	local new = nil
+	if (npc and obj and db.actor and obj.id ~= db.actor:id()) then
+		local section = obj:section_name()
+		new = alife():create(section, npc.position, npc.m_level_vertex_id, npc.m_game_vertex_id, npc.id)
+		if (new) then
+			if (new.parent_id) then
+				if not items[new.parent_id] then items[new.parent_id] = {} end
+				table.insert(items[new.parent_id], {id = new.id, name = new:name()})
+				gps_habar.insert_item(new.parent_id, new) -- Idler++-- adjust the loot in the recesses of labeled
+			end
+			if (obj.parent_id and items[obj.parent_id] and #items[obj.parent_id]>0) then
+				for z=1, #items[obj.parent_id] do
+					if (items[obj.parent_id][z] and items[obj.parent_id][z].id == obj.id) then
+						gps_habar.remove_item(obj.parent_id, items[obj.parent_id][z]) -- Idler++-- adjust the loot in the recesses of labeled
+						table_remove(items[obj.parent_id], z)
+						break
+					end
+				end
+			end
+			alife():release(alife():object(obj.id), true)
+		end
+	end
+	return new
+end
+
+function get_npc_weapon(npc)
+	local obj = nil
+	local fp = 0
+	if (npc) then
+		if items and npc.id and items[npc.id] then
+			local sect
+			local cur_fp				
+			local modes = {}
+			local params = {}
+			local wpn
+			local kf
+			for k,v in pairs(items[npc.id]) do
+				wpn = alife():object(v.id)
+				if wpn and IAmAWeapon[wpn:clsid()] and wpn:name() == v.name and wpn.parent_id == npc.id then
+					modes = {}
+					params = {}
+					sect = wpn:section_name()
+					cur_fp = 0				
+					modes = rx_wmgr.read_wm_modes(npc:community(),ranks.get_obj_rank_name(npc),npc:section_name())
+					params = rx_wmgr.read_wpn_params(sect)
+					if modes and params then
+						if modes.mode1 == "1" then
+							cur_fp = params.cst + modes.addcost
+						elseif modes.mode1 == "2" then
+							kf = rx_wmgr.wm_modes.koeffs[modes.koeffs]
+							cur_fp = (params.dmg*kf.dmg)+(params.rpm*kf.rpm)+(params.dst*kf.dst)+((100/params.dsp)*kf.dsp)
+						elseif modes.mode1 == "3" then
+							cur_fp = rx_wmgr.wm_modes.priors[modes.priors][sect]
+						end
+					end
+					if cur_fp > fp then
+						fp = cur_fp
+						obj = wpn
+					end			
+				end
+		     end
+         end
+	end
+	return obj
+--[[
+		local map = news_main.get_object_levelname(npc)
+		if (map and off_npcs[map]) then
+			local wp = #off_npcs[map].weapons
+			if wp>0 then
+				for w=1,wp do
+					if off_npcs[map].weapons[w] then
+						local www = alife():object(off_npcs[map].weapons[w].id)
+						if www and www.parent_id == npc.id and IAmAWeapon[www:clsid()] then
+							local cur_fp = get_weapon_firepower(www)
+							if cur_fp > fp then
+								fp = cur_fp
+								obj = www
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return obj
+]]	
+end
+
+function get_weapon_firepower(wpn)
+	local result = 0
+	if wpn and IAmAWeapon[wpn:clsid()] then
+		local sect = wpn:section_name()
+		if wpn_fp[sect] then
+			result = wpn_fp[sect]
+		else
+			if not string_find(sect, "grenade_") then
+				--local fd = utils.cfg_get_number(system_ini(), wpn:section_name(), "fire_distance", wpn, false, 1)
+				--local bs = utils.cfg_get_number(system_ini(), wpn:section_name(), "bullet_speed", wpn, false, 1)
+				--local rpm = utils.cfg_get_number(system_ini(), wpn:section_name(), "rpm", wpn, false, 1)
+				-- local priority = utils.cfg_get_number(system_ini(), wpn:section_name(), "ef_weapon_type", wpn, false, 1)
+				-- local priority2 = utils.cfg_get_number(system_ini(), wpn:section_name(), "ef_main_weapon_type", wpn, false, 0)
+				local priority = getIniValueFloat(sect, "ef_weapon_type", 1, nil)
+				local priority2 = getIniValueFloat(sect, "ef_main_weapon_type", 0, nil)
+				local GetRPM = ui_wpn_params.GetRPM(sect)
+				local GetDamage = ui_wpn_params.GetDamage(sect)
+				local GetHandling = ui_wpn_params.GetHandling(sect)
+				local GetAccuracy = ui_wpn_params.GetAccuracy(sect)
+				local fp = 1
+				if priority>1 then
+					if priority2>0 then
+						priority = priority + priority2
+					end
+				end
+				--fp = priority*1000 + math.sqrt(fd*bs*rpm)		
+				fp = math_ceil((priority * 1000) + (GetAccuracy * TB3D_Modders.accuracy_mult) + (GetRPM * 3) + (GetDamage * 8)) - 5000
+				if GetHandling >= 99 then
+					fp = fp + TB3D_Modders.base_fp   --1500
+				end
+				result = fp
+				if wpn_fp[sect] == nil then
+					wpn_fp[sect] = fp
+				end
+			end
+		end
+	end
+	return result
+end
+
+function get_weapon_cost(weapon)
+	local result = 0
+	local sect = weapon:section_name()
+	if (weapon and IAmAWeapon[weapon:clsid()]) then
+		-- result = utils.cfg_get_number(system_ini(), weapon:section_name(), "cost", weapon, false, 0)
+		result = getIniValueFloat(sect, "cost", 0, nil)
+	end
+	return result
+end
+
+function get_item_cost(item)
+	local result = 0
+	if (item and item.section_name) then
+		-- result = utils.cfg_get_number(system_ini(), item:section_name(), "cost", item, false, 0)
+		result = getIniValueFloat(item:section_name(), "cost", 0, nil)
+	end
+	return result
+end
+
+function set_npc_health(obj, health)				--stopped calling as causes crashes 109940
+	if obj then
+		if TB3D_Modders.use_combat_message == true then
+			TB3D_Services.packet_alert("amk_off_line: set npc health npc["..obj:name().."] amount["..utils.to_str(health).."]")
+		end
+		if health > 0 then
+			if health > 2 then
+				health = health * 0.01		--not 0.0-2.0 so convert (100-200)
+			end	
+			if (IAmAMonster[obj:clsid()]) then
+				local tbl = amk.read_monster_params(obj)
+				tbl.health = health
+				tbl.updhealth = health
+				amk.write_monster_params(tbl, obj)
+			elseif (IAmAStalker[obj:clsid()]) then
+				local tbl = amk.read_stalker_params(obj)
+				tbl.health = health
+				tbl.updhealth = health
+				amk.write_stalker_params(tbl, obj)																			
+			end
+		else
+			on_death(obj)
+		end
+	end
+end
+
+function improve_npc_health(obj, percent)
+	if obj then
+		if TB3D_Modders.use_combat_message == true then
+			TB3D_Services.packet_alert("amk_off_line: improve npc health npc["..obj:name().."] %["..utils.to_str(percent).."]")
+		end
+		local tbl = amk.read_stalker_params(obj)
+		if tbl.health > 0 then
+			tbl.health = tbl.health * percent --else tbl.health = percent * 100 end
+			if tbl.health > 2.0 then tbl.health = 2.0 end
+			tbl.updhealth = tbl.health
+			amk.write_stalker_params(tbl, obj)
+		end			
+	end
+end
+
+function reduce_npc_health(obj, percent)
+	if obj then
+		if TB3D_Modders.use_combat_message == true then
+			TB3D_Services.packet_alert("amk_off_line: improve npc health npc["..obj:name().."] %["..utils.to_str(percent).."]")
+		end
+		local tbl = amk.read_stalker_params(obj)
+		if tbl.health > 0 then tbl.health = tbl.health * percent else tbl.health = 0 end
+		tbl.updhealth = tbl.health
+		amk.write_stalker_params(tbl, obj)																			
+	end
+end
+
+function kill_npc(obj)
+	if obj then
+		local tbl = amk.read_stalker_params(obj)
+		tbl.health = 0
+		tbl.updhealth = tbl.health
+		amk.write_stalker_params(tbl, obj)	
+		on_death(obj)
+	end	
+end
+
+function list_npc_items(obj)
+	local sim = alife()
+	if (obj) then
+		 if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: list_npc_items - ["..obj:name().."]") end
+		--get_console():execute("load ~~~ list_npc_items - "..obj:name()..":")
+		local it
+		local find = 0
+		for a=0,last_object do
+			it = sim:object(a)
+			if (it and it.parent_id == obj.id) then
+				if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: list_npc_items - ["..it:name().."]["..it:section_name().."]") end
+				--get_console():execute("load ~~~ list_npc_items - "..it:name().." "..it:section_name())
+				if (IAmAWeapon[it:clsid()]) then
+					find = it.id
+				end
+			end			
+		end
+	end
+end
+
+function dbg_show_team(team)
+	if(team) then
+		for k, player in pairs(team) do
+			if (player.weapon) then
+				mylog("Team: "..player.player:name().." health="..player.health.." rank="..player.rank.." community="..player.player:community().." weapon="..player.weapon:name().." firepower="..player.firepower)
+			else
+				mylog("Team: "..player.player:name().." health="..player.health.." rank="..player.rank.." community="..player.player:community().." weapon=none firepower="..player.firepower)
+			end
+		end
+	end
+end
+
+--[[
+	Unique items for sale. High - in the news.	
+	Sorted the weapons of firepower (ef_weapon_type can still add.)
+	Left itself with something for which there are bullets. (a) - wpn..ammo_class + item_dependence
+	Left one, which is better (a), but no cartridges (b) (%)
+	One which is better (a), but worse than (b) - in the news for sale
+	The rest is up for sale
+	Cartridges left only those that fit in the (a), the rest for sale
+	For warriors - only native Kalash should be ... Just do not sell?
+	Reserve no more than 2 first-aid kits and bandages, antirada
+	2.1 We reserve grenades (%)
+	Reserve not more than 1 pc: flashlight, portable radio, PDA, binoculars, knife, detectors
+	Food, vodka - no more than 1-2 units (%)	
+	Bronicas probably sell ...
+	Part of monsters? Also for sale must have a maximum of 2.1 left.
+]]
+function process_trade(npc)	
+	local item_list = {}
+	local sell_list = {}
+	--local tb_ilist_size = #item_list
+	-- It makes sense to check for trade section [logic]...
+	if npc and IAmAStalker[npc:clsid()] and npc:alive() and npc.m_story_id~=nil and npc.m_story_id == 4294967296 and items[npc.id] and #(items[npc.id])>0 then
+		local m_comm = npc:community()
+		local b_stalker = false		
+		if (m_comm == "actor" or m_comm == "actor_dolg" or m_comm == "actor_freedom" or m_comm == "stalker" or m_comm == "dolg" or m_comm == "freedom") then
+			if (npc.name and npc:name() ~= "agr_ratcatcher") then
+				b_stalker = true
+			end
+		elseif m_comm == "zombied" then
+			return
+		end
+			
+		--Filtered quest items - always_keep_item, sell_table	
+		local obj
+		for ok,ov in pairs(items[npc.id]) do
+			obj = alife():object(ov.id)
+			if obj and obj:name()==ov.name then
+				--if always_keep_item[obj:section_name()] or sell_table[obj:section_name()] == nil or protected_items.obj_is_protected(obj, "items_protected", "exactly") then
+				if sell_table[obj:section_name()] == nil or protected_items.obj_is_protected(obj, "items_protected", "exactly") then
+					-- That we do not need.
+					--news_main.trace("Process_trade: "..npc:name().." ["..m_comm.."] filtered "..obj:section_name().." ["..obj:name().."]")
+				else
+					table.insert(item_list, obj)
+					--item_list[v.id] = obj
+					--news_main.trace("Process_trade: "..npc:name().." ["..m_comm.."] have "..obj:section_name().." ["..obj:name().."]")
+				end
+			end
+		end
+		if item_list and #item_list > 0 then
+			--news_main.trace("Process_trade: "..npc:name().." ["..m_comm.."] have "..tostring(#item_list).." items.")
+			table_sort(item_list, function(a,b) return get_item_cost(a) > get_item_cost(b) end)		
+			-- Choose what to arms keep the NPC.
+			local cnt_medkit = 0
+			local cnt_antirad = 0
+			local cnt_bandage = 0
+			local cnt_grenade = 0
+			local cnt_food = 0
+			local cnt_drink = 0
+			local cnt_torch = 0
+			local cnt_pda = 0
+			local cnt_radio = 0
+			local cnt_guitar = 0
+			local cnt_harmonica = 0
+			local cnt_binocular = 0
+			local cnt_knife = 0
+			local cnt_arts = 0
+			local cnt_detector = 0
+			local cnt_addons = 0
+			local cnt_mparts = 0
+			local ammo_classes = {}
+			local bOk = false
+			local weapons = {}
+			local ammo = {}
+			local sect = ""
+			local ac = ""
+			local vvv = {}
+			for k,v in pairs(item_list) do	
+				sect = v:section_name()
+				--news_main.trace("Process_trade: first pass - "..npc:name().." ["..m_comm.."] have "..sect.." ["..v:name().."]")
+				if IAmAWeapon[v:clsid()] and not (sect == "grenade_f1" or sect =="grenade_gd-05" or sect == "grenade_rgd5" or sect == "wpn_knife") then
+					bOk = false
+					if m_comm == "military" then
+						if sect == "wpn_ak74" or sect =="wpn_ak74u" or sect =="wpn_abakan" or sect =="wpn_pm" or sect =="wpn_usp" or sect =="wpn_val" or sect =="wpn_walther" or sect =="wpn_svu" or sect =="wpn_sig550" or sect =="wpn_fn2000" or sect =="wpn_vintorez" or sect =="wpn_groza" then
+							bOk = true
+						end
+					else
+						bOk = true
+					end
+					if bOk == true then
+						ac = getIniValueString(sect, "ammo_class", "", nil)
+						if ac and ac ~= "" then
+							ammo_classes, weapons, vvv = {}, {}, {}
+							vvv = amk.str_explode(",", ac, true)
+							for ak,av in pairs(vvv) do
+								table.insert(ammo_classes, av)
+							end
+							table.insert(weapons, {obj = v, ammo = ammo_classes})
+						else
+							table.insert(weapons, {obj = v, ammo = nil})
+						end
+					end
+				elseif string_find(sect, "^ammo_") then
+					if ammo[sect] == nil then 
+						ammo[sect] = 1
+					else
+						ammo[sect] = ammo[sect] + 1
+						if ammo[sect] > 2 then
+							table.insert(sell_list, v)
+						end
+					end
+				elseif string_find(sect, "^af_") then
+					--3 most good art has left itself (+ health), others for sale (filtered cobblestone)				
+					if sect ~= "af_buliz" then
+						cnt_arts = cnt_arts + 1
+						if cnt_arts > 3 then
+							table.insert(sell_list, v)
+						end				
+					end
+				elseif sect == "device_torch" then
+					cnt_torch = cnt_torch + 1
+					if cnt_torch > 1 then
+						table.insert(sell_list, v)
+					end
+				--elseif sect == "device_pda" then		--TB3D 109931 removed
+					--cnt_pda = cnt_pda + 1
+					--if cnt_pda > 1 then
+						--table.insert(sell_list, v)
+					--end
+				--elseif sect == "hand_radio" then		--TB3D 109931 removed
+					--cnt_radio = cnt_radio + 1
+					--if cnt_radio > 1 then
+						--table.insert(sell_list, v)
+					--end
+				elseif sect == "harmonica_a" then
+					cnt_harmonica = cnt_harmonica + 1
+					if cnt_harmonica > 1 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "guitar_a" then
+					cnt_guitar = cnt_guitar + 1
+					if cnt_guitar > 1 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "wpn_binoc" or sect == "wpn_arm_binoc" then		--TB3D 109931 removed binocular_a
+					cnt_binocular = cnt_binocular + 1
+					if cnt_binocular > 1 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "wpn_knife" then
+					cnt_knife = cnt_knife + 1
+					if cnt_knife > 1 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "medkit" or sect == "medkit_army" or sect == "medkit_scientic" or sect == "medkit_elite" then
+					cnt_medkit = cnt_medkit + 1
+					if cnt_medkit > 4 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "antirad" then
+					cnt_antirad = cnt_antirad + 1
+					if cnt_antirad > 3 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "bandage" then
+					cnt_bandage = cnt_bandage + 1
+					if cnt_bandage > 3 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "grenade_f1" or sect =="grenade_gd-05" or sect == "grenade_rgd5" then
+					cnt_grenade = cnt_grenade + 1
+					if cnt_grenade > 2 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "bread_a" or sect =="bread" or sect == "kolbasa" or sect == "kolbasa_a" or sect == "conserva" then
+					cnt_food = cnt_food + 1
+					if cnt_food > 4 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "vodka_a" or sect =="vodka" or sect == "energy_drink" then
+					cnt_drink = cnt_drink + 1
+					if cnt_drink > 3 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "detector_simple" or sect =="detector_advances" or sect == "detector_elite" then
+					cnt_detector = cnt_detector + 1
+					if cnt_detector > 1 then
+						table.insert(sell_list, v)
+					end
+				elseif sect == "wpn_addon_scope" or sect =="wpn_addon_scope_susat" or sect == "wpn_addon_silencer" or sect == "wpn_addon_grenade_launcher" or sect == "wpn_addon_grenade_launcher_m203" then
+					cnt_addons = cnt_addons + 1
+					if cnt_addons > 2 then
+						table.insert(sell_list, v)
+					end
+				elseif sect =="mutant_flesh_eye" or sect == "mutant_boar_leg" or sect =="mutant_dog_tail" or sect == "mutant_psevdodog_tail" or sect =="mutant_krovosos_jaw" or sect == "mutant_burer_hand" or sect =="mutant_zombie_hand" or sect == "mutant_snork_leg" or sect =="mutant_spleen_rat" or sect =="mutant_flesh_eye" or sect =="mutant_face_tushkano" or sect =="mutant_fracture_hand" or sect =="mutant_hand_kontroler" or sect =="mutant_poltergeist_glas" or sect =="mutant_psevdogigant_hand" or sect =="mutant_tail_cat" or sect =="mutant_chimera_kogot" then
+					cnt_mparts = cnt_mparts + 1
+					if cnt_mparts > 2 then
+						table.insert(sell_list, v)
+					end
+				else
+					--news_main.trace("Process trade - unknown - "..sect.." "..v:name())
+				end			
+			end
+			local modes = rx_wmgr.read_wm_modes(npc:community(),ranks.get_obj_rank_name(npc),npc:section_name())
+			local weapons_types = {}
+			for z,i in ipairs(modes.types) do
+				weapons_types[i.t] = {}
+			end
+			local params = {}
+			local prm
+			local kf
+			for i,w in ipairs(weapons) do
+				params = {}
+				sect = w.obj:section_name()				
+				params = rx_wmgr.read_wpn_params(sect)
+				prm = 0
+				if modes.mode1 == "1" then
+					prm = params.cst + modes.addcost
+				elseif modes.mode1 == "2" then
+					kf = rx_wmgr.wm_modes.koeffs[modes.koeffs]
+					prm = (params.dmg*kf.dmg)+(params.rpm*kf.rpm)+(params.dst*kf.dst)+((100/params.dsp)*kf.dsp)
+				elseif modes.mode1 == "3" then
+					prm = rx_wmgr.wm_modes.priors[modes.priors][sect]
+				end
+				for k,v in ipairs(modes.types) do
+					if v.t == params.typ then
+						prm = prm + prm*v.p/100
+						break
+					end
+				end
+				if weapons_types[params.typ] then
+					table.insert(weapons_types[params.typ],{obj = w.obj,ammo = w.ammo,prm = prm})
+				end
+			end
+--			table_sort(weapons, function(a,b) return get_weapon_firepower(a.obj) > get_weapon_firepower(b.obj) end)
+			-- So, now we have sorted all the guns NPCs. We find the one for which there are bullets ...
+			local cnt = 0
+			local b_self = false
+			local b_best = false
+			local s_self = ""
+			local b_ammo = false
+			local vac = {}
+			for k,v in pairs(weapons_types) do
+				table_sort(v,function(a,b) return a.prm > b.prm end)
+				for i,w in ipairs(v) do
+					vac = {}
+					cnt = cnt + 1
+					b_ammo = false
+					vac = w.ammo
+					if vac and #vac>0 then
+						for kk, vv in pairs(vac) do
+							if ammo[vv] and ammo[vv] > 0 then -- Thus, the cartridges are.
+								b_ammo = true
+								break
+							end
+						end
+					end
+					if b_self == false and b_ammo == true then
+						b_self = true
+					--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] SELF weapon is  "..w.obj:section_name().." ["..w.obj:name().."]")
+						s_self = w.obj:section_name()
+					elseif b_best == false then
+						if s_self ~= "" then
+							if w.obj:section_name() ~= s_self then
+								b_best = true
+							--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] BEST weapon is  "..w.obj:section_name().." ["..w.obj:name().."]")
+							else
+								table.insert(sell_list, w.obj)
+							end
+						else
+							b_best = true
+						--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] BEST weapon is  "..w.obj:section_name().." ["..w.obj:name().."]")
+						end
+					else
+						table.insert(sell_list, w.obj)
+					end
+				end
+			end
+			-- So, with arms over ...
+			-- All that's left - must sell.
+			-- One the most expensive you can try through news...
+			item_list = nil
+			local money = 0
+			if sell_list and #sell_list>0 then
+				table_sort(sell_list, function(a,b) return get_item_cost(a) > get_item_cost(b) end)		
+				local zz = sell_list[1]
+				if zz and b_stalker == true and (get_item_cost(zz) >= TB3D_Modders.sell_limit) then
+					-- Sell ??through the news.
+					--news_main.trace("Offline: "..npc:name().." going to sell through the news "..zz:name())
+					--amk.mylog("Offline: "..npc:name().." going to sell through the news "..vv:name())
+					news_main.on_offline_trade(npc, zz)
+					table_remove(sell_list, 1)
+				end
+			end
+			local cost, price
+			for kk,vv in pairs(sell_list) do
+				--news_main.trace("Process_trade: final pass - "..npc:name().." ["..m_comm.."] sells "..vv:section_name().." ["..vv:name().."]")
+				cost = get_item_cost(vv)
+				if (cost > 0) then
+					-- s_name = utils.cfg_get_string(system_ini(), vv:section_name(), "inv_name", vv, false, "", "")
+					s_name = getIniValueString(vv:section_name(), "inv_name", "", nil)
+					if (s_name == nil) then s_name = "" end
+					s_name = game.translate_string(s_name)
+					coeff = math_random(30,50) / 100
+					price = math_floor(cost * coeff)
+					money = money + price
+					--news_main.trace("Offline: "..npc:name().." sells "..s_name.." ["..vv:name().."] merchant for "..price)
+					--amk.mylog("Offline: "..npc:name().." sells "..s_name.." ["..vv:name().."] merchant for "..price)
+					-- items
+					if (items[npc.id] and #items[npc.id]>0) then
+						for z=1, #items[npc.id] do
+							if (items[npc.id][z] and items[npc.id][z].id == vv.id) then
+								table_remove(items[npc.id], z)
+								gps_habar.remove_item(npc.id, items[npc.id][z]) -- Idler++-- adjust the loot in the recesses of labeled
+								break
+							end
+						end
+					end
+					if alife() then
+						alife():release(alife():object(vv.id), true)
+					end
+				end				
+			end
+			if (money > 0) then
+				local tbl = amk.read_stalker_params(npc)
+				local old_money = tbl.money
+				if (old_money == nil) then old_money = 0 end
+				tbl.money = old_money + money
+				amk.write_stalker_params(tbl, npc)
+				--amk.mylog("Offline: "..npc:name().." no money - "..old_money..", was - "..old_money + money)
+				--news_main.trace("Offline: "..npc:name().." no money - "..old_money..", was - "..old_money + money)
+			end
+		end
+		--news_main.flushlog()
+	end
+end
+
+-- Building a table if necessary.
+-- In them - max. speed, attack power, distance attacks.
+-- Do not forget about immunities.
+-- Teaches immunities_sect
+-- Teaches immunities_sect read fire_wound_immunity. All damage is multiplied by him.
+function get_monster_params(obj)
+	--if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: get monster params") end
+  local sect = obj:section_name()
+	if (obj and IAmAMonster[obj:clsid()]) or (obj and obj.community and obj:community()=="zombied") then
+		if (monster_params and monster_params[sect]) then
+			return monster_params[sect]
+		else
+			-- local speed 	= utils.cfg_get_number(system_ini(), obj:section_name(), "MaxSpeed", obj, false, 5)
+			local speed 	= getIniValueFloat(sect, "MaxSpeed", 5, nil)
+			-- local dist 	= utils.cfg_get_number(system_ini(), obj:section_name(), "MaxAttackDist", obj, false, 3)
+			local dist 		= getIniValueFloat(sect, "MaxAttackDist", 3, nil)
+			-- local imm_sect = utils.cfg_get_string(system_ini(), obj:section_name(), "immunities_sect", obj, false, "", "")
+			local imm_sect 	= getIniValueString(sect, "immunities_sect", "", nil)
+			-- local immunity 	= utils.cfg_get_number(system_ini(), imm_sect, "fire_wound_immunity", obj, false, 1)
+			local immunity 	= getIniValueFloat(imm_sect, "fire_wound_immunity", 1, nil)
+			-- local att_sect 	= utils.cfg_get_string(system_ini(), obj:section_name(), "attack_params", obj, false, "", "")
+			local att_sect 	= getIniValueString(sect, "attack_params", "", nil)
+			local attack	= 0
+			if (system_ini():section_exist(att_sect)) then
+				local result, id, value = nil, nil, nil
+				local max_attack = 0
+				local m_value
+				local v
+				for a=0, system_ini():line_count(att_sect)-1 do
+					result, id, value = getIniLine(att_sect,a,"","",nil)
+					if id~=nil and amk.trim(id)~="" and amk.trim(id)~=nil and value~=nil then
+						m_value = {}
+						m_value = amk.str_explode(",", amk.trim(value), true)
+						if (m_value and #m_value>2) then
+							v = tonumber(m_value[2])
+							if (v and v > max_attack) then					
+								max_attack = v
+							end
+						end
+					end
+				end
+				attack = max_attack
+			end
+		if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: speed for ["..obj:section_name().."] is ["..tostring(speed).."]") end
+			monster_params[sect] = {speed = speed, dist = dist, immunity = immunity, attack = attack}
+			return monster_params[sect]			
+		end
+	else
+		return nil
+	end
+end
+
+function sobj_is_far(obj, distance)
+	if (db.actor and obj and distance and obj.position and db.actor.position ) then
+		--if obj.m_game_vertex_id and game_graph():valid_vertex_id(obj.m_game_vertex_id) then	-- on same level?
+			local map = TB3D_Services.get_obj_level(obj)
+			if map ~= "" and level.name() == map then
+				local odist = obj.position:distance_to(db.actor:position())
+				--if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: sobj dist["..utils.to_str(odist).."] > ["..utils.to_str(distance).."]?") end
+				if odist > distance then return true end
+			end
+	   --end
+   end
+   return false	--default too close to spawn
+end
+
+function have_ammo(npc, weapon)
+	local result = false
+	local sect = weapon:section_name()
+	if npc and weapon and IAmAStalker[npc:clsid()] and IAmAWeapon[weapon:clsid()] then
+		-- local ammo_str = utils.cfg_get_number(system_ini(), weapon:section_name(), "ammo_class", weapon, false, "")
+		local ammo_str = getIniValueFloat(sect, "ammo_class", "", nil)
+		if ammo_str=="" then -- Bolt or garnet
+			return false
+		end
+		local ammo_list = parse_names(ammo_str)
+		-- and what for this cycle of sorting equipment, as a result - nothing?
+	end
+	return result
+end
+
+function box_is_protected(v)
+	if v then
+		local name = v:name()
+		local id = v.id
+		local sid = v.m_story_id
+		-- check for object name
+		for k, o in pairs(protected.names) do
+			if o == name then
+				return true
+			end
+		end
+		-- check the ID of the object
+		for k, o in pairs(protected.ids) do
+			if o == id then
+				return true
+			end
+		end
+		-- check on the story ID object
+		for k, o in pairs(protected.story_ids) do
+			if o == sid then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function npc_smart_is_peaceful(sobj)
+	local result = false
+	if (sobj and smart_filters and #smart_filters>0) then
+		if (sobj.smart_terrain_id and sobj:smart_terrain_id() and sobj:smart_terrain_id()~=expendable_object) then
+			local sm = alife():object(sobj:smart_terrain_id())
+			if (sm and sm.name and sm:name()) then
+				local sn = sm:name()
+				for ks, vs in pairs(smart_filters) do
+					if (vs == sn) then
+						-- Yeah, he is our peace.
+						result = true
+						break
+					end
+				end
+			end
+		end
+	end
+	return result
+end
+
+function on_death(npc)
+	smart_terrain.on_death( npc.id )
+end
+
+function get_flags(npc_id)
+	local flags = 0
+	local obj = alife():object(npc_id)
+--amk.mylog("amk_offline get flags")
+	if obj then
+		if IAmAMonster[obj:clsid()] or IAmAStalker[obj:clsid()] then
+			local char_ini = xr_logic.get_customdata_or_ini_file(obj, "<customdata>")
+			if char_ini:section_exist("logic") then
+				local from = ""
+				local items = ""
+				if char_ini:line_exist("logic", "on_hit") then
+					flags = 1
+				end
+				if char_ini:line_exist("logic", "on_death") then
+					flags = flags + 2
+				end
+			end
+		end
+	end
+	return flags
+end
+
+function is_valuable(item)
+	local result = false
+	if item and not (IAmAMonster[item:clsid()] or IAmAStalker[item:clsid()]) and protected_items.obj_is_protected(item, "items_protected", "exactly") == false then
+		-- Unica not pick up (yet?)
+		--if always_keep_item[item:section_name()] or sell_table[item:section_name()] == nil then
+		if sell_table[item:section_name()] == nil then
+			return false
+		end
+		local cost = get_item_cost(item)
+		if IAmAWeapon[item:clsid()] then
+			if cost >= 1000 then
+				result = true
+			end
+		elseif cost >= 800 then
+			result = true
+		end
+	end
+	return result
+end
+
+--[[function is_valuable(item)		--!!!!TB3D  saspan patch 20101118
+	local result = false
+	if item and not (IAmAMonster[item:clsid()] or IAmAStalker[item:clsid()]) 
+		and (protected_items.doNotTouchItemEquipment(item) or sell_table[item:section_name()] == nil) then
+		
+		local cost = get_item_cost(item)
+		if IAmAWeapon[item:clsid()] and cost >= 1000 then
+			result = true
+		elseif cost >= 800 then
+			result = true
+		end
+	end
+	return result
+end]]
+
+

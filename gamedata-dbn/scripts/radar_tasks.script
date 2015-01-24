@@ -1,0 +1,19 @@
+--TB3D 1.0.9.9.3.0 new 10/15/12
+function my_ver() return "1.0.9.9.3.0" end
+
+function proceed()
+	if not has_alife_info("rad_code_door") and	-- Radar
+	   db.actor:object("rad_scientist_flash")
+	then
+		TB3D_Services.give_info("rad_code_door") 
+	end
+end
+
+function process_info_portion(info_id)
+	if info_id == "rad_code_door" then
+		level_tasks.add_location(1001, "rad_code_door_location")
+	elseif info_id == "rad_code_door_found" then
+		level_tasks.remove_location(1001, "rad_code_door_location")
+	end
+	return false
+end

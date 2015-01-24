@@ -1,0 +1,55 @@
+--TB3D 1.0.9.9.4.0 new
+function my_ver() return "1.0.9.9.4.0" end
+--[[
+rename incomming to .ltx files and put filename in pda database to retrieve when reading
+]]--
+function network_pole()
+	local f = getFS()
+	local flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_*.nti")
+	local f_cnt = flist:Size()
+	if f_cnt > 0 then
+		local file = flist:GetAt(0)
+		local fileName = file:NameFull()
+		local _first = string.find(fileName, "_", 1, true)
+		local _second = string.find(fileName, "_", _first + 1, true)
+		local _third = string.find(fileName, "_", _second + 1, true)
+		local sendDate = string.sub(fileName, _first + 1, _second - 1)
+		local sendTime = string.sub(fileName, _second + 1, _third - 1)
+		local newPacket = string.sub(fileName, _third + 1, string.find(fileName, ".", 1, true) - 1)
+		local fileNameNew = "tb3d_"..sendDate.."_"..sendTime.."_"..newPacket..".ntd"								--rename as done
+		local f1 = f:update_path("$downloads$", fileName)
+		local f2 = f:update_path("$downloads$", fileNameNew)
+		f:file_rename(f1, f2, true)
+		news_manager.amk_send_tip("%c[255,0,255,0]Network message recieved.%c[default]", "Local Net", 0, 15, "gen_info")
+		return sendDate, sendTime, newPacket
+	end
+	return nil,nil,nil
+end
+
+function network_send(mypacket)
+	local f = getFS()
+	local flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_*.nto")		--check last packet went
+	local f_cnt = flist:Size()
+	if f_cnt > 0 then																							--last packet not sent
+		news_manager.amk_send_tip("%c[255,0,255,0]Network packets not getting sent - please check connection.%c[default]", "Local Net", 0, 15, "gen_info")
+		return false
+	else
+		flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_*.ntd")		--see if last packet done
+		f_cnt = flist:Size()
+		local gameTime = game.get_game_time()										--send next packet
+		local year,month,day,h,m,s,ms = gameTime:get()
+		local dateNow = string.format('%02d%02d', month, day)
+		local timeNow = string.format('%02d%02d%02d%03d', h, m, s, ms)
+		local f2 = f:update_path("$downloads$", "tb3d_"..dateNow.."_"..timeNow.."_"..mypacket..".nti")
+		local f1
+		if f_cnt > 0 then																--done with last packet, reuse file
+			local file = flist:GetAt(0)
+			f1 = f:update_path("$downloads$", file:NameFull())
+			f:file_rename(f1, f2, true)
+		else																			--create first packet file
+			f1 = f:update_path("$app_data_root$", "tb3d_user_id.ltx")
+			f:file_copy(f1, f2)
+		end
+	end
+	return true
+end

@@ -1,0 +1,525 @@
+--<!-- TB3D 1.0.9.9.4.4 added breath opt to modders script, fixed on_eat, dmx135 , added fist_c1 thru _c4, slot 4 check, opt armor search
+function my_ver() return "1.0.9.9.4.4" end
+-------------------[[Scripting emulation invisible slots]]--------------------------------
+-- The main author: Charsi
+-- Small additions and improvements: Shadows
+-- Date: 15/11/2010 - 30/03/2011
+-- Thanks: Malandrinus, Erlik
+---------------------------------------------------------------------------------------------
+local initial, inventory_window = false
+local debug          = false -- system of placing the buttons (true - incl. \ false - off).
+local TBtn           = {}
+local slots          = {{504,45},{429,43},{724,475},{349,63},{585,43}} -- knife, binoculars, a bolt, a helmet, flashlight
+---------------------------------------------------------------------------------------------
+--------------------------------BASIC FUNCTIONS---------------------------------------------
+class "InventoryWnd" (CUIScriptWnd)
+function InventoryWnd:__init(owner) super()
+	self.owner = owner
+	self:Init(0,0,1024,768)
+	self.ClickBtn = {}
+	self.ClickBtn[1] = function()
+		local item = db.actor:item_in_slot(0)
+		if item then
+			amk.spawn_item_in_inv("fake_"..item:section())
+			amk.remove_item(item)
+			dmx_mod.play_sound([[interface\inv_ruck]])
+		end
+		TBtn["check_button_1"]:Show(false)
+	end
+	self.ClickBtn[2] = function()
+		local item = db.actor:item_in_slot(4)
+		if item then
+			amk.spawn_item_in_inv("fake_"..item:section())
+			amk.remove_item(item)
+			dmx_mod.play_sound([[interface\inv_ruck]])
+		end
+		TBtn["check_button_2"]:Show(false)
+	end
+	self.ClickBtn[3] = function()
+		news_manager.send_tip_txt(db.actor, "You cannot remove the bolts from the slot!", nil, "inv_icon")
+	end
+	self.ClickBtn[4] = function()
+		local item = get_item_in_helmet_slot()
+		if item then
+			amk.spawn_item_in_inv("fake_"..item)
+			amk.remove_item(db.actor:object(item))
+			dmx_mod.play_sound([[interface\inv_ruck]])
+			amk.del_variable("helmet_section")
+			remove_helmet_static()
+			helmets_nightvision(false)
+		end
+		TBtn["check_button_4"]:Show(false)
+	end
+	self.ClickBtn[5] = function()
+		local item = db.actor:object("device_torch")
+		if item then
+			amk.spawn_item_in_inv("fake_device_torch")
+			amk.remove_item(item)
+			dmx_mod.play_sound([[interface\inv_ruck]])
+		end
+		TBtn["check_button_5"]:Show(false)
+	end
+	self:InitControls()
+end
+
+function InventoryWnd:__finalize() end
+function InventoryWnd:InitControls()
+	clear_table(TBtn)
+	local item = db.actor:item_in_slot(4)
+	if item and item:section() ~= "wpn_binoc" and item:section() ~= "wpn_arm_binoc" and item:section() ~= "wpn_pso3" and item:section() ~= "sigaret" and item:section() ~= "cigara" then
+		TB3D_Services.info_alert("hidden slots: bad item in slot[4]["..utils.to_str(item:name()).."]["..utils.to_str(item:section()).."]")
+		dmx_mod.drop_item_to_inventory(4)
+	end
+	self.back = CUIStatic()
+	self.back:Init(0,0,1024,768)
+	self.owner:AttachChild(self.back)
+	for k, v in pairs(slots) do
+		local name = "check_button_"..k
+		self.btn = CUIButton()
+		self:Register(self.btn, name)
+		self.back:AttachChild(self.btn)  
+		TBtn[name] = self.btn
+		init_btn(k)
+		self:AddCallback(name, ui_events.WINDOW_LBUTTON_DB_CLICK, self.ClickBtn[k], self)
+	end
+	-- drop button
+	self.btn = CUI3tButton()
+	self.btn:Init("ui_button_main02",713,726,157,48)
+	self.btn:SetText("Drop All")
+	self.btn:SetTextColor(255,240,217,182)
+	self.btn:SetFont(GetFontGraffiti22Russian())
+	self.btn:SetTextAlign(CGameFont.alCenter)
+	self.btn:SetTextY(-0.4)
+	self:Register(self.btn, "btn_drop")
+	self.back:AttachChild(self.btn)  
+	self:AddCallback("btn_drop", ui_events.BUTTON_CLICKED, dmx_treasure.on_btn_drop_ckliked, self)
+	-- debug buttons
+	if debug then
+		self.num_btn = 1 -- room floating buttons
+		self.step = 32  -- pixel pitch
+		-- increase pitch
+		self.btn = CUIButton()
+		self.btn:SetText("Up")
+		self.btn:Init("ui\\ui_common",-40+1024/2,-60+768,40,20)
+		self.btn:SetOriginalRect(130,80,40,20)
+		self:Register(self.btn, "btn_step_up")
+		self.back:AttachChild(self.btn)
+		self:AddCallback("btn_step_up", ui_events.BUTTON_CLICKED, self.ClickBtnStepUp, self)
+		-- reduce step
+		self.btn = CUIButton()
+		self.btn:SetText("Down")
+		self.btn:Init("ui\\ui_common",1024/2,-60+768,40,20)
+		self.btn:SetOriginalRect(130,80,40,20)
+		self:Register(self.btn, "btn_step_dn")
+		self.back:AttachChild(self.btn)
+		self:AddCallback("btn_step_dn", ui_events.BUTTON_CLICKED, self.ClickBtnStepDn, self)
+		-- button up
+		self.btn = CUIButton()
+		self.btn:Init("ui\\ui_common",-40+1024/2,768-20-20,40,20)
+		self.btn:SetOriginalRect(770,110,40,20)
+		self:Register(self.btn, "btn_up")
+		self.back:AttachChild(self.btn)
+		self:AddCallback("btn_up", ui_events.BUTTON_CLICKED, self.ClickBtnUp, self)
+		-- button down
+		self.btn = CUIButton()
+		self.btn:Init("ui\\ui_common",-40+1024/2,768-20,40,20)
+		self.btn:SetOriginalRect(900,110,40,20)
+		self:Register(self.btn, "btn_dwn")
+		self.back:AttachChild(self.btn)
+		self:AddCallback("btn_dwn", ui_events.BUTTON_CLICKED, self.ClickBtnDwn, self)
+		-- button to the left
+		self.btn = CUIButton()
+		self.btn:Init("ui\\ui_common",1024/2,768-20-20,40,20)
+		self.btn:SetOriginalRect(800,80,40,20)
+		self:Register(self.btn, "btn_lft")
+		self.back:AttachChild(self.btn)
+		self:AddCallback("btn_lft", ui_events.BUTTON_CLICKED, self.ClickBtnLft, self)
+		-- button to the right
+		self.btn = CUIButton()
+		self.btn:Init("ui\\ui_common",1024/2,768-20,40,20)
+		self.btn:SetOriginalRect(930,80,40,20)
+		self:Register(self.btn, "btn_rt")
+		self.back:AttachChild(self.btn)
+		self:AddCallback("btn_rt", ui_events.BUTTON_CLICKED, self.ClickBtnRt, self)
+		-- Select the next button
+		self.btn = CUIButton()
+		self.btn:SetText("button "..self.num_btn.." step "..self.step)
+		self.btn:Init("ui\\ui_common",-50+1024/2,-80+768,100,20)
+		self.btn:SetOriginalRect(20,180,70,20)
+		self.btn:SetStretchTexture(true)
+		self:Register(self.btn, "next_btn")
+		self.back:AttachChild(self.btn)
+		self:AddCallback("next_btn", ui_events.BUTTON_CLICKED, self.ClickNxtBtn, self)
+	end
+	initial = true
+end
+
+function InventoryWnd:ClickBtnStepUp()
+	self.step = self.step * 2
+	if self.step > 200 then self.step = 128 end
+	self.btn:SetText("button "..self.num_btn.." step "..self.step)
+end
+
+function InventoryWnd:ClickBtnStepDn()
+	self.step = self.step / 2
+	if self.step == 1 then self.step = 2 end
+	self.btn:SetText("button "..self.num_btn.." step "..self.step)
+end
+
+function InventoryWnd:ClickNxtBtn()
+	self.num_btn = self.num_btn + 1
+	if self.num_btn > #slots then self.num_btn = 1 end
+	self.btn:SetText("button "..self.num_btn.." step "..self.step)
+end
+
+function InventoryWnd:ClickBtnUp()
+	slots[self.num_btn][2] = slots[self.num_btn][2] - self.step
+	if slots[self.num_btn][2] < 0 then slots[self.num_btn][2] = 768 + slots[self.num_btn][2] end
+	init_btn(self.num_btn)
+end
+
+function InventoryWnd:ClickBtnDwn()
+	slots[self.num_btn][2] = slots[self.num_btn][2] + self.step
+	if slots[self.num_btn][2] > 768 then slots[self.num_btn][2] = -768 + slots[self.num_btn][2] end
+	init_btn(self.num_btn)
+end
+
+function InventoryWnd:ClickBtnLft()
+	slots[self.num_btn][1] = slots[self.num_btn][1] - self.step
+	if slots[self.num_btn][1] < 0 then slots[self.num_btn][1] = 1024 + slots[self.num_btn][1] end
+	init_btn(self.num_btn)
+end
+
+function InventoryWnd:ClickBtnRt()
+	slots[self.num_btn][1] = slots[self.num_btn][1] + self.step
+	if slots[self.num_btn][1] > 1024 then slots[self.num_btn][1] = -1024 + slots[self.num_btn][1] end
+	init_btn(self.num_btn)
+end
+---------------------------------------------------------------------------------------------
+------------------ INITIALIZE WITH GIVEN THE SIZE OF THE ICONS STATICS ---------------------------
+function init_btn(number, object)
+	local item
+	local function sections(number)
+		if number == 1 then
+			item = db.actor:item_in_slot(0)
+			if item then return item:section() else return end
+		elseif number == 2 then
+			item = db.actor:item_in_slot(4)
+			if item and (item:section() == "wpn_binoc" or item:section() == "wpn_arm_binoc" or item:section() == "sigaret" or item:section() == "wpn_pso3") then return item:section() else return end
+		elseif number == 3 then
+			item = db.actor:item_in_slot(5)
+			if item then return "bolt" else return end
+		elseif number == 4 then
+			item = get_item_in_helmet_slot()
+			if item then return item else return end
+		elseif number == 5 then
+			item = db.actor:item_in_slot(9)
+			if item then return "device_torch" else return end
+		end
+	end
+	local btn = TBtn["check_button_"..number]
+	if not btn then
+		inventory_window = InventoryWnd(level.main_input_receiver())
+		inventory_window:ShowWnd()
+		btn = TBtn["check_button_"..number]
+	end
+	local section = object or sections(number)
+	if section then
+		--TB3D_Services.packet_alert("hidden slots: item["..utils.to_str(section).."]")
+		section = "fake_"..section
+		local ini = system_ini()
+		local x = ini:r_u32(section, "inv_grid_x")*50
+		local y = ini:r_u32(section, "inv_grid_y")*50
+		local width = ini:r_u32(section, "inv_grid_width")*50
+		local height = ini:r_u32(section, "inv_grid_height")*50
+		btn:InitTexture("ui\\ui_icon_equipment")
+		btn:SetOriginalRect(x,y,width,height)
+		btn:SetStretchTexture(true)
+		local w = 75
+		if number == 3 then w = 37 end
+		local h = height * w / width
+		btn:Init(slots[number][1]-w/2,slots[number][2]-h/2,w,h)
+		btn:Show(true)
+	else
+		btn:Init(slots[number][1],slots[number][2],0,0)
+	end
+	if TB3D_Modders.global_debug == true then TB3D_Services.info_alert("BUTTON_"..number..":x="..slots[number][1].."_y="..slots[number][2]) end
+end
+
+function InventoryWnd:ShowWnd()
+	if initial and inventory_window.back then inventory_window.back:Show(true) end
+end 
+
+function InventoryWnd:HideWnd()
+	if initial and inventory_window.back then inventory_window.back:Show(false) end
+end 
+
+function InventoryWnd:DetachWnd()
+	self.owner:DetachChild(self.back) initial = false
+end
+---------------------------------------------------------------------------------------------
+------------------------ ACTIONS WHEN USING OBJECT --------------------------------
+-- helmets
+local items_for_helmets_slot = {
+["fake_good_psy_helmet"] = true,
+["fake_bad_psy_helmet"] = true,
+["fake_helmet_gasmask_gp5"] = true,
+["fake_helmet_gasmask_gp8b"] = true,
+["fake_helmet_respirator"] = true,
+["fake_helmet_hardhat"] = true,
+["fake_helmet_protective"] = true,
+["fake_helmet_tactic"] = true}
+
+-- knives
+local items_for_0_slot = {
+["fake_wpn_knife"] = true,
+["fake_wpn_bat_a"] = true,
+["fake_wpn_bat_b"] = true,
+["fake_wpn_crowbar"] = true,
+["fake_wpn_elf"] = true,
+["fake_wpn_fist"] = true,
+["fake_wpn_fist_c1"] = true,
+["fake_wpn_fist_c2"] = true,
+["fake_wpn_fist_c3"] = true,
+["fake_wpn_fist_c4"] = true,
+["fake_wpn_fist_m"] = true,
+["fake_wpn_knif2"] = true,
+["fake_wpn_knif3"] = true,
+["fake_wpn_knifa"] = true,
+["fake_wpn_knife_m"] = true,
+["fake_wpn_knife_n"] = true,
+["fake_wpn_knife_new"] = true,
+["fake_wpn_kolbasa"] = true,
+["fake_wpn_machette"] = true,
+["fake_wpn_km2000"] = true,
+["fake_wpn_boker_applegate"] = true,
+["fake_wpn_m9_mod"] = true,
+["fake_wpn_knife_ak47"] = true,
+["fake_wpn_alabama_slammer"] = true,
+["fake_wpn_uniq_knife"] = true,
+["fake_wpn_rambo_knife"] = true,
+["fake_wpn_bc5_knife"] = true,
+["fake_wpn_coujaf"] = true,
+["fake_wpn_wakizashi"] = true}
+	
+-- binoculars
+local items_for_4_slot = {
+["fake_wpn_binoc"] = true,
+["fake_wpn_arm_binoc"] = true,
+["fake_wpn_pso3"] = true}
+
+function on_eat(section)
+	if items_for_0_slot[section] then
+		local real_section = string.sub(section, 6, -1)
+		local item = db.actor:item_in_slot(0)
+		if item then
+			db.actor:drop_item(item)
+			amk.spawn_item_in_inv("fake_"..item:section())
+			amk.remove_item(item)
+		end
+		amk.spawn_item_in_inv(real_section)
+		init_btn(1, real_section)
+	end
+	if items_for_4_slot[section] then
+		local real_section = string.sub(section, 6, -1)
+		local item = db.actor:item_in_slot(4)
+		if item then
+			db.actor:drop_item(item)
+			if not item:section() == "sigaret" then amk.spawn_item_in_inv("fake_"..item:section()) end
+			amk.remove_item(item)
+		end
+		amk.spawn_item_in_inv(real_section)
+		init_btn(2, real_section)
+	end
+	-- device torch
+	if section == "fake_device_torch" then
+		if db.actor:object("device_torch") then
+			amk.spawn_item_in_inv("fake_device_torch")
+		else
+			amk.spawn_item_in_inv("device_torch") init_btn(5, "device_torch")
+		end
+	end
+	if items_for_helmets_slot[section] then
+		if get_wearing_suit_with_helmet() then
+			amk.spawn_item_in_inv(section)
+			news_manager.send_tip_txt(db.actor, "You cannot equip the helmet with this suit!", nil, "inv_icon")
+		else
+			if get_item_in_helmet_slot() then inventory_window.ClickBtn[4]() end
+			local real_section = string.sub(section, 6, -1)
+			amk.spawn_item_in_inv(real_section)
+			if real_section ~= "good_psy_helmet" and real_section ~= "bad_psy_helmet" then
+				add_helmet_static(real_section)
+				dmx_mod.play_sound([[actor\gasmask_on_fast]])
+			end
+			helmets_nightvision(false)
+			amk.save_variable("helmet_section", real_section)
+			init_btn(4, real_section)
+		end
+	end
+end
+---------------------------------------------------------------------------------------------
+----------------------------------- WORKING WITH HELMETS ---------------------------------------
+local hud = get_hud()
+function add_helmet_static(section)
+	if amk.load_variable("option_hud", 3) ~= 0 then
+		if (section == "helmet_gasmask_gp5" or section == "helmet_gasmask_gp8b") and not hud:GetCustomStatic("helmet_gasmask_static") then
+			hud:AddCustomStatic("helmet_gasmask_static", true)
+		elseif section == "helmet_respirator" and not hud:GetCustomStatic("helmet_respirator_static") then
+			hud:AddCustomStatic("helmet_respirator_static", true)
+		elseif section == "helmet_hardhat" and not hud:GetCustomStatic("helmet_hardhat_static") then
+			hud:AddCustomStatic("helmet_hardhat_static", true)
+		elseif section == "helmet_protective" and not hud:GetCustomStatic("helmet_protective_static") then
+			hud:AddCustomStatic("helmet_protective_static", true)
+		elseif section == "helmet_tactic" and not hud:GetCustomStatic("helmet_tactic_static") then
+			hud:AddCustomStatic("helmet_tactic_static", true)
+		else
+			return
+		end
+		dmx_mod.hidden_static()
+	end
+end
+
+function remove_helmet_static()
+	if hud:GetCustomStatic("helmet_gasmask_static") then
+		hud:RemoveCustomStatic("helmet_gasmask_static")
+	elseif hud:GetCustomStatic("helmet_respirator_static") then
+		hud:RemoveCustomStatic("helmet_respirator_static")
+	elseif hud:GetCustomStatic("helmet_hardhat_static") then
+		hud:RemoveCustomStatic("helmet_hardhat_static")
+	elseif hud:GetCustomStatic("helmet_protective_static") then
+		hud:RemoveCustomStatic("helmet_protective_static")
+	elseif hud:GetCustomStatic("helmet_tactic_static") then
+		hud:RemoveCustomStatic("helmet_tactic_static")
+	end
+end
+
+function net_spawn()
+	local section = get_item_in_helmet_slot()
+	if section then add_helmet_static(section) end
+end
+
+function helmet_dropping()
+	local item = get_item_in_helmet_slot()
+	if item and get_wearing_suit_with_helmet() then
+		news_manager.send_tip_txt(db.actor, "You cannot equip the helmet with this suit!", nil, "inv_icon")
+		if has_alife_info("ui_inventory") then
+			inventory_window.ClickBtn[4]()
+		else
+			amk.spawn_item_in_inv("fake_"..item)
+			amk.remove_item(db.actor:object(item))
+			amk.del_variable("helmet_section")
+			remove_helmet_static()
+			helmets_nightvision(false)
+		end
+	end
+end
+
+local breathing_sound
+function breathing()
+	local item = get_item_in_helmet_slot()
+	if ((item and item ~= "good_psy_helmet" and item ~= "bad_psy_helmet") or get_wearing_suit_with_helmet()) and amk.load_variable("option_hud", 3) == 3 and db.actor.power > 0.18 then
+		if not (breathing_sound and breathing_sound:playing()) then
+			breathing_sound = xr_sound.get_safe_sound_object([[actor\gasmask_idle_]]..math.random(2))
+			breathing_sound:play_at_pos(db.actor, vector(), 0, sound_object.s2d + sound_object.looped)
+		end
+	elseif breathing_sound and breathing_sound:playing() then
+		breathing_sound:stop() breathing_sound = nil
+	end
+end
+
+nightvision_sound = nil
+function helmets_nightvision(action)
+	if action == true and amk.load_variable("option_nv", 1) > 0 then
+		local item = get_item_in_helmet_slot()
+		if item == "helmet_protective" or item == "helmet_tactic" then
+			if not (nightvision_sound and nightvision_sound:playing()) then
+				nightvision_sound = sound_object("weapons\\nv_loop")
+				nightvision_sound:play_at_pos(db.actor, vector(), 0, sound_object.s2d + sound_object.looped)
+				dmx_mod.play_sound([[weapons\nv_start]])
+				level.add_pp_effector("nightvision_bad.ppe", 1034, true)
+			end
+		end
+	elseif action == false then
+		if nightvision_sound and nightvision_sound:playing() then
+			nightvision_sound:stop() nightvision_sound = nil
+			dmx_mod.play_sound([[weapons\nv_off]])
+			level.remove_pp_effector(1034)
+		end
+	end
+end
+
+function get_wearing_suit_with_helmet()
+	local is_helmet = false
+	local outfit = db.actor:get_current_outfit()
+	if outfit then
+		local section = outfit:section()
+		if section then
+			if string.find(section, "_exoskeleton") then
+				if string.find(section, "svoboda_exoskeleton")
+				or string.find(section, "monolit_exoskeleton")
+				or string.find(section, "dolg_black_exoskeleton")
+				or string.find(section, "killer_blue_exoskeleton")
+				or string.find(section, "exo_mil_exoskeleton")
+				or string.find(section, "broken_exoskeleton")
+				or string.find(section, "exo_mil_exoskeleton") then		
+					is_helmet = true
+				end
+			elseif string.find(section, "_outfit") then
+				if string.find(section, "military_outfit")
+				--or string.find(section, "mp_military_outfit")
+				or string.find(section, "bandit_gaz_outfit_m1")
+				or string.find(section, "svoboda_yellow_exo_outfit_m1")
+				or string.find(section, "svoboda_heavy_gaz_outfit_m1")
+				or string.find(section, "exo_bandit_outfit")
+				or string.find(section, "exo_outfit")
+				or string.find(section, "specnaz_outfit_m1")
+				or string.find(section, "specops_outfit")
+				or string.find(section, "militaryspec_outfit")
+				or string.find(section, "killer_gaz_outfit_m1")
+				or string.find(section, "scientific_outfit")
+				--or string.find(section, "monolit_scientific_outfit")
+				--or string.find(section, "freedom_scientific_outfit")
+				--or string.find(section, "nebo_scientific_outfit")
+				--or string.find(section, "merc_scientific_outfit")
+				or string.find(section, "protection_outfit")
+				or string.find(section, "ecolog_outfit")
+				or string.find(section, "novice_gaz_outfit_m1")
+				or string.find(section, "neytral_gaz_outfit")
+				or string.find(section, "dolg_outfit_gaz_m1")
+				or string.find(section, "mp_exo_outfit")
+				or string.find(section, "monolit_gaz_outfit_m1")
+				or string.find(section, "outfit_svoboda_gaz_m1")
+				or section == "fire_outfit"
+				or section == "nebo_heavy_outfit"
+				--or section == "mp_scientific_outfit"
+				or section == "military_stalker_commander_outfit" then
+					is_helmet = true
+				end
+			elseif string.find(section, "dolg_scientific")
+			  or string.find(section, "neytral_exo")
+			  or section == "scientist_suit_white" then
+				is_helmet = true
+			end
+		end
+	end
+	return is_helmet
+end
+
+function get_item_in_helmet_slot()
+	return amk.load_variable("helmet_section")
+end
+---------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+function on_info(info_id)
+	if info_id == "ui_inventory" then
+		if not initial then	inventory_window = InventoryWnd(level.main_input_receiver()) end
+		if not inventory_window.back:IsShown() then inventory_window:ShowWnd() end
+	elseif info_id == "ui_inventory_hide" then
+		if inventory_window then inventory_window:DetachWnd() end
+	end
+end
+
+function on_update()
+	helmet_dropping()
+	breathing()
+end

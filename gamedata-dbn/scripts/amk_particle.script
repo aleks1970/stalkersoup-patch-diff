@@ -1,0 +1,150 @@
+-- TB3D 1.0.9.9.3.0 limited particles per obj
+function my_ver() return "1.0.9.9.3.0" end
+
+class "amk_particle"
+local max_particles = 4
+
+function amk_particle:__init(params)
+	if params.obj and params.obj:alive() then
+		local cnt = 0
+		if self.particles then cnt = #self.particles end
+		if cnt < max_particles then
+			self.type = params.typ or "absolute" --bone,absolute
+			self.dir = params.dir or vector():set(0,0,0)
+			self.len = params.len or 1
+			self.looped = params.looped or false
+			self.life_time = params.life_time or -1
+			self.obj = params.obj or nil
+			self.bone = params.bone or nil
+			self.pos = params.pos or nil
+			self.stop_on_death = params.stop_on_death or false
+			self.gravity = params.gravity or vector():set(0,0,0)
+			self.give_dmg = params.give_dmg or false
+			self.target = params.target or nil
+			if params.sound then
+				self.snd = sound_object(params.sound)
+				self.snd_looped = params.sound_looped or false
+			end
+			self.cgravity=vector():set(0,0,0)
+			self.particle = particles_object(params.particle)
+			self.started=false
+			self.start_time = time_global()
+			self.finalized=false
+			--TB3D_Services.packet_alert("amk particle: init["..utils.to_str(params.particle).."]["..utils.to_str(self.type).."]")
+			self:start()
+		else
+			TB3D_Services.packet_alert("amk particle: init obj["..utils.to_str(self.obj:name()).."] already has["..utils.to_str(cnt).."] particles")
+		end
+	end
+end
+
+function amk_particle:__finalize()
+	if self.particle then self.particle:stop() end
+	self.finalized=true
+end
+
+--causes render stalls and crashes in lab x16 as too many are created
+function amk_particle:start()
+	if self.obj:alive() then
+		--local cnt = 0
+		--if self.particles then cnt = #self.particles end
+		--if cnt < max_particles then
+			if not self.particle:playing() and self.started == false then
+				local pos
+				if self.bone and self.obj then
+					pos = self.obj:bone_position(self.bone)
+				elseif self.pos then
+					pos = self.pos
+				end
+				self.start_pos = pos
+				if pos then
+					--TB3D_Services.packet_alert("amk particle: start["..utils.to_str(self.obj:name()).."]")
+					if self.snd then
+						if self.snd_looped then
+							self.snd:play_at_pos(db.actor, pos, 1, sound_object.looped)
+						else
+							self.snd:play_at_pos(db.actor, pos)
+						end
+						self.snd=nil
+					end
+					self.particle:play_at_pos(pos)
+					self.started=true
+				end
+			end
+		--else
+			--TB3D_Services.packet_alert("amk particle: start obj["..utils.to_str(self.obj:name()).."] has["..utils.to_str(cnt).."] particles started")
+		--end
+	end
+end
+
+function amk_particle:update(delta)
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("amk particle: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta["..utils.to_str(delta).."]")
+	end
+	if self.obj and self.obj:alive() and self.particle and not self.finalized then
+		if self.cgravity then self.cgravity = self.cgravity:add(self.gravity) else self.cgravity = self.gravity end
+		if self.particle:playing() then
+			if self.life_time>-1 and time_global()>self.start_time+self.life_time then 
+				self.started=false
+				self.looped=false
+				--self:__finalize() 
+				self.finalized=true
+			else
+				local pos
+				if self.bone and self.obj then
+					pos = self.obj:bone_position(self.bone)
+					self.pos = pos
+				elseif self.dir then
+					self.pos = self.pos:add(self.dir:set_length(self.len/self.life_time*delta))
+					self.pos = self.pos:add(self.cgravity)
+					pos = self.pos
+				end
+				if pos then
+					--TB3D_Services.packet_alert("amk particle: update["..utils.to_str(self.obj:name()).."]")
+					if self.snd and self.snd:playing() then
+						self.snd:set_position(pos)
+					end
+					self.particle:move_to(pos,vector():set(0,0,0))
+				end
+			end
+		else
+			if self.started then
+				if self.looped then
+					--TB3D_Services.packet_alert("amk particle: update loop["..utils.to_str(self.obj:name()).."]")
+					self:start()
+				end
+			end
+		end
+	end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("amk particle: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
+	end
+end
+
+function amk_particle:stop()
+	self.give_dmg=false
+	if self.particle and self.particle:playing() then
+		--TB3D_Services.packet_alert("amk particle: stop part["..utils.to_str(self.obj:name()).."]")
+		self.particle:stop_deffered()
+	end
+	if self.snd and self.snd:playing() then
+		--TB3D_Services.packet_alert("amk particle: stop snd["..utils.to_str(self.obj:name()).."]")
+		self.snd:stop()
+	end
+end
+
+function amk_particle:get_pos()
+	return self.pos
+end
+
+function amk_particle:is_finished()
+	return self.finalized
+end
+
+function amk_particle:on_death()
+	if self.stop_on_death then
+		--TB3D_Services.packet_alert("amk particle: stop death["..utils.to_str(self.obj:name()).."]")
+		self:__finalize()
+	end
+end
+ 

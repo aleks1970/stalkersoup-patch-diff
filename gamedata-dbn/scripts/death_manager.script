@@ -1,0 +1,551 @@
+--TB3D 1.0.9.9.4.0 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives, bad_psy_helmet, pri_followers_leader, fotoman, lastday
+function my_ver() return "1.0.9.9.4.0" end
+
+local math_random = math.random
+--local math_ceil = math.ceil
+local string_find = string.find
+
+--local names_info = {
+--}
+
+local names_info = {
+	["brat_luis"] = "brat_luis_dead",
+	["snip_esc1"] = "snip_esc1_dead",
+	["snip_esc2"] = "snip_esc2_dead",
+	["snip_esc3"] = "snip_esc3_dead",
+	["snip_esc4"] = "snip_esc4_dead",
+	["snip_esc5"] = "snip_esc5_dead",
+	["snip_esc6"] = "snip_esc6_dead",
+	["snip_esc7"] = "snip_esc7_dead",
+	["snip_esc8"] = "snip_esc8_dead",
+	["snip_esc9"] = "snip_esc9_dead",
+	["snip_esc10"] = "snip_esc10_dead",
+	["snip_esc11"] = "snip_esc11_dead",
+	["snip_esc12"] = "snip_esc12_dead",
+	["naem_zahar1"] = "naem_zahar1_dead",
+	["naem_zahar2"] = "naem_zahar2_dead",
+	["naem_zahar3"] = "naem_zahar3_dead",
+	["naem_zahar4"] = "naem_zahar4_dead",
+	["naem_zahar5"] = "naem_zahar5_dead",
+	["naem_zahar6"] = "naem_zahar6_dead",
+	["ecolog_wound_bunker"] = "ucen_talk_est",
+	["mitya"] = "mitya_dead",
+	["grab_stal1"] = "grab_stal1_dead",
+	["grab_stal2"] = "grab_stal2_dead",
+	["grab_stal3"] = "grab_stal3_dead",
+	["grab_stal4"] = "grab_stal4_dead",
+	["grab_stal5"] = "grab_stal5_dead",
+	["mil_trader_gavr"] = "info_gavr_dead",
+	["Mil_Dolg_Zoneguard"] = "mil_scull_dead", --skull
+	["mil_dolg_stalker0000"] = "mil_scull_dead", --skull
+	["mil_freedom_member0018"] = "mil_max_dead",	--max
+	["mil_Svoboda_master_Max"] = "mil_max_dead",	--max
+	["Sak"] = "mil_max_dead",						--max
+	["mil_freedom_member0012"] = "mil_lukash_dead",		--lucash
+	["mil_Svoboda_leader"] = "mil_lukash_dead",		--lucash
+	["svoboda_leader_zombi"] = "mil_lukash_dead",		--lucash
+	["final_lukash"] = "mil_lukash_dead",		--lucash
+	["xalyava_naem1"] = "xalyava_naem1_dead",	--in case logic fails
+	["xalyava_naem2"] = "xalyava_naem2_dead",
+	["xalyava_naem3"] = "xalyava_naem3_dead",
+	["xalyava_naem4"] = "xalyava_naem4_dead",
+	["xalyava_naem5"] = "xalyava_naem5_dead",
+	["xalyava_naem6"] = "xalyava_naem6_dead",
+	["xalyava_naem7"] = "xalyava_naem7_dead",
+	["xalyava_naem8"] = "xalyava_naem8_dead",
+	["pri_followers_leader"] = "pri_aes_mapspot"--,
+	--["pri_followers_bomber"] = "pri_bomber_dead"
+}
+local coll_names_info = {
+	["l02_stalker_0000"] = "dd_informant_dead"
+}
+
+class "drop_manager"
+function drop_manager:__init(npc)
+	self.npc = npc
+end
+
+local counter
+
+function drop_manager:check_dead_info()
+	if self.npc then
+		local npc_name = protected_items.get_obj_name(self.npc)		--strips off the id
+		if TB3D_Services.is_collector() then
+			if npc_name and coll_names_info[npc_name] then
+				TB3D_Services.give_info(coll_names_info[npc_name])
+			end
+		else
+			if npc_name and names_info[npc_name] then
+				TB3D_Services.give_info(names_info[npc_name])
+			end
+		end
+	end
+end
+
+function drop_manager:check_dead_weapons()
+	if self.npc then
+		local item_in_slot = self.npc:item_in_slot(1)
+		if item_in_slot then
+			item_in_slot:unload_magazine()
+			item_in_slot:set_condition(math_random(30, 90)/100)
+		end
+		item_in_slot = self.npc:item_in_slot(2)
+		if item_in_slot then
+			item_in_slot:unload_magazine()
+			item_in_slot:set_condition(math_random(30, 90)/100)
+		end
+	end
+    self.npc:iterate_inventory(check_weapon, self.npc)
+end
+
+function check_weapon(npc, item)
+    if npc and item and alife():object(item:id()) then
+		if IAmAWeapon[item:clsid()] and protected_items.obj_is_protected(item, "items_protected", "exactly") == false then
+			item:set_condition(math_random(30, 90)/100)
+			return true
+		end
+	end
+	return false
+end
+
+function drop_manager:check_dead_looted()
+	counter = 0
+	self.npc:iterate_inventory(check_items, self.npc)						--returns counter
+	return (counter == 0)
+end
+
+--fixes PDAs, spawns some loot IF npc has less items than loot option,
+--most npc already have an inventory and are skipped except for the PDA fix, no weapons or ammo! use load out system
+function drop_manager:check_dead_items()
+	--TB3D_Services.packet_alert("death mgr: check dead items["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	self.npc:iterate_inventory(clear_pda, self.npc)					--removes old pda and bad_psy_helmet, spawns mil_pda 20% of the time, also some clutter removed
+	if string_find(self.npc:name(), "military_ecolog_agro1") then		--Ivanshenko in agro
+		give_some_stuff(self.npc, "bad_psy_helmet", 1)
+	else
+		local ini = self.npc:spawn_ini()
+		if ini and ini:section_exist("dont_spawn_loot") == true then
+			TB3D_Services.packet_alert("death mgr: check_dead_items["..utils.to_str(self.npc:name()).."] dont_spawn_loot")
+			ini = nil
+		else
+			counter = 0
+			self.npc:iterate_inventory(check_loot_items, self.npc)						--returns counter
+			--TB3D_Services.packet_alert("death mgr: check_dead_items["..utils.to_str(self.npc:name()).."] count["..utils.to_str(counter).."] loot["..utils.to_str(random_loot).."]")
+			if counter < 4 then spawn_random_loot(self.npc) end
+		end
+	end
+	--TB3D_Services.packet_alert("death mgr: check dead items done["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+end
+
+function clear_pda(npc, item, rnd)
+	if item then
+		--local sect = item:section()
+		local name = item:name()
+		if name then
+			if string_find(name, "device_pda") then
+				if protected_items.obj_is_protected(item, "items_protected", "exactly") == false then
+					if string_find(name, "_npc") then
+						if math_random(10) < 8 then 							--remove 80% of the time
+							--TB3D_Services.packet_alert("death mgr: check dead items removing pda["..name.."]")
+							npc:drop_item(item)
+							amk.remove_item(item)
+						end
+					else														--remove old zombied pda from all.spawn
+						--TB3D_Services.packet_alert("death mgr: check dead items removing zombied pda["..name.."]")
+						npc:drop_item(item)
+						amk.remove_item(item)
+						if math_random(10) < 3 then 							--give mil pda 20% of the time
+							alife():create("device_pda_npc",
+										npc:position(),
+										npc:level_vertex_id(),
+										npc:game_vertex_id(),
+										npc:id())
+						end
+					end
+				end
+			elseif string_find(name, "device_torch")						--to not interfere with soul cube quest
+			  or string_find(name, "bad_psy_helmet")						--removes those from all.spawn
+			  --or string_find(name, "ammo_og-7b")							--causes child crash
+			  --or string_find(name, "wpn_rpg7")								--causes child crash
+			  or string_find(name, "guitar_a")								--get rid of clutter
+			  or string_find(name, "harmonica_a")
+			  or string_find(name, "binocular_a")
+			  or string_find(name, "balalaika_a") then
+				--TB3D_Services.packet_alert("death mgr: check dead items removing junk["..name.."]")
+				npc:drop_item(item)
+				amk.remove_item(item)
+			end
+		end
+	end
+	return true
+end
+
+function check_items(npc, item)
+	if item then
+		--TB3D_Services.packet_alert("death mgr: check item npc["..utils.to_str(npc:name()).."] item["..utils.to_str(item:section()).."]")
+		counter = counter + 1
+	end
+	return true
+end
+
+function check_loot_items(npc, item)
+	if item then
+		--TB3D_Services.packet_alert("death mgr: check item npc["..utils.to_str(npc:name()).."] item["..utils.to_str(item:section()).."]")
+		if (item.clsid and IAmAWeapon[item:clsid()])
+		  or string_find(item:name(), "wpn_")
+		  or string_find(item:name(), "ammo_")
+		  or string_find(item:name(), "binoc")
+		  or string_find(item:name(), "_addon")
+		  or string_find(item:name(), "torch")
+		  or string_find(item:name(), "device_pda") then
+			--skip it
+		  else
+		--TB3D_Services.packet_alert("death mgr: check item["..utils.to_str(item:name()).."] sect["..utils.to_str(item:section()).."]")
+			counter = counter + 1
+		end
+	end
+	return true
+end
+
+function create_ammo(npc, section, number)
+	local ini = system_ini()
+	local num_in_box
+	if ini:section_exist(section) and ini:section_exist(section, "box_size") then
+		num_in_box = ini:r_u32(section, "box_size")
+	end
+	if num_in_box == nil or num_in_box < 1 then num_in_box = 1 end
+	--local num = num_in_box * number
+	local position = npc:position()
+	local lvi = npc:level_vertex_id()
+	local gvi = npc:game_vertex_id()
+	local pid = npc:id()
+	for i = 1, number do
+	--while num > num_in_box do
+		alife():create_ammo(section, position, lvi, gvi, pid, num_in_box)
+		--num = num - num_in_box
+	end
+	--alife():create_ammo(section, position, lvi, gvi, pid, num)
+end
+
+function give_some_stuff(npc, section, number)
+	local position = npc:position()
+	local lvi = npc:level_vertex_id()
+	local gvi = npc:game_vertex_id()
+	local pid = npc:id()
+	for i=1,number do
+		alife():create(section,
+						position,
+						lvi,
+						gvi,
+						pid)
+	end
+end
+
+function has_weapons(npc, item)
+    if item then
+		if (item.clsid and IAmAWeaponFireOnly[item:clsid()]) then
+			counter = counter + 1
+		elseif (string_find(item:name(), "wpn_")
+		  and not string_find(item:name(), "binoc")
+		  and not string_find(item:name(), "grenade")
+		  and not string_find(item:name(), "_addon")) then
+			--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc:name()).."] weapon["..utils.to_str(item:name()).."] counter["..utils.to_str(counter).."]")
+			counter = counter + 1
+		end
+	end
+	return true
+end
+
+function remove_weapons(npc, item)
+    if item then
+		if (item.clsid and IAmAWeapon[item:clsid()])
+		  or (string_find(item:name(), "wpn_") and not string_find(item:name(), "binoc"))
+		  or string_find(item:name(), "ammo_") then
+			--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc:name()).."] weapon["..utils.to_str(item:name()).."] counter["..utils.to_str(counter).."]")
+			npc:drop_item(item)
+			amk.remove_item(item)
+		end
+	end
+	return true
+end
+
+local new_levels = {
+	["dead_city"] = "l09_deadcity",
+	["cs_agroprom_underground"] = "l10u_bunker",
+	["predbannik"] = "l04_darkvalley",
+	["yantar_old"] = "l08_yantar",
+	["swamp_old"] = "marsh",
+	["hiding_road"] = "generators",
+	["k01_darkscape"] = "l04_darkvalley",
+	["dark_forest"] = "l06_rostok",
+	["level_f-1"] = "generators",
+	["promzone"] = "l07_military",
+	["digger_stash"] = "warlab",
+	["l01_krasivay"] = "l07_military",
+	["l02_dd"] = "l07_military",
+	["l03_rinok"] = "l07_military",
+	["l04_pogost"] = "l07_military",
+	["l05_vokzal"] = "l07_military",
+	["lab_x14"] = "l12u_sarcofag",
+	["l01_poligon"] = "l07_military"
+}
+	
+function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapon and ammo only)
+	local npc_name = self.npc:name()
+	local commun = self.npc:character_community()
+	--TB3D_Services.packet_alert("death mgr: check_npc_loadout["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."] ["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	if commun == "zombied"				--never touch
+	  --or commun == "lastday"				--never touch 
+	  --or commun == "fotoman"				--never touch
+	  or commun == "sniper"					--never touch
+	  or commun == "trader"					--never touch
+	  or commun == "stranger"				--never touch, doctor
+	  or string_find(npc_name, "esc_shustryi")
+	  or string_find(npc_name, "esc_vagon_wounded")
+	  or string_find(npc_name, "val_escort_captive")
+	  or string_find(npc_name, "val_sacrifice_victim")
+	  --or string_find(npc_name, "val_sos_wounded")				--needs one or is defensless against bandits and dogs
+	  or string_find(npc_name, "val_prisoner_captive")
+	  or string_find(npc_name, "val_escort_bandit_halfdead")	--no weapon so does not pursue Bullet to the ambush
+	  or string_find(npc_name, "dead_mono_labirint")
+	  then 
+		return
+	end
+	counter = 0
+	local item_in_slot
+	local suit_id
+	if has_alife_info("tb3d_force_loadouts") == true then
+		item_in_slot = self.npc:item_in_slot(1)
+		if item_in_slot then
+			item_in_slot:unload_magazine()
+			dmx_mod.drop_item_to_inventory(1)
+		end
+		item_in_slot = nil
+		item_in_slot = self.npc:item_in_slot(2)
+		if item_in_slot then
+			item_in_slot:unload_magazine()
+			dmx_mod.drop_item_to_inventory(2)
+		end
+		self.npc:iterate_inventory(remove_weapons, self.npc)		--not binocs
+	else
+		self.npc:iterate_inventory(has_weapons, self.npc)
+		item_in_slot = self.npc:item_in_slot(1)
+		if item_in_slot then
+			counter = counter + 1
+			if TB3D_Modders.loadout_rand_cond == true then
+				item_in_slot:set_condition(math_random(80, 100)/100)
+				suit_id = self.npc:get_current_outfit()
+				if suit_id then suit_id:set_condition(math_random(80, 100)/100) end
+			end
+		end
+		item_in_slot = nil
+		suit_id = nil
+		item_in_slot = self.npc:item_in_slot(2)
+		if item_in_slot then
+			counter = counter + 1
+			if TB3D_Modders.loadout_rand_cond == true then
+				item_in_slot:set_condition(math_random(80, 100)/100)
+				suit_id = self.npc:get_current_outfit()
+				if suit_id then suit_id:set_condition(math_random(80, 100)/100) end
+			end
+		end
+	end
+	if counter == 0 then														--no weapon so dynamically assign it
+		if string_find(npc_name, "sniper") then									--Monolith snipers
+			give_weapon(self.npc, 2, "wpn_svu")
+			create_ammo(self.npc, "ammo_7.62x54_ap", 2)
+			if TB3D_Modders.use_loadout_message == true then
+				TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[sniper]")
+			end
+		elseif string_find(npc_name, "gar_bandit_post_7") then						--garbage top of tunnel
+			give_weapon(self.npc, 2, "wpn_toz34")
+			create_ammo(self.npc, "ammo_12x70_buck", 2)
+			if TB3D_Modders.use_loadout_message == true then
+				TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[toz34]")
+			end
+		elseif commun == "fotoman" then
+			give_weapon(self.npc, 2, "wpn_pm")
+			create_ammo(self.npc, "ammo_9x18_fmj", 2)
+			if TB3D_Modders.use_loadout_message == true then
+				TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[fotoman pm]")
+			end
+		elseif commun == "lastday" then
+			if math_random(10) < 7 then give_weapon(self.npc, 2, "wpn_bizon") else give_weapon(self.npc, 2, "wpn_bizon1") end
+			create_ammo(self.npc, "ammo_9x18_fmj", 2)
+			if TB3D_Modders.use_loadout_message == true then
+				TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[lastday]")
+			end
+		else
+			local rank = self.npc:character_rank()
+			local actor_koef = TB3D_Services.global_koef()							--based on actor rank and game difficulty
+			local npc_koef = TB3D_Services.global_koef(0, rank+1)					--npc rank and level 0
+			local result_intregal = math.floor((actor_koef * npc_koef) * 1000)		--quantize both and put in range
+			local quant_factor = 0
+			if result_intregal > 1000 then
+				rank = 1000
+				result_intregal = 1099
+			elseif result_intregal > 900 then
+				rank = 900
+			elseif result_intregal > 800 then
+				rank = 900
+				result_intregal = result_intregal + 100
+			elseif result_intregal > 700 then
+				rank = 900
+				result_intregal = result_intregal + 200
+			elseif result_intregal > 600 then
+				rank = 600
+			elseif result_intregal > 500 then
+				rank = 600
+				result_intregal = result_intregal + 100
+			elseif result_intregal > 400 then
+				rank = 400
+			elseif result_intregal > 300 then
+				rank = 400
+				result_intregal = result_intregal + 100
+			elseif result_intregal > 200 then
+				rank = 200
+			elseif result_intregal > 100 then
+				rank = 200
+				result_intregal = result_intregal + 100
+			else
+				rank = 200
+				result_intregal = result_intregal + 200
+			end
+			quant_factor = result_intregal - rank
+			--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] result["..utils.to_str(result_intregal).."]["..utils.to_str(quant_factor).."]")
+			if quant_factor < 20 then quant_factor = 1
+			  elseif quant_factor < 40 then quant_factor = 2
+			  elseif quant_factor < 60 then quant_factor = 3
+			  elseif quant_factor < 80 then quant_factor = 4
+			  else quant_factor = 5
+			end
+			local ltx_id = math_random(quant_factor, quant_factor+1)
+			if ltx_id > 5 then ltx_id = 4 end
+			local lname = level:name()
+			if new_levels[lname] then lname = new_levels[lname] end
+			local ini_name = "inventory\\"..lname.."\\"..utils.to_str(commun).."\\"..utils.to_str(rank).."\\"..utils.to_str(ltx_id)..".ltx" 
+			local ini = ini_file(ini_name) 
+			if ini and ini:section_exist("loadout") then									--make sure it is a loadout file	
+				local item
+				if TB3D_Modders.use_loadout_message == true then
+					TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout["..utils.to_str(ini_name).."]")
+				end
+				if ini:section_exist("weapon") then	
+					if ini:line_exist("weapon","secondary") then
+						item = ini:r_string("weapon","secondary")
+						if item and item ~= "" then
+							give_weapon(self.npc, 1, item)
+						end
+					end
+					if ini:line_exist("weapon","primary") then
+						item = ini:r_string("weapon","primary")
+						if item and item ~= "" then
+							give_weapon(self.npc, 2, item)
+						end
+					end
+				end
+				if ini:section_exist("ammo") then	
+					if ini:line_exist("ammo","primary") then
+						item = ini:r_string("ammo","primary")
+						if item and item ~= "" then
+							create_ammo(self.npc, item, math_random(2))
+						end
+					end
+					if ini:line_exist("ammo","secondary") then
+						item = ini:r_string("ammo","secondary")
+						if item and item ~= "" then
+							create_ammo(self.npc, item, math_random(2))
+						end
+					end
+				end
+				if ini:section_exist("extras") then
+					for cnt = 1, 10 do
+						if ini:line_exist("extras", tostring(cnt)) then
+							item = ini:r_string("extras", tostring(cnt))
+							if item and item ~= "" then
+								if string_find(item, "ammo") then
+									create_ammo(self.npc, item, math_random(2))
+								elseif string_find(item, "wpn_") then
+									if math_random(1,50) == 25 then give_weapon(self.npc, 0, item) end
+								else
+									give_some_stuff(self.npc, item, math_random(0,quant_factor))
+								end
+							end
+						else
+							break		--must be consecutive
+						end
+					end
+				end
+			elseif TB3D_Modders.use_loadout_message == true then
+				TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] loadout["..utils.to_str(ini_name).."] not found!!!")
+			end
+			ini_name = ""
+			ini = nil
+		end
+	end
+	--TB3D_Services.packet_alert("death mgr: check_npc_loadout done["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+end
+
+function give_weapon(npc, slot, item)
+	alife():create(item, npc:position(),
+						 npc:level_vertex_id(),
+						 npc:game_vertex_id(),
+						 npc:id())
+	if slot == 2 then			--activate main weapon
+		npc:activate_slot(slot)
+	--elseif slot == 1 then		--activate secondary
+	--else						--in backpack
+	end
+end
+
+function spawn_random_loot(corpse)
+	local loot_count = TB3D_Modders.loot_option
+	if loot_count > 5 then loot_count = 5 end
+	if loot_count > 0 then
+		local total_groups
+		local str = ""
+		local ini = ini_file("misc\\TB3D_loot.ltx") 
+		if ini:section_exist("groups") and ini:line_exist("groups","total") then
+			str = tostring(ini:r_string("groups","total"))
+		end
+		if str and str ~= "" then total_groups = tonumber(str) end
+		if total_groups == nil or total_groups < 1 then total_groups = 20 end
+		local loot_group = math_random(total_groups)
+		local count1 = math_random(loot_count+1) 
+		local count2 = math_random(loot_count+1) 
+		local cnt = 1
+		--TB3D_Services.packet_alert("death mgr: spawn_random_loot["..utils.to_str(corpse:name()).."] group["..utils.to_str(loot_group).."] 1["..utils.to_str(count1).."] 2["..utils.to_str(count2).."]")
+		if ini:section_exist(tostring(loot_group)) then	
+			while cnt > 0 do
+				if ini:line_exist(loot_group,tostring(cnt)) then
+					str = tostring(ini:r_string(loot_group,tostring(cnt)))
+					if str == nil or str == "" then
+						cnt = 0
+					else
+						if math_random(10) < 6 then
+							for i = 1, count1 do
+								alife():create(str,	
+									corpse:position(),
+									corpse:level_vertex_id(),	
+									corpse:game_vertex_id(), 
+									corpse:id())
+							end
+						else
+							for i = 1, count2 do
+								alife():create(str,	
+									corpse:position(),
+									corpse:level_vertex_id(),	
+									corpse:game_vertex_id(), 
+									corpse:id())
+							end
+						end
+						cnt = cnt+1
+					end
+				else
+					cnt = 0
+				end
+			end
+		end
+		str = ""
+		ini = nil
+	end
+end

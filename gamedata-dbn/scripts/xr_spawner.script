@@ -1,0 +1,91 @@
+--TB3D 1.0.9.9.5.0 fixed spawn conditions check for hardcore alife option,debug
+function my_ver() return "1.0.9.9.5.0" end
+--------------------------------------------------------------------------------------------------------------------
+--  Checking the conditions of the permit or prohibit spawn
+--  Author: Ruslan Didenko (Stohe)
+----------------------------------------------------------------------------------------------------------------------
+local string_sub = string.sub
+local spawn_list = {}
+
+function add_to_spawn_list (s_object)
+	--TB3D_Services.packet_alert("xr spawn: add_to_spawn_list["..utils.to_str(s_object:name()).."]")
+	for k,v in pairs(spawn_list) do
+		if v.id == s_object.id then
+			--TB3D_Services.packet_alert("xr spawn: add_to_spawn_list["..utils.to_str(s_object:name()).."] already added")
+			return true
+		end
+	end
+	spawn_list[s_object.id] = {	id = s_object.id,
+								cond = xr_logic.cfg_get_condlist(s_object:spawn_ini(), "spawner", "cond", s_object),
+								npc = nil,
+								online = false }
+	if spawn_list[s_object.id].cond then 
+		if TB3D_Modders.show_tables then show_tables(spawn_list[s_object.id].cond, nil, "xr spawner") end
+		if TB3D_Modders.use_spawn_message == true then
+			TB3D_Services.packet_alert("xr spawn: add_to_spawn_list["..utils.to_str(s_object:name()).."] cond["..utils.to_str(spawn_list[s_object.id].cond).."] added to list")
+		end
+	else
+		if TB3D_Modders.use_spawn_message == true then 
+			TB3D_Services.packet_alert("xr spawn: add_to_spawn_list["..utils.to_str(s_object:name()).."] cond[nil] added to list")
+		end
+	end
+	return true
+end
+
+--se_monster, turret_gun
+function check_spawn(s_object)
+	if TB3D_Modders.use_spawn_message == true then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."]") end
+	if this.is_object_in_list(s_object) == false then
+		if this.add_to_spawn_list(s_object) == false then return false end
+	end
+	if db.actor then
+		if spawn_list[s_object.id].cond ~= nil then
+			if TB3D_Modders.use_spawn_message == true then
+				TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] in list")
+			end
+			if spawn_list[s_object.id].npc == nil then
+				if level.object_by_id(s_object.id) ~= nil then 
+					if is_object_online(s_object.id) == true then
+						spawn_list[s_object.id].npc = level.object_by_id(s_object.id)
+					else   
+						spawn_list[s_object.id].npc = nil
+					end
+				else       
+					spawn_list[s_object.id].npc = nil  
+				end
+			end   
+			--TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] 2")
+			if TB3d_Modders.start_alife_option > 1 and string_sub(s_object:section_name(), 1, 7) ~= "turret_" then				--hardcore
+				if TB3D_Modders.use_spawn_message == true then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] return[true] [hardcore alife]") end
+				return true 
+			end
+			--TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] 2b")
+			if xr_logic.pick_section_from_condlist(db.actor, spawn_list[s_object.id].npc, spawn_list[s_object.id].cond.condlist) ~= nil then
+				if TB3D_Modders.use_spawn_message == true then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] return[true] [cond list]") end
+				return true
+			end
+			spawn_list[s_object.id].npc = nil
+			spawn_list[s_object.id].online = false
+			if TB3D_Modders.use_spawn_message == true then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] return[false] [normal alife]") end
+			return false 
+		elseif string_sub(s_object:section_name(), 1, 7) == "turret_" then				--dynamic stationary turrets
+			if TB3D_Modders.use_spawn_message == true then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] return[true] [hardcore alife]") end
+			return true 
+		else
+			if TB3D_Modders.use_spawn_message == true then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] return[nil] [no condition]") end
+			return nil
+		end
+	end
+	--TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] 3")
+	if TB3D_Modders.use_spawn_message == true then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(s_object:name()).."] return[nil] actor[nil]!!!!!") end
+	spawn_list[s_object.id].npc = nil
+	return nil
+end
+-----------------------------------------------------------------------------------
+function is_object_in_list (s_object)
+    return spawn_list[s_object.id] ~= nil
+end
+
+function net_destroy()
+	spawn_list = {}
+end

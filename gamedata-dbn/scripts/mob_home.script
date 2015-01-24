@@ -1,0 +1,155 @@
+--TB3D 1.0.9.9.1
+function my_ver() return "1.0.9.9.1" end
+----------------------------------------------------------------------------------------------------
+-- Mob Home
+----------------------------------------------------------------------------------------------------
+-- Developer: Jim
+----------------------------------------------------------------------------------------------------
+
+local def_min_radius = 20
+local def_max_radius = 40
+
+--List of monsters, each home
+local home_group={}
+
+class "mob_home"
+
+----------------------------------------------------------------------------------------------------
+-- CONSTRUCTION SCHEME
+----------------------------------------------------------------------------------------------------
+function mob_home:__init(obj, storage)
+	self.object = obj
+	self.st		= storage
+end
+
+----------------------------------------------------------------------------------------------------
+-- RESET SCHEME
+----------------------------------------------------------------------------------------------------
+function mob_home:reset_scheme()
+--[[
+Posted: Haron
+Description: Now you can specify the radius and home_min_radius home_max_radius the flags
+          ways path_home. For this, flags minr, maxr. They should be
+          spelled out in the first point of the path. At radii of jobs in the priority section
+          greater than for those that are set in the flags, ie, If both here and there, then
+          values ??are taken from the section (done for backward compatibility).
+--]]
+    local minr, maxr = def_min_radius, def_max_radius
+	local ptr = patrol(self.st.home)
+	local path_info = utils.parse_waypoint_data(self.st.home, ptr:flags(0), ptr:name(0))				
+    local r = 0
+
+    if self.st.home_min_radius then
+        minr = self.st.home_min_radius
+    else
+        r = path_info.minr
+        if r then
+            r = tonumber(r)
+            if r then
+                minr = r
+            end
+        end
+    end
+    
+    if self.st.home_max_radius then
+        maxr = self.st.home_max_radius
+    else
+        r = path_info.maxr
+        if r then
+            r = tonumber(r)
+            if r then
+                maxr = r
+            end
+        end
+    end
+
+	-- check min and max radius
+	if	minr > maxr then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("Mob_Home : Home Min Radius MUST be < Max Radius. Got: min radius = "..minr.." max radius =  "..maxr) end
+	end 
+
+	self.object:set_home(self.st.home, minr, maxr, self.st.aggressive)
+	add_to_home(self.st.home,self.object)
+	self.st.signals={}
+end
+
+function add_to_home(home,mob)
+--	amk.logct(mob:name().." adding to home "..home,"mcbt")	
+	if home_group[home]==nil then home_group[home]={} end
+	home_group[home][mob:id()]=true	
+end
+
+function remove_from_home(home,mob)
+--	amk.logct(mob:name().." removing from home "..home,"mcbt")	
+	if home_group[home]==nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("mob home: Trying to remove "..mob:name().." from home "..home.." while home is empty.") end
+		return
+	end
+	home_group[home][mob:id()]=nil	
+end
+
+
+function mob_home:hit_callback(obj, amount, local_direction, who, bone_index)
+	if amount == 0 then
+		return
+	end
+--	amk.logct(self.object:name().." mob_home hit_callback","mcbt")	
+	-- Put signal "sig_attacked" for all zverushek from home
+	local group=home_group[self.st.home]
+	if group then
+		local st
+		for id in pairs(group) do
+			st=db.storage and db.storage[id]
+			if st and st.mob_home and st.mob_home.signals then
+				st.mob_home.signals.sig_attacked=true
+--				amk.logct("Setting sig_attacked for id "..id,"mcbt")					
+			else
+			-- throwing zverushku from the group.
+				group[id]=nil
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------------
+-- UPDATE
+----------------------------------------------------------------------------------------------------
+
+function mob_home:update(delta)
+	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
+		return
+	end
+end
+
+function mob_home:deactivate()
+	remove_from_home(self.st.home,self.object)
+	self.object:remove_home()
+end
+
+----------------------------------------------------------------------------------------------------
+-- ADD_TO_BINDER
+----------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	--printf("DEBUG: add_to_binder: npc:name()='%s', scheme='%s', section='%s'", npc:name(), scheme, section)
+
+	local new_action = mob_home(npc, storage)
+
+	-- Register all the actions, in which the method must be called reset_scheme settings change the scheme:
+	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+end
+
+----------------------------------------------------------------------------------------------------
+-- SET_SCHEME
+----------------------------------------------------------------------------------------------------
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local storage				= xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+
+	storage.logic				= xr_logic.cfg_get_switch_conditions(ini, section, npc)
+	
+	storage.home				= utils.cfg_get_string(ini, section, "path_home",			npc, true, gulag_name)
+	storage.home_min_radius		= utils.cfg_get_number(ini, section, "home_min_radius",		npc, false) --, 20)
+	storage.home_max_radius		= utils.cfg_get_number(ini, section, "home_max_radius",		npc, false) --, 40)
+	
+	storage.aggressive			= ini:line_exist( section, "aggressive_home")
+end
+

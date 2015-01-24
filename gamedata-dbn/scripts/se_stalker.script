@@ -1,0 +1,288 @@
+--TB3D 1.0.9.9.5.0 replaced debug flags, added my_ver, switch online, companion
+function my_ver() return "1.0.9.9.5.0" end
+--[[
+Changes script_version:
+  3 - conservation field job_online
+  5 - conservation field was_in_smart_terrain
+  6 - conservation field death_droped
+]]
+
+class "se_stalker"  (cse_alife_human_stalker)
+--------------------
+function se_stalker:__init (section) super (section)
+	self.ini = nil
+	self.ini_initialized = false
+	self.spawner_present = false
+	self.smart_terrain_conditions = nil
+	self.smart_terrain_conditions_initialized = false
+	-- This flag is taken from the work of Smart
+	-- true     = always online
+	-- false    = always online!
+	-- condlist = condition that is true or false otpredelyaet
+	-- nil      = smart anyway
+	self.job_online          = nil
+	self.job_online_condlist = nil
+	-- attended a stalker at least one smart_terrain
+	self.was_in_smart_terrain = false
+	self.death_droped = false --'Generates a character drop items or not.
+	self.dont_spawn_online = false  --TB3D_Modders.test_without_npc or false
+end
+--------------------
+function se_stalker:get_ini()
+  if not self.ini_initialized then
+    self.ini             = self:spawn_ini ()
+    self.ini_initialized = true
+    if self.ini:section_exist("spawner") then
+      self.spawner = xr_logic.parse_condlist(db.actor, "spawner", "cond", self.ini:r_string("spawner", "cond"))
+    end
+  end
+end
+--------------------
+function se_stalker:get_job_online(parent)
+	--if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:  get job online") end
+  if self.job_online_condlist == nil then
+	local state = self.job_online
+    return state
+  else
+	local sect = xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.job_online)
+	return sect ~= nil
+  end
+end
+--------------------
+function se_stalker:can_switch_offline()
+	--if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:  can switch offine") end
+	if amk.convert_npc[self.id]==true then 
+		return true 
+	--dc-- elseif amk.convert_npc[self.id]==false then
+		--  return false
+	end	--dc--
+	if self.job_online_condlist ~= nil then
+		return not (xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.job_online) ~= nil)
+	elseif self.job_online ~= nil then
+		return not self.job_online
+	end
+    return cse_alife_human_stalker.can_switch_offline(self)
+end
+
+--------------------
+function se_stalker:can_switch_online()
+	local result = false								--assume no
+		if TB3D_Modders.test_without_npc and not self.dont_spawn_online then
+			TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] blocked!!!!")
+			self.dont_spawn_online = true
+		end
+		if not self.dont_spawn_online and TB3D_Population_Control.can_go_online(self) then
+			--TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online")
+			-- local ecolog=string.find(self:name(),"bar_ecolog")
+			-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
+			-- if ecolog then amk.dump_table(self.spawner) end
+			if amk.convert_npc[self.id]==true then
+				result = false
+			--dc-- elseif amk.convert_npc[self.id]==false then
+				-- result = true
+			elseif self.job_online_condlist ~= nil then
+				result = xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.job_online) ~= nil
+			elseif self.job_online ~= nil then
+				result = self.job_online
+			elseif self.ini == nil or self.spawner == nil then
+				result = cse_alife_human_stalker.can_switch_online(self)
+			elseif db.actor and db.actor:alive() == false then
+				result = self.online
+			elseif self.online == false then
+				result = (xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
+			elseif xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil then 
+				result = true
+			end  
+			if TB3D_Modders.use_smh3_message == true then
+				if result == true then TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online[true]") end
+			end
+		end
+	return result
+end
+
+--------------------
+function se_stalker:STATE_Write(packet)
+  cse_alife_human_stalker.STATE_Write (self, packet)
+  if self.job_online == true then										--bits 1 & 2, upper bits will be used in future
+    packet:w_u8(0)
+  elseif self.job_online == false then
+    packet:w_u8(1)
+  elseif self.job_online == nil then
+    packet:w_u8(2)
+  else																	-- normal condition
+    packet:w_u8(3)
+    packet:w_stringZ(self.job_online_condlist)
+  end
+  packet:w_bool(self.was_in_smart_terrain)
+  local ddw=0  															-- We write the condition of the wounded.
+  if self.death_droped then ddw = ddw + 1 end							-- upper bits are free
+  if self.wounded then ddw = ddw + 2 end
+  packet:w_u8(ddw)
+end
+--------------------
+function se_stalker:STATE_Read(packet, size)
+	cse_alife_human_stalker.STATE_Read (self, packet, size)
+	if self.script_version >= 3 then
+		local t = packet:r_u8()
+		t=bit_and(t,3) 													-- Reserve upper bits for future use
+		if t == 0 then
+		  self.job_online = true
+		elseif t == 1 then
+		  self.job_online = false
+		elseif t == 2 then
+		  self.job_online = nil
+		else															-- normal condition
+		  self.job_online_condlist = packet:r_stringZ()
+		  self.job_online = xr_logic.parse_condlist(nil, "se_stalker:STATE_Read", "job_online", self.job_online_condlist)
+		end
+		if self.script_version >= 5 then
+			self.was_in_smart_terrain = packet:r_bool()
+			if self.script_version >= 6 then  							-- Read the condition of the wounded.
+				local ddw = packet:r_u8()
+				self.death_droped = bit_and(ddw,1) == 1					-- upper bits are free
+				self.wounded = bit_and(ddw,2) == 2
+			end
+		end
+	end
+end
+--------------------
+function se_stalker:on_before_register()
+  self:fill_exclusives()
+end
+--------------------
+function se_stalker:on_register()
+	if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker on register["..utils.to_str(self:name()).."]") end
+	-- We clean the restrictor
+	local tbl=amk.read_stalker_params(self)
+	tbl.crvu32u16u2={}
+	amk.write_stalker_params(tbl,self)
+  cse_alife_human_stalker.on_register( self )
+	if TB3D_Services.is_collector() then xr_companion.is_companion_se(self)	end		--109950
+  if(actor_stats.add_to_ranking~=nil)then
+    local community = self:community()
+    if not(community == "zombied" or
+       community == "monolith" or
+       community == "arena_enemy")
+    then
+      actor_stats.add_to_ranking(self.id)
+    end
+  end
+  --' Registration in task manager
+  task_manager.get_random_task():register_target(self)
+--[[													--OGSE 109950   use?
+	local smart_terrain_id = 65535
+	local result, smt_id = pcall(smart_terrain.prot_smt_td,self)
+	if result then
+		smart_terrain_id = smt_id
+	end	
+]]--
+  if self:alive() and self:smart_terrain_id() == expendable_object then
+    self:brain():update()
+  end
+end
+--------------------
+function se_stalker:on_unregister()
+	if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker: on unregister["..utils.to_str(self:name()).."]") end
+	cse_alife_human_stalker.on_unregister(self)									--unregister in task manager
+	--if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:  on unregister 2") end
+	--smart_terrain.unregister_npc(self)			--109950 OGSE use?
+	task_manager.get_random_task():unregister_target(self)
+	--if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:  on unregister 3") end
+	if actor_stats.remove_from_ranking ~= nil then
+		local community = self:community()
+		if community ~= "zombied"
+			and community ~= "monolith"
+			and community ~= "arena_enemy" then
+			return
+		else
+			actor_stats.remove_from_ranking(self.id)
+		end
+	end
+	local object_id = smart_terrain.get_strn(self.id)								--returns the obj or nil
+	if object_id then
+		if object_id.gulag then														--if smt and gulag then clear dead
+			if TB3D_Modders.use_smh3_message == true then
+				TB3D_Services.packet_alert("se stalker: on_unregister["..utils.to_str(self:name()).."] clear dead!!!!!!!!")
+			end
+			object_id.gulag:clear_dead(obj_id)
+		end
+	elseif self.alive and self:alive() == false then
+		TB3D_Services.packet_alert("se stalker: on_unregister["..utils.to_str(self:name()).."] relaese object!!!!!!!!")
+		alife():release(obj)
+	end
+	if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:  on unregister["..utils.to_str(self:name()).."] done") end
+end
+--------------------
+function se_stalker:on_spawn()
+  cse_alife_human_stalker.on_spawn(self)
+end
+--------------------
+function se_stalker:on_death(killer)
+  cse_alife_human_stalker.on_death(self, killer)
+end
+--------------------
+function se_stalker:fill_exclusives()
+  self:get_ini()
+  self.smart_terrain_conditions = smart_terrain.read_smart_terrain_conditions( self )
+  if self.smart_terrain_conditions then
+    for name, condlist in pairs(self.smart_terrain_conditions) do
+      smart_terrain.exclusives[name] = (smart_terrain.exclusives[name] or 0) + 1
+    end
+  end
+end
+
+class "se_trader" (cse_alife_trader)
+function se_trader:__init (section) super (section)
+end
+function se_trader:keep_saved_data_anyway()
+  return true
+end
+
+function se_stalker:get_job_online_old()
+	if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:  get job online old") end
+  if self.job_online_condlist == nil then
+    return self.job_online
+  else
+    return xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.job_online) ~= nil
+  end
+end
+--------------------
+function se_stalker:can_switch_offline_old()
+	if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:	can switch offline old") end
+  if amk.convert_npc[self.id]==true then 
+    return true 
+  --elseif amk.convert_npc[self.id]==false then
+  --  return false
+  end
+  if self:get_job_online_old() ~= nil then
+    return not self:get_job_online_old()
+  else
+    return cse_alife_human_stalker.can_switch_offline(self)
+  end
+end
+--------------------
+function se_stalker:can_switch_online_old()
+	if TB3D_Modders.use_smh3_message == true then TB3D_Services.packet_alert("se stalker:  can switch online old") end
+	-- local ecolog=string.find(self:name(),"bar_ecolog")
+	-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
+	-- if ecolog then amk.dump_table(self.spawner) end
+	if TB3D_Population_Control.can_go_online(self) then --:name()) then
+		if amk.convert_npc[self.id]==true then 
+			return false
+		--elseif amk.convert_npc[self.id]==false then 
+			-- return true
+		elseif self:get_job_online_old() ~= nil then
+			return self:get_job_online_old()
+		elseif self.ini == nil or self.spawner == nil then
+			return cse_alife_human_stalker.can_switch_online(self)
+		elseif db.actor and db.actor:alive() == false then
+			return self.online
+		elseif self.online == false then
+			return (xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
+		elseif xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil then 
+			return true
+		end  
+	end
+	return false
+end
+--------------------

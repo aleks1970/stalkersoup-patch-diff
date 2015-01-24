@@ -1,0 +1,317 @@
+--TB3D 1.0.9.9.5.0  removed call to smart terrain unregister(npc), chg min_distance, spots
+function my_ver() return "1.0.9.9.5.0" end
+--[[
+Changes script_version:
+	4 - conservation field job_online
+	5 - conservation field was_in_smart_terrain
+	
+	modyfied by xStream
+]]
+
+need_be_online={}
+
+class "se_monster" (cse_alife_monster_base)
+--------------------
+function se_monster:__init (section) super (section)
+	self.ini = nil
+	self.ini_initialized = false
+	self.spawner_present = false
+	self.smart_terrain_conditions = nil
+	self.smart_terrain_conditions_initialized = false
+	self.check_distance = 	nil
+	self.min_distance = 	nil
+	self.day_night_switch = nil
+	-- This flag is taken from the work of Smart
+	-- true     = always online
+	-- false    = always online!
+	-- condlist = condition that returns true or false
+	-- nil      = smart anyway
+	self.job_online          = nil
+	self.job_online_condlist = nil
+	-- attended a stalker at least one smart_terrain
+	self.was_in_smart_terrain = false
+	self.day_begin=-1		-- -1 = 24hrs a day
+	self.day_end=-1
+	self.state = nil
+	self.dont_spawn_online = false --TB3D_Modders.test_without_creatures or false
+end
+--------------------
+function se_monster:get_ini()
+	if not self.ini_initialized then
+		--TB3D_Services.packet_alert("se monster: get ini - for["..utils.to_str(self:section_name()).."]")
+		self.ini = self:spawn_ini()
+		if self.ini then
+			--TB3D_Services.packet_alert("se monster: initialized")
+			self.ini_initialized = true
+			self.spawner_present = self.ini:section_exist("spawner")		--all.spawn [spawner] sections
+			if self.spawner_present == true then
+				--TB3D_Services.packet_alert("se monster: spawner init["..utils.to_str(self:section_name()).."]")
+				if self.ini:line_exist ("spawner", "check_distance") == true then
+					self.check_distance = utils.cfg_get_bool(self.ini, "spawner", "check_distance",	self, false, false)
+					--TB3D_Services.packet_alert("se monster: check distance["..utils.to_str(self.check_distance).."]")
+				else
+					self.check_distance = false
+				end
+				if self.ini:line_exist ("spawner", "min_distance") == true then
+					self.min_distance = utils.cfg_get_number(self.ini, "spawner", "min_distance", self, false, TB3D_Modders.to_actor)
+					--TB3D_Services.packet_alert("se monster: min distance["..utils.to_str(self.min_distance).."]")
+				else
+					self.min_distance = TB3D_Modders.to_actor
+				end
+				if self.ini:line_exist ("spawner", "day_night_switch") == true then
+					self.day_night_switch = utils.cfg_get_bool(self.ini, "spawner", "day_night_switch", self, false, false)
+					--TB3D_Services.packet_alert("se monster: day night switch["..utils.to_str(self.day_night_switch).."]")
+				else
+					self.day_night_switch = false
+				end
+			else
+				self.check_distance = false
+				self.min_distance = TB3D_Modders.to_actor
+				self.day_night_switch = false
+			end
+		end
+		self.day_begin = utils.cfg_get_number(system_ini(), self:section_name(), "DayTime_Begin", self, false, -1)
+		self.day_end = utils.cfg_get_number(system_ini(), self:section_name(), "DayTime_End", self, false, -1)
+		if self.day_begin ~= -1 and self.day_end ~= -1 then self.day_night_switch = true end
+		--TB3D_Services.packet_alert("se monster: day begin["..utils.to_str(self.day_begin).."] end["..utils.to_str(self.day_end).."]")
+	end
+end
+--------------------
+function se_monster:get_job_online()
+	if self.job_online_condlist == nil then
+		return self.job_online
+	else
+		return xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.job_online) ~= nil
+	end
+end
+--------------------
+function se_monster:can_switch_offline()
+	if self and self.name then
+		local jbo = (self.get_job_online and self:get_job_online())
+		if jbo ~= nil then
+			--TB3D_Services.packet_alert("SE MONSTER: csoff["..self:name().."] jbo["..utils.to_str(jbo).."]")
+			return not jbo
+		else
+			--TB3D_Services.packet_alert("SE MONSTER: csoff["..self:name().."] jbo["..utils.to_str(jbo).."]")
+			return (cse_alife_monster_base.can_switch_offline and cse_alife_monster_base.can_switch_offline(self))
+		end
+	end
+	TB3D_Services.abort_alert("SE MONSTER: csoff [no self or self.name] !!!!")
+	return true
+end
+--------------------
+function se_monster:can_switch_online()
+	if self and self.name then
+		if TB3D_Modders.test_without_creatures and not self.dont_spawn_online then
+			TB3D_Services.packet_alert("SE MONSTER: cson["..self:name().."] blocked!!!!")
+			self.dont_spawn_online = true
+		end
+		if not self.dont_spawn_online and TB3D_Population_Control.can_go_online(self) == true then
+			if need_be_online[self.id]~=nil then
+				local r=need_be_online[self.id]
+				need_be_online[self.id]=nil
+				if TB3D_Modders.use_respawn_message == true then
+					TB3D_Services.packet_alert("SE MONSTER: cson["..self:name().."] need_be_online ["..tostring(r).."]")
+				end
+				return save_state(self, r)
+			end
+			local r=(self.get_job_online and self:get_job_online())
+			if r ~= nil then
+				if TB3D_Modders.use_respawn_message == true then
+					TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] get_job_online ["..tostring(r).."]")
+				end
+				return save_state(self, r)
+			end
+			local day_night_switch,check_distance = select_logic(self)
+			if self.online == false then	-- If the player is not, in the offline
+				if db.actor == nil or db.actor:alive() == false then
+					if TB3D_Modders.use_respawn_message == true then
+						TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] actor alive[false] offline")
+					end
+					return save_state(self, false) 
+				end
+				local chk_spawner=xr_spawner.check_spawn(self)	--returns nil if not custom and true/false otherwise
+				if chk_spawner~=nil then	-- If the little animals have custom_data cond section [spawner]
+					if TB3D_Modders.use_respawn_message == true then
+						TB3D_Services.info_alert("SE MONSTER: cso["..self:name().."] check spawn online["..tostring(chk_spawner).."]")
+					end
+					return save_state(self, chk_spawner)
+				end
+				if not is_creature_day(self, day_night_switch) then						--if the "night" - remain in the off
+					if TB3D_Modders.use_respawn_message == true then
+						TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] creature's time of day[false] offline")
+					end
+					return save_state(self, false)
+				end
+				--if given a distance check, then check.
+				if check_distance == true then
+					-- check the distance to the player. if less than required, then off
+					if not amk_offline_alife.sobj_is_far(self, self.min_distance) then
+						if TB3D_Modders.use_respawn_message == true then
+							TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] distance[false] offline ")
+						end
+						return save_state(self, false)
+					end
+				end
+				if TB3D_Modders.use_respawn_message == true then
+					TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] offline normal")
+				end
+				return save_state(self, cse_alife_monster_base.can_switch_online(self))
+			else
+				if db.actor == nil or db.actor:alive() == false then
+					if TB3D_Modders.use_respawn_message == true then
+						TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] actor dead[true] online")
+					end
+					return save_state(self, true)
+				end
+				local chk_spawner=xr_spawner.check_spawn(self)								--returns nil if not custom and true/false otherwise
+				if chk_spawner~=nil then	-- If the little animals have custom_data cond section [spawner]
+					if TB3D_Modders.use_respawn_message == true then
+						TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] check spawn online["..tostring(chk_spawner).."]")
+					end
+					return save_state(self, chk_spawner)
+				end
+				if check_distance == true then
+					if not amk_offline_alife.sobj_is_far(self, self.min_distance) then		-- check the distance to the player.
+						local obj = level.object_by_id(self.id)								--if the "night" and HS does not see - go offline
+						local r=is_creature_day(self, day_night_switch) or (obj~=nil and db.actor:see(obj))
+						if TB3D_Modders.use_respawn_message == true then
+							TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] day see online["..tostring(r).."]")
+						end
+						return save_state(self, r)
+					end
+				end
+				if TB3D_Modders.use_respawn_message == true then
+					TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] online normal")
+				end
+				return save_state(self, cse_alife_monster_base.can_switch_online(self))
+			end
+		end
+		if TB3D_Modders.use_respawn_message == true then
+			TB3D_Services.info_alert("SE MONSTER: cson["..self:name().."] pop control or dont_spawn_online [offline]")
+		end
+		return save_state(self, false)
+	else
+		TB3D_Services.packet_alert("se monster: can sw on line[no self or self.name]")
+	end
+	--return false
+	return 0	--default to state 0 to prevent ctd
+end
+--------------------
+
+function se_monster:STATE_Write(packet)
+	cse_alife_monster_base.STATE_Write (self, packet)
+	local st = 0
+	if self.state == true then
+		st=4
+	end
+	if self.job_online == true then
+		packet:w_u8(0+st)
+	elseif self.job_online == false then
+		packet:w_u8(1+st)
+	elseif self.job_online == nil then
+		packet:w_u8(2+st)
+	else
+		packet:w_u8(3+st)
+		packet:w_stringZ(self.job_online_condlist)
+	end
+	--TB3D_Services.info_alert("writen "..self.id.." state "..st)
+	packet:w_bool(self.was_in_smart_terrain)
+end
+--------------------
+function se_monster:STATE_Read(packet, size)
+	cse_alife_monster_base.STATE_Read (self, packet, size)
+	if self.script_version >= 4 then
+		local t = packet:r_u8()
+		local st = math.floor(t/4)*4
+		t=t-st
+		if st==4 then need_be_online[self.id]=true end
+		if t == 0 then
+			self.job_online = true
+		elseif t == 1 then
+			self.job_online = false
+		elseif t == 2 then
+			self.job_online = nil
+		else
+			self.job_online_condlist = packet:r_stringZ()
+			self.job_online = xr_logic.parse_condlist(nil, "se_monster:STATE_Read", "job_online", self.job_online_condlist)
+		end
+		--TB3D_Services.info_alert("read["..self.id.."] state["..st.."]")
+	end
+	if self.script_version >= 5 then
+		self.was_in_smart_terrain = packet:r_bool()
+	end
+end
+--------------------
+function se_monster:on_before_register()
+	self:fill_exclusives()
+end
+--------------------
+function se_monster:on_register()
+	-- We clean the restrictor
+	local tbl=amk.read_monster_params(self)
+	tbl.crvu32u16u2={}
+	amk.write_monster_params(tbl,self)
+	cse_alife_monster_base.on_register( self )
+	--' Draw mapspot with an icon							--TB3D109934 moved to bind_monster
+end
+--------------------
+function se_monster:on_unregister()
+	--TB3D_Services.packet_alert("SE_monster: on unregister id["..utils.to_str(self:name()).."] unregistered")
+	cse_alife_monster_base.on_unregister( self )
+end
+--------------------
+function se_monster:on_death(killer)
+	cse_alife_monster_base.on_death(self, killer)
+end
+--------------------
+function se_monster:fill_exclusives()
+	self:get_ini()
+	self.smart_terrain_conditions = smart_terrain.read_smart_terrain_conditions( self )
+	if self.smart_terrain_conditions then
+		for name, condlist in pairs(self.smart_terrain_conditions) do
+			smart_terrain.exclusives[name] = (smart_terrain.exclusives[name] or 0) + 1
+		end
+	end
+end
+
+--------------------
+function is_creature_day(obj, day_night_switch)
+	--checking for Day / Night
+	local is_ok_online = true											--assume is ok to go online
+	if day_night_switch == true then
+		if obj.day_begin ~= -1 and obj.day_end ~= -1 then
+			local hrs = level.get_time_hours()
+			local d_start = obj.day_begin
+			local d_end = obj.day_end
+			if d_start >= d_end then									--night creature, crosses midnite		
+				if hrs > d_end and hrs < d_start then is_ok_online = false end
+			else														--normal day creature
+				if hrs < d_start or hrs > d_end then is_ok_online = false end
+			end
+		end
+	end
+	return is_ok_online
+end
+--------------------109943 always spawn underground
+function select_logic(obj)
+	local day_night_switch = false		--default spawn anytime
+	local check_distance = true			--default check for distance to player
+	local slevel = TB3D_Services.get_obj_level(obj)
+	if slevel ~= "" then
+		if level_weathers.is_indoor(slevel) == true then
+			check_distance = false		--change default to false
+		else
+			if obj.day_night_switch ~= nil then day_night_switch = obj.day_night_switch end			--above ground so obey flag
+		end
+		if obj.check_distance ~= nil then check_distance = obj.check_distance end					--always obey if set
+	end
+	return day_night_switch,check_distance
+end
+
+function save_state(obj, state)
+	if state~=obj.state then
+		obj.state = state
+	end
+	return state
+end

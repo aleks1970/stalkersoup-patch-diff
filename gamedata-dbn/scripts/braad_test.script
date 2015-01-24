@@ -1,0 +1,2275 @@
+--TB3D 1.0.9.9.4.4 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
+-- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
+-- changed lehavre to take money instead, dc/atp level chgr infos
+function my_ver() return "1.0.9.9.4.4" end
+
+local string_find = string.find
+local math_random = math.random
+
+function actor_update()
+	amk.oau_watchdog=669										-----------------669
+	check_info()
+	amk.oau_watchdog=668										-----------------667
+	new_info()
+	amk.oau_watchdog=667										-----------------667
+	kot_info()
+	amk.oau_watchdog=666										-----------------666
+	forest_info()
+	--amk.oau_watchdog=665										-----------------665
+	--grib_respawn()
+	amk.oau_watchdog=664										-----------------664
+	forest_update()  
+	amk.oau_watchdog=663										-----------------663
+	kot_update()
+	amk.oau_watchdog=662										-----------------662
+end
+
+function false_info()			--bstalk: net spawn
+	local ln = level.name()
+	if ln=="l03u_agr_underground" then
+		if has_alife_info("yakut_false_start")
+		and not has_alife_info("yakut_false_have") then
+ 			TB3D_Services.give_info("yakut_false_have")
+		end
+	elseif ln=="l03_agroprom" then
+		if has_alife_info("yakut_false_have")
+		and not has_alife_info("yakut_false_done") then
+			TB3D_Services.give_info("yakut_false_done")
+		end
+	elseif ln=="l06_rostok" then
+		if has_alife_info("zahar_naemnik_start")
+		and not has_alife_info("zahar_naemnik_begin") then
+			TB3D_Services.give_info("zahar_naemnik_begin")
+		end
+	elseif ln=="l10u_bunker" then
+		if has_alife_info("ucen_talk_need")
+		and not has_alife_info("ucen_talk_spawn") then
+			TB3D_Services.give_info("ucen_talk_spawn")
+		end
+	elseif ln=="l01_escape" then
+		if has_alife_info("prizrak_finalzver_start")
+		and not has_alife_info("info_spawn_zver") then
+			TB3D_Services.give_info("info_spawn_zver")
+		end
+	end
+end
+
+function check_dead()
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking dead") end
+	if not has_alife_info("dyak_help_done")
+		and (has_alife_info("esc_saha_dead")
+		or has_alife_info("dyak_dead")) then
+			TB3D_Services.give_info("dyak_help_fail")
+	end
+	if not has_alife_info("add_church_ban_signal")
+		and (has_alife_info("add_church_ban1_dead")
+		or has_alife_info("add_church_ban2_dead")
+		or has_alife_info("add_church_ban3_dead")) then
+			TB3D_Services.give_info("add_church_ban_signal") 
+	end
+	--if level.name()=="marsh" and has_alife_info("kalmyak_vstreca_start")
+		--and not has_alife_info("kalmyak_vstreca_sms") then
+			--amk.start_timer("kalmyak_vstreca",math_random(10,20))
+			--TB3D_Services.give_info("kalmyak_vstreca_sms")	
+	--end
+    if has_alife_info("marsh_dan_umer") then
+		if not has_alife_info("marsh_dan_umer_newsinfo1")
+			and has_alife_info("informator_pda_start")
+			and	not	has_alife_info("informator_pda_have")
+			and not	has_alife_info("informator_pda_done") then
+				amk.start_timer("sms_new",math_random(30,60))
+				TB3D_Services.give_info("marsh_dan_umer_newsinfo1")  
+		end
+		if not has_alife_info("marsh_dan_umer_newsinfo2")
+			and has_alife_info("dan_grab_start")
+			and	has_alife_info("dan_grab_have")
+			and not	has_alife_info("dan_grab_done") then
+				amk.start_timer("sms_new",math_random(40,70))
+				TB3D_Services.give_info("marsh_dan_umer_newsinfo2")
+		end
+		if not has_alife_info("marsh_dan_umer_newsinfo3")
+			and has_alife_info("marsh_dan_umer")
+			and	has_alife_info("dan_flash_start")
+			and	has_alife_info("dan_flash_have")
+			and not	has_alife_info("dan_flash_done") then
+				amk.start_timer("sms_new",math_random(40,70))
+				TB3D_Services.give_info("marsh_dan_umer_newsinfo3")
+		end
+	end
+	if not has_alife_info("marsh_dan_umer_newsinfo4")
+		and has_alife_info("ucen_talk_est") then
+			amk.start_timer("sms_new1",math_random(140,170))
+			TB3D_Services.give_info("marsh_dan_umer_newsinfo4")
+	end		
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking dead done") end
+end
+
+-- local nepis={9613,9622}
+-- local nepis_id={9850,9851}
+
+function spawn_marsh_band()
+	local v = vector()
+	alife():create("agr_bandit_respawn_1",v:set(299.289,0.59365,-122.695),331636,3531)
+	TB3D_Triggers.spawn_alife("agr_bandit_respawn_2", 299.289,0.59365,-122.695, 331636, 3531, 2)
+	alife():create("ds_bandit_respawn_2",v:set(299.289,0.59365,-122.695),331636,3531)
+	alife():create("ds_bandit_respawn_3",v:set(252.754,0.3090138,-145.589),296792,3510)
+	TB3D_Triggers.spawn_alife("val_bandit_respawn_4", 252.754,0.3090138,-145.589, 296792, 3510, 3)
+	alife():create("marsh_nebo_ambush1",v:set(37.800182342,1.1534446,-201.8684),158865,3442)
+	alife():create("marsh_nebo_ambush2",v:set(37.800182342,1.1534446,-201.8684),158865,3442)
+	alife():create("marsh_nebo_ambush3",v:set(37.800182342,1.1534446,-201.8684),158865,3442)
+	alife():create("marsh_nebo_ambush4",v:set(37.800182342,1.1534446,-201.8684),158865,3442)
+	alife():create("prov_ruk",v:set(-3.481797,3.3647267818451,12.3242),137219,3418)
+end
+
+function check_info()
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking info") end
+	local ln = level.name()
+	--but as to whether these are mutually exclusive Vezha ??
+    --[[if (has_alife_info("ferma_band1_see") or
+		has_alife_info("ferma_band2_see") or 
+		has_alife_info("ferma_band3_see") or 
+		has_alife_info("ferma_band4_see") or 
+		has_alife_info("ferma_band5_see") or 
+		has_alife_info("ferma_band6_see") or 
+		has_alife_info("ferma_band7_see"))
+		and not has_alife_info("sveeblov_ferma_have") then
+		TB3D_Services.give_info("sveeblov_ferma_fail")
+    else]]--
+	if ln == "marsh" then
+		if has_alife_info("brat_luis_start") and not has_alife_info("brat_luis_dead") then
+			if has_alife_info("brat_luis_have") then
+				if TB3D_Services.give_info("brat_luis_killself") == true then amk.start_timer("luis_killself",math_random(10,15)) end
+			elseif has_alife_info("brat_luis_start") then
+				TB3D_Services.give_info("brat_luis_spawn")
+			end
+		end
+    elseif ln == "l07_military" then
+		if has_alife_info("francuz_start") then	TB3D_Services.give_info("francuz_spawn") end	
+	end
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking info done") end
+end
+
+function new_info()
+	local ln = level.name()
+--[[    if (has_alife_info("xalyava_naem1_see") or
+		has_alife_info("xalyava_naem2_see") or
+		has_alife_info("xalyava_naem3_see") or
+		has_alife_info("xalyava_naem4_see") or
+		has_alife_info("xalyava_naem5_see") or
+		has_alife_info("xalyava_naem6_see") or
+		has_alife_info("xalyava_naem7_see") or
+		has_alife_info("xalyava_naem8_see"))
+		and not has_alife_info("xalyava_nebo_next") then
+		TB3D_Services.give_info("xalyava_naemnik_see")
+    else]]--
+	if (has_alife_info("xalyava_naemnik_see")
+	or has_alife_info("xalyava_dead"))
+	and not has_alife_info("xalyava_nebo_have") then
+		TB3D_Services.give_info("xalyava_nebo_fail")
+	end
+	if ln == "l03_agroprom" then
+		if has_alife_info("kot_agro_mono_start") then
+			TB3D_Services.give_info("kot_agro_mono_spawn")
+		end
+	end
+    if (has_alife_info("chuk_dead")
+	or has_alife_info("gek_dead"))
+	and not has_alife_info("kot_agro_mono_have") then
+		TB3D_Services.give_info("kot_agro_mono_fail")
+    end
+end
+
+function main_braad(npc)
+	TB3D_Services.set_community(npc, "ecolog", 0, 0)
+	--npc:set_character_community("ecolog", 0, 0)
+	npc:set_relation(game_object.friend, db.actor)
+	TB3D_Services.give_info( "freeman_braad_one" )
+end
+
+function setGulagEnemy()
+	local npc,obj
+	local sim = alife()
+	for i=first_object,last_object do 
+        npc = level.object_by_id(i)
+        if npc and npc:name() == "rostok_stalker" then 
+            obj = sim:object(npc:id()) 
+			break
+        end
+    end
+	sim:create("wpn_mp5",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id)
+	sim:create("wpn_val",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id)
+	sim:create_ammo("ammo_5.56x45_ss190",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id,10)	--30 is too many SIDs
+end
+
+function bloodsucker()	--freeman			TB3D 109932 get rid of bloodsucker just causes caos
+	--if TB3D_Services.is_collector() == true then
+		TB3D_Triggers.bloodsucker()
+	--else
+		--TB3D_Triggers.spawn_alife_rand("bloodsucker_strong",147.087142945,-0.00357154117,59.948166,39508,1228,4)
+	--end
+end
+
+function main_friend(npc)
+	npc:set_relation(game_object.friend, db.actor)
+end
+
+function zombie_blow()
+	local v = vector()
+	TB3D_Triggers.spawn_item_rand("burer_strong",-108.363,21.564,-35.483,312,1529,4)
+	alife():create("bloodsucker_effector",v:set(-146.986,-19.088,-72.524),1082,1457)
+	TB3D_Triggers.spawn_item_rand("cat_strong",-85.379,-19.090,-49.233,9988,1495,8)
+	TB3D_Triggers.spawn_item_rand("cat_strong",-86.602,-19.090,-171.465,9340,1455,4)
+end
+
+function zasada_for()
+	local v = vector()
+	TB3D_Triggers.spawn_item_rand("electro_chimera",12.886095046997,-16.55083847,175.3548889,320050,1697,4)
+	alife():create("chimera_x_ray",v:set(12.886095046997,-16.55083847,175.3548889),320050,1697)
+end
+
+function radar_man()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local v = vector()
+		sim:create("m_controller_old",v:set(-61.979244232178,-21.8962020874,35.8896102905),195,2727)
+		sim:create("m_controller_old",v:set(0.86928582191467,-23.69577599,1.777916193),6155,2703)
+		sim:create("zombie_babka_normal",v:set(0.86928582191467,-23.69577599,1.777916193),6155,2703)
+		sim:create("zombie_babka_strong",v:set(0.86928582191467,-23.69577599,1.777916193),6155,2703)
+		TB3D_Triggers.spawn_item_rand("zombie_normal",0.86928582191467,-23.69577599,1.777916193,6155,2703,6)
+		sim:create("zombie_blow",v:set(0.86928582191467,-23.69577599,1.777916193),6155,2703)
+		sim:create("zombie_normal",v:set(0.86928582191467,-23.69577599,1.777916193),6155,2703)
+	end
+end
+
+function killactor()
+	--TB3D_Services.packet_alert("braad test: killactor start")
+	local npc = level_object_by_sid(9623)
+    if npc and npc:alive() then
+		npc:set_relation(game_object.enemy, db.actor)
+	end
+	npc = level_object_by_sid(9624)
+    if npc and npc:alive() then
+		npc:set_relation(game_object.enemy, db.actor)
+    end    
+	npc = level_object_by_sid(9625)
+    if npc and npc:alive() then
+		npc:set_relation(game_object.enemy, db.actor)
+    end    
+	npc = level_object_by_sid(9905)
+    if npc and npc:alive() then
+		npc:set_relation(game_object.enemy, db.actor)	
+    end    
+	--TB3D_Services.packet_alert("braad test: killactor done")
+end
+
+function killactor_spawn()
+	local sim = alife()
+	local v = vector()
+	sim:create("killer_boevik2",v:set(43.09783554,-8.13079166,14.410468),345215,1582)
+	sim:create("killer_boevik1",v:set(59.50757599,-8.5839643,9.3478708),358211,1570)
+	sim:create("killer_boevik3",v:set(59.52076721,-8.7670116,22.850177765),358227,1559)
+	sim:create("killer_boevik4",v:set(40.780555725,-8.319325447,19.2897949),343015,1582)
+	sim:create("killer_boevik5",v:set(46.9849434,-8.1420059,20.492004),348191,1582)
+	sim:create("killer_boevik6",v:set(51.40478897,-8.08700466,13.5054283),351374,1582)
+	killactor()
+	TB3D_Services.give_info("arhara_shahter_zemly")
+end
+
+function sorok_pda()
+	return new_dialog.item_much("device_pda_npc",40) ~= false
+end
+   
+function sorok_pda_sdal(first_speaker, second_speaker)
+	new_dialog.out_item_much("device_pda_npc",40) 
+end
+
+function chern_dogs()
+	local v = vector()
+	TB3D_Triggers.spawn_item_rand("psy_dog_radar",338.74279785,-46.47824478,-163.8179168,86443,2086,4)
+	TB3D_Triggers.spawn_item_rand("psy_dog_radar",354.486083984,-45.66619491577,-213.2041015625,95066,1872,4)
+	alife():create("psy_dog_radar",v:set(354.486083984,-45.66619491577,-213.2041015625),95066,1872)
+end
+
+function create_monstr()
+	local sim = alife()
+	local position = db.actor:position()
+	position.x = position.x + 13
+	sim:create("burer_strong",	position, db.actor:level_vertex_id(), db.actor:game_vertex_id())
+	sim:create("burer_strong",	position, db.actor:level_vertex_id(), db.actor:game_vertex_id())
+end			
+			
+function kill_npc(sid)
+	local npc = level_object_by_sid(9630)
+    if npc and npc:alive() then
+		npc:kill(npc)
+    end    
+end
+
+function take_yakut_agro2_spot()
+	if TB3D_Services.is_collector() == false then
+		sak.add_spot_of_docent(9650)
+	end
+end
+
+function new_comp()
+	if TB3D_Services.is_collector() == false then
+		alife():create("computer_new",vector():set(27.945556640625,-6.619695186615,-14.894629478455),6746,1140)
+	end
+end
+
+-- sorting things Inventory
+-- unify the procedure. Exceptions items_protected - in the script protected_items.script.
+-- Section name of an object determines there already. Name of the table - the second parameter.
+function release_actor_items()
+	--TB3D_Services.packet_alert("braad test: release_actor_items")
+	db.actor:give_money(-db.actor:money())			--take money instead of items
+--[[    local obj
+    local sim = alife()
+    local cnt = db.actor:object_count()
+    for i=0, cnt-1 do    										-- removal of things
+        obj = db.actor:object(i)
+		if obj then
+			if protected_items.obj_is_protected(obj,"items_protected","exactly") == false then
+				if string_find(obj:name(), "teleport")
+				  or string_find(obj:name(), "torch")
+				  or string_find(obj:name(), "fake_")
+				  or string_find(obj:name(), "binoc")
+				  or string_find(obj:name(), "matras")
+				  or string_find(obj:name(), "val_zapis")
+				  or string_find(obj:name(), "harmonica")
+				  or string_find(obj:name(), "mechta")
+				  or string_find(obj:name(), "cigara")
+				  or string_find(obj:name(), "sigaret")
+				  or (string_find(obj:name(), "device_pda") and not string_find(obj:name(), "device_pda_npc"))
+				  or string_find(obj:name(), "bolt") then
+					--skip
+				else
+					TB3D_Services.packet_alert("braad test: release_actor_items["..utils.to_str(obj:name()).."]")
+					sim:release(sim:object(obj:id()), true)
+				end
+			end
+		else
+			break
+		end
+	end]]--
+	if amk.load_variable("option_autosave",1)~=0 then
+		news_manager.save_collector("LeHavre drug taken")
+	end
+ 	--TB3D_Services.packet_alert("braad test: release_actor_items done")
+end	
+
+function drug_sleep()
+	--TB3D_Services.packet_alert("braad test: drug sleep["..utils.to_str(amk.load_variable("gg_need_sleep_nrg",0)).."]")
+	sleep_manager.main(5+amk.load_variable("gg_need_sleep_nrg",0))
+end
+
+function release_actor_money()
+  local num = db.actor:money() 
+  db.actor:give_money(-num)
+  if TB3D_Modders.log_game_stats == true then game_stats.money_quest_update(-num) end
+end
+
+function friendactor(community1, community2)
+	relation_registry.set_community_goodwill("stalker", "actor", 2000)
+end
+
+function atak_larger_have(task, info)
+  if has_alife_info("snip_esc1_dead") and
+	has_alife_info("snip_esc2_dead") and
+	has_alife_info("snip_esc3_dead") and
+	has_alife_info("snip_esc4_dead") and
+	has_alife_info("snip_esc5_dead") and
+	has_alife_info("snip_esc6_dead") and
+	has_alife_info("snip_esc7_dead") and
+	has_alife_info("snip_esc8_dead") and
+	has_alife_info("snip_esc9_dead") and
+	has_alife_info("snip_esc10_dead") and
+	has_alife_info("snip_esc11_dead") and
+	has_alife_info("snip_esc12_dead") then
+		return TB3D_Services.give_info("atak_larger_have")  --clears infos
+  end
+return false
+end
+
+function zahar_naemnik_have(task, info)
+	if has_alife_info("naem_zahar1_dead") and
+	  has_alife_info("naem_zahar2_dead") and
+	  has_alife_info("naem_zahar3_dead") and
+	  has_alife_info("naem_zahar4_dead") and
+	  has_alife_info("naem_zahar5_dead") and
+	  has_alife_info("naem_zahar6_dead") then
+		return TB3D_Services.give_info("zahar_naemnik_have")     --clears infos
+	end
+	return false
+end
+
+function sms_new()
+	if TB3D_Services.is_collector() == false then
+		if TB3D_Services.give_info("sms_new_dan1") then
+			news_manager.amk_send_tip(game.translate_string("sms_new_dan1_text"),nil,nil,30)
+		end
+	end
+end
+
+function sms_new1()
+	if TB3D_Services.is_collector() == false then
+		if TB3D_Services.give_info("sms_new_dan2") then
+			news_manager.amk_send_tip(game.translate_string("sms_new_dan2_text"),nil,nil,30)
+		end
+	end
+end
+
+function actor_has_money_30000()
+  return db.actor:money()>=30000
+end
+
+function give_money_30000(t1,t2)
+  local npc=t1
+  if npc:id()==db.actor:id() then
+    npc=t2
+  end
+  dialogs.relocate_money(npc,30000,"out")
+end
+
+function delete_smart()
+	local se_obj = alife():object("esc2_bloodsucker1")
+	if se_obj then
+		alife():release(se_obj, true)
+	end
+	local se_obj = alife():object("ros_smart_stalker1")
+	if se_obj then
+		alife():release(se_obj, true)
+	end
+end
+
+function spawn_church_band()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local v = vector()
+		sim:create("add_church_ban1",v:set(294.5813,7.1353683,-153.27551),327543,3531)
+		sim:create("add_church_ban2",v:set(294.5813,7.1353683,-153.27551),327543,3531)
+		sim:create("add_church_ban3",v:set(294.5813,7.1353683,-153.27551),327543,3531)
+	end
+end
+
+function sed_village()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a) 
+			if obj then
+				if obj and obj:name() == "marsh_small_nebo" then 
+					amk.add_spot_on_map(obj.id,"blue_location","Post Clear Sky") 
+					remove_dyak()
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_village()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "marsh_small_nebo" then 
+				level.map_remove_object_spot(obj.id,"blue_location")
+				break
+			end
+		end
+	end
+end
+
+function sed_dyak()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj  = alife():object(a) 
+			if obj then
+				if obj and obj:name() == "dyak" then 
+					amk.add_spot_on_map(obj.id,"blue_location","Clerk") --"Lector") --!!!!TB3D
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_dyak()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "dyak" then 
+				level.map_remove_object_spot(obj.id,"blue_location")
+				break
+			end
+		end
+	end
+end
+
+function mina_band(obj)
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = level.object_by_id(a)
+			if obj and obj:section()=="prov_ruk" then
+				--TB3D_Services.packet_alert("braad test: mina band[prov_ruk]")
+				amk_particle.amk_particle({
+					particle="explosions\\explosion_fuelcan",
+					pos=obj:position(),
+					sound=[[weapons\t_rgd5_explosion]] })
+				TB3D_hit_styles.explode(db.actor, db.actor, 0.8, 500, vector_rotate_y(obj:position(),45))
+				level.add_pp_effector("amk_shoot.ppe", 2011, false)
+				TB3D_Services.check_box_closed()
+				alife():release(alife():object(obj:id()))
+				break
+			end
+		end
+	end
+end
+
+----------
+-- Read the form of no-package
+----------
+function r_shape(packet)
+	local s
+	local st = {}
+	st.count = packet:r_u8()
+	st.shapes = {}
+	for i=1, st.count do
+		s = {}
+		s.type = packet:r_u8()
+		if s.type == 0 then
+			s.center = packet:r_vec3()
+			s.radius = packet:r_float()
+		else
+			s.axis_x = packet:r_vec3()
+			s.axis_y = packet:r_vec3()
+			s.axis_z = packet:r_vec3()
+			s.offset = packet:r_vec3()
+		end
+		st.shapes[i] = s
+	end
+	return st
+end
+
+----------
+-- entry forms in no-pack
+----------
+function w_shape(packet, st)
+	local s
+	packet:w_u8(st.count)
+	for i=1, st.count do
+		s = st.shapes[i]
+		packet:w_u8(s.type)
+		if s.type == 0 then
+			packet:w_vec3(s.center)
+			packet:w_float(s.radius)
+		else
+			packet:w_vec3(s.axis_x)
+			packet:w_vec3(s.axis_y)
+			packet:w_vec3(s.axis_z)
+			packet:w_vec3(s.offset)
+		end
+	end
+end
+
+----------
+-- repacking no packet generated script restriction fragment
+----------
+function rewrite_restrictor(se_obj, custom, radius)
+	local packet = net_packet()
+	se_obj:STATE_Write(packet)
+	local game_vertex_id	= packet:r_u16()
+	local distance		= packet:r_float()
+	local direct_control	= packet:r_s32()
+	local level_vertex_id	= packet:r_s32()
+	local object_flags		= packet:r_s32()
+	local custom_data		= packet:r_stringZ()
+	local story_id		= packet:r_s32()
+	local spawn_story_id	= packet:r_s32()
+	local shape		= r_shape(packet)
+	local restrictor_type	= packet:r_u8()
+	custom_data = custom
+	shape = {}
+	shape.count = 1
+	shape.shapes = {}
+	shape.shapes[1] = {}
+	shape.shapes[1].type = 0
+	shape.shapes[1].center = vector():set(0,0,0)
+	shape.shapes[1].radius = radius
+	packet:w_u16(game_vertex_id)
+	packet:w_float(distance)
+	packet:w_s32(direct_control)
+	packet:w_s32(level_vertex_id)
+	packet:w_s32(object_flags)
+	packet:w_stringZ(custom_data)
+	packet:w_s32(story_id)
+	packet:w_s32(spawn_story_id)
+	w_shape(packet, shape)
+	packet:w_u8(restrictor_type)
+	se_obj:STATE_Read(packet, packet:w_tell() - packet:r_tell())
+end
+
+function kalmyak_tele( actor, npc)
+	if TB3D_Services.is_collector() == false then
+	--TB3D_Services.packet_alert("braad test: kalmyak_tele")
+	   level.add_pp_effector ("blink.ppe", 234, false)       
+	   level.add_pp_effector("teleport.ppe", 2006, false) 
+	   db.actor:set_actor_position(patrol("kalmyak_tele_walk"):point(0))
+	   local dir = patrol("kalmyak_tele_look"):point(0):sub(patrol("kalmyak_tele_look"):point(0))
+	   db.actor:set_actor_direction(-dir:getH())
+	   TB3D_Services.give_info("kalmyak_vstreca_start")
+	--TB3D_Services.packet_alert("braad test: kalmyak_tele done")
+	end
+end
+------------------------------ NOT USED!!!!!!!!!!
+function delete_obj_restrictor()
+  local se_obj = alife():object("marsh_havan_restr")
+  if se_obj then
+    alife():release(se_obj, true)
+  end
+end
+
+function spawn_havan_restr2()
+	if TB3D_Services.is_collector() == false then
+	TB3D_Services.packet_alert("braad test: spawn_havan_restr2")
+		local se_obj = alife():create("space_restrictor",vector():set(-4.2143630981445,3.3634412288666,12.2967),136894,3418)
+		local custom = "[logic]\ncfg = scripts\\new\\nebo\\marsh_havan_restr2.ltx"
+		rewrite_restrictor(se_obj, custom, 3.0)
+	TB3D_Services.packet_alert("braad test: spawn_havan_restr2 done")
+	end
+end
+
+local out_object
+local in_object
+
+function ograblen_kalm(actor,npc)
+	local inv_box_1 = level_object_by_sid(14003)
+	out_object = db.actor
+	in_object = inv_box_1
+	db.actor:inventory_for_each(transfer_object_item)
+end
+
+function vozvrat_kalm(actor,npc)
+	local inv_box_1 = level_object_by_sid(14003)
+	in_object = db.actor
+	out_object = inv_box_1
+	out_object:inventory_for_each(transfer_object_item)
+end
+
+function transfer_object_item(item)
+	out_object:transfer_item(item, in_object)
+	--dbg.log("transfer item=%s from %s to %s", item:name(), out_object:name(), in_object:name())
+end 
+------------------------------ NOT USED!!!!!!!!!!
+function kalmyak_vrag(actor, npc)
+    xr_gulag.setGulagEnemy ("kalmyak_marsh", db.actor)
+end
+
+function kalmyak_spawn()
+	if TB3D_Services.is_collector() == false then
+		--TB3D_Services.packet_alert("braad test: kalmyak_spawn")
+		alife():create("kalmyak_ruk",vector():set(-199.24903869629,0.60609865188599,130.58129),38203,3383)
+	   create_kalmyak_restr()
+	   set_kalmyak_ruk()
+   end
+end
+
+function create_kalmyak_restr()
+	if TB3D_Services.is_collector() == false then
+		--TB3D_Services.packet_alert("braad test: create_kalmyak_restr")
+		local sim = alife()
+		local v = vector()
+		local se_obj = sim:create("space_restrictor",v:set(-194.6745300293,0.58615601062775,133.2268),38203,3383)
+		local custom = "[logic]\ncfg = scripts\\new\\nebo\\kalmyak_restr1.ltx"
+		rewrite_restrictor(se_obj, custom, 3.0)
+		se_obj = sim:create("space_restrictor",v:set(-190.16891479492,-0.44136956334114,125.738),38203,3383)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kalmyak_restr2.ltx"
+		rewrite_restrictor(se_obj, custom, 3.0)
+		se_obj = sim:create("space_restrictor",v:set(-192.65054321289,-0.32059952616692,119.033),38203,3383)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kalmyak_restr3.ltx"
+		rewrite_restrictor(se_obj, custom, 3.0)
+		se_obj = sim:create("space_restrictor",v:set(-201.21597290039,0.26242354512215,116.694),38203,3383)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kalmyak_restr4.ltx"
+		rewrite_restrictor(se_obj, custom, 3.0)
+		se_obj = sim:create("space_restrictor",v:set(-206.72094726563,-0.32424575090408,123.919),37907,3383)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kalmyak_restr5.ltx"
+		rewrite_restrictor(se_obj, custom, 3.0)
+		se_obj = sim:create("space_restrictor",v:set(-203.21374511719,-0.32538011670113,137.027),37907,3383)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kalmyak_restr6.ltx"
+		rewrite_restrictor(se_obj, custom, 3.0)
+		--TB3D_Services.packet_alert("braad test: create_kalmyak_restr done")
+	end
+end
+
+function set_kalmyak_ruk()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj = sim:object(a) 
+		   if obj then
+			  if obj:section_name() == "box_kalmyak" then 
+				amk.add_spot_on_map(obj.id,"crlc_big","Kalmyak's backpack") 
+				break
+			  end
+		   end
+	   end
+   end
+end
+
+function remove_kalmyak_ruk()
+	local sim = alife()
+	local obj
+	for a=first_object,last_object do
+		obj = sim:object(a)
+		if obj then
+			--TB3D_Services.packet_alert("braad test: remove_kalmyak_ruk")
+			if obj:section_name() == "box_kalmyak" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+function set_kalmyak()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj  = sim:object(a) 
+			if obj then
+				if obj and obj:name() == "kalmyak_marsh" then 
+					amk.add_spot_on_map(obj.id,"crlc_big","Kalmyak's last known position") 
+					break
+				end
+			end
+		end
+	end
+end
+
+function remove_kalmyak()
+	local sim = alife()
+	local obj
+	for a=first_object,last_object do
+		obj = sim:object(a) 
+		if obj then
+			if obj and obj:name() == "kalmyak_marsh" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+------DO NOT SIGN UP !!!!!!!!!!!!!! Add file LOGIC
+function kontr_marsh_restr()
+	if TB3D_Services.is_collector() == false then
+		TB3D_Services.packet_alert("braad test: kontr_marsh_restr")
+		local sim = alife()
+		local v = vector()
+		local se_obj = sim:create("space_restrictor",v:set(-171.56242370605,0.78741002082825,391.19),56846,3371)
+		local custom = "[logic]\ncfg = scripts\\new\\nebo\\kontr_marsh_restr1.ltx"
+		rewrite_restrictor(se_obj, custom, 53.0)
+		se_obj = sim:create("space_restrictor",v:set(-170.94248962402,1.1991214752197,404.29232),57320,3361)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kontr_marsh_restr2.ltx"
+		rewrite_restrictor(se_obj, custom, 53.0)
+		se_obj = sim:create("space_restrictor",v:set(-192.83070373535,1.0270764827728,396.1445),45298,3361)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kontr_marsh_restr3.ltx"
+		rewrite_restrictor(se_obj, custom, 53.0)
+		se_obj = sim:create("space_restrictor",v:set(-204.17848205566,0.53202784061432,404.1797),39196,3361)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kontr_marsh_restr4.ltx"
+		rewrite_restrictor(se_obj, custom, 53.0)
+		se_obj = sim:create("space_restrictor",v:set(-189.07986450195,1.2418839931488,418.6262),46761,3361)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kontr_marsh_restr5.ltx"
+		rewrite_restrictor(se_obj, custom, 53.0)
+		se_obj = sim:create("space_restrictor",v:set(-175.13674926758,1.3927493095398,423.0242),54657,3361)
+		custom = "[logic]\ncfg = scripts\\new\\nebo\\kontr_marsh_restr6.ltx"
+		rewrite_restrictor(se_obj, custom, 53.0)
+		TB3D_Services.packet_alert("braad test: kontr_marsh_restr done")
+	end
+end
+------DO NOT SIGN UP !!!!!!!!!!!!!! Add file LOGIC
+
+function spawn_red_mozg()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj = sim:object(a) 
+			if obj and obj:name() == "marsh_controller" then  
+			   alife():create("red_mozg",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+			   break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function set_red_contr()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj  = sim:object(a) 
+			if obj then
+				if obj and obj:name() == "marsh_controller" then 
+					amk.add_spot_on_map(obj.id,"crlc_big","Controller's last known location") 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_red_contr()
+	local sim = alife()
+	local obj
+	for a=first_object,last_object do
+		obj  = sim:object(a) 
+		if obj then
+			if obj and obj:name() == "marsh_controller" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+-----------------------UNIQUE beast-----------------------------------------------------------
+function spawn_rad_red_burer1()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj  = sim:object(a) 
+			if obj then
+				if obj and obj:name() == "rad_red_burer1" then  
+					alife():create("mutant_burer_red_hand",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function spawn_rad_red_krovosos1()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a)
+			if obj then
+				if obj and obj:name() == "rad_red_krovosos1" then  
+					alife():create("mutant_krovosos_red_jaw",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function spawn_mil_red_burer1()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj  = sim:object(a) 
+			if obj then
+				if obj and obj:name() == "mil_red_burer1" then  
+					alife():create("mutant_burer_red_hand",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function spawn_mil_red_krovosos1()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj = sim:object(a) 
+			if obj then
+				if obj and obj:name() == "mil_red_krovosos1" then  
+					alife():create("mutant_krovosos_red_jaw",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function spawn_agr_red_burer1()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a)
+			if obj then
+				if obj and obj:name() == "agr_red_burer1" then  
+					alife():create("mutant_burer_red_hand",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function spawn_agr_red_krovosos1()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a)
+			if obj then
+				if obj and obj:name() == "agr_red_krovosos1" then  
+					alife():create("mutant_krovosos_red_jaw",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function spawn_val_red_burer1()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a)
+			if obj then
+				if obj and obj:name() == "val_red_burer1" then  
+					alife():create("mutant_burer_red_hand",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function spawn_val_red_krovosos1()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a)
+			if obj then
+				if obj and obj:name() == "val_red_krovosos1" then  
+					alife():create("mutant_krovosos_red_jaw",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+-----------------------end UNIQUE beast-----------------------------------------------------------
+
+function kashei_spawn()
+	if TB3D_Services.is_collector() == false then
+		alife():create("sveeblov_ruk",vector():set(406.22711181641,3.4233021736145,236.834),407402,3546)
+	end
+end
+
+function set_kashei()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a) 
+			if obj then
+				if obj and obj:name() == "kashei" then 
+					amk.add_spot_on_map(obj.id,"blue_location","Kashchei") 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_kashei()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "kashei" then 
+				level.map_remove_object_spot(obj.id,"blue_location")
+				break
+			end
+		end
+	end
+end
+
+function reregistr_kashei()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+		obj = alife():object(a) 
+		   if obj then
+				if obj and obj:name() == "kashei" then
+				  local params=amk.read_stalker_params(obj)
+				  params.custom="[logic]\ncfg = scripts\\new\\nebo\\kashei_new.ltx"
+				  params.sid=14100
+				  amk.write_stalker_params(params,obj)  
+				  break	--!!!!TB3D
+				end
+			end
+		end	 
+	end
+end
+
+function friendactornebo(community1, community2)
+	relation_registry.set_community_goodwill ("nebo", "actor", 400)
+end
+
+function kot_krovosos()
+	if TB3D_Services.is_collector() == false then
+		local position = db.actor:position()
+		position.x = position.x + 25
+		alife():create("bloodsucker_strong",position, db.actor:level_vertex_id(), db.actor:game_vertex_id())
+		alife():create("burer_strong",position, db.actor:level_vertex_id(), db.actor:game_vertex_id())
+	end
+end
+
+function spawn_blizn_krug1()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a)
+			if obj then
+				if obj:name() == "blizn_krug1" then  
+					alife():create("mono_note",obj.position,obj.m_level_vertex_id,obj.m_game_vertex_id,obj.id) 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+------------------------------------------------------looking for hang tags Monolith------------------------------
+function set_televizor()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a) 
+			if obj then
+				if obj and obj:name() == "marsh_pust_restr" then 
+					amk.add_spot_on_map(obj.id,"crlc_big","Monolithians location no.1")
+					set_televizor2()
+					set_televizor3()
+					set_televizor4()
+					set_televizor5()	
+					break		--!!!!TB3D		
+				end
+			end
+		end
+	end
+end
+
+function set_televizor2()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a) 
+		if obj then
+			if obj and obj:name() == "dog_marsh" then 
+				amk.add_spot_on_map(obj.id,"crlc_big","Monolithians location no.2") 
+				break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function set_televizor3()
+	local obj
+	for a=first_object,last_object do
+		obj  = alife():object(a) 
+		if obj then
+			if obj and obj:name() == "bloodsuker_mar2" then 
+				amk.add_spot_on_map(obj.id,"crlc_big","Monolithians location no.3") 
+				break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function set_televizor4()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a) 
+		if obj then
+			if obj and obj:name() == "bloodsuker_mar3" then 
+				amk.add_spot_on_map(obj.id,"crlc_big","Monolithians location no.4") 
+				break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function set_televizor5()
+	local obj
+	for a=first_object,last_object do
+		obj  = alife():object(a) 
+		if obj then
+			if obj and obj:name() == "marsh_zombi_hutor" then 
+				amk.add_spot_on_map(obj.id,"crlc_big","Monolithians location no.5") 
+				break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function remove_televizor()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "marsh_pust_restr" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				remove_televizor2()
+				remove_televizor3()
+				remove_televizor4()
+				remove_televizor5()
+				break
+			end
+		end
+	end
+end
+
+function remove_televizor2()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "dog_marsh" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+function remove_televizor3()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "bloodsuker_mar2" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+function remove_televizor4()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "bloodsuker_mar3" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+function remove_televizor5()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "marsh_zombi_hutor" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+------------------------------------------------------looking for hang tags Monolith------------------------------
+function set_kot()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj = sim:object(a) 
+			if obj then
+				if obj and obj:name() == "kot" then 
+					amk.add_spot_on_map(obj.id,"crlc_big","Cat") 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_kot()
+	local sim = alife()
+	local obj
+	for a=first_object,last_object do
+		obj = sim:object(a)
+		if obj and obj:name() == "kot" then 
+			level.map_remove_object_spot(obj.id,"crlc_big")
+			break
+		end
+	end
+end
+
+
+function set_giant()
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local obj
+		for a=first_object,last_object do
+			obj  = sim:object(a) 
+			if obj then
+				if obj and obj:name() == "gigant_red_strong1" then 
+					amk.add_spot_on_map(obj.id,"crlc_big","UNIQUE PSEUDOGIANT") 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_giant()
+	local sim = alife()
+	local obj
+	for a=first_object,last_object do
+		obj  = sim:object(a)
+		if obj then
+			if obj and obj:name() == "gigant_red_strong1" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+
+function luis_killself()
+	if TB3D_Services.is_collector() == false then
+		local npc,obj
+		for a=first_object,last_object do 
+			npc = level.object_by_id(a)
+			if npc and npc:name() == "brat_luis" then 
+				obj = alife():object(npc:id())
+				npc:kill(npc)
+				local snd_obj = xr_sound.get_safe_sound_object([[weapons\colt\colt1911_shoot]])
+				snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)   
+				break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function francuz_killself()
+	if TB3D_Services.is_collector() == false then
+		local npc,obj
+		for a=first_object,last_object do 
+			npc = level.object_by_id(a)
+			if npc and npc:name() == "francuz" then 
+				obj = alife():object(npc:id())
+				npc:kill(npc)
+				local snd_obj = xr_sound.get_safe_sound_object([[weapons\colt\colt1911_shoot]])
+				snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0) 
+				break	--!!!!TB3D			
+			end
+		end
+	end
+end
+
+function zahar_na_limansk()  -- creates a transition co Warehouse in Limansk
+	--if (not has_alife_info(	"level_newlimansk" )) then
+	local obj = alife():story_object(14101)
+	if not obj then
+		dmx_mod.create_level_changer(14101,
+		vector():set(-304.5852,2.48176,428.14794),
+		39639,1850,28633,3006,
+        vector():set(7.2927484512329,-0.0087288916110992,-381.14739990234),
+        vector():set(0.33175057172775,0,-0.94336712360382),
+		"limansk",0,0)
+        --TB3D_Services.give_info("level_newlimansk")
+	end
+end
+
+function spawn_zombi_restr1()
+	if TB3D_Services.is_collector() == false then
+		if level.name() == "limansk" then 
+			if TB3D_Services.give_info("lim_spawn_restr1") == true then
+				local sim = alife()
+				local v = vector()
+				sim:create("lim_sniper",v:set(36.775608062744,28.541257858276,197.56105041504),46539,3003)
+				sim:create("lim_sniper_ohr1",v:set(3.7273268699,13.70157623291,196.73896789551),26776,3010)
+				sim:create("lim_sniper_ohr2",v:set(15.121144294,13.698766708374,196.21144104004),34620,3010)
+				sim:create("lim_sniper_ohr3",v:set(4.3583545684,17.090801239014,198.5705871582),27241,3010)
+				sim:create("zombi_restr1",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr2",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr3",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr4",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr5",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+			end
+		end
+	end
+end
+
+function spawn_zombi_restr2()
+	if TB3D_Services.is_collector() == false then
+		if level.name() == "limansk" then
+			if TB3D_Services.give_info("lim_spawn_restr2") == true then
+				local sim = alife()
+				local v = vector()
+				sim:create("zombi_restr1",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr2",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr3",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr4",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr5",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+			end
+		end
+	end
+end
+
+function spawn_zombi_restr3()
+	if TB3D_Services.is_collector() == false then
+		if level.name()=="limansk" then 
+			if TB3D_Services.give_info("lim_spawn_restr3") == true then
+				local sim = alife()
+				local v = vector()
+				sim:create("zombi_restr1",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr2",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr3",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr4",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+				sim:create("zombi_restr5",v:set(5.4863138198853,10.999716758728,155.81025695801),28057,3010)
+			end
+		end
+	end
+end
+
+function spawn_glushitel()											--radio jammer
+	if TB3D_Services.is_collector() == false then
+		alife():create("glushitel",vector():set(-6.2885980606079,13.082293510437,195.33584594727),21733,3010)
+	end
+end
+
+
+function start(first_speaker, second_speaker)
+	local actor, trader
+	if db.actor and db.actor:id() == first_speaker:id() then
+		actor = first_speaker
+		trader = second_speaker
+	else
+		actor = second_speaker
+		trader = first_speaker
+	end
+	dialogs.relocate_item_section(trader, "glushitel", "out")	
+	local gtime = amk.game_minutes()
+	amk.save_variable("glushitel_reload", gtime + 300)
+	clear_glushitel(actor)
+end
+
+function is_reload_ready(first_speaker, second_speaker)
+	local gtime = amk.game_minutes()
+	local ftime = amk.load_variable("glushitel_reload", 0)
+	if gtime >= ftime then
+		return true
+	else
+		return false
+	end
+end
+
+function is_reload_not_ready(first_speaker, second_speaker)
+	local gtime = amk.game_minutes()
+	local ftime = amk.load_variable("glushitel_reload", 0)
+	if gtime <= ftime then
+		return true
+	else
+		return false
+	end
+end
+
+function clear_glushitel(person)
+	if person and person:object("glushitel") then
+		alife():release(alife():object(person:object("glushitel"):id()), true)
+	end
+end
+
+function clear_reload(first_speaker, second_speaker)
+	amk.del_variable("glushitel_reload")
+end
+
+function start_kalmyak(first_speaker, second_speaker)
+	if TB3D_Services.is_collector() == false then
+		local gtime = amk.game_minutes()
+		amk.save_variable("kalmyak_lekar", gtime + math_random(11, 12) * 60)
+	end
+end
+
+function is_lekar_ready(first_speaker, second_speaker)
+	local gtime = amk.game_minutes()
+	local ftime = amk.load_variable("kalmyak_lekar", 0)
+	if gtime >= ftime then
+		return true
+	else
+		return false
+	end
+end
+
+function is_lekar_not_ready(first_speaker, second_speaker)
+	local gtime = amk.game_minutes()
+	local ftime = amk.load_variable("kalmyak_lekar", 0)
+	if gtime <= ftime then
+		return true
+	else
+		return false
+	end
+end
+
+function clear_lekar(first_speaker, second_speaker)
+	amk.del_variable("kalmyak_lekar")
+end
+
+function set_xalyava()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a) 
+			if obj then
+				if obj and obj:name() == "esc_xalyava" then 
+					amk.add_spot_on_map(obj.id,"crlc_big","Place of transaction") 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_xalyava()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "esc_xalyava" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+function speech_xalyava()
+	if TB3D_Services.is_collector() == false then
+		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\prisoner_help_2]])
+		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]Brothers, it is a free-for-all... the Mercenaries have taken over the farm...",nil,nil,60000)    
+	end
+end
+-----------------------------turret---------------------------------------------------
+function test_turret()
+   if amk.load_variable("info_turret_escape_spawn",false) == false
+	  and (level.name() == "l01_escape") then
+		amk.save_variable("info_turret_escape_spawn", true)
+		TB3D_Services.info_alert("BRAAD TEST: test_turret = info_turret_escape_spawn")
+		turret_mgun.create_turret("turret_nato",level.name(), vector():set(-201.338,-20.307,-147.54),"bandit", "", 90,100)
+	end
+end
+
+function turret()
+	turret_mgun.create_turret("turret_army", "l01_escape", vector():set(-191.44,-18.49,-151.513),62977,46, "military", "esc_blokpost", 90, 90)
+end
+
+function alife_dir(section,position,levelvertex,gamevertex,direction)
+	if TB3D_Services.is_collector() == false then
+		local obj = alife():create(section,position,levelvertex,gamevertex)
+		--level.map_add_object_spot(obj.id, "TRENOGA", "")
+		amk.add_spot_on_map(obj.id,"crlc_big","TRENOGA")
+	end
+end
+
+function lim_turret()
+	if TB3D_Services.is_collector() == false then
+		if not db.actor:has_info("lim_spawn_lim_turret") then 
+			alife_dir("trenoga_lim1",vector():set(61.824359893799,14.957581520081,246.21290588379),58766,3021,
+			  vector():set(0.17578122019768,0,0.98442924022675))
+			TB3D_Services.give_info("lim_spawn_lim_turret")
+		end
+	end
+end
+
+-----------------------------turret---------------------------------------------------
+function kot_info() 
+	if TB3D_Services.is_collector() == false then
+		local ln = level.name()
+		if ln == "l11_pripyat" then
+			if not has_alife_info("kot_find_rabi_spawn_rabi")
+				and has_alife_info("kot_find_rabi_scromnyi") then
+					TB3D_Services.give_info("kot_find_rabi_spawn_rabi")
+			end
+		 elseif ln == "red_forest" then
+			if not has_alife_info("shadowman_all")
+				and (has_alife_info("shadowman_zver_have")
+				or has_alife_info("shadowman_zver_fail")) then
+					TB3D_Services.give_info("shadowman_all")
+			end
+		end
+		if not has_alife_info("kot_lekar_done")
+			and (has_alife_info("kot_kalmyak_lekar_done")
+			or has_alife_info("kot_holod_lekar_done")) then
+				TB3D_Services.give_info("kot_lekar_done")
+		end
+		if not has_alife_info("black_doctor_delete")
+			and has_alife_info("black_doctor_finish_dialog") then
+				amk.start_timer("delete_black_doctor",math_random(10,15))
+				TB3D_Services.give_info("black_doctor_delete")
+		end
+	end
+end
+
+function drink_vodka()
+	db.actor:eat(db.actor:object("vodka"))
+end
+
+function rereg_scromnyi() 
+	if TB3D_Services.is_collector() == false then
+		if TB3D_Services.give_info("scromnyi_rereg") == true then
+		   logig_scromnyi()
+		end
+	end
+end
+
+function logig_scromnyi()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		local params ={}
+		for a=first_object,last_object do
+		obj = alife():object(a) 
+		   if obj then
+			  if obj:name() == "scromnyi" then
+				  params=amk.read_stalker_params(obj)
+				  params.custom="[logic]\ncfg = scripts\\new\\nebo\\scromnyi_new.ltx"
+				  params.sid=14102
+				  amk.write_stalker_params(params,obj)  
+				  break	--!!!!TB3D
+			  end
+		  end
+		end	  
+	end
+end
+
+function rabi_mad()
+	if TB3D_Services.is_collector() == false then
+		local npc,obj
+		for a=first_object,last_object do 
+			npc = level.object_by_id(a)
+			if npc and npc:alive() and npc:name() == "rabi" then 
+				obj = alife():object(npc:id())
+				TB3D_Services.set_community(npc, "zombied", 0, 0)
+				--npc:set_character_community("zombied", 0, 0)  
+				break		--!!!!TB3D	
+			end
+		end
+	end
+end
+
+function del_lim()
+local se_obj
+--TB3D_Services.info_alert("braad test: delete limansk teleports")
+    if TB3D_Services.give_info("info_del_lim_teleport") == true then 
+		se_obj = TB3D_Triggers.look_for_object("lim_zone_teleport1")
+        if se_obj then
+			--TB3D_Services.packet_alert("braad test: nebo_clearing teleport1["..utils.to_str(se_obj.id).."]")
+			alife():release(se_obj, true)
+        end
+		se_obj = TB3D_Triggers.look_for_object("lim_zone_teleport2")
+        if se_obj then
+			--TB3D_Services.packet_alert("braad test: nebo_clearing teleport2["..utils.to_str(se_obj.id).."]")
+          alife():release(se_obj, true)
+        end	
+	end
+end 
+
+function speech_teleport()
+	if TB3D_Services.is_collector() == false then
+		TB3D_Services.info_alert("braad test: speech_teleport")
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]Sviblov, we have urgent business!!... I will wait for you...",nil,nil,60000)  
+		TB3D_Services.give_info("nebo_kurier_first")  
+	end
+end
+
+function kurier_dead()
+	if TB3D_Services.is_collector() == false then
+		local npc --,obj
+		for a=first_object,last_object do 
+			npc = level.object_by_id(a)
+			if npc and npc:name() == "nebo_kurier" then 
+				--obj = alife():object(npc:id())
+				npc:kill(npc)
+				break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function kurier_health(obj)
+	if TB3D_Services.is_collector() == false then
+	-- for a=first_object,last_object do
+	--   local obj = alife():object(a) 
+	--        if obj then 
+	--            if  string.find(obj:name(),"rabi_mono2") and obj.health and obj:health()>0.2 then
+	--		    if string.find(obj:section(), "zomb") and obj.health<0.2 then
+	--          if obj and obj:name() == "rabi_mono2" and obj.health>0.2 then
+	--            obj.health = 0.1
+	--			obj.health and obj:health()=0.2
+	--			obj:kill(obj)
+	--            end
+	--	    end	
+	--    end 
+		if db.actor and db.actor.health then
+			if db.actor.health < 1 then
+				db.actor.health = db.actor.health + 0.6
+			end
+		end  
+	end
+end 
+
+function actor_sleep_in_do()
+	sleep_manager.main(5+amk.load_variable("gg_need_sleep_nrg",0))
+end
+
+function eat_aptec()
+	db.actor:eat(db.actor:object("medkit_scientic"))
+end
+
+function eat_antirad()
+	db.actor:eat(db.actor:object("antirad"))
+end
+
+function doctor_dal()
+	new_dialog.create_items(db.actor,"medkit_scientic",1)
+	new_dialog.create_items(db.actor,"antirad",1)
+end
+
+
+--function black_doctor_init_dialod()
+   --local black_doctor = level_object_by_sid(14008)
+   --db.actor:run_talk_dialog(black_doctor)
+--end
+
+--function actor_sleep_black_doctor()
+--sleep_manager.main(5+amk.load_variable("gg_need_sleep_nrg",0))
+--bl_doc_tele( actor, npc)
+--end
+
+--function bl_doc_tele( actor, npc)
+   --level.add_pp_effector ("blink.ppe", 234, false)       
+   --level.add_pp_effector("teleport.ppe", 2006, false) 
+   --db.actor:set_actor_position(patrol("black_vozvrat_walk"):point(0))
+   --local dir = patrol("black_vozvrat_look"):point(0):sub(patrol("black_vozvrat_look"):point(0))
+   --db.actor:set_actor_direction(-dir:getH())
+   --xr_effects.enable_ui(db.actor, nil)
+--end
+
+function delete_black_doctor()
+  local se_obj = alife():object("black_doctor")
+  if se_obj then
+    alife():release(se_obj, true)
+  end
+end	
+
+function test_kolmogor()
+--local npc,obj
+--    for a=first_object,last_object do
+--       npc = level.object_by_id(a)
+--        if npc and npc:name() == "nebo_kurier" and npc.health >= 0,5 then
+--           npc.health = -0.5 --here at the NPC will be taken away 0.5 Health
+--        end
+--    end
+end 
+
+function spawn_shadowman()
+	if TB3D_Services.is_collector() == false then
+		alife():create("shadowman_ruk",vector():set(23.914667129517,3.9985284805298,26.488586425781),80890,3263)
+	end
+end
+
+function speech_shadowman()
+	if TB3D_Services.is_collector() == false then
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]Be on guard... as it can appear at any moment...",nil,nil,60000)  
+	end
+end
+
+function shadowman_red_spn1() 
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local v = vector()
+		if not has_alife_info("shadowman_red_spn1") then
+			sim:create("boar_normal_sh1",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh2",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh3",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh4",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh5",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("snork_normal_sh1",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh2",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh3",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh4",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh5",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			TB3D_Services.give_info("shadowman_red_spn1") 
+		end
+	end
+end
+
+function shadowman_red_spn2() 
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local v = vector()
+		if not has_alife_info("shadowman_red_spn2") then
+			sim:create("boar_normal_sh6",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh7",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh8",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh9",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh10",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("snork_normal_sh6",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh7",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh8",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh9",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh10",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			TB3D_Services.give_info("shadowman_red_spn2") 
+		end
+	end
+end
+
+function shadowman_red_spn3() 
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local v = vector()
+		if not has_alife_info("shadowman_red_spn3") then
+			sim:create("boar_normal_sh11",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh12",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh13",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh14",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("boar_normal_sh15",v:set(-9.1997413635254,0.043906480073929,-36.546310424805),60673,3290)
+			sim:create("snork_normal_sh11",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh12",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh13",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh14",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			sim:create("snork_normal_sh15",v:set(-22.176950454712,0.78433322906494,18.689910888672),49490,3263)
+			TB3D_Services.give_info("shadowman_red_spn3") 
+		end
+	end
+end
+
+function forest_info() 
+    if level.name()=="red_forest" and not has_alife_info("actor_in_forest")	then
+		TB3D_Services.give_info("actor_in_forest")
+    elseif has_alife_info("mitya_dead") and not has_alife_info("klyak_forest_doc_have") and not has_alife_info("mitya_dead_sms") then
+		amk.start_timer("mitya_sms",math_random(180,200))
+		TB3D_Services.give_info("mitya_dead_sms")
+    elseif level.name()=="marsh" and has_alife_info("grab_stal1_dead") and has_alife_info("grab_stal2_dead") and has_alife_info("grab_stal3_dead") and has_alife_info("grab_stal4_dead") and has_alife_info("grab_stal5_dead") then
+		TB3D_Services.give_info("grab_stal_deads")
+   end
+end
+--------------------------------------------------------FUNGI---------------------------------------------------------------
+local points={
+{position={x=-284.4497,y=-18.2044,z=193.8524},gv=1789,lv=56319}, ---Warehouses
+{position={x=-355.6864,y=-3.100588,z=151.18237},gv=1793,lv=4240},  ---Warehouses
+{position={x=-269.84619,y=-11.2427,z=-71.7646},gv=10,lv=3200},  -- cordon
+{position={x=-201.4213,y=-7.3733,z=-45.88},gv=68,lv=51172},  -- cordon
+{position={x=-174.16,y=-3.36,z=-13.652},gv=69,lv=76187},  -- cordon
+{position={x=-100.404,y=3.5878,z=77.947},gv=81,lv=160506},  -- cordon
+{position={x=-52.189,y=4.272,z=250.807},gv=173,lv=227393},  -- cordon
+{position={x=32.6452,y=1.899,z=383.063},gv=173,lv=227393},  -- cordon
+{position={x=465.1087,y=1.222,z=-178.309},gv=3554,lv=451363},  -- marsh
+{position={x=399.41339,y=0.3934,z=-169.761},gv=3547,lv=402755},  -- marsh
+{position={x=342.558,y=8.3023,z=-108.475},gv=3533,lv=357939},  -- marsh
+{position={x=272.111,y=0.548,z=-43.373},gv=3526,lv=310746},  -- marsh
+{position={x=291.1808,y=0.548,z=36.855},gv=3527,lv=325573},  -- marsh
+{position={x=367.14099,y=1.8678,z=161.486},gv=3539,lv=376678},  -- marsh
+{position={x=387.748,y=3.5888,z=287.368},gv=3540,lv=393779},  -- marsh
+{position={x=297.117,y=1.696,z=288.828},gv=3529,lv=329916},  -- marsh
+{position={x=205.688,y=0.727,z=285.857},gv=3499,lv=262506},  -- marsh
+{position={x=173.0422,y=1.435,z=355.277},gv=3491,lv=238394},  -- marsh
+{position={x=214.362,y=0.6504,z=412.3115},gv=3488,lv=268283},  -- marsh
+{position={x=217.9902,y=7.394,z=516.679},gv=3485,lv=270887},  -- marsh
+{position={x=142.997,y=0.535,z=-248.0656},gv=684,lv=374191},  -- agroprom
+{position={x=70.2182,y=-0.972,z=-234.066},gv=433,lv=305517},  -- agroprom
+{position={x=63.0578,y=-1.14418,z=-149.503},gv=641,lv=299132},  -- agroprom
+{position={x=-74.09,y=0.466,z=58.15},gv=528,lv=166791},  -- agroprom
+{position={x=-29.9080,y=2.2372,z=103.523},gv=588,lv=210656},  -- agroprom
+{position={x=12.6909,y=2.3448,z=92.3616},gv=476,lv=252867},  -- agroprom
+{position={x=81.1135,y=16.0997,z=132.682},gv=508,lv=316629},  -- agroprom
+{position={x=106.297,y=13.690,z=125.696},gv=508,lv=340894},  -- agroprom
+{position={x=123.6996,y=10.369,z=165.9576},gv=504,lv=357641},  -- agroprom
+{position={x=85.8348,y=10.5479,z=188.9713},gv=686,lv=321367},  -- agroprom
+{position={x=319.6008,y=-47.9699,z=-195.063},gv=2082,lv=76027},  -- radar
+{position={x=316.0666,y=-48.0291,z=-133.312},gv=2092,lv=74170},  -- radar
+{position={x=307.758,y=-50.2595,z=-245.0376},gv=2078,lv=69567},  -- radar
+{position={x=308.800,y=-49.135,z=-315.755},gv=2073,lv=69851},  -- radar
+{position={x=372.8744,y=-51.6907,z=-344.82},gv=2068,lv=105583},  -- radar
+{position={x=419.1445,y=-49.5586,z=-310.8674},gv=2066,lv=133749},  -- radar
+{position={x=352.3292,y=-47.796,z=-115.3638},gv=2093,lv=94080},  -- radar
+{position={x=395.896,y=-52.4274,z=-92.122},gv=2036,lv=122268},  -- radar
+{position={x=440.01821,y=-49.07274,z=-55.515},gv=2038,lv=143343},  -- radar
+{position={x=380.7494,y=-48.7936,z=-231.103},gv=2102,lv=111292},  -- radar
+{position={x=422.2033,y=-55.075,z=-259.047},gv=2106,lv=135222},  -- radar
+{position={x=466.6009,y=-48.3848,z=-219.513},gv=2059,lv=153140},  -- radar
+{position={x=487.1975,y=-49.9339,z=-185.659},gv=2056,lv=160751},  -- radar
+{position={x=109.0610,y=-0.6083,z=23.1811},gv=909,lv=305618},  -- darkvalley
+{position={x=161.0832,y=6.02887,z=-9.5908},gv=916,lv=361563},  -- darkvalley
+{position={x=177.67697,y=0.0723,z=-80.587},gv=919,lv=378637},  -- darkvalley
+{position={x=140.8797,y=0.14625,z=-210.068},gv=927,lv=338700},  -- darkvalley
+{position={x=174.1159,y=8.4689,z=-420.6929},gv=941,lv=374683},  -- darkvalley
+{position={x=156.46878,y=4.2590,z=-467.606},gv=941,lv=356378},  -- darkvalley
+{position={x=93.6686,y=1.662,z=-469.5579},gv=949,lv=288081},  -- darkvalley
+{position={x=18.3328,y=1.2652,z=-453.902},gv=952,lv=195541},  -- darkvalley
+{position={x=-76.9337,y=-0.73359,z=-395.521},gv=839,lv=83950},  -- darkvalley
+{position={x=-129.5605,y=0.86102,z=-344.974},gv=845,lv=28054},  -- darkvalley
+{position={x=-131.9178,y=-0.8644,z=-276.884},gv=848,lv=26173},  -- darkvalley
+{position={x=203.9575,y=4.3727,z=203.835},gv=2885,lv=351940},  -- puzir
+{position={x=182.1907,y=14.3156,z=168.909},gv=2885,lv=335133},  -- puzir
+{position={x=106.863,y=4.8457,z=141.5648},gv=2885,lv=274853},  -- puzir
+{position={x=60.0144,y=-0.001477,z=108.286},gv=2885,lv=238003},  -- puzir
+{position={x=46.0673,y=-0.0032,z=57.7905},gv=2885,lv=226374},  -- puzir
+{position={x=-9.9488,y=11.51488,z=-12.7767},gv=2882,lv=180062},  -- puzir
+{position={x=54.212,y=8.6488,z=-83.8907},gv=2884,lv=232601},  -- puzir
+{position={x=99.8832,y=0.12282,z=-94.3717},gv=2884,lv=269168},  -- puzir
+{position={x=102.5485,y=-0.00115,z=-136.3648},gv=2884,lv=270778},  -- puzir
+{position={x=-310.1566,y=-8.9571,z=30.3318},gv=2889,lv=338006},  -- aver
+{position={x=-249.7383,y=-27.5183,z=127.1921},gv=2893,lv=441876},  -- aver
+{position={x=-254.2902,y=11.043003,z=-3.8713},gv=2893,lv=434616},  -- aver
+{position={x=-165.4225,y=26.00623,z=6.20755},gv=2894,lv=585369},  -- aver
+{position={x=-94.820632,y=17.82067,z=39.2792},gv=2894,lv=708197},  -- aver
+{position={x=4.8559,y=-45.3861,z=111.9942},gv=2895,lv=873123},  -- aver
+{position={x=43.3978,y=-39.5448,z=166.2731},gv=2895,lv=943483},  -- aver
+{position={x=109.7717,y=-40.9248,z=260.0759},gv=2899,lv=1062136},  -- aver
+{position={x=217.1144,y=1.8175,z=186.544},gv=2901,lv=1250174},  -- aver
+{position={x=-27.02234,y=-0.8796,z=-294.626},gv=3274,lv=44437},  -- red_forest
+{position={x=17.7548,y=1.2997,z=-98.825},gv=3288,lv=77292},  -- red_forest
+{position={x=-4.83979,y=0.2346,z=-155.3056},gv=3282,lv=64796},  -- red_forest
+{position={x=7.52476,y=-2.52619,z=-265.6032},gv=3291,lv=71635},  -- red_forest
+{position={x=100.37268,y=-1.5567,z=-290.506},gv=3300,lv=101983},  -- red_forest
+{position={x=177.61671,y=-1.304368,z=-290.01339},gv=3314,lv=118739},  -- red_forest
+{position={x=179.43177,y=-1.16113,z=-46.8759},gv=3317,lv=119698},  -- red_forest
+{position={x=193.84136,y=-4.73345,z=10.9854},gv=3317,lv=126615},  -- red_forest
+{position={x=215.8037,y=1.2874,z=102.9057},gv=3319,lv=137614},  -- red_forest
+{position={x=194.8108,y=-1.7354,z=62.4528},gv=3318,lv=127327}  -- red_forest
+}
+
+function grib_respawn()
+	local timeh =level.get_time_hours()
+	--local times =level.get_time_minutes()
+	if has_alife_info("info_respawn_grib") then
+		if timeh ~= 22 then TB3D_Services.remove_info("info_respawn_grib") end
+	elseif timeh == 22 and not has_alife_info("info_respawn_grib") then
+		TB3D_Services.packet_alert("braad test: grib respawn")
+		del_mushroom()
+        spawn_grib()
+		TB3D_Services.give_info("info_respawn_grib")
+		TB3D_Services.packet_alert("braad test: grib respawn done")
+	end
+	
+--[[    if (timeh == 22 and times < 3)  then
+        if TB3D_Services.give_info("info_respawn_grib") == true then --not has_alife_info("info_respawn_grib") then
+		   del_mushroom()
+           spawn_grib()
+		end
+    elseif (timeh == 23 and times < 2) then
+        TB3D_Services.remove_info("info_respawn_grib")
+    end]]--
+end	
+
+function spawn_grib()
+	local sim = alife()
+	local a = {}
+	for i = 1,28,1 do
+	     a = points[math_random(#points)]
+		sim:create("mushroom", vector():set(a.position.x, a.position.y, a.position.z), a.lv, a.gv)
+	end
+end
+
+function del_mushroom()
+	local sim = alife()
+	local actorpos = db.actor:position()
+	local obj
+	for a=first_object,last_object do
+		obj=sim:object(a)
+		-- obj = level.object_by_id(a)
+	    if obj then
+	        if string.find(obj:section_name(),"mushroom") then
+			    if obj.position:distance_to(actorpos) > 30 then sim:release(obj,true) end	
+			end   
+	    end
+	end
+end
+--------------------------------------------------------MUSHROOMS---------------------------------------------------------------
+
+function set_green()
+	local obj
+	local sim = alife()
+	for a=first_object,last_object do
+		obj = sim:object(a) 
+		if obj then
+			if obj and obj:name() == "green_forest" then 
+				amk.add_spot_on_map(obj.id,"crlc_big","Hunters") 
+				break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function remove_green()
+	local sim = alife()
+	local obj
+	for a=first_object,last_object do
+		obj = sim:object(a)
+		if obj then
+			if obj and obj:name() == "green_forest" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+function grab_set1(actor, npc)
+    xr_gulag.setGulagEnemy ("grab_mitya_marsh", actor)
+end
+
+function grab_set11()
+	local npc,obj
+    for a=first_object,last_object do 
+		npc = level.object_by_id(a)
+		if npc and npc:alive() and npc:name() == "grab_stal1" then
+		    obj = alife():object(npc:id())
+			TB3D_Services.set_community(npc, "bandit", 0, 0)
+		    --npc:set_character_community("bandit", 0, 0)
+			break	--!!!!TB3D
+		end
+	end
+	grab_set2()
+	grab_set3()
+	grab_set4()
+	grab_set5()
+end
+
+function grab_set2()
+	local npc,obj
+    for a=first_object,last_object do 
+    npc = level.object_by_id(a)
+		if npc and npc:alive() and npc:name() == "grab_stal2" then
+		    obj = alife():object(npc:id())
+			TB3D_Services.set_community(npc, "bandit", 0, 0)
+		    --npc:set_character_community("bandit", 0, 0)
+        break	--!!!!TB3D
+		end   
+	end
+end
+
+function grab_set3()
+	local npc,obj
+    for a=first_object,last_object do 
+    npc = level.object_by_id(a)
+		if npc and npc:alive() and npc:name() == "grab_stal3" then
+		    obj = alife():object(npc:id())
+			TB3D_Services.set_community(npc, "bandit", 0, 0)
+		    --npc:set_character_community("bandit", 0, 0)
+        break	--!!!!TB3D
+		end   
+	end
+end
+
+function grab_set4()
+	local npc,obj
+    for a=first_object,last_object do 
+    npc = level.object_by_id(a)
+		if npc and npc:alive() and npc:name() == "grab_stal4" then
+		    obj = alife():object(npc:id())
+			TB3D_Services.set_community(npc, "bandit", 0, 0)
+		    --npc:set_character_community("bandit", 0, 0)
+        break	--!!!!TB3D
+		end   
+	end
+end
+
+function grab_set5()
+	local npc,obj
+    for a=first_object,last_object do 
+    npc = level.object_by_id(a)
+		if npc and npc:alive() and npc:name() == "grab_stal5" then
+		    obj = alife():object(npc:id())
+			TB3D_Services.set_community(npc, "bandit", 0, 0)
+		    --npc:set_character_community("bandit", 0, 0)
+			TB3D_Services.give_info("klyak_forest_doc_scene")
+        break	--!!!!TB3D
+		end   
+	end
+end
+
+function mitya_kill()
+	if TB3D_Services.is_collector() == false then
+		local npc,obj
+		for a=first_object,last_object do 
+			npc = level.object_by_id(a)
+			if npc and npc:alive() and npc:name() == "mitya" then 
+				obj = alife():object(npc:id())
+			npc:kill(npc)
+			local snd_obj = xr_sound.get_safe_sound_object([[weapons\colt\colt1911_shoot]])
+			snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+			break	--!!!!TB3D
+			end
+		end
+	end
+end
+
+function mitya_sms()
+	if TB3D_Services.is_collector() == false then
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("name").."SIDOROVICH:  %c[default]Say, Marked One, it is your old friend Sidorovich ... a strange package has arrived ...",nil,nil,60000)  
+		TB3D_Services.give_info("mitya_dead_sms_sidor")
+	end
+end
+
+function spawn_green()
+	if TB3D_Services.is_collector() == false then
+		alife():create("green_ruk",vector():set(228.335338,-7.298178,67.8218),143611,3319)
+	end
+end
+
+function clear_actor(npc)
+    local npc = db.actor
+    npc:iterate_inventory(__del_item, npc)
+	friendactorstalker(community1, community2)
+end
+
+function __del_item(npc, item)
+    local section = item:section()
+    if protected_items.obj_is_protected(item,"items_protected","exactly") == true then
+        return false
+    end
+--    npc:mark_item_dropped(item)
+    alife():release(alife():object(item:id()), true)
+end
+
+function friendactorstalker(community1, community2)
+	relation_registry.set_community_goodwill ("stalker", "actor", 400)
+	relation_registry.set_community_goodwill ("green", "actor", 100)
+end
+
+function actor_has_money_50000()
+  return db.actor:money()>=50000
+end
+
+function give_money_50000(t1,t2)
+  local npc=t1
+  if npc:id()==db.actor:id() then
+    npc=t2
+  end
+  dialogs.relocate_money(npc,50000,"out")
+end
+
+function actor_has_money_10000()
+  return db.actor:money()>=10000
+end
+
+function give_money_10000(t1,t2)
+  local npc=t1
+  if npc:id()==db.actor:id() then
+    npc=t2
+  end
+  dialogs.relocate_money(npc,10000,"out")
+end
+
+function speech_test()
+	if TB3D_Services.is_collector() == false then
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]AAAAHHHHGGGGHHHHHH!!!!!...",nil,nil,60000)  
+		TB3D_Services.give_info("mitya_dead_sms_sidor")
+	end
+end
+
+function kot_update()
+    if level.name()=="l05_bar" and has_alife_info("kot_need_next_done") and not has_alife_info("bkot_spawn") then
+		del_kot_marsh()
+    end	
+end
+
+function del_kot_marsh()
+	local se_obj = alife():object("kot")
+	if se_obj then
+		alife():release(se_obj, true)
+		TB3D_Services.give_info("bkot_spawn")
+	end
+end	
+
+function spawn_zombi_forest() 
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local v = vector()
+		if TB3D_Services.give_info("info_contr_spawn") then  
+			TB3D_Triggers.spawn_alife("zombie_beee", -139.66778564453,-6.2611632347107,-57.55558013916, 7320, 3240, 3)
+			TB3D_Triggers.spawn_alife("zombie_beee", -166.70251464844,2.2021112442017,-43.638122558594, 4559, 3240, 3)
+			TB3D_Triggers.spawn_alife("zombie_beee", -150.7121887207,2.2457160949707,-32.752670288086, 6685, 3240, 3)
+	   end	
+   end
+end
+
+function forest_update()
+    if level.name() == "red_forest" then
+		if has_alife_info("contr_forest1_dead")
+			and has_alife_info("contr_forest2_dead") then
+				TB3D_Services.give_info("contr_forest_deads")
+		end	
+		if  has_alife_info("denis_wound_start")
+			and has_alife_info("forest_wound_dead")
+			and not has_alife_info("denis_wound_next") then
+				TB3D_Services.give_info("denis_wound_fail")
+		end	
+	end
+end
+
+function spawn_denis() 
+	if TB3D_Services.is_collector() == false then
+		local sim = alife()
+		local v = vector()
+		sim:create("killer_denis1",v:set(-154.03199768066,2.179135799408,-29.984512329102),6074,3240)
+		sim:create("killer_denis2",v:set(-168.93768310547,2.1791498661041,-25.87652015686),4320,3240)
+		sim:create("killer_denis3",v:set(-153.88787841797,2.1781146526337,-38.099498748779),6064,3240)
+		sim:create("killer_denis4",v:set(-150.86233520508,2.3751785755157,-45.025329589844),6540,3240)
+		sim:create("killer_denis5",v:set(-157.27326965332,2.2941052913666,-50.785617828369),5652,3240)
+		sim:create("killer_denis6",v:set(-115.58462524414,2.3102631568909,-55.957679748535),9854,3240)
+		sim:create("killer_denis7",v:set(-112.0415725708,2.3187811374664,-54.043090820313),10286,3240)
+		sim:create("killer_denis8",v:set(-103.67635345459,2.3016946315765,-56.758888244629),11667,3250)
+		sim:create("killer_denis9",v:set(-164.65612792969,2.2453947067261,-42.774707794189),4821,3240)
+	end
+end
+
+function set_tunel()
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a) 
+			if obj then
+				if obj and obj:name() == "contr_forest_restr" then 
+					amk.add_spot_on_map(obj.id,"crlc_big","Mine placement") 
+					break	--!!!!TB3D
+				end
+			end
+		end
+	end
+end
+
+function remove_tunel()
+	local obj
+	for a=first_object,last_object do
+		obj = alife():object(a)
+		if obj then
+			if obj and obj:name() == "contr_forest_restr" then 
+				level.map_remove_object_spot(obj.id,"crlc_big")
+				break
+			end
+		end
+	end
+end
+
+function spawn_ag_restr()
+	local se_obj = alife():create("space_restrictor",vector():set(-163.7038269043,0.33191874623299,-299.45358276367),73168,447)
+	local custom = "[logic]\ncfg = scripts\\new\\nebo\\ag_restr.ltx"
+	rewrite_restrictor(se_obj, custom, 60.0)
+end
+
+function spawn_blizn_krug_dead() 
+	if TB3D_Services.is_collector() == false then
+		local obj
+		for a=first_object,last_object do
+			obj = alife():object(a)
+			if obj then
+				if obj:name() == "mono_dead_doc" then  
+					return
+				end
+			end
+		end
+		alife():create("mono_dead_doc",vector():set(245.210,4.360,55.923),292294,3516)
+	end
+end 
+
+function gener_na_boloto_vert()  -- water-meter perehod1
+	if TB3D_Services.is_collector() == false then
+		local obj = alife():story_object(18100)
+		if not obj then
+			dmx_mod.create_level_changer(18100,	vector():set(-104.6570892334,37.470596313477,-467.96307373047),
+			214585,3096,208062,3484,
+			vector():set(237.60340881348,26.244289398193,621.69653320313),
+			vector():set(0,0,0),"marsh",1,0)
+		end
+	end
+end
+
+function boloto_na_gener_vert()  -- water-meter perehod2
+	if TB3D_Services.is_collector() == false then
+		local obj = alife():story_object(18101)
+		if not obj then
+			dmx_mod.create_level_changer(18101, vector():set(345.39685058594,7.8543429374695,-69.320671081543),
+			360152,3528,216969,3096,
+			vector():set(-102.54923248291,37.5275001525879,-466.853424072266),
+			vector():set(0,0,0),"generators",1,0)
+		end
+	end
+end
+
+function sarcofag_derevny()  -- photo transition
+	local obj = alife():story_object(18109)
+	if not obj then
+		dmx_mod.create_level_changer(18109, vector():set(-21.340265274048,69.629508972168,-31.520132064819),
+		598,2417,35739,3335,
+        vector():set(73.263496398926,2.371077299118,-67.258171081543),
+        vector():set(0,0,0),"lost_village",1,0)
+    end
+end
+
+function control_monol_svalka()  -- Lightning-transition
+	local obj = alife():story_object(18110)
+	if not obj then
+		dmx_mod.create_level_changer(18110, vector():set(0.076748996973038,-34.357418060303,17.889852523804),
+		1757,2512,137004,319,
+        vector():set(-57.10103225708,17.666576385498,17.847587585449),
+        vector():set(0,0,0),"l02_garbage",1,0)
+    end
+end
+
+function saxar_perexod()  -- Sugar-transition
+	local obj = alife():story_object(18111)
+	if not obj then
+		dmx_mod.create_level_changer(18111, vector():set(-111.25610351563,1.9637259244919,-289.08743286133),
+		3983,1486,7244,1543,
+        vector():set(-49.463424682617,27.120641708374,-11.838829040527),
+        vector():set(0,0,0),"l08u_brainlab",1,0)
+    end
+end
+
+function mozg_yantar()  -- brain-shift
+	local obj = alife():story_object(18112)
+	if not obj then
+		dmx_mod.create_level_changer(18112, vector():set(-45.602458953857,18.978830337524,-12.382658958435),
+		2892,1530,62547,1505,
+        vector():set(45.247611999512,9.7975540161133,-59.355667114258),
+        vector():set(0,0,0),"l08_yantar",1,0)
+    end
+end
+
+function lima_dead_city()
+	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: lima_dead_city tele") end
+	local obj = alife():story_object(18113)
+	if not obj then
+		dmx_mod.create_level_changer(18113, vector():set(-51.921474456787,-10.597856521606,-182.62138366699),
+		2891,2993,100962,3593,
+        vector():set(-239.38876342773,-2.0321259498596,300.58901977539),
+        vector():set(0,-2,0),"dead_city",1,0)
+    end
+end
+
+function dead_city_atpeshka()
+	local obj = alife():story_object(18114)
+	if not obj then
+		dmx_mod.create_level_changer(18114, vector():set(72.183212280273,-1.8766392469406,-207.6682434082),
+		425926,3646,368029,2813,
+        vector():set(-6.6572103500366,-2.087566614151,-367.70422363281),
+        vector():set(0,0,0),"atp_for_test22",1,0)
+    end
+end
+
+
+

@@ -1,0 +1,126 @@
+---<!-- TB3D 1.0.9.9.1 added unlimited bolt option, added grid size, added my_ver, changed unlimited options 
+function my_ver() return "1.0.9.9.1" end
+--[[Ending bolts]]-----------------------------------
+-- Author: Charsi
+-- Date: 17/08/2010 - 26/04/2011
+-----------------------------------------------------------------------------------
+
+local test_spawn = false -- Test spawn
+local bolt_cnt   = 0
+local st
+local game_start = true
+
+function bolt_fix(obj)
+	if amk.load_variable("b_dr") then
+		db.actor:eat(obj)
+		amk.save_variable("b_dr",false)
+	end
+	game_start = false
+	if TB3D_Modders.unlimited_bolts == false then bolt_cnt=bolt_cnt+1 else bolt_cnt = 1 end
+end
+
+function bolt_end(obj)
+	if game_start and amk.load_variable("b_dr") then del_bolt() end -- Compound throwing just starting
+	amk.save_variable("b_dr",false)
+	game_start = false
+	if TB3D_Modders.unlimited_bolts == false then bolt_cnt=bolt_cnt+1 else bolt_cnt = 1 end
+end
+
+function bolt_lose()
+	if TB3D_Modders.unlimited_bolts == true then
+		bolt_cnt = 1
+	else
+		bolt_cnt=bolt_cnt-1
+		if bolt_cnt < 0 then bolt_cnt = 0 end
+	end
+end
+
+function on_actor_use(obj)
+	--if TB3D_Modders.unlimited_bolts == false then
+		if obj:section()=="fake_bolt" then
+			if db.actor:object("bolt") then
+				spawn_item_in_inv("fake_bolt")
+			else
+				spawn_item_in_inv("bolt")
+			end
+		end
+	--end
+end
+
+function update()
+	if db.actor:active_slot()==5 then
+		if level.main_input_receiver()==nil then show_static() elseif st then remove_static() end
+	elseif st then 
+		remove_static()
+	end
+end
+
+function remove_static()
+	get_hud():RemoveDialogToRender(st) st=nil
+end
+
+function show_static()
+	if st then
+		st:SetText(bolt_cnt)
+	else
+		if TB3D_Modders.unlimited_bolts == true then
+			bolt_cnt = 1
+		else
+			bolt_cnt=0
+			db.actor:iterate_inventory(function(dummy,item) if item:section()=="fake_bolt" then bolt_cnt=bolt_cnt+1 end end,dummy)
+			if db.actor:item_in_slot(5) then bolt_cnt=bolt_cnt+1 end
+		end
+		st=CUIStatic()
+		st:Init(1024-140,768-67,90,50)
+		st:SetFont(GetFontLetterica16Russian())
+		st:SetTextAlign(CGameFont.alRight)
+		st:SetTextColor(255,238,155,23)
+		st:SetTextY(11)
+		st:SetTextX(3)
+		local ini=system_ini() local sect="fake_bolt"
+		local grid	= ini:r_u32("tb3d", "inv_grid_size")
+		local x=ini:r_u32(sect, "inv_grid_x")*grid --50
+		local y=ini:r_u32(sect, "inv_grid_y")*grid --50
+		local width=ini:r_u32(sect, "inv_grid_width")*grid --50
+		local height=ini:r_u32(sect, "inv_grid_height")*grid --50
+		st:InitTexture("ui\\ui_icon_equipment")
+		st:SetOriginalRect(x,y,width,height)
+		get_hud():AddDialogToRender(st)
+	end
+end
+
+function remove_bolt()
+	if TB3D_Modders.unlimited_bolts == false then
+		if not remove_item(db.actor:object("fake_bolt")) then del_bolt() end
+	end
+end
+
+function del_bolt()
+	if TB3D_Modders.unlimited_bolts == false then
+		db.actor:drop_item_and_teleport(db.actor:object("bolt"),vector():set(0,0,0))
+	end
+end
+
+function net_spawn()
+	spawn_item_in_inv("bolt_fix")
+	--if TB3D_Modders.unlimited_bolts == false then
+		--if test_spawn then for i=1,10 do spawn_item_in_inv("fake_bolt") end end
+	--end
+end
+
+function net_destroy()
+	remove_static()
+end
+
+function remove_item(item)
+	if item then
+		local sobj=alife():object(item:id())
+		if sobj then alife():release(sobj,true) end
+		return true
+	end
+	return false
+end
+
+function spawn_item_in_inv(sect)
+	alife():create(sect,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),0)
+end

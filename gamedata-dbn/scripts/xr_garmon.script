@@ -1,0 +1,71 @@
+--TB3D 1.0.9.9.1
+function my_ver() return "1.0.9.9.1" end
+--[[ -----------------------------------------------------------------------------------------------
+ File       : xr_garmon.script
+ Description: GG+garmoshka
+ Copyright  : 2010 © Phoenix
+ Author     :PHOENIX - basis, Vlad - Refinement, ALEX BOY - implementation of an accordion
+ Last update: 02.07.2010(by Evill Zone) and (by ALEX BOY) 
+--]]-----------------------------------------------------------------------------------------------
+
+--[[
+local device_active = true
+local snd_obj,react
+
+function item_update()
+    local item = db.actor:active_item()
+    if not (item and item:section() == "garmoshka_b") then
+        if snd_obj and snd_obj:playing() then
+            snd_obj:stop()
+        end
+        return
+    end
+    if device_active then
+        snd_obj = sound_object("characters_voice\\human_01\\bandit\\music\\harmonica_"..tostring(math.random(1,16)))  
+        snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
+    for k, v in pairs (db.storage) do
+        local stalker = level.object_by_id(k)
+        if (stalker and IsStalker(stalker)) then
+            if stalker:position():distance_to(db.actor:position()) < 10 then
+                if not snd_obj:playing() then
+                    react = sound_object("characters_voice\\human_01\\stalker\\reactions\\music\\reaction_music_"..tostring(math.random(1,11)))  
+                    react:play_at_pos(stalker, stalker:position(), sound_object.s2d)
+                    react.volume = 0.8
+                end
+            end
+        end
+    end
+        device_active = false
+    else
+        if not snd_obj:playing() then
+            device_active = true
+        end
+    end
+end]]
+
+---------------------------dmx135-----------------------------
+local snd_garmoshka
+function garmoshka_update()
+    local item = db.actor:active_item()
+	local reaction_snd = xr_sound.get_safe_sound_object("characters_voice\\human_01\\stalker\\reactions\\music\\reaction_music_"..math.random(11))
+    if item and item:section() == "garmoshka_b" then
+		if not (snd_garmoshka and snd_garmoshka:playing()) then
+			snd_garmoshka = sound_object("characters_voice\\human_01\\bandit\\music\\harmonica_"..math.random(16))
+			snd_garmoshka:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
+		end
+	else
+		local stalker
+		if snd_garmoshka then 
+		    for k, v in pairs(db.storage) do
+                stalker = level.object_by_id(k)
+				if stalker and (get_clsid(stalker) == clsid.script_stalker) and stalker:alive() then
+                    if stalker:position():distance_to(db.actor:position()) < 10 and not reaction_snd:playing() then
+				        reaction_snd:play_no_feedback(db.actor, sound_object.s2d, 0, stalker:position(), 1.0)
+                    end
+                end
+            end
+		    snd_garmoshka:stop() 
+			snd_garmoshka = nil 
+		end
+	end
+end

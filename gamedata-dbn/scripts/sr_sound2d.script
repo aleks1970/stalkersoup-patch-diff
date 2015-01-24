@@ -1,0 +1,205 @@
+--TB3D 1.0.9.9.5.1 new 10/15/12
+function my_ver() return "1.0.9.9.5.1" end
+--[[------------------------------------------------------------------------------------------------------------------
+Проигровка звуков в голове актера
+Tunduk Vladimir aka Sidorovich
+
+--------------------------------------------------------------------------------------------------------------------]]
+local string_find = string.find
+
+class "action_sound2d"
+----------------------
+function action_sound2d:__init (obj, storage)
+	self.object = obj
+	self.st = storage
+	self.snd_obj_l = nil
+	self.snd_obj_r = nil
+	self.time = 0
+	self.playing = false
+	self.current = 0
+end
+----------------------
+function action_sound2d:reset_scheme()
+    self:recreate_sounds ()
+	self.st.signals = {}
+	self.time = time_global ()
+	self.playing = false
+end
+----------------------
+function action_sound2d:recreate_sounds()
+    self.snd_obj_l = nil
+    self.snd_obj_r = nil
+    local name_left, name_right = self:get_sound_name()
+    if name_left ~= nil then
+       --TB3D_Services.packet_alert("rs sound2d: RECREATE_SOUNDS. LEFT CHANNEL = ["..name_left.."]")
+    end    
+    if name_right ~= nil then
+       --TB3D_Services.packet_alert("rs sound2d: RECREATE_SOUNDS. RIGHT CHANNEL = ["..name_right.."]")
+    end    
+    self.snd_obj_l = xr_sound.get_safe_sound_object(name_left)
+    if name_right ~= nil then
+       self.snd_obj_r = xr_sound.get_safe_sound_object(name_right)
+    else   
+       self.snd_obj_r = nil
+    end   
+end
+----------------------
+function action_sound2d:get_next_sound_index()
+    local idx = self.current
+    local tsize = table.getn(sound_theme.ph_snd_themes[self.st.snd_theme])
+    if tsize == 1 then 
+       idx = 1
+    else    
+       while idx == self.current do
+             idx = math.random (1, tsize)
+       end
+    end   
+    self.current = idx
+    return idx
+end
+----------------------
+function action_sound2d:get_sound_name()
+    local name
+    if self.st.snd_name ~= nil then
+       name = self.st.snd_name
+    else   
+       name = sound_theme.ph_snd_themes[self.st.snd_theme][self:get_next_sound_index()]
+		if type(name) == "table" then
+			name = name[1]
+		end
+    end
+    if self.st.stereo == false then
+       return name, nil
+    end
+    return string.format("%s_l", name), string.format("%s_r", name)
+end
+----------------------
+function action_sound2d:update(delta)
+    if self.snd_obj_l == nil then 
+       return 
+    end
+    local actor = db.actor
+    if self.playing == false then
+       self:play_sounds ()
+       self.playing = true
+       return
+    end
+    if self.st.stereo == true then
+       local pos_l, pos_r = self:get_source_positions ()
+       if self.snd_obj_l ~= nil and self.snd_obj_l:playing () == true then
+          self.snd_obj_l:set_position (pos_l)
+       end   
+       if self.snd_obj_r ~= nil and self.snd_obj_r:playing () == true then
+          self.snd_obj_r:set_position (pos_r)
+       end   
+    end   
+    if self.snd_obj_l:playing () == false then
+       self.st.signals["sound_end"] = true
+       if self.st.snd_theme ~= nil then
+          self:recreate_sounds ()  
+          self.time = time_global ()
+	      self.playing = false
+       end       
+    end   
+    xr_logic.try_switch_to_another_section(self.object, self.st, actor)
+end
+----------------------
+function action_sound2d:play_sounds()
+    local d
+    if self.st.delay == self.st.delay_max then
+       d = self.st.delay
+    else
+       d = math.random(self.st.delay, self.st.delay_max)
+    end       
+    local actor = db.actor
+    if self.st.stereo == false then
+		if self.snd_obj_l ~= nil then
+			--TB3D_Services.packet_alert("sr sound2d: playing in [mono]")  
+			self.snd_obj_l:play_at_pos(actor, vector ():set (0, 0, 0), d / 1000.0, sound_object.s2d)
+       end
+    else
+       if self.snd_obj_l == nil or self.snd_obj_r == nil then
+          TB3D_Services.packet_alert("sr sound2d: Can't play stereo sound because sound file for left or right channel not loaded")  
+       else
+		   --TB3D_Services.packet_alert("sr sound2d: playing in [stereo]")  
+		   local pos_l, pos_r = self:get_source_positions()
+		   self.snd_obj_l:play_at_pos(actor, pos_l, d / 1000.0, sound_object.s3d)
+		   self.snd_obj_r:play_at_pos(actor, pos_r, d / 1000.0, sound_object.s3d)
+		end
+    end      
+end
+----------------------
+function action_sound2d:get_source_positions()
+    local actor = db.actor
+    local dir = actor:direction()
+    dir.y = 0.0
+    local dir_left = vector_rotate_y(dir, 45)
+    local dir_right = vector_rotate_y(dir, -45)
+    dir_left:normalize ()
+    dir_right:normalize ()
+    local pos = actor:position ()
+    pos.y = pos.y + 1.5 
+    local pos_l = pos;
+    return pos_l:add(dir_left:mul(1.5)), pos:add(dir_right:mul(1.5))
+end
+----------------------
+function action_sound2d:deactivate()
+    if self.snd_obj_l ~= nil then
+       if self.snd_obj_l:playing() == true then
+          self.snd_obj_l:stop()
+       end
+       self.snd_obj_l = nil
+    end         
+    if self.snd_obj_r ~= nil then
+       if self.snd_obj_r:playing() == true then
+          self.snd_obj_r:stop()
+       end
+       self.snd_obj_r = nil
+    end         
+end
+
+----------------------
+function add_to_binder( npc, ini, scheme, section, storage )
+	xr_logic.subscribe_action_for_events(npc, storage, action_sound2d(npc, storage))
+end
+
+----------------------
+function set_scheme(obj, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind (obj, ini, scheme, section)
+	st.logic = xr_logic.cfg_get_switch_conditions (ini, section, obj)
+	st.snd_name = utils.cfg_get_string (ini, section, "snd", obj, false, "", nil)
+	st.snd_theme = utils.cfg_get_string (ini, section, "theme", obj, false, "", nil)
+	if st.snd_theme ~= nil and st.snd_name then
+	   TB3D_Services.packet_alert("sr sound2d: can't have 2 definition sound files at the same time")
+	end    
+	st.delay = utils.cfg_get_number (ini, section, "delay", obj, false, 0)
+	st.delay_max = utils.cfg_get_number (ini, section, "delay_max", obj, false, 0)
+	st.stereo = utils.cfg_get_bool (ini, section, "stereo", obj, false, false)
+	if st.delay_max < st.delay then
+	    st.delay_max = st.delay
+	end
+	if st.snd_name ~= nil then
+		if TB3D_Services.is_collector() then
+			if string_find(st.snd_name, "mil_pda_")
+			  or string_find(st.snd_name, "aes_") then
+				st.snd_name = ""
+			end
+		end
+		if TB3D_Modders.use_sound_message then
+			if st.snd_name == "" then
+				TB3D_Services.packet_alert("sr sound2d: invalid sound name")
+			else
+				TB3D_Services.packet_alert("sr sound2d: sound name["..st.snd_name.."]")
+			end
+		end
+	else   
+		if TB3D_Modders.use_sound_message then
+			if st.snd_theme == nil or st.snd_theme == "" then
+				TB3D_Services.packet_alert("sr sound2d: invalid sound theme") 
+			else
+				TB3D_Services.packet_alert("sr sound2d: sound theme["..st.snd_theme.."]")
+			end
+		end
+	end   
+end
+

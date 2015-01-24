@@ -1,0 +1,210 @@
+---<!-- TB3D 1.0.9.9.5.0 added 10/05/12, new stay vals, debug, new code, fixed one_hour_ms, aver_snork, val_krovosos
+function my_ver() return "1.0.9.9.5.0" end
+--[[----------------------------------------------------------------------------------------------
+adapted for STALKERSOUP from ww10007 version
+------------------------------------------------------------------------------------------------]]
+local string_find = string.find
+--[[ 
+	presets = {
+		preset_name1 = {							--exists so get his rank by communities
+			community1 = {rank_min1,rank_max1},
+			community2 = {rank_min2,rank_max2},
+			...
+		},
+		preset_name2 = false,						--if no section exists in ltx
+		preset_name3 = {
+			community1 = {rank_min1,rank_max1},
+			community2 = {rank_min2,rank_max2},
+			...
+		},
+		...
+	}
+]]
+local presets = {}
+
+-- return rank or false
+function read_preset( preset_name )
+	local ltx = ini_file( "misc\\smart_terrain_presets.ltx" )
+	if ltx and ltx:section_exist( preset_name ) then
+		local preset = {}
+		local result, field, str
+		local t
+		local n = ltx:line_count( preset_name )
+		local rank_min, rank_max, rank_interval
+		for i = 0, n-1 do
+			result, field, str = ltx:r_line( preset_name, i, "", "" )
+			t = parse_names( str )
+			rank_min = TB3D_Modders.smt_spawn_rank_min
+			rank_max = TB3D_Modders.smt_spawn_rank_max
+			for i, rank_name in ipairs( t ) do
+				rank_interval = ranks.get_rank_interval( rank_name )
+				if rank_interval[1] < rank_min then
+					rank_min = rank_interval[1]
+				end
+				if rank_interval[2] > rank_max then
+					rank_max = rank_interval[2]
+				end
+			end
+			preset[field] = { rank_min, rank_max }
+		end
+		--TB3D_Services.packet_alert("Smart terrain params: read preset["..utils.to_str(preset_name).."] rank_min["..utils.to_str(rank_min).."] rank_max["..utils.to_str(rank_max).."]")
+		return preset
+	else
+		if TB3D_Modders.use_smh1_message == true then 
+			TB3D_Services.packet_alert("Smart terrain params: read preset rank[false]")
+		end
+		return false
+	end
+end
+
+----------smart terrain (days), default = never-----------
+--quick		= 2,  5
+--medium	= 6,  8
+--long		= 12, 14
+--default	= 10000, 10001
+-----------se respawn (hrs*game seconds)------------------
+--seldom	= (3600*96) = 345600
+--medium	= (3600*48) = 172800
+--often		= (3600*24) = 86400
+--once		= -1
+----------------------------------------------------------
+-- TB3D basic scales * stay time multiplier (default 10 = 3600)
+local one_hour_m_div10 = 360*TB3D_Modders.smt_stay_time_mult
+local half_day_ms = one_hour_m_div10 * 12
+local full_day_ms = half_day_ms * 2
+local spawn_once = -1
+
+function get_stay_time_interval(spawn_min, spawn_max)				--value comes from custom ltx, "default" or all.spawn
+		--TB3D_Services.packet_alert("Smart terrain params: stay time min["..utils.to_str(spawn_min).."]")
+	local min, max
+	if spawn_min then
+		local min_str = utils.to_str(spawn_min)
+		if string_find(min_str, "seldom") then						--se rspwn: 5 to 7 game days
+			min = 5*full_day_ms
+			max = 7*full_day_ms
+		elseif string_find(min_str, "long") then					--smt: 3 to 5 game days
+			min = 3*full_day_ms
+			max = 5*full_day_ms
+		elseif string_find(min_str, "medium") then					--se rspwn, smt: 1 to 3 game days
+			min = 1*half_day_ms
+			max = 3*full_day_ms
+		elseif string_find(min_str, "often") then					--se rspwn: 0.5 to 2 game days
+			min = half_day_ms
+			max = 2*full_day_ms
+		elseif string_find(min_str, "quick") then					--smt: .5 to 1 game day
+			min = half_day_ms
+			max = full_day_ms
+		elseif string_find(min_str, "once") then					--se rspwn: just spawns one time
+			min = spawn_once
+			max = spawn_once
+		elseif string_find(min_str, "default") then					--smt: just spawns one time in theory
+			min = 10000
+			max = 10001
+		else
+			min = tonumber(spawn_min)
+			if min then												--was a number
+				if min == spawn_once then							--spawn once
+					max = spawn_once
+				elseif spawn_max then
+					min = spawn_min
+					max = tonumber(spawn_max)
+					if max == nil then max = min end
+				elseif min > 15 then								--valid ms so make window (min/max)
+					max = min + min
+				else
+					min = min * one_hour_m_div10					--hours to ms
+					max = min + min
+				end
+			else
+				min = spawn_once		--spawn once
+				max = spawn_once
+			end
+		end
+	else
+		min = spawn_once		--spawn once
+		max = spawn_once
+	end
+	--TB3D_Services.packet_alert("Smart terrain params: stay time min["..utils.to_str(min).."] max["..utils.to_str(max).."]")
+	return min, max
+end
+
+function get_preset( preset_name )
+	if presets[preset_name] == nil then
+		presets[preset_name] = read_preset( preset_name )
+	end
+	return presets[preset_name]
+end
+
+--[[------------------------SMART TERRAIN RESPAWN------------------------------------
+----- format of conditions, {+/-info_portion}probability,source
+----- "{+condition}prob,0" 												= single conditon
+----- "{+condtion-condition}prob,0" 									= AND 
+----- "{+condition}prob,0,{-condition}prob,0" 							= OR
+----- "{+condition-condition}prob,0,{-condition+condition}prob,0"		= compound ANDs and ORs
+----- "100"																= special condition that forces immediate respawn
+----- "-1"																= special condition that forces spawn once
+local prob_low = "70,0"
+local prob_mod = "80,0"
+local prob_high = "90,0"
+local prob_max = "100,0"
+function check_respawn(name)			--respawns from the all.spawn that conflict with quests
+	local cond_str
+	if name then
+		if string_find(name, "amk_embankment") then									--way overpowered for cordon start, interferes with Fox
+				cond_str = "{+agroprom_military_case_done-tb3d_respawn_toggle}"..prob_high
+		elseif string_find(name, "esc_fabrika_bandit") then							--way too soon, wait til after agro case
+				cond_str = "{+agroprom_military_case_done-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "_bandit_respawn") then							--way too soon, wait til after agro case
+				cond_str = "{+escape_stalker_done}"..prob_high
+		elseif string_find(name, "esc2_bandit_les") then							--way too soon, wait til after agro case
+				cond_str = "{+agroprom_military_case_done-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "esc2_st_fabric") then								--way too soon, wait til after agro case
+				cond_str = "{+agroprom_military_case_done-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "rad_freedom_respawn") then						--way too soon, wait til after agro case
+				cond_str = "{+agroprom_military_case_done-tb3d_respawn_toggle}"..prob_high
+		elseif string_find(name, "sim_stalker_master_master") then					--way too soon, wait til after agro case
+				cond_str = "{+agroprom_military_case_done-tb3d_respawn_toggle}"..prob_high
+		elseif string_find(name, "sak_military_stalker") then						--way too soon, wait til after agro case
+				cond_str = "{+agroprom_military_case_done-tb3d_respawn_toggle}"..prob_max
+		--elseif string_find(name, "esc2_most") then									--dogs_boars restrictor, causes carpark complete
+				--cond_str = "{-tb3d_respawn_toggle}"..prob_max..",{+tb3d_respawn_level2}"..prob_max
+		elseif string_find(name, "aver_snork_strong") then							--snorks in cordon, too soon
+				cond_str = "{+agroprom_military_case_done}"..prob_max
+		elseif string_find(name, "esc2_tunnel1") then			--dogs and boars near viaduct
+				cond_str = "{-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "esc2_tunnel2") then			--boar weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "esc2_tunnel3") then			--boar weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "esc_small_home1") then		--boar weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "esc_small_home2") then		--boar weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "esc_small_home3") then		--dog weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_high
+		elseif string_find(name, "esc_small_home4") then		--dog weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_high
+		elseif string_find(name, "esc_small_home5") then		--dog weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_high
+		elseif string_find(name, "esc_small_home6") then		--flesh weak
+				cond_str = "{-tb3d_respawn_toggle}"..prob_mod
+		elseif string_find(name, "esc_specnaz") then
+				cond_str = "{+bandranen_pda_est}"..prob_max
+		elseif string_find(name, "stalker_bandit_master") then
+				cond_str = "{+bandranen_pda_est}"..prob_max
+		elseif string_find(name, "val_exit1_ambush_soldier2") then
+				cond_str = "{+bandranen_pda_est}"..prob_max
+		elseif string_find(name, "val_soldier_specnaz") then
+				cond_str = "{+bandranen_pda_est}"..prob_max
+		elseif string_find(name, "val_red_krovosos1") then 
+				cond_string = "{+bar_darklab_document_done}"..prob_mod
+		end
+	end
+	--if cond_str then
+		--TB3D_Services.packet_alert("smt params: ["..name.."]["..utils.to_str(cond_str).."] changed")
+	--else
+		--TB3D_Services.packet_alert("smt params: ["..name.."] not changed")
+	--end
+	return cond_str
+end
+]]--

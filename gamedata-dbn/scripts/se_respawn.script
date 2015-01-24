@@ -1,0 +1,531 @@
+--TB3D 1.0.9.9.4.4  optimized, respawner check, read/write packet fix, execute, presets, offline update fix, removed freedom_barier_respawn
+function my_ver() return "1.0.9.9.4.4" end
+--[[------------------------------------------------------------------------------------------------------------------
+Respawner. Scheme updates the population of all of the simulation.
+by Stohe (Ruslan Didenko)
+--------------------------------------------------------------------------------------------------------------------]]
+local string_find = string.find
+local math_random = math.random
+
+local section_name = "respawn"
+local respawners = {}
+
+local idle_spawn_preset = {
+	seldom = 60*60*96,
+	medium = 60*60*48,
+	often = 60*60*24,
+	once = -100000
+}
+
+----------------------------------------------------------------------------------------------------------------------
+-- Various useful functions
+----------------------------------------------------------------------------------------------------------------------
+function r_bool( spawn_ini, section, line, default )
+  if spawn_ini:line_exist( section, line ) then
+    return spawn_ini:r_bool( section, line )
+  else
+    return default
+  end
+end
+
+function r_str( spawn_ini, section, line, default )
+  if spawn_ini:line_exist( section, line ) then
+    return spawn_ini:r_string( section, line )
+  else
+    return default
+  end
+end
+
+function r_num( spawn_ini, section, line, default )
+  if spawn_ini:line_exist( section, line ) then
+    return spawn_ini:r_float( section, line )
+  else
+    return default
+  end
+end
+
+function r_2nums( spawn_ini, section, line, def1, def2 )
+  if spawn_ini:line_exist( section, line ) then
+    -- if the default-s is greater than the values ??in the ini, then the score, missing the last value from the ini
+    local t = parse_names( spawn_ini:r_string( section, line ) )
+    local n = #t
+    if n == 0 then
+      return def1, def2
+    elseif n == 1 then
+      return t[1], def2
+    else
+      return t[1], t[2]
+    end
+  else
+    return def1, def2
+  end
+end
+
+function parse_names( s )
+    local t = {}
+    for name in string.gfind( s, "([%w_%-.\\]+)%p*" ) do
+        table.insert( t, name )
+    end
+    return t
+end
+
+function r_spawns( spawn_ini, section, line, sectSpawnProps)
+	if spawn_ini:line_exist( section, line ) then
+		--' if the default-s is greater than the values ??in the ini, then the score, missing the last value from the ini
+		local t = parse_names( spawn_ini:r_string( section, line ) )
+		local n = #t
+		local ret_table = {}
+		local k = 1
+		local p
+		local spawn = {}
+		local respawn_ini = system_ini()
+		local community = nil
+		local rank = nil
+		local check = true
+		local custom_data = nil
+		local custom_data_ltx = nil
+		while k <= n do
+			spawn = {}
+			spawn.section = t[k]
+			if t[k+1] ~= nil then			-- Check that this is not the last record
+				p = nil
+				p = tonumber(t[k+1])
+				if p then					-- check that the second number specifies the probability, rather than another section spawn
+					spawn.prob = p			-- hammering number
+					k = k + 2
+				else
+					spawn.prob = 1   		-- hammered defaulted 1
+					k = k + 1
+				end
+			else
+				spawn.prob = 1
+				k = k + 1
+			end
+			table.insert(ret_table, spawn)
+			if sectSpawnProps[spawn.section] == nil then
+				respawn_ini = system_ini()
+				community = r_str(respawn_ini, spawn.section, "community", "nil")
+				rank = r_str(respawn_ini, spawn.section, "spec_rank", "nil")
+				check = true
+				custom_data = r_str(respawn_ini, spawn.section, "custom_data", nil)
+				if custom_data ~= nil then
+					custom_data_ltx = ini_file(custom_data)
+					if custom_data_ltx:section_exist("smart_terrains") then
+						if custom_data_ltx:line_exist("smart_terrains", "none") then
+							if r_str(custom_data_ltx, "smart_terrains", "none") == "true" then
+								check = false
+							end 
+						end
+						if check and custom_data_ltx:line_exist("smart_terrains", "respawn_check") then
+							if r_str(custom_data_ltx, "smart_terrains", "respawn_check") == "false" then
+								check = false
+							end
+						end                        
+					end
+				end
+				sectSpawnProps[spawn.section] = {community = community, rank = rank, check = check}
+			end
+		end
+		return ret_table
+	end
+	return nil
+end
+----------------------------------------------------------------------------------------------------------------------
+-- The server object spawner
+----------------------------------------------------------------------------------------------------------------------
+class "se_respawn" ( cse_alife_smart_zone )
+function se_respawn:__init( section ) super( section )
+	self.spawned_obj = {}
+	self.sectSpawnProps = {}  -- Table for caching spawn section properties.
+	self.proxy_initialized = false
+	self.respawn_time = game.get_game_time()		--so it is initialized for first write
+end
+
+-- conservation
+function se_respawn:STATE_Write( packet )
+	cse_alife_smart_zone.STATE_Write( self, packet )
+	local table_size = #self.spawned_obj
+	--TB3D_Services.packet_alert("SPAWNER SAVE table_size["..utils.to_str(table_size).."]")
+	--if TB3D_Modders.show_tables then show_tables(self.spawned_obj, nil, "se respawn") end
+	packet:w_u8(table_size)
+	for i=1,table_size do
+		packet:w_u16(self.spawned_obj[i])
+	end
+	utils.w_CTime(packet, self.respawn_time or game.get_game_time())		--insures that a date is written
+	--TB3D_Services.packet_alert("se respawn: write["..utils.to_str(self:name()).."]["..utils.to_str(self.amk_name).."] respawn_time["..self.respawn_time:dateToString(0).." "..self.respawn_time:timeToString(1).."]")
+end
+
+-- recovery
+function se_respawn:STATE_Read( packet, size )
+	cse_alife_smart_zone.STATE_Read( self, packet, size )
+	if not editor() then
+		local table_size = packet:r_u8()
+		--TB3D_Services.packet_alert("SPAWNER READ table_size["..utils.to_str(table_size).."]")
+		for i=1,table_size do
+			table.insert(self.spawned_obj, packet:r_u16())
+		end
+		--if TB3D_Modders.show_tables then show_tables(self.spawned_obj, nil, "se respawn") end
+		if packet:r_eof() then
+			self.respawn_time = game.get_game_time()
+			self.rt_read = false	--init respawn_time but force update on actual respawn
+		else
+			self.respawn_time = utils.r_CTime(packet)
+			self.rt_read = true
+		end
+	end
+	--TB3D_Services.packet_alert("se respawn: read["..utils.to_str(self:name()).."]["..utils.to_str(self.amk_name).."] respawn_time["..self.respawn_time:dateToString(0).." "..self.respawn_time:timeToString(1).."]")
+end
+
+-- initialize the object.
+-- called a simulator.
+function se_respawn:on_register()
+	--if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se respawn: on register") end
+	cse_alife_smart_zone.on_register( self )
+	init_respawn_params(self)
+	--if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se respawn: on register done") end
+end
+
+-- Create an object
+function se_respawn:create(prob)
+	if TB3D_Modders.use_respawn_message == true then
+		TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."]")
+	end
+	--if string_find(self:name(), "sim_stalker_general") or string_find(self:name(), "sim_stalker_veteran1") then return false end	--bad desc in new files
+	--if TB3D_Population_Control.can_go_online(self) == false then return false end
+	if tostring(prob)=="true" then
+		prob=80
+	elseif tostring(prob)=="false" then
+		prob=0
+	end
+	if tonumber(prob) == nil then   
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("se respawn: create["..tostring(self:name()).."] probability doesn't set") end
+		if TB3D_Modders.show_tables then show_tables(self.conditions, nil, "se respawn") end
+		prob = 0
+		return false
+	end
+	if math_random(100) <= tonumber(prob) then
+		local spawn_section = ""
+		local sum = 0
+		-- Produce a random person weighted sample
+		-- taking into account already spawned number of people.
+		for k,v in pairs(self.respawn_section) do
+			sum = sum + v.prob
+		end
+		sum = math_random(0, sum)
+		for k,v in pairs(self.respawn_section) do
+			sum = sum - v.prob      
+			if sum <= 0 then
+			  spawn_section = v.section
+			  break
+			end
+		end
+		if spawn_section == nil or spawn_section == "" then
+			TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] skipped: no spawn section")
+			return false
+		elseif self.spawn_ini == nil then
+			TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] skipped: has no respawn ini")
+			return false
+		end
+		local parent_id = nil
+		if self.parent ~= nil then
+			local s_obj = alife():story_object(self.parent)
+			if s_obj == nil then
+				if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("se respawn: create["..utils.to_str(self:name()).."] cant find parent with SID["..utils.to_str(self.parent).."]") end
+				return false
+			end
+			parent_id = s_obj.id
+		end
+		local obj
+		if parent_id ~= nil then
+			--TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] sect["..utils.to_str(spawn_section).."] has parent")
+		  obj = alife():create(spawn_section, 
+				self.position,
+				self.m_level_vertex_id, 
+				self.m_game_vertex_id,
+				parent_id)
+		else
+			--TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] sect["..utils.to_str(spawn_section).."]")
+		  obj = alife():create(spawn_section, 
+				self.position,
+				self.m_level_vertex_id, 
+				self.m_game_vertex_id)
+		end
+		if obj and (self.spawn_ini) then
+			amk.on_REspawn(obj,self)	--fixes missing cslids
+			if self.spawned_obj then
+				local tt = self.sectSpawnProps[spawn_section]
+				if (obj.brain) and (obj.smart_terrain_id) then
+					if self.item_spawn == false then        
+						if tt.check == true and not self.amk_name then
+							obj:brain():update()
+							local smart_terrain_id = obj:smart_terrain_id()
+							if smart_terrain_id ~= expendable_object then   
+								--TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] done smt true")
+								if obj.id then table.insert(self.spawned_obj ,obj.id) else return false end
+								return true
+							else
+								--TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] done smt false")
+								alife():release(obj, true)
+								return false
+							end
+						end
+					end
+					if obj.id then table.insert(self.spawned_obj, obj.id) else return false end
+					--TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] done true")
+					return true
+				end
+				--TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] no brain or smt !!!!")
+				if obj.id then table.insert(self.spawned_obj ,obj.id) end
+			else
+				TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] no self.spawned_object !!!!")
+			end
+		else
+			TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] no spawn.ini !!!!")
+		end
+	else
+		--TB3D_Services.packet_alert("se RESPAWN: create["..utils.to_str(self:name()).."] prob failed")
+	end
+	return false
+end
+
+-- An attempt to spawn objects.
+-- Update to minimum amount, or spawn with a given probability
+function se_respawn:spawn()	
+	--TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] spawn")
+	if not self.spawn_once then
+		-- Runs through the already respawned objects and deletes them if dead or destroyed.
+		local obj
+		for k,v in pairs(self.spawned_obj) do
+			obj = level.object_by_id(v)
+			if obj == nil then
+				obj = alife():object(v)
+			end
+			if obj then
+				if (IAmAStalker[obj:clsid()] or IAmAMonster[obj:clsid()]) and obj:alive() == false then
+					table.remove(self.spawned_obj, k)
+				end
+			else
+				table.remove(self.spawned_obj, k)
+			end
+		end 
+	end
+	--if TB3D_Population_Control.can_start_respawn(self) == false then return end
+	if xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.conditions) == "0" then
+		if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] spawn cond[0]") end
+		return
+	end
+	if self.spawn_once and not self.already_once_spawned then 
+		self.already_once_spawned = true
+	end
+	local diff = self.min_count - #self.spawned_obj
+	if diff > 0 then   -- extra spawn a minimum number of objects
+		while diff > 0 do
+			--TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] spawned["..utils.to_str(#self.spawned_obj).."] min["..utils.to_str(self.min_count).."] try spawn")
+			if self:create(100) == false then
+				if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] did not create") end
+				break
+			end
+			diff = diff - 1
+		end
+	end
+	if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] max spawns["..utils.to_str(self.max_spawn).."] max per spawn["..utils.to_str(self.max_count).."] active["..utils.to_str(#self.spawned_obj).."] try fill") end
+	if self.max_count ~= -1 then
+		diff = self.max_count - #self.spawned_obj
+		if diff > 0 then
+			local cnt = TB3D_Modders.respawner_max_per_slice or 6
+			for i=1,diff do   
+				--if #self.spawned_obj >= self.max_count then
+					--break
+				--end
+				if self:create(xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.conditions)) == false then
+					if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] cond["..utils.to_str(self.conditions).."] not conditions for respawn") end
+					break
+				end
+				cnt = cnt - 1
+				if cnt < 1 then break end
+			end
+		end
+	end
+	--TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] spawn done")
+end
+
+--' Remove already respawned object from the list
+--' Used only for box with rags in smart terrain
+function se_respawn:remove_spawned(id)
+  for k,v in pairs(self.spawned_obj) do
+    if id == v then
+		table.remove(self.spawned_obj, k)
+    end       
+  end 
+end
+
+function se_respawn:execute()
+	if self.already_once_spawned == true								--only a one time spawn
+	  or self.idle_spawn_min == -1 then return end						--event spawn
+	if self.respawn_time < game.get_game_time() then
+		local idle_time = game.CTime()
+		local now = game.get_game_time()
+		local spawn_rate = TB3d_Modders.start_alife_option
+		local hrs = math_random(12, 24)									--normal
+		if spawn_rate > 1 then											--hardcore
+			hrs = math_random(1, 6)
+		elseif spawn_rate > 0 then										--moderate		
+			hrs = math_random(6, 12)
+		end
+		idle_time:setHMSms(hrs, 0, 0, math_random(self.idle_spawn_min, self.idle_spawn_max)*1000)
+		self.respawn_time = now + idle_time
+		self:spawn()
+		if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se RESPAWN: execute["..utils.to_str(self:name()).."] spawned") end
+	end
+end
+
+-- Update is offline, always execute as this is used at startup for the all.sav
+function se_respawn:update()
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("se RESPAWN: update["..utils.to_str(self:name()).."]["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]  update_offline")
+	end
+	cse_alife_smart_zone.update( self )
+	self:execute()
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("se RESPAWN: update["..utils.to_str(self:name()).."]["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]  done")
+	end
+end
+
+-- Update Online, insure not 'spawn once (-1)' and is proper distance from actor to execute
+function se_respawn:update_online()
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("se RESPAWN: update_online["..utils.to_str(self:name()).."]["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]  update_online")
+	end
+	if self.respawn_radius ~= -1 then										--spawn once?
+		local alife_opt = TB3d_Modders.start_alife_option
+		local spawn_distance = self.respawn_radius
+		if alife_opt > 1 then 												--hardcore, real close
+			if spawn_distance > 50 then spawn_distance = 50 end
+		elseif alife_opt > 0 then 											--moderate, sorta close
+			if spawn_distance > 80 then spawn_distance = 80 end
+		else
+			if spawn_distance < 50 then spawn_distance = 50 end				--normal alife BUT no 'in your face' spawns
+		end
+		if db.actor:position():distance_to(self.position) > spawn_distance then
+			--TB3D_Services.packet_alert("se RESPAWN: update online["..utils.to_str(self:name()).."] dist["..utils.to_str(spawn_distance).."]")
+			if TB3D_Population_Control.can_start_respawn(self) == true then self:execute() end
+		end
+	end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("se RESPAWN: update_online["..utils.to_str(self:name()).."]["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
+	end
+end
+
+function spawn(name)
+	--TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(name).."] from respawners table")
+	local spawner = respawners[name]
+	if spawner and spawner.max_count ~= -1 then
+		local cnt = spawner.max_count - #spawner.spawned_obj
+		if cnt > 0 then
+			--TB3D_Services.packet_alert("se respawn: spawning["..utils.to_str(cnt).."] ["..utils.to_str(spawner:name()).."]")
+			for i=1,cnt do
+				if spawner:create(xr_logic.pick_section_from_condlist(db.actor_proxy, spawner, spawner.conditions)) == false then
+					if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("se respawn: spawn["..utils.to_str(spawner:name()).."] not conditions for respawn") end
+					break
+				end
+			end 
+		else
+			--TB3D_Services.packet_alert("se respawn: spawn["..utils.to_str(cnt).."] ["..utils.to_str(spawner:name()).."] failed")
+		end
+	end
+end
+
+function create_ammo(section, position, lvi, gvi, pid, num)
+  local ini = system_ini()
+  local num_in_box = ini:r_u32(section, "box_size")
+  while num > num_in_box do
+    alife():create_ammo(section, position, lvi, gvi, pid, num_in_box)
+    num = num - num_in_box
+  end
+  alife():create_ammo(section, position, lvi, gvi, pid, num)
+end
+
+local amk_respawner_control={}
+local amk_named_respawner_control={}
+
+function init_respawn_params(obj)
+	amk_respawner_control[obj:name()] = obj
+	local ini = obj:spawn_ini()															-- Proofreads Spawn settings
+	if not ini:section_exist(section_name) then return end								--"respawn"
+	obj.respawn_section = r_spawns(ini, section_name, "respawn_section", obj.sectSpawnProps)  
+	if obj.respawn_section == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("se respawn: RESPAWN: ["..obj:name().."] field 'respawn_section' doesn't exist.") end
+	end
+	obj.spawned_goes_online = r_bool(ini, section_name, "spawned_goes_online", nil)
+	obj.spawn_once = r_bool(ini, section_name, "spawn_once", false)
+	obj.amk_name = r_str(ini, section_name, "amk_name", nil)
+	if obj.amk_name then amk_named_respawner_control[obj.amk_name] = obj end
+	obj.min_count = r_num(ini, section_name, "min_count", -1)
+	obj.max_count = r_num(ini, section_name, "max_count", -1)
+	if obj.min_count > obj.max_count and obj.max_count ~= -1 then
+		if TB3D_Modders.use_abort_message == true then
+			TB3D_Services.abort_alert("se respawn: RESPAWN ["..obj:name().."] min["..utils.to_str(obj.min_count).."] max["..utils.to_str(obj.max_count).."]")
+		end
+		obj.max_count = obj.min_count
+	end
+	obj.max_spawn = r_num(ini, section_name, "max_spawn", 1)
+	obj.idle_spawn_min, obj.idle_spawn_max = r_2nums(ini, section_name, "idle_spawn")
+	--TB3D_Services.packet_alert("se respawn: init["..obj:name().."] min["..utils.to_str(spawn_min).."] max["..utils.to_str(spawn_max).."]")
+	if obj.idle_spawn_min == nil then
+		TB3D_Services.abort_alert("se respawn: RESPAWN: ["..obj:name().."] field 'idle_spawn' doesn't exist.")
+		obj.idle_spawn_min = -1														--spawn once
+	end
+	if obj.idle_spawn_max == nil then
+		obj.idle_spawn_max = obj.idle_spawn_min										--insure a value exists in both
+	end
+	if idle_spawn_preset[obj.idle_spawn_min] ~= nil then
+		obj.idle_spawn_min = idle_spawn_preset[obj.idle_spawn_min]  				--if is a string then get value
+	else
+		obj.idle_spawn_min = tonumber(obj.idle_spawn_min)							--else is a number
+	end
+	if idle_spawn_preset[obj.idle_spawn_max] ~= nil then
+		obj.idle_spawn_max = idle_spawn_preset[obj.idle_spawn_max]  				--if is a string then get value
+	else
+		obj.idle_spawn_max = tonumber(obj.idle_spawn_max)							--else is a number
+	end
+	if obj.idle_spawn_max < obj.idle_spawn_min then obj.idle_spawn_max = obj.idle_spawn_min end
+	obj.respawn_radius = r_num(ini, section_name, "respawn_radius", -1)
+	--if obj.respawn_radius > 200 then obj.respawn_radius = 200 end
+	obj.str_conditions = r_str(ini, section_name, "conditions", 100) 
+	obj.conditions = xr_logic.parse_condlist(obj, section_name, "conditions", obj.str_conditions)
+	obj.parent = r_num(ini, section_name, "parent", nil)
+	obj.item_spawn = r_bool(ini, section_name, "item_spawn", false)
+	if obj.rt_read == false then
+		obj.respawn_time = game.get_game_time()
+		obj.rt_read = true
+	end
+	respawners[obj:name()] = obj
+    if TB3D_Modders.use_respawn_message == true then
+		TB3D_Services.packet_alert("se respawn: init["..obj:name().."] amk name["..utils.to_str(obj.amk_name).."] parent["..utils.to_str(obj.parent).."]")
+		local tt
+		for kk,vv in pairs(obj.respawn_section) do
+			tt = nil
+			tt = obj.sectSpawnProps[vv.section]
+			if tt then
+				TB3D_Services.packet_alert("se respawn: Section["..utils.to_str(vv.section).."] community["..utils.to_str(tt.community or nil).."] rank["..utils.to_str(tt.rank or nil).."]")
+			end
+		end
+		TB3D_Services.packet_alert("se respawn: init["..obj:name().."] go online?["..utils.to_str(obj.spawned_goes_online).."] spawn once?["..utils.to_str(obj.spawn_once).."]")
+		TB3D_Services.packet_alert("se respawn: init["..obj:name().."] spawn?["..utils.to_str(obj.item_spawn).."] min["..obj.idle_spawn_min.."] max["..obj.idle_spawn_max.."]")
+		TB3D_Services.packet_alert("se respawn: init["..obj:name().."] date["..obj.respawn_time:dateToString(0).."] time["..obj.respawn_time:timeToString(1).."]")
+		TB3D_Services.packet_alert("se respawn: init["..obj:name().."] radius["..utils.to_str(obj.respawn_radius).."] conditions["..obj.str_conditions.."]")
+	end
+	ini = ""
+end
+
+function reinit_spawner_params(name)
+	if amk_respawner_control[name] then
+		init_respawn_params(amk_respawner_control[name])
+	end
+end
+
+function get_respawner_by_name(name)
+	if amk_named_respawner_control[name] then
+		return alife():object(amk_named_respawner_control[name].id)
+	end
+end
