@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.3.3 new 10/15/12
-function my_ver() return "1.0.9.9.3.3" end
+--TB3D 1.0.9.9.9.0 new 10/15/12, clear callbacks
+function my_ver() return "1.0.9.9.9.0" end
 ----------------------------------------------------------------------------------------------------
 -- Physic gate control
 ----------------------------------------------------------------------------------------------------
@@ -124,6 +124,11 @@ function action_gate:get_angle(bone_idx)
         self.bone_id[bone_idx] = nil
     end
     return 0
+end
+
+function action_gate:net_destroy()				--109990
+	self.object:set_callback(callback.hit, nil)
+	self.object:set_callback(callback.use_object, nil)
 end
 
 function action_gate:initialize(loading)

@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.8 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.0 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started
-function my_ver() return "1.0.9.9.8.8" end
+function my_ver() return "1.0.9.9.9.0" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -18,6 +18,7 @@ local upd_timeLDK
 local upd_timeTB3D
 function update(time_now, slice_base)															--only called if is_collector() = true
 	if has_alife_info("tb3d_collector_done") then												--setup complete, let's rock
+amk.oau_watchdog=680
 		local ln = level.name()
 		local level_up = TB3D_Services.get_level_up()											--109955 for actions past the Collector levelup
 		------------------------------------------------------------------------------------------main loop
@@ -468,12 +469,6 @@ function on_item_take(obj)
 				TB3D_Services.give_info("tb3d_found_in_npp2")
 			end
 		end
-		--if sect == "tb3d_pri_document" then
-			--if ln == "l11_pripyat" and amk.load_variable("tb3d_suits", 0) < 3 then
-				--TB3D_Triggers.spawn_suit(10,99.434,4.336,131.041,215847,2185)
-				--amk.save_variable("tb3d_suits", 3)
-			--end
-		--end
 	elseif level_up == 4 then
 		if TB3D_DLC_001 then is_remove_item = TB3D_DLC_001.on_item_take(obj) end								--109978, optional dlc content				
 	elseif level_up == 5 then

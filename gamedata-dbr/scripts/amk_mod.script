@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.8.9 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.9.0 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -9,7 +9,7 @@
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms
-function my_ver() return "1.0.9.9.8.9" end
+function my_ver() return "1.0.9.9.9.0" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -351,6 +351,8 @@ function check_spawn()
 		--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
 		TB3D_services.stalker_set_portals()										--clears lcs based on info portions
 		if startup > 0 then
+			amk_anoms.pre_blow_off()											--109990, start clean
+			amk_anoms.generate_anoms()
 			start_blow_timer(5)	--no news on start for blowouts
 			news_manager.amk_send_tip_id("amk_welcome_msg","amk_welcome_title",10,40,"tb3d_master")
 			amk.del_variable("temp_intro")

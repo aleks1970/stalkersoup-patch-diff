@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.4 localized give_game_news, level cleaner, name in binder , removed sak, db.spawn_net_packet/destroy_net_packet
-function my_ver() return "1.0.9.9.7.4" end
+--TB3D 1.0.9.9.9.0 localized give_game_news, level cleaner, name in binder , removed sak, db.spawn_net_packet/destroy_net_packet, clear callbacks
+function my_ver() return "1.0.9.9.9.0" end
 -- original idea by Monnoroch
 -- base script by Malandrinus
 -- scripting by Shadowman
@@ -50,6 +50,7 @@ end
 
 function my_binder:net_destroy()
 	--get_console():execute("my_binder:net_destroy")
+    self.object:set_callback(callback.use_object, nil)			--109990
 	db.destroy_net_packet(self.object)											--109940
     object_binder.net_destroy(self)
 end

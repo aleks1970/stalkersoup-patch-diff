@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.9 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.0.9.9.9.0 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
--- use_rat_infests
-function my_ver() return "1.0.9.9.8.9" end
+-- use_rat_infests, moved hardcore_mobs
+function my_ver() return "1.0.9.9.9.0" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -142,11 +142,11 @@ function spawn_npcs(x, y, z, lv, gv, type, max)
 	if max > 9 then min = 4 end
 	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
 	local cnt = math_floor(math_random(min, max) * flevel)
-	if TB3D_Modders.hardcore_mobs then
-		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	else
+	--if TB3D_Modders.hardcore_mobs then
+		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	--else
 		if cnt > max then cnt = max end
-	end
+	--end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] ["..name.."]")
 	end
@@ -172,11 +172,11 @@ function spawn_mob(x, y, z, lv, gv, type, max)
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	if TB3D_Modders.hardcore_mobs then
-		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	else
+	--if TB3D_Modders.hardcore_mobs then
+		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	--else
 		if cnt > max then cnt = max end
-	end
+	--end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] ["..name.."]")
 	end
@@ -192,11 +192,11 @@ function spawn_rats(x, y, z, lv, gv, max)
 		if max > 9 then min = 4 end
 		local cnt = math_floor(math_random(min, max) * flevel)
 		if cnt < 1 then cnt = 1 end
-		if TB3D_Modders.hardcore_mobs then
-			cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-		else
+		--if TB3D_Modders.hardcore_mobs then
+			--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+		--else
 			if cnt > max then cnt = max end
-		end
+		--end
 		if TB3D_Modders.use_mob_messages then
 			TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_rat]")
 		end
@@ -212,11 +212,11 @@ function spawn_dogs(x, y, z, lv, gv, max)										--109989
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	if TB3D_Modders.hardcore_mobs then
-		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	else
+	--if TB3D_Modders.hardcore_mobs then
+		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	--else
 		if cnt > max then cnt = max end
-	end
+	--end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_dog_habaruch]")
 	end
@@ -231,11 +231,11 @@ function spawn_snorks(x, y, z, lv, gv, max)
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	if TB3D_Modders.hardcore_mobs then
-		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	else
+	--if TB3D_Modders.hardcore_mobs then
+		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	--else
 		if cnt > max then cnt = max end
-	end
+	--end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_snork_jumper]")
 	end
@@ -250,11 +250,11 @@ function spawn_bandits(x, y, z, lv, gv, max)									--109989
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	if TB3D_Modders.hardcore_mobs then
-		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	else
+	--if TB3D_Modders.hardcore_mobs then
+		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	--else
 		if cnt > max then cnt = max end
-	end
+	--end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_bandit_novice]")
 	end

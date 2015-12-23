@@ -1,10 +1,10 @@
---TB3D 1.0.9.9.8.4 removed item number function, removed set_npc_health(), 
+--TB3D 1.0.9.9.9.0 removed item number function, removed set_npc_health(), 
 -- devil to Bes, added breaks, cons pkt srvcs, fixed item reloc and item out functions, 
 -- glowworm fixes, removed ratcatcher check from used item, 'to the swamp' vice cave, petrushka to petruha,
 -- dmx135, hit styles, doc in pripyat, chgd nepis_umer, trasure to treasure, delta display,
 -- delta display to slice mult, add_tail, removed make_kill_task_failed, levchn ids changed in all.spawn, garb - cave
 -- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box
-function my_ver() return "1.0.9.9.8.4" end
+function my_ver() return "1.0.9.9.9.0" end
 
 ---------------------------------------------------------------------
 -- Hi from Syaka 
@@ -565,7 +565,7 @@ function checkout_items_count(actor,item)									--!!!!TB3D increment the count
 	end
 end
 
-function reloc_items_count(actor,item)									--!!!!TB3D deccrement the counter
+function reloc_items_count(actor,item)									--!!!!TB3D decrement the counter
 	if item.section and item:section()==reloc_params.itm_section then
 		if reloc_params.itm_cnt_found > 0 then
 			TB3D_Services.transfer_item(actor, item, stalk, "SAK")	--good transfers
@@ -575,7 +575,7 @@ function reloc_items_count(actor,item)									--!!!!TB3D deccrement the counter
 	end
 end
 
-function out_items_count(actor,item)									--!!!!TB3D deccrement the counter
+function out_items_count(actor,item)									--!!!!TB3D decrement the counter
 	if item.section and item:section()==reloc_params.itm_section then
 		if reloc_params.itm_cnt_found > 0 then
 			--if TB3D_Modders.use_sak_message then TB3D_Services.info_alert("SAK: out_items_count") end

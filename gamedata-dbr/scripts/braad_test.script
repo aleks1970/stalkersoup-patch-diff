@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.3 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
+--TB3D 1.0.9.9.9.0 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
 -- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
 -- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info
-function my_ver() return "1.0.9.9.8.3" end
+function my_ver() return "1.0.9.9.9.0" end
 
 local string_find = string.find
 local math_random = math.random
@@ -2247,7 +2247,9 @@ function mozg_yantar()  -- brain-shift
 end
 
 function lima_dead_city()
-	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: lima_dead_city tele") end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.info_alert("braad test: lima_dead_city tele")
+	end
 	local obj = alife():story_object(18113)
 	if not obj then
 		dmx_mod.create_level_changer(18113, vector():set(-51.921474456787,-10.597856521606,-182.62138366699),

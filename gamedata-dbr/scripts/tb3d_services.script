@@ -1,16 +1,16 @@
----TB3D 1.0.9.9.8.9 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.9.0 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
--- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations
-function my_ver() return "1.0.9.9.8.9" end	--modders append with initials and rev.
+-- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs
+function my_ver() return "1.0.9.9.9.0" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.9}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.0}" end
 
-major_version = 109989							--used in saves
+major_version = 109990							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -265,7 +265,7 @@ function report_plug_ins()
 	packet_alert("tb3d services: reporting plug ins done")
 	local gmode = system_ini():r_string("game_mode", "mode")
 	local act_id = db.actor:id()
-	packet_alert("tb3d_services: actor reputation["..utils.to_str(db.actor:character_reputation()).."] rank["..utils.to_str(db.actor:character_rank()).."] koef["..utils.to_str(global_koef(level_up)).."] comm["..utils.to_str(db.actor:character_community()).."] level up["..utils.to_str(level_up).."] gmode["..utils.to_str(gmode).."]")
+	packet_alert("tb3d_services: actor reputation["..utils.to_str(db.actor:character_reputation()).."] diff["..utils.to_str(level.get_game_difficulty()).."] rank["..utils.to_str(db.actor:character_rank()).."] koef["..utils.to_str(global_koef(level_up)).."] comm["..utils.to_str(db.actor:character_community()).."] level up["..utils.to_str(level_up).."] gmode["..utils.to_str(gmode).."]")
 	packet_alert("tb3d_services: actor goodwill stalker["..utils.to_str(relation_registry.community_goodwill("stalker",  act_id)).."]")
 	packet_alert("tb3d_services: actor goodwill ecolog["..utils.to_str(relation_registry.community_goodwill("ecolog",  act_id)).."]")
 	packet_alert("tb3d_services: actor goodwill green["..utils.to_str(relation_registry.community_goodwill("green",  act_id)).."]")
@@ -1010,21 +1010,31 @@ function change_rank(npc, rval)
 	--end
 end
 
---based on:  rank * (koef_ratio * (game difficulty + (rank * (level_up * koef_ratio))))
---------------------------------------------------------------------------
 local koef_ratio = 1/TB3D_Modders.coefficient_factor
 function global_koef(diff_level, force_rank)				--109986
 	local rank
-	local diff = level.get_game_difficulty() + 1			--1 thru 4
 	if force_rank and force_rank > 0 then
 		rank = force_rank
 	else
 		rank = db.actor:character_rank()
 	end
-	if diff_level and diff_level > 0 then					--collector (level_up 1 and up)
-		diff = diff + (0.37 * diff_level)					--increases each level_up
+	local diff
+	if diff_level and diff_level > 0 then							--109990, collector (level_up 1 and up)
+		diff = (1.0 + ((diff_level * 0.5)) * (rank * koef_ratio))	--increases each level_up (1.5 through 5.0)
+	else
+		diff = 0.5 + (level.get_game_difficulty() * 0.5)			--0.5 thru 1.5
+		diff = diff * (rank * koef_ratio)
 	end
-	return (diff * rank) * koef_ratio
+	if diff < 0.1 then
+		diff = 0.1
+	elseif TB3D_Modders.hardcore_mobs then
+		if diff > TB3D_Modders.hardcore_mobs_mult then diff = TB3D_Modders.hardcore_mobs_mult end
+	elseif diff_level and diff_level > 0 then
+		if diff > 5 then diff = 5 end								--collector limit
+	else
+		if diff > 2 then diff = 2 end								--stalker limit
+	end
+	return diff
 end
 
 function get_info_portions(sect)

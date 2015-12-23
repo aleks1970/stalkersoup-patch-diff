@@ -1,7 +1,7 @@
---<!-- TB3D 1.0.9.9.8.9 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.0 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska
-function my_ver() return "1.0.9.9.8.9" end
+function my_ver() return "1.0.9.9.9.0" end
 
 local upd_pos = 0
 local fix_done = false
@@ -430,6 +430,20 @@ function on_item_take(obj)
 		end
 	end
 	if info_given == true then amk_dialogs.info_received() end
+	--109990, move multiple item quests to here to reduce loop load
+	if has_alife_info("shadows_cube_dialog_start") and not has_alife_info("shadows_cube_prov_check") then
+		dmx_mod.shadows_cube_prov()
+	end
+	if has_alife_info("mil_Svoboda_trader_plan_start") and (not has_alife_info("mil_Svoboda_trader_plan_check")
+	  and not has_alife_info("mil_freedom_member0021_umer")) then
+		sak_dialog.ratcatcher_food_have_check()
+	end
+	if has_alife_info("starshoy_say_one_start") and not has_alife_info("starshoy_say_one_check") then
+		arhara_dialog.starshoy_say_one_check()
+	end
+	if has_alife_info("started_doc_tvar") and not has_alife_info("have_doc_tvar_check") then
+		arhara_dialog.have_doc_tvar()
+	end
 	return is_remove_obj
 end
 

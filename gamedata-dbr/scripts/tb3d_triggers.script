@@ -1,12 +1,11 @@
----TB3D 1.0.9.9.8.9 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.9.0 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
--- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, spawn quantities,
--- creatures of the night
-function my_ver() return "1.0.9.9.8.9" end
+-- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals
+function my_ver() return "1.0.9.9.9.0" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random=math.random
 local math_floor = math.floor
@@ -493,167 +492,100 @@ end
 function creatures_of_the_night()	--only called once after midnight
 	local ln = level.name()
 	local is_pack = nil
-	local is_harsh = (has_alife_info("tb3d_harsh_environment"))
 		--TB3D_Services.info_alert("night creatures")
 		if ln == "l01_escape" then
-			spawn_alife_rand("werewolf",384.692,20.200,284.930,595047,251,2)	--tunnel at end of tracks
-			is_pack = true
+				spawn_alife_rand("werewolf",384.692,20.200,284.930,595047,251,2)	--tunnel at end of tracks
+				is_pack = true
 		elseif ln == "l02_garbage" then
-			spawn_alife_rand("werewolf",155.752,7.682,29.582,311457,385,2)		--far east, end of pile
-			is_pack = true
+				spawn_alife_rand("werewolf",155.752,7.682,29.582,311457,385,2)		--far east, end of pile
+				is_pack = true
 		elseif ln == "l03_agroprom" then
-			spawn_alife_rand("werewolf",193.925,20.629,87.207,404928,501, 1)		-- above tunnel
-			spawn_alife_rand("werewolf",49.164,9.326,-84.389,285967,547, 1)			-- hill between bases
-			is_pack = true
-		--elseif ln == "l03u_agr_underground" then
-			--none
+		elseif ln == "l03u_agr_underground" then
 		elseif ln == "l04_darkvalley" then
-			spawn_alife_rand("werewolf",-48.131,-2.958,-143.643,117685,879,2)		--pit with tractor
-			spawn_alife_rand("werewolf",132.106,14.174,-404.274,329386,943,2)		--rocks above pond
-			is_pack = true
-		--elseif ln == "l04u_labX18" then
-			--none
+				spawn_alife_rand("werewolf",-48.131,-2.958,-143.643,117685,879,2)		--pit with tractor
+				spawn_alife_rand("werewolf",132.106,14.174,-404.274,329386,943,2)		--rocks above pond
+				is_pack = true
+		elseif ln == "l04u_labX18" then
 		elseif ln == "l06_rostok" then
-			spawn_alife_rand("werewolf",-96.165,6.513,-259.042,38988,1434, 1)			--by tent at yantar exit
-			spawn_alife_rand("werewolf",-53.049,-0.002,111.998,56725,1419, 1)			--near shed before snipers
-			is_pack = true
 		elseif ln == "l05_bar" then
-			spawn_alife_rand("werewolf",363.917,29.532,-261.471,47432,1281, 2)			--top of cliff above truck near garbage exit
-			spawn_alife_rand("werewolf",24.620,5.050,359.707,21369,1246, 1)				--right hill at warehouse exit
-			spawn_alife_rand("werewolf",-14.118,3.946,327.519,17780,1246, 1)			--left hill at warehouse exit
-			is_pack = true
 		elseif ln == "l08_yantar" then
-			spawn_alife_rand("werewolf",157.960,9.327,31.210,120319,1523, 1)			--hillside far nw
-			spawn_alife_rand("werewolf",-82.610,-7.462,-203.832,10791,1488, 1)			--under tunnel exit from lab
-			is_pack = true
 		elseif ln == "l08u_brainlab" then
-			--none
 		elseif ln == "l07_military" then
-			 if not is_harsh then
-				spawn_alife_rand("werewolf",-85.974,-8.548,409.424,228115,1819,2)		--above chopper
-				is_pack = true
-			 end
 		elseif ln == "l10_radar" then
-			 if not is_harsh then
-				spawn_alife_rand("werewolf",422.203,-48.515,-112.696,127682,2036,4)	--center on rocks
-				is_pack = true
-			 end
-		--elseif ln == "l10u_bunker" then
-			--none
-		--elseif ln == "l11_pripyat" then
-			--none
-		--elseif ln == "l12_stancia" then
-			--none
-		--elseif ln == "l12_stancia_2" then
-			--none
-		--elseif ln == "l12u_sarcofag" then
-			--none
-		--elseif ln == "l12u_control_monolith" then
-			--none
+		elseif ln == "l10u_bunker" then
+		elseif ln == "l11_pripyat" then
+		elseif ln == "l12_stancia" then
+		elseif ln == "l12_stancia_2" then
+		elseif ln == "l12u_sarcofag" then
+		elseif ln == "l12u_control_monolith" then
 		elseif ln == "atp_for_test22" then
-		
 		elseif ln == "peshera" then
-		
-		--elseif ln == "av_peshera" then
-			--none
+		elseif ln == "av_peshera" then
 		elseif ln == "puzir" then
-			spawn_alife_rand("werewolf",-94.990,19.603,130.544,111887,2881,2)	--on northern rocks
-			is_pack = true
+				spawn_alife_rand("werewolf",-94.990,19.603,130.544,111887,2881,2)	--on northern rocks
+				is_pack = true
 		elseif ln == "aver" then
-			 if not is_harsh then
 				spawn_alife_rand("werewolf",-102.563,23.455,73.455,693513,2894,2)	--center peak on rocks
 				spawn_alife_rand("werewolf",369.703,45.638,120.780,1531112,2906,2)	--far E. peak on rocks
 				is_pack = true
-			 end
 		elseif ln == "limansk" then
-		
-		--elseif ln == "hospital" then
-			--none
+		elseif ln == "hospital" then
 		elseif ln == "generators" then
-			 if not is_harsh then
-			 
-			 end
-		--elseif ln == "warlab" then
-			--none
+		elseif ln == "warlab" then
 		elseif ln == "red_forest" then
-			spawn_alife_rand("werewolf",145.121,-0.190,-182.607,106526,3304,2)	--small cave
-			is_pack = true 
+				spawn_alife_rand("werewolf",145.121,-0.190,-182.607,106526,3304,2)	--small cave
+				is_pack = true 
 		elseif ln == "lost_village" then
-			spawn_alife_rand("werewolf",124.927,9.906,-19.391,48990,3336,2)		--east tunnel
-			is_pack = true
+				spawn_alife_rand("werewolf",124.927,9.906,-19.391,48990,3336,2)		--east tunnel
+				is_pack = true
 		elseif ln == "marsh" then
-			spawn_alife_rand("werewolf",-94.524,0.826,464.607,119948,3393,2)	--northern tracks
-			is_pack = true
+				spawn_alife_rand("werewolf",-94.524,0.826,464.607,119948,3393,2)	--northern tracks
+				is_pack = true
 		elseif ln == "dead_city" then
-			 if not is_harsh then
-			 
-			 end
 		elseif ln == "zaton" then
-			spawn_alife_rand("werewolf",-111.639,-6.296,-227.265,717557,3673,4)	--in cave under station
-			spawn_alife_rand("werewolf",-10.250,1.678,250.123,923280,3677,4)	--in cave under burnt ranch
-			is_pack = true
+				spawn_alife_rand("werewolf",-111.639,-6.296,-227.265,717557,3673,4)	--in cave under station
+				is_pack = true
+				spawn_alife_rand("werewolf",-10.250,1.678,250.123,923280,3677,4)	--in cave under burnt ranch
 		elseif ln == "jupiter" then
-		
 		elseif ln == "pripyat" then	--east pripyat
-			 if not is_harsh then
 				spawn_alife_rand("werewolf",234.454,0.547,22.189,452741,3768,4)		--near the hospital
 				is_pack = true
-			 end
-		--elseif ln == "jupiter_underground" then
-			--none
-		--elseif ln == "labx8" then
-			--none
-		--elseif ln == "cs_agroprom_underground" then
-			--none
+		elseif ln == "jupiter_underground" then
+		elseif ln == "labx8" then
+		elseif ln == "cs_agroprom_underground" then
 		elseif ln == "predbannik" then
-			spawn_alife_rand("werewolf",-269.439,46.687,238.627,524489,4024,4)	--peak above cave
-			is_pack = true
+				spawn_alife_rand("werewolf",-269.439,46.687,238.627,524489,4024,4)	--peak above cave
+				is_pack = true
 		elseif ln == "yantar_old" then
-			spawn_alife_rand("werewolf",231.216,8.801,65.287,543778,4382,4)	--east woods
-			spawn_alife_rand("werewolf",188.130,13.851,202.517,496024,4381,4)	--top of bunker
-			is_pack = true
+				spawn_alife_rand("werewolf",231.216,8.801,65.287,543778,4382,4)	--east woods
+				spawn_alife_rand("werewolf",188.130,13.851,202.517,496024,4381,4)	--top of bunker
+				is_pack = true
 		elseif ln == "swamp_old" then
-			spawn_alife_rand("werewolf",283.068,5.104,-278.998,1762433,4395,2)	--sw road gate
-			spawn_alife_rand("werewolf",-188.400,-5.488,-156.304,743914,4387,2)	--sw corner below tower
-			is_pack = true
+				spawn_alife_rand("werewolf",283.068,5.104,-278.998,1762433,4395,2)	--sw road gate
+				spawn_alife_rand("werewolf",-188.400,-5.488,-156.304,743914,4387,2)	--sw corner below tower
+				is_pack = true
 		elseif ln == "hiding_road" then
-			spawn_alife_rand("werewolf",-270.456,-0.077,107.009,67606,4409,4)	--west train tunnel
-			is_pack = true
+				spawn_alife_rand("werewolf",-270.456,-0.077,107.009,67606,4409,4)	--west train tunnel
+				is_pack = true
 		elseif ln == "k01_darkscape" then
-			spawn_alife_rand("werewolf",364.145,26.607,220.181,875143,4646,4)	--sw side of rail tunnel
-			spawn_alife_rand("werewolf",442.302,29.191,385.688,944682,4649,4)	--ne side
-			is_pack = true
+				spawn_alife_rand("werewolf",364.145,26.607,220.181,875143,4646,4)	--sw side of rail tunnel
+				spawn_alife_rand("werewolf",442.302,29.191,385.688,944682,4649,4)	--ne side
+				is_pack = true
 		elseif ln == "dark_forest" then
-		
 		elseif ln == "level_f-1" then
-			 if not is_harsh then
-			 
-			 end
 		elseif ln == "promzone" then
-			spawn_alife_rand("werewolf",-30.338,19.704,-475.190,138458,4817,2)	--south end
-			spawn_alife_rand("werewolf",116.248,20.592,-357.635,419106,4973,3)	--behind south trash pile
-			spawn_alife_rand("werewolf",-41.726,21.354,445.734,121518,4796,3)	--peak above pipes end
-			is_pack = true
-		--elseif ln == "digger_stash" then
-			--none
+				spawn_alife_rand("werewolf",-30.338,19.704,-475.190,138458,4817,2)	--south end
+				spawn_alife_rand("werewolf",116.248,20.592,-357.635,419106,4973,3)	--behind south trash pile
+				spawn_alife_rand("werewolf",-41.726,21.354,445.734,121518,4796,3)	--peak above pipes end
+				is_pack = true
+		elseif ln == "digger_stash" then
 		elseif ln == "l01_krasivay" then
-		
 		elseif ln == "l02_dd" then
-		
 		elseif ln == "l03_rinok" then
-			 if not is_harsh then
-			 
-			 end
 		elseif ln == "l04_pogost" then
-			 if not is_harsh then
-			 
-			 end
 		elseif ln == "l05_vokzal" then
-		
-		--elseif ln == "lab_x14" then
-			--none
-		--elseif ln == "l01_poligon" then
-			--none
+		elseif ln == "lab_x14" then
+		elseif ln == "l01_poligon" then
 		end
 		if is_pack ~= nil then wolf_howls(is_pack) end
 	return true	--sets TB3D_Services.spawned
@@ -674,6 +606,7 @@ function eprip_spawns()	--called when Shadows spawns in the swamp
   	spawn_item_rand("ammo_5.56x45_ss190",-124.223,0.600,-264.911,71235,3752,4)			--in the toilet
   	spawn_item_rand("grenade_f1",-124.223,0.600,-264.911,71235,3752,4)					--in the toilet
 	alife():create("wpn_fw900k",vector():set(-103.962,-2.652,-233.178),87982,3752)		--on table under light
+	------
 end
 
 function dist_center_ambush()						--top of construction site
@@ -1363,17 +1296,16 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 	elseif stash_num == 12 then		--warehouses
 		if has_alife_info("tb3d_harsh_environment") then
 			enemies = "tb3dm_zombie_strong"
-			qty = 3
+			qty = 10
 		else
 			enemies = "tb3dm_killer_exo_unic"
-			qty = 2
+			qty = 5
 		end
 		if rand == 1 then
 			spawn_alife_rand(enemies,-26.449,-13.582,335.959,281075,1803, qty)			--chopper
 		elseif rand == 2 then
 			spawn_alife_rand(enemies,-6.784,-6.146,78.494,300362,1580, qty)				--entrance to base
 			spawn_alife_rand(enemies,27.919,-8.876,-47.801,333061,1590, qty)			--inside base
-			TB3D_Services.delayed_action(1,"tb3d_hunt12_send", 5)						--109988, gets stuck in pipe
 		else
 			spawn_alife_rand(enemies,-269.732,-6.571,406.570,68860,1851, qty)			--below rocks
 		end
@@ -1385,16 +1317,16 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 		spawn_alife_rand(enemies,195.515,-12.702,83.415,53913,1936, qty)				--camp on upper road
 	elseif stash_num == 13 then		--radar
 		if rand == 1 then
-			spawn_alife_rand("tb3dm_zombie_strong",204.447,5.769,-14.557,72763,2030, 6)				--all around power lines
-			spawn_alife_rand("tb3dm_zombie_strong",133.932,6.594,-42.438,72759,2030, 6)
-			spawn_alife_rand("tb3dm_zombie_strong",127.306,1.572,-9.984,51093,1975, 6)
+			spawn_alife_rand("tb3dm_zombie_strong",204.447,5.769,-14.557,72763,2030, 10)				--all around power lines
+			spawn_alife_rand("tb3dm_zombie_strong",133.932,6.594,-42.438,72759,2030, 10)
+			spawn_alife_rand("tb3dm_zombie_strong",127.306,1.572,-9.984,51093,1975, 10)
 		elseif rand == 2 then
 			--TODO
 		else
 			--TODO
 		end
 		if has_alife_info("tb3d_harsh_environment") then
-			spawn_alife_rand("tb3dm_zombie_babka_strong",382.320,-33.843,145.775,112679,1926, 10)		--exit to pripyat
+			spawn_alife_rand("tb3dm_zombie_babka_strong",382.320,-33.843,145.775,112679,1926, 20)		--exit to pripyat
 		else
 			TB3D_Mobs.spawn_npcs(382.320,-33.843,145.775,112679,1926, 2, 10)						--109985, zombied npc below stash
 		end
@@ -1408,7 +1340,7 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 		end
 		dmx_mod.create_level_changer_npp1_to_radar()
 	elseif stash_num == 16 then		--radar, monster tree
-		--already loaded with alife
+		--TODO, 1 rand
 	elseif stash_num == 17 then		--radar, final stash for part 1
 		if has_alife_info("tb3d_harsh_environment") then
 			spawn_alife_rand("tb3dm_zombie_strong",590.280,-51.316,-45.751,209879,1898, 6)		--below stash
@@ -1468,9 +1400,6 @@ end
 
 function remove_brainlab_alife()
 	if not fix_done then
-		local snd_obj = xr_sound.get_safe_sound_object([[ambient\earthquake]])						--109989
-		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-		level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
 		local is_fixed
 		local obj_level
 		local level_name
@@ -1482,12 +1411,8 @@ function remove_brainlab_alife()
 					obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
 					level_name = alife():level_name(obj_level)
 					if level_name == "l08u_brainlab" then
-						if string_find(obj:name(), "dog_")
-						  --or string_find(obj:name(), "x16_zombied")						--109989, none of these are the cause
-						  --or string_find(obj:name(), "x16_stalker")
-						  --or string_find(obj:name(), "x16_m_controller")
-						  --or string_find(obj:name(), "x16_exo")
-						  or string_find(obj:name(), "tushkano_") then
+						--if string_find(obj:name(), "x16_stalker_ghost")
+						if string_find(obj:name(), "x16_m_controller_e") then
 							is_fixed = true
 						end
 						--TB3D_Services.remove_info("yan_controller_respawn_01")

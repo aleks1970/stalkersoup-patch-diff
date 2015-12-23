@@ -1,5 +1,6 @@
---TB3D 1.0.9.9.3.2 added my_ver, fixed thunder for guide, commented out line 1180, sherstyk ammo_pkm_box_1 ammunition on line: 185 aleks1970
-function my_ver() return "1.0.9.9.3.2" end
+--TB3D 1.0.9.9.9.0 added my_ver, fixed thunder for guide, commented out line 1180, sherstyk ammo_pkm_box_1 ammunition on line: 185 aleks1970,
+-- mil_Svoboda_trader_plan_check
+function my_ver() return "1.0.9.9.9.0" end
 -------------------------------------------------------------------------------------------------------
 -- Syakovy Dialogues 
 -------------------------------------------------------------------------------------------------------
@@ -948,9 +949,18 @@ function give_mil_Svoboda_trader_plan(first_speaker, second_speaker)
 	sak.out_item_namber("sak_plan", 1)
 end
 
-function ratcatcher_food_have()
-  	return amk_utils.inventory_search("bread",20) ~= false and amk_utils.inventory_search("conserva",20) ~= false and amk_utils.inventory_search("vodka",5) ~= false and amk_utils.inventory_search("kolbasa",20) ~= false
+function ratcatcher_food_have_check()
+  	if amk_utils.inventory_search("bread",20) ~= false
+	and amk_utils.inventory_search("conserva",20) ~= false
+	and amk_utils.inventory_search("vodka",5) ~= false
+	and amk_utils.inventory_search("kolbasa",20) ~= false then
+		TB3D_Services.give_info("mil_Svoboda_trader_plan_check")
+	end
 end
+function ratcatcher_food_have()
+	return has_alife_info("mil_Svoboda_trader_plan_check")
+end
+
 function tushkano_have()
   	return amk_utils.inventory_search("mutant_face_tushkano",10) ~= false and amk_utils.inventory_search("vodka",10) ~= false
 end

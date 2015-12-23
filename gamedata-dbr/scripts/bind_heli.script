@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.7.0 db calls, db.spawn_heli/destroy_heli
-function my_ver() return "1.0.9.9.7.0" end
+-- TB3D 1.0.9.9.9.0 db calls, db.spawn_heli/destroy_heli, clear callbacks
+function my_ver() return "1.0.9.9.9.0" end
 --[[------------------------------------------------------------------------------------------------
 Helicoter binding
 Chugai Alexander
@@ -84,6 +84,8 @@ end
 
 function heli_binder:net_destroy()
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("heli binder: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
+	self.object:set_callback( callback.helicopter_on_point, nil )		--109990
+	self.object:set_callback( callback.helicopter_on_hit, nil )		--109990
 	db.del_heli( self.object )
 	object_binder.net_destroy( self )
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("heli binder: net destroy["..utils.to_str(self.object:name()).."] done") end

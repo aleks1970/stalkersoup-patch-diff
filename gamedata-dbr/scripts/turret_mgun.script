@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.5 turret put/get packets, updated, prevent nil from xr_spawner
-function my_ver() return "1.0.9.9.7.5" end
+--TB3D 1.0.9.9.9.0 turret put/get packets, updated, prevent nil from xr_spawner, , clear callbacks
+function my_ver() return "1.0.9.9.9.0" end
 function bind(obj)
 	local ini = obj:spawn_ini()
 	if ini == nil or not ini:section_exist("logic") then
@@ -52,6 +52,7 @@ end
 
 function turret_binder:net_destroy()
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("turret binder: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
+	self.object:set_callback(callback.helicopter_on_hit, nil)			--109990
 	db.del_turret(self.object)
 	object_binder.net_destroy(self)
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("turret binder: net destroy["..utils.to_str(self.object:name()).."] done") end

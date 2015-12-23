@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.7 commented out lamps, added forced weapon hiding, changed end game after credits, fixed arena box and items
+--TB3D 1.0.9.9.9.0 commented out lamps, added forced weapon hiding, changed end game after credits, fixed arena box and items
 --activate_bolt commented out, cleanup, military_dolg_dead, optimized, rad_barrels, pripyat, localized, kostya_restrictors,
 -- translate, debug, skip groups, send_tip_id optimization, gold bars, sar_monolit_send, start small reject, debug, aem lights
-function my_ver() return "1.0.9.9.8.7" end
+function my_ver() return "1.0.9.9.9.0" end
 ----------------------------------------------------------------------------------------------------
 -- General functions
 ----------------------------------------------------------------------------------------------------
@@ -119,6 +119,7 @@ end
 function teleport_actor(actor, npc, p)
 	local point = patrol(p[1])
 	local look = patrol(p[2])
+	--TB3D_Services.packet_alert("xr effects: teleport actor")
 	db.actor:set_actor_position(point:point(0))
 	local dir = look:point(0):sub(point:point(0))
 	db.actor:set_actor_direction(-dir:getH()) 
