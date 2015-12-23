@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.6 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
--- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult
-function my_ver() return "1.0.9.9.8.6" end
+--TB3D 1.0.9.9.8.8 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+-- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures
+function my_ver() return "1.0.9.9.8.8" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -58,12 +58,12 @@ local mob_list_npc = {
 ----- randomly selected creature from group based on day/night ------------
 local mob_list_day = {
 	[1] = "tb3dm_dog_habaruch",					--normal
-	[2] = "tb3dm_zombie_strong",
+	[2] = "tb3dm_poltergeist_normal_tele",
 	[3] = "tb3dm_boar",
 	[4] = "tb3dm_snork_jumper",
 	
 	[5] = "tb3dm_izlom_swamp",					--swamp
-	[6] = "tb3dm_zombie_strong",
+	[6] = "tb3dm_flesh_weak",
 	[7] = "tb3dm_chimera_strong",
 	[8] = "tb3dm_bloodsucker_strong",
 
@@ -74,8 +74,8 @@ local mob_list_day = {
 	
 	[13] = "tb3dm_snork_jumper",				--city
 	[14] = "tb3dm_bloodsucker_strong",
-	[15] = "tb3dm_zombie_strong",
-	[16] = "tb3dm_dog_habaruch",
+	[15] = "tb3dm_controller_normal",
+	[16] = "tb3dm_pseudodog_weak",
 	
 	[17] = "tb3dm_snork_indoor",				--indoor
 	[18] = "tb3dm_izlom",
@@ -110,14 +110,14 @@ local mob_list_night = {
 	[12] = "tb3dm_cat_strong",
 	
 	[13] = "tb3dm_snork_jumper",				--city
-	[14] = "tb3dm_zombie_strong",
+	[14] = "tb3dm_controller_normal",
 	[15] = "tb3dm_burer_normal",
 	[16] = "tb3dm_chimera_x_ray",
 	
 	[17] = "tb3dm_snork_indoor",				--indoor
 	[18] = "tb3dm_izlom",
 	[19] = "tb3dm_tarakan",
-	[20] = "tb3dm_tushkano",
+	[20] = "tb3dm_poltergeist_normal_tele",
 	
 	[21] = "tb3dm_gigant_strong",				--large
 	[22] = "tb3dm_biblio",
@@ -885,10 +885,9 @@ function check_mil_spawns(spawns)				--109984
 			--spawn_npcs(-335.090,-13.301,397.380,16207,1860, typ, qty)			--camp at warehouse exit
 			--spawn_npcs(-210.731,-12.723,46.150,117196,1657, typ, qty)			--camp at bar exit
 			--spawn_npcs(6.862,-7.383,-8.567,314354,1585, typ, qty)				--center of base by tank
-			spawns = spawns + 1
 		end
-		spawns = spawns + 1
 	end
+	spawns = spawns + 1
 	if spawns > 10 then spawns = 1 end
 	amk.save_variable("mil_spawns", spawns)
 end

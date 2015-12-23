@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.8.6 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.0.9.9.8.8 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
---has_ammo, reorganized, optimized loot ammo
-function my_ver() return "1.0.9.9.8.6" end
+--has_ammo, reorganized, optimized loot ammo, check dead items
+function my_ver() return "1.0.9.9.8.8" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
@@ -126,21 +126,21 @@ function drop_manager:check_dead_items()
 	if ammo_count > 100 then ammo_count = 100 end
 	function clear_pda(npc, item, rnd)
 		if item then
-			if protected_items.obj_is_protected(item) == false then
-				local name = item:name()
-				local sect = item:section()
-				if name then
-					if string_find(name, "device_pda")
-					  or string_find(name, "device_torch")							--to not interfere with soul cube quest
-					  or string_find(name, "bad_psy_helmet")						--removes those from all.spawn
-					  or string_find(name, "guitar_a")								--get rid of clutter
-					  or string_find(name, "harmonica_a")
-					  or string_find(name, "binocular_a")
-					  or string_find(name, "balalaika_a") then
-						--TB3D_Services.packet_alert("death mgr: check dead items junk["..name.."] removed")
-						npc:drop_item(item)
-						amk.remove_item(item)
-					elseif string_find(sect, "ammo_") then				--109983, optimized ammo method
+			local name = item:name()
+			local sect = item:section()
+			if name then
+				if string_find(name, "device_pda")
+				  or string_find(name, "device_torch")							--to not interfere with soul cube quest
+				  or string_find(name, "bad_psy_helmet")						--removes those from all.spawn
+				  or string_find(name, "guitar_a")								--get rid of clutter
+				  or string_find(name, "harmonica_a")
+				  or string_find(name, "binocular_a")
+				  or string_find(name, "balalaika_a") then
+					--TB3D_Services.packet_alert("death mgr: check dead items junk["..name.."] removed")
+					npc:drop_item(item)
+					amk.remove_item(item)
+				elseif protected_items.obj_is_protected(item) == false then				--109988, moved after psi helmet
+					if string_find(sect, "ammo_") then				--109983, optimized ammo method
 						local ini = system_ini()
 						local num_in_box = ini:r_u32(sect, "box_size")
 						if num_in_box and num_in_box > 1 then				--109984, causes 'not found on server' errors (non fatal)
@@ -185,12 +185,14 @@ function drop_manager:check_dead_items()
 	if spawn_rate > 80 then spawn_rate = 80 end
 	local community = self.npc:character_community()
 	if community and (community == "military" or community == "ecolog" or community == "monolith" or community == "lastday") then
-		if math_random(100) < spawn_rate then 							--109981
-			alife():create("device_pda_npc",
-					self.npc:position(),
-					self.npc:level_vertex_id(),
-					self.npc:game_vertex_id(),
-					self.npc:id())
+		if not string_find(self.npc:name(), "dead_military_esc") then
+			if math_random(100) < spawn_rate then 							--109981
+				alife():create("device_pda_npc",
+						self.npc:position(),
+						self.npc:level_vertex_id(),
+						self.npc:game_vertex_id(),
+						self.npc:id())
+			end
 		end
 	elseif community and community ~= "zombied" and community ~= "bandit" then	--109984
 		if math_random(100) < spawn_rate then 							--109981
@@ -493,7 +495,15 @@ function give_some_stuff(npc, section, number)
 	local lvi = npc:level_vertex_id()
 	local gvi = npc:game_vertex_id()
 	local pid = npc:id()
-	for i=1,number do
+	if number > 1 then
+		for i=1,number do
+			alife():create(section,
+							position,
+							lvi,
+							gvi,
+							pid)
+		end
+	else
 		alife():create(section,
 						position,
 						lvi,

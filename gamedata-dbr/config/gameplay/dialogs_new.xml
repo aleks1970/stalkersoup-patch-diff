@@ -1,4 +1,5 @@
-<!-- ************ TB3D 1.0.9.9.7.0 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda *************** -->
+<!-- ************ TB3D 1.0.9.9.8.8 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
+  can_start_dan, treasure_ecolog_have *************** -->
 <game_dialogs>
 	<dialog id="prinesi_hvost">
 		<has_info>zahar_vstrecha_start</has_info>
@@ -666,6 +667,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="dan_grab_helmet">
+		<precondition>new_dialog.can_start_dan</precondition>
 		<has_info>agroprom_military_case_done</has_info>
 		<dont_has_info>dan_grab_start</dont_has_info>
 		<phrase_list>
@@ -801,7 +803,7 @@
 			<phrase id="4">
 				<text>yakut_need_do_4</text>
 				<give_info>yakut_treasure_start</give_info>
-				<action>new_dialog.yakut_treasure_have</action>
+				<!--action>new_dialog.yakut_treasure_have</action   109988-->
 				<next>5</next>
 			</phrase>
 			<phrase id="5">
@@ -865,7 +867,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="yakut_proverka">
-		<action>new_dialog.treasure_ecolog_have</action>
+		<precondition>new_dialog.treasure_ecolog_have</precondition>
 		<has_info>system_ecolog_done</has_info>
 		<dont_has_info>yakut_ograblen_done</dont_has_info>
 		<phrase_list>
@@ -879,7 +881,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="uceh_about_prizrak">
-		<action>new_dialog.treasure_ecolog_have</action>
+		<precondition>new_dialog.treasure_ecolog_have</precondition>
 		<has_info>saharov_pda_done</has_info>
 		<dont_has_info>treasure_ecolog_start</dont_has_info>
 		<phrase_list>
@@ -915,8 +917,8 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="uceh_first_prizrak">
-		<action>new_dialog.treasure_ecolog_have</action>
-		<has_info>treasure_ecolog_have</has_info>
+		<precondition>new_dialog.treasure_ecolog_have</precondition>
+		<!--has_info>treasure_ecolog_have</has_info    109988-->
 		<dont_has_info>treasure_ecolog_done</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -929,7 +931,7 @@
 			</phrase>
 			<phrase id="2">
 				<text>uceh_first_prizrak_2</text>
-				<action>new_dialog.treasure_ecolog_have</action>
+				<!--action>new_dialog.treasure_ecolog_have</action    109988-->
 				<give_info>treasure_ecolog_done</give_info>
 				<action>arhara_dialog.spawn_burer_bar</action>
 				<action>new_dialog.treasure_ecolog_done</action>
@@ -1218,13 +1220,14 @@
 			<phrase id="2">
 				<text>yakut_ograb_2</text>
 				<give_info>yakut_ograblen_start</give_info>
-				<action>new_dialog.yakut_ograblen_have</action>
+				<!--action>new_dialog.yakut_ograblen_have</action-->
 				<action>dialogs.break_dialog</action>
 			</phrase>
 		</phrase_list>
 	</dialog>
 	<dialog id="yakut_ograb_done">
 		<dont_has_info>yakut_ograblen_done</dont_has_info>
+		<precondition>new_dialog.yakut_ograblen_have</precondition>
 		<has_info>yakut_ograblen_have</has_info>
 		<phrase_list>
 			<phrase id="0">
