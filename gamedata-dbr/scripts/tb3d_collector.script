@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.6 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.8.7 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started
-function my_ver() return "1.0.9.9.8.6" end
+function my_ver() return "1.0.9.9.8.7" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -816,17 +816,7 @@ end
 function process_levels(lname, sname)
 	local level_up = TB3D_Services.get_level_up()									--109955 for actions past the Collector levelup
 	--============ allways do as environment must be set first ===============================
-	if level_up == 2 then															--Desolation = above ground is harsh in some levels and breaks gear
-		if TB3D_Services.is_instorm(lname) == true then													--109978, levels close to npp
-			TB3D_Services.set_harsh_environment(1)														--109978
-		else
-			TB3D_Services.clear_harsh_environment()														--109978
-		end
-	elseif level_up == 3 then														--Reclamation = storm over, mad rush to the NPP
-		if TB3D_Services.remove_info("tb3d_harsh_environment") then
-			TB3D_Services.clear_harsh_environment()														--109981, storm is over
-		end
-	elseif level_up == 4 then														--LIVE LINK
+	if level_up == 4 then														--LIVE LINK
 		if TB3D_DLC_001 then TB3D_DLC_001.process_levels(lname, sname) end								--109978, optional dlc content				
 	elseif level_up == 5 then
 		if TB3D_DLC_002 then TB3D_DLC_002.process_levels(lname, sname) end								--109978, optional dlc content				
@@ -842,13 +832,25 @@ function process_levels(lname, sname)
 		if TB3D_DLC_007 then TB3D_DLC_007.process_levels(lname, sname) end								--109978, optional dlc content				
 	end
 	if lname ~= sname then
+		--TB3D_Services.packet_alert("tb3d collector: process levels lname["..lname.."] sname["..sname.."] levelup["..utils.to_str(level_up).."]")
+		reset_spawn_triggers()												--109981, save in vars for reloads
+		if level_up == 2 then															--Desolation = above ground is harsh in some levels and breaks gear
+			if TB3D_Services.is_instorm(lname) == true then													--109978, levels close to npp
+				TB3D_Services.set_harsh_environment(1)														--109978
+			else
+				TB3D_Services.clear_harsh_environment()														--109978
+			end
+		elseif level_up == 3 then														--Reclamation = storm over, mad rush to the NPP
+			if TB3D_Services.remove_info("tb3d_harsh_environment") then
+				TB3D_Services.clear_harsh_environment()														--109981, storm is over
+			end
+		end
+		TB3D_Triggers.check_coll_portals()			--109987
 		if has_alife_info("tb3d_radar_done") and not has_alife_info("tb3d_hunt2_start") then			--treasure hunt part 2
 			if has_alife_info("zep24_have") and not has_alife_info("tb3d_harsh_environment") then		--109982, wait for zep ending
 				TB3D_Services.delayed_action(1, "tb3d_hunt2_start", 30)
 			end
 		end
-		--TB3D_Services.packet_alert("tb3d collector: process levels lname["..lname.."] sname["..sname.."] levelup["..utils.to_str(level_up).."]")
-		reset_spawn_triggers()												--109981, save in vars for reloads
 		if lname == "l01_escape" then
 			local spawns = amk.load_variable("tb3d_esc_spawns", 0)
 			if spawns == 0 then
@@ -863,7 +865,16 @@ function process_levels(lname, sname)
 		elseif lname == "l02_garbage" then
 			--future
 		elseif lname == "l05_bar" then
-			--future
+			local spawns = amk.load_variable("tb3d_bar_spawns", 0)
+			if spawns < 1 then
+				TB3D_Services.give_info("bar_arena_fight_8_done")										--109987, skip rookie bar fights
+				TB3D_Services.give_info("bar_arena_rank_false")											-- sends arny to the bar for a break
+				TB3D_Services.give_info("aem_spam")
+				TB3D_Services.give_info("aem_startup")
+				TB3D_Services.give_info("aem_special_done")
+				spawns = 1
+			end
+			amk.save_variable("tb3d_bar_spawns", spawns)
 		elseif lname == "l06_rostok" then
 			--local spawns = amk.load_variable("sarc_spawns", 0)
 			--TB3D_Triggers.ros_spawns(spawns)															--109978

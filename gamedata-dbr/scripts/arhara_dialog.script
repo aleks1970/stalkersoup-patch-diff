@@ -1,9 +1,9 @@
---' TB3D 1.0.9.9.8.4 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.0.9.9.8.7 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
--- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art
-function my_ver() return "1.0.9.9.8.4" end
+-- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot
+function my_ver() return "1.0.9.9.8.7" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -3016,35 +3016,35 @@ function pipets_vert_zadanie_sms()
 end
 function hit_heli_hit_sms1()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_hit_heli_hit1","sms_pilots",1,25,"default")
+		news_manager.amk_send_tip_id("sms_hit_heli_hit1","sms_pilot",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_130]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	end
 end
 function hit_heli_hit_sms2()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_hit_heli_hit2","sms_pilots",1,25,"default")
+		news_manager.amk_send_tip_id("sms_hit_heli_hit2","sms_pilot",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_126]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	end
 end
 function hit_heli_hit_sms3()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_hit_heli_hit3","sms_pilots",1,30,"default")
+		news_manager.amk_send_tip_id("sms_hit_heli_hit3","sms_pilot",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_127]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	end
 end
 function hit_heli_hit_sms4()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_hit_heli_hit4","sms_pilots",1,25,"default")
+		news_manager.amk_send_tip_id("sms_hit_heli_hit4","sms_pilot",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_128]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	end
 end
 function hit_heli_hit_sms5()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_hit_heli_hit4","sms_pilots",1,25,"default")
+		news_manager.amk_send_tip_id("sms_hit_heli_hit4","sms_pilot",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_129]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	end

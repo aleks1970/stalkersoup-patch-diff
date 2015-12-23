@@ -1,11 +1,11 @@
----TB3D 1.0.9.9.8.6 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.8.7 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
--- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop
-function my_ver() return "1.0.9.9.8.6" end
+-- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals
+function my_ver() return "1.0.9.9.8.7" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random=math.random
 local math_floor = math.floor
@@ -798,17 +798,15 @@ function remove_zone_teleports()
 	if se_obj then alife():release(se_obj, true) end
 end
 
-function spawn_bar_portals()
-	----------- bar-warhouses -----------------------------------
-	--need portal: tower to warehouse exit
-	--need target: from tower to warehouse exit
-	--need portal: warehouse exit to roof
-	--[l05_bar]: (109.662,3.438,71.878),33033,1225)		--target from warhouse exit, roof over hunters
-	----------- bar-garbage -------------------------------------
-	--[l05_bar]: (155.955,4.948,71.171),41158,1180)		--portal arena roof to garbage exit
-	--[l05_bar]: (357.757,10.930,-442.953),83911,1289)	--target to garbage exit from arena roof
-	--[l05_bar]: (351.671,11.766,-435.218),85666,1289)	--portal garbage exit to bar
-	--[l05_bar]: (206.206,0.220,51.474),49958,1177)		--target from garbage exit portal, door in entry
+function spawn_bar_portals()			--109987
+	alife():create("bar_gexit_tele", vector():set(351.671,11.766,-435.218),85666,1289)	--portal garbage exit to bar
+	alife():create("zone_teleport", vector():set(351.671,11.766,-435.218),85666,1289)		--marker
+	alife():create("bar_roof_tele", vector():set(157.160,11.053,80.468),41387,1211)		--portal arena roof to garbage exit
+	alife():create("zone_teleport", vector():set(157.160,11.053,80.468),41387,1211)		--marker
+	alife():create("bar_sroof_tele", vector():set(108.345,3.438,73.511),33034,1225)		--sleep place roof to whse exit
+	alife():create("zone_teleport", vector():set(108.345,3.438,73.511),33034,1225)		--marker
+	alife():create("bar_wexit_tele", vector():set(1.493,1.999,289.353),21537,1245)		--whse exit to sleep place roof
+	alife():create("zone_teleport", vector():set(1.493,1.999,289.353),21537,1245)		--marker
 end
 
 -- Spawn places to sleep
@@ -1184,6 +1182,28 @@ function spawn_ds_portals()			--109978, moved here
 	alife():create("zone_teleport", vector():set(518.712,-1.468,-420.649),971751,4653)		--marker
 end
 
+function spawn_jup_portals()			--109987
+	alife():create("jup_trlrright_tele", vector():set(302.991,29.062,-139.740),1207252,3741)	--trailer right portal to tower by table
+	alife():create("zone_teleport", vector():set(302.991,29.062,-139.740),1207252,3741)			--marker
+	alife():create("jup_trlrleft_tele", vector():set(311.083,29.030,-141.033),1217531,3741)		--trailer left portal to radar complex under S
+	alife():create("zone_teleport", vector():set(311.083,29.030,-141.033),1217531,3741)			--marker
+	alife():create("jup_cmplx_tele", vector():set(-414.609,2.641,16.106),25032,3708)			--radar complex under N, portal to trailer
+	alife():create("zone_teleport", vector():set(-414.609,2.641,16.106),25032,3708)				--marker
+	alife():create("jup_tower_tele", vector():set(-14.675,23.074,253.074),692825,3725)			--tower at window
+	alife():create("zone_teleport", vector():set(-14.675,23.074,253.074),692825,3725)			--marker
+end
+
+function spawn_zat_portals()			--109987
+	alife():create("zat_bridge_tele", vector():set(429.719,40.359,-230.540),1670637,3694)	--bridge to ship
+	alife():create("zone_teleport", vector():set(429.719,40.359,-230.540),1670637,3694)		--marker
+	alife():create("zat_shipb_tele", vector():set(70.596,-0.347,36.479),1021131,3677)		--ship to bridge
+	alife():create("zone_teleport", vector():set(70.596,-0.347,36.479),1021131,3677)		--marker
+	alife():create("zat_shipr_tele", vector():set(76.357,-0.263,33.978),1021131,3677)		--ship to radar
+	alife():create("zone_teleport", vector():set(76.357,-0.263,33.978),1021131,3677)		--marker
+	alife():create("zat_radar_tele", vector():set(-412.857,12.192,-22.607),158823,3663)		--radar to ship
+	alife():create("zone_teleport", vector():set(-412.857,12.192,-22.607),158823,3663)		--marker
+end
+
 function signal_green(x,y,z,lv,gv)			--109978, moved here
 	if TB3D_Services.is_night() then
 		alife():create("glow_stick_green",vector():set(x,y+1,z),lv,gv)
@@ -1421,4 +1441,15 @@ function spawn_tunnel_zombied()
 	spawn_alife_rand("tb3dm_zombied_eco", -87.830,-11.456,-218.146,9013,1485,2)			--spawn upto 2 zombied behind pipe wall
 	spawn_alife_rand("tb3dm_zombied_eco", -55.929,-12.470,-249.126,19369,1454,4)		--spawn upto 4 zombied on island
 	spawn_alife_rand("tb3dm_zombied_eco", -8.698,-11.880,-261.798,35697,1482,2)			--spawn upto 2 zombied by station wall
+end
+
+function check_coll_portals()												--109987
+	local spawned = amk.load_variable("tb3d_coll_ports", 0)
+	if spawned < 1 then							--109987
+		spawn_jup_portals()
+		spawn_bar_portals()
+		spawn_zat_portals()
+		spawned = 1
+	end
+	amk.save_variable("tb3d_coll_ports", spawned)
 end

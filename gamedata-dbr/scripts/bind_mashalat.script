@@ -1,0 +1,341 @@
+--[[-----------------------------------------------------------------------
+| 					<<< Invisibility in a suit >>>
+| To work used battery, which lasts for a certain time,
+| Battery charges when removing the suit. When the battery, invisibility
+| Disabled. When dressed suit shows the battery level.
+| When firing and visible weapons, enemies you see, but the indicator
+| It does not show.
+| Is not compatible with old scripts, it needs to remove or disable!
+| (C) Intro aka nanobots ver. 10/17/2014 2.15 g
+| Rewritten for StalkerSoup by aleks1970 03/26/2015
+--]]-----------------------------------------------------------------------
+
+local invisible_global 	= 1		-- switch script: 0 - off. 1 - incl.
+local fake_knife_on 	= true 	-- uses the fake knives?
+local time_invisible 	= 360	-- when battery is fully discharged, at which ceases to be invisible, sec.
+local time_batar 		= 60	-- while a full charge time, sec	-- previous 120 aleks1970
+local rangeMin 			= 1 	-- visibility out of sight on, m.
+local rangeMax 			= 4 	-- visibility in the field of view on, m.
+local update_npc		= 3000 	-- refresh visibility NPC, ms.
+local lev_cond 			= 0.6 	-- Worn level at which the camouflage cloak ceases to be working (invisible)
+local slot_knife 		= 0		-- number of knife slots for PM
+local translate			= game.translate_string
+local ini = system_ini()
+local hud = get_hud()
+local actor_id = 0
+local ramka = nil
+local polosa = nil
+local blink = 0
+local invisible_weapons = {						-- invisible weapon (transparent) for NPC
+			["wpn_bizon1"] 			= true,
+			["wpn_m16a2_sk12"] 		= true,
+			["intergral_knife"] 	= true,
+			["mobile"] 				= true,
+	}
+
+local con = get_console()
+local function log(arg)
+	con:execute("load ~ "..string.sub(tostring(arg),1 , 200))
+	con:execute("flush")
+end
+
+------------------------------------------------------------
+-- Binder knife --
+function init_knife(obj)
+	local new_binder = intknife_binder(obj)
+	obj:bind_object(new_binder)
+end
+---------------------
+class "intknife_binder" (object_binder)
+---------------------
+--\\ initialization binder
+function intknife_binder:__init(obj) super(obj)
+	self.id = self.object:id()
+	obj:set_fastcall(self.fastcall_knife, self)
+end
+
+function intknife_binder:fastcall_knife()
+	local par = self.object:parent()
+	if par and par:id() == actor_id  then return false
+	end
+	alife():release(alife():object(self.id)) -- If the emissions, then remove
+	--log("intknife_binder:fastcall_knife()knife away! id-("..self.id..")time-("..time_global()..")")
+	return true
+end
+----------------------------------------------------------------
+--\\ Register online
+function init(obj)
+	if invisible_global == 0 then return end
+	local new_binder = mashalat_binder(obj)
+	obj:bind_object(new_binder)
+end
+--------------------------------------------------------------------------------------------
+class "mashalat_binder" (object_binder)
+--------------------------------------------------------------------------------------------
+--\\ initialization binder
+function mashalat_binder:__init(obj) super(obj)
+	self.tormoz = 0
+	self.id = self.object:id()
+	self.last_ammo_elapsed = 0
+	self.last_wpn_id = nil
+	self.no_inv_time = 0
+	self.invisible = false
+	self.make_invizible = false
+	self.not_invizible = true
+	self.effector_on = false
+	self.batar = 1
+	self.time_msg = 0
+	if time_invisible < 1 then time_invisible = 1 end
+	self.time_invisible = time_invisible * 1000
+	if time_batar < 1 then time_batar = 1 end
+	self.time_batar = time_batar * 1000
+	log("mashalat_binder:__init(obj)id-("..obj:id()..")time-("..time_global()..")")
+end
+
+function mashalat_binder:update(delta)
+	object_binder.update(self, delta)
+	local outfit_cammo = db.actor:item_in_slot(6)
+	local ac_slot = db.actor:active_slot() -- active slot
+	local wpn = db.actor:active_item()
+	local wpn0 = db.actor:item_in_slot(0) -- blade slot	
+	local msg_new = false
+	local msg = ""
+	local wpn_inv = false
+	local camouflage_strelok_dressed = outfit_cammo and outfit_cammo:section() == "meceniy_outfit_strelok"
+	if not camouflage_strelok_dressed then		-- not wearing camouflage cloak 
+		if self.not_invizible == false then 
+			log("Camouflage shot! time-("..time_global()..")")
+			self.invisible = false
+			if ramka then
+				hud:RemoveDialogToRender(ramka)
+				ramka = nil
+				hud:RemoveDialogToRender(polosa)
+				polosa = nil
+				--log("RemoveDialogToRender()time-("..time_global()..")")
+			end
+			bind_stalker.restore_weapon()
+			if self.effector_on == true then
+				level.remove_pp_effector(1111)
+				self.effector_on = false
+			end
+			self.not_invizible = true
+			self.make_invizible = false
+			if wpn0 and wpn0:section() == "intergral_knife" then
+				alife():release(alife():object(wpn0:id()), true) -- clear it
+			end
+		end
+		self.batar = self.batar + delta/self.time_batar -- battery
+		if self.batar > 1 then
+			self.batar = 1
+		end
+	else		-- wearing camouflage cloak
+		if wpn0 then
+			if wpn0:section() ~= "intergral_knife" then
+				local fakekn = ""
+				if fake_knife_on then
+					fakekn = "fake_"
+				end
+				local sect0 = fakekn..wpn0:section()
+				alife():create(sect0, vector():set(0,0,0),1,1, actor_id)
+				alife():release(alife():object(wpn0:id()), true) -- clear it
+				alife():create("intergral_knife", vector():set(0,0,0),1,1, actor_id)
+				local fake = db.actor:object("fake_intergral_knife")
+				if fake then
+					alife():release(alife():object(fake:id()), true)
+				end
+			end
+		else
+			alife():create("intergral_knife", vector():set(0,0,0),1,1, actor_id)
+		end
+		if self.make_invizible == false then -- for the first time put camouflage cloak
+			log("Wearing camouflage! time-("..time_global()..")")
+			level.add_pp_effector ("teleport.ppe", 1111, false)
+			level.set_pp_effector_factor(1111, 1.0)
+			self.effector_on = true
+			self.make_invizible = true
+			self.not_invizible = false
+			self.destroy_invizible = false
+			self.time_msg = time_global()
+		else  -- camouflage cloak dressed check in arms.
+			if outfit_cammo:condition() > lev_cond then -- camouflage cloak work	
+				if self.no_inv_time < time_global() then
+					wpn_inv = false -- invisible whether weapons in active slot, if not, become visible!
+					if wpn then
+						local sect = wpn:section()
+						if invisible_weapons[sect] == true then 
+							wpn_inv = true
+						end
+					else
+						wpn_inv = true
+					end
+					if wpn_inv == true then
+						bind_stalker.restore_weapon()
+						self.invisible = true
+					else
+						self.invisible = false
+					end
+				end
+				local wpn_id = nil
+				if wpn and wpn_inv and ac_slot ~= slot_knife then		-- invisible weapon in the hands of
+					wpn_id = wpn:id()
+					local ammo_elapsed = wpn:get_ammo_in_magazine()
+					if wpn_id == self.last_wpn_id and self.last_ammo_elapsed > ammo_elapsed then -- and it shoots
+						self.invisible = false
+						self.no_inv_time = time_global() + update_npc -- how much time will be visible after the shot
+						self.tormoz = time_global()
+						--log("Shooting! ac_slot-("..ac_slot..")self.no_inv_time-("..self.no_inv_time..")time-("..time_global()..")")
+					end
+					self.last_ammo_elapsed = ammo_elapsed
+				end	
+				self.last_wpn_id = wpn_id
+				self.batar = self.batar - delta/self.time_invisible -- battery drain
+				if self.batar < 0 then
+					self.batar = 0
+					self.invisible = false
+				end
+				if self.time_msg <= time_global() then
+					if self.batar > 0 then
+						msg = ""	--string.format("Included: Battery[%d]", math.floor(self.batar*100+0.5))
+					else
+					--	msg = string.format("Off: The battery is empty!") --aleks1970
+						msg = string.format(translate("battery_is_empty")) --aleks1970
+						blink = 1 - blink
+					end
+					msg_new = true
+					self.time_msg = time_global() + 1000
+				end
+			else	-- camouflage cloak does not work
+				if self.destroy_invizible == false then
+					self.invisible = false
+				--	msg = string.format("Camouflage damaged!") --aleks1970
+					msg = string.format(translate("is_damaged")) --aleks1970
+					msg_new = true
+					self.destroy_invizible = true
+					bind_stalker.restore_weapon()
+				end
+			end
+		end
+	end
+	if level.main_input_receiver()  then
+		if ramka then
+			hud:RemoveDialogToRender(ramka)
+			ramka = nil
+			hud:RemoveDialogToRender(polosa)
+			polosa = nil
+			--log("RemoveDialogToRender()time-("..time_global()..")")
+		end
+		self.time_msg = time_global()
+	else
+		if msg_new == true then
+			if not ramka then
+				ramka = CUIStatic()
+				ramka:Init(384,30,250,24)
+				ramka:InitTexture("invizhud\\ProgressBatteryBelow")
+				ramka:SetStretchTexture(true)
+				ramka:SetFont(GetFontGraffiti22Russian())
+				ramka:SetTextAlign(CGameFont.alCenter)
+				hud:AddDialogToRender(ramka)
+				--log("AddDialogToRender(ramka)time-("..time_global()..")")
+			end
+			if not polosa then
+				polosa = CUIStatic()
+				polosa:Init(387, 32, 244, 20)
+				polosa:InitTexture("invizhud\\ProgressBatteryBar")
+				polosa:SetStretchTexture(true)
+				hud:AddDialogToRender(polosa)
+				--log("AddDialogToRender(polosa)time-("..time_global()..")")
+			end
+			local dln = math.floor(self.batar*244+0.5)
+			polosa:SetWidth(dln)
+			polosa:Show(true)
+			ramka:SetText(msg)
+			ramka:SetTextY(708)	--ramka:SetTextY(3) aleks1970
+			if blink == 0 then
+				ramka:SetTextColor(255, 225, 215, 0)
+			else
+				ramka:SetTextColor(255, 225, 0, 0)
+			end
+			ramka:Show(true)
+			msg_new = false
+		end
+	end
+	if self.tormoz <= time_global() then -- Apparently NPSov update every second update_npc
+		--log("Setting visibility invisiblee-("..tostring(self.invisible)..")batar-("..math.floor(self.batar*100+0.5)..")time-("..time_global()..")")
+		invisible_npc(self.invisible)
+		self.tormoz = time_global() + update_npc
+	end
+end
+
+function mashalat_binder:net_Relcase(obj) -- works a little faster net_destroy()
+	if obj and obj:id() == self.id then
+		if ramka then
+			hud:RemoveDialogToRender(ramka)
+			ramka = nil
+			hud:RemoveDialogToRender(polosa)
+			polosa = nil
+			log("mashalat_binder:net_Relcase(id-"..obj:id()..")RemoveDialogToRender()time-("..time_global()..")")
+		end
+	end
+end
+
+function mashalat_binder:net_destroy()
+	if ramka then
+		hud:RemoveDialogToRender(ramka)
+		ramka = nil
+		hud:RemoveDialogToRender(polosa)
+		polosa = nil
+		log("RemoveDialogToRender()time-("..time_global()..")")
+	end
+	if db.actor then
+		invisible_npc(false)	-- in case you suddenly removed the costume!
+		local wpn0 = db.actor:item_in_slot(0) -- blade slot
+		if wpn0 and wpn0:section() == "intergral_knife" then
+			alife():release(alife():object(wpn0:id()), true) -- clear it
+		end
+		log("mashalat_binder:net_destroy()camouflage cloak away! id-("..self.object:id()..")time-("..time_global()..")")
+	end
+	log("mashalat_binder:net_destroy() id-("..self.object:id()..")time-("..time_global()..")")
+	object_binder.net_destroy(self)
+end
+
+function invisible_npc(invisible)
+	local object_all
+	local range = 0
+	for id, v in pairs (db.storage) do
+		object_all = level.object_by_id(id)
+		if object_all and object_all:alive() then 
+			local section = object_all:section()
+			local eyer = 0
+			local eyev = 120
+			if ini:line_exist(section, "eye_range") then -- 
+				eyer = ini:r_float(section, "eye_range")
+				if invisible == true then 
+					eyev = ini:r_float(section, "eye_fov")
+					range = math.floor(db.actor:position():distance_to(object_all:position())-5)
+					if range < rangeMin then range = rangeMin end
+					if range < rangeMax and look_angle(object_all) < eyev*0.5 then range = rangeMax end
+					if range > eyer then range = eyer end
+				else
+					range = eyer
+				end
+				object_all:set_range(range)	
+			end
+			--log("Object-("..section..")name-("..object_all:name()..")range-("..range..")Visibility NPC default-("..eyer..")")
+		end
+	end
+end
+
+function look_angle(npc)
+	local npc_pos = npc:bone_position("bip01_head")
+	local dir = npc:direction()
+	local actor_pos = db.actor:position()
+	local npc_pos_dir = get_dir_to_obj(npc_pos, actor_pos)
+	local ugl = yaw_degree3d(npc_pos_dir, dir) -- angle of view of the actor
+	--log("angle-("..ugl..")")
+	return ugl
+end
+
+function get_dir_to_obj(self_pos,obj_pos)
+	return obj_pos:sub(self_pos):normalize()
+end
+

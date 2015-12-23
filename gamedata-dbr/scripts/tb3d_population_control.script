@@ -1,8 +1,8 @@
--- TB3D 1.0.9.9.8.6 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.0.9.9.8.7 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment
-function my_ver() return "1.0.9.9.8.6" end
+function my_ver() return "1.0.9.9.8.7" end
 					
 -----over population control----
 local string_find = string.find
@@ -659,7 +659,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 	if obj_name and db.actor then
 		local is_report = false
 		if TB3D_Modders.use_setup_message and string_find(obj_name, TB3D_Modders.npc_to_log) then is_report = true end
-		--if is_report then TB3D_Services.packet_alert("tb3d pop control: can go online["..obj_name.."] ?") end
+		--TB3D_Services.packet_alert("tb3d pop control: can go online["..obj_name.."] ?")
 		if has_alife_info("tb3d_harsh_environment") then
 			if string_sub(obj_name, 1, 6) == "tb3dm_"
 			  or string_sub(obj_name, 1, 4) == "amk_"
@@ -1075,6 +1075,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 			elseif lname == "l02_garbage" then
 				if hdr4 == "gar_"			--short circuit known spawns
 				  or hdr4 == "sak_"
+				  or hdr4 == "amk_"			--109987, vitek_voron the trader
 				  or hdr6 == "garbag"
 				  or hdr6 == "svalka"
 				  or hdr6 == "tamaz_" then
@@ -1314,7 +1315,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					result = true
 				end
 			elseif lname == "l05_bar" then
-				if hdr4 == "bar_"			--short circuit known spawns
+				if hdr4 == "bar_"				--bar_stalker_0005 = arena fight 1, _0006 = fight 2, 7 & 8 = 3, 9 - 13 = 4, 14 & 15 = 5, 16 - 21 = 6, 22 = 7, 23 - 26 = 8
 				  or hdr6 == "gar_st"			--gar_stalker_general
 				  or hdr6 == "prapor"			--prapor
 				  or hdr6 == "dolgov"			--dolgovazyi

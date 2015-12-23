@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.8.0 added fixed conditions for Collector, added autosave to arena, fixed bar jobs, debug 
-function my_ver() return "1.0.9.9.8.0" end
+-- TB3D 1.0.9.9.8.7 added fixed conditions for Collector, added autosave to arena, fixed bar jobs, debug, arena fast autosave 
+function my_ver() return "1.0.9.9.8.7" end
 --------------------------------------------------------------------------------------------------------
 -- Trader Repair
 --------------------------------------------------------------------------------------------------------
@@ -385,7 +385,7 @@ function arena_give_reward(actor, npc)
 	TB3D_Services.give_info("bar_arena_reset")	
 	xr_zones.purge_arena_items("bar_arena")
 	if amk.load_variable("option_autosave",1)~=0 then
-		news_manager.save_collector("Arena Fight "..utils.to_str(f).." Done")
+		news_manager.save_collector("Arena Fight "..utils.to_str(f).." Done", true)
 	end
 end
 
