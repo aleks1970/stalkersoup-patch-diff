@@ -1,10 +1,10 @@
-<!-- *** TB3D 1.0.9.9.7.2 temporary support of level spawns in new levels, removed "�" aleks1970 *** -->
+<!-- *** TB3D 1.0.9.9.8.8 removed "�" aleks1970, criticals and final localization -->
 <xml>
 	<specific_character id="bandit_novice_default4" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -12,13 +12,14 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_novice_default5" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -26,13 +27,14 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_novice_default6" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -40,6 +42,7 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<!-- ***************BANDIT NOVICE 2*************** -->
@@ -47,7 +50,7 @@
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -55,13 +58,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_3</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="sim_bandit_novice1" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -69,13 +73,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_3</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="sim_bandit_novice11" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -83,13 +88,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_3</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="sim_bandit_novice12" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -97,13 +103,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_4</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="sim_bandit_novice13" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -111,13 +118,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_8</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="sim_bandit_novice14" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -125,13 +133,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_8</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="sim_bandit_novice15" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -139,13 +148,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_8</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="sim_bandit_novice16" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_novice</team>
 		<class>Bandit_novice</class>
 		<community>bandit</community>
@@ -153,13 +163,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_8</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_general_default3" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_general</team>
 		<class>Bandit_general</class>
 		<community>bandit</community>
@@ -167,13 +178,14 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_3</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_general_default4" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="14" y="4"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_general</team>
 		<class>Bandit_general</class>
 		<community>bandit</community>
@@ -181,6 +193,7 @@
 		<reputation>0</reputation>
 		<visual>actors\bandit\stalker_bandit_4</visual>
 #include "inventory\bandit_novice_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<!-- ***************BANDIT GENERAL SNIP*************** -->
@@ -188,7 +201,7 @@
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -196,13 +209,14 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_general_snip_defaul12" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -211,13 +225,14 @@
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
 #include "dialogs\uband_esc.xml"
+#include "gameplay\character_criticals_6.xml"
 </specific_character>
 	<!-- ***************BANDIT VETERAN*************** -->
 	<specific_character id="bandit_veteran_default4" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="22" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_veteran</team>
 		<class>Bandit_veteran</class>
 		<community>bandit</community>
@@ -225,6 +240,7 @@
 		<reputation>-20</reputation>
 		<visual>actors\bandit\stalker_bandit_veteran</visual>
 #include "inventory\bandit_veteran_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<!-- ***************BANDIT VETERAN GAS*************** -->
@@ -232,7 +248,7 @@
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="22" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_veteran</team>
 		<class>Bandit_veteran</class>
 		<community>bandit</community>
@@ -240,13 +256,14 @@
 		<reputation>-20</reputation>
 		<visual>actors\bandit\stalker_bandit_veteran</visual>
 #include "inventory\bandit_veteran_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_veteran_gas_default2" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="22" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_veteran</team>
 		<class>Bandit_veteran</class>
 		<community>bandit</community>
@@ -254,13 +271,14 @@
 		<reputation>-20</reputation>
 		<visual>actors\bandit\stalker_bandit_veteran</visual>
 #include "inventory\bandit_veteran_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_veteran_gas_default3" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="22" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_veteran</team>
 		<class>Bandit_veteran</class>
 		<community>bandit</community>
@@ -268,6 +286,7 @@
 		<reputation>-20</reputation>
 		<visual>actors\bandit\stalker_bandit_veteran</visual>
 #include "inventory\bandit_veteran_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<!-- ***************BANDIT VETERAN SNIP*************** -->
@@ -275,7 +294,7 @@
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="22" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_veteran</team>
 		<class>Bandit_veteran</class>
 		<community>bandit</community>
@@ -283,13 +302,14 @@
 		<reputation>-20</reputation>
 		<visual>actors\bandit\stalker_bandit_veteran</visual>
 #include "inventory\bandit_veteran_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_veteran_snip_default2" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="22" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_veteran</team>
 		<class>Bandit_veteran</class>
 		<community>bandit</community>
@@ -297,6 +317,7 @@
 		<reputation>-20</reputation>
 		<visual>actors\bandit\stalker_bandit_veteran</visual>
 #include "inventory\bandit_veteran_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<!-- ***************BANDIT MASTER PUL*************** -->
@@ -304,7 +325,7 @@
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -312,13 +333,14 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_master_pul_default1" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -326,13 +348,14 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<specific_character id="bandit_master_pul_default2" team_default="1">
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -340,6 +363,7 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<!-- ***************BANDIT MASTER RPG*************** -->
@@ -347,7 +371,7 @@
 		<name>Unknown_Bandit_name_gameplay</name>
 		<icon x="24" y="14"/>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown Bandit. Dubious reputation. Detailed information unavailable.</bio>
+		<bio>sim_bandit_novice_bio</bio>
 		<team>Bandit_master</team>
 		<class>Bandit_master</class>
 		<community>bandit</community>
@@ -355,6 +379,7 @@
 		<reputation>-50</reputation>
 		<visual>actors\bandit\stalker_bandit_master</visual>
 #include "inventory\bandit_master_items.xml"
+#include "gameplay\character_criticals_6.xml"
 #include "dialogs\uband_esc.xml"
 </specific_character>
 	<!-- ************************************* -->

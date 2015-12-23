@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.8.4 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.8.9 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -8,8 +8,8 @@
 -- sak_book4, tb3d_collector, corrected lighting_val, changed fixer to only be called on level change, sak_book4, news, blowout types, get_obj_level,
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
--- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970
-function my_ver() return "1.0.9.9.8.4" end
+-- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms
+function my_ver() return "1.0.9.9.8.9" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -48,31 +48,40 @@ function first_run() 		--mod_call() from amk.script on_game_load, do not spawn o
 		verify_failed = TB3D_Verify_Scripts.verify_files()
 	end
 	--!!!!TB3D - !!!!!!! DO NOT CHANGE - ORDER IS CRITICAL !!!!!!!!!!!! -----
-	local tb3d_ver = amk.load_variable("tb3d_version",0)		--returns 0 if not created yet
-	local level_up = TB3D_Services.init_level_up()				--109980
+	local tb3d_ver = amk.load_variable("tb3d_version",0)						--returns 0 if not created yet
+	local level_up = TB3D_Services.init_level_up()								--109980
 	--TB3D_Services.packet_alert("TB3D starting ver["..utils.to_str(tb3d_ver).."] levelup["..utils.to_str(level_up).."]")
-	if tb3d_ver < TB3D_Services.major_version then				--older saves or new game
-		if tb3d_ver > 0 then									--old legacy tb3d save
-			if level_up > -1 then
+	if tb3d_ver < TB3D_Services.major_version then								--older saves or new game
+		if tb3d_ver > 0 then													--109989, old legacy tb3d save
+			if level_up > 0 then
 				TB3D_Services.packet_alert("TB3D converting old collector save["..utils.to_str(tb3d_ver).."] to["..TB3D_Services.major_version.."] levelup["..utils.to_str(level_up).."] returning to the zone...")
+			elseif level_up == -1 then
+				TB3D_Services.packet_alert("TB3D converting old stalker save["..utils.to_str(tb3d_ver).."] to["..TB3D_Services.major_version.."], returning to the zone...")
+				TB3D_Services.set_new_levelup(0) 								--109989
 			else
 				TB3D_Services.packet_alert("TB3D converting old stalker save["..utils.to_str(tb3d_ver).."] to["..TB3D_Services.major_version.."], returning to the zone...")
 			end
-			amk.save_variable("first_started",(tb3d_ver))		--started saving this in 109924
-		else													--new game
+			if amk.load_variable("first_started", nil) == nil then 				--109989
+				amk.save_variable("first_started", tb3d_ver)					--started saving this in 109924
+			end
+			amk.save_variable("check_prior", tb3d_ver)							--109989, need update version fixes
+		else																	--new game
 			amk.save_variable("temp_intro", 1)
 			if get_console():get_string("mm_net_srv_name") == game.translate_string("gd_collector") then
-				TB3D_Services.set_new_levelup(1) 				--109978
+				TB3D_Services.set_new_levelup(1) 								--109978
 				TB3D_Services.give_info("tb3d_started_as_collector")
 				TB3D_Services.packet_alert("TB3D version["..TB3D_Services.major_version.."] new game collector...")
 			else
-				TB3D_Services.set_new_levelup(0)				--109978
+				TB3D_Services.set_new_levelup(0)								--109978
 				TB3D_Services.packet_alert("TB3D version["..TB3D_Services.major_version.."] new game stalker...")
 			end
-			amk.save_variable("first_started",TB3D_Services.major_version)			--user support
+			amk.save_variable("first_started",TB3D_Services.major_version)		--user support
+			amk.save_variable("check_prior", TB3D_Services.major_version)		--109989, do initial fixes
 		end
-	else														--returning: same version
-		if level_up == -1 then
+		amk.save_variable("tb3d_version", TB3D_Services.major_version)
+	else																		--returning: same version
+		if level_up == -1 then													--109989, should never happen on a returning game
+			TB3D_Services.set_new_levelup(0) 									--109989
 			TB3D_Services.packet_alert("TB3D started["..utils.to_str(amk.load_variable("first_started",0)).."] version["..TB3D_Services.major_version.."] levelup["..utils.to_str(level_up).."] no level up!!!!...")
 		elseif level_up > 0 then
 			TB3D_Services.packet_alert("TB3D started["..utils.to_str(amk.load_variable("first_started",0)).."] version["..TB3D_Services.major_version.."] levelup["..utils.to_str(level_up).."] collector returning to the zone...")
@@ -80,7 +89,6 @@ function first_run() 		--mod_call() from amk.script on_game_load, do not spawn o
 			TB3D_Services.packet_alert("TB3D started["..utils.to_str(amk.load_variable("first_started",0)).."] version["..TB3D_Services.major_version.."] stalker returning to the zone...")
 		end
 	end
-	amk.save_variable("tb3d_version", TB3D_Services.major_version)
 	--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!--
 	-------------!! obsolete, now saved in level_weathers
 	if amk.load_variable("weather",nil) ~= nil then amk.del_variable("weather") end
@@ -106,7 +114,6 @@ end --first run
 --'*******************************************************************************
 --'   **      **    **   **   **        CHECK_SPAWN          **   **   **   **    
 --'*******************************************************************************
-local last_hdr_state
 function check_spawn()
 	local obj
 	local lname = level.name()
@@ -151,7 +158,6 @@ function check_spawn()
 			--if not obj then obj = alife():create(10776) end							--obj[33943][pri_space_restrictor_0011]
 			--TB3D_Services.packet_alert("sid 10776 created obj["..utils.to_str(obj.id).."]["..utils.to_str(obj:name()).."]")
 		end
-		amk_anoms.pre_blow_off()
 		amk.g_start_timer("gg_need_sleep",0,0,6)
 		amk.g_start_timer("show_news",0,0,10)
 		TB3D_FIXER.force_fixes()																--109976 must be before dynamic spawns and env update
@@ -179,19 +185,26 @@ function check_spawn()
 		else
 			TB3D_Services.packet_alert("special teleport used from["..sname.."] to["..lname.."]")
 		end
+		local blow = TB3D_Services.blow()															--109989, moved
 		--TB3D_Services.info_alert("AMK MOD: check spawn 6b")
 		TB3D_Services.level_on_save(sname)															--109983, set var
 		if lname ~= sname then
-			TB3D_Services.remove_info("yan_zombied_respawn_01")										--reset snork for next use
-			TB3D_Services.remove_info("yan_zombied_respawn_02")										--reset snork for next use
-			TB3D_Services.remove_info("yan_zombied_respawn_04")										--reset snork for next use
-			TB3D_Services.remove_info("yan_zombied_respawn_05")										--reset snork for next use
-			TB3D_Services.remove_info("yan_zombied_respawn_06")										--reset snork for next use
-			TB3D_Services.remove_info("yan_zombied_respawn_07")										--reset snork for next use
+			TB3D_Services.remove_info("yan_zombied_respawn_01")										--109989, reset snorks for next use
+			TB3D_Services.remove_info("yan_zombied_respawn_02")
+			TB3D_Services.remove_info("yan_zombied_respawn_03")
+			TB3D_Services.remove_info("yan_zombied_respawn_04")
+			TB3D_Services.remove_info("yan_zombied_respawn_05")
+			TB3D_Services.remove_info("yan_zombied_respawn_06")
+			TB3D_Services.remove_info("yan_zombied_respawn_07")
+			TB3D_Services.remove_info("yan_zombied_respawn_08")
 			TB3D_Services.remove_info("tb3d_sar_toggled")											--reset monolit for next use
 			TB3D_Services.remove_info("tb3d_marsh_zones")											--frog sounds, set in dyn spawn
 			TB3D_Services.remove_info("tb3d_cooling_zones")											--ventillators, set in dyn spawn
 			TB3D_FIXER.force_fixes()																--109976 must be before dynamic spawns and env update
+			if not blow then
+				amk_anoms.pre_blow_off()							--109989 moved from amk_anoms.init(), always regenerate on level change
+				amk_anoms.generate_anoms()
+			end
 			amk_anoms.generate_arts(lname)															--109976 now per level
 			TB3D_dyn_spawn.dynamic_objects(lname)													--dynamic spawns - TB3D 109934
 			if not has_alife_info("tb3d_game_end") then
@@ -226,7 +239,7 @@ function check_spawn()
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("AMK MOD: check spawn 3")
 	end
-	TB3D_Triggers.spawn_zone_teleports()					--radar, limansk
+	TB3D_Triggers.spawn_zone_teleports()															--radar, limansk
 	if (news_main) then news_main.init() end
 	if TB3D_Modders.use_offline_alife then
 		amk_offline_alife.init()
@@ -236,8 +249,6 @@ function check_spawn()
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("AMK MOD: check spawn 4")
 	end
-	TB3D_Services.check_prior_version(lname, sname)												--109972
-	local blow = TB3D_Services.blow()			--amk.load_variable("blowout",nil)
 	local startup = amk.load_variable("temp_intro",0)								--109972
 	-------------------------------------------------------------------------------------------
 	if TB3D_Services.is_collector(10) == true or has_alife_info("tb3d_game_end") then 				-- COLLECTOR START
@@ -333,12 +344,9 @@ function check_spawn()
 			TB3D_Collector.process_levels(lname, sname)
 			TB3D_Services.update()												--!!!!TB3D start task update timer
 		end
-		if verify_failed then
-			news_manager.amk_send_tip_id("tb3d_bad_script_msg","tb3d_system_msg",10,40,"tb3d_master")		--109980, if game loads at all
-		end
 		--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("AMK MOD: check spawn c6") end
 	-------------------------------------------------------------------------------------------
-	else																							-- STALKER START
+	else						-- STALKER START
 	-------------------------------------------------------------------------------------------
 		--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
 		TB3D_services.stalker_set_portals()										--clears lcs based on info portions
@@ -353,9 +361,9 @@ function check_spawn()
 			if obj then alife():release(obj) end
 			----- moved from amk and sak -------TB3D 109932------------------------------------------------------------------------
 			--amk			--recipies for arts
-			amk.spawn_item("amk_zapiska",vector():set(-126.96,-28.41,-379.12),27,125181)	-- devices\quest_items\yan_x16_documents
-			amk.spawn_item("amk_zapiska",vector():set(21.6,-3.94,-18.28),1140,5991)
-			amk.spawn_item("amk_zapiska",vector():set(-126.92,23.27,-36.98),1543,7083)
+			amk.spawn_item("amk_zapiska",vector():set(-126.96,-28.41,-379.12),27,125181)	-- l01_escape
+			amk.spawn_item("amk_zapiska",vector():set(21.6,-3.94,-18.28),1140,5991)			-- l04u_labx18
+			--amk.spawn_item("amk_zapiska",vector():set(-117.381,18.722,-21.890),1529,84)	-- l08u_brainlab, 109989 moved to tb3d_stalker
 			---sak
 			amk.spawn_item("sak_document",vector():set(350,-51.74,-24.45),2031,93051) 		-- radar lc -- document under the corpse of the scientist in the woods RJ
 			amk.spawn_item("rad_document6",vector():set(621.95,-42.64,187.38),1910,224619)	-- artmod info -- case in a kung monolitovtsuv
@@ -378,6 +386,14 @@ function check_spawn()
 		end
 		--TB3D_Services.packet_alert("AMK MOD: check spawn 7")
 		TB3D_Modders.stalker_spawn()													-- give items on spawn
+	end
+	if verify_failed then
+		news_manager.amk_send_tip_id("tb3d_bad_script_msg","tb3d_system_msg",10,40,"tb3d_master")		--109980, if game loads at all
+	end
+	local check_prior = amk.load_variable("check_prior", nil)										--109989
+	if check_prior then
+		TB3D_Services.check_prior_version(check_prior)												--109989, version changed or new game
+		amk.del_variable("check_prior")
 	end
 	art_hit.net_spawn()
   	if TB3D_Modders.Global_Debug then
@@ -2014,6 +2030,9 @@ function Run_Blowout_pp()
 		elseif level.name() == "l03_agroprom" or level.name() == "l03u_agr_underground"			--109975
 		  and not has_alife_info("agroprom_military_case_done") then
 			TB3D_Services.stop_blow()			--skip it to not have base in hideout
+			bt = 5								--not 0 so no news given
+		elseif level.name() == "l07_military" and not has_alife_info("bar_deactivate_radar_done") then
+			TB3D_Services.stop_blow()			--109989, skip it to not happen during skull or barrier battles
 			bt = 5								--not 0 so no news given
 		else
 			if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("AMK MOD: Run_Blowout_pp["..utils.to_str(bt).."]") end

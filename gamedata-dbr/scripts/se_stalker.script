@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.1 replaced debug flags, added my_ver, switch online, companion, brain update, companion moved
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.8.8 replaced debug flags, added my_ver, switch online, companion, brain update, companion moved, generators_udav
+function my_ver() return "1.0.9.9.8.8" end
 --[[
 Changes script_version:
   3 - conservation field job_online
@@ -56,10 +56,14 @@ end
 --------------------
 function se_stalker:can_switch_offline()
 	local result = false
-	if TB3D_Modders.use_smh3_message == true then
-		TB3D_Services.packet_alert("se stalker:  can switch offine")
+	local is_report = false
+	if TB3D_Modders.use_state_message and string_find(self:name(), TB3D_Modders.npc_to_log) then is_report = true end
+	if is_report then
+		TB3D_Services.packet_alert("se stalker: ["..self:name().."]  can switch offine?")
 	end
-	if amk.convert_npc[self.id]==true then 
+	if string_find(self:name(), "generators_udav") and not has_alife_info("udav_pabota_ok_start") then			--109988
+		result = false
+	elseif amk.convert_npc[self.id]==true then 
 		result = true 
 	--dc-- elseif amk.convert_npc[self.id]==false then
 		--  return false
@@ -70,7 +74,7 @@ function se_stalker:can_switch_offline()
 	else
 		result = cse_alife_human_stalker.can_switch_offline(self)
 	end
-	if TB3D_Modders.use_setup_message and string_find(self:name(), TB3D_Modders.npc_to_log) then
+	if is_report then
 		TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch offline["..utils.to_str(result).."]")
 	end
 	return result

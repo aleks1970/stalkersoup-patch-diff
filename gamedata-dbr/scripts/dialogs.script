@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.2 added my_ver, db calls, esc_medkit, debug, clear_community
-function my_ver() return "1.0.9.9.8.2" end
+--TB3D 1.0.9.9.8.9 added my_ver, db calls, esc_medkit, debug, clear_community, faction changes
+function my_ver() return "1.0.9.9.8.9" end
 
 function allow_break_dialog(first_speaker, second_speaker, id)
 	if second_speaker:profile_name() == "osoznanie" then
@@ -316,27 +316,17 @@ end
 -----------------------------------------------------------------------------------
 -- Community
 -----------------------------------------------------------------------------------
-function actor_clear_community(actor, npc)			--109950
+function actor_clear_community(actor, npc)			--109989
 	--printf("ACTOR NOW IN [NEUTRAL] COMMUNITY")
 	if db.actor then
-		db.actor:set_character_community("actor", 0, 0)
+		TB3D_Services.set_community(db.actor, "actor", 0, 0)
 		TB3D_Services.give_info("actor_set_actor")	
 	end
-	if has_alife_info("actor_set_dolg") then
-		TB3D_Services.remove_info("actor_set_dolg")
-	end
-	if has_alife_info("actor_set_freedom") then
-		TB3D_Services.remove_info("actor_set_freedom")
-	end
-	if has_alife_info("actor_set_bandit") then
-		TB3D_Services.remove_info("actor_set_bandit")
-	end
-	if has_alife_info("actor_prebandit") then
-		TB3D_Services.remove_info("actor_prebandit")
-	end
-	if has_alife_info("osvedomitel_actor_prebandit") then
-		TB3D_Services.remove_info("osvedomitel_actor_prebandit")
-	end
+	TB3D_Services.remove_info("actor_set_dolg")
+	TB3D_Services.remove_info("actor_set_freedom")
+	TB3D_Services.remove_info("actor_set_bandit")
+	TB3D_Services.remove_info("actor_prebandit")
+	TB3D_Services.remove_info("osvedomitel_actor_prebandit")
 	return true
 end
 
@@ -351,112 +341,70 @@ function actor_not_in_dolg(actor, npc)
 	return not actor_in_dolg(actor, npc)
 end
 
-function actor_set_dolg(actor, npc)
+function actor_set_dolg(actor, npc)			--109989
 	--printf("ACTOR NOW IN [DOLG] COMMUNITY")
 	if db.actor then
-		TB3D_Services.set_community(db.actor, "actor_dolg", 0, 0, true)
+		TB3D_Services.set_community(db.actor, "actor_dolg", 0, 0)
 		TB3D_Services.give_info("actor_set_dolg")			--109950
-		if has_alife_info("actor_set_actor") then
-			TB3D_Services.remove_info("actor_set_actor")
-		end
-		if has_alife_info("actor_set_freedom") then
-			TB3D_Services.remove_info("actor_set_freedom")
-		end
-		if has_alife_info("actor_set_bandit") then
-			TB3D_Services.remove_info("actor_set_bandit")
-		end
-		if has_alife_info("actor_prebandit") then
-			TB3D_Services.remove_info("actor_prebandit")
-		end
-		if has_alife_info("osvedomitel_actor_prebandit") then
-			TB3D_Services.remove_info("osvedomitel_actor_prebandit")
-		end
+		TB3D_Services.remove_info("actor_set_actor")
+		TB3D_Services.remove_info("actor_set_freedom")
+		TB3D_Services.remove_info("actor_set_bandit")
+		TB3D_Services.remove_info("actor_prebandit")
+		TB3D_Services.remove_info("osvedomitel_actor_prebandit")
 		return true
 	end
 end
 
-function actor_set_freedom()			--109950
+function actor_set_freedom()			--109989
 	--printf("ACTOR NOW IN [FREEDOM] COMMUNITY")
 	if db.actor then
-		db.actor:set_character_community("actor_freedom",0,0)
+		TB3D_Services.set_community(db.actor, "actor_freedom", 0, 0)
 		TB3D_Services.give_info("actor_set_freedom")
-		if has_alife_info("actor_set_actor") then
-			TB3D_Services.remove_info("actor_set_actor")
-		end
-		if has_alife_info("actor_set_dolg") then
-			TB3D_Services.remove_info("actor_set_dolg")
-		end
-		if has_alife_info("actor_set_bandit") then
-			TB3D_Services.remove_info("actor_set_bandit")
-		end
-		if has_alife_info("actor_prebandit") then
-			TB3D_Services.remove_info("actor_prebandit")
-		end
-		if has_alife_info("osvedomitel_actor_prebandit") then
-			TB3D_Services.remove_info("osvedomitel_actor_prebandit")
-		end
+		TB3D_Services.remove_info("actor_set_actor")
+		TB3D_Services.remove_info("actor_set_dolg")
+		TB3D_Services.remove_info("actor_set_bandit")
+		TB3D_Services.remove_info("actor_prebandit")
+		TB3D_Services.remove_info("osvedomitel_actor_prebandit")
 		return true
 	end
 end
 
-function actor_set_bandit()
+function actor_set_bandit()			--109989
 	--printf("ACTOR NOW IN [BANDIT] COMMUNITY")
 	if db.actor then
-		db.actor:set_character_community("bandit",0,0)
+		TB3D_Services.set_community(db.actor, "bandit", 0, 0)
 		TB3D_Services.give_info("actor_set_bandit")
-		if has_alife_info("actor_set_actor") then
-			TB3D_Services.remove_info("actor_set_actor")
-		end
-		if has_alife_info("actor_set_dolg") then
-			TB3D_Services.remove_info("actor_set_dolg")
-		end
-		if has_alife_info("actor_set_freedom") then
-			TB3D_Services.remove_info("actor_set_freedom")
-		end
-		if has_alife_info("actor_prebandit") then
-			TB3D_Services.remove_info("actor_prebandit")
-		end
-		if has_alife_info("osvedomitel_actor_prebandit") then
-			TB3D_Services.remove_info("osvedomitel_actor_prebandit")
-		end
+		TB3D_Services.remove_info("actor_set_actor")
+		TB3D_Services.remove_info("actor_set_dolg")
+		TB3D_Services.remove_info("actor_set_freedom")
+		TB3D_Services.remove_info("actor_prebandit")
+		TB3D_Services.remove_info("osvedomitel_actor_prebandit")
 		return true
 	end
 end
 
-function set_actor_prebandit()					--109950
+function set_actor_prebandit()			--109989
 	--printf("ACTOR NOW IN [PREBANDIT] COMMUNITY")
 	if db.actor then
-		db.actor:set_character_community("actor_prebandit",0,0)
+		TB3D_Services.set_community(db.actor, "actor_prebandit", 0, 0)
 		TB3D_Services.give_info("actor_prebandit")
 		amk.g_start_timer("dismiss_prebandit",0,0,86000)
-		if has_alife_info("actor_set_actor") then
-			TB3D_Services.remove_info("actor_set_actor")
-		end
-		if has_alife_info("actor_set_dolg") then
-			TB3D_Services.remove_info("actor_set_dolg")
-		end
-		if has_alife_info("actor_set_freedom") then
-			TB3D_Services.remove_info("actor_set_freedom")
-		end
+		TB3D_Services.remove_info("actor_set_actor")
+		TB3D_Services.remove_info("actor_set_dolg")
+		TB3D_Services.remove_info("actor_set_freedom")
 		return true
 	end
 end
 
-function set_actor_prebandit1()				--109950
+function set_actor_prebandit1()			--109989
 	--printf("ACTOR NOW IN [PREBANDIT] COMMUNITY")
 	if db.actor and not has_alife_info("actor_set_bandit") then
-		db.actor:set_character_community("actor_prebandit",0,0)
+		TB3D_Services.set_community(db.actor, "actor_prebandit", 0, 0)
 		TB3D_Services.give_info("actor_prebandit")
 		amk.g_start_timer("dismiss_prebandit",0,0,64000)
-		if has_alife_info("actor_set_actor") then
-			TB3D_Services.remove_info("actor_set_actor")
-		end
-		if has_alife_info("actor_set_dolg") then
-			TB3D_Services.remove_info("actor_set_dolg")
-		end
-		if has_alife_info("actor_set_freedom") then
-			TB3D_Services.remove_info("actor_set_freedom")
-		end
+		TB3D_Services.remove_info("actor_set_actor")
+		TB3D_Services.remove_info("actor_set_dolg")
+		TB3D_Services.remove_info("actor_set_freedom")
 		return true
 	end
 end
@@ -480,30 +428,18 @@ function actor_not_in_zombied(actor, npc)
 	return not actor_in_zombied(actor, npc)
 end
 
-function actor_set_zombied(actor, npc)
+function actor_set_zombied(actor, npc)			--109989
 	--printf("ACTOR NOW IN [ZOMBIED] COMMUNITY")
 	if db.actor and not has_alife_info("actor_set_zombied") then
-		db.actor:set_character_community("actor_zombied", 0, 0)
+		TB3D_Services.set_community(db.actor, "actor_zombied", 0, 0)
 		TB3D_Services.give_info("actor_set_zombied")
 		soundtrack.set_zombie()
-		if has_alife_info("actor_set_actor") then
-			TB3D_Services.remove_info("actor_set_actor")
-		end
-		if has_alife_info("actor_set_dolg") then
-			TB3D_Services.remove_info("actor_set_dolg")
-		end
-		if has_alife_info("actor_set_freedom") then
-			TB3D_Services.remove_info("actor_set_freedom")
-		end
-		if has_alife_info("actor_prebandit") then
-			TB3D_Services.remove_info("actor_prebandit")
-		end
-		if has_alife_info("actor_set_bandit") then
-			TB3D_Services.remove_info("actor_set_bandit")
-		end
-		if has_alife_info("osvedomitel_actor_prebandit") then
-			TB3D_Services.remove_info("osvedomitel_actor_prebandit")
-		end
+		TB3D_Services.remove_info("actor_set_actor")
+		TB3D_Services.remove_info("actor_set_dolg")
+		TB3D_Services.remove_info("actor_set_freedom")
+		TB3D_Services.remove_info("actor_prebandit")
+		TB3D_Services.remove_info("actor_set_bandit")
+		TB3D_Services.remove_info("osvedomitel_actor_prebandit")
 	else
 		db.actor:kill(db.actor)
 	end
@@ -514,7 +450,6 @@ function actor_clear_community(actor, npc)
 	--printf("ACTOR NOW IN [NEUTRAL] COMMUNITY")
 	if db.actor then
 		TB3D_Services.set_community(db.actor, "actor")
-		--db.actor:set_character_community("actor", 0, 0)
 	end
 	return true
 end

@@ -1,22 +1,14 @@
---<!-- TB3D 1.0.9.9.8.8 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.8.9 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
---cube, sak_resiver, complete_group(), autosaves, update
-function my_ver() return "1.0.9.9.8.8" end
+--cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska
+function my_ver() return "1.0.9.9.8.9" end
 
 local upd_pos = 0
 local fix_done = false
 function update(tnow, sbase)							--109983
 	if upd_pos < tnow then
 		upd_pos = tnow + (100 * sbase)
-		if not fix_done then
-			local lname = level.name()
-			if lname == "l08u_brainlab" then
-				if TB3D_Collector.actor_in_range(vector():set(-124.785,18.767,-21.196), 10) then
-					fix_done = true
-					TB3D_Triggers.remove_brainlab_alife()									--remove x16_m_controller_e, causes ctd on level exit
-				end
-			end
-		end
+		--109989, moved remove_brainlab_alife() to item take: amk_zapiska
 	end
 end
 
@@ -29,7 +21,8 @@ function on_info(info_id)
 		--TB3D_Triggers.spawn_marmor()
 	elseif info_id=="yan_has_ghost_pda" then
 		news_manager.send_tip(db.actor, "storyline_ghost_tip", nil, "wolf")
-		if has_alife_info("agr_find_gunslinger_cache_final") then			--delay it so all.spawn will trigger provodnik first
+		amk.spawn_item("amk_zapiska",vector():set(-117.381,18.722,-21.890),1529,84)		--109989, kept getting lost so moved it
+	if has_alife_info("agr_find_gunslinger_cache_final") then			--delay it so all.spawn will trigger provodnik first
 			TB3D_Services.give_info("yan_provodnik_spawn")
 		end
 	elseif info_id == "yan_kruglov_decoder_have" then
@@ -93,6 +86,19 @@ function on_info(info_id)
 		TB3D_Triggers.spawn_quest_suits()
 	elseif info_id == "shadowman_zver_start" then
 		--alife():create("nebo_heavy_outfit",vector():set(23.890,19.8,18.771),80551,3263)
+	elseif info_id == "info_way_bar_wild_territory" then												--109989, remove emi blocking entrance
+		TB3D_Services.remove_bar_emi()
+	elseif info_id == "cit_fail_first_task" then
+		TB3D_Mobs.spawn_bandits(-57.551,-6.502,13.167,4007,778,6)										--109989, institute entrance
+		TB3D_Mobs.spawn_bandits(-96.612,-16.465,-78.895,1922,754,6)										--109989, room near hideout entrance
+	elseif info_id == "esc_commander_die" then															--109989, attacks village too easily
+		if has_alife_info("tb3d_blockpost_attacked") then
+			TB3D_Services.give_info("esc_blocpost_pust")												--must be player attacking so spawn choppers
+		end
+	elseif info_id == "tb3d_blockpost_attacked" then													--109989, attacks village too easily
+		if has_alife_info("esc_commander_die") then
+			TB3D_Services.give_info("esc_blocpost_pust")												--must be player attacking so spawn choppers
+		end
 	elseif info_id == "tb3d_complete_group0" then														--to mil start, delayed task completions
 		TB3D_Services.complete_group(0)
 	elseif info_id == "tb3d_complete_group1" then														--to mil start, delayed task completions
@@ -156,6 +162,11 @@ function on_item_take(obj)
 	--TB3D_Services.packet_alert("tb3d stalker: on item take["..sect.."]")
 	if obj:name()=="mil_stalker0012" then
 		info_given = TB3D_Services.give_info("info_amk_recipt_stone_dikoobraz")
+	elseif sect == "mushroom" then													--109989
+		if ln == "l03_agroprom" and has_alife_info("esc_find_doctor_start") then	--find doc in hideout
+			TB3D_Mobs.spawn_dogs(4.143,5.443,110.879,244698,514,2)					--hills on either side
+			TB3D_Mobs.spawn_dogs(-46.125,8.178,118.542,194965,519,2)
+		end
 	elseif sect == "bad_psy_helmet" then
 		if has_alife_info("dan_grab_start") and not has_alife_info("dan_grab_done") then
 			TB3D_Services.give_info("dan_grab_have")
@@ -175,6 +186,7 @@ function on_item_take(obj)
 		elseif ln=="l04u_labx18" then
 			info_given = TB3D_Services.give_info("info_amk_recipt_simbion")
 		elseif ln=="l08u_brainlab" then			--is on body, this may not be needed
+			TB3D_Triggers.remove_brainlab_alife()									--remove x16_m_controller_e, causes ctd on level exit
 			info_given = TB3D_Services.give_info("info_amk_recipt_dummy")
 		end  
 		is_remove_obj = true
@@ -529,12 +541,26 @@ function process_levels(lname, sname)
 				obj = alife():story_object(6002)
 				if not obj then alife():create(3565) end      							--109953, [3565] index in all.spawn
 			end
+			if has_alife_info("cit_fail_first_task") then			--109989, always dogs and bandits in cordon
+				TB3D_Mobs.spawn_dogs(102.492,1.620,524.469,402814,219, 10)				--cordon exit
+				TB3D_Mobs.spawn_dogs(-17.910,0.638,253.688,259155,184,10)				--farm
+				TB3D_Mobs.spawn_dogs(-50.128,-10.042,-65.347,229164,77,10)				--viaduct
+				TB3D_Mobs.spawn_bandits(113.044,-7.495,8.628,414741,118,10)				--carpark
+			end
 		elseif lname=="l02_garbage" then
 			if sname=="l01_escape" then
 				if has_alife_info("kpk_remont_poehali")
 				  and not has_alife_info("docent_kpk_gotov_start") then
 					TB3D_Triggers.broken_pda_mobs()
 				end
+			end
+			if has_alife_info("cit_fail_first_task") then			--109989, always dogs and bandits in garbage
+				TB3D_Mobs.spawn_dogs(265.158,-8.215,2.050,375150,390, 10)			--far se corner
+				TB3D_Mobs.spawn_dogs(192.679,-1.401,53.181,338376,384,10)			--east dog tree
+				TB3D_Mobs.spawn_dogs(70.979,0.772,109.376,241242,370,6)				--storage tanks
+				TB3D_Mobs.spawn_bandits(-198.530,8.182,9.848,30448,308,10)			--tunnel
+				TB3D_Mobs.spawn_dogs(-132.296,-1.968,-201.368,83998,269,10)			--truck graveyard
+				TB3D_Mobs.spawn_dogs(87.328,-3.083,-254.476,255157,263,10)			--east of cordon exit
 			end
 		elseif lname=="l05_bar" then
 			if sname=="l02_garbage" then
@@ -543,15 +569,24 @@ function process_levels(lname, sname)
 					TB3D_Triggers.broken_pda()
 				end
 			end
+			if has_alife_info("cit_fail_first_task") then							--109989, always dogs
+				TB3D_Mobs.spawn_dogs(196.248,1.741,-112.590,46678,1276, 10)			--ditch
+			end
 		elseif lname=="l04_darkvalley" then
-			--if sname=="l01_escape" then													--cordon tunnel to dv
-				--db.actor:set_actor_position(vector():set(-44.38, 0.43, -541.47))
-			--end
+			if has_alife_info("cit_fail_first_task") then							--109989, always dogs and bandits
+				TB3D_Mobs.spawn_dogs(136.678,0.401,-195.961,334008,926,10)			--trailor next to lab
+				TB3D_Mobs.spawn_dogs(-97.117,1.943,-295.942,61718,849,10)			--center on hill
+				TB3D_Mobs.spawn_bandits(-152.247,0.880,-188.034,11311,862,6)		--garbage exit
+			end
 		elseif lname=="l03_agroprom" then
 			if sname=="hospital" then														--remove lc hosp to agro, now done in amk_mod
 				--obj = alife():story_object(97104)
 				--if obj then alife():release(obj) end
 				TB3D_Services.give_info("tb3d_final_start")
+			elseif sname == "l03u_agr_underground" then
+				if has_alife_info("cit_fail_first_task") and not has_alife_info("pri_monolith_decoder_got") then			--109989
+					TB3D_Mobs.spawn_mob(-69.302,0.563,49.152,171798,662, 0, 10)
+				end
 			end
 			if has_alife_info("agroprom_military_case_done") then
 				if TB3D_Services.give_info("tb3d_zapagro_doc") then
@@ -607,6 +642,10 @@ function process_levels(lname, sname)
 			end
 		elseif lname=="zaton" then
 			TB3D_Mobs.check_zaton_spawns2()
+		elseif lname == "l12_stancia" then
+			if has_alife_info("tb3d_wish_granted") then			--109989, empty after chaes
+				TB3D_Mobs.check_npp1_spawns()
+			end
 		end
 		if lname ~= "labx8" then
 			if TB3D_Services.remove_info("tb3d_bad_torch") then

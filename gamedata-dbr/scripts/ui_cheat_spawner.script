@@ -1,5 +1,5 @@
---<!-- TB3D 1.0.9.9.8.1 ui dots error, added community to friend cheat, deadman_to_life, obj level--> 
-function my_ver() return "1.0.9.9.8.1" end
+--<!-- TB3D 1.0.9.9.8.9 ui dots error, added community to friend cheat, deadman_to_life, obj level, remove all--> 
+function my_ver() return "1.0.9.9.8.9" end
 -- initialization
 class "spawner" (CUIScriptWnd)
 --- List of People kvesovikov Salsola version of 01.22.2010 (may need to add) ------
@@ -31,23 +31,33 @@ function spawner:InitControls()
 	xml:InitStatic("background", self)
 
 	-- button
-	self:Register(xml:Init3tButton("caption", self),"caption")
+	self:Register(xml:Init3tButton("caption_1", self),"caption_1")
+	self:Register(xml:Init3tButton("caption_2", self),"caption_2")
+	self:Register(xml:Init3tButton("caption_3", self),"caption_3")
 	self:Register(xml:Init3tButton("btn_1", self),"btn_1")
 	-- exit button
 	self:Register(xml:Init3tButton("btn_quit", self),"btn_quit")
 	self:Register(xml:InitEditBox("edit_box", self), "edit_box")
 
-  local caption = self:GetButton("caption")
+  local caption_1 = self:GetButton("caption_1")
+  local caption_2 = self:GetButton("caption_2")
+  local caption_3 = self:GetButton("caption_3")
   local btn_1 = self:GetButton("btn_1")
   if self.action == "spawn" then
-    caption:SetText(translate("section_desired_object_number_of_script"))
+    caption_1:SetText(translate("section_desired_object_number_of_caption_1"))
+    caption_2:SetText(translate("section_desired_object_number_of_caption_2"))
+    caption_3:SetText(translate("section_desired_object_number_of_script"))
     btn_1:SetText(translate("spawn_script"))
   elseif self.action == "spawn2inv" then
-    caption:SetText(translate("the_amount_in_inventory_script"))
+    caption_1:SetText(translate("the_amount_in_inventory_caption_1"))
+    caption_2:SetText(translate("the_amount_in_inventory_caption_2"))
+    caption_3:SetText(translate("the_amount_in_inventory_script"))
     btn_1:SetText(translate("spawn2inventory_script"))
 
   elseif self.action == "set_npc_goodwill" then
-    caption:SetText(translate("sec_desired_npc_script"))
+    caption_1:SetText(translate("sec_desired_npc_caption_1"))
+    caption_2:SetText(translate("sec_desired_npc_caption_2"))
+    caption_3:SetText(translate("sec_desired_npc_script"))
     btn_1:SetText(translate("set_friend_script"))
 
 --[[  elseif self.action == "info" then
@@ -55,10 +65,14 @@ function spawner:InitControls()
     btn_1:SetText(translate("writing_old_script"))]]
 	
   elseif self.action == "find" then
-    caption:SetText(translate("part_object_to_search_for_script"))
+    caption_1:SetText(translate("part_object_to_search_for_caption_1"))
+    caption_2:SetText(translate("part_object_to_search_for_caption_2"))
+    caption_3:SetText(translate("part_object_to_search_for_script"))
     btn_1:SetText(translate("search_script"))
   elseif self.action == "remove" then
-    caption:SetText(translate("part_the_object_to_remove_script"))
+    caption_1:SetText(translate("part_the_object_to_remove_warning_1"))
+    caption_2:SetText(translate("part_the_object_to_remove_warning_2"))
+    caption_3:SetText(translate("part_the_object_to_remove_script"))
     btn_1:SetText(translate("remove_script"))
   end
 end
@@ -71,8 +85,7 @@ end
 
 function spawner:OnKeyboard(dik, keyboard_action)
 	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
-	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
--- to hang out Esc
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then		-- to hang out Esc
 		if dik == DIK_keys.DIK_ESCAPE then
 			self:on_quit()
 		end
@@ -84,18 +97,18 @@ function spawner:OnKeyboard(dik, keyboard_action)
 end
 
 function show_actor_position()
-  if level.present() and (db.actor ~= nil) then
-	  local vid, gvid
-	  local a = vector()
-	  a = db.actor:position()
-	  vid = db.actor:level_vertex_id()
-	  gvid = db.actor:game_vertex_id()
-	  local text = string.format("TB3D_Position[%s]: (%.3f,%.3f,%.3f),%d,%d)",level.name(),a.x,a.y,a.z,vid,gvid)
-	news_manager.amk_send_tip(text,"TB3D Server Master",20,60,"tb3d_master")
-	  TB3D_Services.info_alert(text)
-	  a = db.actor:direction()
-	  text = string.format("TB3D_Direction[%s]: rad(%.3f,%.3f,%.3f) deg(%.3f,%.3f,%.3f)",level.name(),a.x,a.y,a.z,utils.rad2deg(a.x),utils.rad2deg(a.y),utils.rad2deg(a.z))
-	  TB3D_Services.info_alert(text)
+	if level.present() and (db.actor ~= nil) then
+		local vid, gvid
+		local a = vector()
+		a = db.actor:position()
+		vid = db.actor:level_vertex_id()
+		gvid = db.actor:game_vertex_id()
+		local text = string.format("TB3D_Position[%s]: (%.3f,%.3f,%.3f),%d,%d)",level.name(),a.x,a.y,a.z,vid,gvid)
+		news_manager.amk_send_tip(text,"TB3D Server Master",20,60,"tb3d_master")
+		TB3D_Services.info_alert(text)
+		a = db.actor:direction()
+		text = string.format("TB3D_Direction[%s]: rad(%.3f,%.3f,%.3f) deg(%.3f,%.3f,%.3f)",level.name(),a.x,a.y,a.z,utils.rad2deg(a.x),utils.rad2deg(a.y),utils.rad2deg(a.z))
+		TB3D_Services.info_alert(text)
 	end
 end
 
@@ -109,23 +122,21 @@ function spawner:spawn(text,whre)
 	gvid = db.actor:game_vertex_id()
 	local repiout =amk.load_variable("repair_item_outfit", 0)
 	local repiweap =amk.load_variable("repair_item_weapon", 0)
-  local n = 1
+	local n = 1
 	local sf = string.find(text,",")
 	if sf then
-	  n = string.sub(text,sf+1)+0
-	  if n==nil then
-	    n = 0
-	  elseif n>999 then
-	    n = 999
-	  end
-	  type = string.sub(text,1,sf-1)
+		n = string.sub(text,sf+1)+0
+		if n==nil then
+			n = 0
+		elseif n>999 then
+			n = 999
+		end
+		type = string.sub(text,1,sf-1)
 	end
-
 	if not system_ini():section_exist(type) then
 	  news_manager.amk_send_tip(translate("section_script").." "..type.." "..translate("there_is_no_script"),translate("Cheat_spawner_script"),0,10,"gen_info")
 	  return false
 	end
-
 	for i=1,n do
 		if gde=="1" then
 			a.x = a.x-1+math.random()*2
@@ -145,28 +156,28 @@ function spawner:spawn(text,whre)
 			end
 		end
 	end
-
   -- news_manager.amk_send_tip("Created "..type.." in the number of "..n.." pieces.","Cheat: Spawner",0,10,"gen_info")
   return true
 end
 
--- amk_zone_
-
-function spawner:remove_all (name)
+function spawner:remove_all(name)
     local obj
     local n=0
     for a=first_object,last_object do
 	    obj = alife():object(a)
-		  if obj and string.find(obj:name(),name) then
-        alife():release(obj,true)
-        n = n+1
+		if obj then
+			if string.find(obj:name(), name) then
+			--if obj:name() == name then			--109989, partial matches causes key npc/items to be removed accidentally
+				if TB3D_Modders.show_removed_items then TB3D_Services.packet_alert("remove all: item["..obj:name().."] removed") end
+				alife():release(obj,true)
+				n = n+1
+			end
 	  	end
   	end
---  	news_manager.amk_send_tip("Deleted ["..n.."] Objects.","Cheat: Clear",0,10,"gen_info")
 	news_manager.amk_send_tip(translate("Deleted_1_script")..n..translate("objects_script"),translate("cheat_clear_script"),0,10,"gen_info")
 end
 
-function spawner:find_closest (type)
+function spawner:find_closest(type)
     local min = 999999
     local dist
     local closest = -1

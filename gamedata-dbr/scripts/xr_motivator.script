@@ -1,9 +1,10 @@
---TB3D 1.0.9.9.8.3 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+--TB3D 1.0.9.9.8.9 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
 -- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
 -- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
 -- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions, radar_monolit_dead, generic_m_story_id,
--- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update, agro soldiers health
-function my_ver() return "1.0.9.9.8.3" end
+-- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update,
+-- agro soldiers health, krysuk
+function my_ver() return "1.0.9.9.8.9" end
 --[[------------------------------------------------------------------------------------------------------------------
 Author: Ruslan Didenko (Stohe)
 how to call methods of Binder:
@@ -208,7 +209,9 @@ function motivator_binder:net_spawn(sobject)
 				-- tell all non-npc to not evade anomolies
 				local commun = npc:character_community()
 				--[ [
-				if TB3D_Modders.ai_anomoly_evade == false or				-- no one evades them
+				if npc_name == "val_bandit_krisyk" then					--109989
+					--he needs to evade them
+				elseif TB3D_Modders.ai_anomoly_evade == false or				-- no one evades them
 					npc_name == "bar_ecolog_professor" or			-- for wild territory tunnel
 					commun == "nebo" or			--!!!!TB3D causes CTDs in swamp
 					commun == "zombied"	

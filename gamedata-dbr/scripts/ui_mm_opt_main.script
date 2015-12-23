@@ -105,9 +105,15 @@ function options_dialog:UpdateControls()
 
 	opt:SetCurrentValues("key_binding")
 
-	if not xrRender_test_r2_hw() then
-		self.combo_r2:SetCurrentID		(0)
-		self.combo_r2:Enable			(false)
+	local is_r2 = xrRender_test_r2_hw()						--109989, NVIDEA update 6.14.13.5306 broken: always returns false
+	if not is_r2 then
+		if not TB3D_Modders.force_r2_hw then
+			TB3D_Services.packet_alert("ui mm opt main: xrRender R2 hardware["..utils.to_str(is_r2).."]")
+			self.combo_r2:SetCurrentID		(0)
+			self.combo_r2:Enable			(false)
+		else
+			TB3D_Services.packet_alert("ui mm opt main: xrRender R2 hardware[forced on]")
+		end
 	end
 	
 	self:UpdateDependControls()

@@ -93,7 +93,9 @@ function update(tg)
 end
 
 function npc_update(npc,st)
-	--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("rx addons: npc update start") end
+	if TB3D_Modders.Global_Debug == true then
+		TB3D_Services.info_alert("rx addons: npc update start")
+	end
 	if addons_sets.enabled ~= true then
 		return
 	end
@@ -110,7 +112,9 @@ function npc_update(npc,st)
 		end
 		st.rx_addons_time = tg+math.random(addons_sets.check_prd,addons_sets.check_prd+addons_sets.check_prd*0.5)
 	end
-	--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("rx addons: npc update done") end
+	if TB3D_Modders.Global_Debug == true then
+		TB3D_Services.info_alert("rx addons: npc update done")
+	end
 end
 
 function process(npc)

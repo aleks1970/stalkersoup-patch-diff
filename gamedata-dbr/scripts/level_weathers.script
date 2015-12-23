@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.7.4  fixed miss-spelled weather vice wather line 283, added jupitor_underground, dmx135, blowout(), cleanup, weather option,
+--TB3D 1.0.9.9.8.9  fixed miss-spelled weather vice wather line 283, added jupitor_underground, dmx135, blowout(), cleanup, weather option,
 --added labx8 to indoor, aes blowout
-function my_ver() return "1.0.9.9.7.4" end
+function my_ver() return "1.0.9.9.8.9" end
 -- [[ Dynamic Weather v0.9.5 script ]] --
 
 local ticksize = 1380
@@ -183,8 +183,8 @@ function WeatherManager:select_weather(force)
             local cycle_id = self.cycle_idx[self.dyn_weather]
             if cycle_id ~= nil then
                 -- probability of transition based on the time this cycle has been active
-                local trans_prob = self.cycles[cycle_id].from_weight * self.cycle_time / 300 + 33
-                if math.random(1000) <= 10 * trans_prob then
+                local trans_prob = (self.cycles[cycle_id].from_weight * self.cycle_time / 300 + 33) * 10
+                if math.random(1000) <= trans_prob then
                     local min_skips        -- skip count for the least skipped cycle
                     local max_skips        -- ditto for most skipped
                     local transtab    = {} -- array of available transitions
@@ -202,13 +202,11 @@ function WeatherManager:select_weather(force)
                         end
                     end
                     -- assume that transdef is a comma separated list of transition_name:cycle_id
+                    local skipped_weight		--109989
                     for trans, cycle_id in string.gmatch(transdef, "([%w_-]+):(%d+)") do
-                        local skipped_weight
                         -- least skipped cycle gets 0.5 weight, most skipped used gets 1.5
                         if min_skips < max_skips then
-                            skipped_weight = 0.5
-                                           + (self.cycles[cycle_id].skipped - min_skips)
-                                                   / (max_skips - min_skips)
+                            skipped_weight = 0.5 + (self.cycles[cycle_id].skipped - min_skips) / (max_skips - min_skips)
                         else
                             skipped_weight = 1
                         end
@@ -334,13 +332,13 @@ end
 function WeatherManager:load(F)
     local info_str = F:r_stringZ()
     local composite = F:r_u32()
-    TB3D_Services.packet_alert("level weathers: loaded["..utils.to_str(info_str).."] composite["..utils.to_str(composite).."]")
     local lastidx = composite % div_minutes
     self.cycle_time = math.floor(composite / div_minutes)
     self.time = dayminute()
     self.dyn_weather = string.sub(info_str, string.find(info_str, "^[%w-_]*"))		-- recover current cycle name as first element of the saved info string
+	local cycle_id		--109989
     for name, skipped in string.gmatch(info_str, "([%w-_]+):(%d+)") do    			-- load the skip counters from the remaining portion of the string
-        local cycle_id = self.cycle_idx[name]
+        cycle_id = self.cycle_idx[name]
         if cycle_id ~= nil then
             self.cycles[cycle_id].skipped = skipped
         else
@@ -348,6 +346,7 @@ function WeatherManager:load(F)
             lastidx = 0   														-- set to invalid value so the savedgame is "converted"
         end
     end
+    TB3D_Services.packet_alert("level weathers: loaded["..utils.to_str(self.dyn_weather).."] current cycle["..utils.to_str(cycle_id).."]")
     if lastidx > 0
        and lastidx <= #self.trans_times
        and self.cycle_time <= cycle_length  									--was 14400 in dmx
@@ -364,15 +363,12 @@ function WeatherManager:load(F)
 end
 
 -- update function called from bind_stalker.script
-function WeatherManager:update()
+function WeatherManager:update()				--109989
 	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("level weathers: update["..utils.to_str(time_global()).."]") end
-	if amk_mod.blowout() == true
-	  or (level.name() == "l12_stancia" and has_alife_info("aes_actor_road") and not has_alife_info("aes_timer_20000")) then
-		return
-	end
+	if level.name() == "l12_stancia" and has_alife_info("aes_actor_road") and not has_alife_info("aes_timer_20000") then return end
     local time = dayminute()
     local update_flag = 0
-    -- weather is not what it should be so unless a blowout is underway
+    -- if weather is not what it should be so unless a blowout is underway
     -- the correct weather should be resumed
     if level.get_weather() ~= self.cur_weather then
         TB3D_Services.packet_alert("level weathers: restoring weather")

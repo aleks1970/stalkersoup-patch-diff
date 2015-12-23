@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.7.7 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
--- better cleaner and evaluate, obj_is_protected, checkcorpse
-function my_ver() return "1.0.9.9.7.7" end
+--TB3D 1.0.9.9.8.9 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
+-- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list
+function my_ver() return "1.0.9.9.8.9" end
 -- Red75 (c) 2008
 -- Marauder scheme v 1.1
 -- Part of AMK MOD
@@ -83,7 +83,7 @@ local valuable_clsid={
     [clsid.equ_scientific]=true,
     [clsid.equ_stalker_s]=true,
     [clsid.obj_antirad]=true,
-    [clsid.obj_attachable]=true,
+    --[clsid.obj_attachable]=true,			--109989, gas cannisters
     --[clsid.obj_bandage]=true,
     --[clsid.obj_bolt]=true,
     --[clsid.obj_bottle]=true,
@@ -211,8 +211,9 @@ function ev_see_stuff:evaluate()
 		local actsch=db.storage[npc_id].active_scheme
 		if actsch and db.actor then
 			if xr_logic.try_switch_to_another_section(npc, db.storage[npc_id][actsch], db.actor) then
-				--return
-			end	--109974
+				if res then freeGObject(self.st) end
+				return false	--109989, finish existing scheme first
+			end
 		end
 		local act_sec=db.storage[npc_id].active_section or ""
 		if string_find(act_sec,"^combat") or (not npc:alive()) or xr_wounded.is_wounded(npc) or npc:best_enemy() or
@@ -221,7 +222,6 @@ function ev_see_stuff:evaluate()
 			return false
 		end 
 		if res and self.st.block_search then return true end
-		local dist_limit = TB3D_Modders.search_dist_limit or 50
 		timed( self.st,"tm1",5000+math_random()*10000,
 			function()
 				local function check_item(o)
@@ -242,12 +242,6 @@ function ev_see_stuff:evaluate()
 									if TB3D_Modders.use_looting_message then TB3D_Services.packet_alert("watcher act: see stuff eval["..npc:name().."] object["..obj:name().."] valuable[true]") end
 									local max_dist
 									if string_find(act_sec,"^camper") or string_find(act_sec,"^danger") then
-										max_dist = TB3D_Modders.search_dusy_dist or 5
-									elseif string_find(npc:name(), "esc_blokpost")
-									  or string_find(npc:name(), "esc_zvezdochet")
-									  or string_find(npc:name(), "gar_bandit_stroyka")
-									  or string_find(npc:name(), "esc_bridge_soldier")
-									  or string_find(npc:name(), "amk_embankment_soldat") then
 										max_dist = TB3D_Modders.search_dusy_dist or 5
 									else
 										max_dist = TB3D_Modders.search_max_dist or 60
@@ -559,25 +553,10 @@ function add_to_binder(object, char_ini, scheme, section, st)
 	local npc=object
 	st.disabled_objects={}
 	local manager = object:motivation_action_manager()
-	local zombi=npc:character_community()=="zombied"
-				or npc:character_community()=="trader"
-				or npc:character_community()=="fotoman"						--109976
-				or npc:character_community()=="arena_enemy"
-				or npc:name()=="agr_defector_stalker1"
-				or npc:name()=="mil_stalker0012"
-				or npc:name()=="agr_krot"									--109977, mole
-				or npc:name()=="yantar_ecolog_general" 						-- mad at the Military and Sakharov
-				or npc:name()=="mil_freedom_member0021" 					-- Miser into a zombie!
-				or string_find(npc:profile_name(),"syslov")					-- DMX MOD on
-				or string_find(npc:profile_name(),"kombat")
-				or string_find(npc:profile_name(),"shadows")
-				or string_find(npc:profile_name(),"mudri")
-				or string_find(npc:profile_name(),"grozn")
-				or string_find(npc:profile_name(),"alex")					-- DMX MOD off
 	local prop_idlecombat=xr_evaluators_id.state_mgr + 3
 	local prop_contact=xr_evaluators_id.stohe_meet_base + 1
 	--TB3D_Services.packet_alert("watcher act: npc["..utils.to_str(npc:name()).."] story id["..utils.to_str(npc:story_id()).."]")
-	if npc:story_id() ~= generic_m_story_id or zombi then
+	if npc:story_id() ~= generic_m_story_id or npc_no_looting(npc) then				--109989
 		manager:add_evaluator(evid_see_stuff, property_evaluator_const(false))
 		manager:add_evaluator(evid_see_body, property_evaluator_const(false))
 		manager:add_evaluator(evid_near_stuff, property_evaluator_const(false))
@@ -636,3 +615,47 @@ end
 function set_scheme(npc, ini, scheme, section) local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.ini=ini
 end 
+
+function npc_no_looting(npc)
+	local comm =  npc:character_community()
+	local name = npc:name()
+	local profile_name = npc:profile_name()
+	return (
+		comm == "zombied"
+		or comm == "trader"
+		or comm == "fotoman"						--109976
+		or comm == "stalker_antisniper"				--109989, Dyak, ...
+		or comm == "stalker_sakharov"				--109989, Ghost, Fritz, Stargazer, ...
+		or comm == "arena_enemy"
+		or profile_name == "Syslov"
+		or profile_name == "Kombat"
+		or profile_name == "Shadows"
+		or profile_name == "Mudri"
+		or profile_name == "Grozn"
+		or profile_name == "Alex"
+		or name =="agr_defector_stalker1"
+		or name =="agr_ratcatcher"									--109989, deserter in swamp
+		or name =="gar_dm_novice"									--109989, yurik
+		or name =="gar_hellcar_group_1"								--109989, need to stay in positions for bes quest
+		or name =="gar_hellcar_group_2"
+		or name =="gar_stalker_0006"								--109989, need to stay in position for bes quest
+		or name =="gar_stalker_0007"								--109989, Vampire
+		or name =="mil_stalker0012"
+		or name =="brat_luis"										--109989, brother luis
+		or name =="agr_krot"										--109977, mole
+		or name =="yantar_ecolog_general" 							-- mad at the Military and Sakharov
+		or name =="mil_freedom_member0021" 							-- Miser into a zombie!
+		or string_find(name,"marsh_nebo_")							-- 109989, tend to pick up everything in swamp
+		or string_find(name,"agr_factory_")							-- 109989, messes with battle
+		or string_find(name,"bar_stalker_")							-- 109989, get too far away from buildings
+		or string_find(name,"rad_ambush")							-- 109989, loot dead scientists
+		or string_find(name,"mil_freedom_barier_respawn_")			-- 109989, wander into battle area before attack
+		or string_find(name,"nebo_exit")							-- 109989
+		or string_find(name, "esc_blokpost")						-- 109989, moved from evaluator
+		or string_find(name, "esc_bridge_soldier")
+		or string_find(name, "amk_embankment_soldat")
+		or string_find(name, "andersen")
+		or string_find(name, "zemlyk")
+		or string_find(name, "gar_bandit_stroyka")
+		)
+end

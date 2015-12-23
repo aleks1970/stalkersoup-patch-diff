@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.0 agr_doc_wakeup
-function my_ver() return "1.0.9.9.7.0" end
+--TB3D 1.0.9.9.8.9 agr_doc_wakeup
+function my_ver() return "1.0.9.9.8.9" end
 
 function proceed()
 	if not has_alife_info("pri_monolith_decoder_got")
@@ -19,7 +19,7 @@ function process_info_portion(info_id)
 		level_tasks.add_location(827, "crlc_big", "pri_stadium_zone_hint")
 	elseif info_id == "cit_jail_doctor_pryp_task" then
 		level_tasks.add_location(825, "crlc_big", "pri_hotel_zone_hint")
-		TB3D_Services.remove_info("agr_doc_wakeup")								--109961 force completion if anim stalls
+		--TB3D_Services.remove_info("agr_doc_wakeup")								--109989, not needed - force completion if anim stalls
 	else
         return false
 	end

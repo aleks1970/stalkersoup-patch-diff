@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.1   added new reporting 12/07/11, removed empty calls to utils, game news, npc checks, protection, rain factor, output, debug
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.8.9   added new reporting 12/07/11, removed empty calls to utils, game news, npc checks, protection, rain factor, output, debug, get_dmg
+function my_ver() return "1.0.9.9.8.9" end
 ---- Rulix aka Bak --- 1.7.2009
 
 local table_sort = table.sort
@@ -132,6 +132,9 @@ function weapon_manager:__init(npc)
 end
 
 function weapon_manager:initialize()
+	if TB3D_Modders.Global_Debug == true then
+		TB3D_Services.info_alert("rx wmgr: initialize["..utils.to_str(self.npc:character_name()).."]")
+	end
 	if rx_ai.IsTrader(self.npc) then
 		self.disabled = true
 		if TB3D_Modders.use_wmgr_messages then TB3D_Services.packet_alert("rx wmgr: initialize["..utils.to_str(self.npc:character_name()).."] disabled[trader]") end
@@ -148,6 +151,9 @@ function weapon_manager:initialize()
 	end
 	self.period = 0
 	if TB3D_Modders.use_wmgr_messages then TB3D_Services.packet_alert("rx wmgr: initialize["..utils.to_str(self.npc:character_name()).."] comm["..utils.to_str(comm).."] rank["..utils.to_str(ranks.get_obj_rank_name(self.npc)).."] done") end
+	if TB3D_Modders.Global_Debug == true then
+		TB3D_Services.info_alert("rx wmgr: initialize["..utils.to_str(self.npc:character_name()).."] done")
+	end
 end
 
 function weapon_manager:update()
@@ -1131,8 +1137,11 @@ function get_dmg(section)
 	local hit_power = read_if_exist_float(section,"hit_power",0.5)
 	local k_hit = read_if_exist_float(ammo_list,"k_hit",0.8)
 	local buck = read_if_exist_float(ammo_list,"buck_shot",1)
-	if buck > 1 then buck = buck*0.6 end
-	local damage = (hit_power * k_hit * 25 + buck) * 1.5
+	local pellets = 1													--109989
+	if buck > 0 then
+		pellets = 1/buck
+	end
+	local damage = (hit_power * k_hit * (25 * pellets)) * 1.5
 	if TB3D_Modders.use_wmgr_messages then TB3D_Services.packet_alert("rx wmgr: get damage["..utils.to_str(section).."] ammo["..utils.to_str(ammo_list).."] dmg["..utils.to_str(damage).."] done") end
 	return damage
 end

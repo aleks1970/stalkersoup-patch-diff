@@ -1,16 +1,16 @@
----TB3D 1.0.9.9.8.8 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.8.9 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
--- removed lastrepreward, rain_factor, storm stages, horror spawns
-function my_ver() return "1.0.9.9.8.8" end	--modders append with initials and rev.
+-- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations
+function my_ver() return "1.0.9.9.8.9" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.8}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.9}" end
 
-major_version = 109988							--used in saves
+major_version = 109989							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -277,6 +277,7 @@ function report_plug_ins()
 	packet_alert("tb3d_services: actor goodwill killer["..utils.to_str(relation_registry.community_goodwill("killer",  act_id)).."]")
 	packet_alert("tb3d_services: actor goodwill monolith["..utils.to_str(relation_registry.community_goodwill("monolith",  act_id)).."]")
 	packet_alert("tb3d_services: actor goodwill zombied["..utils.to_str(relation_registry.community_goodwill("zombied",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill trader["..utils.to_str(relation_registry.community_goodwill("trader",  act_id)).."]")
 end
 function get_language_pack()
     local ltx = system_ini()
@@ -938,30 +939,26 @@ function check_active_community()								--109981, actor only on spawn
 	local comm = "actor"
 	if has_alife_info("zombien_already") then								--109982, zombied takes pres.
 		comm = "zombied"
-	elseif is_collector() then
-		--comm = "actor"
-	elseif lname == "l08_yantar" then
-		if has_alife_info("xvatit_uzhe") then								--109982, friends with chernomer
-			comm = "stranger"
-		--else
-			--comm = "actor"
+	elseif is_collector() == false then
+		if lname == "l08_yantar" then
+			if has_alife_info("xvatit_uzhe") then								--109982, friends with chernomer
+				comm = "stranger"
+			end
+		elseif lname == "l04_darkvalley" then
+			if has_alife_info("bandits_neitral") then
+				comm = "stranger"
+			end
 		end
-	elseif lname == "l04_darkvalley" then
-		if has_alife_info("bandits_neitral") then
-			comm = "stranger"
-		--else
-			--comm = "actor"
-		end
-	end
-	if comm == "actor" then
-		if amk_utils.inventory_search("amul_naemn", 1) then
-			comm = "killer"
-		elseif amk_utils.inventory_search("amulet", 1) then
-			comm = "monolith"
-		elseif amk_utils.inventory_search("bullion_gild", 1) then
-			comm = "freedom"
-		elseif amk_utils.inventory_search("streyndzher", 1) then
-			comm = "stranger"
+		if comm == "actor" then
+			if amk_utils.inventory_search("amul_naemn", 1) then
+				comm = "killer"
+			elseif amk_utils.inventory_search("amulet", 1) then
+				comm = "monolith"
+			elseif amk_utils.inventory_search("bullion_gild", 1) then
+				comm = "freedom"
+			elseif amk_utils.inventory_search("streyndzher", 1) then
+				comm = "stranger"
+			end
 		end
 	end
 	if comm ~= db.actor:character_community() then
@@ -970,6 +967,7 @@ function check_active_community()								--109981, actor only on spawn
 			db.actor:set_character_community(comm)				--if actor then leave goodwill and reputation as it was
 		else
 			db.actor:set_character_community(comm,0,0)			--insures that you are always nuetral to start
+			--set_player_relations(0)								--109989, all nuetral
 		end
 	end
 end
@@ -1001,8 +999,8 @@ function change_rank(npc, rval)
 			if newrank > 25000 then newrank = 25000 end
 		else
 			newrank = newrank + rval
-			if newrank > 2500 then
-				newrank = 2500	--max for stalker
+			if newrank > 5000 then
+				newrank = 5000	--max for stalker x 2, 109988
 			end
 		end	--divisor used in probabilities, also 300 and 600 used for arena and hand tele
 		npc:set_character_rank(newrank)
@@ -1012,27 +1010,21 @@ function change_rank(npc, rval)
 	--end
 end
 
---based on rank * difficulty koef
---stalker: 2500:1 ratio against ((game difficulty+1) * rank)
---collector: 2500:1 ratio against ((4 + flevel) * rank)
+--based on:  rank * (koef_ratio * (game difficulty + (rank * (level_up * koef_ratio))))
 --------------------------------------------------------------------------
-local koef_ratio = 1/2500
+local koef_ratio = 1/TB3D_Modders.coefficient_factor
 function global_koef(diff_level, force_rank)				--109986
-	local rank, diff, result
-	local diff = 1
-	if force_rank ~= nil then
+	local rank
+	local diff = level.get_game_difficulty() + 1			--1 thru 4
+	if force_rank and force_rank > 0 then
 		rank = force_rank
 	else
 		rank = db.actor:character_rank()
 	end
-	if diff_level and diff_level > 0 then						--collector (levelup 1 and up)
-		diff = diff_level + 4									--continue after level 0 difficulties
-	else														--stalker (levelup 0)
-		diff = level.get_game_difficulty()						--1 thru 4
+	if diff_level and diff_level > 0 then					--collector (level_up 1 and up)
+		diff = diff + (0.37 * diff_level)					--increases each level_up
 	end
-	result = (diff * koef_ratio) * rank
-	--packet_alert("tb3d services: global koef["..utils.to_str(result).."] rank["..utils.to_str(rank).."] level["..utils.to_str(diff_level).."] diff["..utils.to_str(diff).."]")
-	return result
+	return (diff * rank) * koef_ratio
 end
 
 function get_info_portions(sect)
@@ -1259,12 +1251,12 @@ function get_all_quests()
 end
 
 -- communities ------------------------------------------------------------------
--- stalker, monolith, military, killer, ecolog, dolg, freedom, bandit, zombied,
--- trader, stranger, arena_enemy, sniper, green, nebo, lastday, fotoman
+-- military, freedom, dolg, stalker, bandit, monolith, ecolog, killer, lastday, trader,
+-- zombied, stranger, arena_enemy, sniper, green, nebo, fotoman
+-- normal game_relations.ltx values: -400 = enemy, 0 = neutral, 500 = friend
 ---------------------------------------------------------------------------------
 function set_player_relations(standings)
-	-- normal game_relations.ltx values: -400 = enemy, 0 = neutral, 500 = friend
-	local mil, freedom, dolg, stalker, bandit, mono, ecolog, killer, lastday
+	local mil, freedom, dolg, stalker, bandit, mono, ecolog, killer, lastday, trader
 	if standings == 1 then					--good standings all
 		mil = 500
 		freedom = 500
@@ -1275,6 +1267,7 @@ function set_player_relations(standings)
 		ecolog = 500
 		killer = 500
 		lastday = 500
+		trader = 500
 	elseif standings == 2 then				--fair standings
 		mil = 100
 		freedom = 100
@@ -1285,6 +1278,7 @@ function set_player_relations(standings)
 		ecolog = 100
 		killer = -400
 		lastday = -400
+		trader = 100
 	elseif standings == 3 then				--normal good standings
 		mil = 200
 		freedom = 200
@@ -1295,6 +1289,7 @@ function set_player_relations(standings)
 		ecolog = 200
 		killer = -400
 		lastday = -400
+		trader = 500
 	elseif standings == 4 then				--normal game standings
 		mil = 0
 		freedom = 0
@@ -1305,6 +1300,7 @@ function set_player_relations(standings)
 		ecolog = 0
 		killer = -500
 		lastday = -500
+		trader = 200
 	elseif standings == 5 then				--collector start
 		mil = 0
 		freedom = 0
@@ -1315,6 +1311,7 @@ function set_player_relations(standings)
 		ecolog = 0
 		killer = -500
 		lastday = -500
+		trader = 500
 	else									--all neutral
 		mil = 0
 		freedom = 0
@@ -1325,6 +1322,7 @@ function set_player_relations(standings)
 		ecolog = 0
 		killer = 0
 		lastday = 0
+		trader = 0
 	end
 	relation_registry.set_community_goodwill ("military", db.actor:id(), mil)
 	relation_registry.set_community_goodwill ("freedom", db.actor:id(), freedom)
@@ -1335,7 +1333,31 @@ function set_player_relations(standings)
 	relation_registry.set_community_goodwill ("monolith", db.actor:id(), mono)
 	relation_registry.set_community_goodwill ("killer", db.actor:id(), killer)
 	relation_registry.set_community_goodwill ("lastday", db.actor:id(), lastday)
-
+	relation_registry.set_community_goodwill ("trader", db.actor:id(), trader)			--109989
+end
+function save_player_relations()			--109989
+	amk.save_variable("tb3d_relation_mil", relation_registry.community_goodwill("military", db.actor:id()))
+	amk.save_variable("tb3d_relation_frd", relation_registry.community_goodwill("freedom", db.actor:id()))
+	amk.save_variable("tb3d_relation_dlg", relation_registry.community_goodwill("dolg", db.actor:id()))
+	amk.save_variable("tb3d_relation_stk", relation_registry.community_goodwill("stalker", db.actor:id()))
+	amk.save_variable("tb3d_relation_eco", relation_registry.community_goodwill("ecolog", db.actor:id()))
+	amk.save_variable("tb3d_relation_bdt", relation_registry.community_goodwill("bandit", db.actor:id()))
+	amk.save_variable("tb3d_relation_mon", relation_registry.community_goodwill("monolith", db.actor:id()))
+	amk.save_variable("tb3d_relation_kil", relation_registry.community_goodwill("killer", db.actor:id()))
+	amk.save_variable("tb3d_relation_ldk", relation_registry.community_goodwill("lastday", db.actor:id()))
+	amk.save_variable("tb3d_relation_trd", relation_registry.community_goodwill("trader", db.actor:id()))
+end
+function restore_player_relations()			--109989
+	relation_registry.set_community_goodwill("military", db.actor:id(), amk.load_variable("tb3d_relation_mil"))
+	relation_registry.set_community_goodwill("freedom", db.actor:id(), amk.load_variable("tb3d_relation_frd"))
+	relation_registry.set_community_goodwill("dolg", db.actor:id(), amk.load_variable("tb3d_relation_dlg"))
+	relation_registry.set_community_goodwill("stalker", db.actor:id(), amk.load_variable("tb3d_relation_stk"))
+	relation_registry.set_community_goodwill("ecolog", db.actor:id(), amk.load_variable("tb3d_relation_eco"))
+	relation_registry.set_community_goodwill("bandit", db.actor:id(), amk.load_variable("tb3d_relation_bdt"))
+	relation_registry.set_community_goodwill("monolith", db.actor:id(), amk.load_variable("tb3d_relation_mon"))
+	relation_registry.set_community_goodwill("killer", db.actor:id(), amk.load_variable("tb3d_relation_kil"))
+	relation_registry.set_community_goodwill("lastday", db.actor:id(), amk.load_variable("tb3d_relation_ldk"))
+	relation_registry.set_community_goodwill("trader", db.actor:id(), amk.load_variable("tb3d_relation_trd"))
 end
 
 function get_collector_items(sect, num)
@@ -2767,13 +2789,13 @@ function adjust_for_level(lname)
 	get_console():execute("r2_ls_squality "..utils.to_str(shadow_qlty))				--shadows
 end
 
-function check_prior_version(lname, sname)											--109972
+function check_prior_version(tb3d_ver)											--109972
 	local obj
 	local stage = amk.load_variable("tb3d_fixer_stage", 0)		--returns 0 if not created yet
-	local tb3d_ver = amk.load_variable("tb3d_version",0)
+	--local tb3d_ver = amk.load_variable("tb3d_version", 0)
 	local started = amk.load_variable("first_started", 0)
 	if started < 109984 and stage < 6 then stage = 0 end				--109984, redo fixes
-	packet_alert("tb3d services: prior version["..utils.to_str(tb3d_ver).."] started["..utils.to_str(started).."] stage["..utils.to_str(stage).."]")
+	packet_alert("tb3d services: check prior version started["..utils.to_str(started).."] version["..utils.to_str(tb3d_ver).."] stage["..utils.to_str(stage).."]")
 	if stage < 1 then
 		obj = alife():story_object(99200)																		--old ds lc, actually in wasted wood
 		if obj then alife():release(obj) end
@@ -2800,7 +2822,7 @@ function check_prior_version(lname, sname)											--109972
 		stage = 1
 	end
 	if stage < 2 then								--remove runaway rad zones
-		if lname == sname then						--if not same level then will be done by fixer
+		--if lname == sname then						--if not same level then will be done by fixer
 			--local cnt = 0
 			for a=first_object,last_object,1 do		--skip actor (0)
 				obj = alife():object(a)
@@ -2814,7 +2836,7 @@ function check_prior_version(lname, sname)											--109972
 				end
 			end
 			--packet_alert("tb3d services: old version fixer removed["..utils.to_str(cnt).."] rad zones!!!!")
-		end
+		--end
 		stage = 2
 	end
 	if stage < 3 then
@@ -2891,4 +2913,15 @@ function check_has_parent(obj)			--109982, function parent() not functioning
 	end
 	if parent_id == expendable_object then parent_id = nil end
 	return parent_id
+end
+
+function remove_bar_emi()			--109989, removes emi blocking wild territory
+	local obj
+	for a=first_object,last_object,1 do		--skip actor (0)
+		obj = alife():object(a)
+		if obj and obj.name and string_find(obj:name(), "zone_emi_tb3d") then
+			alife():release(obj, true)
+			break
+		end
+	end
 end

@@ -1,5 +1,5 @@
-<!-- ************ TB3D 1.0.9.9.8.8 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
-  can_start_dan, treasure_ecolog_have *************** -->
+<!-- ************ TB3D 1.0.9.9.8.9 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
+  can_start_dan, treasure_ecolog_have, ghost diary, preds after info checks *************** -->
 <game_dialogs>
 	<dialog id="prinesi_hvost">
 		<has_info>zahar_vstrecha_start</has_info>
@@ -64,9 +64,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="fox_give">
-		<precondition>arhara_dialog.fox_kriss_have</precondition>
 		<dont_has_info>fox_kriss_done</dont_has_info>
 		<has_info>fox_kriss_have</has_info>
+		<precondition>arhara_dialog.fox_kriss_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>fox_give_0</text>
@@ -103,8 +103,8 @@
 	</dialog>
 	<dialog id="prapor_give_jaw">
 		<dont_has_info>prapor_jaw_done</dont_has_info>
-		<precondition>new_dialog.prapor_jaw_have</precondition>
 		<has_info>prapor_jaw_have</has_info>
+		<precondition>new_dialog.prapor_jaw_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>prapor_give_jaw_0</text>
@@ -269,8 +269,8 @@
 	</dialog>
 	<dialog id="freeman_bring_one">
 		<has_info>freeman_eagle_have</has_info>
-		<precondition>wawka_dialog.good_eagle_m1_have</precondition>
 		<dont_has_info>freeman_eagle_done</dont_has_info>
+		<precondition>wawka_dialog.good_eagle_m1_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>freeman_bring_one_0</text>
@@ -533,9 +533,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="dan_bring_pda">
-		<precondition>braad_test.sorok_pda</precondition>
 		<has_info>dan_pda_est</has_info>
 		<dont_has_info>dan_pda_sdal</dont_has_info>
+		<precondition>braad_test.sorok_pda</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>dan_bring_pda_0</text>
@@ -549,8 +549,8 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="dan_repair">
-		<precondition>escape_dialog.trader_repair_precond</precondition>
 		<has_info>dan_pda_sdal</has_info>
+		<precondition>escape_dialog.trader_repair_precond</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>dan_repair_0</text>
@@ -667,9 +667,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="dan_grab_helmet">
-		<precondition>new_dialog.can_start_dan</precondition>
 		<has_info>agroprom_military_case_done</has_info>
 		<dont_has_info>dan_grab_start</dont_has_info>
+		<precondition>new_dialog.can_start_dan</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>dan_grab_helmet_0</text>
@@ -713,9 +713,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="dan_bring_helmet">
-		<precondition>new_dialog.dan_grab_have</precondition>
 		<has_info>dan_grab_have</has_info>
 		<dont_has_info>dan_grab_done</dont_has_info>
+		<precondition>new_dialog.dan_grab_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>dan_bring_helmet_0</text>
@@ -867,9 +867,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="yakut_proverka">
-		<precondition>new_dialog.treasure_ecolog_have</precondition>
 		<has_info>system_ecolog_done</has_info>
 		<dont_has_info>yakut_ograblen_done</dont_has_info>
+		<precondition>new_dialog.treasure_ecolog_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>yakut_proverka_0</text>
@@ -881,7 +881,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="uceh_about_prizrak">
-		<precondition>new_dialog.treasure_ecolog_have</precondition>
+		<!--precondition>new_dialog.treasure_ecolog_have</precondition--> <!--109989-->
 		<has_info>saharov_pda_done</has_info>
 		<dont_has_info>treasure_ecolog_start</dont_has_info>
 		<phrase_list>
@@ -917,9 +917,10 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="uceh_first_prizrak">
+		<has_info>treasure_ecolog_start</has_info>					<!--109989-->
+		<dont_has_info>treasure_ecolog_done</dont_has_info>
 		<precondition>new_dialog.treasure_ecolog_have</precondition>
 		<!--has_info>treasure_ecolog_have</has_info    109988-->
-		<dont_has_info>treasure_ecolog_done</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
 				<text>uceh_first_prizrak_0</text>
@@ -976,9 +977,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="barm_simb_prizrak">
-		<precondition>new_dialog.barmen_simbion_have</precondition>
 		<has_info>barmen_simbion_have</has_info>
 		<dont_has_info>barmen_simbion_done</dont_has_info>
+		<precondition>new_dialog.barmen_simbion_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>barm_simb_prizrak_0</text>
@@ -1227,8 +1228,8 @@
 	</dialog>
 	<dialog id="yakut_ograb_done">
 		<dont_has_info>yakut_ograblen_done</dont_has_info>
-		<precondition>new_dialog.yakut_ograblen_have</precondition>
 		<has_info>yakut_ograblen_have</has_info>
+		<precondition>new_dialog.yakut_ograblen_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>yakut_ograb_done_0</text>
@@ -1304,9 +1305,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="sahar_speak_helmet">
-		<precondition>new_dialog.helmet_est</precondition>
 		<dont_has_info>helmet_sahar_otdal</dont_has_info>
 		<has_info>dan_flash_done</has_info>
+		<precondition>new_dialog.helmet_est</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>sahar_speak_helmet_0</text>
@@ -1407,10 +1408,10 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="zahar_larger_done">
-		<precondition>arhara_dialog.zapchasti_est_vse</precondition>
 		<has_info>atak_larger_begin</has_info>
 		<dont_has_info>atak_larger_done</dont_has_info>
 		<dont_has_info>neud_kvest</dont_has_info>
+		<precondition>arhara_dialog.zapchasti_est_vse</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>zahar_larger_done_0</text>
@@ -1623,9 +1624,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="prapor_done_group">
-		<precondition>new_dialog.prapor_apt_have</precondition>
 		<dont_has_info>prapor_apt_done</dont_has_info>
 		<has_info>prapor_apt_have</has_info>
+		<precondition>new_dialog.prapor_apt_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>prapor_done_group_0</text>
@@ -1669,9 +1670,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="barmen_done_group">
-		<precondition>new_dialog.barrem_talk_have</precondition>
 		<has_info>barrem_talk_have</has_info>
 		<dont_has_info>barrem_talk_est</dont_has_info>
+		<precondition>new_dialog.barrem_talk_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>barmen_done_group_0</text>
@@ -2066,9 +2067,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="prizrak_gold_art_done">
-		<precondition>new_dialog.gold_art_have</precondition>
 		<has_info>gold_art_have</has_info>
 		<dont_has_info>gold_art_done</dont_has_info>
+		<precondition>new_dialog.gold_art_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>prizrak_gold_art_done_0</text>
@@ -2102,9 +2103,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="prizrak_tri_tainik_est">
-		<precondition>new_dialog.tri_tainik_have</precondition>
 		<has_info>tri_tainik_have</has_info>
 		<dont_has_info>tri_tainik_done</dont_has_info>
+		<precondition>new_dialog.tri_tainik_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>prizrak_tri_tainik_est_0</text>
@@ -2358,9 +2359,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kalmyak_vstrecha_second">
-		<precondition>new_dialog.kalmyak_need_have</precondition>
 		<has_info>kalmyak_need_have</has_info>
 		<dont_has_info>kalmyak_need_done</dont_has_info>
+		<precondition>new_dialog.kalmyak_need_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kalmyak_vstrecha_second_0</text>
@@ -2494,9 +2495,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="vasil_second">
-		<precondition>new_dialog.marsh_remont_have</precondition>
 		<has_info>marsh_remont_have</has_info>
 		<dont_has_info>marsh_remont_done</dont_has_info>
+		<precondition>new_dialog.marsh_remont_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>vasil_second_0</text>
@@ -2547,9 +2548,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="dyak_zamena_finish">
-		<precondition>new_dialog.dyak_maz_have</precondition>
 		<has_info>dyak_maz_have</has_info>
 		<dont_has_info>dyak_maz_done</dont_has_info>
+		<precondition>new_dialog.dyak_maz_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>dyak_zamena_finish_0</text>
@@ -2636,9 +2637,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="sveeblov_first_zadan_end">
-		<precondition>new_dialog.controller_hutor_have</precondition>
 		<has_info>controller_hutor_have</has_info>
 		<dont_has_info>controller_hutor_done</dont_has_info>
+		<precondition>new_dialog.controller_hutor_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>sveeblov_first_zadan_end_0</text>
@@ -2756,9 +2757,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="sveeblov_weapons_est">
-		<precondition>new_dialog.sveeblov_ferma_have</precondition>
 		<has_info>sveeblov_ferma_have</has_info>
 		<dont_has_info>sveeblov_ferma_done</dont_has_info>
+		<precondition>new_dialog.sveeblov_ferma_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>sveeblov_weapons_est_0</text>
@@ -2877,9 +2878,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kot_second_speak">
-		<precondition>new_dialog.kot_need_doc_have</precondition>
 		<has_info>kot_need_doc_have</has_info>
 		<dont_has_info>kot_need_doc_done</dont_has_info>
+		<precondition>new_dialog.kot_need_doc_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kot_second_speak_0</text>
@@ -2932,9 +2933,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kot_nebo_second_speak">
-		<precondition>new_dialog.kot_need_next_have</precondition>
 		<has_info>kot_need_next_have</has_info>
 		<dont_has_info>kot_need_next_done</dont_has_info>
+		<precondition>new_dialog.kot_need_next_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kot_nebo_second_speak_0</text>
@@ -3002,9 +3003,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="tv_need_second">
-		<precondition>new_dialog.need_televizor_have</precondition>
 		<has_info>need_televizor_have</has_info>
 		<dont_has_info>need_televizor_done</dont_has_info>
+		<precondition>new_dialog.need_televizor_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>tv_need_second_0</text>
@@ -3089,10 +3090,10 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="marsh_barman_help_est">
-		<precondition>new_dialog.marsh_barman_have</precondition>
 		<has_info>gigant_red_strong1_hit</has_info>
 		<dont_has_info>gigant_red_strong1_dead</dont_has_info>
 		<dont_has_info>gigant_red_done</dont_has_info>
+		<precondition>new_dialog.marsh_barman_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>marsh_barman_help_est_0</text>
@@ -3245,9 +3246,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="scryaga_glushitel_is_not_ready">
-		<precondition>braad_test.is_reload_not_ready</precondition>
 		<has_info>borman_glushitel_scryaga</has_info>
 		<dont_has_info>borman_glushitel_next</dont_has_info>
+		<precondition>braad_test.is_reload_not_ready</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>scryaga_glushitel_is_not_ready_0</text>
@@ -3259,9 +3260,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="scryaga_glushitel_is_ready">
-		<precondition>braad_test.is_reload_ready</precondition>
 		<has_info>borman_glushitel_scryaga</has_info>
 		<dont_has_info>borman_glushitel_next</dont_has_info>
+		<precondition>braad_test.is_reload_ready</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>scryaga_glushitel_is_ready_0</text>
@@ -3421,9 +3422,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kalmyak_need_lekar_second">
-		<precondition>new_dialog.kot_kalmyak_lekar_next</precondition>
 		<has_info>kot_kalmyak_lekar_next</has_info>
 		<dont_has_info>kot_kalmyak_lekar_est</dont_has_info>
+		<precondition>new_dialog.kot_kalmyak_lekar_next</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kalmyak_need_lekar_second_0</text>
@@ -3438,9 +3439,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kalmyak_lekar_iz_not_ready">
-		<precondition>braad_test.is_lekar_not_ready</precondition>
 		<has_info>kot_kalmyak_lekar_est</has_info>
 		<dont_has_info>kot_kalmyak_lekar_have</dont_has_info>
+		<precondition>braad_test.is_lekar_not_ready</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kalmyak_lekar_iz_not_ready_0</text>
@@ -3452,9 +3453,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kalmyak_lekar_iz_ready">
-		<precondition>braad_test.is_lekar_ready</precondition>
 		<has_info>kot_kalmyak_lekar_est</has_info>
 		<dont_has_info>kot_kalmyak_lekar_have</dont_has_info>
+		<precondition>braad_test.is_lekar_ready</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kalmyak_lekar_iz_ready_0</text>
@@ -3469,9 +3470,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kot_est_lekar_kalmyak">
-		<precondition>new_dialog.lekar_kalmyak_actor</precondition>
 		<has_info>kot_kalmyak_lekar_have</has_info>
 		<dont_has_info>kot_kalmyak_lekar_done</dont_has_info>
+		<precondition>new_dialog.lekar_kalmyak_actor</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kot_est_lekar_kalmyak_0</text>
@@ -3535,9 +3536,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="holod_est_simbion_lekar">
-		<precondition>new_dialog.kot_holod_lekar_next</precondition>
 		<has_info>kot_holod_lekar_next</has_info>
 		<dont_has_info>kot_holod_lekar_est</dont_has_info>
+		<precondition>new_dialog.kot_holod_lekar_next</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>holod_est_simbion_lekar_0</text>
@@ -3560,9 +3561,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="kot_est_lekar_holod">
-		<precondition>new_dialog.lekar_kalmyak_actor</precondition>
 		<has_info>kot_holod_lekar_have</has_info>
 		<dont_has_info>kot_holod_lekar_done</dont_has_info>
+		<precondition>new_dialog.lekar_kalmyak_actor</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>kot_est_lekar_holod_0</text>
@@ -3871,9 +3872,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="zahar_est_perehod">
-		<precondition>new_dialog.francuz_have</precondition>
 		<has_info>francuz_have</has_info>
 		<dont_has_info>francuz_done</dont_has_info>
+		<precondition>new_dialog.francuz_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>zahar_est_perehod_0</text>
@@ -3990,9 +3991,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="joker_second_poisk_trader_need">
-		<precondition>new_dialog.actor_have_tri_vo</precondition>
 		<has_info>kot_find_rabi_djoker</has_info>
 		<dont_has_info>kot_find_rabi_djoker_vodka</dont_has_info>
+		<precondition>new_dialog.actor_have_tri_vo</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>joker_second_poisk_trader_need_0</text>
@@ -4236,9 +4237,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="saharov_need_kurier">
-		<precondition>new_dialog.nebo_clear_have</precondition>
 		<has_info>nebo_kurier_doc_need</has_info>
 		<dont_has_info>nebo_kurier_doc_est</dont_has_info>
+		<precondition>new_dialog.nebo_clear_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>saharov_need_kurier_0</text>
@@ -5261,9 +5262,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="green_est_doc">
-		<precondition>new_dialog.actor_has_rukzak_green</precondition>
 		<has_info>klyak_forest_doc_next</has_info>
 		<dont_has_info>klyak_forest_doc_green</dont_has_info>
+		<precondition>new_dialog.actor_has_rukzak_green</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>green_est_doc_0</text>
@@ -5290,9 +5291,9 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="klyak_est_doc">
-		<precondition>new_dialog.klyak_forest_doc_have</precondition>
 		<has_info>klyak_forest_doc_have</has_info>
 		<dont_has_info>klyak_forest_doc_done</dont_has_info>
+		<precondition>new_dialog.klyak_forest_doc_have</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>klyak_est_doc_0</text>

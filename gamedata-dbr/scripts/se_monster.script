@@ -106,6 +106,7 @@ end
 function se_monster:can_switch_online()
 	local is_report = false
 	if self and self.name then
+		--TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."]")
 		if TB3D_Modders.test_without_creatures and not self.dont_spawn_online then
 			TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] blocked!!!!")
 			self.dont_spawn_online = true

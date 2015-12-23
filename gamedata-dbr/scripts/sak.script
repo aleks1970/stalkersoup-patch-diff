@@ -643,7 +643,7 @@ function deadman_to_life(art)
 				amk_mod.af_flash(art)
 				--amk_offline_alife.set_npc_health(obj,npis_id)
 				alife():release(obj)
-				alife():create(nps_id)
+				alife():create(npis_id)				--109989
 			end
 		end
 	end
@@ -658,9 +658,7 @@ function nepis_umer()
 		obj=alife():story_object(npis)
 		if obj and IAmAStalker[obj:clsid()] and not obj:alive() then
 			name=obj:name()
-			if not has_alife_info(name.."_umer") then
-				db.actor:give_info_portion(name.."_umer")
-			end
+			TB3D_Services.give_info(name.."_umer")
 		end
 	end
 	if has_alife_info("mil_Svoboda_trader_plan_faze")

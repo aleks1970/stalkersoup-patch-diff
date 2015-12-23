@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.8.0   fixed conditions for Collector, removed fake_ from item sections, cube dialog, give talk message, debug
-function my_ver() return "1.0.9.9.8.0" end
+-- TB3D 1.0.9.9.8.9   fixed conditions for Collector, removed fake_ from item sections, cube dialog, give talk message, debug, fation changes
+function my_ver() return "1.0.9.9.8.9" end
 ---------------------------------------------------------------------
 -- Trader Repair
 -----------------------------------------------------------------------------------
@@ -162,7 +162,6 @@ function trader_check_miniquest_free_all_neg(trader, actor)
 	return true
 end
 
-
 --------------------------------------------------------------------------------------------------------
 -- Dialog & InfoPortions Function
 --------------------------------------------------------------------------------------------------------
@@ -171,15 +170,12 @@ end
 -- Trader
 --------------------------------------------------------------------------------------------------------
 
-
 function transfer_deneg(first_speaker, second_speaker)
     dialogs.relocate_money(second_speaker, 1400, "in")
     dialogs.relocate_item_section(second_speaker, "detector_simple", "in")
 	dialogs.relocate_item_section(second_speaker, "arc_art_box_8basic", "in")
 	dialogs.relocate_item_section(first_speaker, "arc_art_box_1basic", "out")
-	
 end
-   
 
 function give_weapon_from_trader(trader, actor)
     --dialogs.relocate_item_section(trader, "wpn_knife", "in")    
@@ -376,7 +372,7 @@ function give_weapon_to_actor (trader, actor)	--!!!!TB3D
 		dialogs.relocate_item_section(trader, "syh_pay_gde_3", "in")
 		dialogs.relocate_item_section(trader, "wpn_fuck", "in")
 		dialogs.relocate_item_section(trader, "bolt", "in")
-		else   
+	else   
 		dialogs.relocate_item_section(trader, "wpn_pmx1", "in")
 		dialogs.relocate_item_section(trader, "ammo_9x18_fmj", "in")
         dialogs.relocate_item_section(trader, "smoking_b", "in") 
@@ -680,7 +676,6 @@ function factions_repair_setduty_j(trader, actor)
 	if db.actor ~= nil then 
 		dialogs.relocate_money(actor, 350000, "out")
 		TB3D_Services.set_community(db.actor, "actor_dolg", 0, 0, true)
-		--db.actor:set_character_community("actor_dolg", 0, 0)
 		local chkgoodwill = relation_registry.community_goodwill("dolg",  db.actor:id())
 		if chkgoodwill > 0 then 
 			chkgoodwill = chkgoodwill + 200
@@ -720,10 +715,11 @@ end
 
 function factions_repair_checkmon_j(trader, actor)
    local whatami = db.actor:character_community()
-   local playhitemb = db.actor:object("h_2")
-   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 250000) and (whatami ~= "monolith") and (whatami == "actor") then return true
-   else return false
+   if whatami == "actor" and db.actor:money() >= 250000 then
+	   local playhitemb = db.actor:object("h_2")
+	   if playhitemb or TB3D_Modders.join_factions then return true end
    end
+   return false
 end
 
 function factions_repair_checkmonolith(first_speaker, second_speaker)
@@ -753,10 +749,11 @@ end
 
 function factions_repair_bandit_j(trader, actor)
    local whatami = db.actor:character_community()
-   local playhitemb = db.actor:object("h_2")
-   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 250000) and (whatami ~= "bandit") and (whatami == "actor") then return true
-   else return false
+   if whatami == "actor" and db.actor:money() >= 250000 then
+	   local playhitemb = db.actor:object("h_2")
+	   if playhitemb or TB3D_Modders.join_factions then return true end
    end
+   return false
 end
 
 function factions_repair_checkbandit(first_speaker, second_speaker)
@@ -772,8 +769,7 @@ end
 function factions_repair_setbandit_j(trader, actor)
 	if db.actor ~= nil then 
 		dialogs.relocate_money(actor, 250000, "out")
-		TB3D_Services.set_community(db.actor, "bandit", 0, 0, true)
-		--db.actor:set_character_community("bandit", 0, 0)
+		TB3D_Services.set_community(db.actor, "bandit", 0, 0)
 		local chkgoodwill = relation_registry.community_goodwill("bandit",  db.actor:id())
 		if chkgoodwill > 0 then 
 			chkgoodwill = chkgoodwill + 200
@@ -784,30 +780,29 @@ function factions_repair_setbandit_j(trader, actor)
 	end
 end
 
-
 function factions_repair_mil_j(trader, actor)
    local whatami = db.actor:character_community()
-   local playhitemb = db.actor:object("h_2")
-   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 400000) and (whatami ~= "military") and (whatami == "actor") then return true
-   else return false
+   if whatami == "actor" and db.actor:money() >= 400000 then
+	   local playhitemb = db.actor:object("h_2")
+	   if playhitemb or TB3D_Modders.join_factions then return true end
    end
+   return false
 end
 
 function factions_repair_checkmil(first_speaker, second_speaker)
 	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
 	local item_name_and_price = ""
 	local howmuch = 400000
-		if  db.actor:money() >= 400000 then
-			item_name_and_price = game.translate_string("list_factions_repair_6").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
-			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
-		end
+	if  db.actor:money() >= 400000 then
+		item_name_and_price = game.translate_string("list_factions_repair_6").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	end
 end
 
 function factions_repair_setmil_j(trader, actor)
 	if db.actor ~= nil then 
 		dialogs.relocate_money(actor, 400000, "out")
-		TB3D_Services.set_community(db.actor, "military", 0, 0, true)
-		--db.actor:set_character_community("military", 0, 0)
+		TB3D_Services.set_community(db.actor, "military", 0, 0)
 		local chkgoodwill = relation_registry.community_goodwill("military",  db.actor:id())
 		if chkgoodwill > 0 then 
 			chkgoodwill = chkgoodwill + 200
@@ -820,27 +815,27 @@ end
 
 function factions_repair_kill_j(trader, actor)
    local whatami = db.actor:character_community()
-   local playhitemb = db.actor:object("h_2")
-   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 300000) and (whatami ~= "killer") and (whatami == "actor") then return true
-   else return false
+   if whatami == "actor" and db.actor:money() >= 300000 then
+	   local playhitemb = db.actor:object("h_2")
+	   if playhitemb or TB3D_Modders.join_factions then return true end
    end
+   return false
 end
 
 function factions_repair_checkkill(first_speaker, second_speaker)
 	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
 	local item_name_and_price = ""
 	local howmuch = 300000
-		if  db.actor:money() >= 300000 then
-			item_name_and_price = game.translate_string("list_factions_repair_8").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
-			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
-		end
+	if  db.actor:money() >= 300000 then
+		item_name_and_price = game.translate_string("list_factions_repair_8").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	end
 end
 
 function factions_repair_setkill_j(trader, actor)
 	if db.actor ~= nil then 
 		dialogs.relocate_money(actor, 300000, "out")
-		TB3D_Services.set_community(db.actor, "killer", 0, 0, true)
-		--db.actor:set_character_community("killer", 0, 0)
+		TB3D_Services.set_community(db.actor, "killer", 0, 0)
 		local chkgoodwill = relation_registry.community_goodwill("military",  db.actor:id())
 		if chkgoodwill > 0 then 
 			chkgoodwill = chkgoodwill + 200
@@ -854,27 +849,25 @@ end
 
 function factions_repair_eco_j(trader, actor)
    local whatami = db.actor:character_community()
-   if (db.actor:money() >= 300000) and (whatami ~= "ecolog") and (whatami == "actor") then return true
-   else return false
-   end
+   if whatami == "actor" and db.actor:money() >= 300000 then return true end
+   return false
 end
 
 function factions_repair_checkeco(first_speaker, second_speaker)
 	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
 	local item_name_and_price = ""
 	local howmuch = 500000
-		if  db.actor:money() >= 300000 then
-			item_name_and_price = game.translate_string("list_factions_repair_10").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
-			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
-		end
+	if db.actor:money() >= 300000 then
+		item_name_and_price = game.translate_string("list_factions_repair_10").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	end
 end
 
 function factions_repair_seteco_j(trader, actor)
 	if db.actor ~= nil then 
 		dialogs.relocate_money(actor, 300000, "out")
-		TB3D_Services.set_community(db.actor, "ecolog", 0, 0, true)
-		--db.actor:set_character_community("ecolog", 0, 0)
 		local chkgoodwill = relation_registry.community_goodwill("ecolog",  db.actor:id())
+		TB3D_Services.set_community(db.actor, "ecolog", 0, 0)
 		if chkgoodwill > 0 then 
 			chkgoodwill = chkgoodwill + 200
 			relation_registry.set_community_goodwill ("ecolog", db.actor:id(), chkgoodwill)
@@ -883,7 +876,6 @@ function factions_repair_seteco_j(trader, actor)
 		end
 	end
 end
-
 
 function factions_repair_quit_j(trader, actor)
    local whatami = db.actor:character_community()
@@ -897,17 +889,17 @@ function factions_repair_checkquit(first_speaker, second_speaker)
 	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
 	local item_name_and_price = ""
 	local howmuch = 250000
-		if  db.actor:money() >= 250000 then
-			item_name_and_price = game.translate_string("list_factions_repair_9").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
-			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
-		end
+	if  db.actor:money() >= 250000 then
+		item_name_and_price = game.translate_string("list_factions_repair_9").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	end
 end
 
 function factions_repair_setquit_j(trader, actor)
 	if db.actor ~= nil then 
 		dialogs.relocate_money(actor, 250000, "out")
-		TB3D_Services.set_community(db.actor, "actor", 0, 0, true)
-		--db.actor:set_character_community("actor", 0, 0)
+		TB3D_Services.set_community(db.actor, "actor", 0, 0)
+		TB3D_Services.set_player_relations(4)
 	end
 end
 

@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.8.4 temporary support of level spawns in new levels, vet_research_bio, 100% localized*************** -->
+<!-- ************ TB3D 1.0.9.9.8.8 temporary support of level spawns in new levels, vet_research_bio, 100% localized, specnaz_default_2*************** -->
 <xml>
 	<!-- ***************BANDITS PROFILES*************** -->
 	<!-- ***************BANDIT NOVICE*************** -->
@@ -1639,12 +1639,11 @@
 		<terrain_sect>stalker_military_terrain</terrain_sect>
 		<rank>765</rank>
 		<reputation>23</reputation>
-		<critical_wound_weights>75,25,25</critical_wound_weights>
 		<visual>actors\soldier\soldier_spetsnaz</visual>
 		<snd_config>characters_voice\human_02\military\</snd_config>
 		<crouch_type>0</crouch_type>
 #include "inventory\specnaz_regular_items.xml"
-#include "gameplay\character_criticals_6.xml"
+		<critical_wound_weights>75,25,25</critical_wound_weights>
 #include "dialogs\generic_dialogs.xml"
 	</specific_character>
 	<!-- *************** SOLDIER COMMANDERS *************** -->

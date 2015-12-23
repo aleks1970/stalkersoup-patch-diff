@@ -1,20 +1,20 @@
--- TB3D 1.0.9.9.8.8 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.0.9.9.8.9 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
--- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm
-function my_ver() return "1.0.9.9.8.8" end
+-- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized
+function my_ver() return "1.0.9.9.8.9" end
 					
 -----over population control----
 local string_find = string.find
 local string_sub = string.sub
 
-local respawn_count = 0
+local removed_count = 0
 
 local stalkers = 0
 local dogs = 0
 local cats = 0
 local rats = 0
-local crows = 0
+--local crows = 0							--109989, crows spawn after fixer
 local pseudodogs = 0
 local tushkanos = 0
 local snorks = 0
@@ -35,242 +35,6 @@ local controllers = 0
 local poltergeist = 0
 local phantoms = 0
 
---[[						--for testing only
-local tags6 = {
-["doktor"] = true,		--escape, pripyat
-["kordon"] = true,		--escape
-["xalyav"] = true,		--escape
-["escape"] = true,		--escape
-["snip_e"] = true,		--escape
-["zapasn"] = true,		--escape
-["mill_s"] = true,		--escape
-["zvezd_"] = true,		--escape
-["garbag"] = true,		--garbage
-["svalka"] = true,		--garbage
-["tamaz_"] = true,		--garbage
-["sniper"] = true,		--agro
-["trezv_"] = true,		--agro
-["yakut_"] = true,		--agro
-["piyan_"] = true,		--agro
-["kapita"] = true,		--agro
-["final_"] = true,		--agro
-["kuzhet"] = true,		--agro
-["prapor"] = true,		--bar
-["dolgov"] = true,		--bar
-["piligr"] = true,		--bar
-["dark_b"] = true,		--dv
-["dark_s"] = true,		--dv
-["rostok"] = true,		--wild terr
-["yantar"] = true,		--yantar
-["arhara"] = true,		--yantar
-["factor"] = true,		--yantar
-["cherno"] = true,		--yantar
-["saxar_"] = true,		--brainlab
-["brainl"] = true,		--brainlab
-["foto_m"] = true,		--brainlab
-["milita"] = true,		--military
-["milit_"] = true,		--military
-["yakut_"] = true,		--military
-["tamaz_"] = true,		--military
-["piligr"] = true,		--military
-["francu"] = true,		--military
-["scromn"] = true,		--military
-["stalke"] = true,		--military
-["djoker"] = true,		--military
-["radar_"] = true,
-["pripya"] = true,		--pripyat
-["pesher"] = true,
-["blood_"] = true,		--aver, peshera, av_peshera
-["puzir_"] = true,
-["zimovi"] = true,		--aver
-["labiri"] = true,		--av_peshera
-["blizn_"] = true,		--limansk
-["freedo"] = true,		--limansk
-["stalk_"] = true,		--limansk
-["borman"] = true,		--limansk
-["m_osoz"] = true,		--control monolith
-["hospit"] = true,		--hospital
-["black_"] = true,		--hospital, generators
-["promz_"] = true,		--promzone
-["warlab"] = true,  	--warlab
-["panter"] = true,  	--warlab
-["body1_"] = true,  	--warlab
-["body2_"] = true,  	--warlab
-["sheste"] = true,  	--warlab
-["gener_"] = true,		--generators
-["genera"] = true,		--generators
-["bland_"] = true, 		--belong only in DV
-["redfor"] = true,		--red forest
-["forest"] = true,		--red forest
-["shadow"] = true,		--red forest
-["contr_"] = true,		--red forest
-["villag"] = true,		--old village
-["after_"] = true,		--old village
-["kolmog"] = true,		--old village
-["dead_c"] = true,		--dead_city
-["dcity_"] = true,		--dead_city
-["shtab_"] = true,		--dead_city
-["chasov"] = true,		--dead_city
-["patrul"] = true,		--dead_city
-["kultor"] = true,		--dead_city
-["marsh_"] = true,		--marsh
-["prip_n"] = true,		--marsh
-["m_trad"] = true,		--marsh
-["boloto"] = true,		--marsh
-["clear_"] = true,		--marsh
-["ferma_"] = true,		--marsh
-["kashei"] = true,		--marsh
-["kalmya"] = true,		--marsh
-["syslov"] = true,		--marsh
-["junder"] = true,		--jup under
-["labx8_"] = true,		--lab x8
-["esc_st"] = true,		--predbannik
-["soldie"] = true,		--predbannik
-["yan_ol"] = true,		--yantar old
-["swamp_"] = true,		--swamp old
-["killer"] = true,		--swamp old
-["stalke"] = true,		--hiding road
-["darska"] = true,		--darkscape
-["bandit"] = true,		--darkscape, yantar
-["dark_f"] = true, 		--dark forest
-["promz_"] = true,		--promzone
-["soldie"] = true,		--promzone
-["vokzal"] = true,		--vokzal
-["digger"] = true		--digger stash
-}
-local tags5 = {
-["tb3d_"] = true,		--all
-["esc2_"] = true,		--escape
-["agro_"] = true,		--agro
-["mono_"] = true,		--agro
-["agr_u"] = true,		--agro under
-["kat2_"] = true,		--agro under
-["kluk_"] = true,		--bar, military
-["dead_"] = true,		--esc, bar
-["rost_"] = true,		--rostok
-["naem_"] = true,		--rostok
-["aes2_"] = true,		--stancia2
-["bun2_"] = true,		--bunker
-["aver_"] = true,
-["lost_"] = true,		--lost village
-["pred_"] = true,		--hospital, predbannik
-["borm_"] = true,		--limansk
-["city_"] = true,		--dead city
-["stab_"] = true,		--dead city
-["vxod_"] = true,		--dead city
-["jund_"] = true,		--jup under
-["kras_"] = true,		--krasivay
-["land_"] = true,		--aver, generators
-["metka"] = true,		--generators
-["boev_"] = true,		--marsh
-["baza_"] = true,		--marsh
-["mitya"] = true,		--marsh
-["grab_"] = true,		--marsh
-["brat_"] = true,		--marsh
-["snip_"] = true,		--marsh
-["nebo_"] = true,		--marsh
-["rad_n"] = true,		--marsh
-["val_b"] = true,		--marsh
-["agr_n"] = true,		--marsh
-["bodi_"] = true,		--warlab
-["prom_"] = true,		--promzone
-["nato_"] = true		--poligon
-}
-local tags4 = {
-["amk_"] = true,		--all
-["sim_"] = true,		--all
-["sak_"] = true,		--all
-["esc_"] = true,		--escape
-["ens_"] = true,		--escape
-["gar_"] = true,		--garbage
-["chuk"] = true,		--agro
-["agr_"] = true,		--agro, agro under
-["kat_"] = true,		--agro under
-["bkot"] = true,		--bar
-["aem_"] = true,		--bar
-["val_"] = true,		--dark valley
-["x18_"] = true,		--labx18
-["lab_"] = true,		--labx18
-["bar_"] = true,
-["ros_"] = true,		--rostok
-["yan_"] = true,		--yantar
-["x16_"] = true,		--brainlab
-["mil_"] = true,
-["rad_"] = true,		--radar, bunker
-["bun_"] = true,		--bunker
-["pri_"] = true,		--east pripyat
-["aes_"] = true,		--stancia
-["sar_"] = true,		--sarcofag
-["mon_"] = true,		--control monolith
-["atp_"] = true,		--atp
-["dyak"] = true,		--marsh
-["red_"] = true,		--red forest
-["for_"] = true,		--red forest
-["psy_"] = true,		--red forest
-["lim_"] = true,		--limansk
-["hos_"] = true,		--hospital
-["gen_"] = true,		--generators
-["war_"] = true,		--warlab
-["zat_"] = true,		--zaton
-["jup_"] = true,		--jupiter
-["cs_u"] = true,		--cs agro under
-["pre_"] = true,		--predbannik
-["dar_"] = true,		--darkscape, x18
-["l01_"] = true,		--krasivay
-["l02_"] = true,		--dd
-["l03_"] = true,		--rinok
-["l04_"] = true,		--pogost
-["l05_"] = true,		--vokzal
-["x14_"] = true,		--lab x14
-["pol_"] = true,		--poligon
-}
-local tags3 = {
-["f1_"] = true,			--dark valley, level f-1
-["dt_"] = true,			--dark valley only
-["hr_"] = true,			--hiding road only
-["ds_"] = true,			--darkscape and dd
-["df_"] = true,			--dark forest
-["av_"] = true,			--av_peshera
-["mg_"] = true,			--dead_city
-["dd_"] = true,			--dd
-["dm_"] = true,			--dd
-["kot"] = true,			--marsh
-["gek"] = true			--agro
-}
-
-local gtags6 = {
-["flesh_"] = true,		--generic creature respawns
-["snork_"] = true,		--generic creature respawns
-["pseudo"] = true,		--generic creature respawns
-["bloods"] = true,		--generic creature respawns
-["burer_"] = true,		--generic creature respawns
-["electr"] = true,		--generic creature respawns
-["chimer"] = true,		--generic creature respawns
-["tushka"] = true,		--generic creature respawns
-["taraka"] = true,		--generic creature respawns
-["gigant"] = true,		--generic creature respawns
-["biblio"] = true,		--generic creature respawns
-["scelet"] = true,		--generic creature respawns
-["m_bloo"] = true,		--generic creature respawns
-["m_cont"] = true,		--generic creature respawns
-["m_polt"] = true,		--generic creature respawns
-["m_crow"] = true,		--generic creature respawns
-["m_dog_"] = true,		--generic creature respawns
-["m_tush"] = true,		--generic creature respawns
-["fractu"] = true,		--generic creature respawns
-["zombie"] = true		--generic creature respawns
-}
-local gtags5 = {
-["boar_"] = true,		--generic respawn
-["m_car"] = true		--generic drivable cars
-}
-local gtags4 = {
-["dog_"] = true,		--generic creature respawns
-["cat_"] = true,		--generic creature respawns
-["rat_"] = true			--generic creature respawns
-}
---]]
-
 function population_control(obj, sect)
 	local is_fixed = false
 	local obj_name
@@ -280,142 +44,148 @@ function population_control(obj, sect)
 		obj_name = sect
 	end
 	if obj_name then
-		if TB3D_Modders.use_population_report == true then TB3D_Services.packet_alert("tb3d pop control: object["..utils.to_str(obj_name).."]") end
-		if string_find(obj_name, "stalker") then
+		--if TB3D_Modders.use_population_report == true then TB3D_Services.packet_alert("tb3d pop control: object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."]") end
+		if string_find(obj_name, "^stalker")
+		  or sect == "m_barman" or sect == "m_osoznanie" then
 				stalkers = stalkers + 1
-		elseif string_find(obj_name, "psy_dog") then
+		elseif string_find(obj_name, "^psy_dog") then
 			if pseudodogs + 1 > TB3D_Modders.max_pseudodogs then
 				is_fixed = true
 			else
 				pseudodogs = pseudodogs + 1
 			end
-		elseif string_find(obj_name, "pseudodog") then
+		elseif string_find(obj_name, "^pseudodog") then
 			if pseudodogs + 1 > TB3D_Modders.max_pseudodogs then
 				is_fixed = true
 			else
 				pseudodogs = pseudodogs + 1
 			end
-		elseif string_find(obj_name, "dog_") then
+		elseif string_find(obj_name, "^dog_") then
 			if dogs + 1 > TB3D_Modders.max_dogs then
 				is_fixed = true
 			else
 				dogs = dogs + 1
 			end
-		elseif string_find(obj_name, "_cat") then
+		elseif string_find(obj_name, "^cat_")
+		  or string_find(obj_name, "^kot_") then
 			if cats + 1 > TB3D_Modders.max_cats then
 				is_fixed = true
 			else
 				cats = cats + 1
 			end
-		elseif string_find(obj_name, "_rat") then
+		elseif string_find(obj_name, "^rat_")
+		  or string_find(obj_name, "^ratstrong")
+		  or string_find(obj_name, "^ratnormal")
+		  or string_find(obj_name, "^ratweak") then
 			if rats + 1 > TB3D_Modders.max_rats then
 				is_fixed = true
 			else
 				rats = rats + 1
 			end
-		elseif string_find(obj_name, "_crow") then
-			if crows + 1 > TB3D_Modders.max_crows then
-				is_fixed = true
-			else
-				crows = crows + 1
-			end
-		elseif string_find(obj_name, "_tush") or string_find(obj_name, "tushkano") then
+		--elseif sect == "m_crow" then
+			--if crows + 1 > TB3D_Modders.max_crows then
+				--is_fixed = true
+			--else
+				--crows = crows + 1
+			--end
+		elseif string_find(obj_name, "^tushkano") then
 			if tushkanos + 1 > TB3D_Modders.max_tushkanos then
 				is_fixed = true
 			else
 				tushkanos = tushkanos + 1
 			end
-		elseif string_find(obj_name, "snork") then
+		elseif string_find(obj_name, "^snork") then
 			if snorks + 1 > TB3D_Modders.max_snorks then
 				is_fixed = true
 			else
 				snorks = snorks + 1
 			end
-		elseif string_find(obj_name, "boar") then
+		elseif string_find(obj_name, "^boar") then
 			if boars + 1 > TB3D_Modders.max_boars then
 				is_fixed = true
 			else
 				boars = boars + 1
 			end
-		elseif string_find(obj_name, "tarakan") then
+		elseif string_find(obj_name, "^tarakan") then
 			if tarakans + 1 > TB3D_Modders.max_tarakans then
 				is_fixed = true
 			else
 				tarakans = tarakans + 1
 			end
-		elseif string_find(obj_name, "flesh") then
+		elseif string_find(obj_name, "^flesh") then
 			if flesh + 1 > TB3D_Modders.max_flesh then
 				is_fixed = true
 			else
 				flesh = flesh + 1
 			end
-		elseif string_find(obj_name, "zombie") then		
+		elseif string_find(obj_name, "^zombie") then		
 			if zombies + 1 > TB3D_Modders.max_zombies then
 				is_fixed = true
 			else
 				zombies = zombies + 1
 			end
-		elseif string_find(obj_name, "scelet") then		
+		elseif string_find(obj_name, "^scelet") then		
 			if scelets + 1 > TB3D_Modders.max_scelets then
 				is_fixed = true
 			else
 				scelets = scelets + 1
 			end
-		elseif string_find(obj_name, "ghoul") then		
+		elseif string_find(obj_name, "^ghoul") then		
 			if ghouls + 1 > TB3D_Modders.max_ghouls then
 				is_fixed = true
 			else
 				ghouls = ghouls + 1
 			end
-		elseif string_find(obj_name, "bibliotekar") then		
+		elseif sect == "bibliotekar" then		
 			if bibliotekar + 1 > TB3D_Modders.max_bibliotekar then
 				is_fixed = true
 			else
 				bibliotekar = bibliotekar + 1
 			end
-		elseif string_find(obj_name, "fracture") then		
+		elseif string_find(obj_name, "^fracture") then		
 			if fractures + 1 > TB3D_Modders.max_fractures then
 				is_fixed = true
 			else
 				fractures = fractures + 1
 			end
-		elseif string_find(obj_name, "burer") then		
+		elseif string_find(obj_name, "^burer") then		
 			if burers + 1 > TB3D_Modders.max_burers then
 				is_fixed = true
 			else
 				burers = burers + 1
 			end
-		elseif string_find(obj_name, "gigant") then		
+		elseif string_find(obj_name, "^gigant") then		
 			if gigants + 1 > TB3D_Modders.max_gigants then
 				is_fixed = true
 			else
 				gigants = gigants + 1
 			end
-		elseif string_find(obj_name, "bloodsucker") then		
+		elseif string_find(obj_name, "^bloodsucker") then		
 			if bloodsuckers + 1 > TB3D_Modders.max_bloodsuckers then
 				is_fixed = true
 			else
 				bloodsuckers = bloodsuckers + 1
 			end
-		elseif string_find(obj_name, "werewolf") then		
+		elseif string_find(obj_name, "^werewolf") then		
 			if werewolves + 1 > TB3D_Modders.max_werewolves then
 				is_fixed = true
 			else
 				werewolves = werewolves + 1
 			end
-		elseif string_find(obj_name, "chimera") then		
+		elseif string_find(obj_name, "^chimera")
+		  or string_find(obj_name, "^electro") then		
 			if chimera + 1 > TB3D_Modders.max_chimera then
 				is_fixed = true
 			else
 				chimera = chimera + 1
 			end
-		elseif string_find(obj_name, "controller") then		
+		elseif string_find(obj_name, "^m_controller") then		
 			if controllers + 1 > TB3D_Modders.max_controllers then
 				is_fixed = true
 			else
 				controllers = controllers + 1
 			end
-		elseif string_find(obj_name, "poltergeist") then		
+		elseif string_find(obj_name, "^m_poltergeist") then		
 			if poltergeist + 1 > TB3D_Modders.max_poltergeist then
 				is_fixed = true
 			else
@@ -431,80 +201,9 @@ function population_control(obj, sect)
 	end
 	if is_fixed == true then
 		if TB3D_Modders.use_population_report == true then TB3D_Services.packet_alert("tb3d pop control: object["..utils.to_str(obj_name).."] removed") end
-		respawn_count = respawn_count + 1
+		removed_count = removed_count + 1
 	end
 	return is_fixed
-end
-
-function remove_object(obj)
-	local sect
-	local obj_name
-	if obj then
-		if obj.section_name then
-			sect = obj:section_name()
-		else
-			sect = obj:name()
-		end
-		if sect == "respawn" then
-			if obj.amk_name then obj_name = obj.amk_name else obj_name = obj:name() end
-		else
-			obj_name = sect
-		end
-		if obj_name then
-			if TB3D_Modders.use_population_report == true then TB3D_Services.packet_alert("tb3d pop control: object["..utils.to_str(obj_name).."] removed from count") end
-			if string_find(obj_name, "stalker") then
-					stalkers = stalkers - 1
-			elseif string_find(obj_name, "psy_dog") then
-					pseudodogs = pseudodogs - 1
-			elseif string_find(obj_name, "pseudodog") then
-					pseudodogs = pseudodogs - 1
-			elseif string_find(obj_name, "dog_") then
-					dogs = dogs - 1
-			elseif string_find(obj_name, "_cat") then
-					cats = cats - 1
-			elseif string_find(obj_name, "_rat") then
-					rats = rats - 1
-			elseif string_find(obj_name, "_crow") then
-					crows = crows - 1
-			elseif string_find(obj_name, "_tush") or string_find(obj_name, "tushkano") then
-					tushkanos = tushkanos - 1
-			elseif string_find(obj_name, "snork") then
-					snorks = snorks - 1
-			elseif string_find(obj_name, "boar") then
-					boars = boars - 1
-			elseif string_find(obj_name, "tarakan") then
-					tarakans = tarakans - 1
-			elseif string_find(obj_name, "flesh") then
-					flesh = flesh - 1
-			elseif string_find(obj_name, "zombie") then		
-					zombies = zombies - 1
-			elseif string_find(obj_name, "scelet") then		
-					scelets = scelets - 1
-			elseif string_find(obj_name, "ghoul") then		
-					ghouls = ghouls - 1
-			elseif string_find(obj_name, "bibliotekar") then		
-					bibliotekar = bibliotekar - 1
-			elseif string_find(obj_name, "fracture") then		
-					fractures = fractures - 1
-			elseif string_find(obj_name, "burer") then		
-					burers = burers - 1
-			elseif string_find(obj_name, "gigant") then		
-					gigants = gigants - 1
-			elseif string_find(obj_name, "bloodsucker") then		
-					bloodsuckers = bloodsuckers - 1
-			elseif string_find(obj_name, "werewolf") then		
-					werewolves = werewolves - 1
-			elseif string_find(obj_name, "chimera") then		
-					chimera = chimera - 1
-			elseif string_find(obj_name, "controller") then		
-					controllers = controllers - 1
-			elseif string_find(obj_name, "poltergeist") then		
-					poltergeist = poltergeist - 1
-			elseif string_find(obj_name, "phantom") then		
-					phantoms = phantoms - 1
-			end
-		end
-	end
 end
 
 function population_report()
@@ -514,7 +213,7 @@ function population_report()
 		TB3D_Services.packet_alert("tb3d population control: dogs["..utils.to_str(dogs).."]")
 		TB3D_Services.packet_alert("tb3d population control: cats["..utils.to_str(cats).."]")
 		TB3D_Services.packet_alert("tb3d population control: rats["..utils.to_str(rats).."]")
-		TB3D_Services.packet_alert("tb3d population control: crows["..utils.to_str(crows).."]")
+		--TB3D_Services.packet_alert("tb3d population control: crows["..utils.to_str(crows).."]")
 		TB3D_Services.packet_alert("tb3d population control: pseudodogs["..utils.to_str(pseudodogs).."]")
 		TB3D_Services.packet_alert("tb3d population control: tushkanos["..utils.to_str(tushkanos).."]")
 		TB3D_Services.packet_alert("tb3d population control: snorks["..utils.to_str(snorks).."]")
@@ -535,7 +234,7 @@ function population_report()
 		TB3D_Services.packet_alert("tb3d population control: poltergeist["..utils.to_str(poltergeist).."]")
 		TB3D_Services.packet_alert("tb3d population control: phantoms["..utils.to_str(phantoms).."]")
 	end
-	TB3D_Services.info_alert("tb3d population control: trimmed["..utils.to_str(respawn_count).."] from population")
+	TB3D_Services.info_alert("tb3d population control: trimmed["..utils.to_str(removed_count).."] from population")
 end
 
 ------------------------------ offline alife ------------------
@@ -935,7 +634,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 				dont_spawn_online = true
 			elseif hdr6 == "puzir_" and lname ~= "puzir" then		--snork
 				dont_spawn_online = true
-			elseif (hdr6 == "gener_" or hdr4 == "gen_") and lname ~= "generators" then		--forest_chimera_x_ray1,2, snork, gen_bloodsucker_na_krushe  TODO: need fix black_doc
+			elseif (hdr6 == "gener_" or hdr4 == "gen_" or hdr6 == "genera") and lname ~= "generators" then		--109989, forest_chimera_x_ray1,2, snork, gen_bloodsucker_na_krushe  TODO: need fix black_doc
 				dont_spawn_online = true
 			elseif hdr6 == "forest" and lname ~= "red_forest" then		--forest_chimera_x_ray1,2
 				dont_spawn_online = true
@@ -1045,6 +744,8 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						elseif has_alife_info("esc_darklab_documents_read") then					--keep them out until cordon story quests are done
 							result = true
 						end
+					elseif string_find(obj_name, "stalker_0007") then					--109989, Vampire
+						dont_spawn_online = true
 					elseif string_find(obj_name, "wounded_bandit") then								--stole the pda
 						if extended_levels then
 							dont_spawn_online = true
@@ -1112,13 +813,15 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 			elseif lname == "l02_garbage" then
 				if hdr4 == "gar_"			--short circuit known spawns
 				  or hdr4 == "sak_"
-				  or hdr4 == "amk_"			--109987, vitek_voron the trader
+				  or hdr4 == "amk_"			--109987, vitek_voron the trader, amk_artem_kulinar
 				  or hdr6 == "garbag"
 				  or hdr6 == "svalka"
 				  or hdr6 == "tamaz_" then
 					if string_find(obj_name, "himera") then		--keep them from effecting robbers and bes quests
 						if has_alife_info("agr_find_gunslinger_cache_final") then
 							result = true
+						else
+							dont_spawn_online = true
 						end
 					elseif string_find(obj_name, "_dm_")
 					  or string_find(obj_name, "tamaz_ohr") then
@@ -1128,6 +831,8 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						else
 							result = true
 						end
+					elseif string_find(obj_name, "stalker_0007") then					--109989, Vampire
+						dont_spawn_online = true
 					else
 						result = true
 					end
@@ -1154,7 +859,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					end
 				elseif hdr4 == "sim_" then									--see if allowed simulation
 					if string_find(obj_name, "novice_neumeha")
-					  or string_find(obj_name, "general_upir")
+					  or string_find(obj_name, "general_upir")				--Vitamin
 					  or string_find(obj_name, "_gusarov")					--gar graveyard after val chase
 					  or string_find(obj_name, "bandit_veteran") then
 						if extended_levels then
@@ -1180,6 +885,12 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 			elseif lname == "l03_agroprom" then
 				if hdr4 == "sak_" then			--short circuit known spawns
 					result = true					--mil trader
+				elseif hdr4 == "gar_" then
+					if string_find(obj_name, "stalker_0007") then					--109989, Vampire
+						dont_spawn_online = true
+					else
+						result = true
+					end
 				elseif hdr4 == "esc_" then
 					dont_spawn_online = true
 				elseif hdr5 == "agro_"
@@ -1192,9 +903,15 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					  or string_find(obj_name, "_zone")
 					  or string_find(obj_name, "_flesh")
 					  or string_find(obj_name, "dog_")
-					  --or string_find(obj_name, "bloodsucker")
+					  or string_find(obj_name, "ratcatcher")						--109989, deserter in trailor
 					  or string_find(obj_name, "_nii_") then
 						result = true
+					elseif string_find(obj_name, "zastava1_soldier") then			--109989, interfere with Mole rescue
+						if not has_alife_info("agr_find_gunslinger_cache_found") then
+							dont_spawn_online = true
+						else
+							result = true
+						end
 					elseif string_find(obj_name, "factory_defence_stalker") then		--109975, fight with exit guards
 						if has_alife_info("agr_find_gunslinger_cache_found") and not has_alife_info("agroprom_military_case_done") then
 							dont_spawn_online = true
@@ -1318,6 +1035,12 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 							result = true
 						end
 					end
+				elseif hdr6 == "bloods" then									--109989
+					if has_alife_info("bar_deactivate_radar_done") then
+						result = true
+					else
+						dont_spawn_online = true
+					end
 				elseif string_find(obj_name, "agr_krot")						--Mole
 				  or string_find(obj_name, "korchagin_") then					--dead_korchagin_military
 					if extended_levels then
@@ -1352,8 +1075,31 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					result = true
 				end
 			elseif lname == "l05_bar" then
-				if hdr4 == "bar_"				--bar_stalker_0005 = arena fight 1, _0006 = fight 2, 7 & 8 = 3, 9 - 13 = 4, 14 & 15 = 5, 16 - 21 = 6, 22 = 7, 23 - 26 = 8
-				  or hdr6 == "gar_st"			--gar_stalker_general
+				if hdr4 == "bar_" then									--bar_stalker_0005 = arena fight 1, _0006 = fight 2, 7 & 8 = 3, 9 - 13 = 4, 14 & 15 = 5, 16 - 21 = 6, 22 = 7, 23 - 26 = 8
+					if string_find(obj_name, "^bar_visitor_") then		--109989, bar_visitor_2,3,4,5,7,8,10,12,13,15	around campfires
+						if TB3D_Modders.reduce_bar_visitors then
+							if string_find(obj_name, "visitor_2")
+							  or string_find(obj_name, "visitor_5")
+							  or string_find(obj_name, "visitor_8")
+							  or string_find(obj_name, "visitor_12")
+							  or string_find(obj_name, "visitor_15") then
+								dont_spawn_online = true
+							else
+								result = true
+							end
+						else
+							result = true
+						end
+					elseif string_find(obj_name, "stalker_0001") then			--109989, Barin wandering around warehouse exit
+						if has_alife_info("naemn_shturm_poluch_done") then		-- after humback mission
+							result = true
+						else
+							dont_spawn_online = true
+						end
+					else
+						result = true
+					end
+				elseif hdr6 == "gar_st"			--gar_stalker_general
 				  or hdr6 == "prapor"			--prapor
 				  or hdr6 == "dolgov"			--dolgovazyi
 				  or hdr4 == "aem_"				--arny, arena
@@ -1541,8 +1287,19 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					else
 						result = true
 					end
-				--elseif string_find(obj_name, "bloodsucker_effector") then
-						--dont_spawn_online = true
+				elseif hdr4 == "gar_" then
+				  --or hdr4 == "pri_" or hdr4 == "atp_" or hdr6 == "swamp_"
+				  --or hdr6 == "gener_" or hdr6 == "genera" or hdr4 == "yan_"
+				  --or hdr6 == "dcity_" or hdr5 == "aver_" then
+					dont_spawn_online = true
+				elseif hdr6 == "genera" then				--109989
+					dont_spawn_online = true
+				elseif hdr6 == "bloods" then				--109989, bloodsucker_effector
+					if has_alife_info("yan_find_scientist_done") then
+						result = true
+					else
+						dont_spawn_online = true
+					end
 				elseif string_find(obj_name, "mil_dolg_stalker")
 				  or string_find(obj_name, "military_neytral_stalk1") then
 					if extended_levels then
@@ -1550,11 +1307,6 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					else
 						result = true
 					end
-				elseif hdr4 == "gar_" then
-				  --or hdr4 == "pri_" or hdr4 == "atp_" or hdr6 == "swamp_"
-				  --or hdr6 == "gener_" or hdr6 == "genera" or hdr4 == "yan_"
-				  --or hdr6 == "dcity_" or hdr5 == "aver_" then
-						dont_spawn_online = true
 				else
 					result = true
 				end
@@ -2155,6 +1907,8 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 				if hdr5 == "aver_"			--short circuit known spawns
 				  or hdr4 == "sak_" then
 					result = true
+				elseif hdr4 == "gar_" then								--109989, vampire
+					dont_spawn_online = true
 				elseif hdr4 == "sim_" then										--see if allowed simulation
 					if string_find(obj_name, "arhara_zimovie")
 					  or string_find(obj_name, "aver_")
@@ -2182,7 +1936,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						else
 							result = true
 						end
-					elseif string_find(obj_name, "effector_av1") then		--109974 path errors
+					elseif string_find(obj_name, "effector_av") then		--109989 path errors av1 and av2
 						dont_spawn_online = true
 					else
 						result = true
