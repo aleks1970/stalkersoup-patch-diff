@@ -1,5 +1,7 @@
--- TB3D 1.0.9.9.4.4
+-- TB3D 1.0.9.9.4.4, translate
 function my_ver() return "1.0.9.9.4.4" end
+
+local translate = game.translate_string
 class "arc_container_menu" (CUIScriptWnd)
 
 local max_arts_in_container = 3 -- FIXME
@@ -308,7 +310,7 @@ function btn_put_art(art_index)
         end
 		if inv_rad >= 0.0007 then
 		    arc_radiation.change_inv_arts_radiation(inv_rad-0.0007)
-			news_manager.amk_send_tip("This container is designed for less radioactive Artefacts. You cannot use it to fully offset the damaging effects of radiation. Put the Artefact in a different container.",nil,nil,5)
+			news_manager.amk_send_tip(translate("arc_ui_container_1"),nil,nil,5)
 		end
 		-- Skunk finish
 

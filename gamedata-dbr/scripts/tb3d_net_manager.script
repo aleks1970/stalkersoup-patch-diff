@@ -1,8 +1,9 @@
---TB3D 1.0.9.9.9.5 tb3d_launcher_
+--TB3D 1.0.9.9.9.5 tb3d_launcher_, translate
 function my_ver() return "1.0.9.9.9.5" end
 --[[
 rename incomming to .ltx files and put filename in pda database to retrieve when reading
 ]]--
+local translate = game.translate_string
 function launcher_check()
 	local f = getFS()
 	local flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_launcher_*.txt")
@@ -36,7 +37,7 @@ function network_pole()
 		local f1 = f:update_path("$downloads$", fileName)
 		local f2 = f:update_path("$downloads$", fileNameNew)
 		f:file_rename(f1, f2, true)
-		news_manager.amk_send_tip("%c[255,0,255,0]Network message recieved.%c[default]", "Local Net", 0, 15, "gen_info")
+		news_manager.amk_send_tip(translate("Network_mes_recieved_0"), translate("Local_Net_0"), 0, 15, "gen_info")
 		return sendDate, sendTime, newPacket
 	end
 	return nil,nil,nil
@@ -47,7 +48,7 @@ function network_send(mypacket)
 	local flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_*.nto")		--check last packet went
 	local f_cnt = flist:Size()
 	if f_cnt > 0 then																							--last packet not sent
-		news_manager.amk_send_tip("%c[255,0,255,0]Network packets not getting sent - please check connection.%c[default]", "Local Net", 0, 15, "gen_info")
+		news_manager.amk_send_tip(translate("Network_packets_not_0"), translate("Local_Net_0"), 0, 15, "gen_info")
 		return false
 	else
 		flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_*.ntd")		--see if last packet done

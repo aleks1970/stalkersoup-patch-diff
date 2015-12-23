@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.4 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.9.6 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -9,8 +9,8 @@
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
--- test_for_need_sleep_matras aleks1970
-function my_ver() return "1.0.9.9.9.4" end
+-- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over
+function my_ver() return "1.0.9.9.9.6" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -26,6 +26,7 @@ local math_cos = math.cos
 local math_ceil = math.ceil
 local string_find = string.find
 local string_sub = string.sub
+local translate = game.translate_string
 
 local sound_obj_right,sound_obj_left,snd_volume,snd_obj_eq
 
@@ -68,7 +69,7 @@ function first_run() 		--mod_call() from amk.script on_game_load, do not spawn o
 			amk.save_variable("check_prior", tb3d_ver)							--109989, need update version fixes
 		else																	--new game
 			amk.save_variable("temp_intro", 1)
-			if get_console():get_string("mm_net_srv_name") == game.translate_string("gd_collector") then
+			if get_console():get_string("mm_net_srv_name") == translate("gd_collector") then
 				TB3D_Services.set_new_levelup(1) 								--109978
 				TB3D_Services.give_info("tb3d_started_as_collector")
 				TB3D_Services.packet_alert("TB3D version["..TB3D_Services.major_version.."] new game collector...")
@@ -307,10 +308,15 @@ function check_spawn()
 				local money = db.actor:money()
 				amk.g_start_timer("blow_shift", 0, 0, 2)							-- give time for guards to go online
 				news_main.next_blow(4)
+				TB3D_Services.give_info("agr_nii_rupor_off")						--109996, make sure speaker is off
 			elseif levelup == 2 then												--109978, Desolation
 				TB3D_Services.set_player_relations(5)								--109981, killer, lastday and mono -500, all others 0
 				TB3D_Services.delayed_action(1, "tb3d_sms_storm", 10)				--start timer to send sms
 				TB3D_Services.set_harsh_environment(2)								--start earthquake and wake
+			elseif levelup == 3 then												--109996, reclamation
+				alife():create("zep_note_gen_grimwald", vector():set(-223.757,33.071,-127.943),78486,3077)		--109996, tent ne near checkpoint	
+			elseif levelup == 4 then												--109996, free play and DLC
+				TB3D_Services.set_player_relations(5)								--109996, killer, lastday and mono -500, all others 0
 			end
 			TB3D_Collector.process_levels(lname, sname)
 		else
@@ -327,21 +333,9 @@ function check_spawn()
 				end
 			end
 			if has_alife_info("tb3d_sms_storm") and not has_alife_info("tb3d_storm_over") then								--109984
-				local strm_strtd = amk.load_variable("tb3d_storm_started", 0)
-				if strm_strtd > 0 then
-					if not has_alife_info("tb3d_block_1") and strm_strtd + 3 > level.get_time_days() then
-						TB3D_Services.give_info("tb3d_block_1")
-					elseif strm_strtd + 5 > level.get_time_days() then
-						TB3D_Services.give_info("tb3d_block_2")						--only NPP areas
-					elseif strm_strtd + 7 > level.get_time_days() then
-						TB3D_Services.give_info("tb3d_storm_over")
-						amk.del_variable("tb3d_storm_started")
-						TB3D_Services.set_new_levelup(3)							--set for process_levels
-					end
-				else
-					amk.save_variable("tb3d_storm_started", level.get_time_days())
-				end
+				TB3D_Services.check_storm_over()			--109996
 			end
+		--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
 			TB3D_Collector.process_levels(lname, sname)
 			TB3D_Services.update()												--!!!!TB3D start task update timer
 		end
@@ -349,7 +343,6 @@ function check_spawn()
 	-------------------------------------------------------------------------------------------
 	else						-- STALKER START
 	-------------------------------------------------------------------------------------------
-		--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
 		TB3D_services.stalker_set_portals()										--clears lcs based on info portions
 		if startup > 0 then
 			amk_anoms.pre_blow_off()											--109990, start clean
@@ -705,7 +698,7 @@ local afs={
 ["af_pudd_2"] = true,
 ["af_pudd_3"] = true,
 ["af_rusty_kristall"] = true,
-["af_rusty_sea-urchin"] = true,
+["af_rusty_sea_urchin"] = true,
 ["af_rusty_thorn"] = true,
 ["af_simbion"] = true,
 ["af_soul"] = true,
@@ -866,7 +859,7 @@ local anom_recept_komp = {
 					vremya = {0,5,0}
 				},
 				["info_amk_recipt_dikoobraz"] = {
-					komp = {["af_rusty_sea-urchin"]=true},
+					komp = {["af_rusty_sea_urchin"]=true},
 					cel = {["af_dik_1"]=true},
 					vremya = {0,3,0}
 				},
@@ -998,7 +991,7 @@ local anom_recept_komp = {
 					cel = {["af_gold_fish"]=true}
 				},
 				["info_artmod_fuzz_kolobok_buzz"] = {
-					komp = {["af_night_star"]=true,["af_soul"]=true,["af_electra_moonlight"]=true,["af_rusty_sea-urchin"]=true},
+					komp = {["af_night_star"]=true,["af_soul"]=true,["af_electra_moonlight"]=true,["af_rusty_sea_urchin"]=true},
 					cel = {["af_fuzz_kolobok"]=true}
 				},
 				["info_artmod_vyvert_buzz"] = {
@@ -1101,7 +1094,7 @@ local anom_recept_komp = {
 					cel = {["af_ameba_mica"]=true}
 				},
 				["info_artmod_dummy_glassbeads_mincer"] = {
-					komp = {["af_ameba_mica"]=true,["af_rusty_sea-urchin"]=true,["af_gold_fish"]=true,["af_night_star"]=true},
+					komp = {["af_ameba_mica"]=true,["af_rusty_sea_urchin"]=true,["af_gold_fish"]=true,["af_night_star"]=true},
 					cel = {["af_dummy_glassbeads"]=true}
 				},
 				["info_amk_recipt_burer_grandmother_glassbeards"] = {
@@ -1166,9 +1159,9 @@ local anom_recept_komp = {
 					komp = {["af_mincer_meat"]=true,["af_vyvert"]=true,["af_fireball"]=true,["mutant_flesh_eye"]=true},
 					cel = {["af_cristall"]=true}
 				},
-				["info_artmod_rusty_sea-urchin_mosquito_bald"] = {
+				["info_artmod_rusty_sea_urchin_mosquito_bald"] = {
 					komp = {["af_ameba_slime"]=true,["af_blood"]=true,["af_rusty_kristall"]=true,["mutant_krovosos_jaw"]=true},
-					cel = {["af_rusty_sea-urchin"]=true}
+					cel = {["af_rusty_sea_urchin"]=true}
 				},
 				["info_artmod_dummy_dummy_mosquito_bald"] = {
 					komp = {["af_ameba_mica"]=true,["af_cristall"]=true,["af_mincer_meat"]=true,["af_night_star"]=true},
@@ -1248,7 +1241,7 @@ local anom_recept_komp = {
 					remove_anomaly = true
 				},
 				["life_heart_final"] = {
-					komp = {["af_dummy_dummy"]=true,["af_rusty_sea-urchin"]=true,["af_gold_fish"]=true,["af_night_star"]=true},
+					komp = {["af_dummy_dummy"]=true,["af_rusty_sea_urchin"]=true,["af_gold_fish"]=true,["af_night_star"]=true},
 					cel = {["af_life_heart"]=true}
 				},
 				["info_red_battery"] = {
@@ -1344,7 +1337,7 @@ function get_af_transform_param(name, recept, recepti)
 		result = anom_recept_komp["default"][name]
 	else
 		-- no information!!!
-		news_manager.amk_send_tip(game.translate_string("sms_no_info")..name.."]!",game.translate_string("sms_cook_arts"),0,15,"gen_info")
+		news_manager.amk_send_tip(translate("sms_no_info")..name.."]!",translate("sms_cook_arts"),0,15,"gen_info")
 		result = nil
 	end
 	return result
@@ -1596,11 +1589,11 @@ function af_transform_universal_end(params)
 		local from_komp = ""
 		for k,v in pairs(params.komp) do
 			if k then
-				from_komp = from_komp..game.translate_string(amk.get_inv_name(k))
+				from_komp = from_komp..translate(amk.get_inv_name(k))
 			end
 		end
 		-- cut off, "" in the tail
-		local rtext = game.translate_string("trans_finished_title").." [%c[255,240,20,14]"..string_sub(from_komp, 1, -1).."%c[default]]"
+		local rtext = translate("trans_finished_title").." [%c[255,240,20,14]"..string_sub(from_komp, 1, -1).."%c[default]]"
 		-- spawns a result (v)
 		for k,v in pairs(params.result) do
 			obj = amk.spawn_item(k, vector():set(params.pos.x,params.pos.y+1,params.pos.z), params.gv, params.lv)		--109975
@@ -1642,7 +1635,7 @@ end
 -- old function
 function af_transform_end(params)
 	local from_sect="\""..params.from_sect.."\""
-	from_sect = game.translate_string("trans_finished_title").." [%c[255,240,20,14]"..from_sect.."%c[default]]"
+	from_sect = translate("trans_finished_title").." [%c[255,240,20,14]"..from_sect.."%c[default]]"
 	local obj
 	obj=amk.spawn_item(params.section,vector():set(params.pos.x,params.pos.y,params.pos.z),params.gv,params.lv)
 	amk.add_spot_on_map(obj.id,"red_location",rtext)
@@ -1884,6 +1877,7 @@ end
 
 function check_blowout(phase)
 	local bt=blowout_type()
+	TB3D_Services.packet_alert("AMK MOD: check blowout bt["..utils.to_str(bt).."] phase["..utils.to_str(phase).."]")
 	if bt == 0 or bt == 2 or bt == 3 then
 		local results = TB3D_Modders.blow_phase_basis + (math_random()*TB3D_Modders.blow_phase_shift) - (TB3D_Modders.blow_phase_shift/2)
 		if results < 1 then results = 1 elseif results > TB3D_Modders.blow_phase_max then results = TB3D_Modders.blow_phase_max end
@@ -1899,7 +1893,6 @@ function check_blowout(phase)
 			amk.g_start_timer("blowout", 0, 0, 1, 1)
 			--TB3D_Services.set_blow(phase)	
 		elseif phase==1 then
-			--TB3D_Services.packet_alert("AMK MOD: blowout ["..phase.."]")
 			amk_anoms.pre_blow_off()
 			amk.g_start_timer("blowout", 0, 0, results, 2)
 			--TB3D_Services.set_blow(phase)								--109980
@@ -2022,6 +2015,7 @@ end
 function Run_Blowout_pp()
 	local bt=blowout_type()		--returns 5 if no blowout or type
 	if TB3D_Modders.run_blowout_pp == true and has_alife_info("tutorial_end") and not has_alife_info("tb3d_harsh_environment") then		--109992
+		TB3D_Services.packet_alert("AMK MOD: Run_Blowout_pp hr["..level.get_time_hours().."] min["..level.get_time_minutes().."]") 
 		if level.name() == "l04_darkvalley" and not has_alife_info("bandit_krisyk_done") then
 			TB3D_Services.stop_blow()			--skip it to not have bes and demon attack bandit base
 			bt = 5								--not 0 so no news given

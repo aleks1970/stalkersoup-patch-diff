@@ -1,5 +1,5 @@
 --TB3D 1.0.9.9.8.0 fixed rucksack, no amk news.ltx file (commented out), added news_alert, 'Jury Semetsky' to 'Unknown STALKER',
--- added labx8 to isolated list, death news, blowout news, fast saves, obj level, removed generate_arts, blow()
+-- added labx8 to isolated list, death news, blowout news, fast saves, obj level, removed generate_arts, blow(), translate
 function my_ver() return "1.0.9.9.8.0" end
 -- local ti = table.insert
 
@@ -8,6 +8,7 @@ local table_remove = table.remove
 local table_sort = table.sort
 local string_find = string.find
 local string_gsub = string.gsub
+local translate = game.translate_string
 
 local prob = 0.4
 local bInit = false
@@ -528,7 +529,7 @@ function get_object_name(obj)
 		--value	= utils.cfg_get_string(system_ini(), obj:section(), "inv_name", obj, false, "", "")
 		value	= getIniValueString(sect, "inv_name", "", nil)
 		-- s_name = value
-		s_name = game.translate_string(value)
+		s_name = translate(value)
 		if string_find(sect, "^af_") then
 			s_name = "artifact "..s_name
 		end
@@ -537,7 +538,7 @@ function get_object_name(obj)
 		--value	= utils.cfg_get_string(system_ini(), obj:section_name(), "inv_name", obj, false, "", "")
 		value	= getIniValueString(sect, "inv_name", "", nil)
 		-- s_name = value
-		s_name = game.translate_string(value)
+		s_name = translate(value)
 		if string_find(sect, "^af_") then
 			s_name = "artifact "..s_name
 		end

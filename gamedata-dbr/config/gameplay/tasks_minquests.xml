@@ -1,6 +1,6 @@
-<!-- ************ TB3D 1.0.9.9.8.3 moved from game_tasks.xml, fixed Sahharov and pda(mil), Max to Prapor, petrushka to petruha,
+<!-- ************ TB3D 1.0.9.9.9.6 moved from game_tasks.xml, fixed Sahharov and pda(mil), Max to Prapor, petrushka to petruha,
  miser to skinflint, dummy glass beads, grandmothers beads, treatises to records, minor edits, ghost pda, krysyuks pda,
- boar_hoofs_vodka, Bring_safe_Syak, added articles *************** -->
+ boar_hoofs_vodka, Bring_safe_Syak, added articles, doktor_teleport_ *************** -->
 <game_task id="saharov_pda">
 	<title>Bring_Ghost_PDA_to_Sakharov_gameplay_titles</title>
 	<objective>
@@ -500,7 +500,7 @@
 	</objective>
 	<objective>
 		<text>Find_the_Ruby_Battery_gameplay_descriptions</text>
-		<function_complete>sak_dialog.dummy_battery_red_have</function_complete>
+		<function_complete>sak_dialog.dummy_battery_red_have_info</function_complete>
 		<infoportion_set_complete>doktor_teleport_11_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -520,7 +520,7 @@
 	</objective>
 	<objective>
 		<text>Find_Ruby_Film_artifact_gameplay_descriptions</text>
-		<function_complete>sak_dialog.dummy_pellicle_red_have</function_complete>
+		<function_complete>sak_dialog.dummy_pellicle_red_have_info</function_complete>
 		<infoportion_set_complete>doktor_teleport_12_have</infoportion_set_complete>
 	</objective>
 	<objective>

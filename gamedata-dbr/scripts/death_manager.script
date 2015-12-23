@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.5 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.0.9.9.9.6 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
---has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts
-function my_ver() return "1.0.9.9.9.5" end
+--has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts, last_day
+function my_ver() return "1.0.9.9.9.6" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
@@ -86,6 +86,14 @@ end
 
 function drop_manager:check_dead_weapons()
 	if self.npc then
+		local lname = level:name()
+		local npc_name = protected_items.get_obj_name(self.npc)		--strips off the id
+		local commun = self.npc:character_community()		--109990
+		--TB3D_Services.packet_alert("death mgr: check dead weapons["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."]")
+		if commun and commun == "lastday" then
+			if string_find(npc_name, "charactercommander") then return end
+			--if lname == "red_forest" or lname == "dead_city" then return end
+		end
 		local min_cond = TB3D_Modders.loadout_weapon_cond									--109981
 		if min_cond == nil or min_cond < 0 or min_cond > 99 then min_cond = 80 end
 		local item_in_slot = self.npc:item_in_slot(1)
@@ -98,32 +106,35 @@ function drop_manager:check_dead_weapons()
 			item_in_slot:unload_magazine()													--remove ammo to prevent child ctd
 			item_in_slot:set_condition(math_random(min_cond, 100)/100)
 		end
-	end
-	function check_weapon(npc, item)																	--109981
-		if npc and item and alife():object(item:id()) then
-			if IAmAWeapon[item:clsid()] then
-				item:unload_magazine()																	--109981, pm still causes error with 9x18_fmj
-				if protected_items.obj_is_protected(item) == false then
-					local min_cond = TB3D_Modders.loadout_weapon_cond									--109981
-					if min_cond == nil or min_cond < 0 or min_cond > 99 then min_cond = 80 end
-					item:set_condition(math_random(min_cond, 100)/100)
-					return true
+		function check_weapon(npc, item)																	--109981
+			if npc and item and alife():object(item:id()) then
+				if IAmAWeapon[item:clsid()] then
+					item:unload_magazine()																	--109981, pm still causes error with 9x18_fmj
+					if protected_items.obj_is_protected(item) == false then
+						local min_cond = TB3D_Modders.loadout_weapon_cond									--109981
+						if min_cond == nil or min_cond < 0 or min_cond > 99 then min_cond = 80 end
+						item:set_condition(math_random(min_cond, 100)/100)
+						return true
+					end
 				end
 			end
+			return false
 		end
-		return false
+		self.npc:iterate_inventory(check_weapon, self.npc)
 	end
-    self.npc:iterate_inventory(check_weapon, self.npc)
 end
 
 --fixes PDAs, spawns some loot IF npc has less items than loot option, reduces ammo to reasonable amount
 --most npc already have an inventory and are skipped except for the PDA fix, no weapons or ammo! use load out system
 function drop_manager:check_dead_items()		--109989, just deal with simple qty and not box size
-	--TB3D_Services.packet_alert("death mgr: check dead items["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	local lname = level:name()
+	local npc_name = protected_items.get_obj_name(self.npc)		--strips off the id
 	local community = self.npc:character_community()		--109990
-	if commun and commun == "lastday" then
+	if community == nil then community = "zombied" end
+	--TB3D_Services.packet_alert("death mgr: check dead items["..utils.to_str(npc_name).."] community["..utils.to_str(community).."]")
+	if community == "lastday" then
 		if string_find(npc_name, "charactercommander") then return end
-		if lname == "red_forest" or lname == "dead_city" then return end
+		--if lname == "red_forest" or lname == "dead_city" then return end
 	end
 	local npc_id = self.npc:id()
 	local loot_count = 0							--109989, keep track of random loot
@@ -176,9 +187,29 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 	end
 	local spawn_rate = TB3D_Modders.pda_spawn_rate or 30				--109981
 	if spawn_rate > 80 then spawn_rate = 80 end
-	if community and (community == "military" or community == "ecolog" or community == "monolith" or community == "lastday") then
+	if community == "zombied" then
+		if math_random(100) > 30 then
+			give_some_stuff(self.npc, "bread_a", 1)
+		end
+	elseif community == "bandit" then 							--109996
+		if math_random(100) < 30 then
+			alife():create("device_pda",
+						self.npc:position(),
+						self.npc:level_vertex_id(),
+						self.npc:game_vertex_id(),
+						self.npc:id())
+		end
+	elseif community == "stalker" or community == "green" or community == "ecolog" or community == "humter" then
+		if math_random(100) < spawn_rate then
+			alife():create("device_pda",
+						self.npc:position(),
+						self.npc:level_vertex_id(),
+						self.npc:game_vertex_id(),
+						self.npc:id())
+		end
+	elseif community ~= "arena_enemy" and community ~= "fotoman" then
 		if not string_find(self.npc:name(), "dead_military_esc") then
-			if math_random(100) < spawn_rate then 							--109981
+			if math_random(100) < spawn_rate then
 				alife():create("device_pda_npc",
 						self.npc:position(),
 						self.npc:level_vertex_id(),
@@ -186,22 +217,8 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 						self.npc:id())
 			end
 		end
-	elseif community and community ~= "zombied" and community ~= "bandit" then	--109984
-		if math_random(100) < spawn_rate then 							--109981
-			alife():create("device_pda",
-						self.npc:position(),
-						self.npc:level_vertex_id(),
-						self.npc:game_vertex_id(),
-						self.npc:id())
-		end
 	end
-	if community and community == "zombied" then
-		if math_random(100) > 50 then
-			give_some_stuff(self.npc, "bread_a", 1)
-		--else
-			--give_some_stuff(self.npc, "vodka_a", 1)
-		end
-	elseif string_find(self.npc:name(), "military_ecolog_agro1") then		--Ivanshenko in agro
+	if string_find(self.npc:name(), "military_ecolog_agro1") then		--Ivanshenko in agro
 		give_some_stuff(self.npc, "bad_psy_helmet", 1)
 	else
 		local ini = self.npc:spawn_ini()
@@ -223,34 +240,44 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 	local lname = level:name()
 	local npc_name = self.npc:name()
 	local commun = self.npc:character_community()
-	if TB3D_Modders.Global_Debug == true then
-		TB3D_Services.packet_alert("death mgr: check_npc_loadout["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."] ["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	if TB3D_Modders.use_loadout_message == true then
+		TB3D_Services.packet_alert("death mgr: check_npc_loadout["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."]")
 	end
 	if commun == "trader" 													--never touch
 	  or (commun == "fotoman" and lname == "l08u_brainlab")					--never touch, suspended in brain for photo so can't be armed
 	  or commun == "sniper"													--never touch
 	  --or commun == "zombied"												--never touch
 	  or commun == "stranger"												--never touch, doctor
-	  --or commun == "lastday" and (string_find(npc_name, "ldk") or string_find(npc_name, "sim_") or string_find(npc_name, "charactercommander"))		--109989
-	  or string_find(npc_name, "zemlyk")
-	  or string_find(npc_name, "esc_shustryi")
-	  or string_find(npc_name, "esc_vagon_wounded")
-	  or string_find(npc_name, "val_escort_captive")
-	  or string_find(npc_name, "val_sacrifice_victim")
-	  --or string_find(npc_name, "val_sos_wounded")							--needs one or is defensless against bandits and dogs
-	  or string_find(npc_name, "val_prisoner_captive")
-	  or string_find(npc_name, "val_escort_bandit_halfdead")				--no weapon so does not pursue Bullet to the ambush
-	  or string_find(npc_name, "dead_mono_labirint")
 	  then 
 		return
 	elseif commun == "lastday" then
 		if string_find(npc_name, "charactercommander") then return end		--109989
-		if lname == "red_forest" or lname == "dead_city" then return end
+	elseif commun == "killer" then
+		if string_find(npc_name, "dead_mono_labirint") then return end
+	elseif commun == "dolg" then
+		if string_find(npc_name, "val_prisoner_captive")
+		  or string_find(npc_name, "val_sacrifice_victim")
+		  or string_find(npc_name, "val_escort_captive") then 
+			return
+		end
+	elseif commun == "bandit" then
+		if string_find(npc_name, "val_escort_bandit_halfdead") then return end	--no weapon so does not pursue Bullet to the ambush
+	elseif commun == "stalker" then
+		if string_find(npc_name, "zemlyk")
+		  or string_find(npc_name, "esc_shustryi")
+		  or string_find(npc_name, "esc_vagon_wounded")
+		  --or string_find(npc_name, "val_sos_wounded")							--needs one or is defensless against bandits and dogs
+		  then 
+			return
+		end
 	end
 	counter = 0
 	local item_in_slot
 	local suit_id
 	if has_alife_info("tb3d_force_loadouts") == true then
+		if TB3D_Modders.use_loadout_message == true then
+			TB3D_Services.packet_alert("death mgr: check_npc_loadout["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."] forced load out!!!!")
+		end
 		item_in_slot = self.npc:item_in_slot(1)
 		if item_in_slot then
 			item_in_slot:unload_magazine()
@@ -267,7 +294,6 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 				if (item.clsid and IAmAWeapon[item:clsid()])
 				  or (string_find(item:name(), "wpn_") and not string_find(item:name(), "binoc"))
 				  or string_find(item:name(), "ammo_") then
-					--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc:name()).."] weapon["..utils.to_str(item:name()).."] counter["..utils.to_str(counter).."]")
 					npc:drop_item(item)
 					amk.remove_item(item)
 				end
@@ -276,8 +302,18 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 		end
 		self.npc:iterate_inventory(remove_weapons, self.npc)		--not binocs
 	else
-		local min_cond = TB3D_Modders.min_weapon_cond								--109981
-		if min_cond == nil or min_cond > 99 or min_cond < 0 then min_cond = 80 end
+		item_in_slot = self.npc:item_in_slot(1)
+		if item_in_slot then
+			counter = counter + 1
+			--self.npc:activate_slot(1)
+		else
+			item_in_slot = nil
+			item_in_slot = self.npc:item_in_slot(2)
+			if item_in_slot then
+				counter = counter + 1
+				--self.npc:activate_slot(2)
+			end
+		end
 		function has_weapons(npc, item)					--109981
 			if item then
 				if (item.clsid and IAmAWeaponFireOnly[item:clsid()]) then
@@ -286,13 +322,19 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 				  and not string_find(item:name(), "binoc")
 				  and not string_find(item:name(), "grenade")
 				  and not string_find(item:name(), "_addon")) then
-					--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc:name()).."] weapon["..utils.to_str(item:name()).."] counter["..utils.to_str(counter).."]")
 					counter = counter + 1
 				end
 			end
 			return true
 		end
-		self.npc:iterate_inventory(has_weapons, self.npc)
+		if counter == 0 then self.npc:iterate_inventory(has_weapons, self.npc) end
+	end
+	if counter == 0 then 													--109996, no weapon so dynamically assign loadout
+		local min_cond = TB3D_Modders.min_weapon_cond								--109981
+		if min_cond == nil or min_cond > 99 or min_cond < 0 then min_cond = 80 end
+		--if TB3D_Modders.use_loadout_message == true then
+			--TB3D_Services.packet_alert("death mgr: check_npc_loadout["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."] assign load out")
+		--end
 		item_in_slot = self.npc:item_in_slot(1)
 		if item_in_slot then
 			counter = counter + 1
@@ -306,20 +348,18 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 		suit_id = nil
 		item_in_slot = self.npc:item_in_slot(2)
 		if item_in_slot then
-			counter = counter + 1
 			if TB3D_Modders.loadout_rand_cond == true then
 				item_in_slot:set_condition(math_random(min_cond, 100)/100)
 				suit_id = self.npc:get_current_outfit()
 				if suit_id then suit_id:set_condition(math_random(min_cond, 100)/100) end
 			end
 		end
-	end
-	local ammo_cnt = TB3D_Modders.loadout_ammo_count or 200				--109981, excess will be removed when npc dies
-	if commun == "zombied" then
-		--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[zombied]")
-		create_ammo(self.npc, "ammo_5.45x39_fmj", ammo_cnt)			--109981, so they don't run out too soon
-	elseif counter == 0 then													--no weapon so dynamically assign it
-		if string_find(npc_name, "sniper") then									--Monolith snipers
+		local ammo_cnt = TB3D_Modders.loadout_ammo_count or 200				--109981, excess will be removed when npc dies
+		if commun == "zombied" then
+			--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[zombied]")
+			give_weapon(self.npc, 2, "wpn_ak74")
+			create_ammo(self.npc, "ammo_5.45x39_fmj", ammo_cnt)			--109981, so they don't run out too soon
+		elseif string_find(npc_name, "sniper") then									--Monolith snipers
 			give_weapon(self.npc, 2, "wpn_svu")
 			create_ammo(self.npc, "ammo_7.62x54_ap", ammo_cnt)
 			if TB3D_Modders.use_loadout_message == true then
@@ -337,13 +377,6 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 			if TB3D_Modders.use_loadout_message == true then
 				TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[fotoman pm]")
 			end
-		--elseif commun == "lastday" then						--109981, tb3dm_ and dav_ldk respawns in dead marshes and research
-			--if math_random(10) < 7 then give_weapon(self.npc, 2, "wpn_bizon") else give_weapon(self.npc, 2, "wpn_bizon1") end
-			--create_ammo(self.npc, "ammo_9x18_fmj", 2)
-			--create_ammo(self.npc, "ammo_9x18_pbp", 2)
-			--if TB3D_Modders.use_loadout_message == true then
-				--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[lastday]")
-			--end
 		else
 			local ltx_max = 3
 			local rank = self.npc:character_rank()			--109995, simplified process

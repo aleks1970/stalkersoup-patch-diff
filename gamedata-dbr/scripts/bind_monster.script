@@ -509,10 +509,12 @@ function generic_object_binder:net_spawn(sobject)
 			local sobj = self.object:id()
 			if sobj then
 				local obj_name = self.object:name()
+				if obj_name == nil then obj_name = self.object:section() end		--109996
+				if obj_name == nil then obj_name = "NIL" end
 				local lname = level:name()
 				--local sname = amk.load_variable("level_on_save", lname)			--109983
 				if self.object.alive and self.object:alive() == false and lname ~= TB3D_Services.level_on_save() then
-					if TB3D_Services.can_remove_dead(lname) == true and db.check_corpse_looted(obj) ~= nil then			--now interactive corpse cleaner
+					if TB3D_Services.can_remove_dead(lname, obj_name) == true and db.check_corpse_looted(obj) ~= nil then			--now interactive corpse cleaner
 						if is_report or TB3D_modders.use_spawn_message or TB3D_Modders.pop_spawn_message then
 							TB3D_Services.packet_alert("bind monster: dead["..obj_name.."] removed")
 						end

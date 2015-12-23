@@ -1,9 +1,11 @@
---TB3D 1.0.9.9.4.4
+--TB3D 1.0.9.9.4.4, translate and text color - aleks1970
 function my_ver() return "1.0.9.9.4.4" end
 -- Module Smart Handheld Teleport ... Spot (Shooter)
 -- Features: 1) Not sovseh locations can teleport, 2) If you can not teleport to this location, you will receive a message from the List Sakharov location where you can teleport, and 3) to Use the teleport only when HS had already done some story assignments, 4) If you can not to Use it also will get a message ..
 -- otrihtovano by sapsan
 local math_random = math.random
+local translate = game.translate_string
+local text_color_system = TB3D_Services.get_text_color("system")
 
 local tabl_changers_by_level = {-- flew! complement! no level - no teleport there!
 	["l01_escape"] = {
@@ -145,15 +147,15 @@ function soobj() -- Strangely enough, this "to" limited and not "source"
 	local tabl_levels_name = {}
 	local sim = alife();
 	for k,v in pairs(tabl_changers_by_level) do
-		tabl_levels_name[#tabl_levels_name+1] = game.translate_string(k)
+		tabl_levels_name[#tabl_levels_name+1] = translate(k)
 	end
 	local levels_name = table.concat(tabl_levels_name, ", ")
-	local text = TB3D_Services.get_text_color("system").."Sakharov:\\n%c[default]You can not teleport out of the area.. Go to another region.. Repeat regions from which you can teleport: "..levels_name.."\\n"
+	local text = text_color_system..translate("not_teleport_out_0").." "..levels_name.."\\n"
 	news_manager.send_tip_txt(db.actor, text, nil, nil, 10000)
 end
 
 function noob()
-	local text = TB3D_Services.get_text_color("system").."Sakharov:\\n%c[255,255,128,128]You're still not quite experienced for this, try after some complex tasks .. It can rack up experience .. Heh.\\n"
+	local text = text_color_system..translate("not_quite_experienced_1")
 	news_manager.send_tip_txt(db.actor, text, nil, nil, 10000)
 end
 

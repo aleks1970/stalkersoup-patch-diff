@@ -1,11 +1,12 @@
--- TB3D 1.0.9.9.9.0   use_DMX_cars, db calls, use_binder_message, clear callbacks
-function my_ver() return "1.0.9.9.9.0" end
+-- TB3D 1.0.9.9.9.6   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
+function my_ver() return "1.0.9.9.9.6" end
 ----------------------------------------------------------------------------------------------------
 -- Physic objects binding
 ----------------------------------------------------------------------------------------------------
 -- Developer: Evgeniy Negrobov (Jon) jon@gsc-game.kiev.ua
 -- Revised: Andrey Fidrya (Zmey) af@svitonline.com
 ----------------------------------------------------------------------------------------------------
+local string_find = string.find
 local actor_inside_car = false
 function restore_actor_inside_car()
     actor_inside_car = false
@@ -117,15 +118,30 @@ function generic_physics_binder:net_spawn(data)
 		return false
 	end
 	local sobj = self.object
-	--TB3D_Services.packet_alert("bind physic object: net spawn["..sobj:name().."]")
-	if sobj:clsid() == clsid.projector then
-		db.add_sl(sobj)
+	if sobj then
+		local obj_name
+		if sobj.name then obj_name = sobj:name() else obj_name = "nil" end
+		--TB3D_Services.packet_alert("bind physic object: net spawn["..obj_name.."]")
+		if string_find(obj_name,"x16_physic_destroyable_object_0000") then						--109996
+			if has_alife_info("yantar_tunnel_finish") then										--grate can fall shut in an explosion
+				--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] not spawned")
+				alife():release(sobj, true)
+				return true
+			end
+		elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--109996, inner door of upper room
+			--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] not spawned")
+			alife():release(sobj, true)
+			return true
+		end
+		if sobj:clsid() == clsid.projector then
+			db.add_sl(sobj)
+		end
+		if sobj:spawn_ini() ~= nil and sobj:spawn_ini():section_exist("drop_box") == true then
+			self.box_items = xr_box.ph_item_box(sobj)
+		end
+		if sobj:clsid() == clsid.car_s or sobj:section() == "m_car" then db.add_car_to_fix(sobj) end		--109950
+		amk.on_net_spawn(sobj)
 	end
-	if sobj:spawn_ini() ~= nil and sobj:spawn_ini():section_exist("drop_box") == true then
-		self.box_items = xr_box.ph_item_box(sobj)
-	end
-	if sobj:clsid() == clsid.car_s or sobj:section() == "m_car" then db.add_car_to_fix(sobj) end		--109950
-	amk.on_net_spawn(sobj)
 	return true
 end
 

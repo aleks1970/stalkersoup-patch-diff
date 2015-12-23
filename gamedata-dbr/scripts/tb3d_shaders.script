@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.1  new 02/26/12, chgd scopeUsed, ddof to ingame menu, corrected indoor NV, mblur removed, DX11
+-- TB3D 1.0.9.9.9.1  new 02/26/12, chgd scopeUsed, ddof to ingame menu, corrected indoor NV, mblur removed, DX11, text color - aleks1970
 function my_ver() return "1.0.9.9.9.1" end
 ----------------------------------------------------------------------------
 -- digital zoom, DDOF shaders
@@ -6,6 +6,8 @@ function my_ver() return "1.0.9.9.9.1" end
 -- presently only the aa_weight is fully functional in the shaders
 -- target distancing: WIP 02/28/12
 ----------------------------------------------------------------------------
+
+local text_color_tip = TB3D_Services.get_text_color("tip")
 
 -- General variables
 local enabled = 2
@@ -242,24 +244,24 @@ function set_dof(mode)
 			ddof_kernal = 0																	--no blur
 			get_console():execute("r2_aa off")	
 			--get_console():execute("r2_mblur "..tostring(TB3D_Modders.motion_blur))			--restore user setting
-			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Motion Blur enabled")
+			news_manager.send_tip_txt(db.actor, text_color_tip.."TB3D:\\n  %c[default]Motion Blur enabled")
 			enabled = 1
 		elseif mode == 2 then	--classic
-			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Classsic DDOF enabled")
+			news_manager.send_tip_txt(db.actor, text_color_tip.."TB3D:\\n  %c[default]Classsic DDOF enabled")
 			enabled = 2
 			ddof_kernal = TB3D_Modders.ddof_kernel_C										--on classic blur
 			--get_console():execute("r2_mblur 0.0")	
 			get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on classic
 			get_console():execute("r2_aa on")	
 		elseif mode == 3 then	--gauss
-			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]gaussian DDOF enabled")
+			news_manager.send_tip_txt(db.actor, text_color_tip.."TB3D:\\n  %c[default]gaussian DDOF enabled")
 			enabled = 3
 			ddof_kernal = TB3D_Modders.ddof_kernel_G										--on gaussian blur
 			--get_console():execute("r2_mblur 0.0")	
 			get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on gaussian blur
 			get_console():execute("r2_aa on")	
 		else		--off
-			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]DOF/Mblur disabled")
+			news_manager.send_tip_txt(db.actor, text_color_tip.."TB3D:\\n  %c[default]DOF/Mblur disabled")
 			enabled = 0
 			ddof_kernal = 0																	--no blur
 			get_console():execute("r2_aa off")	

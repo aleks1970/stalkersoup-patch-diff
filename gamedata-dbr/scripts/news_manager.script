@@ -1,9 +1,17 @@
 -- TB3D 1.0.9.9.8.1, added old pda sound option, news_alert, save collector, message traps, db.actor vice actor in all calls,
 -- added count to relocate items, consolidated tips, dmx135, consolidated give_game_news and give_talk_message, rem dup snds,
 -- death news, send tip, storyline_eliminate_gunslinger, give_game_news, fast saves, \\n, storyline ghost, in item, companion message,
--- gps tips, debug, autosave
+-- gps tips, debug, autosave, text color - aleks1970
 function my_ver() return "1.0.9.9.8.1" end
 
+local text_color_tip = TB3D_Services.get_text_color("tip")
+local text_color_enc = TB3D_Services.get_text_color("enc")
+local text_color_task = TB3D_Services.get_text_color("task")
+local text_color_name = TB3D_Services.get_text_color("name")
+local text_color_money = TB3D_Services.get_text_color("money")
+local text_color_alert = TB3D_Services.get_text_color("alert")
+local text_color_system = TB3D_Services.get_text_color("system")
+local text_color_treasure = TB3D_Services.get_text_color("treasure")
 local translate = game.translate_string
 local string_sub = string.sub
 local last_save_time
@@ -174,7 +182,7 @@ function upload_message_id(news_id1, news_id2, texture, rect, atext)		--109977, 
 		end
 		local atxt = atext
 		if atxt == nil then atxt = "simple_answer_item" end
-		local news_text = TB3D_Services.get_text_color("system").."UPLOADED:".."  %c[default]"..translate(news_id1)
+		local news_text = text_color_system.."UPLOADED:".."  %c[default]"..translate(news_id1)
 		if news_id2 then
 			news_text = news_text.." "..translate(news_id2)
 		end
@@ -201,14 +209,14 @@ end
 
 function mmm_on_death(news_text)
 	local texture = "ui_npc_u_ucheniy_2"
-	local news_caption = translate(TB3D_Services.get_text_color("tip")..translate("st_tip").."  %c[default]"..news_text)
+	local news_caption = translate(text_color_tip..translate("st_tip").."  %c[default]"..news_text)
 	give_game_news(news_caption, texture, 1, 40*1000)
 end
 
 function terror_messg(news_text, header)
 	local player = pda_news
 	player:play(db.actor, 0, sound_object.s2d)
-	local news_text = translate(TB3D_Services.get_text_color("alert")..header.."  %c[default]"..news_text)
+	local news_text = translate(text_color_alert..header.."  %c[default]"..news_text)
 	give_game_news(news_text, "ui\\ui_VDGicon", Frect():set(0,47,83,47), 0, 5000)
 end
 
@@ -220,7 +228,7 @@ function gps_send_alert_tip(location, lname, cond, timeout, showtime)
 	end
 	local x = tips_icons["gps"][1]	--0
 	local y = tips_icons["gps"][2]	--706
-	local news_text = TB3D_Services.get_text_color("alert").."GPS:".."  %c[default]"..translate(location).." "..lname.." "..translate(cond)
+	local news_text = text_color_alert.."GPS:".."  %c[default]"..translate(location).." "..lname.." "..translate(cond)
 	give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), 0, 5000)
 	return true
 end
@@ -233,7 +241,7 @@ function gps_send_sys_tip(location, lname, cond, timeout, showtime)
 	end
 	local x = tips_icons["gps"][1]	--0
 	local y = tips_icons["gps"][2]	--706
-	local news_text = TB3D_Services.get_text_color("system").."GPS:".."  %c[default]"..translate(location).." "..lname.." "..translate(cond)
+	local news_text = text_color_system.."GPS:".."  %c[default]"..translate(location).." "..lname.." "..translate(cond)
 	give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), 0, 5000)
 	return true
 end
@@ -262,7 +270,7 @@ function amk_send_tip_id(news_id, header_id, timeout, showtime, sender, sound)
 		local y = tips_icons[sender][2]
 		local ntext
 		if header_id then ntext = translate(header_id) else ntext = translate("st_tip") end
-		ntext = TB3D_Services.get_text_color("tip")..ntext.." %c[default]"..translate(news_id)
+		ntext = text_color_tip..ntext.." %c[default]"..translate(news_id)
 		if TB3D_Modders.use_news_message then
 			TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(ntext).."]") 
 		end
@@ -297,7 +305,7 @@ function amk_send_tip(news_text, header, timeout, showtime, sender, sound)
 		  end
 		  local x = tips_icons[sender][1]
 		  local y = tips_icons[sender][2]
-			local ntext = TB3D_Services.get_text_color("tip")..hdr.."  %c[default]"..news_text
+			local ntext = text_color_tip..hdr.."  %c[default]"..news_text
 			if TB3D_Modders.use_news_message then
 				TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(ntext).."]") 
 			end
@@ -425,7 +433,7 @@ function send_the_tip(actor, news_id, timeout, sender, showtime, sender_id)
 	end
 	local x = tips_icons[sender][1]
 	local y = tips_icons[sender][2]
-	local ntext = TB3D_Services.get_text_color("tip")..translate("st_tip").."  %c[default]"..translate(news_id)
+	local ntext = text_color_tip..translate("st_tip").."  %c[default]"..translate(news_id)
 	--if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("news mgr: sending the tip["..ntext.."]") end
 	give_game_news(ntext, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), timeout, showtime)
 	return true
@@ -455,11 +463,11 @@ function send_task(actor, type, task, objective)
 	local news_text
 	pda_task:play(db.actor, 0, sound_object.s2d)	--' Play's default sound
 	if db.actor:is_talking() then	
-		news_text = TB3D_Services.get_text_color("task")..translate(action_descr_by_type[type]).."  %c[default]"..translate(task:get_title())
+		news_text = text_color_task..translate(action_descr_by_type[type]).."  %c[default]"..translate(task:get_title())
 		--TB3D_Services.packet_alert("NEWS MGR: send task talk msg["..news_text.."]")
 		give_talk_message(news_text, task_texture, task_rect)
 	else
-		news_text = TB3D_Services.get_text_color("task")..translate(action_descr_by_type[type]).."  %c[default]"..translate(task:get_title())
+		news_text = text_color_task..translate(action_descr_by_type[type]).."  %c[default]"..translate(task:get_title())
 		--TB3D_Services.packet_alert("NEWS MGR: send task game news["..news_text.."]")
 		give_game_news(news_text, task_texture, task_rect, 0, 3000)
 	end	
@@ -514,10 +522,10 @@ function send_encyclopedy(type, title)								--TB3D - ONLY DIARY IS USED!!!!
 		--' We take the coordinates from the texture Tasca
 		local task_texture, task_rect = get_texture_info("ui_iconsTotal_locations", "ui_iconsTotal_locations")
 		if db.actor:is_talking() then	
-			local news_text = TB3D_Services.get_text_color("enc")..translate("st_found_new_pda").." %c[default]"..translate(title)
+			local news_text = text_color_enc..translate("st_found_new_pda").." %c[default]"..translate(title)
 			give_talk_message(news_text, task_texture, task_rect)
 		else
-			local news_text = TB3D_Services.get_text_color("enc")..translate("st_found_new_pda").." %c[default]"..translate(title)
+			local news_text = text_color_enc..translate("st_found_new_pda").." %c[default]"..translate(title)
 			give_game_news(news_text, task_texture, task_rect, 0, 3000)
 		end	
 	end
@@ -546,7 +554,7 @@ function send_treasure(name)
 	if level_name[level_key] ~= nil then
 		tmp_str = level_name[level_key]..": "
 	end
-	local news_text = TB3D_Services.get_text_color("treasure")..translate("st_found_new_treasure").." "..TB3D_Services.get_text_color("name")..tmp_str.."%c[default]"..translate(name)	
+	local news_text = text_color_treasure..translate("st_found_new_treasure").." "..text_color_name..tmp_str.."%c[default]"..translate(name)	
 	give_game_news(news_text, task_texture, task_rect, 0, 3000)
 end
 
@@ -566,19 +574,19 @@ function relocate_item(actor, type, item, count)
 	if type == "in" then
 		local task_texture, task_rect = get_texture_info("ui_iconsTotal_found_thing")
 		if db.actor:is_talking() then
-			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			local news_text = text_color_money..translate("general_in_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
 			give_talk_message(news_text, task_texture, task_rect)
 		else
-			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			local news_text = text_color_money..translate("general_in_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
 			give_game_news(news_text, task_texture, task_rect, 0, 3000)
 		end		
 	elseif type == "out" then
 		local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_thing")
 		if db.actor:is_talking() then
-			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			local news_text = text_color_alert..translate("general_out_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
 			give_talk_message(news_text, task_texture, task_rect)
 		else
-			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			local news_text = text_color_alert..translate("general_out_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
 			give_game_news(news_text, task_texture, task_rect, 0, 3000)
 		end		
 	end
@@ -592,19 +600,19 @@ if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("news mgr
 	if type == "in" then
 		local task_texture, task_rect = get_texture_info("ui_iconsTotal_found_money")
 		if db.actor:is_talking() then
-			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_money").." %c[default]"..translate(tostring(amount))
+			local news_text = text_color_money..translate("general_in_money").." %c[default]"..translate(tostring(amount))
 			give_talk_message(news_text, task_texture, task_rect)
 		else
-			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_money").."  %c[default]"..translate(tostring(amount))
+			local news_text = text_color_money..translate("general_in_money").."  %c[default]"..translate(tostring(amount))
 			give_game_news(news_text, task_texture, task_rect, 0, 3000)
 		end		
 	elseif type == "out" then
 		local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
 		if db.actor:is_talking() then
-			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_money").." %c[default]"..translate(tostring(amount))
+			local news_text = text_color_alert..translate("general_out_money").." %c[default]"..translate(tostring(amount))
 			give_talk_message(news_text, task_texture, task_rect)
 		else
-			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_money").."  %c[default]"..translate(tostring(amount))
+			local news_text = text_color_alert..translate("general_out_money").."  %c[default]"..translate(tostring(amount))
 			give_game_news(news_text, task_texture, task_rect, 0, 3000)
 		end		
 	end

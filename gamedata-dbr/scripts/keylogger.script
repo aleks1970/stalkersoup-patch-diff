@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.1 chg actor to db.actor, dmx135
+-- TB3D 1.0.9.9.1 chg actor to db.actor, dmx135, translate
 function my_ver() return "1.0.9.9.1" end
 --[[-----------------------------------------------------------------------------------------------
  File        : keylogger.script
@@ -9,6 +9,7 @@ function my_ver() return "1.0.9.9.1" end
 --]]-----------------------------------------------------------------------------------------------
 
 local t, vk, ini
+local translate = game.translate_string
 
 function getTbl()
 	local ini = ini_file("keys.cfg")
@@ -46,7 +47,7 @@ end
 
 function eat_item(item)
 	local static = get_hud():AddCustomStatic("cant_walk", true)
-	static:wnd():SetText("Used: "..game.translate_string(amk.get_inv_name(item:section())))
+	static:wnd():SetText("Used: "..translate(amk.get_inv_name(item:section())))
 	static:wnd():SetTextY(80)
 	db.actor:eat(item)
 end

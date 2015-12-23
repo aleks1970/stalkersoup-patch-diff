@@ -367,6 +367,7 @@ function create_lamp(pos, lvid, gvid, dir, visual, brightness, shadow, color, al
 	if dir ~= nil then
 		se_obj.direction = vector():set(dir)
 	end
+	return se_obj
 end
 
 --[[

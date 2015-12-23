@@ -1,8 +1,10 @@
---<!-- TB3D 1.0.9.9.4.4 missing comma line 251, wpn_sg552_fss_de-->
+--<!-- TB3D 1.0.9.9.4.4 missing comma line 251, wpn_sg552_fss_de, translate-->
 --File:  restriction_stock .script
 --Created:  28.05.2008
 --Copyright:  © 2008 AMK team
 --Version:  3.1.0.1 
+
+local translate = game.translate_string
 
 ------------------------
 InvStat = 0
@@ -35,7 +37,15 @@ TableWpnOutf = {
 function restriction_of_stock(ItemObj,Fix)
 	local actor = db.actor
 	local ItemName  = ItemObj:name()
-	local msg = {"It is not necessary to take this...","I already have one of these equipped...","I must leave this ... my Inventory is full","I have no use for this..","I am over-encumbered...","I cannot take this...","In order to take this, I must drop something else..."}
+	local msg1 = translate("restriction_stock_msg1")
+	local msg2 = translate("restriction_stock_msg2")
+	local msg3 = translate("restriction_stock_msg3")
+	local msg4 = translate("restriction_stock_msg4")
+	local msg5 = translate("restriction_stock_msg5")
+	local msg6 = translate("restriction_stock_msg6")
+	local msg7 = translate("restriction_stock_msg7")
+--	local msg = {"It is not necessary to take this...","I already have one of these equipped...","I must leave this ... my Inventory is full","I have no use for this..","I am over-encumbered...","I cannot take this...","In order to take this, I must drop something else..."}
+	local msg = {msg1, msg2, msg3, msg4, msg5, msg6, msg7}
 
 	if string.gfind(ItemName,"ammo") then
 		if Fix == 0 then 

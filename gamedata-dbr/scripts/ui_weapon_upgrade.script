@@ -1,12 +1,12 @@
---TB3D 1.0.9.9.7.6  fixed two button texts, dmx135
+--TB3D 1.0.9.9.7.6  fixed two button texts, dmx135, translate
 function my_ver() return "1.0.9.9.7.6" end
 --[[-----------------------------------------------------------------------------------------------
  File         : ui_weapon_upgrade.script
  Description  : Graphical frontend upgrade weapons
  Copyright    : DMX MOD\People Salsola
  Author       : Charsi, with minor revisions by Shadows
- Last edit    : 03.03.2011
- Version      : 0.5
+ Last edit    : 24.07.2015 By aleks1970
+ Version      : 0.6
 --]]-----------------------------------------------------------------------------------------------
 
 local pos_x = 130
@@ -14,6 +14,15 @@ local pos_y = 110
 local pos_y2 = 130
 local icon_up_w = 90
 local icon_up_h = 44
+
+local translate = game.translate_string
+-- ------------------------------ local text ------------------------------
+local for_weapons_1 = translate("repair_check_txt4")
+local upgrade_slot = translate("repair_check_txt5")
+local upgrade_for = translate("repair_check_txt6")
+local upgrade_req_m = translate("repair_check_txt7")
+local wait_to_repair = translate("repair_check_txt10")
+-- ---- texts are in the "string_table_tips.xml" file - aleks1970 -----
 
 -- create window and show it
 function main_wnd()
@@ -121,7 +130,7 @@ function up_wnd1:__init() super()
 	self.back_btn:Init("ui\\ui_upgrade_menu",17,405,80,30)
 	self.back_btn:SetOriginalRect(160,460,80,30)
 	self.back_btn:Show(false)
-	self.back_btn:SetText("back")
+	self.back_btn:SetText(translate("repair_check_txt2"))
 	self.back_btn:SetTextAlign(CGameFont.alLeft)
 	self.back_btn:SetTextX(9)
 	self.back_btn:SetTextY(-1)
@@ -133,7 +142,7 @@ function up_wnd1:__init() super()
 	self.exit_btn:SetWindowName("exit_btn")
 	self.exit_btn:Init("ui\\ui_upgrade_menu",408,405,80,30)
 	self.exit_btn:SetOriginalRect(260,460,80,30)
-	self.exit_btn:SetText("output")
+	self.exit_btn:SetText(translate("repair_check_txt1"))
 	self.exit_btn:SetTextAlign(CGameFont.alRight)
 	self.exit_btn:SetTextX(-14)
 	self.exit_btn:SetTextY(-1)
@@ -277,7 +286,7 @@ function up_wnd2:__init(n,type_up,owner) super()
 	self.btn_ok:SetWindowName("btn_ok")
 	self.btn_ok:Init("ui_button_ordinary",225,150,117,29)
 	--self.btn_ok:Init(180,140,114,26)
-	self.btn_ok:SetText("OK")
+	self.btn_ok:SetText(translate("repair_check_txt9"))
 	self.btn_ok:SetTextColor(255,216,186,140)
 	--self.btn_ok:SetTextY(-1)
 	self.btn_ok:SetTextAlign(CGameFont.alCenter)
@@ -291,25 +300,39 @@ function up_wnd2:__init(n,type_up,owner) super()
 	elseif type_up == "diminishing returns" then up_name = up_name.."_otdaca"
 	end
 	self.up_name=up_name
+	local color = "green"
 	local cost = cost(n)
-	local text = "For weapons in "..n.." slot "..type_up.." for "..cost.." RUB."
-	local text_btn_no = "CANCEL"
+	local text = for_weapons_1.." "..n.." "..upgrade_slot.." "..type_up.." "..upgrade_for.." "..cost.." RUB."
+	local text_btn_no = translate("repair_check_txt8")
 	if cost > db.actor:money() then
-		text = "For this upgrade requires more "..(cost-db.actor:money()).. " RUB."	--!!!!TB3D missing "
-		text_btn_no = "OK"
+		text = upgrade_req_m.." "..(cost-db.actor:money()).. " RUB."	--!!!!TB3D missing "
+		text_btn_no = translate("repair_check_txt9")
+		color = "red"
 		self.btn_ok:Show(false)
 	end
 	if 0.95 > db.actor:item_in_slot(n):condition() then
-		text = "Arms too worn, have it repaired."
-		text_btn_no = "OK"
+		text = translate("repair_check_txt3")
+		text_btn_no = translate("repair_check_txt9")
+		color = "yellow"
 		self.btn_ok:Show(false)
 	end
 	-- Description of upgrade
 	self.st_desc=CUIStatic()
 	self.st_desc:Init(120,80,350,30)
 	self.st_desc:SetText(text)
-	self.st_desc:SetTextAlign(CGameFont.alRight)
-	self.st_desc:SetTextColor(255,216,186,140)
+	self.st_desc:SetTextAlign(CGameFont.alCenter)
+	self.st_desc:SetFont(GetFontLetterica18Russian())
+--	self.st_desc:SetFont(GetFontGraffiti19Russian())
+	self.st_desc:SetTextColor(255,0,220,10)
+	if (color == "red") then
+		self.st_desc:SetTextColor(255,255,32,23)
+	elseif (color == "yellow") then
+		self.st_desc:SetTextColor(255,238,155,23)
+	else
+		self.st_desc:SetTextColor(255,0,220,10)
+	end
+
+--	self.st_desc:SetTextColor(255,216,186,140)
 	--self.st_desc:SetTextY(-1)
 	self:AttachChild(self.st_desc)
 	-- Cancel button
@@ -334,7 +357,7 @@ function up_wnd2:OnButton_btn_ok_clicked()
 	level.start_stop_menu(self.owner,true)
 	local d=alife():object("dolgovazyi")
 	repair_check[self.up_name](db.actor,level.object_by_id(d.id))
-	news_manager.send_tip_txt(db.actor,"When the upgrade completed - will send you SMS.\\nWill do everything in three hours, wait. Go until the beer pops - Bartender today, like, good.", nil, "wpn_repair", 25000)
+	news_manager.send_tip_txt(db.actor, wait_to_repair, nil, "wpn_repair", 25000)
 end
 
 function up_wnd2:OnButton_btn_no_clicked()

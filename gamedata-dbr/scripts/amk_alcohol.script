@@ -2,8 +2,9 @@
 function my_ver() return "1.0.9.9.1.5" end
 -- Alcohol addiction by Terrapack. Osnovnoye function.
 -- Also edit the file amk.script, amk_mod.script
+-- translate
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
---
+local translate = game.translate_string
 --===	Variables	===--
 -- old buffer
 local ap_old={}
@@ -246,21 +247,21 @@ function alcohol_drink(game_time)
 		ap.b = 0
 		ap.f0 = 1
 		ap.f1 = game_time + 5 --minute
-		news_manager.amk_send_tip(game.translate_string("alc_too_much_die"),nil,nil,5)
+		news_manager.amk_send_tip(translate("alc_too_much_die"),nil,nil,5)
 	end
 	--
 	--checking whether to "sleep" HS - he drank a max. the number of bottles, but less deadly peak
 	if ap.a == alc_max_drink_bottles then
 		ap.g0 = 1
 		ap.g1 = game_time + alc_max_drink_to_dream_timer --minutes
-		news_manager.amk_send_tip(game.translate_string("alc_too_much"),nil,nil,5)
+		news_manager.amk_send_tip(translate("alc_too_much"),nil,nil,5)
 	end
 	--
 	--checking for the appearance of alcoholism
 	if ap.c == 0 then
 		--character is not an alcoholic, but has now become :)
 		if ap.b > alc_todo_alcoholic then
-			news_manager.amk_send_tip(game.translate_string("alc_todo_alcoholic"),nil,nil,5)
+			news_manager.amk_send_tip(translate("alc_todo_alcoholic"),nil,nil,5)
 			ap.c = 1
 			--there must be a start timer to require acceptance of vodka after n hours
 			--timer to the desire of alcohol and Unlearning from it (in theory ought to be that it was after protrezvleniya)
@@ -332,11 +333,11 @@ function amk_need_alcohol(game_time)
 		if ap.d0 == 0 then
 			ap.d0 = 1
 			ap.d1 = game_time + alc_time_lose_hp*60 --hours
-			news_manager.amk_send_tip(game.translate_string("alc_need_drink"),nil,nil,5)
+			news_manager.amk_send_tip(translate("alc_need_drink"),nil,nil,5)
 		end
 		if alcoholic_lose_hp_flag == 1 then
 			ap.d1 = game_time + alc_time_lose_hp*60 --hours
-			news_manager.amk_send_tip(game.translate_string("alc_need_drink"),nil,nil,5)
+			news_manager.amk_send_tip(translate("alc_need_drink"),nil,nil,5)
 		end
 	end
 end
@@ -347,7 +348,7 @@ function amk_lose_hp(game_time)
 		TB3D_hit_styles.burn(db.actor, db.actor, alc_hp_lose, 1, vector():set(0, 0, 0))
 		ap.d0 = 1
 		ap.d1 = game_time + alc_time_lose_hp*60 --hours
-		news_manager.amk_send_tip(game.translate_string("alc_need_drink_big"),nil,nil,5)
+		news_manager.amk_send_tip(translate("alc_need_drink_big"),nil,nil,5)
 	end
 	if ap.b0 == 0 then
 		alcoholic_lose_hp_flag = 0
@@ -370,7 +371,7 @@ function amk_abstinent_step(game_time)
 			ap.c1 = 0
 			ap.b = 0
 			ap.c = 0
-			news_manager.amk_send_tip(game.translate_string("alc_coded"),nil,nil,5)
+			news_manager.amk_send_tip(translate("alc_coded"),nil,nil,5)
 		end
 		if tmp2>0 then
 			if tmp2 < alc_todo_alcoholic then
@@ -380,7 +381,7 @@ function amk_abstinent_step(game_time)
 				ap.d1 = 0
 				ap.c0 = 1
 				ap.c1 = game_time + alc_unlike_time*24*60 --days
-				news_manager.amk_send_tip(game.translate_string("alc_no_more_need"),nil,nil,5)
+				news_manager.amk_send_tip(translate("alc_no_more_need"),nil,nil,5)
 			end
 			if tmp2 > alc_todo_alcoholic then
 				ap.c0 = 1

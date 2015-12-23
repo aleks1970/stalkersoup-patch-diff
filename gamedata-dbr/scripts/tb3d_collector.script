@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.5 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.6 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started,
 --ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2
-function my_ver() return "1.0.9.9.9.5" end
+function my_ver() return "1.0.9.9.9.6" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -19,7 +19,7 @@ local upd_timeLDK
 local upd_timeTB3D
 function update(time_now, slice_base)															--only called if is_collector() = true
 	if has_alife_info("tb3d_collector_done") then												--setup complete, let's rock
-amk.oau_watchdog=680
+		amk.oau_watchdog=680
 		local ln = level.name()
 		local level_up = TB3D_Services.get_level_up()											--109955 for actions past the Collector levelup
 		------------------------------------------------------------------------------------------main loop
@@ -379,19 +379,19 @@ amk.oau_watchdog=680
 				end
 			end
 		end
-		if level_up == 4 then
+		if level_up > 3 then
 			if TB3D_DLC_001 then TB3D_DLC_001.update(time_now, slice_base, ln) end								--109978, optional dlc content				
-		elseif level_up == 5 then
+		--elseif level_up == 5 then
 			if TB3D_DLC_002 then TB3D_DLC_002.update(time_now, slice_base, ln) end								--109978, optional dlc content				
-		elseif level_up == 6 then
+		--elseif level_up == 6 then
 			if TB3D_DLC_003 then TB3D_DLC_003.update(time_now, slice_base, ln) end								--109978, optional dlc content				
-		elseif level_up == 7 then
+		--elseif level_up == 7 then
 			if TB3D_DLC_004 then TB3D_DLC_004.update(time_now, slice_base, ln) end								--109978, optional dlc content				
-		elseif level_up == 8 then
+		--elseif level_up == 8 then
 			if TB3D_DLC_005 then TB3D_DLC_005.update(time_now, slice_base, ln) end								--109978, optional dlc content				
-		elseif level_up == 9 then
+		--elseif level_up == 9 then
 			if TB3D_DLC_006 then TB3D_DLC_006.update(time_now, slice_base, ln) end								--109978, optional dlc content				
-		elseif level_up > 9 then
+		--elseif level_up > 9 then
 			if TB3D_DLC_007 then TB3D_DLC_007.update(time_now, slice_base, ln) end								--109978, optional dlc content				
 		end
 	----------------------------------------------------------------------------------------------end main loop
@@ -480,19 +480,19 @@ function on_item_take(obj)
 				TB3D_Dialog.npp2_mushroom_take()
 			end
 		end
-	elseif level_up == 4 then
+	else	--if level_up == 4 then
 		if TB3D_DLC_001 then is_remove_item = TB3D_DLC_001.on_item_take(obj) end								--109978, optional dlc content				
-	elseif level_up == 5 then
+	--elseif level_up == 5 then
 		if TB3D_DLC_002 then is_remove_item = TB3D_DLC_002.on_item_take(obj) end								--109978, optional dlc content				
-	elseif level_up == 6 then
+	--elseif level_up == 6 then
 		if TB3D_DLC_003 then is_remove_item = TB3D_DLC_003.on_item_take(obj) end								--109978, optional dlc content				
-	elseif level_up == 7 then
+	--elseif level_up == 7 then
 		if TB3D_DLC_004 then is_remove_item = TB3D_DLC_004.on_item_take(obj) end								--109978, optional dlc content				
-	elseif level_up == 8 then
+	--elseif level_up == 8 then
 		if TB3D_DLC_005 then is_remove_item = TB3D_DLC_005.on_item_take(obj) end								--109978, optional dlc content				
-	elseif level_up == 9 then
+	--elseif level_up == 9 then
 		if TB3D_DLC_006 then is_remove_item = TB3D_DLC_006.on_item_take(obj) end								--109978, optional dlc content				
-	elseif level_up > 9 then
+	--elseif level_up > 9 then
 		if TB3D_DLC_007 then is_remove_item = TB3D_DLC_007.on_item_take(obj) end								--109978, optional dlc content				
 	end
 	return is_remove_item
@@ -571,15 +571,6 @@ function on_info(info_id)
 			--alife():create("predbannik_m_trader", vector():set(78.980,-0.922,92.742),1067710,4005,97129)		--sid = 4001
 		elseif info_id == "zep_sms_from_cemetery" then				--109978
 			news_manager.amk_send_tip_id("tb3d_cem_distress","sms_incomming",10,40,"common_channel")		--send sms from stalkers
-		elseif info_id == "tb3d_sms_storm" then
-			news_manager.amk_send_tip_id("tb3d_sms_about_storm","sms_incomming",10,40,"common_channel")		--send sms from stalkers
-			TB3D_Services.delayed_action(1, "tb3d_sms_storm_areas", 10)
-			dmx_mod.create_level_changer_jupu_tunnels()
-			dmx_mod.create_level_changer_tunnels_to_red_forest()
-			amk.save_variable("tb3d_storm_started", level.get_time_days())
-		elseif info_id == "tb3d_sms_storm_areas" then
-			news_manager.amk_send_tip_id("tb3d_sms_storm_areas","sms_incomming",10,40,"common_channel")		--send sms from stalkers
-			TB3D_Services.delayed_action(1, "tb3d_give_storm_info", 10)
 		elseif info_id == "barman_zep4_start" then
 			if not has_alife_info("zep14_have") then
 				if has_alife_info("zep13_have") then
@@ -593,12 +584,29 @@ function on_info(info_id)
 		elseif info_id == "tb3d_hunt2_start" then
 			news_manager.amk_send_tip_id("hunt_part2_message","sms_sid",10,40,"trader")						--109981, moved from dav_hunt
 			tb3d_dav_hunt.spawn_next(17)			--109986
-		elseif info_id == "tb3d_give_storm_info" then
-			news_manager.amk_send_tip_id("tb3d_sms_storm_comment","sms_incomming",10,40,"common_channel")	--109982, sms from stalkers
 		elseif info_id == "tb3d_lanky_suit_fixed" then
 			news_manager.amk_send_tip_id("tb3d_sms_repair_done","sms_incomming",10,40,"common_channel")		--109982, sms from lanky
 		elseif info_id == "tb3d_hunt12_send" then
 			TB3D_Services.move_actor(-246.113,-6.094,292.782,true)											--109988, tower in village
+		elseif info_id == "tb3d_garb2_had_info" then
+			TB3D_Triggers.spawn_gar2_bandits()				--109996
+		elseif info_id == "tb3d_sms_storm" then
+			news_manager.amk_send_tip_id("tb3d_sms_about_storm","sms_incomming",10,40,"common_channel")		--send sms from stalkers
+			TB3D_Services.delayed_action(1, "tb3d_sms_storm_areas", 10)
+			dmx_mod.create_level_changer_jupu_tunnels()
+			dmx_mod.create_level_changer_tunnels_to_red_forest()
+			amk.save_variable("tb3d_storm_started", level.get_time_days())
+		elseif info_id == "tb3d_sms_storm_areas" then
+			news_manager.amk_send_tip_id("tb3d_sms_storm_areas","sms_incomming",10,40,"common_channel")		--send sms from stalkers
+			TB3D_Services.delayed_action(1, "tb3d_give_storm_info", 10)
+		elseif info_id == "tb3d_give_storm_info" then
+			news_manager.amk_send_tip_id("tb3d_sms_storm_comment","sms_incomming",10,40,"common_channel")	--109982, sms from stalkers
+		elseif info_id == "tb3d_block_1" then
+			news_manager.amk_send_tip_id("tb3d_sms_storm_receded01","sms_incomming",10,40,"common_channel")	--109996, sms from stalkers
+		elseif info_id == "tb3d_block_2" then
+			news_manager.amk_send_tip_id("tb3d_sms_storm_receded02","sms_incomming",10,40,"common_channel")	--109996, sms from stalkers
+		elseif info_id == "tb3d_storm_over" then
+			news_manager.amk_send_tip_id("tb3d_sms_storm_over","sms_incomming",10,40,"common_channel")	--109996, sms from stalkers
 		end
 		if amk.load_variable("option_autosave",1) ~= 0 then		--automatic saves for collector levels (1-10)
 			local save_str = ""
@@ -629,25 +637,27 @@ function on_info(info_id)
 					save_str = "start_x14"
 				elseif info_id == "tb3d_give_storm_info" then			--109982, the storm begins
 					save_str = "start_storm"
+				elseif info_id == "tb3d_storm_over" then				--109996, the storm ends
+					save_str = "storm_over"
 				end
 			end
 			if save_str ~= "" then
 				local send_delay = TB3D_Modders.autosave_wait_time or 6
 				amk.start_timer("autosave",send_delay,translate(save_str))
 			end
-		elseif level_up == 4 then
+		else	--if level_up == 4 then
 			if TB3D_DLC_001 then TB3D_DLC_001.on_info(info_id) end								--109978, optional dlc content				
-		elseif level_up == 5 then
+		--elseif level_up == 5 then
 			if TB3D_DLC_002 then TB3D_DLC_002.on_info(info_id) end								--109978, optional dlc content				
-		elseif level_up == 6 then
+		--elseif level_up == 6 then
 			if TB3D_DLC_003 then TB3D_DLC_003.on_info(info_id) end								--109978, optional dlc content				
-		elseif level_up == 7 then
+		--elseif level_up == 7 then
 			if TB3D_DLC_004 then TB3D_DLC_004.on_info(info_id) end								--109978, optional dlc content				
-		elseif level_up == 8 then
+		--elseif level_up == 8 then
 			if TB3D_DLC_005 then TB3D_DLC_005.on_info(info_id) end								--109978, optional dlc content				
-		elseif level_up == 9 then
+		--elseif level_up == 9 then
 			if TB3D_DLC_006 then TB3D_DLC_006.on_info(info_id) end								--109978, optional dlc content				
-		elseif level_up > 9 then
+		--elseif level_up > 9 then
 			if TB3D_DLC_007 then TB3D_DLC_007.on_info(info_id) end								--109978, optional dlc content	
 		end
 	end
@@ -676,19 +686,19 @@ function from_box(box, item)
 			end
 			TB3D_dav_hunt.spawn_next(num)
 		end
-	elseif level_up == 4 then
+	else	--if level_up == 4 then
 		if TB3D_DLC_001 then do_transfer = TB3D_DLC_001.from_box(box, item) end								--109978, optional dlc content				
-	elseif level_up == 5 then
+	--elseif level_up == 5 then
 		if TB3D_DLC_002 then do_transfer = TB3D_DLC_002.from_box(box, item) end								--109978, optional dlc content				
-	elseif level_up == 6 then
+	--elseif level_up == 6 then
 		if TB3D_DLC_003 then do_transfer = TB3D_DLC_003.from_box(box, item) end								--109978, optional dlc content				
-	elseif level_up == 7 then
+	--elseif level_up == 7 then
 		if TB3D_DLC_004 then do_transfer = TB3D_DLC_004.from_box(box, item) end								--109978, optional dlc content				
-	elseif level_up == 8 then
+	--elseif level_up == 8 then
 		if TB3D_DLC_005 then do_transfer = TB3D_DLC_005.from_box(box, item) end								--109978, optional dlc content				
-	elseif level_up == 9 then
+	--elseif level_up == 9 then
 		if TB3D_DLC_006 then do_transfer = TB3D_DLC_006.from_box(box, item) end								--109978, optional dlc content				
-	elseif level_up > 9 then
+	--elseif level_up > 9 then
 		if TB3D_DLC_007 then do_transfer = TB3D_DLC_007.from_box(box, item) end								--109978, optional dlc content
 	end
 	return do_transfer
@@ -761,19 +771,19 @@ function item_drop(obj)
 					TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",67.120,-19.292,-178.588,1190,3868,2)		--east end
 				end
 			end
-		elseif level_up == 4 then
+		else	--if level_up == 4 then
 			if TB3D_DLC_001 then TB3D_DLC_001.item_drop(obj) end								--109978, optional dlc content				
-		elseif level_up == 5 then
+		--elseif level_up == 5 then
 			if TB3D_DLC_002 then TB3D_DLC_002.item_drop(obj) end								--109978, optional dlc content				
-		elseif level_up == 6 then
+		--elseif level_up == 6 then
 			if TB3D_DLC_003 then TB3D_DLC_003.item_drop(obj) end								--109978, optional dlc content				
-		elseif level_up == 7 then
+		--elseif level_up == 7 then
 			if TB3D_DLC_004 then TB3D_DLC_004.item_drop(obj) end								--109978, optional dlc content				
-		elseif level_up == 8 then
+		--elseif level_up == 8 then
 			if TB3D_DLC_005 then TB3D_DLC_005.item_drop(obj) end								--109978, optional dlc content				
-		elseif level_up == 9 then
+		--elseif level_up == 9 then
 			if TB3D_DLC_006 then TB3D_DLC_006.item_drop(obj) end								--109978, optional dlc content				
-		elseif level_up > 9 then
+		--elseif level_up > 9 then
 			if TB3D_DLC_007 then TB3D_DLC_007.item_drop(obj) end								--109978, optional dlc content				
 		end
 	end
@@ -787,19 +797,19 @@ function on_use_object(obj)
 	dmx_medicines.use(obj)
 	dmx_cars.car_repair(obj) 
 	local level_up = TB3D_Services.get_level_up()									--109978, for DLC content
-	if level_up == 4 then
+	if level_up > 3 then
 		if TB3D_DLC_001 then TB3D_DLC_001.on_use_object(obj) end								--109978, optional dlc content				
-	elseif level_up == 5 then
+	--elseif level_up == 5 then
 		if TB3D_DLC_002 then TB3D_DLC_002.on_use_object(obj) end								--109978, optional dlc content				
-	elseif level_up == 6 then
+	--elseif level_up == 6 then
 		if TB3D_DLC_003 then TB3D_DLC_003.on_use_object(obj) end								--109978, optional dlc content				
-	elseif level_up == 7 then
+	--elseif level_up == 7 then
 		if TB3D_DLC_004 then TB3D_DLC_004.on_use_object(obj) end								--109978, optional dlc content				
-	elseif level_up == 8 then
+	--elseif level_up == 8 then
 		if TB3D_DLC_005 then TB3D_DLC_005.on_use_object(obj) end								--109978, optional dlc content				
-	elseif level_up == 9 then
+	--elseif level_up == 9 then
 		if TB3D_DLC_006 then TB3D_DLC_006.on_use_object(obj) end								--109978, optional dlc content				
-	elseif level_up > 9 then
+	--elseif level_up > 9 then
 		if TB3D_DLC_007 then TB3D_DLC_007.on_use_object(obj) end								--109978, optional dlc content				
 	end
 end
@@ -807,19 +817,19 @@ end
 function check_usable_item(obj)		--VICTIM ONLY, actor checks these directly in binder, called by amk_mod.script
 	--TB3D_Services.packet_alert("tb3d collector: check usable item["..obj:name().."]")
 	local level_up = TB3D_Services.get_level_up()									--109978, for DLC content
-	if level_up == 4 then
+	if level_up > 3 then
 		if TB3D_DLC_001 then TB3D_DLC_001.check_usable_item(obj) end								--109978, optional dlc content				
-	elseif level_up == 5 then
+	--elseif level_up == 5 then
 		if TB3D_DLC_002 then TB3D_DLC_002.check_usable_item(obj) end								--109978, optional dlc content				
-	elseif level_up == 6 then
+	--elseif level_up == 6 then
 		if TB3D_DLC_003 then TB3D_DLC_003.check_usable_item(obj) end								--109978, optional dlc content				
-	elseif level_up == 7 then
+	--elseif level_up == 7 then
 		if TB3D_DLC_004 then TB3D_DLC_004.check_usable_item(obj) end								--109978, optional dlc content				
-	elseif level_up == 8 then
+	--elseif level_up == 8 then
 		if TB3D_DLC_005 then TB3D_DLC_005.check_usable_item(obj) end								--109978, optional dlc content				
-	elseif level_up == 9 then
+	--elseif level_up == 9 then
 		if TB3D_DLC_006 then TB3D_DLC_006.check_usable_item(obj) end								--109978, optional dlc content				
-	elseif level_up > 9 then
+	--elseif level_up > 9 then
 		if TB3D_DLC_007 then TB3D_DLC_007.check_usable_item(obj) end								--109978, optional dlc content				
 	end
 end
@@ -827,19 +837,19 @@ end
 function process_levels(lname, sname)
 	local level_up = TB3D_Services.get_level_up()									--109955 for actions past the Collector levelup
 	--============ allways do as environment must be set first ===============================
-	if level_up == 4 then														--LIVE LINK
+	if level_up > 3 then														--LIVE LINK
 		if TB3D_DLC_001 then TB3D_DLC_001.process_levels(lname, sname) end								--109978, optional dlc content				
-	elseif level_up == 5 then
+	--elseif level_up == 5 then
 		if TB3D_DLC_002 then TB3D_DLC_002.process_levels(lname, sname) end								--109978, optional dlc content				
-	elseif level_up == 6 then
+	--elseif level_up == 6 then
 		if TB3D_DLC_003 then TB3D_DLC_003.process_levels(lname, sname) end								--109978, optional dlc content				
-	elseif level_up == 7 then
+	--elseif level_up == 7 then
 		if TB3D_DLC_004 then TB3D_DLC_004.process_levels(lname, sname) end								--109978, optional dlc content				
-	elseif level_up == 8 then
+	--elseif level_up == 8 then
 		if TB3D_DLC_005 then TB3D_DLC_005.process_levels(lname, sname) end								--109978, optional dlc content				
-	elseif level_up == 9 then
+	--elseif level_up == 9 then
 		if TB3D_DLC_006 then TB3D_DLC_006.process_levels(lname, sname) end								--109978, optional dlc content				
-	elseif level_up > 9 then
+	--elseif level_up > 9 then
 		if TB3D_DLC_007 then TB3D_DLC_007.process_levels(lname, sname) end								--109978, optional dlc content				
 	end
 	if lname ~= sname then
@@ -873,8 +883,9 @@ function process_levels(lname, sname)
 			if TB3D_Modders.use_random_tanks then
 				if has_alife_info("barman_zep4_start") then turret_spawn.kordon_spawn_turret() end		--southern outpost
 			end
-		elseif lname == "l02_garbage" then
-			--future
+		elseif lname == "l02_garbage" then				--109996
+			TB3D_Mobs.spawn_dogs(192.357,-1.344,57.052,338382,384, 12)			--big tree
+			if has_alife_info("tb3d_give_storm_info") then TB3D_Triggers.spawn_gar_bandits() end	--hangar and swamps
 		elseif lname == "l05_bar" then
 			local spawns = amk.load_variable("tb3d_bar_spawns", 0)
 			if spawns < 1 then
@@ -898,7 +909,7 @@ function process_levels(lname, sname)
 		elseif lname == "l04_darkvalley" then
 			TB3D_Mobs.check_dv_spawns()
 		elseif lname == "l03_agroprom" then
-			--future
+			if has_alife_info("tb3d_give_storm_info") then TB3D_Triggers.spawn_agro_dogs() end			--109996
 		elseif lname == "l08_yantar" then
 			TB3D_Mobs.check_yantar_spawns()
 		elseif lname == "l12u_sarcofag" then

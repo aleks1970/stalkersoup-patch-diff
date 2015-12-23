@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<!-- TB3D 1.0.9.9.7.2 added af-izomorf -->
+<!-- TB3D 1.0.9.9.9.6 added af_izomorf -->
 <!-- Added missing "enc_zone_izomorf_kompas" from russian with google translate aleks1970 -->
-<!-- removed new lines in two diaogs, fixed izomorph crystal and compass -->
+<!-- removed new lines in two diaogs, fixed izomorph crystal and compass, removed '-' -->
 <string_table>
 #include "text\eng\string_table_amk_arts_desc.xml"
 #include "text\eng\string_table_arts_desc.xml"
@@ -12,31 +12,31 @@
 	<string id="Zone">
 		<text>the ZONE</text>
 	</string>
-	<string id="Zone-story">
+	<string id="Zone_story">
 		<text>History of the ZONE</text>
 	</string>
-	<string id="Story-2006">
+	<string id="Story_2006">
 		<text>April 12th, 2006 @ 15:37 hrs...</text>
 	</string>
-	<string id="enc_zone_zone-story_story-2006">
+	<string id="enc_zone_zone_story_story_2006">
 		<text>The Contaminated Zone was aglow with the brightest of lights, almost unbearable to the human eye. You could virtually see the clouds in the sky turning into vapor. After a moment of dead silence there came rattling thunder, and then the earth shook. People fell to the ground, screwing up their eyes and covering their ears. Those who could still stand ran for their lives. It looked as though all the nuclear fuel buried under the Sarcophagus had suddenly exploded. The next day the Army cordoned off the new Zone..\nThe satellites helped to establish that the epicenter of the explosion was not actually in the vicinity of the NPP reactors, but about half a kilometer away. It is believed that the personnel employed at the Station died instantly...\nThough many people still remained within the cordoned area. The rescue operation soon proved a pointless endeavor, as all the people and machinery sent deep into the area would die or malfunction immediately. A little while after the disaster, the Zone diameter hopped out by a few more kilometers. Most of the government troops guarding the border line and the research teams stationed there perished instantly. Panic stricken, people took to flight. The residents of nearby towns and villages were hastily evacuated. An enormous danger is looming over the world and we can only guess what its full impact may be...</text>
 	</string>
-	<string id="Story-2008">
+	<string id="Story_2008">
 		<text>2008</text>
 	</string>
-	<string id="enc_zone_zone-story_story-2008">
+	<string id="enc_zone_zone_story_story_2008">
 		<text>Two years have passed since the second major disaster inside the contaminated Zone surrounding the Chernobyl Nuclear Powewr Plant .. The continuously growing death-toll, countless missing persons, dead cattle, decaying buildings, and maimed forests continues to grow in numbers daily, with no signs of ending soon. Until this day, Scientists have no explanation as to what exactly happened in at the NPP .. Meanwhile .. countless Anomalies were discovered in the area, and the Zone continues to expand as each day passes...</text>
 	</string>
-	<string id="Story-2010">
+	<string id="Story_2010">
 		<text>2010</text>
 	</string>
-	<string id="enc_zone_zone-story_story-2010">
+	<string id="enc_zone_zone_story_story_2010">
 		<text>Following in the tracks of those foolhardy loners that call themselves S.T.A.L.K.E.R.s, Scientific Research expeditions are once again embarking on an in-depth study of the Zone. However, the perimeter once 'guarded' by the Army has sinced gained some other, more dangerous inhabitants .. from common poachers to the worst kind of Bandit scum stemming from the Russian criminal underworld. Most of the S.T.A.L.K.E.R.s roam the Zone in search of Anomalies and the so-called Artefacts they produce .. all in the pursuit of the substantial wealth they promise those foolish enough to pursuue them deep into the heart of the Zone...</text>
 	</string>
-	<string id="Story-raid">
+	<string id="Story_raid">
 		<text>Break in the Zone ... 2010</text>
 	</string>
-	<string id="enc_zone_zone-story_story-raid">
+	<string id="enc_zone_zone_story_story_raid">
 		<text>The Army, including Special Forces Units headed by Paramilitary S.T.A.L.K.E.R. Detachments, launched a massive raid deep into the Zone. Their objective was to break through to the Chernobyl NPP, and wipe out what was believed to be the cause of all of the Anomalous fields throughout the Zone. If not successful, they were to at least obtain first-hand information on the Zone's true 'Source'. This doomed endeavor, involving over a thousand military personnel, was a complete, and utter failure. Isolated groups of survivors were forced to settle within the Zone's perimeter with absolutely no hopes of being rescued anytime soon .. they, like so many others, have simply been forgotten...</text>
 	</string>
 	<!--======================================-->
@@ -75,10 +75,10 @@
 	<string id="enc_zone_locations_darkdolina">
 		<text>Always gloomy, always misty, and always rainy. S.T.A.L.K.E.R.s venturing into the Dark Valley are likely to find valuable artefacts, instant death, or both. A place frequented by some of the most experienced old-timers, though you may also stumble upon some common bandits. There's supposed to be an underground lab around there somewhere, so it might be worthwhile to look for a hidden entrance along the way. No one has returned from there alive, though, and no one can tell for sure just what nasty surprises await you there...</text>
 	</string>
-	<string id="Military-loc">
+	<string id="Military_loc">
 		<text> Army Warehouses </text>
 	</string>
-	<string id="enc_zone_locations_military-loc">
+	<string id="enc_zone_locations_military_loc">
 		<text>A deserted Army Base next to a dilapidated hamlet and a small marsh. The village is an eerie place, literally swarming with mutants - the bloodsuckers alone are legion. S.T.A.L.K.E.R.s do their best to keep away from it, even if it means going extra kilometers around it. The anarchists from the Freedom faction have settled down in the Army base. The road connecting the base to the Zone is guarded by the infamous Brain Scorcher, which blocks the way to Pripyat and the Chernobyl NPP...</text>
 	</string>
 	<string id="Pripiat">
@@ -114,49 +114,49 @@
 	<!--======================================-->
 	<!--	  DMX 1.3.2 LOCATIONS			  -->
 	<!--======================================-->
-	<string id="zone_locations-deadcity">
+	<string id="zone_locations_deadcity">
 		<text>Dead City</text>
 	</string>
 	<string id="enc_zone_locations_deadcity">
 		<text>The Dead City is a Soviet-era town located between Yantar and Limansk that was abandoned by its inhabitants in the wake of the 1986 Chernobyl NPP disaster. Over the years it fell prey to scavengers and elements, slowly falling apart. The city's central feature is the town square, with a statue of Lenin in the middle. This square also houses the city's culture/sports centre and party headquarters. A short distance to the south-east lies the school, complete with a basketball court. The rest of the city is occupied by block housing, dilapitated single homes and garages. Over the years, the city was stripped of most of its valuables and by 2012 it has become nothing more than a sad empty shell of its former self...</text>
 	</string>
-	<string id="zone_locations-limansk">
+	<string id="zone_locations_limansk">
 		<text>Limansk</text>
 	</string>
 	<string id="enc_zone_locations_limansk">
 		<text>Limansk is an empty place, abandoned by its former inhabitants. The derelict buildings and vehicles that litter the city witness only the occassional Bandit or wandering Monolith patrol pass through. After the formation of the Zone, it became even more barren, and hostile as strange anomalies filled the city and its surroundings. Cut off from the rest of the world, and the Zone in particular, with only scattered members from either the Monolith, or Bandit factions occupying it's deserted streets, it is truly a 'Ghost Town' in every sense of the word. When the massive blowout came in September 2011, the anomalies disappeared and S.T.A.L.K.E.R.s began pouring into the city, looking for a safe path around the 'Brain Scorcher', and deeper into the Zone...</text>
 	</string>
-	<string id="zone_locations-darklab">
+	<string id="zone_locations_darklab">
 		<text>Laboratory X-18</text>
 	</string>
 	<string id="enc_zone_locations_darklab">
 		<text>Laboratory X-18 has been around since the Cold War [1947-1991], when it was established in order to study the effects of radiation on living cells. After the 1986 Chernobyl NPP disaster, work in the Lab declined slightly, but things didn't stay that way for long. One day, after a series of intensive experiments, one of the 'Test Subjects' broke out of his/it's restraints, and proceeded to destroy most of the Main Laboratory, killing most of the Scientific staff in the process. It then proceeded to unlock the holding cells of all of the remaining 'experiments' .. The surviving staff members locked themselves out of the main Laboratory by a series of large coded doors. Eventually, however, the 'Remnants' of Laboratory X-18's gruesome treachery climbed out of the confines of the Lab via the heating ducts, and killed them all...</text>
 	</string>
-	<string id="zone_locations-brainlab">
+	<string id="zone_locations_brainlab">
 		<text>Laboratory X-16</text>
 	</string>
 	<string id="enc_zone_locations_brainlab">
 		<text>Located beneath the factory complex at Lake Yantar, in a secure underground bunker, sheltered from the outside world. Its structure is fairly uncomplicated, with the main, circular chamber, which resembles a nuclear missile silo housing some very strange mechanisms of unknown origin. The access halls, and Research Facility, where test subjects were reportedly kept for study by warped Scientist's for unknown, and inhumane experiments. Prior to the 2006 incident, Lab X-16 received equipment from Laboratory X-18. The goal of X-16 was to create a radius in which they could control the minds of humans and all other living creatures throughout the entire Zone...</text>
 	</string>
-	<string id="zone_locations-labx10">
+	<string id="zone_locations_labx10">
 		<text>Laboratory X-10</text>
 	</string>
 	<string id="enc_zone_locations_labx10">
 		<text>Some S.T.A.L.K.E.R.s have heard stories about the existence of this strange Laboratory, but no-one has ever really seen it, nor can they confirm that it actually exists. If anyone has ... they certainly did not return to talk about it. Code named X-10, it resides below the Psi-Antenna .. and has earned the distinction of being simply called the 'Bunker'. Stories tell of it being located in the vicinity of the 'Radar', and very difficult to find ( if it were to even exist ). Apparently, the Monolith faction maintains a very strong presence in this area, and many say that it is their sworn duty to protect it's secrecy ..</text>
 	</string>
-	<string id="zone_locations-warlab">
+	<string id="zone_locations_warlab">
 		<text>Military Lab</text>
 	</string>
 	<string id="enc_zone_locations_warlab">
 		<text>Located underneath what was formerly the 'Jubilee Services Center' in Pripyat, it has recently become a stronghold for 'Monolith' forces .. it is a labyrinthian underground complex that was built for the sole purpose of monitoring, and maintaining the huge Generators that reside on the surface. It is rumoured to have housed the Scientist minds responsible for the development of the "C-Consciousness" Project .. A catastrophic failure involving one of the Electrical Transistors connecting the Generators caused serious Project setbacks, and the entire operation was relocated to somewhere more secure, and further to the North .. The official name of this place was once Laboratory X-8. After the 'Incident', it came to be known simply as the 'Military Lab'...</text>
 	</string>
-	<string id="zone_locations-secretlab">
+	<string id="zone_locations_secretlab">
 		<text>Secret Laboratory</text>
 	</string>
 	<string id="enc_zone_locations_secretlab">
 		<text>This mysterious Laboratory is rumoured to reside directly below the Sarcophagus at the Chernobyl Nuclear Power Plant .. It is also rumoured to be origin of the notorious 'Monolith' Faction .. It is said that the only way into this secret facility is by means of the Sarcophagus. However, the only way of gaining entry is by means of a well concealed door, which is further protected by an electronically coded lock. This information has never been confirmed, because no-one has ever returned from the Sarcophagus .. neither alive, dead nor zombified...</text>
 	</string>
-	<string id="zone_locations-generators">
+	<string id="zone_locations_generators">
 		<text>Generators</text>
 	</string>
 	<string id="enc_zone_locations_generators">
@@ -192,7 +192,7 @@
 	<string id="enc_zone_anomalies_gravi">
 		<text>An anomaly of presumably gravitational nature. When triggered, the tremendous power of the Vortex drags everything within the radius of 10-15 meters towards center. Victims drawn into the core have no chance of survival: their bodies are quickly constricted into a tight lump, only to be blown up in a powerful discharge of energy a moment later. The anomaly remains stationary throughout its lifetime (a week on average). Easily recognizable in daylight by the air fluctuation above, dancing leaves, fragments of dismembered corpses lying around and a distinctive dark stain in the center. Highly dangerous at night since it can be revealed only by means of a detector or by throwing metal objects into it. Forms three types of artifacts: Wrenched, Gravi and Goldfish...</text>
 	</string>
-	<string id="af-izomorf">
+	<string id="af_izomorf">
 		<text>"General concepts"</text>
 	</string>
 	<string id="enc_zone_izomorf">
@@ -315,175 +315,175 @@
 	<string id="enc_zone_artifact_electro_crystal_thorn">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+3 \n%c[default]Extremely rare artefact possessing positive properties. It is formed in the Elektra anomaly from standard coal in conditions of full darkness. Found only in underground vaults, and is practically unknown throughout the Zone. Considerably accelerates metabolism, therefore it is important not to forget to have sustainance close at hand... It should demand a good price, but since hardly anyone knows of it's existence; finding a prospective buyer could prove itself to be difficult, if not impossible...</text>
 	</string>
-	<string id="af-water-flower">
+	<string id="af_water_flower">
 		<text>Water Flower</text>
 	</string>
 	<string id="artifact_af_water_flower">
 		<text>%c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+3 \n%c[default]Strange artefact of unknown origin. Only one of these strange artefacts has ever been found, and it was right after repeated explosions near the Generators. It is physically quite beautiful, possessing a bluish luminescence. Quickly accelerates metabolism, providing extra energy in difficult situations. The drawback to this, of course is the need for constant nourishment in order to feed this metabolism. Slightly radioactive. Unconfirmed Data: - can be used as part of the transmutation recipe for the Heart of the Poltergeist... </text>
 	</string>
-	<string id="af-water-flower1">
+	<string id="af_water_flower1">
 		<text>Purple Flower</text>
 	</string>
 	<string id="artifact_af_water_flower1">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+10 \n%c[default]Upon interaction with the Heart of the Poltergeist artefact, the Water Flower loses a small part of it's energy, and changes it's appearance to that of this attractive new Artefact... the Purple Flower...</text>
 	</string>
-	<string id="af-kamen-udachy">
+	<string id="af_kamen_udachy">
 		<text>Success Stone</text>
 	</string>
 	<string id="artifact_af_kamen_udachy">
 		<text>Hyperabsolute. Artefact, which is probably only possible to find only once in a lifetime, given the extreme rarity of components and other conditions of transmutation. Cluster of huge amounts of energy and vitality, many times reducing radiation. Maybe as a one-time, so probably the gradual use of the properties of the artefact. The price for this hyperabsolute is purely symbolic, since the possibility of obtaining this artifact know only one.</text>
 	</string>
-	<string id="af-spiral">
+	<string id="af_spiral">
 		<text>Spiral</text>
 	</string>
 	<string id="enc_zone_af_spiral">
 		<text>%c[1,1,1,1 ]_______ %c[255,255,255,255] Radiation%c[255,255,1,1] +7 \n%c[default] The product of an experiment gone wrong by a Dr. Klenow... became the first known synthesized Artefact. Shaped like a spiral, it has some very useful properties. However, there are also negative. Far removed in appearance and properties from the original, from which a copy is made, but given the positive qualities and having the presence of artefacts, offsetting the negative side - can be very useful.</text>
 	</string>
-	<string id="af-eye-voron">
+	<string id="af_eye_voron">
 		<text>Raven's Eye</text>
 	</string>
 	<string id="enc_zone_af_eye_voron">
 		<text>%c[1,1,1,1 ]_______ %c[255,255,255,255] Radiation%c[255,255,1,1] +10 \n%c[default] Unusual and rare artefact that looks like a luminous sphere, which is located on a branch. Very Rare. According to unconfirmed reports, it is believed to have been produced by the EMI anomaly when reacting with a certain type of wood, at least, this artefact is sometimes found in the area of this anomaly. Emits radiation, and reduces protection from bullet wounds, However, it also possesses a number of very positive qualities. Both beautiful, as well as expensive...</text>
 	</string>
-	<string id="af-ameba-mica">
+	<string id="af_ameba_mica">
 		<text>Mica</text>
 	</string>
-	<string id="af-ameba-mica_s">
+	<string id="af_ameba_mica_s">
 		<text>Mica</text>
 	</string>
-	<string id="enc_zone_artifact_af-ameba-mica">
+	<string id="enc_zone_artifact_af_ameba_mica">
 		<text>The Fruit Punch anomaly is able to create such an artefact at the rarest, most extreme collection of physical conditions. The result is a semi-transparent, hard object. When worn on the belt, this artefact will coagulate the blood from wounds, thus dereasing the amount of blood loss. However, the chances of receiving damage from burns is increased. This artefact is of great interest to Scientific Organizations in and around the Zone. A rare and expensive artefact.</text>
 	</string>
-	<string id="af-ameba-slime">
+	<string id="af_ameba_slime">
 		<text>Slime</text>
 	</string>
-	<string id="af-ameba-slime_s">
+	<string id="af_ameba_slime_s">
 		<text>Slime</text>
 	</string>
-	<string id="enc_zone_artifact_af-ameba-slime">
+	<string id="enc_zone_artifact_af_ameba_slime">
 		<text>It is certain that this artefact is created by the anomaly called Fruit Punch. When worn on the belt, this artefact will coagulate the blood from wounds, thus dereasing the amount of blood loss. However, the chances of receiving damage from burns is increased. This artefact is of moderate interest to Scientific Organizations in and around the Zone. A common and inexpensive artefact.</text>
 	</string>
-	<string id="af-ameba-slug">
+	<string id="af_ameba_slug">
 		<text>Slug</text>
 	</string>
-	<string id="af-ameba-slug_s">
+	<string id="af_ameba_slug_s">
 		<text>Slug</text>
 	</string>
-	<string id="enc_zone_artifact_af-ameba-slug">
+	<string id="enc_zone_artifact_af_ameba_slug">
 		<text>Formed by the Fruit Punch anomaly. The negative qualities of this artifact are compensated by the fact that it heightens the coagulation quality of blood. However, the chances of receiving damage from burns is increased. This artefact is highly sought after by Scientific Organizations in and around the Zone. It's not often that one encounters such a rare artefact, and Traders will pay well for it too.</text>
 	</string>
-	<string id="af-blood">
+	<string id="af_blood">
 		<text>Stone Blood</text>
 	</string>
-	<string id="af-blood_s">
+	<string id="af_blood_s">
 		<text>Stone Blood</text>
 	</string>
-	<string id="enc_zone_artifact_af-blood">
+	<string id="enc_zone_artifact_af_blood">
 		<text>Artefact formed in the Whirligig anomaly. It is an ugly reddish colour, pressed and fancifully curved polymerized residues of plants, soil and bones. When wearing an artifact on your belt, a kind of mysterious way, slightly faster healing of wounds and stops bleeding. Do stalkers is believed that this artifact lies the power of people who perished in the anomaly. However, this artifact attracts predators to the owner. Selling price is low due to a fairly wide distribution. Interest in the artifact exhibit scientific organizations, primarily doctors and all sorts of religious cults.</text>
 	</string>
-	<string id="af-cristall">
+	<string id="af_cristall">
 		<text>Crystal</text>
 	</string>
-	<string id="af-cristall_s">
+	<string id="af_cristall_s">
 		<text>Crystal</text>
 	</string>
-	<string id="enc_zone_artifact_af-cristall">
+	<string id="enc_zone_artifact_af_cristall">
 		<text>This artefact is formed in anomalous zones with intense thermal activity. Actively consumes excessive heat, remaining cool to the touch throughout. This artefact is created when heavy metals fall into the "Burner" anomaly. This artefact eliminates radiation wonderfully. It is highly valued by S.T.A.L.K.E.R.s and quite difficult to find. Demands a high price, and is of great interest within Scientific Organizations throughout the Zone.</text>
 	</string>
-	<string id="af-cristall-flower">
+	<string id="af_cristall_flower">
 		<text>Stone Flower</text>
 	</string>
-	<string id="af-cristall-flower_s">
+	<string id="af_cristall_flower_s">
 		<text>Stone Flower</text>
 	</string>
-	<string id="enc_zone_artifact_af-cristall-flower">
+	<string id="enc_zone_artifact_af_cristall_flower">
 		<text>%c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+5 \n%c[default]Born in the Springboard anomaly, this artefact is made up of a granite-like stone deformed by an extreme gravitational force, resulting in a crystallized formation that has not been explained by science to date. Can provide moderate protection against bullets, and is slightly radioactive. The bits of metallic compounds create a beautiful light play. It is very calming to study this artefact at night by the fire.</text>
 	</string>
-	<string id="af-drops">
+	<string id="af_drops">
 		<text>Droplet</text>
 	</string>
-	<string id="af-drops_s">
+	<string id="af_drops_s">
 		<text>Droplet</text>
 	</string>
-	<string id="enc_zone_artifact_af-drops">
+	<string id="enc_zone_artifact_af_drops">
 		<text>Artefact produced by the Heat anomaly. Teardrop-shaped formation with a cracked glazed surface. Stalkers say that wearing an artifact reduces damage from the bites of wild beasts. Impairs endurance. The price is low. Interest in the artifact exhibit collectors and jewelers.</text>
 	</string>
-	<string id="af-dummy-battery">
+	<string id="af_dummy_battery">
 		<text>Battery</text>
 	</string>
-	<string id="af-dummy-battery_s">
+	<string id="af_dummy_battery_s">
 		<text>Battery</text>
 	</string>
-	<string id="enc_zone_artifact_af-dummy-battery">
+	<string id="enc_zone_artifact_af_dummy_battery">
 		<text> the Origin of an artefact is not known. Ridge brilliant education. Very useful artefact for its{his} carrier{bearer}. Improves all characteristics of radiating stability{resistance} and a susceptibility to an electricity. The impression is made, that the artefact strengthens any processes proceeding around of it{him}. The price of sale huge. Special interest to an artefact is shown with the scientific organizations. </text>
 	</string>
-	<string id="af-dummy-dummy">
+	<string id="af_dummy_dummy">
 		<text>Dummy</text>
 	</string>
-	<string id="af-dummy-dummy_s">
+	<string id="af_dummy_dummy_s">
 		<text>Dummy</text>
 	</string>
-	<string id="enc_zone_artifact_af-dummy-dummy">
+	<string id="enc_zone_artifact_af_dummy_dummy">
 		<text> the Origin of an artefact is not known. Two rigid disks linked together by slime. The artefact slightly reduces defeat from all types of gravitational anomalies and explosions, absorbing shock waves. The price of sale high. Interest to an artefact is shown with the scientific organizations. </text>
 	</string>
-	<string id="af-dummy-glassbeads">
+	<string id="af_dummy_glassbeads">
 		<text>Mama's Beads</text>
 	</string>
-	<string id="af-dummy-glassbeads_s">
+	<string id="af_dummy_glassbeads_s">
 		<text>Mama's Beads</text>
 	</string>
-	<string id="enc_zone_artifact_af-dummy-glassbeads">
+	<string id="enc_zone_artifact_af_dummy_glassbeads">
 		<text>Shaped like a DNA helix, the beads are created in the Burner anomaly and pulsate, generating emissions beneficial to the human body. These emissions increase the metabolism of any living creature, accelerating clotting and healing of open wounds. The exact mechanism behind this artifact continues to puzzle Scientists. An extremely rare artefact: it has no negative qualities. Scientists have never been able to duplicate it under laboratory conditions.</text>
 	</string>
-	<string id="af-dummy-pellicle">
+	<string id="af_dummy_pellicle">
 		<text>Pellicle</text>
 	</string>
-	<string id="af-dummy-pellicle_s">
+	<string id="af_dummy_pellicle_s">
 		<text>Pellicle</text>
 	</string>
-	<string id="enc_zone_artifact_af-dummy-pellicle">
+	<string id="enc_zone_artifact_af_dummy_pellicle">
 		<text>According to Professor Sakharov, this was the first artefact the Ecologists managed to create under controlled laboratory conditions. Now, this artefact is so rare that many Researchers can't even imagine that such a substance could even exist at all. Provides excellent protection against caustic chemical components.</text>
 	</string>
-	<string id="af-dummy-spring">
+	<string id="af_dummy_spring">
 		<text>Spring</text>
 	</string>
-	<string id="af-dummy-spring_s">
+	<string id="af_dummy_spring_s">
 		<text>Spring</text>
 	</string>
-	<string id="enc_zone_artifact_af-dummy-spring">
+	<string id="enc_zone_artifact_af_dummy_spring">
 		<text>the origin of this rare artefact is unkknown. resembles two rigid disks linked together by viscous slime. According to the opinion of some Scientists, this artefact is a hybrid between the artefacts Battery and Shell. Highly sought after by Zone Scientists, and they will pay good money for it as well...</text>
 	</string>
-	<string id="af-electra-flash">
+	<string id="af_electra_flash">
 		<text>Flash</text>
 	</string>
-	<string id="af-electra-flash_s">
+	<string id="af_electra_flash_s">
 		<text>Flash</text>
 	</string>
-	<string id="enc_zone_artifact_af-electra-flash">
+	<string id="enc_zone_artifact_af_electra_flash">
 		<text>The Elektra anomaly sometimes births this artefact. Thanks to its heavily crystallized molecules, this electrostatic artefact is a powerful absorbent of electric charges, able to protect its bearer from electric shocks of up to 5,000 volts. S.T.A.L.K.E.R.s readily keep it for themselves, rather than trade it because of it's positive qualities. If sold, it goes for a good price, and because it has a nice external appearance, it is highly sought after by Jewellers dealing with Traders from a safe distance outside the Zone.</text>
 	</string>
-	<string id="af-electra-moonlight">
+	<string id="af_electra_moonlight">
 		<text>Moonlight</text>
 	</string>
-	<string id="af-electra-moonlight_s">
+	<string id="af_electra_moonlight_s">
 		<text>Moonlight</text>
 	</string>
-	<string id="enc_zone_artifact_af-electra-moonlight">
+	<string id="enc_zone_artifact_af_electra_moonlight">
 		<text>This unique electrostatic artifact can resonate under the influence of psi-waves. S.T.A.L.K.E.R.s have learned to fine-tune the artefact so that it resonates in opposite phase to the main source of emissions, thus fully or significantly neutralizing their effects. This artefact is formed inside of the Elektra anomaly on rare occasions. It has powerful restorative abilities, but at the cost of electrical resistance. a very rare, and expensive artefact. Highly sought after by members within the Scientific Community, as well as Jewellers, and Collectors.</text>
 	</string>
-	<string id="af-caterpillar">
+	<string id="af_caterpillar">
 		<text>Plasma Caterpillar</text>
 	</string>
-	<string id="af-caterpillar_s">
+	<string id="af_caterpillar_s">
 		<text>Plasma Caterpillar</text>
 	</string>
-	<string id="enc_zone_artifact_af-caterpillar">
+	<string id="enc_zone_artifact_af_caterpillar">
 		<text> the Rare artefact. You will not find it{him} in one anomaly as he is an alive biosubstance. It is formed from Bezoar from stomach of old controllers at influence on them anomaly until hot. Time Transmuratsii approximately 5 minutes, probability of successful end with education of the Plasma caterpillar{track} approximately 75%. It is not enough, who in the Zone knows this recipe and existence of the given artefact. People Sakharov assume, that this alive substance is formed of not digested bones of bones of an electrochimera under long influence of the perverted gastric juice of the controller, hypnotic aura constantly surrounding it{him} and the subsequent influence extremely heats. Remains only to guess, as this biomass thus does not perish. </text>
 	</string>
-	<string id="af-babka_4">
+	<string id="af_babka_4">
 		<text>Grandma's Beads</text>
 	</string>
-	<string id="enc_zone_artifact_af-babka_4">
+	<string id="enc_zone_artifact_af_babka_4">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]0 \n%c[default]the Absolute received by transmutation of an artefact Beads Grandmother Burer in current of 5 minutes in anomaly until hot. The recipe, obviously, has been received by practical consideration. From positive qualities it is necessary to note increase in stability of the owner of an artefact to bullet wounds. </text>
 	</string>
 	<string id="af_arhara_globus">
@@ -495,22 +495,22 @@
 	<string id="enc_zone_artifact_af_arhara_globus">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+5 \n%c[default]This absolute on appearance is completely not similar to the predecessor, reminds a children's rattle with prickles, whence and its{his} name has gone... Approve{Confirm}, that during transformation play a role of unknown persons to a science of connection of the silver, present in anomaly jellied. Possesses quite good qualities, in spite of the fact that the main feature of its{his} predecessor - protection against psi-influence a little weakened... Moderately radioactive. Has the quite good price. </text>
 	</string>
-	<string id="af-part-monolit">
+	<string id="af_part_monolit">
 		<text>Heart of the Poltergeist</text>
 	</string>
-	<string id="af-part-monolit_s">
+	<string id="af_part_monolit_s">
 		<text>Heart of the Poltergeist</text>
 	</string>
 	<string id="artifact_af_part_monolit">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+85 \n%c[default] Heart of the poltergeist the Extremely rare artefact reminding pulsing heart. Actually represents a splinter of a monolith. Whom and when he broke off from the basic part of a crystal it was not known, but the artefact possesses a greater{big} set of positive qualities. Lack only one - the highest doze of radiated radiation. To carry away such artefact it is impossible even at presence of special containers and suits. It becomes possible{probable} only at presence on a belt{zone} of the several artefacts reducing radiation. </text>
 	</string>
-	<string id="af-part-monolit1">
+	<string id="af_part_monolit1">
 		<text>Modified Heart of the Poltergeist</text>
 	</string>
 	<string id="artifact_af_part_monolit1">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+15 \n%c[default] the Modified Heart of the poltergeist . It is received by practical consideration by the professor Maple, tried to make an identical copy of the given artefact. Attempt by success has not crowned. At an artefact properties, but fortunately have changed, the internal structure has not suffered. </text>
 	</string>
-	<string id="af-part-monolit2">
+	<string id="af_part_monolit2">
 		<text>Modified Heart of the Poltergeist II</text>
 	</string>
 	<string id="artifact_af_part_monolit2">
@@ -525,125 +525,125 @@
 	<string id="enc_zone_anomalies_item_zharka_descr">
 		<text>Black energy - this artefact has received the name for the dark color. Is a product of several anomalies - such sometimes happens, when at the occurrence different kinds of anomalies adjoin among themselves. As well as cobble-stone, Black energy does not possess any visible positive qualities and consequently does not enjoy authority neither at {unknown}, nor at dealers. Many at all do not take it{him}, including a useless weed. However extremely the little know, that this artefact radiates a specific kind of the energy similar on microwave, that has enabled to use it{him} in some development as a specific element of a dining. </text>
 	</string>
-	<string id="af-electra-sparkler">
+	<string id="af_electra_sparkler">
 		<text>Sparkler</text>
 	</string>
-	<string id="af-electra-sparkler_s">
+	<string id="af_electra_sparkler_s">
 		<text>Sparkler</text>
 	</string>
-	<string id="enc_zone_artifact_af-electra-sparkler">
+	<string id="enc_zone_artifact_af_electra_sparkler">
 		<text>Artefact produced by the Elektra anomaly. Translucent amorphous formation sometimes found generating small lightning-sparks. Wearing an artifact on your belt slightly increases stamina. The price is low. Interest in the artifact exhibit scientific organizations, collectors and jewelers.</text>
 	</string>
-	<string id="af-fireball">
+	<string id="af_fireball">
 		<text>Fireball</text>
 	</string>
-	<string id="af-fireball_s">
+	<string id="af_fireball_s">
 		<text>Fireball</text>
 	</string>
-	<string id="enc_zone_artifact_af-fireball">
+	<string id="enc_zone_artifact_af_fireball">
 		<text>Artefact produced by the Heat anomaly. Translucent reddish spherical shape. Stalkers say that wearing an artifact reduces damage from the bites of wild beasts. Impairs endurance. Price is average. Interest in the artifact exhibit collectors and jewelers.</text>
 	</string>
-	<string id="af-fuzz-kolobok">
+	<string id="af_fuzz_kolobok">
 		<text>Burnt Fuzz</text>
 	</string>
-	<string id="af-fuzz-kolobok_s">
+	<string id="af_fuzz_kolobok_s">
 		<text>Burnt Fuzz</text>
 	</string>
-	<string id="enc_zone_artifact_af-fuzz-kolobok">
+	<string id="enc_zone_artifact_af_fuzz_kolobok">
 		<text> the Artefact of a unknown origin. Scientists till now cannot solve the recipe of reception of this miracle of the Zone. At carrying on a belt{zone} stability{resistance} of an organism any physical damages considerably{much} increases. It is radioactive. The price very high. Special interest to an artefact is shown by physicians. </text>
 	</string>
-	<string id="af-gold-fish">
+	<string id="af_gold_fish">
 		<text>Goldfish</text>
 	</string>
-	<string id="af-gold-fish_s">
+	<string id="af_gold_fish_s">
 		<text>Goldfish</text>
 	</string>
-	<string id="enc_zone_artifact_af-gold-fish">
+	<string id="enc_zone_artifact_af_gold_fish">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+10 \n%c[default]Artefact that occasionally formed in the anomaly Vortex. Education with a beautiful mirrored surface. At night, light the space around them within a radius of 1-2 meters. Is a compressed and intricately curved strong gravity remains of plants, soil and anything else that gets in the anomaly at the time of discharge. When wearing the artifact at the waist increases the immunity to shock the gravitational anomalies, such as a Springboard, but this plague, due to powerful gravitational field pulls the bullet that was not pleased with her owner. Selling price is very high. The probability of occurrence - low. Interest in the artifact exhibit scientific organizations, collectors and jewelers.</text>
 	</string>
-	<string id="af-gravi">
+	<string id="af_gravi">
 		<text>Gravi</text>
 	</string>
-	<string id="af-gravi_s">
+	<string id="af_gravi_s">
 		<text>Gravi</text>
 	</string>
-	<string id="enc_zone_artifact_af-gravi">
+	<string id="enc_zone_artifact_af_gravi">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+5 \n%c[default]Beautiful artefact formed in the Vortex anomaly. Is a compressed and intricately curved strong gravity remains of plants, soil and anything else that gets in the vicinity of the anomaly. When wearing the artifact at the waist increases the immunity to shock the gravitational anomalies, such as a springboard. Sale price and the probability of occurrence - the average. Interest in the artifact exhibit scientific organizations, collectors and jewelers.</text>
 	</string>
-	<string id="af-medusa">
+	<string id="af_medusa">
 		<text>Medusa</text>
 	</string>
-	<string id="af-medusa_s">
+	<string id="af_medusa_s">
 		<text>Medusa</text>
 	</string>
-	<string id="enc_zone_artifact_af-medusa">
+	<string id="enc_zone_artifact_af_medusa">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+3 \n%c[default]Artifact formed in the anomaly Springboard.  Is a compressed and intricately curved strong gravity remains of plants, soil and anything else that gets in the vicinity of the anomaly. When wearing the artifact at the waist increases the immunity to retractor gravitational anomalies, such as the funnel and Carousel and has little effect shield which reduces damage from small arms. Slightly radioactive. Selling price is low due to a fairly wide distribution. Interest in the artifact exhibit scientific organizations.</text>
 	</string>
-	<string id="af-mincer-meat">
+	<string id="af_mincer_meat">
 		<text>Meat Chunk</text>
 	</string>
-	<string id="af-mincer-meat_s">
+	<string id="af_mincer_meat_s">
 		<text>Meat Chunk</text>
 	</string>
-	<string id="enc_zone_artifact_af-mincer-meat">
+	<string id="enc_zone_artifact_af_mincer_meat">
 		<text>Artifact formed in the Whirligig anomaly. It is an ugly yellowish formation of pressed and fancifully curved polymerized residues of plants, soil and bones. When wearing an artifact on your belt, a kind of mystical way, greatly speeds up the healing and well-stops bleeding. Do stalkers is believed that this artifact lies the power of people who perished in the anomaly. However, this artifact attracts predators to the owner. Sale price and the probability of occurrence - the average. Interest in the artifact exhibit scientific organizations, primarily doctors and all sorts of religious cults.</text>
 	</string>
-	<string id="af-night-star">
+	<string id="af_night_star">
 		<text>Night Star</text>
 	</string>
-	<string id="af-night-star_s">
+	<string id="af_night_star_s">
 		<text>Night Star</text>
 	</string>
-	<string id="enc_zone_artifact_af-night-star">
+	<string id="enc_zone_artifact_af_night_star">
 		<text> %c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+10 \n%c[default]Artefact that occasionally forms inside the Springboard anomaly .. Education with a beautiful mirrored surface and colored phosphorescent inclusions. At night, light greenish light all around him in a radius of 1-2 meters, for which he received from stalkers name. Is a compressed and intricately curved strong gravity remains of plants, soil and anything else that gets in the vicinity of the anomaly. When wearing an Artefact on the belt greatly increases the immunity to gravitational anomalies, such as the Vortex and Whirligig, and also has the effect of reducing damage from small arms. But it is highly radioactive, so  it should be worn with caution. Selling price is very high. The probability of occurrence - low. Scientific Organizations, and the Military seem rather interested in these Artefacts for various reasons...</text>
 	</string>
-	<string id="af-rusty-kristall">
+	<string id="af_rusty_kristall">
 		<text>Crystal Thorn</text>
 	</string>
-	<string id="af-rusty-kristall_s">
+	<string id="af_rusty_kristall_s">
 		<text>Crystal Thorn</text>
 	</string>
-	<string id="enc_zone_artifact_af-rusty-kristall">
+	<string id="enc_zone_artifact_af_rusty_kristall">
 		<text> the Artefact it is possible to find Rusty hair near to anomaly. He deduces{removes} radiation from an organism of the person, but at the same time opens bleedings so at carrying this artefact it is necessary to be cautious and to not forget about its{his} negative influence. The price average. Interest to an artefact is shown with the scientific organizations, collectors and jewellers. </text>
 	</string>
-	<string id="af-rusty-sea-urchin">
+	<string id="af_rusty_sea_urchin">
 		<text>Urchin</text>
 	</string>
-	<string id="af-rusty-sea-urchin_s">
+	<string id="af_rusty_sea_urchin_s">
 		<text>Urchin</text>
 	</string>
-	<string id="enc_zone_artifact_af-rusty-sea-urchin">
+	<string id="enc_zone_artifact_af_rusty_sea_urchin">
 		<text> the Artefact is found more often nearby from anomaly with Rusty hair. He deduces{removes} radiation from an organism of the person. However at constant use of this artefact the person has a risk of loss of a plenty of blood. The price high. Interest to an artefact is shown with the scientific organizations, collectors and jewellers. </text>
 	</string>
-	<string id="af-rusty-thorn">
+	<string id="af_rusty_thorn">
 		<text>Thorn</text>
 	</string>
-	<string id="af-rusty-thorn_s">
+	<string id="af_rusty_thorn_s">
 		<text>Thorn</text>
 	</string>
-	<string id="enc_zone_artifact_af-rusty-thorn">
+	<string id="enc_zone_artifact_af_rusty_thorn">
 		<text>The end result of the interaction between the Burnt Fuzz anomaly, and a human corpse. The Thorn artefact, when worn on the belt, will continuously pierce, and prick one's side; causing minor lacerations, and bleeding. The upside of this seemingly negative effect, is the artefact's uncanny ability to leach harmful radionucliodes from the body. Although quite widespread throughout the Zone... a keen interest in this artefact is still exhibited by Scientific Organizations, Treasure Collectors, and Exotic Jewellers... </text>
 	</string>
-	<string id="af-soul">
+	<string id="af_soul">
 		<text>Soul</text>
 	</string>
-	<string id="af-soul_s">
+	<string id="af_soul_s">
 		<text>Soul</text>
 	</string>
-	<string id="enc_zone_artifact_af-soul">
+	<string id="enc_zone_artifact_af_soul">
 		<text>Rare artefact formed in the Springboard anomaly. It is a yellowish-red brilliant concoction of pressed and fancifully curved polymerized residues of plants, soil and bones. Do stalkers is believed that this artifact concluded souls perished in the anomaly of people. When wearing an artifact on your belt, a kind of mysterious way, within a few seconds to fully recover health and stop any bleeding. At the same time deteriorating stamina and resistance to psy-attack monsters telepaths. Also note the stalkers fun fact when you wear on your belt, this artifact is constantly hungry. Selling price is very high. The probability of occurrence - low. Interest in the artifact exhibit scientific organizations, primarily doctors and all sorts of religious cults. </text>
 	</string>
-	<string id="af-vyvert">
+	<string id="af_vyvert">
 		<text>Quirk</text>
 	</string>
-	<string id="af-vyvert_s">
+	<string id="af_vyvert_s">
 		<text>Quirk</text>
 	</string>
-	<string id="enc_zone_artifact_af-vyvert">
+	<string id="enc_zone_artifact_af_vyvert">
 		<text> %c[1,1,1,1]______%c[255,255,255,255]Radiation %c[255,255,1,1] +3\n%c[default]Artefact formed in the Vortex anomaly. A compressed, and intricately curvacious remnant of various plant-life, soil and other small objects that were sucked into the Vortex itself... When wearing the artefact on the belt, it tends to decrease the negative effects of gravitational anomalies, such as the Springboard anomaly. The Quirk is relatively easy to find, and as a result it does not demand a very high price. It continues to be studied by Scientists, Ecologists, and the Military in the attempt to determine it's full capabilities...</text>
 	</string>
 	<!-- Added missing "enc_zone_izomorf_kompas" from russian with google translate aleks1970, chgd to kristal and added short desc 109934 -->
-	<string id="af-pkristal">
+	<string id="af_pkristal">
 		<text>Isomorphic Pseudo-Crystal</text>
 	</string>
 	<string id="enc_zone_izomorf_kristal">
@@ -665,7 +665,7 @@
 		<text>%c[1,1,1,1]___%c[255,255,255,255]Radiation %c[255,255,1,1] +10\n%c[default]Isomorph. Properties are unknown. But we know only one thing - it is able to neutralize several anomalies, paving the way for the host, while appearing again. It addressed by the anomalies include: hot, Aspic, Fountain, Freezer, bubble, tornado, fog Hearth</text>
 	</string>
 	<!-- Added missing "enc_zone_izomorf_kompas" from russian with google translate aleks1970 -->
-	<string id="af-ikompas">
+	<string id="af_ikompas">
 		<text>Isomorphic Compass</text>
 	</string>
 	<string id="enc_zone_izomorf_kompas">
@@ -758,19 +758,19 @@
 	<!--======================================-->
 	<!--ARTEFACT ACTIVATION (Arhara)		  -->
 	<!--======================================-->
-	<string id="enc_zone_anomalies_activation-basic">
+	<string id="enc_zone_anomalies_activation_func">
 		<text>Activation Fundamentals</text>
 	</string>
 	<string id="enc_zone_anomalies_activation_basic">
 		<text>Under certain conditions, it becomes possible to enclose certain Artefacts in a protective layer, or shell... in order to manipulate them in specific ways that will enable their parent Anomaly to be re-activated on-the-spot. The activated artefact will lose all of it's original properties, and instead will metaphorsisize into another entity altogether... This process releases energy concentrated within an artefact that re-metabolize around the Activation Site. The artefact itself is completely absorbed by the process. Despite the similarity, these anomolous zones are very different in nature from their parental counterparts, whereas the original anomaly regenerates the energy required to sustain it's very existance. In contrast, the fabricated anomaly that is the end result of a successful activation procedure can only last for a very short time... usually only a few short minutes. They will then de-activate, and simply dissipate back into the Zone...</text>
 	</string>
-	<string id="activation-why">
+	<string id="activation_why">
 		<text>Activation Purpose</text>
 	</string>
 	<string id="enc_zone_anomalies_activation_why">
 		<text>The root cause of this strange phenomenon is likely to be traced back to the days when the Zone was literally churning with Scientific activity. Laboratories throughout the Zone were conducting similar reverse engineering projects in their attempts to counter the effects of deadly radiation poisoning as a result of the disastrous incident which took place in 2011... At some point, somewhere within the catacombs beneath the Zone, in one of these laboratories, someone discovered the process involved in succesfully activating, or transforming; one form of anomalous energy into another... in this case: an Artefact being able to re-generate into a temporary anomolous field that is a clone of it's parental anomaly...</text>
 	</string>
-	<string id="enc_zone_anomalies_activation-practice">
+	<string id="enc_zone_anomalies_activation_practice_title">
 		<text>Activation Process</text>
 	</string>
 	<string id="enc_zone_anomalies_activation_practice">

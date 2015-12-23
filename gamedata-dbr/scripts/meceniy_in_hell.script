@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.0 chgd horror spawns: 50% chance collector, 20% novice to 50% master, spawn check for bad phantoms,
--- rewrote hellhour, level_info, agro and agro_u, actor and kruglov in ignore list, get_level_up
-function my_ver() return "1.0.9.9.8.0" end
+--TB3D 1.0.9.9.9.6 chgd horror spawns: 50% chance collector, 20% novice to 50% master, spawn check for bad phantoms,
+-- rewrote hellhour, level_info, agro and agro_u, actor and kruglov in ignore list, get_level_up, harsh env
+function my_ver() return "1.0.9.9.9.6" end
 --------------------------------------------------------------------------------------------------
 --*Module "Time of Terror" .. Spot (Shooter)
 --podrihtovano by sapsan
@@ -235,7 +235,7 @@ local tabl_horror_by_level = {
 		},
 		actor_hit_power = {radiation = 0.0005, shock = 0.00001}
 	},
---[[	l11_pripyat = {
+	l11_pripyat = {
 		spawn = {
 			exact = { -- monsters with exact coordinates
 				["fracture_normal_horror"] = {-15.07,-0.41,34.17},
@@ -254,15 +254,15 @@ local tabl_horror_by_level = {
 				["fracture_strong_horror"] = {-15.07,-0.41,34.17}
 			},
 			rand = { -- monsters with random coordinates
-				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
-				["zombie_normal_horror"] = {count = 10, d = 50, y = 0},
-				["zombie_immortal_horror"] = {count = 5, d = 50, y = 0},
-				["zombie_hell_horror"] = {count = 5, d = 50, y = 0},
-				["zombie_ghost_horror"] = {count = 5, d = 50, y = 0}
+				--["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				--["zombie_normal_horror"] = {count = 10, d = 50, y = 0},
+				--["zombie_immortal_horror"] = {count = 5, d = 50, y = 0},
+				--["zombie_hell_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_ghost_horror"] = {count = 1, d = 50, y = 0}
 			}
 		},
 		actor_hit_power = {radiation = 0.01, shock = 0.0007}
-	},]]--
+	},
 	pripyat = {
 		spawn = {
 			exact = { -- monsters with exact coordinates
@@ -396,9 +396,9 @@ local tabl_horror_by_level = {
 			rand = { -- monsters with random coordinates
 				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
 				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
-				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 40, y = 12},
 				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
-				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+				["zombie_immortal_horror"] = {count = 5, d = 40, y = 0}
 			}
 		},
 		actor_hit_power = {radiation = 0.005, shock = 0.0002}
@@ -410,7 +410,7 @@ local tabl_horror_by_level = {
 			rand = { -- monsters with random coordinates
 				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
 				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
-				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 40, y = 12},
 				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
 				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
 			}
@@ -440,7 +440,7 @@ local tabl_horror_by_level = {
 				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
 				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
 				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
-				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+				["zombie_immortal_horror"] = {count = 5, d = 40, y = 0}
 			}
 		},
 		actor_hit_power = {radiation = 0.005, shock = 0.0002}
@@ -499,8 +499,10 @@ local level_info
 local hit_once = false
 
 function horrortime()
+	local lname = level.name()		--109996
+	if TB3D_Services.is_instorm(lname) == true then return end		--109996
 	if not tabl_horror_by_level[level.name()] then return end
-	if level.name() == "l03_agroprom" or level:name() == "l03u_agr_underground"			--109975
+	if lname == "l03_agroprom" or lname == "l03u_agr_underground"			--109975
 	  and not have_alife_info("agroprom_military_case_done") then
 		return
 	end
@@ -510,7 +512,7 @@ function horrortime()
 	if not has_alife_info("horror_time_begin") and not has_alife_info("horror_fail") then		--not in a hell hour now
 		if timeh == horror_begin_time.h and timem < horror_end_time.m then						--time to start a hell hour?
 			--TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."]")
-			level_info = tabl_horror_by_level[level.name()]
+			level_info = tabl_horror_by_level[lname]
 			local diff_range = TB3D_Services.get_level_up() + 1									--109978, insure between 1 and 11
 			diff_range = diff_range + level.get_game_difficulty()								--2 to 5, so novice = 20% chance, master = 50% chance
 			diff_range = math.random(1,diff_range)
@@ -560,7 +562,7 @@ function horrortime()
 				level.add_pp_effector("nightvision.ppe", 77777772, false) 
 				level.add_pp_effector("psy_antenna.ppe", 77777771, true, "")
 				effects()
-				if TB3D_Modders.hell_spawn == true then horrorspawn(level.name()) end
+				if TB3D_Modders.hell_spawn == true then horrorspawn(lname) end
 				if TB3D_Modders.phantom_spawn == true then spawn_phantom() end
 				horror_sound()
 				random_reaction()
@@ -580,7 +582,7 @@ function horrortime()
 			if timem == horror_time_2.m and hit_once == false then
 				hit_once = true
 				if TB3D_Modders.horror_hit == true then
-					level_info = tabl_horror_by_level[level.name()]							--109961
+					level_info = tabl_horror_by_level[lname]							--109961
 					if level_info and TB3D_Services.is_indoor(false) == false then
 						rad = level_info["actor_hit_power"]["radiation"]
 						shock = level_info["actor_hit_power"]["shock"]

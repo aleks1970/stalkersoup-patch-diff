@@ -1,5 +1,9 @@
---TB3D 1.0.9.9.1 
+--TB3D 1.0.9.9.1, translate and text color - aleks1970
 function my_ver() return "1.0.9.9.1" end
+
+local translate = game.translate_string
+local text_color_treasure = TB3D_Services.get_text_color("treasure")
+
 local solid_list = {
 --novice section (<300)
  "wpn_mp5_m2",
@@ -11,7 +15,7 @@ local solid_list = {
  "ammo_9x39_ap",
  "ammo_9x39_sp5",
  "af_fuzz_kolobok",
- "af_rusty_sea-urchin",
+ "af_rusty_sea_urchin",
  "af_dummy_glassbeads",
  "af_dummy_pellicle",
  "af_dummy_battery",
@@ -252,7 +256,7 @@ function CTreasure:give_treasure(k)
 	local obj = alife():story_object(v.target)
 	if obj ~= nil and level.map_has_object_spot(obj.id, "treasure") == 0 then
 		news_manager.send_treasure(v.name)		
-		local text = TB3D_Services.get_text_color("treasure")..game.translate_string(v.name).."\n%c[default]"..game.translate_string(v.description)
+		local text = text_color_treasure..translate(v.name).."\n%c[default]"..translate(v.description)
 		level.map_add_object_spot_ser(obj.id, "treasure", text)
 
 		-- check what type of cache is selected, if the cache is not a classic, and not nominal, then replace the contents

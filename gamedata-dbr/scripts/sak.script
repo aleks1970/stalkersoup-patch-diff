@@ -3,7 +3,7 @@
 -- glowworm fixes, removed ratcatcher check from used item, 'to the swamp' vice cave, petrushka to petruha,
 -- dmx135, hit styles, doc in pripyat, chgd nepis_umer, trasure to treasure, delta display,
 -- delta display to slice mult, add_tail, removed make_kill_task_failed, levchn ids changed in all.spawn, garb - cave
--- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box
+-- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box, translate
 function my_ver() return "1.0.9.9.9.0" end
 
 ---------------------------------------------------------------------
@@ -17,6 +17,7 @@ local math_cos = math.cos
 local string_find = string.find
 local string_format = string.format
 local string_gsub = string.gsub
+local translate = game.translate_string
 
 function add_new_escape_100() 
 	add_new_lc(9100,8067,"to_escape","info_way100a")
@@ -276,11 +277,11 @@ function add_new_lc(levch,levchn,levchm,info)
 			if TB3D_Modders.use_lc_message then TB3D_Services.info_alert("SAK: adding lc ["..levchm.."]") end
 			level.map_add_object_spot(obj.id, "level_changer",levchm)
 			local t = dmx_mod.get_lc_data(obj)	-- DMX MOD on		updated to dmx_mod_fix_lc 6-29-2011			!!!!TB3D
-			local level_start = game.translate_string(TB3D_Services.get_obj_level(t.game_vertex_id))
-			--local level_end = game.translate_string(string.sub(t.dest_level_name,1)) --("l"..string.sub(t.dest_level_name,2))
-			local level_end = game.translate_string(string.lower(t.dest_level_name))
+			local level_start = translate(TB3D_Services.get_obj_level(t.game_vertex_id))
+			--local level_end = translate(string.sub(t.dest_level_name,1)) --("l"..string.sub(t.dest_level_name,2))
+			local level_end = translate(string.lower(t.dest_level_name))
 			local txt = level_start.." -> "..level_end
-			news_manager.amk_send_tip(txt, game.translate_string("path_new"), 2, 25, "pda_icon")-- DMX MOD off
+			news_manager.amk_send_tip(txt, translate("path_new"), 2, 25, "pda_icon")-- DMX MOD off
 			TB3D_Services.give_info(info)	--info_received()
 		end
 		if TB3D_Modders.use_lc_message then TB3D_Services.info_alert("SAK: add new lc ["..levchm.."] done") end

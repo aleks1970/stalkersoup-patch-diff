@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.6 dav updates, ldk3_master fixed, final from dav, updated to new levels,
--- changed for level-ups (109961), localized, added spawn groups, adj hardcore spawns
-function my_ver() return "1.0.9.9.8.6" end
+--TB3D 1.0.9.9.9.6 dav updates, ldk3_master fixed, final from dav, updated to new levels,
+-- changed for level-ups (109961), localized, added spawn groups, adj hardcore spawns, red forest and done_with infos
+function my_ver() return "1.0.9.9.9.6" end
 
 -----------------------------------------------------------------------------------------------------------
 --dAVROs Lastday killers v1_1  last contributed: April 2014
@@ -83,7 +83,7 @@ function check_spawn(ln)						--called from tb3d_collector on spawn
 	local pos = db.actor:position()
 	-- ====================================================== Zaton - Backwater ===========================================================================
 	if ln == "zaton" then
-		if has_alife_info("collector_ready_for_zaton") then
+		if has_alife_info("collector_ready_for_zaton") and not has_alife_info("collector_done_with_zaton") then
 			if pos.y<-15 and pos.x<-150 and pos.x>-155 and pos.z<-172 and pos.z>-180 then		-- Teleport into Zatcave ambush
 				-- news_manager.send_tip(db.actor, "Hmmm.....I dont think Im alone", nil, nil, 16000)
 				--(-152.790,-16.191,-176.779,641423,3673)  Teleport in coordinates
@@ -128,7 +128,7 @@ function check_spawn(ln)						--called from tb3d_collector on spawn
 		end
 	elseif ln == "jupiter" then
 	-- ====================================================== Jupiter ===========================================================================
-		if has_alife_info("collector_ready_for_jupiter") then
+		if has_alife_info("collector_ready_for_jupiter") and not has_alife_info("collector_done_with_jupiter") then
 			if pos.y>-2 and pos.y<0 and pos.x<-47 and pos.x>-52 and pos.z<200 and pos.z>197 then-- Teleport into Jupiter station
 				-- news_manager.send_tip(db.actor, "Safe at last.....should be OK in hear", nil, nil, 16000)	
 				--(-49.357,-0.620,198.186,636193,3717)		Teleport in coordinates
@@ -161,7 +161,7 @@ function check_spawn(ln)						--called from tb3d_collector on spawn
 		end
 	elseif ln == "pripyat" then
 	-- ====================================================== East Pripyat ===========================================================================
-		if has_alife_info("collector_ready_for_eastprip") then
+		if has_alife_info("collector_ready_for_eastprip") and not has_alife_info("collector_done_with_eastprip") then
 			if pos.x<145 and pos.x>140 and pos.z<-190 and pos.z>-200 then		-- Teleport into Pripstation ambush
 				-- news_manager.send_tip(db.actor, "Rufuge at last. Time for a rest", nil, nil, 16000)	
 				--(143.940,2.367,-194.718,375710,3765)		Teleport in coordinates
@@ -203,37 +203,28 @@ end
 function spawn_ldk1(ln, pos)						--called from tb3d_collector update
 -- ==================================== Red Forest ===============================================	
 	if ln == "red_forest" then																	
-		if has_alife_info("collector_ready_for_redf") then
-			-- run once info portion conditional with a rectangular detection zone
-			if not has_alife_info("redforest_ldk_spawn1") then			-- First Redforest in box spawn
-				if pos.x>-150 and pos.x<-130 and pos.z>-302 and pos.z<-250 then
+		if has_alife_info("collector_ready_for_redf") and not has_alife_info("redforest_ldk_spawn3") then
+			if not has_alife_info("redforest_ldk_spawn1") then			--109996, First group other side of bridge
+				if pos.x < -110 and pos.x > -120 then					--109996, between road and fence above river
 					-- news_manager.send_tip(db.actor, "get out of here STALKER", nil, nil, 16000)
 					TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",-159.533,0.650,-312.683,5337,3237,3)
 					TB3D_Services.give_info("redforest_ldk_spawn1")
-				end
-			end
-			if not has_alife_info("redforest_ldk_spawn2") then			-- Second Redforest in box spawn
-				if pos.x>-175 and pos.x<-155 and pos.z>-274 and pos.z<-267 then	
-					-- news_manager.send_tip(db.actor, "Turn around now stranger - you're not welcome here", nil, nil, 16000)
 					TB3D_Triggers.spawn_alife_rand("dav_ldk_veteran_respawn1",-178.028,0.138,-285.848,3464,3236,3)
 					TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",-157.141,0.509,-292.899,5699,3239,2)
 					TB3D_Services.give_info("redforest_ldk_spawn2")
 				end
-			end
-			if not has_alife_info("redforest_ldk_spawn3") then			-- Third Redforest in box spawn
-				if pos.x>-173 and pos.x<-169 and pos.z>-318 and pos.z<-311 then	
-					-- news_manager.send_tip(db.actor, "last warning - PISS OFF", nil, nil, 16000)
-					TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",-202.563,0.137,-323.795,489,3231,3)
-					TB3D_Triggers.spawn_alife_rand("ldk6_master",-196.140,0.136,-306.760,1219,3231,1)
-					TB3D_Triggers.spawn_alife_rand("ldk1_troop",-196.940,0.136,-306.060,1219,3231,2)
-					TB3D_Services.give_info("redforest_ldk_spawn3")
-				end
+			elseif pos.x < -149 and pos.z < -294 then					--109996, second group in tunnel
+				-- news_manager.send_tip(db.actor, "last warning - PISS OFF", nil, nil, 16000)
+				TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",-202.563,0.137,-323.795,489,3231,3)
+				TB3D_Triggers.spawn_alife_rand("ldk6_master",-196.140,0.136,-306.760,1219,3231,1)
+				TB3D_Triggers.spawn_alife_rand("ldk1_troop",-196.940,0.136,-306.060,1219,3231,2)
+				TB3D_Services.give_info("redforest_ldk_spawn3")
 			end
 		end
 -- ============================= Dead City ===========================		
 	elseif ln == "dead_city" then																
 		amk.oau_watchdog=748
-		if has_alife_info("collector_ready_for_dcity") then
+		if has_alife_info("collector_ready_for_dcity") and not has_alife_info("collector_done_with_dcity") then
 			amk.oau_watchdog=7481
 			if not has_alife_info("dcity_ldk_spawn1") then
 				if db.actor:position():distance_to(dc_hot_spot1) < 20 then			-- First dead City spawn - Panther Building
@@ -327,7 +318,7 @@ function spawn_ldk1(ln, pos)						--called from tb3d_collector update
 		amk.oau_watchdog=747
 -- ================================== Zaton ===========================================
 	elseif ln == "zaton" then																		
-		if has_alife_info("collector_ready_for_zaton") then
+		if has_alife_info("collector_ready_for_zaton") and not has_alife_info("collector_done_with_zaton") then
 			if TB3D_Services.give_info("zaton_ldk_warning") then
 				--news_manager.send_tip(db.actor, translate("hunt_bkwtr_warning"), nil, nil, 120000)
 			end
@@ -441,7 +432,7 @@ function spawn_ldk1(ln, pos)						--called from tb3d_collector update
 		amk.oau_watchdog=746
 -- ===================================== Jupiter =============================================		
 	elseif ln == "jupiter" then	
-		if has_alife_info("collector_ready_for_jupiter") then
+		if has_alife_info("collector_ready_for_jupiter") and not has_alife_info("collector_done_with_jupiter") then
 			if TB3D_Services.give_info("jupiter_ldk_warning") then
 				-- news_manager.send_tip(db.actor, "Welcome to Jupiter - be careful, Lastday Killers have been seen in the area", nil, nil, 120000)
 			end
@@ -494,7 +485,7 @@ function spawn_ldk1(ln, pos)						--called from tb3d_collector update
 					TB3D_Services.give_info("jup_ldk_spawn7")
 				end
 			end
-		elseif has_alife_info("collector_ready_for_jupund") then														--after jup under return to surface
+		elseif has_alife_info("collector_ready_for_jupund") and not has_alife_info("collector_done_with_jupund") then														--after jup under return to surface
 			if not has_alife_info("jup_ldk_spawn8") then
 				if db.actor:position():distance_to(jup_hot_spot5) < 5 then
 					-- news_manager.send_tip(db.actor, "hotspot 5  heading to the Elevator", nil, nil, 1600)
@@ -521,7 +512,7 @@ function spawn_ldk1(ln, pos)						--called from tb3d_collector update
 		amk.oau_watchdog=745
 -- ===================================================== East Pripyat ====================================================		
 	elseif ln == "pripyat" then																		
-		if has_alife_info("collector_ready_for_eastprip") then
+		if has_alife_info("collector_ready_for_eastprip") and not has_alife_info("collector_done_with_eastprip") then
 			if TB3D_Services.give_info("eastprip_ldk_warning") then
 				-- news_manager.send_tip(db.actor, "Welcome to East Pripyat - be careful, Lastday Killers have been seen in the area", nil, nil, 120000)
 			end
@@ -607,7 +598,7 @@ function spawn_ldk1(ln, pos)						--called from tb3d_collector update
 		amk.oau_watchdog=744
 	-- ====================================================== Jupiter Underground ================================================
 	elseif ln == "jupiter_underground" then
-		if has_alife_info("collector_ready_for_jupund") then
+		if has_alife_info("collector_ready_for_jupund") and not has_alife_info("collector_done_with_jupund") then
 			if not has_alife_info("jupund_ldk_spawn1") then
 				news_manager.send_tip(db.actor, translate("hunt_ldk_warning"), nil, nil, 6000)
 				alife():create("ldk6_commander",vector():set(45.3996,1.916,-0.561),34451,3808) 			-- main buiding gnd floor main room

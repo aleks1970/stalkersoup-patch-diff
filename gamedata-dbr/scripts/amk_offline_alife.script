@@ -4,7 +4,7 @@
 function my_ver() return "1.0.9.9.7.6" end
 -- file from the mod "People Salsola 2009" from 14.06. Adapted for fashion 'label with swag 2.1.4' 06/07/2009
 -- Adapted to the Manager of weapons. Rulix aka Bak from 2.07.09
--- Adatiroval: Idler.
+-- Adatiroval: Idler., translate
 
 --globals-----------------
 tables_ready = false
@@ -20,6 +20,7 @@ local math_floor = math.floor
 local math_abs = math.abs
 local math_ceil = math.ceil
 local string_find = string.find
+local translate = game.translate_string
 
 local sell_table = {}
 local item_dependence = {}
@@ -1830,7 +1831,7 @@ function process_trade(npc)
 					-- s_name = utils.cfg_get_string(system_ini(), vv:section_name(), "inv_name", vv, false, "", "")
 					s_name = getIniValueString(vv:section_name(), "inv_name", "", nil)
 					if (s_name == nil) then s_name = "" end
-					s_name = game.translate_string(s_name)
+					s_name = translate(s_name)
 					coeff = math_random(30,50) / 100
 					price = math_floor(cost * coeff)
 					money = money + price

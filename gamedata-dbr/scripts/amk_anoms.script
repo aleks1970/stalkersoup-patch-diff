@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.8.9  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init
-function my_ver() return "1.0.9.9.8.9" end
+-- TB3D 1.0.9.9.9.6  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init
+function my_ver() return "1.0.9.9.9.6" end
 
 --[[-------------------------- variable and table --------------------------]]
 local table_sort=table.sort
@@ -71,7 +71,7 @@ local arts_sections={
 	pudd_1="af_pudd_1",
 	rusty_1="af_rusty_thorn",
 	rusty_2="af_rusty_kristall",
-	rusty_3="af_rusty_sea-urchin",
+	rusty_3="af_rusty_sea_urchin",
 	spirit_1="af_spirit_1",
 	voron_1="af_eye_voron",
 	zharka_1="af_drops",
@@ -390,7 +390,7 @@ local arts_amk={
 	["af_pudd_1"]=true,
 	["af_rusty_thorn"]=true,
 	["af_rusty_kristall"]=true,
-	["af_rusty_sea-urchin"]=true,
+	["af_rusty_sea_urchin"]=true,
 	["af_spirit_1"]=true,
 	["af_eye_voron"]=true,
 	["af_drops"]=true,
@@ -401,8 +401,8 @@ function dynamic_art(obj_name, lname, sect)
 	local result = true																--default: is a dynamic art so don't remove
 	if TB3D_Services.is_collector() or TB3D_Modders.dyn_arts_always then			--109981, default = start dyn arts on levelup 1
 		if lname ~= "" then
-			if arts_amk[sect] == true then											--109981, must be in list
-				if level_vertexes[lname] then										--must be one of the dyn levels
+			if level_vertexes[lname] then											--109996, must be one of the dyn levels
+				if arts_amk[sect] == true then										--109981, must be in list
 					if string_sub(obj_name, 1, 3) == "af_" then result = false end	--make sure it is not level specific else remove
 				end
 			end

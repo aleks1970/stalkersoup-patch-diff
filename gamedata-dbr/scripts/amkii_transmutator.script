@@ -748,7 +748,7 @@ function CAmkDeviceTransmutator:AddArtefact(iSectIndex, iBarName)
 					if system_ini():section_exist(aSect) then
 						for i=1, table.getn(aArtsInfo) do						
 							if aArtsInfo[i]["sSection"] == aSect and aArtsInfo[i]["iCount"] ~= 0 then
-								-- _log("... aArtsInfo["..i.."][iCount]: "..tostring(aArtsInfo[i]["iCount"]).." "..game.translate_string(amk.get_inv_name(aSect)))
+								-- _log("... aArtsInfo["..i.."][iCount]: "..tostring(aArtsInfo[i]["iCount"]).." "..translate(amk.get_inv_name(aSect)))
 								self:AddArtefact(i,"Inv")
 								aReciptsHave[info]["komp"][aSect] = "added"
 							end
@@ -758,7 +758,7 @@ function CAmkDeviceTransmutator:AddArtefact(iSectIndex, iBarName)
 				for cSect, m in pairs(aReciptsHave[info]["komp"]) do
 --[[					if aReciptsHave[info]["komp"][cSect] ~= "added" then
 						CountLostKomp = CountLostKomp + 1
-						local str = game.translate_string(amk.get_inv_name(cSect))
+						local str = translate(amk.get_inv_name(cSect))
 						if txtNotkomp == "" then
 							txtNotkomp = str
 						else
@@ -766,7 +766,7 @@ function CAmkDeviceTransmutator:AddArtefact(iSectIndex, iBarName)
 						end
 					end]]--
 					if aReciptsHave[info]["komp"][cSect] ~= "added" then
-						table.insert(tblNotKomp, game.translate_string(amk.get_inv_name(cSect)))
+						table.insert(tblNotKomp, translate(amk.get_inv_name(cSect)))
 					end
 				end
 				if CountLostKomp == 0 then -- have all the ingredients and a recipe, watch the cooking

@@ -1,10 +1,13 @@
 --TB3D 1.0.9.9.9.0 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
 -- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
--- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info
+-- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info, translate and text color - aleks1970
 function my_ver() return "1.0.9.9.9.0" end
 
 local string_find = string.find
 local math_random = math.random
+local translate = game.translate_string
+local text_color_tip = TB3D_Services.get_text_color("tip")
+local text_color_name = TB3D_Services.get_text_color("name")
 
 function actor_update()
 	amk.oau_watchdog=669										-----------------669
@@ -389,7 +392,7 @@ end
 function sms_new()
 	if TB3D_Services.is_collector(3000) == false then
 		if TB3D_Services.give_info("sms_new_dan1") then
-			news_manager.amk_send_tip(game.translate_string("sms_new_dan1_text"),nil,nil,30)
+			news_manager.amk_send_tip(translate("sms_new_dan1_text"),nil,nil,30)
 		end
 	end
 end
@@ -397,7 +400,7 @@ end
 function sms_new1()
 	if TB3D_Services.is_collector(3000) == false then
 		if TB3D_Services.give_info("sms_new_dan2") then
-			news_manager.amk_send_tip(game.translate_string("sms_new_dan2_text"),nil,nil,30)
+			news_manager.amk_send_tip(translate("sms_new_dan2_text"),nil,nil,30)
 		end
 	end
 end
@@ -1443,7 +1446,7 @@ function speech_xalyava()
 	if TB3D_Services.is_collector(3000) == false then
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\prisoner_help_2]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]Brothers, it is a free-for-all... the Mercenaries have taken over the farm...",nil,nil,60000)    
+		news_manager.send_tip_txt(db.actor, text_color_tip..translate("braad_incoming_m_0"),nil,nil,60000)    
 	end
 end
 -----------------------------turret---------------------------------------------------
@@ -1573,7 +1576,7 @@ end
 function speech_teleport()
 	if TB3D_Services.is_collector(3000) == false then
 		TB3D_Services.info_alert("braad test: speech_teleport")
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]Sviblov, we have urgent business!!... I will wait for you...",nil,nil,60000)  
+		news_manager.send_tip_txt(db.actor, text_color_tip..translate("braad_incoming_m_1"),nil,nil,60000)  
 		TB3D_Services.give_info("nebo_kurier_first")  
 	end
 end
@@ -1677,7 +1680,7 @@ end
 
 function speech_shadowman()
 	if TB3D_Services.is_collector(3000) == false then
-		--news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]Be on guard... as it can appear at any moment...",nil,nil,60000)  
+		--news_manager.send_tip_txt(db.actor, text_color_tip.."INCOMING:  %c[default]Be on guard... as it can appear at any moment...",nil,nil,60000)  
 		news_manager.amk_send_tip_id("sms_shadows_speech", "shadows_private", 10, 60, "common_channel")
 	end
 end
@@ -2015,7 +2018,7 @@ end
 
 function mitya_sms()
 	if TB3D_Services.is_collector(3000) == false then
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("name").."SIDOROVICH:  %c[default]Say, Marked One, it is your old friend Sidorovich ... a strange package has arrived ...",nil,nil,60000)  
+		news_manager.send_tip_txt(db.actor, text_color_name..translate("braad_incoming_m_2"),nil,nil,60000)  
 		TB3D_Services.give_info("mitya_dead_sms_sidor")
 	end
 end
@@ -2072,7 +2075,7 @@ end
 
 function speech_test()
 	if TB3D_Services.is_collector(3000) == false then
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]AAAAHHHHGGGGHHHHHH!!!!!...",nil,nil,60000)  
+		news_manager.send_tip_txt(db.actor, text_color_tip..translate("braad_incoming_m_3"),nil,nil,60000)  
 		TB3D_Services.give_info("mitya_dead_sms_sidor")
 	end
 end

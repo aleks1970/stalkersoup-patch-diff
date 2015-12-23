@@ -1,5 +1,5 @@
 -- TB3D 1.0.9.9.8.4 re-written for speed and better task management, added monolit tele, shortened disp time,
--- update, petruha toz, new levels, \\n, mil_volk_resiver_done
+-- update, petruha toz, new levels, \\n, mil_volk_resiver_done, translate and text color - aleks1970
 function my_ver() return "1.0.9.9.8.4" end
 --[[ --------------------------------------------------------------------------------------------
  File        : TB3D_Update:  adapted from max.script
@@ -9,6 +9,9 @@ function my_ver() return "1.0.9.9.8.4" end
 
 local ini =""
 local result_shown
+local translate = game.translate_string
+local text_color_tip = TB3D_Services.get_text_color("tip")
+
 function update_start()
 	local lvln = level.name()
 	ini = ini_file("misc\\TB3D_tasks.ltx") 
@@ -768,7 +771,7 @@ function update_start()
 		end
 	end	
 	if not result_shown then
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D: %c[default]"..game.translate_string(lvln), nil, "tb3d_master", 10000)
+		news_manager.send_tip_txt(db.actor, text_color_tip.."TB3D: %c[default]"..translate(lvln), nil, "tb3d_master", 10000)
 	end
 	ini = ""
 	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("tb3d update: done") end
@@ -778,12 +781,12 @@ function show_result(indx,lvln)
 	if ini:line_exist("tasks",tostring(indx)) then
 		local strg	= ""
 		if indx == 9999 then
-			strg = ini:r_string_wq("tasks",tostring(indx))..": "..game.translate_string(lvln)
+			strg = ini:r_string_wq("tasks",tostring(indx))..": "..translate(lvln)
 		else
 			strg = ini:r_string_wq("tasks",tostring(indx))
 		end
   --TB3D_Services.info_alert("tb3d update["..strg.."]")
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D: %c[default]"..strg, nil, "tb3d_master", 10000)
+		news_manager.send_tip_txt(db.actor, text_color_tip.."TB3D: %c[default]"..strg, nil, "tb3d_master", 10000)
 		strg = ""
 		result_shown = true
 	end

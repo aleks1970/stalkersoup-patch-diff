@@ -1,11 +1,12 @@
 --TB3D 1.0.9.9.9.3 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 -- dav update 16Apr14, item 17, send_tip_id optimization, fixed send_tip_id to amk_send_tip_id, debug, save now, moved triggers and added debug,
--- af gold on roof in eprip, stash 14 lc to npp1, spawn_tel
+-- af gold on roof in eprip, stash 14 lc to npp1, spawn_tel, text color - aleks1970
 function my_ver() return "1.0.9.9.9.3" end
 -- randomly caches Collector treasures and provides base for bind_stalker services
 
 local string_sub = string.sub
 local string_find = string.find
+local text_color_tip = TB3D_Services.get_text_color("tip")
 
 ----------------------------------------------- Collector Treasure Hunt last added to by dAVROs Oct 2013 ----------------------------------------------------
 ----------------------------------------------------- collector hunt by dAVROs -------------------------------------------------------------------
@@ -369,7 +370,7 @@ function get_item(str)
 		if reslt == true then
 			alife():create(desc, vector():set(x,y,z),lv,gv)
 			if TB3D_Modders.use_spawn_message then
-				news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:  %c[default]Collector Hunt Spawned["..desc.."]")
+				news_manager.send_tip_txt(db.actor, text_color_tip.."TB3D:  %c[default]Collector Hunt Spawned["..desc.."]")
 			end
 		else
 			if TB3D_Modders.use_abort_message then TB3D_Services.packet_alert("Collector Item Failed: ["..desc.."]") end

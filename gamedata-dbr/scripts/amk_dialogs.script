@@ -2,6 +2,8 @@
 function my_ver() return "1.0.9.9.3.4" end
 -- AMK Support for the functionality of the dialogues
 -- Initial release by Red75
+-- translate
+local translate = game.translate_string
 
 function make_kill_task_failed(actor,npc,p1,p2) 
   local nid=npc:id()
@@ -73,7 +75,7 @@ end
 
 
 function info_received()
-  news_manager.amk_send_tip("",game.translate_string("st_found_new_pda"),0,10,"gen_info")
+  news_manager.amk_send_tip("",translate("st_found_new_pda"),0,10,"gen_info")
 end
 
 function actor_has_money_30000()

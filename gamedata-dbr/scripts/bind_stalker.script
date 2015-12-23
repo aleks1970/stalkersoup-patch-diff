@@ -9,7 +9,7 @@
 -- sak_book4, grib_respawn to OAL, player_ogg.update, point_drop, rstr update 500, send_tip_id optimization, pause,
 -- force_garbage_collect, earth shake, xr_spawner, time_now, no avi in collector, update alert last, ftl time, debug,
 -- informer_out, blow(), on_item_take, removed blowout_wave, run_hide, active community, removed unused timers, restrictor slice,
--- mteleport updates, memory check on save, deactivated modders calls, slice levels, removed amk_utils cache, meceniy_outfit-net_destroy,
+-- mteleport updates, memory check on save, deactivated modders calls, slice levels, removed amk_utils cache, meceniy_outfit-net_destroy, translate
 -- moved dx11 check
 function my_ver() return "1.0.9.9.9.5" end
 -- TB3D re-written 08/15/2011
@@ -18,6 +18,7 @@ function my_ver() return "1.0.9.9.9.5" end
 -- Adatiroval: Idler.
 
 local string_find = string.find
+local translate = game.translate_string
 
 ---------- globals ----------------------
 dmx_transfer = false 											-- DMX MOD
@@ -1074,13 +1075,13 @@ function actor_binder:update(delta)
 		get_hud():AddCustomStatic("hud_save_warning")
 		local wnd=get_hud():GetCustomStatic("hud_save_warning"):wnd()
 		if self.critical==1 then
-		  wnd:SetTextST(game.translate_string("amk_warn_trans"))
+		  wnd:SetTextST(translate("amk_warn_trans"))
 		  self.critical=nil
 		elseif self.critical==2 then
-		  wnd:SetTextST(game.translate_string("amk_warn_trans_critical"))
+		  wnd:SetTextST(translate("amk_warn_trans_critical"))
 		  self.critical=nil
 		else
-		  wnd:SetTextST(game.translate_string("amk_warn_attention"))
+		  wnd:SetTextST(translate("amk_warn_attention"))
 		end
 		elseif self.wt and self.wt<time_now then
 		self.wt=nil

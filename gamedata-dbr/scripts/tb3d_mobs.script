@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.5 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.0.9.9.9.6 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
--- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns
-function my_ver() return "1.0.9.9.9.5" end
+-- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns
+function my_ver() return "1.0.9.9.9.6" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -22,16 +22,16 @@ local mobs = 0			--all other creatures
 local mob_list_npc = {
 	[1] = "tb3dm_bandit_novice",					--bandits
 	[2] = "tb3dm_bandit_snip",
-	[3] = "tb3dm_bandit_rpg",
-	[4] = "tb3dm_bandit_gas",
+	[3] = "tb3dm_bandit_gas",
+	[4] = "tb3dm_bandit_rpg",
 	
 	[5] = "tb3dm_stalker_veteran",					--stalkers
 	[6] = "tb3dm_stalker_nauch",
 	[7] = "tb3dm_stalker_resp",
 	[8] = "tb3dm_stalker_dark",
 
-	[9] = "tb3dm_zombied_mil",						--zombied
-	[10] = "tb3dm_zombied_regular",
+	[9] = "tb3dm_zombied_regular",					--zombied
+	[10] = "tb3dm_zombied_mil",	
 	[11] = "tb3dm_zombied_eco",
 	[12] = "tb3dm_zombied_nato",
 	
@@ -45,10 +45,10 @@ local mob_list_npc = {
 	[19] = "tb3dm_ecolog_resp",
 	[20] = "tb3dm_ecolog_sky",
 
-	[21] = "tb3dm_mon_monster",						--monolith
-	[22] = "tb3dm_mon_robot",
-	[23] = "tb3dm_mon_regular",
-	[24] = "tb3dm_mon_nauch",
+	[21] = "tb3dm_mon_regular",						--monolith
+	[22] = "tb3dm_mon_nauch",
+	[23] = "tb3dm_mon_robot",
+	[24] = "tb3dm_mon_monster",
 
 	[25] = "tb3dm_killer_nauch",					--killer
 	[26] = "tb3dm_killer_exo_unic",
@@ -133,23 +133,32 @@ local mob_list_night = {
 
 --type = {0=bandit, 1=stalker, 2=zombied, 3=military, 4=ecolog, 5=monolith, 6=killer}
 function spawn_npcs(x, y, z, lv, gv, type, max)
-	local mob = math_random(4)
-	if type > 0 then
-		mob = mob + (type * 4)
-	end
-	local name = mob_list_npc[mob]
-	local min = 1
-	if max > 9 then min = 4 end
+	local mob = 1
+	mob = mob + (type * 4)
+	local min = 2
+	if max <= min then max = min + 1
+	elseif max > 9 then min = 4 end
 	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
 	local cnt = math_floor(math_random(min, max) * flevel)
-	--if TB3D_Modders.hardcore_mobs then
-		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	--else
-		if cnt > max then cnt = max end
-	--end
-	if TB3D_Modders.use_mob_messages then
-		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] ["..name.."]")
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
 	end
+	if TB3D_Modders.use_mob_messages then
+		TB3D_Services.packet_alert("tb3d mobs: spawning npc["..utils.to_str(cnt).."] ["..mob.."]")
+	end
+	if cnt > 5 then			--109996, add stronger npc when spawning large numbers
+		alife():create(mob_list_npc[mob+3], vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
+	end
+	if cnt > 4 then
+		alife():create(mob_list_npc[mob+2], vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
+	end
+	if cnt > 3 then
+		alife():create(mob_list_npc[mob+1], vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
+	end
+	local name = mob_list_npc[mob]
 	for i=1, cnt do
 		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important, no smt id
 	end
@@ -159,9 +168,7 @@ end
 function spawn_mob(x, y, z, lv, gv, type, max)
 	local mob = math_random(4)		--pick one of the four in the group
 	local name
-	if type > 0 then
-		mob = mob + (type * 4)
-	end
+	mob = mob + (type * 4)
 	if TB3D_Services.is_night(false) == true then
 		name = mob_list_night[mob]
 	else
@@ -172,13 +179,11 @@ function spawn_mob(x, y, z, lv, gv, type, max)
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	--if TB3D_Modders.hardcore_mobs then
-		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	--else
-		if cnt > max then cnt = max end
-	--end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	end
 	if TB3D_Modders.use_mob_messages then
-		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] ["..name.."]")
+		TB3D_Services.packet_alert("tb3d mobs: spawning mob["..utils.to_str(cnt).."] ["..name.."]")
 	end
 	for i=1, cnt do
 		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
@@ -192,11 +197,6 @@ function spawn_rats(x, y, z, lv, gv, max)
 		if max > 9 then min = 4 end
 		local cnt = math_floor(math_random(min, max) * flevel)
 		if cnt < 1 then cnt = 1 end
-		--if TB3D_Modders.hardcore_mobs then
-			--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-		--else
-			if cnt > max then cnt = max end
-		--end
 		if TB3D_Modders.use_mob_messages then
 			TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_rat]")
 		end
@@ -212,11 +212,9 @@ function spawn_dogs(x, y, z, lv, gv, max)										--109989
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	--if TB3D_Modders.hardcore_mobs then
-		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	--else
-		if cnt > max then cnt = max end
-	--end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_dog_habaruch]")
 	end
@@ -231,11 +229,9 @@ function spawn_snorks(x, y, z, lv, gv, max)
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	--if TB3D_Modders.hardcore_mobs then
-		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	--else
-		if cnt > max then cnt = max end
-	--end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_snork_jumper]")
 	end
@@ -250,13 +246,23 @@ function spawn_bandits(x, y, z, lv, gv, max)									--109989
 	if max > 9 then min = 4 end
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
-	--if TB3D_Modders.hardcore_mobs then
-		--cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
-	--else
-		if cnt > max then cnt = max end
-	--end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	end
 	if TB3D_Modders.use_mob_messages then
-		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_bandit_novice]")
+		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [bandits]")
+	end
+	if cnt > 9 then			--109996, add stronger bandits when spawning large numbers
+		alife():create("tb3dm_bandit_rpg", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
+	end
+	if cnt > 7 then
+		alife():create("tb3dm_bandit_snip", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
+	end
+	if cnt > 5 then
+		alife():create("tb3dm_bandit_gas", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
 	end
 	for i=1, cnt do
 		alife():create("tb3dm_bandit_novice", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
@@ -265,14 +271,24 @@ end
 
 function spawn_killer_squad(x,y,z,lv,gv,type,cnt,is_signal)
 	if is_signal then TB3D_Triggers.signal_green(x,y+5,z,lv,gv) end				--109978
-	local mob = math_random(4)
-	if type > 0 then
-		mob = mob + (type * 4)
+	local mob = 1
+	mob = mob + (type * 4)
+	if TB3D_Modders.use_mob_messages then
+		TB3D_Services.packet_alert("tb3d mobs: killer squad["..utils.to_str(cnt).."] ["..mob.."]")
+	end
+	if cnt > 9 then			--109996, add stronger killers when spawning large numbers
+		alife():create(mob_list_npc[mob+3], vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
+	end
+	if cnt > 7 then
+		alife():create(mob_list_npc[mob+2], vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
+	end
+	if cnt > 5 then
+		alife():create(mob_list_npc[mob+1], vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		cnt = cnt - 1
 	end
 	local name = mob_list_npc[mob]
-	if TB3D_Modders.use_mob_messages then
-		TB3D_Services.packet_alert("tb3d mobs: killer squad["..utils.to_str(cnt).."] ["..name.."]")
-	end
 	for i=1, cnt do
 		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important, no smt id
 	end
@@ -964,7 +980,7 @@ function check_mil_spawns(spawns)				--109984
 end
 
 function check_npp1_spawns()
-	local typ, qty = 5,6			--monolith
+	local typ, qty = 5,4			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 10
@@ -978,7 +994,7 @@ function check_npp1_spawns()
 		spawn_mob(1049.885,-0.601,-38.601,468261,2394, typ, qty)		--corner of courtyard near train cars
 		spawn_mob(1031.139,-0.001,-130.792,461308,2397, typ, qty)		--under powerline tower at curve
 		spawn_mob(928.612,-0.003,-193.994,411661,2285, typ, qty)		--behind main sign
-		spawn_mob(890.149,-0.066,-309.573,399362,2401, typ, qty)		--main entrance in corner
+		spawn_mob(924.662,-0.101,-399.231,394342,2400, typ, qty)		--109996, main entrance
 	else
 		spawn_npcs(223.990,4.798,-94.440,94165,2389, typ, qty)
 		spawn_npcs(278.937,-0.001,-220.131,115565,2350, typ, qty)
@@ -990,12 +1006,12 @@ function check_npp1_spawns()
 		spawn_npcs(1049.885,-0.601,-38.601,468261,2394, typ, qty)
 		spawn_npcs(1031.139,-0.001,-130.792,461308,2397, typ, qty)
 		spawn_npcs(928.612,-0.003,-193.994,411661,2285, typ, qty)
-		spawn_npcs(890.149,-0.066,-309.573,399362,2401, typ, qty)
+		spawn_npcs(924.662,-0.101,-399.231,394342,2400, typ, qty)
 	end
 end
 
 function check_npp2_spawns()
-	local typ, qty = 5,6			--monolith
+	local typ, qty = 5,4			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 20

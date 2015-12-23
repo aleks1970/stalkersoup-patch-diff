@@ -1,9 +1,10 @@
--- TB3D 1.0.9.9.8.9   fixed conditions for Collector, removed fake_ from item sections, cube dialog, give talk message, debug, fation changes
+-- TB3D 1.0.9.9.8.9   fixed conditions for Collector, removed fake_ from item sections, cube dialog, give talk message, debug, fation changes, translate
 function my_ver() return "1.0.9.9.8.9" end
 ---------------------------------------------------------------------
 -- Trader Repair
 -----------------------------------------------------------------------------------
 
+local translate = game.translate_string
 local weapon_profit_margin = 4
 local armor_profit_margin = 1.5
 
@@ -89,21 +90,21 @@ function repair_costs(first_speaker, second_speaker)
 		if item_in_slot_1 ~= nil then 
 			item_repair_cost = math.floor( (1-item_in_slot_1:condition()) * item_in_slot_1:cost() * weapon_profit_margin )
 			if item_repair_cost > 0 then
-				item_name_and_price = game.translate_string("list_trader_repair_0").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
+				item_name_and_price = translate("list_trader_repair_0").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
 				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 			end
 		end
 		if item_in_slot_2 ~= nil then
 			item_repair_cost = math.floor( (1-item_in_slot_2:condition()) * item_in_slot_2:cost() * weapon_profit_margin )
 			if item_repair_cost > 0 then
-				item_name_and_price = game.translate_string("list_trader_repair_1").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
+				item_name_and_price = translate("list_trader_repair_1").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
 				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 			end
 		end
 		if item_in_slot_6 ~= nil then
 			item_repair_cost = math.floor( (1-item_in_slot_6:condition()) * item_in_slot_6:cost() * armor_profit_margin )
 			if item_repair_cost > 0 then
-				item_name_and_price = game.translate_string("list_trader_repair_2").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
+				item_name_and_price = translate("list_trader_repair_2").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
 				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 			end
 		end
@@ -188,8 +189,8 @@ end
 
 function doc_x8(obj)
 	alife():create("bibliotekar",vector():set(140.922,-0.367,220.575),370139,3769)
-	news_manager.amk_send_tip("I got to the apartment, Shadows and Pavel were, Cube was not. But I found interesting about the notebook night incident in the laboratory... Karoche after all that happened, our friend went back to the lab. Apparently, so did not come out of there...\\nBy the way there yet sink a strange - entry is repeated constantly. To record the conversation sort of military...\\nWhat do you think?", "Labeled: a private channel", 10, 20, "actor_sms")
-	news_manager.amk_send_tip("I think that's what - you have to move. We're in trouble - our last conversation overheard. And maybe someone else knew about the Cube ... Maybe the one who let you tip me...\\nIn general the eastern part of Pripyat is now occupied by a fit squad of mercenaries. They know what you're looking for the Cube in the apartment...\\nWe must make them believe otherwise. You do not want trouble? You can try to merge the disinformation to the stalker network...\\nTry to write in the chat via PDA: 'Cube for Sale, belonged to Shadows. The cordon around the Perimeter, in 8 hours.'\\nWrite exactly as I wrote, then maybe they will think you already took the Cube ... Try.", "Shadows: private channel", 30, 50)
+	news_manager.amk_send_tip(translate("shadows_and_pavel_1"), translate("Labeled_private_channel_0"), 10, 20, "actor_sms")
+	news_manager.amk_send_tip(translate("shadows_and_pavel_2"), translate("Shadows_private_channel_0"), 30, 50)
 	TB3D_Triggers.spawn_alife("werewolf",-49.974,-0.507,-71.471,139443,3759, 2)
 	TB3D_Triggers.spawn_alife("werewolf",140.922,-0.367,220.575,370139,3769, 2)
 	dmx_mod.pripyat_base_spawn()
@@ -601,7 +602,7 @@ function factions_repair_checkstalker(first_speaker, second_speaker)
     local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
 	if (gulag) then
 		if gulag:npc_is_enemy_to_anybody(db.actor) and db.actor:money() >= 250000 then
-			item_name_and_price = game.translate_string("list_factions_repair_4").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			item_name_and_price = translate("list_factions_repair_4").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 		end
 	end
@@ -630,11 +631,11 @@ function factions_repair_checkduty(first_speaker, second_speaker)
 		if chkgoodwill > -100 and db.actor:money() >= 250000 then howmuch = 250000 	end
 		if chkgoodwill < -100 and chkgoodwill >= -1000 and db.actor:money() >= 250000 then howmuch = 250000 end
 		if chkgoodwill < -1000 and db.actor:money() >= 350000 then howmuch = 350000 end
-		item_name_and_price = game.translate_string("list_factions_repair_0").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_0").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	  elseif (relation_registry.community_goodwill ("dolg", db.actor:id()) >= 0) and (db.actor:money() >= 250000) then
 		howmuch = 250000
-		item_name_and_price = game.translate_string("list_factions_repair_1").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_1").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	  end
     end
@@ -650,11 +651,11 @@ function factions_repair_checkfree(first_speaker, second_speaker)
 		if chkgoodwill > -100 and db.actor:money() >= 250000 then howmuch = 250000 end
 		if chkgoodwill < -100 and chkgoodwill >= -1000 and db.actor:money() >= 350000 then howmuch = 350000 end
 		if chkgoodwill < -1000 and  db.actor:money() >= 350000 then howmuch = 350000 end
-		item_name_and_price = game.translate_string("list_factions_repair_2").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_2").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	elseif (relation_registry.community_goodwill ("freedom", db.actor:id()) >= 0) and (db.actor:money() >= 350000) then
 		howmuch = 350000
-		item_name_and_price = game.translate_string("list_factions_repair_3").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_3").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	end
   end
@@ -727,7 +728,7 @@ function factions_repair_checkmonolith(first_speaker, second_speaker)
 	local item_name_and_price = ""
 	local howmuch = 250000
 		if  db.actor:money() >= 250000 then
-			item_name_and_price = game.translate_string("list_factions_repair_5").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			item_name_and_price = translate("list_factions_repair_5").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 		end
 end
@@ -761,7 +762,7 @@ function factions_repair_checkbandit(first_speaker, second_speaker)
 	local item_name_and_price = ""
 	local howmuch = 250000
 		if  db.actor:money() >= 250000 then
-			item_name_and_price = game.translate_string("list_factions_repair_7").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			item_name_and_price = translate("list_factions_repair_7").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 		end
 end
@@ -794,7 +795,7 @@ function factions_repair_checkmil(first_speaker, second_speaker)
 	local item_name_and_price = ""
 	local howmuch = 400000
 	if  db.actor:money() >= 400000 then
-		item_name_and_price = game.translate_string("list_factions_repair_6").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_6").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	end
 end
@@ -827,7 +828,7 @@ function factions_repair_checkkill(first_speaker, second_speaker)
 	local item_name_and_price = ""
 	local howmuch = 300000
 	if  db.actor:money() >= 300000 then
-		item_name_and_price = game.translate_string("list_factions_repair_8").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_8").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	end
 end
@@ -858,7 +859,7 @@ function factions_repair_checkeco(first_speaker, second_speaker)
 	local item_name_and_price = ""
 	local howmuch = 500000
 	if db.actor:money() >= 300000 then
-		item_name_and_price = game.translate_string("list_factions_repair_10").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_10").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	end
 end
@@ -890,7 +891,7 @@ function factions_repair_checkquit(first_speaker, second_speaker)
 	local item_name_and_price = ""
 	local howmuch = 250000
 	if  db.actor:money() >= 250000 then
-		item_name_and_price = game.translate_string("list_factions_repair_9").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		item_name_and_price = translate("list_factions_repair_9").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	end
 end

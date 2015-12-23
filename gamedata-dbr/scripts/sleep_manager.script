@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.7 added my_ver, fixed times,removed amk corpses 
-function my_ver() return "1.0.9.9.7.7" end
+--TB3D 1.0.9.9.9.6 added my_ver, fixed times,removed amk corpses, dream 
+function my_ver() return "1.0.9.9.9.6" end
 -- -----------------------------
 --  DreamMod v0.2 by Ab@dDon ---
 -- -----------------------------
@@ -28,7 +28,7 @@ function main(scale)
 	db.actor:stop_talk()
 	--bind_stalker.hide_weapon()
 	level.disable_input()
-	sleep_manager.hp_corrector(scale)
+	--sleep_manager.hp_corrector(scale)
 	sleep_manager.starter(scale)
 	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: main done") end
 end
@@ -44,11 +44,14 @@ end
 function dreamer()
 	--TB3D_Services.time_resync()	--resync time of day
 	if sleep_manager.is_sleep_active() then
-		sleep_manager.hp_corrector(0)
+		--sleep_manager.hp_corrector(0)
 		local dream = dream.sleep_video_name_callback()
-	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: dreamer start") end
-		if dream ~= "" then game.start_tutorial(dream)
-		else game.start_tutorial("without_dream") end
+		if dream and dream ~= "" then		--109996
+			if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: dreamer start") end
+			game.start_tutorial(dream)
+		else
+			game.start_tutorial("without_dream")
+		end
 	end
 end
 
@@ -77,7 +80,6 @@ function hp_corrector(fr)
 	if fr ~= 0 then
 		hp = fr/6 + db.actor.health
 		if hp > 1 then hp = 1 end
-		return
 	elseif db.actor.health > hp then 
 		db.actor.health = hp - db.actor.health
 	end

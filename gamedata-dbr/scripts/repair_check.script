@@ -1,11 +1,17 @@
---TB3D 1.0.9.9.4.4	added upgrade lines 522-541
+--TB3D 1.0.9.9.4.4	added upgrade lines 522-541, translate
+--[[-------------------------------------------------------------------------------------------------------------
+ File         : repair_check.script
+ Description  : Advanced Trader Weapon Repair v.1.1
+ Copyright    : AMK Team, StalkerSoup
+ Author       : Basic functions by AMK Team, advanced functions by Black 777 Team (Wlad777 and BlackyBPG)
+ Rewritten    : rewritten and added to the horseradish by RAY, translated for StalkerSoup by aleks1970 07/23/2015
+ LastUpdate   : 24.07.2015 by aleks1970
+--]]-------------------------------------------------------------------------------------------------------------
 function my_ver() return "1.0.9.9.4.4" end
--- Advanced Trader Weapon Repair v.1.1
 
--- Basic functions by AMK Team, advanced functions by Black 777 Team (Wlad777 and BlackyBPG)
---------------------------------------------------------------------------------------------------------
-
--- rewritten and added to the horseradish by RAY
+local math_floor = math.floor
+local string_find = string.find
+local translate = game.translate_string
 
 local weapon_profit_margin = 4
 local armor_profit_margin = 4
@@ -15,11 +21,61 @@ local rem_ubit_stvol_2 = 0
 local is_perv = 0
 local is_vtor = 0
 
-local is_upgr_kalibr = false          -- weapons available to change the caliber
-local is_upgr_otdaca = false   -- weapons available to upgrade the recoil
-local is_upgr_ves = false   -- weapons available for weight loss
+local is_upgr_kalibr = false	-- weapons available to change the caliber
+local is_upgr_otdaca = false	-- weapons available to upgrade the recoil
+local is_upgr_ves = false		-- weapons available for weight loss
 local nomer_massiva = 0
 
+-- ------------------------------ local text ------------------------------
+local your_sidearm = translate("repair_check_msg1")
+local inc_accuracy = translate("repair_check_msg2")
+local reduce_weight = translate("repair_check_msg3")
+local cant_repair = translate("repair_check_msg4")
+local following_upgrades = translate("repair_check_msg5")
+local will_cost = translate("repair_check_msg6")
+local would_cost = translate("repair_check_msg7")
+local calibre_5_45_39mm_5_56_45mm = translate("repair_check_msg8")
+local calibre_5_56_45mm_5_45_39mm = translate("repair_check_msg9")
+local calibre_9_18mm_9_19mm = translate("repair_check_msg10")
+local calibre_9_19mm_9_18mm = translate("repair_check_msg11")
+local slightly_damaged = translate("repair_check_msg12")
+local your_primary = translate("repair_check_msg13")
+local rubles_def_1 = translate("repair_check_msg14")
+local dont_have_money = translate("repair_check_msg15")
+local cannot_repair = translate("repair_check_msg16")
+local armor_conditi = translate("repair_check_msg17")
+local your_Agreed = translate("repair_check_msg18")
+local have_not_money = translate("repair_check_msg19")
+local for_repairs = translate("repair_check_msg20")
+local quite_damaged = translate("repair_check_msg21")
+local to_repair = translate("repair_check_msg22")
+local work_of_lanky = translate("repair_check_msg23")
+local must_pay_me = translate("repair_check_msg24")
+local similar_weapon = translate("repair_check_msg25")
+local enough_money_p = translate("repair_check_msg26")
+local weapon_spare_p = translate("repair_check_msg27")
+local to_repair_it = translate("repair_check_msg28")
+local for_repairs_it = translate("repair_check_msg29")
+local give_me_it = translate("repair_check_msg30")
+local damage_by_perc = translate("repair_check_msg31")
+local what_do_you_s = translate("repair_check_msg32")
+local spare_parts_2 = translate("repair_check_msg33")
+local spare_parts_3 = translate("repair_check_msg34")
+local spare_parts_4 = translate("repair_check_msg35")
+local spare_parts_5 = translate("repair_check_msg36")
+local spare_parts_6 = translate("repair_check_msg37")
+local math_rubles = translate("repair_check_msg38")
+local spare_parts_7 = translate("repair_check_msg39")
+local spare_parts_8 = translate("repair_check_msg40")
+local spare_parts_9 = translate("repair_check_msg41")
+local spare_parts_10 = translate("repair_check_msg42")
+local gretings_wario = translate("repair_check_msg43")
+local you_left_here = translate("repair_check_msg44")
+local your_trunk_0 = translate("repair_check_msg45")
+local quick_travel = translate("repair_check_msg46")
+local cant_upgrade_1 = translate("repair_check_msg47")
+local cant_upgrade_2 = translate("repair_check_msg48")
+-- ---- texts are in the "string_table_tips.xml" file - aleks1970 -----
 
 -- array of "comparable" barrels, rules, themselves, made from noodle for tests
 
@@ -334,43 +390,43 @@ function upgrade_costs(trader, actor, first_speaker, second_speaker)
 			local wep_1 =  is_upgrade_kalibr(item_in_slot_1:section())
 			local wep_2 =  is_upgrade_otdaca(item_in_slot_1:section())
 			local wep_3 =  is_upgrade_ves(item_in_slot_1:section())
-			local item_upgr_cost1 = math.floor( item_in_slot_1:cost() * 2 )
+			local item_upgr_cost1 = math_floor( item_in_slot_1:cost() * 2 )
 			local name1 = read_string_if_exist(system_ini(),item_in_slot_1:section(),"inv_name",nil)
 			
 			if wep_1 == nil and wep_2 == nil and wep_3 == nil then
-				news_manager.give_talk_message("So, in regards to your sidearm "..game.translate_string(name1)..". I can't repair it..."   , task_texture, task_rect, "iconed_trade_info")
+				news_manager.give_talk_message(your_sidearm.." "..translate(name1)..cant_upgrade_1 , task_texture, task_rect, "iconed_trade_info")
 			elseif (0.96 >= item_in_slot_1:condition() + 0.01) then
-				news_manager.give_talk_message("So, in regards to your sidearm   "..game.translate_string(name1)..". It appears to be slightly damaged - I shall not undertake any work on it. Repair it yourself first, and then I can upgrade it." , task_texture, task_rect, "iconed_trade_info")
+				news_manager.give_talk_message(your_sidearm.." "..translate(name1)..slightly_damaged , task_texture, task_rect, "iconed_trade_info")
 			else
-				str_text_1 = "So, in regards to your sidearm "..game.translate_string(name1)..". I can offer you the following upgrades:"
+				str_text_1 = your_sidearm.." "..translate(name1)..following_upgrades
 				if wep_1 ~= nil then
 					if (nomer_massiva == 1) and (db.actor:money() >= item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 5.45x39mm to 5.56x45mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost1.." rubles%c[default]."
+						str_text_1 = str_text_1..calibre_5_45_39mm_5_56_45mm.." "..will_cost..item_upgr_cost1.." "..rubles_def_1
 					elseif (nomer_massiva == 1) and (db.actor:money() < item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 5.45x39mm to 5.56x45mm .. It would cost you \\n%c[255,255,32,23]"..item_upgr_cost1.." rubles%c[default], but, you don't appear to have the money.."
+						str_text_1 = str_text_1..calibre_5_45_39mm_5_56_45mm.." "..would_cost..item_upgr_cost1.." "..dont_have_money
 					elseif (nomer_massiva == 2) and (db.actor:money() >= item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 9x18mm to 9x19mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost1.." rubles%c[default]."
+						str_text_1 = str_text_1..calibre_9_18mm_9_19mm.." "..will_cost..item_upgr_cost1.." "..rubles_def_1
 					elseif (nomer_massiva == 2) and (db.actor:money() < item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 9x18mm to 9x19mm .. It would cost you \\n%c[255,255,32,23]"..item_upgr_cost1.." rubles%c[default], but, you don't appear to have the money.."
+						str_text_1 = str_text_1..calibre_9_18mm_9_19mm.." "..would_cost..item_upgr_cost1.." "..dont_have_money
 					elseif (nomer_massiva == 3) and (db.actor:money() >= item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 9x19mm to 9x18mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost1.." rubles%c[default]."
+						str_text_1 = str_text_1..calibre_9_19mm_9_18mm.." "..will_cost..item_upgr_cost1.." "..rubles_def_1
 					elseif (nomer_massiva == 3) and (db.actor:money() < item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 9x19mm to 9x18mm .. It would cost you \\n%c[255,255,32,23]"..item_upgr_cost1.." rubles%c[default], but, you don't appear to have the money.."
+						str_text_1 = str_text_1..calibre_9_19mm_9_18mm.." "..would_cost..item_upgr_cost1.." "..dont_have_money
 					elseif (nomer_massiva == 4) and (db.actor:money() >= item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 5.56x45mm to 5.45x39mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost1.." rubles%c[default]."
+						str_text_1 = str_text_1..calibre_5_56_45mm_5_45_39mm.." "..will_cost..item_upgr_cost1.." "..rubles_def_1
 					elseif (nomer_massiva == 4) and (db.actor:money() < item_upgr_cost1) then
-						str_text_1 = str_text_1.."\\n   - Change the calibre from 5.56x45mm to 5.45x39mm .. It would cost you\\n%c[255,255,32,23]"..item_upgr_cost1.." rubles%c[default], but, you don't appear to have the money.."
+						str_text_1 = str_text_1..calibre_5_56_45mm_5_45_39mm.." "..would_cost..item_upgr_cost1.." "..dont_have_money
 					end
 				end
 				if (wep_2 ~= nil) and (db.actor:money() >= item_upgr_cost1) then
-					str_text_1 = str_text_1.."\\n   - Increased accuracy ..  It will cost %c[255,238,155,23]"..item_upgr_cost1.." rubles%c[default]."
+					str_text_1 = str_text_1..inc_accuracy.." "..will_cost..item_upgr_cost1.." "..rubles_def_1
 				elseif (wep_2 ~= nil) and (db.actor:money() < item_upgr_cost1) then
-					str_text_1 = str_text_1.."\\n   - Increased accuracy ..  It would cost you \\n%c[255,255,32,23]"..item_upgr_cost1.." rubles%c[default], but, you don't appear to have the money.."
+					str_text_1 = str_text_1..inc_accuracy.." "..would_cost..item_upgr_cost1.." "..dont_have_money
 				end
 				if (wep_3 ~= nil) and (db.actor:money() >= item_upgr_cost1) then
-					str_text_1 = str_text_1.."\\n   - Reduce the weight ..  It will cost %c[255,238,155,23]"..item_upgr_cost1.." rubles%c[default]."
+					str_text_1 = str_text_1..reduce_weight.." "..will_cost..item_upgr_cost1.." "..rubles_def_1
 				elseif (wep_3 ~= nil) and (db.actor:money() < item_upgr_cost1) then
-					str_text_1 = str_text_1.."\\n   - Reduce the weight ..  It would cost you \\n%c[255,255,32,23]"..item_upgr_cost1.." rubles%c[default], but, you don't appear to have the money.."
+					str_text_1 = str_text_1..reduce_weight.." "..would_cost..item_upgr_cost1.." "..dont_have_money
 				end
 			end
 
@@ -382,45 +438,44 @@ function upgrade_costs(trader, actor, first_speaker, second_speaker)
 			local wep_1 =  is_upgrade_kalibr(item_in_slot_2:section())
 			local wep_2 =  is_upgrade_otdaca(item_in_slot_2:section())
 			local wep_3 =  is_upgrade_ves(item_in_slot_2:section())
-			local item_upgr_cost2 = math.floor( item_in_slot_2:cost() * 2 )
+			local item_upgr_cost2 = math_floor( item_in_slot_2:cost() * 2 )
 			local name2 = read_string_if_exist(system_ini(),item_in_slot_2:section(),"inv_name",nil)
 			
 			if wep_1 == nil and wep_2 == nil and wep_3 == nil then
 				get_console():execute("1")
-
-				news_manager.give_talk_message("Ah, in regards to your primary weapon  "..game.translate_string(name2)..". I cannot repair it.."   , task_texture, task_rect, "iconed_trade_info")
+				news_manager.give_talk_message(your_primary.." "..translate(name2)..cant_upgrade_2 , task_texture, task_rect, "iconed_trade_info")
 			elseif (0.96 >= item_in_slot_2:condition() + 0.01) then
-				news_manager.give_talk_message("Ah, in regards to your primary weapon "..game.translate_string(name2)..". It appears to be slightly damaged - I shall not undertake any work on it. Repair it yourself first, and then I can upgrade it." , task_texture, task_rect, "iconed_trade_info")
+				news_manager.give_talk_message(your_primary.." "..translate(name2)..slightly_damaged , task_texture, task_rect, "iconed_trade_info")
 			else
-				str_text_2 = "Ah, in regards to your primary weapon  "..game.translate_string(name2)..". I can offer you the following upgrades:"
+				str_text_2 = your_primary.." "..translate(name2)..following_upgrades
 				if wep_1 ~= nil then
 					if (nomer_massiva == 1) and (db.actor:money() >= item_upgr_cost2) then
-						str_text_2 = str_text_2.."\\n   - Change the calibre from 5.45x39mm to 5.56x45mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost2.." rubles%c[default]."
+						str_text_2 = str_text_2..calibre_5_45_39mm_5_56_45mm.." "..will_cost..item_upgr_cost2.." "..rubles_def_1
 					elseif (nomer_massiva == 1) and (db.actor:money() < item_upgr_cost2) then
-						str_text_2 = str_text_2.."\\n   - Change the calibre from 5.45x39mm to 5.56x45mm .. It would cost you \\n%c[255,255,32,23]"..item_upgr_cost2.." rubles%c[default], but, you don't appear to have the money.."
+						str_text_2 = str_text_2..calibre_5_45_39mm_5_56_45mm.." "..would_cost..item_upgr_cost2.." "..dont_have_money
 					elseif (nomer_massiva == 2) and (db.actor:money() >= item_upgr_cost2) then
-						str_text_2 = str_text_2.."\\n   - Change the calibre from 9x18mm to 9x19mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost2.." rubles%c[default]."
+						str_text_2 = str_text_2..calibre_9_18mm_9_19mm.." "..will_cost..item_upgr_cost2.." "..rubles_def_1
 					elseif (nomer_massiva == 2) and (db.actor:money() < item_upgr_cost2) then
-						str_text_2 = str_text_2.."\\n   - Change the calibre from 9x18mm to 9x19mm .. It would cost you \\n%c[255,255,32,23]"..item_upgr_cost2.." rubles%c[default], but, you don't appear to have the money.."
+						str_text_2 = str_text_2..calibre_9_18mm_9_19mm.." "..would_cost..item_upgr_cost2.." "..dont_have_money
 					elseif (nomer_massiva == 3) and (db.actor:money() >= item_upgr_cost2) then
-						str_text_2 = str_text_2.."\\n   - Change the calibre from 9x19mm to 9x18mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost2.." rubles%c[default]."
+						str_text_2 = str_text_2..calibre_9_19mm_9_18mm.." "..will_cost..item_upgr_cost2.." "..rubles_def_1
 					elseif (nomer_massiva == 3) and (db.actor:money() < item_upgr_cost2) then
-						str_text_2 = str_text_2.."\\n   - Change the calibre from 9x19mm to 9x18mm .. It would cost you \\n%c[255,255,32,23]"..item_upgr_cost2.." rubles%c[default], but, you don't appear to have the money.."
+						str_text_2 = str_text_2..calibre_9_19mm_9_18mm.." "..would_cost..item_upgr_cost2.." "..dont_have_money
 					elseif (nomer_massiva == 4) and (db.actor:money() >= item_upgr_cost2) then
-						str_text_2 = str_text_2.."\\n   - Change the calibre from 5.56x45mm to 5.45x39mm .. It will cost \\n%c[255,238,155,23]"..item_upgr_cost2.." rubles%c[default]."
+						str_text_2 = str_text_2..calibre_5_56_45mm_5_45_39mm.." "..will_cost..item_upgr_cost2.." "..rubles_def_1
 					elseif (nomer_massiva == 4) and (db.actor:money() < item_upgr_cost2) then
-						dstr_text_2 = str_text_2.."\\n   - Change the calibre from 5.56x45mm to 5.45x39mm .. It would cost you \\n%c[255,255,32,23]"..item_upgr_cost2.." rubles%c[default], but, you don't appear to have the money.."
+						dstr_text_2 = str_text_2..calibre_5_56_45mm_5_45_39mm.." "..would_cost..item_upgr_cost2.." "..dont_have_money
 					end
 				end
 				if (wep_2 ~= nil) and (db.actor:money() >= item_upgr_cost2) then
-					str_text_2 = str_text_2.."\\n   - Increased accuracy ..  It will cost %c[255,238,155,23]"..item_upgr_cost2.." rubles%c[default]."
+					str_text_2 = str_text_2..inc_accuracy.." "..will_cost..item_upgr_cost2.." "..rubles_def_1
 				elseif (wep_2 ~= nil) and (db.actor:money() < item_upgr_cost2) then
-					str_text_2 = str_text_2.."\\n   - Increased accuracy ..  It would cost you \\n%c[255,255,32,23]"..item_upgr_cost2.." rubles%c[default], but, you don't appear to have the money.."
+					str_text_2 = str_text_2..inc_accuracy.." "..would_cost..item_upgr_cost2.." "..dont_have_money
 				end
 				if (wep_3 ~= nil) and (db.actor:money() >= item_upgr_cost2) then
-					str_text_2 = str_text_2.."\\n   - Reduce the weight ..  It will cost %c[255,238,155,23]"..item_upgr_cost2.." rubles%c[default]."
+					str_text_2 = str_text_2..reduce_weight.." "..will_cost..item_upgr_cost2.." "..rubles_def_1
 				elseif (wep_3 ~= nil) and (db.actor:money() < item_upgr_cost2) then
-					str_text_2 = str_text_2.."\\n   - Reduce the weight ..  It would cost you \\n%c[255,255,32,23]"..item_upgr_cost2.." rubles%c[default], but, you don't appear to have the money.."
+					str_text_2 = str_text_2..reduce_weight.." "..would_cost..item_upgr_cost2.." "..dont_have_money
 				end
 			end
 
@@ -439,7 +494,7 @@ function trader_check_money_upgr_s1(actor, trader)
 	local item_in_slot = db.actor:item_in_slot(1)
 
 	if (item_in_slot ~= nil) then 
-		local item_upgr_cost1 = math.floor(item_in_slot:cost() * 2 )
+		local item_upgr_cost1 = math_floor(item_in_slot:cost() * 2 )
 		if (item_upgr_cost1 > 0) and (db.actor:money() >= item_upgr_cost1) and (0.96 < item_in_slot:condition() + 0.01) then
 			return true
 		else 
@@ -452,7 +507,7 @@ function trader_check_money_upgr_s2(actor, trader)
 	local item_in_slot = db.actor:item_in_slot(2)
 
 	if (item_in_slot ~= nil) then 
-		local item_upgr_cost2 = math.floor(item_in_slot:cost() * 2 )
+		local item_upgr_cost2 = math_floor(item_in_slot:cost() * 2 )
 		if (item_upgr_cost2 > 0) and (db.actor:money() >= item_upgr_cost2) and (0.96 < item_in_slot:condition() + 0.01) then
 			return true
 		else 
@@ -469,7 +524,7 @@ function trader_upgrade_weapon_s1_kalibr(actor, trader)
 	if item_in_slot ~= nil then
 		local var = repairmasterlist[trader:name()][1]
 		local wpn = item_in_slot:section()
-		local item_repair_cost = math.floor(item_in_slot:cost() * 2)
+		local item_repair_cost = math_floor(item_in_slot:cost() * 2)
 		tt = 3
 		local wep_1 =  is_upgrade_kalibr(item_in_slot:section())
 		local new_wpn = nil
@@ -488,7 +543,7 @@ function trader_upgrade_weapon_s1_otdaca(actor, trader)
 	if item_in_slot ~= nil then
 		local var = repairmasterlist[trader:name()][1]
 		local wpn = item_in_slot:section()
-		local item_repair_cost = math.floor(item_in_slot:cost() * 2)
+		local item_repair_cost = math_floor(item_in_slot:cost() * 2)
 		tt = 3
 		local wep_2 =  is_upgrade_otdaca(item_in_slot:section())
 		local new_wpn = nil
@@ -507,7 +562,7 @@ function trader_upgrade_weapon_s1_ves(actor, trader)
 	if item_in_slot ~= nil then
 		local var = repairmasterlist[trader:name()][1]
 		local wpn = item_in_slot:section()
-		local item_repair_cost = math.floor(item_in_slot:cost() * 2)
+		local item_repair_cost = math_floor(item_in_slot:cost() * 2)
 		tt = 3
 		local wep_3 =  is_upgrade_ves(item_in_slot:section())
 		local new_wpn = nil
@@ -526,7 +581,7 @@ function trader_upgrade_weapon_s2_kalibr(actor, trader)
 	if item_in_slot ~= nil then
 		local var = repairmasterlist[trader:name()][1]
 		local wpn = item_in_slot:section()
-		local item_repair_cost = math.floor(item_in_slot:cost() * 2)
+		local item_repair_cost = math_floor(item_in_slot:cost() * 2)
 		tt = 3
 		local wep_1 =  is_upgrade_kalibr(item_in_slot:section())
 		local new_wpn = nil
@@ -545,7 +600,7 @@ function trader_upgrade_weapon_s2_otdaca(actor, trader)
 	if item_in_slot ~= nil then
 		local var = repairmasterlist[trader:name()][1]
 		local wpn = item_in_slot:section()
-		local item_repair_cost = math.floor(item_in_slot:cost() * 2)
+		local item_repair_cost = math_floor(item_in_slot:cost() * 2)
 		tt = 3
 		local wep_2 =  is_upgrade_otdaca(item_in_slot:section())
 		local new_wpn = nil
@@ -564,7 +619,7 @@ function trader_upgrade_weapon_s2_ves(actor, trader)
 	if item_in_slot ~= nil then
 		local var = repairmasterlist[trader:name()][1]
 		local wpn = item_in_slot:section()
-		local item_repair_cost = math.floor(item_in_slot:cost() * 2)
+		local item_repair_cost = math_floor(item_in_slot:cost() * 2)
 		tt = 3
 		local wep_3 =  is_upgrade_ves(item_in_slot:section())
 		local new_wpn = nil
@@ -629,21 +684,21 @@ function trader_check_money_s1(actor, trader)
 
 	local is_upgr = 0
 	if (item_in_slot ~= nil) then 
-		if (string.find(item_in_slot:section(),"kalibr")~=nil) or (string.find(item_in_slot:section(),"otdaca")~=nil) or (string.find(item_in_slot:section(),"ves")~=nil) then
+		if (string_find(item_in_slot:section(),"kalibr")~=nil) or (string_find(item_in_slot:section(),"otdaca")~=nil) or (string_find(item_in_slot:section(),"ves")~=nil) then
 			is_upgr = 1
 		end 
 	end
 
 	if (rem_name ~= "hnd_weap_04") and (item_in_slot ~= nil) and (0.11 < item_in_slot:condition() + 0.01) and (is_upgr ~= 1) then 
 		weapon_profit_margin = repairmasterlist[trader:name()][2]
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
 		if item_repair_cost > 0 and db.actor:money() >= item_repair_cost and 0.95 > item_in_slot:condition() then
 			tmpcode = 0
 			return check_secondary(item_in_slot:section())
 		end 
 	elseif (rem_name == "hnd_weap_04") and (item_in_slot ~= nil) then 
 		weapon_profit_margin = repairmasterlist[trader:name()][2]
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
 		if (is_upgr == 1) then
 			item_repair_cost = item_repair_cost * 2
 		end
@@ -667,21 +722,21 @@ function trader_check_money_s2(actor, trader)
 
 	local is_upgr = 0
 	if (item_in_slot ~= nil) then 
-		if (string.find(item_in_slot:section(),"kalibr")~=nil) or (string.find(item_in_slot:section(),"otdaca")~=nil) or (string.find(item_in_slot:section(),"ves")~=nil) then
+		if (string_find(item_in_slot:section(),"kalibr")~=nil) or (string_find(item_in_slot:section(),"otdaca")~=nil) or (string_find(item_in_slot:section(),"ves")~=nil) then
 			is_upgr = 1
 		end 
 	end
 
 	if (rem_name ~= "hnd_weap_04") and  (item_in_slot ~= nil) and (0.11 < item_in_slot:condition() + 0.01) and (is_upgr ~= 1) then 
 		weapon_profit_margin = repairmasterlist[trader:name()][2]
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
 		if item_repair_cost > 0 and db.actor:money() >= item_repair_cost and 0.95 > item_in_slot:condition() then
 			tmpcode = 0
 			return check_secondary(item_in_slot:section())
 		end 
 	elseif (rem_name == "hnd_weap_04") and  (item_in_slot ~= nil)  then 
 		weapon_profit_margin = repairmasterlist[trader:name()][2]
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
 		if (is_upgr == 1) then
 			item_repair_cost = item_repair_cost * 2
 		end
@@ -702,7 +757,7 @@ function trader_check_money_s6(actor, trader)
 	local item_in_slot = db.actor:item_in_slot(6)
 	if item_in_slot ~= nil then 
 		armor_profit_margin = repairmasterlist[trader:name()][3]
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * armor_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * armor_profit_margin )
 		if item_repair_cost > 0 and db.actor:money() >= item_repair_cost and 0.95 > item_in_slot:condition() then
 			return true
 		end 
@@ -718,9 +773,9 @@ function trader_repiar_weapon_s1(actor, trader)
 		local wpn = item_in_slot:section()
 		local var = repairmasterlist[trader:name()][1]
 		weapon_profit_margin = repairmasterlist[trader:name()][2]
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
 		local is_upgr = 0
-		if (string.find(wpn,"kalibr")~=nil) or (string.find(wpn,"otdaca")~=nil) or (string.find(wpn,"ves")~=nil) then
+		if (string_find(wpn,"kalibr")~=nil) or (string_find(wpn,"otdaca")~=nil) or (string_find(wpn,"ves")~=nil) then
 			is_upgr = 1
 		end
 		if (is_upgr == 1) then
@@ -764,9 +819,9 @@ function trader_repiar_weapon_s2(actor, trader)
 		local wpn = item_in_slot:section()
 		local var = repairmasterlist[trader:name()][1]
 		weapon_profit_margin = repairmasterlist[trader:name()][2]
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
 		local is_upgr = 0
-		if (string.find(wpn,"kalibr")~=nil) or (string.find(wpn,"otdaca")~=nil) or (string.find(wpn,"ves")~=nil) then
+		if (string_find(wpn,"kalibr")~=nil) or (string_find(wpn,"otdaca")~=nil) or (string_find(wpn,"ves")~=nil) then
 			is_upgr = 1
 		end
 		if (is_upgr == 1) then
@@ -811,7 +866,7 @@ function trader_repiar_armor_s6(actor, trader)
 		local var = repairmasterlist[trader:name()][1]
 		armor_profit_margin = repairmasterlist[trader:name()][3]
 
-		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * armor_profit_margin )
+		local item_repair_cost = math_floor( (1-item_in_slot:condition()) * item_in_slot:cost() * armor_profit_margin )
 
 		if item_repair_cost <= 10000 then tt = 2.0
 		elseif item_repair_cost <= 20000 then tt = 4.0
@@ -852,14 +907,14 @@ if wpn ~= nil then
 	check_sec = 0
 	local j = table.getn(wpnA)
 	for i=1,j do
-		if string.find(wpn, wpnA[i]) ~= nil then
+		if string_find(wpn, wpnA[i]) ~= nil then
 			check_sec = 1
 			wpn_temp = wpnA
 		end
 	end
 		if check_sec == 0 then
  j=table.getn(wpnB) for i=1,j do
- if string.find(wpn,wpnB[i])~=nil then
+ if string_find(wpn,wpnB[i])~=nil then
  check_sec=2
 wpn_temp = wpnB
  end
@@ -867,7 +922,7 @@ wpn_temp = wpnB
  end
 		if check_sec == 0 then
  j=table.getn(wpnC) for i=1,j do
-	if string.find(wpn,wpnC[i])~=nil then
+	if string_find(wpn,wpnC[i])~=nil then
  check_sec=3
 wpn_temp = wpnC
  end
@@ -875,7 +930,7 @@ wpn_temp = wpnC
  end
 		if check_sec == 0 then
  j=table.getn(wpnD) for i=1,j do
-	if string.find(wpn,wpnD[i])~=nil then
+	if string_find(wpn,wpnD[i])~=nil then
  check_sec=4
 wpn_temp = wpnD
  end
@@ -883,7 +938,7 @@ wpn_temp = wpnD
  end
 		if check_sec == 0 then
  j=table.getn(wpnE) for i=1,j do
-	if string.find(wpn,wpnE[i])~=nil then
+	if string_find(wpn,wpnE[i])~=nil then
  check_sec=5
 wpn_temp = wpnE
  end
@@ -891,7 +946,7 @@ wpn_temp = wpnE
  end
 		if check_sec == 0 then
  j=table.getn(wpnF) for i=1,j do
-	if string.find(wpn,wpnF[i])~=nil then
+	if string_find(wpn,wpnF[i])~=nil then
  check_sec=6
 wpn_temp = wpnF
  end
@@ -899,7 +954,7 @@ wpn_temp = wpnF
  end
 		if check_sec == 0 then
  j=table.getn(wpnG) for i=1,j do
-	if string.find(wpn,wpnG[i])~=nil then
+	if string_find(wpn,wpnG[i])~=nil then
  check_sec=7
 wpn_temp = wpnG
  end
@@ -907,7 +962,7 @@ wpn_temp = wpnG
  end
 		if check_sec == 0 then
  j=table.getn(wpnH) for i=1,j do
-	if string.find(wpn,wpnH[i])~=nil then
+	if string_find(wpn,wpnH[i])~=nil then
  check_sec=8
 wpn_temp = wpnH
  end
@@ -915,7 +970,7 @@ wpn_temp = wpnH
  end
 		if check_sec == 0 then
  j=table.getn(wpnI) for i=1,j do
-	if string.find(wpn,wpnI[i])~=nil then
+	if string_find(wpn,wpnI[i])~=nil then
  check_sec=9
 wpn_temp = wpnI
  end
@@ -923,7 +978,7 @@ wpn_temp = wpnI
  end
 		if check_sec == 0 then
  j=table.getn(wpnJ) for i=1,j do
-	if string.find(wpn,wpnJ[i])~=nil then
+	if string_find(wpn,wpnJ[i])~=nil then
  check_sec=10
 wpn_temp = wpnJ
  end
@@ -931,7 +986,7 @@ wpn_temp = wpnJ
  end
 		if check_sec == 0 then
  j=table.getn(wpnK) for i=1,j do
-	if string.find(wpn,wpnK[i])~=nil then
+	if string_find(wpn,wpnK[i])~=nil then
  check_sec=11
 wpn_temp = wpnK
  end
@@ -939,7 +994,7 @@ wpn_temp = wpnK
  end
 		if check_sec == 0 then
  j=table.getn(wpnL) for i=1,j do
-	if string.find(wpn,wpnL[i])~=nil then
+	if string_find(wpn,wpnL[i])~=nil then
  check_sec=12
 wpn_temp = wpnL
  end
@@ -947,7 +1002,7 @@ wpn_temp = wpnL
  end
 		if check_sec == 0 then
  j=table.getn(wpnM) for i=1,j do
-	if string.find(wpn,wpnM[i])~=nil then
+	if string_find(wpn,wpnM[i])~=nil then
  check_sec=13
 wpn_temp = wpnM
  end
@@ -955,7 +1010,7 @@ wpn_temp = wpnM
  end
 		if check_sec == 0 then
  j=table.getn(wpnN) for i=1,j do
-	if string.find(wpn,wpnN[i])~=nil then
+	if string_find(wpn,wpnN[i])~=nil then
  check_sec=14
 wpn_temp = wpnN
  end
@@ -963,7 +1018,7 @@ wpn_temp = wpnN
  end
 		if check_sec == 0 then
  j=table.getn(wpnO) for i=1,j do
-	if string.find(wpn,wpnO[i])~=nil then
+	if string_find(wpn,wpnO[i])~=nil then
  check_sec=15
 wpn_temp = wpnO
  end
@@ -971,7 +1026,7 @@ wpn_temp = wpnO
  end
 		if check_sec == 0 then
  j=table.getn(wpnP) for i=1,j do
-	if string.find(wpn,wpnP[i])~=nil then
+	if string_find(wpn,wpnP[i])~=nil then
  check_sec=16
 wpn_temp = wpnP
  end
@@ -979,7 +1034,7 @@ wpn_temp = wpnP
  end
 		if check_sec == 0 then
  j=table.getn(wpnQ) for i=1,j do
-	if string.find(wpn,wpnQ[i])~=nil then
+	if string_find(wpn,wpnQ[i])~=nil then
  check_sec=17
 wpn_temp = wpnQ
  end
@@ -987,7 +1042,7 @@ wpn_temp = wpnQ
  end
 		if check_sec == 0 then
  j=table.getn(wpnR) for i=1,j do
-	if string.find(wpn,wpnR[i])~=nil then
+	if string_find(wpn,wpnR[i])~=nil then
  check_sec=18
 wpn_temp = wpnR
  end
@@ -995,7 +1050,7 @@ wpn_temp = wpnR
  end
 		if check_sec == 0 then
  j=table.getn(wpnS) for i=1,j do
-	if string.find(wpn,wpnS[i])~=nil then
+	if string_find(wpn,wpnS[i])~=nil then
  check_sec=19
 wpn_temp = wpnS
  end
@@ -1003,7 +1058,7 @@ wpn_temp = wpnS
  end
 		if check_sec == 0 then
  j=table.getn(wpnT) for i=1,j do
-	if string.find(wpn,wpnT[i])~=nil then
+	if string_find(wpn,wpnT[i])~=nil then
  check_sec=20
 wpn_temp = wpnT
  end
@@ -1011,7 +1066,7 @@ wpn_temp = wpnT
  end
 		if check_sec == 0 then
  j=table.getn(wpnU) for i=1,j do
-	if string.find(wpn,wpnU[i])~=nil then
+	if string_find(wpn,wpnU[i])~=nil then
  check_sec=21
 wpn_temp = wpnU
  end
@@ -1019,7 +1074,7 @@ wpn_temp = wpnU
  end
 		if check_sec == 0 then
  j=table.getn(wpnV) for i=1,j do
-	if string.find(wpn,wpnV[i])~=nil then
+	if string_find(wpn,wpnV[i])~=nil then
  check_sec=22
 wpn_temp = wpnV
  end
@@ -1027,7 +1082,7 @@ wpn_temp = wpnV
  end
 		if check_sec == 0 then
  j=table.getn(wpnW) for i=1,j do
-	if string.find(wpn,wpnW[i])~=nil then
+	if string_find(wpn,wpnW[i])~=nil then
  check_sec=23
 wpn_temp = wpnW
  end
@@ -1035,7 +1090,7 @@ wpn_temp = wpnW
  end
 		if check_sec == 0 then
  j=table.getn(wpnX) for i=1,j do
-	if string.find(wpn,wpnX[i])~=nil then
+	if string_find(wpn,wpnX[i])~=nil then
  check_sec=24
 wpn_temp = wpnX
  end
@@ -1043,7 +1098,7 @@ wpn_temp = wpnX
  end
 		if check_sec == 0 then
  j=table.getn(wpnY) for i=1,j do
-	if string.find(wpn,wpnY[i])~=nil then
+	if string_find(wpn,wpnY[i])~=nil then
  check_sec=25
 wpn_temp = wpnY
  end
@@ -1051,7 +1106,7 @@ wpn_temp = wpnY
  end
 		if check_sec == 0 then
  j=table.getn(wpnZ) for i=1,j do
-	if string.find(wpn,wpnZ[i])~=nil then
+	if string_find(wpn,wpnZ[i])~=nil then
  check_sec=26
 wpn_temp = wpnZ
  end
@@ -1059,7 +1114,7 @@ wpn_temp = wpnZ
  end
 		if check_sec == 0 then
  j=table.getn(wpn1) for i=1,j do
-	if string.find(wpn,wpn1[i])~=nil then
+	if string_find(wpn,wpn1[i])~=nil then
  check_sec=27
 wpn_temp = wpn1
  end
@@ -1067,7 +1122,7 @@ wpn_temp = wpn1
  end
 		if check_sec == 0 then
  j=table.getn(wpn2) for i=1,j do
-	if string.find(wpn,wpn2[i])~=nil then
+	if string_find(wpn,wpn2[i])~=nil then
  check_sec=28
 wpn_temp = wpn2
  end
@@ -1075,7 +1130,7 @@ wpn_temp = wpn2
  end
 		if check_sec == 0 then
  j=table.getn(wpn3) for i=1,j do
-	if string.find(wpn,wpn3[i])~=nil then
+	if string_find(wpn,wpn3[i])~=nil then
  check_sec=29
 wpn_temp = wpn3
  end
@@ -1086,7 +1141,7 @@ wpn_temp = wpn3
 			function(dummy, item) 
 				j = table.getn(wpn_temp) 
 				for i=1,j do 
-					if string.find(item:section(), wpn_temp[i])~=nil then 
+					if string_find(item:section(), wpn_temp[i])~=nil then 
 						if ((item:condition()+0.01)>0.11) then --and ((item:condition()+0.01)<0.96)  then 
 							tmpcode=tmpcode+1 
 					
@@ -1153,7 +1208,7 @@ function remove_secondary(item,checker)
 	local finder
 	local cond = item:condition() + 0.01
 	for i=1,j do
-		if checker ~= 0 then finder = string.find(sec, wpn_temp[i])
+		if checker ~= 0 then finder = string_find(sec, wpn_temp[i])
 		end
 
 		if (finder~=nil) and (cond > 0.11) and (tmpcode == 0) then --and (cond < 0.96) then
@@ -1177,13 +1232,13 @@ function do_release_action(par)
 		amk.save_variable(par,("2"..wpnsec))
 		local name = read_string_if_exist(system_ini(),wpnsec,"inv_name",nil)
 		local repmas = repairmaster[par][1]
-		local sms = "Greetings, warrior. This is "..tostring(repmas)..".\\nHaven't forgotten the trash you left here? Take, ready... "
+		local sms = gretings_wario.." "..tostring(repmas)..you_left_here
 		if name ~= nil then
-			sms = sms..game.translate_string(name)
+			sms = sms..translate(name)
 		else
-			sms = sms.."your trunk"
+			sms = sms..your_trunk_0
 		end
-		sms = sms..". Advise quick travel in my direction. Heh..."
+		sms = sms..quick_travel
 		news_manager.send_tip_txt(db.actor, sms, nil, "weaprep", 35000)
 	end
 end
@@ -1350,15 +1405,15 @@ function repair_costs(trader, actor, first_speaker, second_speaker)
 				rem_ubit_stvol_1  = 1
 			end
 			is_perv = 1
-			local item_repair_cost1 = math.floor( (1-item_in_slot_1:condition()) * item_in_slot_1:cost() * weapon_profit_margin )
-			iznos = math.floor(100*(1-item_in_slot_1:condition()) )
+			local item_repair_cost1 = math_floor( (1-item_in_slot_1:condition()) * item_in_slot_1:cost() * weapon_profit_margin )
+			iznos = math_floor(100*(1-item_in_slot_1:condition()) )
 			tmpcode = 0
 			local checksec1 = check_secondary(item_in_slot_1:section())
 			local name1 = read_string_if_exist(system_ini(),item_in_slot_1:section(),"inv_name",nil)
 
 			is_upgr = 0
 
-			if (string.find(item_in_slot_1:section(),"kalibr")~=nil) or (string.find(item_in_slot_1:section(),"otdaca")~=nil) or (string.find(item_in_slot_1:section(),"ves")~=nil) then
+			if (string_find(item_in_slot_1:section(),"kalibr")~=nil) or (string_find(item_in_slot_1:section(),"otdaca")~=nil) or (string_find(item_in_slot_1:section(),"ves")~=nil) then
 				is_upgr = 1
 				item_repair_cost1 = item_repair_cost1 * 2
 			end 
@@ -1366,27 +1421,26 @@ function repair_costs(trader, actor, first_speaker, second_speaker)
 			if (item_repair_cost1 > 0)  and (0.96 > item_in_slot_1:condition() + 0.01) then
 				if (rem_name ~= "hnd_weap_04") and (is_upgr == 1) then
 					is_upgr = 0
-					item_name_and_price1 = "Where did you acquire such a strange weapon? Is this the work of Lanky!? \n I would not even attempt to undertake repairs on such a weapon as this. If you wish to have it repaired - bring it back to Lanky at the Bar. \n He will take care of it for you.."
+					item_name_and_price1 = work_of_lanky
 				elseif (db.actor:money() >= item_repair_cost1) and (checksec1==true) and (0.11 < item_in_slot_1:condition() + 0.01) then
-					item_name_and_price1 = "For repairs "..game.translate_string(name1).." you must pay me %c[255,238,155,23]"..item_repair_cost1.." rubles%c[default] in advance, and\n bring me a similar weapon that I can use for spare parts. Do not bring me any unique weapons, or you may never see it again .. I will keep them!!\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price1 = for_repairs.." "..translate(name1).." "..must_pay_me..item_repair_cost1.." "..spare_parts_5..damage_by_perc.." "..iznos.."."
 				elseif (db.actor:money() < item_repair_cost1) and (checksec1==true) and (0.11 < item_in_slot_1:condition() + 0.01) then
-					item_name_and_price1 = "For repairs "..game.translate_string(name1).." I will take %c[255,255,32,23]"..item_repair_cost1.." rubles%c[default] and\n a similar weapon for spare parts, but, you don't appear to have the money..\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price1 = for_repairs.." "..translate(name1).." "..spare_parts_7..item_repair_cost1.." "..spare_parts_2..damage_by_perc.." "..iznos.."."
 				elseif (db.actor:money() >= item_repair_cost1) and (checksec1==false) and (0.11 < item_in_slot_1:condition() + 0.01) then
-					item_name_and_price1 = "For repairs "..game.translate_string(name1).." it will cost %c[255,255,32,23]"..item_repair_cost1.." rubles%c[default], however..\n you do not have a similar weapon for spare parts..\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price1 = for_repairs.." "..translate(name1).." "..spare_parts_8..item_repair_cost1.." "..spare_parts_3..damage_by_perc.." "..iznos.."."
 				elseif (db.actor:money() < item_repair_cost1) and (checksec1==false) and (0.1 < item_in_slot_1:condition() + 0.01) then
-					item_name_and_price1 = "For repairs "..game.translate_string(name1).." it's going to cost %c[255,255,32,23]"..item_repair_cost1.." rubles%c[default], however..\n you have neither the funds, nor a similar weapon for spare parts..\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price1 = for_repairs.." "..translate(name1).." "..spare_parts_9..item_repair_cost1.." "..spare_parts_4..damage_by_perc.." "..iznos.."."
 
 				elseif (rem_name ~= "hnd_weap_04") and (0.11 >= item_in_slot_1:condition() + 0.01) then
-					item_name_and_price1 = "To repair "..game.translate_string(name1).." I cannot perform repairs, as it is too damaged\n If you want, I can take this piece of scrap metal off your hands for .. say... 5 percent of it's value ("..math.floor(item_in_slot_1:cost()*0.05).."rubles) and\n What do you say?!..."
-				
+					item_name_and_price1 = to_repair.." "..translate(name2).." "..spare_parts_6.."("..math_floor(item_in_slot_1:cost()*0.05).." "..math_rubles..")"..what_do_you_s
 				elseif (rem_name == "hnd_weap_04") and (0.1 >= item_in_slot_1:condition() + 0.01)  and (checksec1==true) and (db.actor:money() >= item_repair_cost1) then
-					item_name_and_price1 = "Yes, it is quite damaged "..game.translate_string(name1).." simple as that..\n All right, here's the deal..\n Give me %c[255,238,155,23]"..item_repair_cost1.." rubles%c[default] as well as\n a similar weapon for spare parts.."
+					item_name_and_price1 = quite_damaged.." "..translate(name1).." "..give_me_it..item_repair_cost1.." "..weapon_spare_p
 				elseif (rem_name == "hnd_weap_04") and (0.11 >= item_in_slot_1:condition() + 0.01)  and (checksec1==false) and (db.actor:money() >= item_repair_cost1) then
-					item_name_and_price1 = "Yes, it is quite damaged "..game.translate_string(name1).." simple as that..\n It is possible for me to repair it. It will cost %c[255,255,32,23]"..item_repair_cost1.." rubles%c[default], but\n you do not have a similar weapon for spare parts.."
+					item_name_and_price1 = quite_damaged.." "..translate(name1).." "..to_repair_it.." "..item_repair_cost1.." "..similar_weapon
 				elseif (rem_name == "hnd_weap_04") and (db.actor:money() < item_repair_cost1) and (checksec1==true) and (0.11 >= item_in_slot_1:condition() + 0.01) then
-					item_name_and_price1 = "Yes, it is quite damaged  "..game.translate_string(name1).." simple as that..\n It is possible for me to repair it. For repairs, it will cost %c[255,255,32,23]"..item_repair_cost1.." rubles%c[default] and\n a similar weapon for spare parts, but, you do not appear to have enough money.."
+					item_name_and_price1 = quite_damaged.." "..translate(name1).." "..for_repairs_it.." "..item_repair_cost1.." "..enough_money_p
 				elseif (rem_name == "hnd_weap_04") and (db.actor:money() < item_repair_cost1) and (checksec1==false) and (0.11 >= item_in_slot_1:condition() + 0.01) then
-					item_name_and_price1 = "Yes, it is quite damaged "..game.translate_string(name1).." simple as that..\n It is possible for me to repair it. It will cost %c[255,255,32,23]"..item_repair_cost1.." rubles%c[default], but\n you do not have a similar weapon for spare parts.."
+					item_name_and_price1 = quite_damaged.." "..translate(name1).." "..to_repair_it.." "..item_repair_cost1.." "..similar_weapon
 				end
 				if item_name_and_price1 ~= nil then
 					news_manager.give_talk_message(item_name_and_price1, task_texture, task_rect, "iconed_trade_info")
@@ -1398,41 +1452,40 @@ function repair_costs(trader, actor, first_speaker, second_speaker)
 				rem_ubit_stvol_2  = 1
 			end
 			is_vtor = 1
-			local item_repair_cost2 = math.floor( (1-item_in_slot_2:condition()) * item_in_slot_2:cost() * weapon_profit_margin )
-			iznos = math.floor(100*(1-item_in_slot_2:condition()) )
+			local item_repair_cost2 = math_floor( (1-item_in_slot_2:condition()) * item_in_slot_2:cost() * weapon_profit_margin )
+			iznos = math_floor(100*(1-item_in_slot_2:condition()) )
 			tmpcode = 0
 			local checksec2 = check_secondary(item_in_slot_2:section())
 			local name2 = read_string_if_exist(system_ini(),item_in_slot_2:section(),"inv_name",nil)
 
 			is_upgr = 0
-			if (string.find(item_in_slot_2:section(),"kalibr")~=nil) or (string.find(item_in_slot_2:section(),"otdaca")~=nil) or (string.find(item_in_slot_2:section(),"ves")~=nil) then
+			if (string_find(item_in_slot_2:section(),"kalibr")~=nil) or (string_find(item_in_slot_2:section(),"otdaca")~=nil) or (string_find(item_in_slot_2:section(),"ves")~=nil) then
 				is_upgr = 1
 				item_repair_cost2 = item_repair_cost2 * 2
 			end 
 
-
 			if (item_repair_cost2 > 0)  and (0.96 > item_in_slot_2:condition() + 0.01) then
 				if (rem_name ~= "hnd_weap_04") and (is_upgr == 1) then
 					is_upgr = 0
-					item_name_and_price2 = "Where did you acquire such a strange weapon? Is this the work of Lanky!? \n I would not even attempt to undertake repairs on such a weapon as this. If you wish to have it repaired - bring it back to Lanky at the Bar. \n He will take care of it for you.."
+					item_name_and_price2 = work_of_lanky
 				elseif (db.actor:money() >= item_repair_cost2) and (checksec2==true) and (0.11 < item_in_slot_2:condition() + 0.01) then
-					item_name_and_price2 = "For repairs "..game.translate_string(name2).." you must pay me %c[255,238,155,23]"..item_repair_cost2.." rubles%c[default] in advance, and\n bring me a similar weapon that I can use for spare parts. Do not bring me any unique weapons, or you may never see it again .. I will keep them!!\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price2 = for_repairs.." "..translate(name2).." "..must_pay_me..item_repair_cost2.." "..spare_parts_5..damage_by_perc.." "..iznos.."."
 				elseif (db.actor:money() < item_repair_cost2) and (checksec2==true) and (0.11 < item_in_slot_2:condition() + 0.01) then
-					item_name_and_price2 = "For repairs "..game.translate_string(name2).." I will take %c[255,255,32,23]"..item_repair_cost2.." rubles%c[default] and\n a similar weapon for spare parts, but, you don't appear to have the money..\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price2 = for_repairs.." "..translate(name2).." "..spare_parts_7..item_repair_cost2.." "..spare_parts_2..damage_by_perc.." "..iznos.."."
 				elseif (db.actor:money() >= item_repair_cost2) and (checksec2==false) and (0.11 < item_in_slot_2:condition() + 0.01) then
-					item_name_and_price2 = "For repairs "..game.translate_string(name2).." it will cost you %c[255,255,32,23]"..item_repair_cost2.." rubles%c[default], however..\n you do not have a similar weapon for spare parts..\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price2 = for_repairs.." "..translate(name2).." "..spare_parts_10..item_repair_cost2.." "..spare_parts_3..damage_by_perc.." "..iznos.."."
 				elseif (db.actor:money() < item_repair_cost2) and (checksec2==false) and (0.11 < item_in_slot_2:condition() + 0.01) then
-					item_name_and_price2 = "For repairs "..game.translate_string(name2).." it will cost %c[255,255,32,23]"..item_repair_cost2.." rubles%c[default], however..\n you have neither the funds, nor a similar weapon for spare parts..\n This weapon is damaged by a percentage of "..iznos.."."
+					item_name_and_price2 = for_repairs.." "..translate(name2).." "..spare_parts_8..item_repair_cost2.." "..spare_parts_4..damage_by_perc.." "..iznos.."."
 				elseif (rem_name ~= "hnd_weap_04") and (0.11 >= item_in_slot_2:condition() + 0.01) then
-					item_name_and_price2 = "To repair "..game.translate_string(name2).." I cannot perform repairs, as it is too damaged\n If you want, I can take this piece of scrap metal off your hands for .. say... 5 percent of it's value ("..math.floor(item_in_slot_2:cost()*0.05).."rubles) and\n What do you say?!..."
+					item_name_and_price2 = to_repair.." "..translate(name2).." "..spare_parts_6.."("..math_floor(item_in_slot_1:cost()*0.05).." "..math_rubles..")"..what_do_you_s
 				elseif (rem_name == "hnd_weap_04") and (0.1 >= item_in_slot_2:condition() + 0.01)  and (checksec2==true) and (db.actor:money() >= item_repair_cost2) then
-					item_name_and_price2 = "Yes, it is quite damaged "..game.translate_string(name2).." simple as that..\n All right, here's the deal..\n Give me %c[255,238,155,23]"..item_repair_cost2.." rubles%c[default] as well as\n a similar weapon for spare parts.."
+					item_name_and_price2 = quite_damaged.." "..translate(name2).." "..give_me_it..item_repair_cost2.." "..weapon_spare_p
 				elseif (rem_name == "hnd_weap_04") and (0.11 >= item_in_slot_2:condition() + 0.01)  and (checksec2==false) and (db.actor:money() >= item_repair_cost2) then
-					item_name_and_price2 = "Yes, it is quite damaged "..game.translate_string(name2).." simple as that..\n It is possible for me to repair it. It will cost %c[255,255,32,23]"..item_repair_cost2.." rubles%c[default], but\n you do not have a similar weapon for spare parts.."
+					item_name_and_price2 = quite_damaged.." "..translate(name2).." "..to_repair_it.." "..item_repair_cost2.." "..similar_weapon
 				elseif (rem_name == "hnd_weap_04") and (db.actor:money() < item_repair_cost2) and (checksec2==true) and (0.11 >= item_in_slot_2:condition() + 0.01) then
-					item_name_and_price2 = "Yes, it is quite damaged  "..game.translate_string(name2).." simple as that..\n It is possible for me to repair it. For repairs, it will cost %c[255,255,32,23]"..item_repair_cost2.." rubles%c[default] and\n a similar weapon for spare parts, but, you do not appear to have enough money.."
+					item_name_and_price2 = quite_damaged.." "..translate(name2).." "..for_repairs_it.." "..item_repair_cost2.." "..enough_money_p
 				elseif (rem_name == "hnd_weap_04") and (db.actor:money() < item_repair_cost2) and (checksec2==false) and (0.11 >= item_in_slot_2:condition() + 0.01) then
-					item_name_and_price2 = "Yes, it is quite damaged "..game.translate_string(name2).." simple as that..\n It is possible for me to repair it. It will cost %c[255,255,32,23]"..item_repair_cost2.." rubles%c[default], but\n you do not have a similar weapon for spare parts.."
+					item_name_and_price2 = quite_damaged.." "..translate(name2).." "..to_repair_it.." "..item_repair_cost2.." "..similar_weapon
 				end
 				if item_name_and_price2 ~= nil then
 					news_manager.give_talk_message(item_name_and_price2, task_texture, task_rect, "iconed_trade_info")
@@ -1447,17 +1500,17 @@ function repair_costs(trader, actor, first_speaker, second_speaker)
 		if rem_name ~= "hnd_weap_01" then
 
 		if item_in_slot_6 ~= nil then
-			local item_repair_cost = math.floor( (1-item_in_slot_6:condition()) * item_in_slot_6:cost() * armor_profit_margin )
-			iznos = math.floor(100*(1-item_in_slot_6:condition()))
+			local item_repair_cost = math_floor( (1-item_in_slot_6:condition()) * item_in_slot_6:cost() * armor_profit_margin )
+			iznos = math_floor(100*(1-item_in_slot_6:condition()))
 
 			if (item_repair_cost > 0) and (db.actor:money() >= item_repair_cost) and (item_in_slot_6:condition()) < 0.95 then
 						-- list_trader_repair_2 Cost of repairing Armour:
-				local item_name_and_price = "Armour Condition: "..iznos.."%. "..game.translate_string("list_trader_repair_2").." %c[255,238,155,23]"..item_repair_cost.." rubles%c[default]. Agreed?"
+				local item_name_and_price = armor_conditi.." "..iznos.."%. "..translate("list_trader_repair_2").." %c[255,238,155,23]"..item_repair_cost.." "..rubles_def_1.." "..your_Agreed
 				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 
 			elseif (item_repair_cost > 0) and (db.actor:money() < item_repair_cost) then
 						-- list_trader_repair_2 Cost of repairing Armour:
-				local item_name_and_price = "Armour Condition: "..iznos.."%. "..game.translate_string("list_trader_repair_2").." %c[255,255,32,23]"..item_repair_cost.." rubles%c[default]. Come back later... as you do not appear to have the money.."
+				local item_name_and_price = armor_conditi.." "..iznos.."%. "..translate("list_trader_repair_2").." %c[255,255,32,23]"..item_repair_cost.." "..rubles_def_1.." "..have_not_money
 				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 
 
@@ -1490,7 +1543,7 @@ end
 function pay_damaged1(actor, trader)
 	local item_in_slot = db.actor:item_in_slot(1)
 	if item_in_slot ~= nil then
-		dialogs.relocate_money(db.actor, math.floor(item_in_slot:cost()*0.05), "in")
+		dialogs.relocate_money(db.actor, math_floor(item_in_slot:cost()*0.05), "in")
 		news_manager.relocate_item(db.actor, "out", item_in_slot:section())
 		alife():release(alife():object(item_in_slot:id()), true)
 	end
@@ -1500,7 +1553,7 @@ end
 function pay_damaged2(actor, trader)
 	local item_in_slot = db.actor:item_in_slot(2)
 	if item_in_slot ~= nil then
-		dialogs.relocate_money(db.actor, math.floor(item_in_slot:cost()*0.05), "in")
+		dialogs.relocate_money(db.actor, math_floor(item_in_slot:cost()*0.05), "in")
 		news_manager.relocate_item(db.actor, "out", item_in_slot:section())
 		alife():release(alife():object(item_in_slot:id()), true)
 	end

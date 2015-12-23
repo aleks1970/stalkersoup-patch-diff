@@ -1,5 +1,5 @@
 -- TB3D 1.0.9.9.8.7    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem,
--- fast saves, community, improvements
+-- fast saves, community, improvements, translate and text color - aleks1970
 function my_ver() return "1.0.9.9.8.7" end
 local time_open = TB3D_Modders.time_open
 local time_close = TB3D_Modders.time_close
@@ -8,6 +8,8 @@ local stake2 = TB3D_Modders.stake2
 local stake3 = TB3D_Modders.stake3
 local perc_min = TB3D_Modders.perc_min
 local perc_max = TB3D_Modders.perc_max
+local translate = game.translate_string
+local text_color_aem = TB3D_Services.get_text_color("aem")
 ---------------------------------------------------------------------------------------------------
 local arenaext = nil	-- object manager
 local time_def = nil	-- time in the world at the start of the game (CTime)
@@ -617,7 +619,7 @@ function CArenaext:cleanup()
 			end
 		end
 	end
-	news_manager.amk_send_tip(game.translate_string("sms_mod_deleted"),game.translate_string("sms_arena"),1,30,"arena")
+	news_manager.amk_send_tip(translate("sms_mod_deleted"),translate("sms_arena"),1,30,"arena")
 end
 
 -------
@@ -1479,11 +1481,11 @@ function CArenaext:dlg_init_stakes_fight(dlg, name1, name2, parent, dlg_id)
 	--printf("CArenaext:dlg_init_stakes_fight('%s vs %s')", name1, name2)
 	local team1 = self.teams[name1]
 	local team2 = self.teams[name2]
-	local title = game.translate_string(team1.name1)
+	local title = translate(team1.name1)
 	title = title .. " "
-	title = title .. game.translate_string("aem_job_stake_vs")
+	title = title .. translate("aem_job_stake_vs")
 	title = title .. " "
-	title = title .. game.translate_string(team2.name2)
+	title = title .. translate(team2.name2)
 	local phr = dlg:AddPhrase(title, dlg_id, parent, -10000)
 	local phr_script = phr:GetPhraseScript()
 	phr_script:AddPrecondition("aem_manager.is_stakes_valid")
@@ -1538,11 +1540,11 @@ function CArenaext:dlg_init_turnament_fight(dlg, name1, name2, parent, dlg_id)
 	--printf("CArenaext:dlg_init_turnament_fight('%s vs %s')", name1, name2)
 	local team1 = self.teams[name1]
 	local team2 = self.teams[name2]
-	local title = game.translate_string(team1.name1)
+	local title = translate(team1.name1)
 	title = title .. " "
-	title = title .. game.translate_string("aem_job_stake_vs")
+	title = title .. translate("aem_job_stake_vs")
 	title = title .. " "
-	title = title .. game.translate_string(team2.name2)
+	title = title .. translate(team2.name2)
 	local phr = dlg:AddPhrase(title, dlg_id, parent, -10000)
 	local phr_script = phr:GetPhraseScript()
 	phr_script:AddPrecondition("aem_manager.is_turnament_valid")
@@ -1566,7 +1568,7 @@ end
 -- adds to the dialogue with the rates of branch
 -------
 function CArenaext:dlg_init_stake_tree(dlg, stake, parent)
-	local tm = " "..game.translate_string("aem_job_stake_money_tm")
+	local tm = " "..translate("aem_job_stake_money_tm")
 	local phr = dlg:AddPhrase(tostring(stake1)..tm, stake, parent, -10000)
 	local phr_script = phr:GetPhraseScript()
 	phr_script:AddPrecondition("aem_manager.has_money_1")
@@ -1876,24 +1878,24 @@ function msg(text)
 		has_alife_info("aem_admin_dead") or
 		has_alife_info("aem_arny_spread_out") or
 		has_alife_info("aem_admin_spread_out") then
-		who = game.translate_string("aem_barman")
+		who = translate("aem_barman")
 		icon = Frect():set(332,235,84,45)
 	else
 		npc = alife():object(amk.load_variable("aem_id"))
 		if npc ~= nil and npc:alive() == true then
 			if npc:profile_name() == "aem_arny" then
-				who = game.translate_string("bar_arny_name")
+				who = translate("bar_arny_name")
 				icon = Frect():set(332,141,84,45)
 			else
-				who = game.translate_string("aem_admin")
+				who = translate("aem_admin")
 				icon = Frect():set(83,329,84,45)
 			end
 		end
 	end
-	msg = game.translate_string(text)
+	msg = translate(text)
 	snd = xr_sound.get_safe_sound_object([[device\pda\pda_tip]])
 	snd:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-	news_manager.give_game_news(TB3D_Services.get_text_color("aem")..who..":\\n%c[default]"..msg, "ui\\ui_iconstotal", icon, 0, 15000)
+	news_manager.give_game_news(text_color_aem..who..":\\n%c[default]"..msg, "ui\\ui_iconstotal", icon, 0, 15000)
 end
 
 function npc(npc)

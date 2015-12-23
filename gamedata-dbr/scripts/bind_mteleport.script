@@ -1,11 +1,11 @@
--- TB3D 1.0.9.9.7.0 use_binder_message 
-function my_ver() return "1.0.9.9.7.0" end
+-- TB3D 1.0.9.9.9.6 use_binder_message, removal if collector 
+function my_ver() return "1.0.9.9.9.6" end
 -- ************************************************
 -- **                    Imp                     **
 -- **         Binder improvised teleports        **
 -- **  Supports the work of self-made teleports  **
 -- ************************************************
-
+local string_find = string.find
 local teleport_binders ={}	-- List of Teleport
 
 function abs_comp(a,b)
@@ -76,7 +76,9 @@ function actor_update(delta)
 end
 
 function bind( obj )
-	if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("bind mteleport: bind["..utils.to_str(obj:name()).."] section["..obj:section().."]") end
+	local obj_name
+	if obj.name then obj_name = obj:name() else obj_name = "nil" end
+	if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("bind mteleport: bind["..obj_name.."]") end	-- section["..obj:section().."]") end
 	obj:bind_object( restrictor_teleport( obj ) ) 
 end
 
@@ -92,6 +94,39 @@ function restrictor_teleport:net_spawn(data)
 	local s_obj = alife():object(self.object:id())
 	if s_obj then
 		if self.teleport == true then
+			if TB3D_Services.is_collector(6000) then			--109996
+				local obj_name
+				if s_obj.name then obj_name = s_obj:name() else obj_name = "nil" end
+				if string_find(obj_name, "^m_teleport_") then
+					if string_find(obj_name, "generators")		--m_teleport_1_generators, _2_
+					  or string_find(obj_name, "warlab")		--m_teleport_warlab1
+					  or string_find(obj_name, "izkanalii")		--m_teleport_izkanalii_dcity
+					  or string_find(obj_name, "_10")			--m_teleport_10, agro
+					  or string_find(obj_name, "_11")			--m_teleport_11, agro
+					  or string_find(obj_name, "_21")			--m_teleport_21, esc
+					  or string_find(obj_name, "_31")			--m_teleport_31, esc
+					  or string_find(obj_name, "hospital")		--m_teleport_hospital
+					  or string_find(obj_name, "hosp_verh")		--m_teleport_2_hosp_verh1,2, hosp
+					  or string_find(obj_name, "_blok_v")		--m_teleport_blok_vhod_otsek, m_teleport_blok_vuhod_3otsek, hosp
+					  or string_find(obj_name, "_44")			--m_teleport_44, agro
+					  or string_find(obj_name, "_71")			--m_teleport_71, agro
+					  or string_find(obj_name, "_final")		--m_teleport_final_truba, agro
+					  or string_find(obj_name, "_taynik") then	--m_teleport_vnutri_norm_taynik, m_teleport_agro_norm_taynik, agro
+						--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] not spawned")
+						alife():release(s_obj, true)
+						return true
+					end
+				end
+				--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] spawned")
+				--zone_teleport_new, swamp base
+				--zone_teleport_new_out, swamp base
+				--m_teleport_bolota_u_agru, swamp (kalmyak??)
+				--m_teleport_labirint1,2,3
+				--m_teleport_exit, labrynth
+				--m_teleport_prip, 2, 3
+				--m_teleport_dok_prip_vuhod
+				--m_teleport_prip_dok_vxod
+			end
 			teleport_binders[self.object:id()] = self
 			-- Complete the table settings
 			self["parametrs"] = {}

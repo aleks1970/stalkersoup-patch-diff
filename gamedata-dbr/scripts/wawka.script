@@ -1,5 +1,6 @@
---TB3D 1.0.9.9.1  optimized 
+--TB3D 1.0.9.9.1  optimized, translate
 function my_ver() return "1.0.9.9.1" end
+local translate = game.translate_string
 
 function add_krysyk_pomer_treasure()
 	treasure_manager.get_treasure_manager():give_treasure("esc_secret_village_rucksack")
@@ -65,39 +66,39 @@ end
 function smski_besu(st)
 	if st==1 then
 		if TB3D_Services.give_info("sms_pulya") then
-			news_manager.amk_send_tip(game.translate_string("sms_pulya_text"),nil,nil,30)
+			news_manager.amk_send_tip(translate("sms_pulya_text"),nil,nil,30)
 		end
 	elseif st==2 then
 		if TB3D_Services.give_info("sms_lukash") then
-			news_manager.amk_send_tip(game.translate_string("sms_lukash_text"),nil,nil,30)
+			news_manager.amk_send_tip(translate("sms_lukash_text"),nil,nil,30)
 		end
 	elseif st==3 then
 		if TB3D_Services.give_info("sms_serega") then
-			news_manager.amk_send_tip(game.translate_string("sms_serega_text"),nil,nil,30)
+			news_manager.amk_send_tip(translate("sms_serega_text"),nil,nil,30)
 		end
    end
 end
 
 function smska_borova()
     if TB3D_Services.give_info("sms_borov") then
-		news_manager.amk_send_tip(game.translate_string("sms_borov_text"),nil,nil,30)
+		news_manager.amk_send_tip(translate("sms_borov_text"),nil,nil,30)
 	end
 end
 
 function smska_volka()
 	if TB3D_Services.give_info("sms_volk") then
-		news_manager.amk_send_tip(game.translate_string("sms_volk_text"),nil,nil,30)
+		news_manager.amk_send_tip(translate("sms_volk_text"),nil,nil,30)
 	end
 end
 
 function smska_shurupa()
 	if TB3D_Services.give_info("sms_shurup") then
-		news_manager.amk_send_tip(game.translate_string("sms_shurup_text"),nil,nil,30)
+		news_manager.amk_send_tip(translate("sms_shurup_text"),nil,nil,30)
 	end
 end
 
 function smska_dana()
 	if TB3D_Services.give_info("sms_dan") then
-		news_manager.amk_send_tip(game.translate_string("sms_dan_text"),nil,nil,30)
+		news_manager.amk_send_tip(translate("sms_dan_text"),nil,nil,30)
 	end
 end

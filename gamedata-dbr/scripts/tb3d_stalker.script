@@ -1,8 +1,11 @@
---<!-- TB3D 1.0.9.9.9.5 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.6 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
---item take, chaes_perexod_start
-function my_ver() return "1.0.9.9.9.5" end
+--item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_
+function my_ver() return "1.0.9.9.9.6" end
+
+local translate = game.translate_string
+local text_color_tip = TB3D_Services.get_text_color("tip")
 
 local upd_pos = 0
 local fix_done = false
@@ -392,7 +395,7 @@ function on_item_take(obj)
 		if not has_alife_info("spawn_teleport25") then spawn_teleport.spawn_teleport25(obj) end
 		if not has_alife_info("kostya_documents_have") then
 			new_spawn.new_inventory13(obj)
-			news_manager.send_tip_txt(db.actor,  TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]Information found", nil, nil, 30000)
+			news_manager.send_tip_txt(db.actor,  text_color_tip..translate("stalker_information_found_0"), nil, nil, 30000)
 		end
 	elseif sect=="item_delete1" then
 		spawn_teleport.delete_1(obj)
@@ -463,40 +466,48 @@ function on_item_take(obj)
 			end
 		end
 	elseif sect == "mozg" then													--109993
-		if has_alife_info("svoboda_lukash_start") and not has_alife_info("svoboda_lukash_have") then
-			if arhara1_dialog1.anarh_mozg_have() == true then
+		if has_alife_info("svoboda_lukash_start") and not has_alife_info("svoboda_lukash_done") then
+			--if arhara1_dialog1.anarh_mozg_have() == true then
 				TB3D_Services.give_info("svoboda_lukash_have")
-			end
+			--end
 		end
 	elseif sect == "antizombie" then													--109995
-		if has_alife_info("chaes_perexod_start") and not has_alife_info("chaes_perexod_have") then
+		if has_alife_info("chaes_perexod_start") and not has_alife_info("chaes_perexod_done") then
 			--if arhara_dialog.chaes_perexod_have() == true then
 				TB3D_Services.give_info("chaes_perexod_have")
 			--end
 		end
 	elseif sect == "wpn_m_134" then														--109993
-		if has_alife_info("atp_propusk_start") and not has_alife_info("atp_propusk_have") then
-			if arhara_dialog.atp_propusk_have() == true then
+		if has_alife_info("atp_propusk_start") and not has_alife_info("atp_propusk_done") then
+			--if arhara_dialog.atp_propusk_have() == true then
 				TB3D_Services.give_info("atp_propusk_have")
-			end
+			--end
 		end
 	elseif sect == "meceniy_outfit_new" then											--109993
-		if has_alife_info("arhara_ekza_start") and not has_alife_info("arhara_ekza_have") then
-			if arhara_dialog.baty_zadanie_have() == true then
+		if has_alife_info("arhara_ekza_start") and not has_alife_info("arhara_ekza_done") then
+			--if arhara_dialog.baty_zadanie_have() == true then
 				TB3D_Services.give_info("arhara_ekza_have")
-			end
+			--end
 		end
 	elseif sect == "sumka_arhara" then													--109993
-		if has_alife_info("sahar_sumka_start") and not has_alife_info("sahar_sumka_have") then
-			if arhara_dialog.sahar_sumka_have() == true then
+		if has_alife_info("sahar_sumka_start") and not has_alife_info("sahar_sumka_done") then
+			--if arhara_dialog.sahar_sumka_have() == true then
 				TB3D_Services.give_info("sahar_sumka_have")
-			end
+			--end
 		end
 	elseif sect == "money" or sect == "money1" or sect == "money2" or sect == "money3" then		--109993
 		if has_alife_info("lysyi_klad_nayti_start") and not has_alife_info("lysyi_klad_nayti_have") then
 			if arhara_dialog.lysyi_klad_nayti_have() == true then
 				TB3D_Services.give_info("lysyi_klad_nayti_have")
 			end
+		end
+	elseif sect == "af_dummy_battery_red" then		--109996
+		if has_alife_info("doktor_teleport_11_faze1") and not has_alife_info("doktor_teleport_11_done") then
+			TB3D_Services.give_info("doktor_teleport_11_have")
+		end
+	elseif sect == "af_dummy_pellicle_red" then		--109996
+		if has_alife_info("doktor_teleport_12_faze1") and not has_alife_info("doktor_teleport_12_done") then
+			TB3D_Services.give_info("doktor_teleport_12_have")
 		end
 	end
 	if info_given == true then amk_dialogs.info_received() end

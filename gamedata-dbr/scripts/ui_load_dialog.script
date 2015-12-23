@@ -1,4 +1,4 @@
---TB3D 1.0.9.9.7.6  disconnecting 
+--TB3D 1.0.9.9.7.6  disconnecting, translate
 function my_ver() return "1.0.9.9.7.6" end
 -- File:        UI_LOAD_DIALOG.SCRIPT
 -- Description: Load Dialog for STALKER
@@ -6,6 +6,8 @@ function my_ver() return "1.0.9.9.7.6" end
 -- Copyright:   2004 GSC Game World
 -- Author:      Serhiy Vynnychenko (narrator@gsc-game.kiev.ua)
 -- Version:     0.5
+
+local translate = game.translate_string
 
 class "load_item" (CUIListItemEx)
 
@@ -191,9 +193,9 @@ function file_data(fname)
 		
 		
 		--string.format("[%d:%d:%d %d]",m,d,h,min,y)
-		local health = string.format("\\n%s %d%s", game.translate_string("ui_inv_health"),sg:actor_health()*100,"%")
+		local health = string.format("\\n%s %d%s", translate("ui_inv_health"),sg:actor_health()*100,"%")
 		
-		return game.translate_string("st_level") .. ": " .. game.translate_string(sg:level_name()) .. "\\n" .. game.translate_string("ui_inv_time")..": " .. date_time .. health
+		return translate("st_level") .. ": " .. translate(sg:level_name()) .. "\\n" .. translate("ui_inv_time")..": " .. date_time .. health
 	else
 		return "no file data"
 	end	

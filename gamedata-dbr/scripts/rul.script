@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.2 added my_ver, dmx135, removed " from Hunchback
+-- TB3D 1.0.9.9.2 added my_ver, dmx135, removed " from Hunchback, translate
 function my_ver() return "1.0.9.9.2" end
 --[[--------------------------------------------
  File         : rul.script
@@ -8,6 +8,7 @@ function my_ver() return "1.0.9.9.2" end
  Last update  : Shadows
 --]]-------------------------------------------------
 
+local translate = game.translate_string
 local car1_price = 1000 -- Humpback Zaz on Cordon   !!!!TB3D  made it cheap, gives master key
 local car2_price = 30000 -- Military Niva the Garbage
 local car3_price = 15000 -- UAZ MIA on agricultural industry
@@ -135,7 +136,7 @@ end
 
 function car_offer(info,text,price)
     local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
-    local name_and_price = game.translate_string(text).." %c[255,238,155,23]"..price.." RUB%c[default]"
+    local name_and_price = translate(text).." %c[255,238,155,23]"..price.." RUB%c[default]"
     if not has_alife_info(info) then
         news_manager.give_talk_message(name_and_price, task_texture, task_rect, "iconed_trade_info")
     end

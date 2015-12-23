@@ -1,5 +1,7 @@
---TB3D 1.0.9.9.7.5 
+--TB3D 1.0.9.9.7.5, translate and text color - aleks1970
 function my_ver() return "1.0.9.9.7.5" end
+local translate = game.translate_string
+local text_color_tip = TB3D_Services.get_text_color("tip")
 class "ui_ms_community" (CUIScriptWnd)
 
 function ui_ms_community:__init(owner) super()
@@ -25,8 +27,8 @@ self:Register(xml:Init3tButton("btn_quit", self),"btn_quit")
 self:Register(xml:InitEditBox("edit_box", self), "edit_box")
 local caption = self:GetButton("caption")
 local btn_1 = self:GetButton("btn_1")
-caption:SetText("Select Grouping")
-btn_1:SetText("To Community")
+caption:SetText(translate("ui_Select_Grouping"))
+btn_1:SetText(translate("ui_To_Community"))
 end
 
 function ui_ms_community:InitCallBacks()
@@ -52,12 +54,13 @@ end
 end
 
 function ui_ms_community:set_coom(str)
+	local act = db.actor
 	if system_ini():line_exist("communities_relations",str) then	
 		TB3D_Services.set_community(db.actor, str, 0, 0)
 		--db.actor:set_character_community(str, 0, 0)
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]You have entered the:"..str,nil,nil,1000)
+		news_manager.send_tip_txt(act, text_color_tip..translate("ui_have_entered_the")..str,nil,nil,1000)
 	else
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]No such group:"..str,nil,nil,1000)
+		news_manager.send_tip_txt(act, text_color_tip..translate("ui_no_such_group")..str,nil,nil,1000)
 	end
 		self:on_close()	
 end

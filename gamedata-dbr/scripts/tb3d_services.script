@@ -1,16 +1,17 @@
----TB3D 1.0.9.9.9.5 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.9.6 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
--- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed
-function my_ver() return "1.0.9.9.9.5" end	--modders append with initials and rev.
+-- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed,
+-- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over
+function my_ver() return "1.0.9.9.9.6" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.5}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.6}" end
 
-major_version = 109995							--used in saves
+major_version = 109996							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -19,6 +20,7 @@ local isnight									--flag is set based on day_start and day_end in modders sc
 local ismidnight, isnoon						--major day cycle event points, true for 5 game minutes after 0 or 12 hour change 
 local string_find = string.find					--create a local pointer for faster lookups
 local math_random = math.random
+local translate = game.translate_string
 local medkit,antirad,bandage,vodka = 0,0,0,0         -- counters items
 local medkit_wnd,antirad_wnd,bandage_wnd,vodka_wnd   -- static window
 local is_skipping = false
@@ -71,12 +73,12 @@ end
 -- 200=treasure_manager, 300=xr_sound, 310=sr_sound2d, 400-407=xr_motivator, 500=xr_conditions, 600=ui_handradio,
 -- 700-704=tb3d_dyn_spawn, 800-802=news_manager, 900-921=dmx_mod, 950-957=bar_rostok_tasks,
 -- 1000=gulag_pripyat, 1100=escape_dialog, 1200-1201=dialogs_yantar, 1300-1301=bar_dialogs,
--- 2000=xr_effects, 3000=braad_test, 4000=arhara_dialog, 5000=new_spawn
+-- 2000=xr_effects, 3000=braad_test, 4000=arhara_dialog, 5000=new_spawn, 6000=bind_mteleport
 function is_collector(idx)
 	local is_freeplay = get_level_up()			--109980
 	 if is_freeplay == -1 then
 		packet_alert("tb3d services: is collector freeplay[nil] for["..utils.to_str(idx).."]")
-		if get_console():get_string("mm_net_srv_name") == game.translate_string("gd_collector") then
+		if get_console():get_string("mm_net_srv_name") == translate_string("gd_collector") then
 			is_freeplay = 1
 		else
 			is_freeplay = 0
@@ -96,8 +98,9 @@ function get_level_up()							--109980
 end
 function set_new_levelup(levelup)				--109980
 	level_up = levelup
+	local ntext = translate("services_stalkersoup_level")
 	amk.save_variable("freeplay",levelup)
-	if level_up > 0 then news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."STALKERSOUP:  %c[default]LEVEL "..utils.to_str(level_up).." Achieved!", 1, "tb3d_master", 40) end
+	if level_up > 0 then news_manager.send_tip_txt(db.actor, ntext.." "..utils.to_str(level_up).." "..translate("services_Achieved_level"), 1, "tb3d_master", 40) end
 end
 
 function fell_through_level(pos)
@@ -528,6 +531,7 @@ function set_daytime()												--needed to set isnight without triggering cam
 	else
 		isnight = false
 	end
+	packet_alert("tb3d: game time hr["..utils.to_str(m_h).."] mn["..utils.to_str(m_m).."] is night["..utils.to_str(isnight).."]")		--109996
 end
 
 ------monitor transfers and insure item parent is not item
@@ -549,7 +553,7 @@ end
 function skip_cave()
 	if give_info("tb3d_cave_done") == false then
 		--packet_alert("tb3d: skip cave [already done]")
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]ESCAPE Teleport Released, cave was already done")
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip")..translate("services_cave_already_done"))
 	else
 		if give_info("zvezdochet_talk_start") == true then		--didn't talk to stargazer
 			--packet_alert("tb3d: skip cave [zvezdochet_talk_start]")
@@ -1032,8 +1036,6 @@ function global_koef(diff_level, force_rank)				--109993
 	local diff = 1 + (((1 + diff_level) * rank) * koef_ratio)
 	if diff < 1 then
 		diff = 1
-	elseif TB3D_Modders.hardcore_mobs then
-		if diff > TB3D_Modders.hardcore_mobs_mult then diff = TB3D_Modders.hardcore_mobs_mult end
 	elseif diff_level and diff_level > 0 then
 		if diff > 5 then diff = 5 end								--collector limit
 	else
@@ -1648,6 +1650,7 @@ function env_update()
 		elseif m_h == 12 and m_m < 4 then
 			isnoon = true
 			remove_info("art_mec_spawn")
+			check_storm_over()				--109996
 		end
 		isnight = false
 	end
@@ -1927,6 +1930,24 @@ function clear_harsh_environment()											--109980
 	if remove_info("tb3d_bad_torch") then
 		delayed_action(1, "tb3d_bad_torch", 10)
 		amk.save_variable("torch_state", 3)
+	end
+end
+
+function check_storm_over()					--109996
+	local strm_strtd = amk.load_variable("tb3d_storm_started", 0)
+	local days = level.get_time_days()
+	if strm_strtd > 0 then
+		if not has_alife_info("tb3d_block_1") and strm_strtd + 3 > days then
+			TB3D_Services.give_info("tb3d_block_1")
+		elseif strm_strtd + 5 > days then
+			TB3D_Services.give_info("tb3d_block_2")						--only NPP areas
+		elseif strm_strtd + 7 > days then
+			TB3D_Services.give_info("tb3d_storm_over")
+			amk.del_variable("tb3d_storm_started")
+			TB3D_Services.set_new_levelup(3)							--set for process_levels
+		end
+	else
+		amk.save_variable("tb3d_storm_started", days)
 	end
 end
 
@@ -2385,18 +2406,21 @@ function jump_to_npc(npc)
 	end
 end
 
-function can_remove_dead(lname)
+function can_remove_dead(lname, npc_name)
 	local result = false
 	if lname == "l01_escape" then
 		if has_alife_info("bar_darklab_document_done") then result = true end
 	elseif lname == "l02_garbage" then
-		if has_alife_info("bar_darklab_document_done") then result = true end
+		if string_find(npc_name, "gar_stalker") then if has_alife_info("gar_dram_novice_mp5_m1_done") then result = true end
+		elseif string_find(npc_name, "gar_wounded_bandit") then if has_alife_info("bandranen_pda_est") then result = true end
+		elseif has_alife_info("bar_darklab_document_done") then result = true end
 	elseif lname == "marsh" then
 		if has_alife_info("brat_luis_have") then result = true end
 	elseif lname == "l05_bar" then
 		if has_alife_info("bar_deactivate_radar_done") then result = true end
 	elseif lname == "l04_darkvalley" then
-		if has_alife_info("bar_darklab_document_done") then result = true end
+		if string_find(npc_name, "dead_korchagin_military") then if is_collector(0) then result = true end
+		elseif has_alife_info("bar_darklab_document_done") then result = true end
 	elseif lname == "l07_military" then
 		if has_alife_info("rad_after_antenna_turned_off") then result = true end
 	elseif lname == "l03_agroprom" then
@@ -2406,13 +2430,16 @@ function can_remove_dead(lname)
 	elseif lname == "l06_rostok" then
 		if has_alife_info("yan_kill_brain_done") then result = true end
 	elseif lname == "l08_yantar" then
-		if has_alife_info("bar_x16_documents_done") then result = true end
+		if string_find(npc_name, "yan_ecolog_respawn_2") then if is_collector(0) then result = true end
+		elseif has_alife_info("bar_x16_documents_done") then result = true end
 	elseif lname == "l10_radar" then
-		if has_alife_info("rad_after_antenna_turned_off") then result = true end
+		if string_find(npc_name, "radar_monolit_dead") then if is_collector(0) then result = true end
+		elseif has_alife_info("rad_after_antenna_turned_off") then result = true end
 	elseif lname == "l11_pripyat" then
 		if has_alife_info("pri_wave7_end") or has_alife_info("pri_followers_all_dead") then result = true end
 	elseif lname == "l12_stancia" then
-		if has_alife_info("aes_found_sarcofag") then result = true end
+		if string_find(npc_name, "aes_Soldier_commander") then if is_collector(0) then result = true end
+		elseif has_alife_info("aes_found_sarcofag") then result = true end
 	elseif lname == "l12_stancia_2" then
 		if has_alife_info("aes2_monolit_ambush11") or has_alife_info("m9_ready") then result = true	end
 	elseif lname == "k01_darkscape" then
@@ -2458,7 +2485,10 @@ function can_remove_dead(lname)
     elseif lname == "l12u_control_monolith" then
 		if has_alife_info("zep24_have") then result = true end
 	elseif lname == "peshera" then
+		if string_find(npc_name, "peshera_stalker_dead") then if is_collector(0) then result = true end
+		else
 		--result = false
+		end
     elseif lname == "av_peshera" then
 		--result = false
 	elseif lname == "predbannik" then

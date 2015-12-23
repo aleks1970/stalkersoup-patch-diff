@@ -1,9 +1,10 @@
---TB3D 1.0.9.9.5.2 obj level
+--TB3D 1.0.9.9.5.2 obj level, translate
 function my_ver() return "1.0.9.9.5.2" end
 
 --local table_sort = table.sort
 --local table_remove = table.remove
 local table_insert = table.insert
+local translate = game.translate_string
 
 --[[					--testing only
 local gvtab ={}
@@ -82,7 +83,7 @@ function on_drop(item)
 			if se_box and se_box:clsid() == clsid.inventory_box then
 				table_insert(amk_offline_alife.protected.ids, se_box.id)
 				amk_offline_alife.update_tables(level.name())
-				news_manager.amk_send_tip("The cache has been securely locked", nil, nil, 5)
+				news_manager.amk_send_tip(translate("cache_has_been_locked"), nil, nil, 5)
 			end
 		end
 	end

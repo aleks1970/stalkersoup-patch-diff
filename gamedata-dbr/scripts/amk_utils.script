@@ -4,6 +4,7 @@ function my_ver() return "1.0.9.9.9.0" end
 --Check the number of items in the actor inventory
 function inventory_search(iItemSection, iNeededCount)
 	local vCount = 0
+	--TB3D_Services.packet_alert("amk utils: inventory search["..utils.to_str(iItemSection).."}")
 	db.actor:iterate_inventory(function (dummy, vItem)
 			if vItem:section() == iItemSection then
 				vCount = vCount + 1 

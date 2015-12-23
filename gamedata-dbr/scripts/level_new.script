@@ -1,5 +1,6 @@
 -- TB3D 1.0.9.9.2 dmx135, optimized db.actor, fixed tp
 function my_ver() return "1.0.9.9.2" end
+local translate = game.translate_string
 
 function create_sarkbunker_exit()	-- creates transitions:to/from sarcophagus in the LAB X-10
 	if TB3D_Services.give_info("level_newtri") then
@@ -18,7 +19,7 @@ function create_sarkbunker_exit()	-- creates transitions:to/from sarcophagus in 
         vector():set(0.0,0.0,-1.0 ),
 		"l12u_sarcofag",0,0,"sarbunker_exit")
 	end
-	news_manager.amk_send_tip("path_sarbunker", "path_new", 2, 25, "pda_icon")
+	news_manager.amk_send_tip(translate("path_sarbunker"), translate("path_new"), 2, 25, "pda_icon")
 end
 
 function create_sarchaes2_exit()	-- creates transitions: to/from sarcophagus CHAES2
@@ -38,5 +39,5 @@ function create_sarchaes2_exit()	-- creates transitions: to/from sarcophagus CHA
         vector():set(-0.997,0,0.06419),
 		"l12u_sarcofag",0,0,"sarchaes2_exit")
 	end
-	news_manager.amk_send_tip("path_sarchaes2", "path_new", 2, 25, "pda_icon")
+	news_manager.amk_send_tip(translate("path_sarchaes2"), translate("path_new"), 2, 25, "pda_icon")
 end

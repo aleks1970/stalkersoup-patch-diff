@@ -1,4 +1,4 @@
---<!-- TB3D 1.0.9.9.8.9 ui dots error, added community to friend cheat, deadman_to_life, obj level, remove all--> 
+--<!-- TB3D 1.0.9.9.8.9 ui dots error, added community to friend cheat, deadman_to_life, obj level, remove all, translate--> 
 function my_ver() return "1.0.9.9.8.9" end
 -- initialization
 class "spawner" (CUIScriptWnd)
@@ -104,7 +104,7 @@ function show_actor_position()
 		vid = db.actor:level_vertex_id()
 		gvid = db.actor:game_vertex_id()
 		local text = string.format("TB3D_Position[%s]: (%.3f,%.3f,%.3f),%d,%d)",level.name(),a.x,a.y,a.z,vid,gvid)
-		news_manager.amk_send_tip(text,"TB3D Server Master",20,60,"tb3d_master")
+		news_manager.amk_send_tip(text,translate("TB3D_Server_Master_0"),20,60,"tb3d_master")
 		TB3D_Services.info_alert(text)
 		a = db.actor:direction()
 		text = string.format("TB3D_Direction[%s]: rad(%.3f,%.3f,%.3f) deg(%.3f,%.3f,%.3f)",level.name(),a.x,a.y,a.z,utils.rad2deg(a.x),utils.rad2deg(a.y),utils.rad2deg(a.z))
@@ -196,7 +196,7 @@ function spawner:find_closest(type)
   	if closest>0 then
   	  obj = alife():object(closest)
   	  local map = TB3D_Services.get_obj_level(obj.m_game_vertex_id)
-  	  local text = obj:name().."; level="..game.translate_string(map)
+  	  local text = obj:name().."; level="..translate(map)
   	  if map ~= "" and map == level.name() then
   	    local p1 = db.actor:position()
   	    local p2 = obj.position

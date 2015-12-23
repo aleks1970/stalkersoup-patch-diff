@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.5 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric, targets_killed
+-- TB3D 1.0.9.9.9.5 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric, targets_killed, translate
 function my_ver() return "1.0.9.9.9.5" end
 
 local table_remove = table.remove
@@ -6,6 +6,7 @@ local string_len = string.len
 local string_sub = string.sub
 local string_find = string.find		---!!!!TB3D
 local math_random = math.random
+local translate = game.translate_string
 
 local random_task = nil
 
@@ -692,7 +693,7 @@ function CRandomTask:action_task_show(npc, actor)
 	  for k,v in pairs(self.task_id_by_parent[parent]) do   
 		if self:task_avail(actor, npc, nil, nil, self.task_info[v].init_phrase_id, false) then
 		  task_texture, task_rect = get_texture_info("ui_icons_task_"..self.task_info[v].type, "ui_iconsTotal_locations")
-		  news_manager.give_talk_message(game.translate_string(self.task_info[v].name), task_texture, task_rect,"iconed_trade_info")
+		  news_manager.give_talk_message(translate(self.task_info[v].name), task_texture, task_rect,"iconed_trade_info")
 		end
 	  end
   end
@@ -1425,7 +1426,7 @@ function show_reward(actor,npc,p1,p2)
 	if reward_money ~= nil then 
 		task_texture, task_rect = get_texture_info("ui_iconsTotal_found_money")
 		if task_details.need_return and reward_text == "" then
-			news_manager.give_talk_message(reward_money .. " RU (" .. game.translate_string("return_for_reward") .. ")", task_texture, task_rect, "iconed_trade_info")
+			news_manager.give_talk_message(reward_money .. " RU (" .. translate("return_for_reward") .. ")", task_texture, task_rect, "iconed_trade_info")
 		else
 			news_manager.give_talk_message(reward_money .. " RU", task_texture, task_rect,"iconed_trade_info")
 		end
@@ -1447,9 +1448,9 @@ function format_reward_text(reward_list)
 	end
 	for i,v in pairs(rwd) do
 		if v == 1 then
-			reward_text = reward_text .. game.translate_string(news_manager.get_inv_name(i)) .. ", "
+			reward_text = reward_text .. translate(news_manager.get_inv_name(i)) .. ", "
 		else
-			reward_text = reward_text .. string.format("%s",v) .. "x " .. game.translate_string(news_manager.get_inv_name(i)) .. ", "
+			reward_text = reward_text .. string.format("%s",v) .. "x " .. translate(news_manager.get_inv_name(i)) .. ", "
 		end
 	end
 	if string_len(reward_text) >=2 then

@@ -1,8 +1,9 @@
---TB3D 1.0.9.9.7.5
+--TB3D 1.0.9.9.7.5, translate
 function my_ver() return "1.0.9.9.7.5" end
 --------------------------------------------------------------------------------------------
 -----------Psi-rays for Alt_sys_artmod(by Psi-rays & RamSoft)v.2.0----------------------------
 ----------------------------------------------------------------------------------------------
+local translate = game.translate_string
 
 class "pdaam" (CUIScriptWnd)
 
@@ -166,7 +167,7 @@ function pdaam:InitControls()
 			if has_alife_info("info_artmod_cristall_mosquito_bald")  then
 				self:Register(xml:Init3tButton("btn_grv_4", self),"btn_grv_4")
 			end
-			if has_alife_info("info_artmod_rusty_sea-urchin_mosquito_bald")  then --- slyuda
+			if has_alife_info("info_artmod_rusty_sea_urchin_mosquito_bald")  then --- slyuda
 				self:Register(xml:Init3tButton("btn_grv_5", self),"btn_grv_5")
 			end	
 			if has_alife_info("info_artmod_dummy_dummy_mosquito_bald")  then
@@ -300,7 +301,7 @@ local pos=actor:position()
 	if amk_utils.inventory_search("bezoar",1) ~= false then
 		amk.remove_item_from_inventory_by_name("bezoar",actor)
 		level.add_pp_effector("teleport.ppe", 1524, false)
-		amk_mod.af_start_transform_timer(amk_mod.af_start_transform(85,15,"af_buliz","af_caterpillar") , pos ,0,0,3,game.translate_string(amk.get_inv_name("af_caterpillar")))
+		amk_mod.af_start_transform_timer(amk_mod.af_start_transform(85,15,"af_buliz","af_caterpillar") , pos ,0,0,3,translate(amk.get_inv_name("af_caterpillar")))
 	else
 		news_manager.amk_send_tip(translate("sms_transmutat_bezoar"),translate("sms_incomming"),10,30,"pda_icon")
 	end
@@ -360,7 +361,7 @@ function pdaam:buzz_5()
 		--self:on_quit()
 end
 function pdaam:buzz_6()
-		self:start_transf("af_night_star","af_soul","af_electra_moonlight","af_rusty_sea-urchin","af_fuzz_kolobok") --+
+		self:start_transf("af_night_star","af_soul","af_electra_moonlight","af_rusty_sea_urchin","af_fuzz_kolobok") --+
 		--self:on_quit()
 end
 function pdaam:buzz_7()
@@ -395,7 +396,7 @@ function pdaam:mncr_5()
 		--self:on_quit()
 end
 function pdaam:mncr_6()
-		self:start_transf("af_ameba_mica","af_rusty_sea-urchin","af_gold_fish","af_night_star","af_dummy_glassbeads") --+
+		self:start_transf("af_ameba_mica","af_rusty_sea_urchin","af_gold_fish","af_night_star","af_dummy_glassbeads") --+
 		--self:on_quit()
 end
 -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -418,7 +419,7 @@ function pdaam:grv_4()
 		--self:on_quit()
 end
 function pdaam:grv_5()
-		self:start_transf("af_ameba_slime","af_blood","af_rusty_kristall","mutant_krovosos_jaw","af_rusty_sea-urchin")--+
+		self:start_transf("af_ameba_slime","af_blood","af_rusty_kristall","mutant_krovosos_jaw","af_rusty_sea_urchin")--+
 		--self:on_quit()
 end
 function pdaam:grv_6()
@@ -451,7 +452,7 @@ function pdaam:start_transf(it1,it2,it3,it4,fit)
 		amk.remove_item_from_inventory_by_name(it3,actor)
 		amk.remove_item_from_inventory_by_name(it4,actor)
 		level.add_pp_effector("teleport.ppe", 1524, false)
-		amk_mod.af_start_transform_timer(amk_mod.af_start_transform(85,15,"af_buliz",fit) , pos ,0,0,3,game.translate_string(amk.get_inv_name(fit)))
+		amk_mod.af_start_transform_timer(amk_mod.af_start_transform(85,15,"af_buliz",fit) , pos ,0,0,3,translate(amk.get_inv_name(fit)))
 	else
 		news_manager.amk_send_tip(translate("sms_transmutat_fail"),translate("sms_incomming"),10,30,"pda_icon")
 	end

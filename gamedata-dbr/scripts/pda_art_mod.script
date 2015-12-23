@@ -1,9 +1,10 @@
---TB3D 1.0.9.9.1
+--TB3D 1.0.9.9.1, translate
 function my_ver() return "1.0.9.9.1" end
 ----------------------------------------------------------------------------------------------
 -----------Psi-rays for Alt_sys_artmod(by Psi-rays & RamSoft)v.2.0----------------------------
 ----------------------------------------------------------------------------------------------
 
+local translate = game.translate_string
 function f_pda_art_mod_use(obj)
 gnn()
 local ahp = db.actor:object("pda_art_mod")
@@ -19,8 +20,8 @@ function gnn()
 		if an then
 			local anname=an:name()
 			--local sid=an:story_id()
-			--news_manager.amk_send_tip(game.translate_string(anname),nil,nil,5)
-			--news_manager.amk_send_tip(game.translate_string(sid),nil,nil,5)
+			--news_manager.amk_send_tip(translate(anname),nil,nil,5)
+			--news_manager.amk_send_tip(translate(sid),nil,nil,5)
 			amk.del_variable("is_anom")
 			--if aid ~= nil then 
 				amk.save_variable("is_anom",anname) 

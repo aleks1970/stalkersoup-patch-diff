@@ -553,16 +553,25 @@ function killers_in_camp()
 		if rmndr2 and rmndr2 ~= 0 then 											--city creatures
 			type = 3
 		end
+		if cnt > 3 then
+			TB3D_Mobs.spawn_mob(-339.522,-13.436,383.070,13343,1847,type,2)		--guard right
+			cnt = cnt - 2
+		end
 		TB3D_Mobs.spawn_mob(-344.543,-13.615,397.582,10002,1847,type,cnt)		--near beds
-		TB3D_Mobs.spawn_mob(-339.522,-13.436,383.070,13343,1847,type,cnt)		--guard right
 	else
 		if rmndr2 and rmndr2 ~= 0 then 											--killers
 			type = 6
 		end
+		if cnt > 3 then
+			TB3D_Mobs.spawn_npcs(-338.113,-13.662,391.415,14273,1847,type,2)		--guard left
+			cnt = cnt - 2
+		end
+		if cnt > 3 then
+			TB3D_Mobs.spawn_npcs(-339.522,-13.436,383.070,13343,1847,type,2)		--guard right
+			cnt = cnt - 2
+		end
 		TB3D_Mobs.spawn_npcs(-348.533,-13.737,398.042,7999,1847,type,cnt)		--near fire
 		TB3D_Mobs.spawn_npcs(-344.543,-13.615,397.582,10002,1847,type,cnt)		--near beds
-		TB3D_Mobs.spawn_npcs(-338.113,-13.662,391.415,14273,1847,type,cnt)		--guard left
-		TB3D_Mobs.spawn_npcs(-339.522,-13.436,383.070,13343,1847,type,cnt)		--guard right
 	end
 end
 
@@ -584,7 +593,7 @@ end
 ---------------------------- ZEP NPP2 -----------------------------------
 function npp2_killers_npp1()
 	local mob = amk.load_variable("tb3d_doc_count", 0) + 1
-	local cnt, rmndr = math_fmod(mob, 2)
+	local cnt, rmndr = math_fmod(mob, 4)
 	if cnt < 3 then cnt = 3 end
 	local type = 5															--default monolith
 	if rmndr and rmndr ~= 0 then				--killers
@@ -600,7 +609,7 @@ end
 
 function npp2_killers_rs()
 	local mob = amk.load_variable("tb3d_doc_count", 0) + 1
-	local cnt, rmndr = math_fmod(mob, 2)
+	local cnt, rmndr = math_fmod(mob, 4)
 	if cnt < 3 then cnt = 3 end
 	local type = 6															--default killers
 	if rmndr and rmndr ~= 0 then				--monolith
@@ -1132,7 +1141,7 @@ end
 function npp2_mushroom_take()
 	local tgt = math_random(1,7)
 	if tgt == 1 then
-		TB3D_Services.move_actor(944.056,-0.099,150.380, true)		--,244635,2636)		--under tank near npp1 exit
+		TB3D_Services.move_actor(944.056,-0.099,150.380, true)		--,244635,2636)			--under tank near npp1 exit
 	elseif tgt == 2 then
 		TB3D_Services.move_actor(975.355,13.191,224.725, true)		--),240903,2637)		--antannae dish
 	elseif tgt == 2 then
@@ -1140,10 +1149,18 @@ function npp2_mushroom_take()
 	elseif tgt == 2 then
 		TB3D_Services.move_actor(719.056,19.225,118.530, true)		--),196907,2633)		--high ledge
 	elseif tgt == 2 then
-		TB3D_Services.move_actor(257.971,51.630,139.722, true)		--),92127,2574)		--blind corner
+		TB3D_Services.move_actor(257.971,51.630,139.722, true)		--),92127,2574)			--blind corner
 	elseif tgt == 2 then
 		TB3D_Services.move_actor(577.760,9.090,205.097, true)		--),173488,2631)		--under tower
 	else
 		TB3D_Services.move_actor(444.933,10.101,177.676, true)		--),148554,2599)		--suspended platform
 	end
+end
+
+function spawn_f1_mushart()
+	alife():create("af_dummy_mushroom", vector():set(-151.632,21.042,185.398),127361,4680)	--F1 floating island big
+	alife():create("af_dummy_mushroom", vector():set(-223.754,-2.375,82.551),337173,3708)	--table in jupiter lab
+	alife():create("af_dummy_mushroom", vector():set(201.287,-6.003,-36.824),510998,4384)	--research above brain
+	alife():create("af_dummy_mushroom", vector():set(-70.694,-4.716,113.152),209469,4384)	--research underground crane cab
+	alife():create("af_dummy_mushroom", vector():set(1094.891,0.758,-380.806),408027,2401)	--npp1 cooling tower
 end

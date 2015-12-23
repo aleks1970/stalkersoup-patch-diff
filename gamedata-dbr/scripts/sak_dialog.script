@@ -378,16 +378,16 @@ function dummy_spring_have()
 	return amk_utils.inventory_search("af_dummy_spring",1) ~= false
 end
 function give_3rusty_sea_urchin(first_speaker, second_speaker)
-	sak.out_item_namber("af_rusty_sea-urchin", 3)
+	sak.out_item_namber("af_rusty_sea_urchin", 3)
 end
 function rusty_sea_urchin_3have()
-	return amk_utils.inventory_search("af_rusty_sea-urchin",3) ~= false
+	return amk_utils.inventory_search("af_rusty_sea_urchin",3) ~= false
 end
 function give_rusty_sea_urchin(first_speaker, second_speaker)
-	sak.out_item_namber("af_rusty_sea-urchin", 1)
+	sak.out_item_namber("af_rusty_sea_urchin", 1)
 end
 function rusty_sea_urchin_have()
-	return amk_utils.inventory_search("af_rusty_sea-urchin",1) ~= false
+	return amk_utils.inventory_search("af_rusty_sea_urchin",1) ~= false
 end
 function give_rusty_kristall(first_speaker, second_speaker)
 	sak.out_item_namber("af_rusty_kristall", 1)
@@ -753,11 +753,18 @@ end
 function dummy_battery_red_have()
 	return amk_utils.inventory_search("af_dummy_battery_red",1) ~= false
 end
+function dummy_battery_red_have_info()
+	return has_alife_info("doktor_teleport_11_have")
+end
 function give_dummy_battery_red(first_speaker, second_speaker)
 	sak.out_item_namber("af_dummy_battery_red", 1)
 end
 function dummy_pellicle_red_have()
+	--TB3D_Services.packet_alert("sak dialog: dummy_pellicle_red_have")
 	return amk_utils.inventory_search("af_dummy_pellicle_red",1) ~= false
+end
+function dummy_pellicle_red_have_info()
+	return has_alife_info("doktor_teleport_12_have")
 end
 function give_dummy_pellicle_red(first_speaker, second_speaker)
 	sak.out_item_namber("af_dummy_pellicle_red", 1)

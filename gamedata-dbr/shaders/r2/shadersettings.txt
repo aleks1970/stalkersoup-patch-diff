@@ -62,8 +62,8 @@
 		#define XKERNEL float(1.8) 		// Probably should be same as KERNEL!	
 	#endif
 	//#define DEPTH_OF_FIELD 		//109992 not implemented yet, Enables Depth Of Field   # Blurs objects in the distance
-	//#define SATURATION_FILTER		// Enables Saturation Filter, giving a grey like appearance to areas which are "unsafe".
-	//#define CONTRAST_FILTER			// Enables Contrast Filter, giving a grey like appearance to areas which are "unsafe".
+	#define SATURATION_FILTER		// Enables Saturation Filter, giving a grey like appearance to areas which are "unsafe".
+	#define CONTRAST_FILTER			// Enables Contrast Filter, giving a grey like appearance to areas which are "unsafe".
 	//#define SSAO					// Enable Screen Space Ambient Occlusion << # Looks good if you are on Object Dynamic Lighting >>
 		
 /////////////////////////// Direct X Support ////////////////////////////

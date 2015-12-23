@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.7.6 optimized, added force weapon hide, GC on inv close, removed garbagecollect, bioradar and belt size check
+-- TB3D 1.0.9.9.7.6 optimized, added force weapon hide, GC on inv close, removed garbagecollect, bioradar and belt size check, translate
 function my_ver() return "1.0.9.9.7.6" end
 
 belt = {}					--actually whole inventory, not the belt slots
@@ -9,6 +9,7 @@ local need_update = true
 local inventory_open = false
 local separator_spawned = false
 local separator = "separator"
+local translate = game.translate_string
 
 local flag
 
@@ -159,7 +160,7 @@ end
 function check_blood()
 --   if belt_status == true then
       if belt["af_blood"]~=nil and belt["af_blood"]>0 then -- that is, when setting the belt [af_blood] is 1, 2, 3 .. How to hang Stones.
-             news_manager.amk_send_tip("Blood Stone on the belt")
+             news_manager.amk_send_tip(translate("Blood_Stone_on_belt"))
           end
 --   end
 end
@@ -199,7 +200,7 @@ local sect=nil
 			sect = sobj:section_name()
 			if unique_sect[sect] and t[sect] ~= nil and t[sect] > 0 then
 			alife():release(sobj, true)
-			text="Unnecessary artifact: "..game.translate_string(amk.get_inv_name(sect)).." moved from belt to pack"
+			text=translate("Unnecessary_artifact_0").." "..translate(amk.get_inv_name(sect)).." "..translate("moved_from_belt_pack")
 			news_manager.send_tip_txt(db.actor, text, nil, nil, nil)
 			amk.spawn_item_in_inv(sect, db.actor)
 			t[sect] = t[sect] - 1

@@ -781,6 +781,20 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			spawn_anomoly("zone_emi_tb3d",-16.1000003814697,-34.4000015258789,27.5289993286133,1251,5372)
 		end
 	end
+--[[	local id, obj
+	for id=first_object, last_object do
+		obj = level.object_by_id(id)							--only returns objects for active level
+		if obj ~= nil and
+		   obj:section() == "tb3dm_firelight"
+		  -- and string.find(obj:name(), "tb3dm_firelight")
+		then
+			TB3D_Services.packet_alert("dyn spawn: lamp on["..obj:name().."]["..obj:section().."]")
+			local hl = obj:get_hanging_lamp()
+			if hl ~= nil then
+				hl:turn_on()
+			end
+		end
+	end]]--
 	TB3D_Services.info_alert("tb3d triggers: dynamic spawns level["..lname.."] done")
 end
 
@@ -820,6 +834,7 @@ end
 function spawn_fire(lpos, lv, gv)
 	alife():create("zone_burning_tb3d",lpos,lv,gv)			--heat waves and injury
 	alife():create("zone_fire_tb3d",lpos,lv,gv)				--flames
+	--aem_lights.create_lamp(vector(lpos.x,lpos.y+1,lpos.z),lv,gv, nil, "", 1.0, is_shadows, -8878179, "tb3dm_firelight")
 	--alife():create("zone_campfire_tb3d",lpos,lv,gv)		--smoke around fire
 end
 

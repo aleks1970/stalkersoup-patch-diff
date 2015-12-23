@@ -8,7 +8,7 @@
 -- old_research_send, spawn_sewer_stuff
 function my_ver() return "1.0.9.9.9.5" end
 ---these trigger points are being re-used for the Collector gameplay
-local math_random=math.random
+local math_random = math.random
 local math_floor = math.floor
 local math_ceil = math.ceil
 local string_find = string.find
@@ -1061,10 +1061,11 @@ function warlab_spawns(level_up)			--109978
 		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,1,false)			--around lab entrance
 		TB3D_Mobs.spawn_killer_squad(158.189,30.681,-499.143,518915,3131,6,1,false)
 		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,1,false)
-	elseif level_up > 2 then
-		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,2,false)			--around lab entrance
-		TB3D_Mobs.spawn_killer_squad(158.189,30.681,-499.143,518915,3131,6,2,false)
-		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,2,false)
+	else
+		local cnt = math_random(3)
+		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,cnt,false)			--around lab entrance
+		TB3D_Mobs.spawn_killer_squad(158.189,30.681,-499.143,518915,3131,6,cnt,false)
+		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,cnt,false)
 	end
 end
 
@@ -1074,6 +1075,7 @@ function npp_spawns(idx)			--109978
 		alife():create("vehicle_tb3d_btr", vector():set(966.393,-0.037,-219.751),432458,2285)	--drivable tank at entrance
 		alife():create("vehicle_tb3d_btr", vector():set(516.691,-0.101,-41.436),229322,2304)	--drivable tank near large pipes
 		alife():create("vehicle_tb3d_sport", vector():set(873.004,-0.102,-361.184),389488,2400)	--buggy behind gate for fast travel
+		is_save = true		--109996
 	end
 	if is_save then amk.save_variable("npp1_spawns", idx+1) end
 end
@@ -1207,6 +1209,19 @@ function spawn_zat_portals()			--109987
 	alife():create("zone_teleport", vector():set(76.357,-0.263,33.978),1021131,3677)		--marker
 	alife():create("zat_radar_tele", vector():set(-412.857,12.192,-22.607),158823,3663)		--radar to ship
 	alife():create("zone_teleport", vector():set(-412.857,12.192,-22.607),158823,3663)		--marker
+end
+
+function spawn_npp1_portals()
+	alife():create("npp1_train_tele", vector():set(1063.704,1.518,-28.231),473438,2280)		--train car portal
+	alife():create("zone_teleport", vector():set(1063.704,1.518,-28.231),473438,2280)		--marker
+	alife():create("npp1_sarc_tele", vector():set(387.701,0.215,62.286),168994,2385)		--sarc entrance
+	alife():create("zone_teleport", vector():set(387.701,0.215,62.286),168994,2385)			--marker
+	alife():create("npp1_tower_tele", vector():set(1095.0,0.758,-390.0),408027,2401)		--inside tower
+	alife():create("zone_teleport", vector():set(1094.891,0.758,-380.806),408027,2401)		--marker
+	alife():create("npp1_tank_tele", vector():set(393.454,-0.002,-209.491),171475,2347)		--between tanks near gen exit
+	alife():create("zone_teleport", vector():set(393.454,-0.002,-209.491),171475,2347)		--marker
+	alife():create("npp1_sign_tele", vector():set(929.176,-0.000,-197.663),409630,2285)		--behind sign
+	alife():create("zone_teleport", vector():set(929.176,-0.000,-197.663),409630,2285)		--marker
 end
 
 function signal_green(x,y,z,lv,gv)			--109978, moved here
@@ -1456,6 +1471,10 @@ function check_coll_portals()												--109987
 		spawn_zat_portals()
 		spawned = 1
 	end
+	if spawned < 2 then							--109996
+		spawn_npp1_portals()
+		spawned = 2
+	end
 	amk.save_variable("tb3d_coll_ports", spawned)
 end
 
@@ -1485,4 +1504,22 @@ function spawn_sewer_stuff()	--109995, start collector
 	alife():create("bioradar", vector():set(-117.921,-1.824,5.525),224007,3615)
 	alife():create("wpn_fn2000_sniper", vector():set(-117.921,-1.824,5.525),224007,3615)
 	alife():create("outfit_specnaz_m1", vector():set(-117.921,-1.824,5.525),224007,3615)
+end
+
+function spawn_gar2_bandits()					--109996, when talk to gar_hellcar_group_2
+	TB3D_Mobs.spawn_bandits(-125.320,-2.600,-197.555,90553,269,12)	--veh graveyard
+end
+
+function spawn_gar_bandits()					--109996, entering garbage after storm starts
+	TB3D_Mobs.spawn_bandits(-63.527,0.847,7.235,134373,330,6)		--hangar campfire
+	TB3D_Mobs.spawn_bandits(-86.797,0.382,9.641,121247,328,6)		--hangar center
+	TB3D_Mobs.spawn_bandits(77.985,0.139,-148.290,247047,397,10)	--next to swamps
+end
+
+function spawn_agro_dogs()
+	TB3D_Mobs.spawn_dogs(80.551,0.034,-133.653,315623,427, 6)		--van on road to base
+	TB3D_Mobs.spawn_dogs(-150.344,-0.390,-305.699,87193,447, 10)	--S campfire behind base
+	TB3D_Mobs.spawn_dogs(-140.965,7.594,-101.493,98014,602, 8)		--N hill above base
+	TB3D_Mobs.spawn_dogs(-114.171,10.455,27.215,126000,527, 8)		--hill above swamp
+	TB3D_Mobs.spawn_dogs(-15.992,7.149,140.283,224351,515, 12)		--N powerlines
 end

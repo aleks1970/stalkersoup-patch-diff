@@ -3,11 +3,12 @@
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
--- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff
+-- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, text color - aleks1970
 function my_ver() return "1.0.9.9.9.5" end
 
 local math_random = math.random
 local translate = game.translate_string
+local text_color_name = TB3D_Services.get_text_color("name")
 
 --' spawns the radio wolf at the dump (Syaka function stopped working)
 function spawn_add_resiver()
@@ -525,7 +526,7 @@ end
 --' re spawn monsters in the cave and several artov
 function monstr1_spawn1_peshera1()
 	alife():create("af_rusty_thorn",vector():set(-93.115,-12.629,18.815),18189,2872)
-	alife():create("af_rusty_sea-urchin",vector():set(-99.898,-12.647,48.704),16000,2869)
+	alife():create("af_rusty_sea_urchin",vector():set(-99.898,-12.647,48.704),16000,2869)
 	if TB3D_Modders.cave_hard == true then
 		alife():create("m_poltergeist_strong_flame",vector():set(-67.926,-12.681,76.354),24792,2873)
 		TB3D_Triggers.spawn_item("bloodsucker_strong",-136.398,2.679,26.343,7031,2866,2)
@@ -2481,7 +2482,7 @@ function zabral_gad_pechatku(first_speaker, second_speaker)
 end
 
 --function zvezd_sms_karta()
---news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("name").."Astrologer:  %c[default]Strelok ... I'll be waiting for you at the Rookie Village in the Cordon. I hope that you have heard from Fang. Don't forget to bring that map of where that Safe is ...\\n", nil, nil, 60000)
+--news_manager.send_tip_txt(db.actor, text_color_name.."Astrologer:  %c[default]Strelok ... I'll be waiting for you at the Rookie Village in the Cordon. I hope that you have heard from Fang. Don't forget to bring that map of where that Safe is ...\\n", nil, nil, 60000)
 --end
 
 --' telohran Panthers gave art goodbye
@@ -3977,7 +3978,7 @@ function u_tretego_generatora_sms5()
 end
 --function u_tretego_generatora_sms5()
 	--if TB3D_Services.is_collector(4000) == false then
-		--news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("name").."SOLVADOR:  %c[default]Yes he was there, plus or minus mixed, geek-novice... And?\\n", nil, nil, 15000)
+		--news_manager.send_tip_txt(db.actor, text_color_name.."SOLVADOR:  %c[default]Yes he was there, plus or minus mixed, geek-novice... And?\\n", nil, nil, 15000)
 		-- Soundtrack
 		--local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_110]])
 		--snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -7599,7 +7600,7 @@ local tabl_art_v_buliz = {
     ["af_dummy_battery"] = 0.6,
     ["af_dummy_dummy"] = 0.6,
     ["af_dummy_glassbeads"] = 0.6,
-    ["af_rusty_sea-urchin"] = 0.6,
+    ["af_rusty_sea_urchin"] = 0.6,
     ["af_fuzz_kolobok"] = 0.6
     }
 local art_v_buliz_virogdeno_count = 0 -- number of degenerate artifacts

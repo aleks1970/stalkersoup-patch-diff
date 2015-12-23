@@ -1,12 +1,13 @@
--- TB3D 1.0.9.9.9.2 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.0.9.9.9.6 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
 -- atp_brigada1, dead removal, travka, val bloodsucker, rad_curve, val_sniper3, turret, labx18 bad ameba,
 -- redone for new 'can go on line', sak_book4, f1 to dyn content, hog, dark_btr2_restrictor, af_ameba_slug to af_ameba_,
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
--- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count, dyn spawns
-function my_ver() return "1.0.9.9.9.2" end
+-- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
+-- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin
+function my_ver() return "1.0.9.9.9.6" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -51,6 +52,14 @@ function force_fixes()
 		if obj then
 			if obj.name then obj_name = obj:name() else obj_name = "NIL" end
 			if obj.section_name then sect = obj:section_name() else sect = "NIL" end
+			if string_find(obj_name, "sea-urchin") then			--109996, remove names with '-'
+				--if TB3D_Modders.use_cleaner_message == true then
+					TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] removed")
+				--end
+				alife():release(obj, true)
+				fixed_count = fixed_count + 1
+				nil_count = nil_count + 1
+			end
 			local has_parent = TB3D_Services.check_has_parent(obj)
 			if game_graph():valid_vertex_id(obj.m_game_vertex_id) then
 				obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
@@ -200,8 +209,6 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 		else
 			is_skip = true
 		end
-	--elseif string_find(obj_name, "ldk") and not string_find(obj_name, "_ldk") then
-		--is_fixed = true
 	elseif sect == "inventory_box" or sect == "smart_terrain" then
 		if string_find(obj_name, "ds_bandit_stoy_inventory_box") then
 			if has_alife_info("tweed_zep3_start") then
@@ -212,11 +219,6 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 		else
 			is_skip = true
 		end
-		--if string_find(obj_name, "f1_st_boar_flesh7") then								--grabs esc_flesh_normal
-			--is_fixed = true
-		--else
-			is_skip = true
-		--end
 	elseif sect == "physic_destroyable_object" or sect == "physic_object" then
 		if string_find(obj_name, "aes_physic_destroyable_object")
 		  or string_find(obj_name, "pol_hamm") then
@@ -231,12 +233,12 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 			else
 				is_skip = true
 			end
-		elseif string_find(obj_name,"x16_physic_destroyable_object_0000") then				--grate can fall shut in an explosion
-			if has_alife_info("yantar_tunnel_finish") then
-				is_fixed = true
-			else
-				is_skip = true
-			end
+		--elseif string_find(obj_name,"x16_physic_destroyable_object_0000") then				--grate can fall shut in an explosion
+			--if has_alife_info("yantar_tunnel_finish") then
+				--is_fixed = true
+			--else
+				--is_skip = true
+			--end
 		elseif string_find(obj_name, "monolith_generator_000") then
 			if is_collector then
 				is_fixed = true
@@ -249,8 +251,8 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 			else
 				is_skip = true
 			end
-		elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--inner door of upper room
-			is_fixed = true
+		--elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--inner door of upper room
+			--is_fixed = true
 		else
 			is_skip = true
 		end
@@ -298,24 +300,6 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 		end
 	elseif string_find(obj_name, "outfit_specnaz_m1") then					--F1 stash interferes with Yantar quest
 		if lnum == 45 then is_fixed = true end
-	--elseif string_find(obj_name, "m_teleport_radar_derevo")
-	  --or string_find(obj_name, "^zone_teleport")
-	  --or string_find(obj_name, "m_teleport_holm2")
-	  --or string_find(obj_name, "m_teleport_holm3")
-	  --or string_find(obj_name, "m_teleport_holm4")
-	  --or string_find(obj_name, "m_teleport_holm5")
-	 -- then														--treasure hunt mteleports in radar
-		--if is_collector and has_alife_info("tb3d_radar_done") then
-			--is_fixed = true
-		--else
-			--is_skip = true
-		--end
-	--elseif string_find(obj_name, "^zone_sphere") or string_find(obj_name, "m_teleport_ju") then						--treasure hunt mteleports in jupu
-		--if is_collector and has_alife_info("collector_done_with_jupund") then
-			--is_fixed = true
-		--else
-			--is_skip = true
-		--end
 	end
 	return is_skip, is_fixed
 end
@@ -388,13 +372,7 @@ function check_restrictors(obj_name, sect, is_collector)
 				is_skip = true
 			end
 		elseif string_find(obj_name, "esc_prison") then
-			--if is_collector
-			  --or has_alife_info("esc_darklab_documents_read")
-			  --or has_alife_info("esc_darklab_documents_gain") then
-				--is_fixed = true
-			--else
-				is_skip = true
-			--end
+			is_skip = true
 		elseif string_find(obj_name, "x18_poltergeist_door_closer")
 		  or string_find(obj_name, "x16_space_restrictor_ghost_pda")
 		  or string_find(obj_name, "yan_controller_respawn_01")
@@ -641,7 +619,7 @@ function check_dyn_spawns(obj, obj_name, sect, obj_level)
 			end
 			is_skip = true
 		else
-			is_fixed = true
+			is_fixed = true							--dynamic lights
 		end
 	elseif obj_level < 9							--only levels with dyn content
 	  or (obj_level > 10 and obj_level < 13)		--skip 10, 13
@@ -1064,9 +1042,9 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 		   or string_find(obj_name, "atp_soldat_attakker")
 		   or string_find(obj_name, "atp_trupak_disk")
 		   or string_find(obj_name, "atp_presled_last")
-		  or string_find(obj_name, "atp_monolit")
-		  or string_find(obj_name, "atp_kalinin")
-		  or string_find(obj_name, "atp_brigada") then
+		   or string_find(obj_name, "atp_monolit")
+		   or string_find(obj_name, "atp_kalinin")
+		   or string_find(obj_name, "atp_brigada") then
 				if is_collector then
 					is_fixed = true
 				else
@@ -1184,7 +1162,7 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 			or string_find(obj_name, "gen_sapsan")
 			or string_find(obj_name, "gener_desant")
 			or string_find(obj_name, "generators_monolit")
-		   or string_find(obj_name, "gener_bl_doktor") then
+		    or string_find(obj_name, "gener_bl_doktor") then
 				if string_find(obj_name, "koster_") then
 					is_skip = true
 				elseif is_collector then
@@ -1192,8 +1170,6 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 				else
 					is_skip = true
 				end
-		--elseif string_find(obj_name,"af_") then									--bad vertex
-			--is_fixed = true
 		 end
 	elseif obj_level == 27 then												--warlab
 		  if string_find(obj_name, "pantera")
@@ -1320,30 +1296,11 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 	elseif obj_level == 36 then												--labx8
 	elseif obj_level == 37 then												--cs agro under
 	elseif obj_level == 38 then												--predbennik
-		--if string_find(obj_name,"predbannik_m_trader") then				--109980, like sid!!, MODEL: can't find cycles
-			--is_fixed = true
-		--elseif string_find(obj_name,"predbannik_barman") then				--remove so he can be respawned
-			--if not has_alife_info("tb3d_pred_trader") then
-				--is_fixed = true
-			--end
-		--end
 	--elseif obj_level == 39 then											--old garbage same as promzone
 	elseif obj_level == 40 then												--old yantar
-		--if string_find(obj_name,"yan_old_inventory_box_0004") then							--bad vertex
-			--is_fixed = true
-		--end
-		--if string_find(obj_name,"af_") then									--bad vertex
-			--is_fixed = true
-		--end
 	elseif obj_level == 41 then												--old swamp
-		--if string_find(obj_name, "af_") then								--mass spawning
-			--is_fixed = true
-		--end
 	elseif obj_level == 42 then												--hiding road
 	elseif obj_level == 43 then												--darkscape
-		--if string_find(obj_name,"ds_tushkano") then							--path errors
-			--is_fixed = true
-		--end
 	elseif obj_level == 44 then												--dark forest
 	elseif obj_level == 45 then												--f-1
 	elseif obj_level == 46 then												--promzone
