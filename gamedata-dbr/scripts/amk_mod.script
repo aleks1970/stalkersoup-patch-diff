@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.2 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.9.4 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -8,8 +8,9 @@
 -- sak_book4, tb3d_collector, corrected lighting_val, changed fixer to only be called on level change, sak_book4, news, blowout types, get_obj_level,
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
--- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp
-function my_ver() return "1.0.9.9.9.2" end
+-- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
+-- test_for_need_sleep_matras aleks1970
+function my_ver() return "1.0.9.9.9.4" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -48,11 +49,11 @@ function first_run() 		--mod_call() from amk.script on_game_load, do not spawn o
 		verify_failed = TB3D_Verify_Scripts.verify_files()
 	end
 	--!!!!TB3D - !!!!!!! DO NOT CHANGE - ORDER IS CRITICAL !!!!!!!!!!!! -----
-	local tb3d_ver = amk.load_variable("tb3d_version",0)						--returns 0 if not created yet
-	local level_up = TB3D_Services.init_level_up()								--109980
+	local tb3d_ver = amk.load_variable("tb3d_version",0)		--returns 0 if not created yet
+	local level_up = TB3D_Services.init_level_up()				--109980
 	--TB3D_Services.packet_alert("TB3D starting ver["..utils.to_str(tb3d_ver).."] levelup["..utils.to_str(level_up).."]")
-	if tb3d_ver < TB3D_Services.major_version then								--older saves or new game
-		if tb3d_ver > 0 then													--109989, old legacy tb3d save
+	if tb3d_ver < TB3D_Services.major_version then				--older saves or new game
+		if tb3d_ver > 0 then									--109989, old legacy tb3d save
 			if level_up > 0 then
 				TB3D_Services.packet_alert("TB3D converting old collector save["..utils.to_str(tb3d_ver).."] to["..TB3D_Services.major_version.."] levelup["..utils.to_str(level_up).."] returning to the zone...")
 			elseif level_up == -1 then
@@ -543,9 +544,9 @@ function test_for_need_sleep_matras(oid)
 			for npcId, npc in pairs(db.storage) do
 				obj = level_object_by_id(npcId)
 				if obj then
-					if obj:id() ~= db.actor					--109978
-					  and (( IAmAStalker[obj:clsid()] and amk.get_npc_relation(obj,db.actor)=="enemy" ) or IAmAMonster[obj:clsid()])
-					  and obj:position():distance_to(actorPos) < 40 and obj:see(db.actor) then
+					if	(obj:id() ~= db.actor
+						and (( IAmAStalker[obj:clsid()] and amk.get_npc_relation(obj,db.actor)=="enemy" ) or IAmAMonster[obj:clsid()])
+						and obj:position():distance_to(actorPos) < 40 and obj:see(db.actor)) then
 						enemy=true
 						break
 					end

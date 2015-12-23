@@ -1,11 +1,14 @@
--- TB3D 1.0.9.9.8.0 optimized, spawn_thermos_inside
-function my_ver() return "1.0.9.9.8.0" end
+-- TB3D 1.0.9.9.9.4 optimized, spawn_thermos_inside, opt func calls
+function my_ver() return "1.0.9.9.9.4" end
 
 --' verify the presence of the brain
 function anarh_mozg_have()
 	--TB3D_Services.packet_alert("arhara1 dialog1: have brains for lukash?")
 	return amk_utils.inventory_search("mozg",2) ~= false
 end 
+function anarh_mozg_have_info()
+	return has_alife_info("anarh_mozg_have")
+end
 
 --' surrender brain to Lukash received the award 
 function anarh_mozg_done(first_speaker, second_speaker)

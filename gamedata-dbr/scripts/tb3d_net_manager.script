@@ -1,8 +1,24 @@
---TB3D 1.0.9.9.4.0 new
-function my_ver() return "1.0.9.9.4.0" end
+--TB3D 1.0.9.9.9.4 tb3d_launcher_
+function my_ver() return "1.0.9.9.9.4" end
 --[[
 rename incomming to .ltx files and put filename in pda database to retrieve when reading
 ]]--
+function launcher_check()
+	local f = getFS()
+	local flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_launcher_*.txt")
+	local f_cnt = flist:Size()
+	if f_cnt > 0 then
+		local file = flist:GetAt(0)
+		local fileName = file:NameFull()
+		local _first = string.find(fileName, "_", 1, true)
+		local _second = string.find(fileName, "_", _first + 1, true)
+		local newPacket = string.sub(fileName, _second + 1, string.find(fileName, ".", 1, true) - 1)
+		f:file_delete(f:update_path("$downloads$", fileName))
+		return newPacket
+	end
+	return nil
+end
+
 function network_pole()
 	local f = getFS()
 	local flist = f:file_list_open_ex("$downloads$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "tb3d_*.nti")

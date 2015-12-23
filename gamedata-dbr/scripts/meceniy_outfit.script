@@ -1,11 +1,14 @@
---TB3D 1.0.9.9.9.3  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
--- Localization
-function my_ver() return "1.0.9.9.9.3" end
+--TB3D 1.0.9.9.9.4  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
+-- Localization, nano outfit, redesign, tb3d adapted
+function my_ver() return "1.0.9.9.9.4" end
+--[[---------------------------------------------------------
+ File         : meceniy_outfit.script
+ Description  : \\"Nano and Exoskeleton Skat-15M outfits" .. With life support system (SZHP) and upgradeable options ..
+ Copyright    : StalkerSoup
+ Author       : Spot (Shooter).., Shadows, Rewritten for StalkerSoup by aleks1970 05/26/2015
+ LastUpdate   : 18.07.2015 by aleks1970
+--]]-----------------------------------------------------------------------------------------
 
---\\"NanoEkzoSkelet Skat-15M "" .. With the system of life support (SZHP) and upgradeable .. Spot (Shooter)..
-local string_find = string.find
-
-local t_upd = 0
 local f_1 = false
 local f_1_end = false
 
@@ -17,6 +20,9 @@ local f_3_end = false
 
 local f_4 = false
 local f_4_end = false
+
+local f_5 = false
+local f_5_end = false
 
 local is_pleer = false
 
@@ -30,42 +36,209 @@ local flag_skat_2 = false
 local flag_skat_3 = false
 local flag_skat_4 = false -- DMX UPGRADE
 
+local SMS_Skat = true
+local SMS_enabled = true	-- Reporting Skat15/Nano version on sms... - aleks1970
+local SMS_used_supp = true	-- Reporting Skat15/Nano used supplays on sms... - aleks1970
+local SMS_sound_enabled = true	-- Enable/disable sound - aleks1970
+local SMS_danger_report = true	-- Reporting Skat15/Nano danger notifications on sms... - aleks1970
+
+local ramka = nil
+local food_ok = true
+local drink_v = false
+local food_dif = false
+local enemy_detector = true		--// onscreen enemy detector on/off
+local constanta = 60*100           --// constant equal to one minute of real time
+--local release_drink = constanta*6  --// time delay for drinking vodka on the 1 hour of the game (the value in GMT) = 6 minutes real
+local release_drink = constanta*6*3	--// 3 hour/18 minutes real!?? -- aleks1970
+local delay_function = 50000
+local food_ok_interval = 0
+local rad_food_interval = 0
+
+local msg_new
+local rad_heal
+local nano_heal
+local suit_type
+local outfit_type
+local obj_distance
+local supp_check_en
+local outfit_debug = false --true
+
+meceniy_icons = {		-- new outfit sms icons - aleks1970
+	default			= {44,229},		-- suit_9
+	skat_ok			= {0,330},		-- suit_0, suit_1
+	skat_power		= {166,435},	-- suit_4, suit_5
+	skat_health		= {0,424},		-- suit_2
+	skat_radiation	= {0,377},		-- suit_3
+	skat_food		= {332,435},	-- suit_6
+	nano_ok			= {83,330},		-- suit_0, suit_1
+	nano_power		= {249,435},	-- suit_4, suit_5
+	nano_health		= {83,424},		-- suit_2
+	nano_radiation	= {83,377},		-- suit_3
+	nano_food		= {415,435}		-- suit_6
+}
+-- -----------------------------------------------------------------------------------------------------
+local act = db.actor
 local suppl_heal = false
 local suppl_energy = false
+local suppl_bandage = false
 local suppl_anti_rad = false
-local suppl_anti_zombi = false
+local suppl_energy_drink = false
+local suppl_anti_rad_drink = false
 
 local last_time
 local full_charge = 700
 local last_charge = full_charge
 
+local string_find = string.find
 local translate = game.translate_string
 
-local skat_powersys = translate("skat15_sms_skat_power_system")
+local Text_color_red = TB3D_Services.get_text_color("alert")
+local Text_color_orange = TB3D_Services.get_text_color("system")
+local Text_color_green = TB3D_Services.get_text_color("money")
+local Text_color_yellow = TB3D_Services.get_text_color("tip")
 
-local TB3D_text_color_1 = TB3D_Services.get_text_color("alert")
-local TB3D_text_color_2 = TB3D_Services.get_text_color("system")
-local TB3D_text_color_3 = TB3D_Services.get_text_color("money")
-local TB3D_text_color_4 = TB3D_Services.get_text_color("tip")
-local lf_support = translate("skat15_sms_life_suport")
-local lf_support_1 = translate("skat15_sms_life_suport_1")
-local lf_support_2 = translate("skat15_sms_life_suport_2")
-local lf_support_3 = translate("skat15_sms_life_suport_3")
-local lf_support_4 = translate("skat15_sms_life_suport_4")
-local lf_support_5 = translate("skat15_sms_life_suport_5")
-local skat_system = translate("skat15_sms_skat_system_m")
+local lf_support = Text_color_orange..translate("skat15_sms_life_suport")
+local lf_support_1 = Text_color_orange..translate("skat15_sms_life_suport_1")
+local lf_support_2 = Text_color_orange..translate("skat15_sms_life_suport_2")
+local lf_support_3 = Text_color_orange..translate("skat15_sms_life_suport_3")
+local lf_support_4 = Text_color_orange..translate("skat15_sms_life_suport_4")
+local lf_support_5 = Text_color_orange..translate("skat15_sms_life_suport_5")
+
 local lf_admin_supp = translate("skat15_sms_life_adminis_aid_proced_suport")
+local skat_powersys = Text_color_orange..translate("skat15_sms_skat_power_system")
+local skat_system = Text_color_orange..translate("skat15_sms_skat_system_m")
+local nano_system = Text_color_orange..translate("nano_sms_skat_system_m")
+-- ------------------------------------------- new part for outfit version check ------------------------------------------------------
+local log_delay = 0
+local outfit_check = 0
+function on_actor_update(is_scope)
+	local advanced_outfit = act:get_current_outfit()
+	if not advanced_outfit or not act:alive() then SMS_Skat = true remove_txt() return end	--shutdown, if the player is dead or not wearing outfit - aleks1970
+	if advanced_outfit then
+		local outfit_section = advanced_outfit:section()
+		if string_find(outfit_section, "nano_outfit_") and not string_find(outfit_section, "nano_outfit_add") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = true
+				do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_name"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "nano_outfit_addh_") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = true
+				do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_addh_name"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "nano_outfit_addw_") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = true
+				do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_addw_name"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "exo_mil_exoskeleton_tb3d") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = false
+				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_tb3d_s"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "exo_mil_exoskeleton_dmx") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = false
+				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_dmx_upgrade_s"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "exo_mil_exoskeleton_addx") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = false
+				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_addx_s"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "exo_mil_exoskeleton_addr") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = false
+				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_addr_s"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "exo_mil_exoskeleton_add") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = false
+				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_add_s"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		elseif string_find(outfit_section, "exo_mil_exoskeleton") then
+			if SMS_enabled and SMS_Skat then
+				nano_heal = false
+				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name"), 10000)
+				SMS_Skat = false
+			end
+			outfit_type = true
+		else
+		outfit_type = false
+		end
+	end
+	
+	if outfit_debug then
+		if log_delay < time_global() then
+			TB3D_Services.packet_alert("meceniy outifit: suit["..utils.to_str(section).."] type["..utils.to_str(suit_type).."] used["..utils.to_str(used).."]")
+			TB3D_Services.packet_alert("meceniy outifit: food-delay["..utils.to_str(food_ok_interval).."] rad-food-delay["..utils.to_str(rad_food_interval).."]")
+			log_delay = time_global() + 1500
+		end
+	end
+	
+	if outfit_type then
+	--	if outfit_check_2 < time_global() then
+	--		news_manager.send_tip_txt(act, skat_system..Text_color_green.."advanced outfit on...", nil, 5000)
+	--		outfit_check_2 = time_global() + 5000
+	--	end
+		supplay_check()
+		on_sub_actor_update(is_scope)
+	--	if level.main_input_receiver() then
+	--		SMS_Skat = true
+	--	end
+	else
+		if rad_heal == nil then
+			rad_heal = 0
+		else
+			if (rad_heal >= 1) then
+			new_rad_food()
+			end
+		end
+	--	if outfit_check_2 < time_global() then
+	--		news_manager.send_tip_txt(act, skat_system..Text_color_green.."advanced outfit off...", nil, 5000)
+	--		outfit_check_2 = time_global() + 5000
+	--	end
+		SMS_Skat = true
+	return
+	end
+	meceniy_send_tip_txt()
+end
 
-function on_actor_update()
-	local outfit = db.actor:get_current_outfit()		--db.actor:item_in_slot(6)
-	if outfit then																--may not be wearing the upgrade
+-- ----------------------------------------------------- outfit version check end --------------------------------------------------------
+
+function on_sub_actor_update(is_scope)
+	local outfit = act:get_current_outfit()			--db.actor:item_in_slot(6)
+	if outfit then											--may not be wearing the upgrade
 		local section = outfit:section()
 		local suit_type = 0
 		if not is_pleer then
 			player_ogg.start_pleer_post_save()
 			is_pleer = true
 		end
-		if string_find(section, "exo_mil_exoskeleton_tb3d") then
+		if string_find(section, "nano_outfit_")
+		and not string_find(section, "nano_outfit_add") then
+			suit_type = 8
+		elseif string_find(section, "nano_outfit_addw_") then
+			suit_type = 7
+		elseif string_find(section, "nano_outfit_addh_") then
+			suit_type = 6
+		elseif string_find(section, "exo_mil_exoskeleton_tb3d") then
 			suit_type = 5
 		elseif string_find(section, "exo_mil_exoskeleton_dmx") then
 			suit_type = 4
@@ -79,28 +252,28 @@ function on_actor_update()
 		if suit_type < 5 then
 			--see if an upgrade occured
 			if flag_skat_1 then		
-				local e_up1 = db.actor:object("exo_mil_exoskeleton_add")
+				local e_up1 = act:object("exo_mil_exoskeleton_add")
 				if e_up1 then
 					e_up1:set_condition(con_skat_1)
 					suit_type = 1
 				end
 				flag_skat_1 = false
 			elseif flag_skat_2 then		
-				local e_up2 = db.actor:object("exo_mil_exoskeleton_addr")
+				local e_up2 = act:object("exo_mil_exoskeleton_addr")
 				if e_up2 then
 					e_up2:set_condition(con_skat_2)
 					suit_type = 2
 				end
 				flag_skat_2 = false
 			elseif flag_skat_3 then		
-				local e_up3 = db.actor:object("exo_mil_exoskeleton_addx")
+				local e_up3 = act:object("exo_mil_exoskeleton_addx")
 				if e_up3 then
 					e_up3:set_condition(con_skat_3)
 					suit_type = 3
 				end
 				flag_skat_3 = false
 			elseif flag_skat_4 then		-- DMX UPGRADE ON
-				local e_up4 = db.actor:object("exo_mil_exoskeleton_dmx")
+				local e_up4 = act:object("exo_mil_exoskeleton_dmx")
 				if e_up4 then
 					e_up4:set_condition(con_skat_4)
 					suit_type = 4
@@ -108,33 +281,300 @@ function on_actor_update()
 				flag_skat_4 = false     -- DMX UPGRADE OFF
 			end
 		end
-		--TB3D_Services.packet_alert("meceniy outifit: suit["..utils.to_str(section).."] type["..utils.to_str(suit_type).."] used["..utils.to_str(used).."]")
 		if suit_type == 1 then
-			system_outfit()
+			outfit_system_base()
 		elseif suit_type == 2 then
-			system_outfit()
-			new_system_rad()
+			outfit_system_min(is_scope)	-- Concatenation functions - aleks1970
 		elseif suit_type == 3 then
 			if exo_update(outfit) > 0 then
-				system_outfit()
-				new_system_rad()
-				new_system_power()
-				new_anti_dot()
+				outfit_system_max(is_scope)	-- Concatenation functions - aleks1970
+			else
+				remove_txt()
 			end
-		elseif suit_type == 4 then			--109993
-			--if exo_update(outfit) > 0 then
-				system_outfit()
-				new_system_rad()
-				new_system_power()
-				new_anti_dot()
-			--end
-		elseif suit_type == 5 then
-			system_outfit()
-			new_system_rad()
-			new_system_power()
+		elseif suit_type == 4 then	-- Skat15 - DMX
+			outfit_system_max(is_scope)						-- DMX UPGRADE OFF
+		elseif suit_type == 5 then	-- Skat15 - Storm
+			outfit_system_max(is_scope)
+		elseif suit_type == 6 then	-- nano_outfit_addh_ outfit - aleks1970
+			outfit_system_max(is_scope)
+		elseif suit_type == 7 then	-- nano_outfit_addw_ outfit - aleks1970
+			outfit_system_max(is_scope)
+		elseif suit_type == 8 then	-- nano_outfit_ outfit - aleks1970
+			outfit_system_mid(is_scope)
 			new_anti_dot()
 		end
 	end
+end
+
+-- -------------------------- test for the enemy nearby --------------------------
+local enemy_txt_reset = 0
+local enemy_log_delay_1 = 0
+function meceniy_enemy(is_scope)
+	local enemy=false
+	if not is_scope then
+		local obj
+		local txt
+		local stalker
+		local monster
+		local actor = db.actor
+	--	local obj_distance = 140
+		local actorPos = actor:position()
+		local lvo_id = level.object_by_id
+		local objPos
+		local dist
+		--local a_see
+		local last_dist
+		if enemy_log_delay_1 < time_global() then
+			last_dist = 220												--force new search
+			for npcId, npc in pairs(db.storage) do						--109994, find closest enemy
+				obj = lvo_id(npcId)
+				if obj then
+					stalker = IAmAStalker[obj:clsid()]
+					monster = IAmAMonster[obj:clsid()]
+					if (stalker or monster) and (obj.alive and obj:alive() == true) then
+						objPos = obj:position()
+						dist = actorPos:distance_to(objPos)
+						--dist = objPos:distance_to_xz(actorPos)
+						if dist < 220 and dist < last_dist then
+							if monster and obj:section() ~= "dogfrend" then
+								if dist < 80 then
+									last_dist = dist
+								elseif obj:see(db.actor) then
+									last_dist = dist
+								end
+							elseif stalker and amk.get_npc_relation(obj,actor)=="enemy" then
+								last_dist = dist
+							end
+							if last_dist < 20 then break end					--in your face so stop searching
+						end
+					end
+				end
+			end		--loop
+			dist = last_dist
+			--TB3D_Services.packet_alert("enemy distance["..utils.to_str(dist).."]")
+			if dist < 220 then				-- 109994
+				if dist < 20 then
+					obj_distance = 20
+					enemy = true
+				elseif dist < 30 then
+					obj_distance = 30
+					enemy = true
+				elseif dist < 40 then
+					obj_distance = 40
+					enemy = true
+				elseif dist < 50 then
+					obj_distance = 50
+					enemy = true
+				elseif dist < 60 then
+					obj_distance = 60
+					enemy = true
+				elseif dist < 70 then
+					obj_distance = 70
+					enemy = true
+				elseif dist < 80 then
+					obj_distance = 80
+					enemy = true
+				elseif dist < 90 then
+					obj_distance = 90
+					enemy = false	--enough distance to drink vodka - check 422 line - aleks1970
+				elseif dist < 100 then
+					obj_distance = 100
+					enemy = false
+				elseif dist < 110 then
+					obj_distance = 110
+					enemy = false
+				elseif dist < 120 then
+					obj_distance = 120
+					enemy = false
+				elseif dist < 140 then
+					obj_distance = 140
+					enemy = false
+				elseif dist < 160 then
+					obj_distance = 160
+					enemy = false
+				elseif dist < 180 then
+					obj_distance = 180
+					enemy = false
+				elseif dist < 200 then
+					obj_distance = 200
+					enemy = false
+				else
+					obj_distance = 220
+					enemy = false
+				end
+			else
+				obj_distance = 220
+				enemy = false
+			end
+			enemy_log_delay_1 = time_global() + 1200
+		elseif enemy_txt_reset < time_global() then	-- reset(hide) onscreen text
+			obj_distance = 220
+			enemy_txt_reset = time_global() + 13000
+		end
+	--	TB3D_Services.info_alert("news mgr: enemy2["..utils.to_str(enemy2).."] npc_relation["..utils.to_str(lvo_id).."] npc_relation_id["..utils.to_str(obj).."]")
+	end
+	if enemy==true then
+	--	if enemy_log_delay_1 < time_global() then --and enemy_see then
+		--	do_heal_sms(true, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo: sovraznik je blizu - je bila uspesna...", 6000)
+	--		do_heal_sms(true, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo-true: sovraznik je blizu  - je bila uspesna..."..Text_color_green..("sovraznik na oddaljenosti"..utils.to_str(obj_distance)), 6000)
+	--	enemy_log_delay_1 = time_global() + 1500
+		--	TB3D_Services.packet_alert("meceniy outifit: enemy["..utils.to_str(enemy).."] npc_relation["..utils.to_str(lvo_id).."] npc_relation_id["..utils.to_str(obj).."] npc_object_id["..utils.to_str(obj:id()).."] npc_see_actor["..utils.to_str(obj:see(act)).."]")
+	--	enemy_see = false
+	--	end
+		return true	--function new_system_rad():drink vodka "enabled" - aleks1970
+	else
+	--	if enemy_log_delay_1 < time_global() then --and (not enemy_see) then
+		--	do_heal_sms(false, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo: sovraznik_2 -"..Text_color_red.." ni bila uspesna...", 6000)
+	--		do_heal_sms(false, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo-false: sovraznik je blizu  - je bila uspesna..."..Text_color_red..("sovraznik na oddaljenosti"..utils.to_str(obj_distance)), 6000)
+	--	enemy_log_delay_1 = time_global() + 3000
+		--	TB3D_Services.packet_alert("meceniy outifit: enemy["..utils.to_str(enemy).."] npc_relation["..utils.to_str(lvo_id).."] npc_relation_id["..utils.to_str(obj).."] npc_object_id["..utils.to_str(obj:id()).."] npc_see_actor["..utils.to_str(obj:see(act)).."]")
+	--	enemy_see = true
+	--	end
+		return false	--function new_system_rad():drink vodka "disabled" - aleks1970
+	end
+end
+
+-- ----------------------------------------------------------------------------
+-- actor:relation(obj) == game_object.enemy
+-- ----------------------------------------------------------------------------
+local blink = 0
+local time_msg = 50000
+function new_enemy_radar(is_scope)
+	if (not enemy_detector) then return end
+	local hud = get_hud()
+	local msg_new = true
+	if is_scope then
+		if ramka then
+			hud:RemoveDialogToRender(ramka)
+			ramka = nil
+			time_msg = time_global() + 5000
+		end
+	else
+		if (not act:alive()) or time_msg > (time_global() + 2000) then return end	-- delayed start
+		if obj_distance == nil then
+			obj_distance = 220
+		end
+		local msg = translate("enemy_sms_skat_system_m1").." "..obj_distance.." "..translate("enemy_sms_skat_system_m2")
+		if level.main_input_receiver() then
+			if ramka then
+				hud:RemoveDialogToRender(ramka)
+				ramka = nil
+				time_msg = time_global() + 5000
+			end
+		else
+			if msg_new == true then
+				if not ramka then
+					ramka = CUIStatic()
+					ramka:SetAutoDelete(true)
+					ramka:Init(386,735,250,24)
+					ramka:SetTextColor(255, 0, 220, 10)
+					ramka:SetFont(GetFontGraffiti19Russian())
+					ramka:SetTextAlign(CGameFont.alCenter)
+					hud:AddDialogToRender(ramka)
+				end
+				ramka:SetText(msg)
+				ramka:SetTextY(1)
+				if obj_distance >= 100 then
+					ramka:SetTextColor(255, 0, 220, 10)
+				elseif (obj_distance > 50) and (obj_distance < 85) then	--elseif obj_distance > 50 then - aleks1970
+					ramka:SetTextColor(255, 225, 215, 0)
+				elseif (obj_distance <= 50) then  --with "else" - text on the 90 meters distance become red - aleks1970
+					ramka:SetTextColor(255, 225, 0, 0)
+				end
+				ramka:Show(true)
+				if obj_distance <= 50 then	-- range for changing red and yellow color on interval
+					if blink == 0 then
+						ramka:SetTextColor(255, 225, 0, 0)
+					else
+						ramka:SetTextColor(255, 225, 215, 0)
+					end
+				else
+					if (obj_distance > 50) and (obj_distance < 85) then	-- range for the yellow color text(not blinking)
+						ramka:Show(true)
+					end
+					if (blink == 0) and (obj_distance >= 90 and obj_distance <= 200) then	-- range for text to blinking with green color - aleks1970
+						ramka:Show(false)
+					else
+						ramka:Show(true)
+					end
+				--	if obj_distance < 100 then
+				--		ramka:Show(true)
+				--		if blink == 0 and obj_distance > 80 then
+				--			ramka:Show(false)
+				--		else
+				--			ramka:Show(true)
+				--		end
+				--	end
+				end
+				if time_msg < time_global() then
+					blink = 1 - blink
+					time_msg = time_global() + 1200
+				end
+				if obj_distance > 200 then
+					ramka:Show(false)
+				end
+				msg_new = false
+			else
+				if ramka then
+					hud:RemoveDialogToRender(ramka)
+					ramka = nil
+					time_msg = time_global() + 5000
+				end
+			end
+		end
+	end
+end
+-- -------------------------------------------------------------------------------
+function remove_txt()
+	local hud = get_hud()
+	--if ramka then
+		hud:RemoveDialogToRender(ramka)
+		ramka=nil
+	--end
+end
+
+function net_destroy()
+	if food_tabl then food_tabl = nil end --{}
+	if check_multi_supplay then check_multi_supplay = nil end --{}
+	remove_txt()
+end
+-- -------------------------------------------------------------------------------
+function outfit_system_max(is_scope)
+	if delay_function > time_global() then return end	-- small delay for the smooth level start - aleks1970
+	system_outfit()
+	new_system_bleeding()
+	new_system_rad()
+	new_rad_food()
+	new_system_power()
+	new_anti_dot()
+	meceniy_enemy(is_scope)
+	new_enemy_radar(is_scope)
+end
+
+function outfit_system_mid(is_scope)
+	if delay_function > time_global() then return end
+	system_outfit()
+	new_system_bleeding()
+	new_system_rad()
+	new_rad_food()
+	new_system_power()
+	new_anti_dot()
+	meceniy_enemy(is_scope)
+end
+
+function outfit_system_min(is_scope)
+	if delay_function > time_global() then return end
+	system_outfit()
+	new_system_bleeding()
+	new_system_rad()
+	new_rad_food()
+	meceniy_enemy(is_scope)
+end
+
+function outfit_system_base()
+	if delay_function > time_global() then return end
+	system_outfit()
+	new_system_bleeding()
 end
 
 function on_item_drop(obj)
@@ -154,15 +594,19 @@ function on_item_drop(obj)
 	end
 end
 
+function release_object(itm,actor)
+	return alife():release(alife():object(itm:id()))
+end
+
 function doc_use()
-	local e1 = db.actor:object("exo_mil_exoskeleton")
+	local e1 = act:object("exo_mil_exoskeleton")
 	if e1 then
 		con_skat_1 = e1:condition()
-		--amk.remove_item_from_inventory(e1, db.actor)
-		alife():release(alife():object(e1:id()))
+		release_object(e1,act)
+		--alife():release(alife():object(e1:id()))
 		amk.spawn_item_in_inv("exo_mil_exoskeleton_add")
 		flag_skat_1 = true
-		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_upg_complete_m"), nil, nil, 10000)
+		do_heal_sms(true, "suit_4", skat_system..Text_color_green..translate("skat15_sms_upg_complete_m"), 10000)
 		alife():create("art_acumm",vector():set(-89.387,-2.457,-25.271),19105,2875)
 	else
 		amk.spawn_item_in_inv("doc_1")
@@ -170,64 +614,65 @@ function doc_use()
 end
 
 function doc_use_2()
-	local e2 = db.actor:object("exo_mil_exoskeleton_add")
+	local e2 = act:object("exo_mil_exoskeleton_add")
 	if e2 then
 		con_skat_2 = e2:condition()
-		--amk.remove_item_from_inventory(e2, db.actor)
-		alife():release(alife():object(e2:id()))
+		release_object(e2,act)
+		--alife():release(alife():object(e2:id()))
 		amk.spawn_item_in_inv("exo_mil_exoskeleton_addr")
 		flag_skat_2 = true
-		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_upg_complete_m1"), nil, nil, 10000)
+		do_heal_sms(true, "suit_4", skat_system..Text_color_green..translate("skat15_sms_upg_complete_m1"), 10000)
 	else
 		amk.spawn_item_in_inv("doc_8")
 	end
 end
 
 function doc_use_3()
-	local e3 = db.actor:object("exo_mil_exoskeleton_addr")
-	local have_art_accum = db.actor:object("art_acumm")
+	local e3 = act:object("exo_mil_exoskeleton_addr")
+	local have_art_accum = act:object("art_acumm")
 	if e3 and have_art_accum then
 		con_skat_3 = e3:condition()
-		--amk.remove_item_from_inventory(e3, db.actor)
-		alife():release(alife():object(e3:id()))
+		release_object(e3,act)
+		--alife():release(alife():object(e3:id()))
 		amk.spawn_item_in_inv("exo_mil_exoskeleton_addx")
 		flag_skat_3 = true
-		news_manager.send_tip(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_upg_complete_m2"), nil, nil, 10000)
+		do_heal_sms(true, "suit_4", skat_system..Text_color_green..translate("skat15_sms_upg_complete_m2"), 10000)
 	else
-		if e3 then news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_1..translate("skat15_sms_req_energy"), nil, nil, 20000) end
+		if e3 then do_heal_sms(true, "suit_7", skat_system..Text_color_red..translate("skat15_sms_req_energy"), 20000) end
 		amk.spawn_item_in_inv("doc_10")
 	end
 end
 
 function doc_use_4()     -- DMX UPGRADE ON
-	local e4 = db.actor:object("exo_mil_exoskeleton_addx")
+	local e4 = act:object("exo_mil_exoskeleton_addx")
 	if e4 then
 		con_skat_4 = e4:condition()
-		--amk.remove_item_from_inventory(e4, db.actor)
-		alife():release(alife():object(e4:id()))
+		release_object(e4,act)
+		--alife():release(alife():object(e4:id()))
 		amk.spawn_item_in_inv("exo_mil_exoskeleton_dmx")
 		flag_skat_4 = true
-		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_final_upg_complete"), nil, nil, 10000)
+		do_heal_sms(true, "suit_4", skat_system..Text_color_green..translate("skat15_sms_final_upg_complete"), 10000)
 	else
 		amk.spawn_item_in_inv("dmx_skat15_upgrade")
 	end
 end                      -- DMX UPGRADE OFF
 
+local system_interval = 0
 function system_outfit()
-	local act = db.actor
-	if (act.health > 0.5) and (act:get_bleeding() <= 0.3) then 
+	-- local act = db.actor
+	if (act.health >= 0.65) then	--and (act:get_bleeding() <= 0.3) then
 		f_1 = false		f_1_end = false
-		return 
+		return
 	end
-	
-	if (act.health <= 0.5) and (not f_1) then
-		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_health_below_auto"), nil, nil, 30000)
-	elseif (act:get_bleeding() > 0.3) and (not f_1) then	
-		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_3..translate("skat15_sms_life_suport_auto"), nil, nil, 30000)
+
+	if SMS_danger_report and (not f_1) and (not supp_check_en) and system_interval < time_global() then
+		local skat_supl = Text_color_yellow..translate("skat15_sms_health_below_auto")
+		do_heal_sms(true, "suit_4", lf_support.." - "..skat_supl, 12000)
+		system_interval = time_global() + 10000
 	end
-	
+
 	f_1 = true
-	
+
 	local heal_0 = true
 	local heal_1 = act:object("medkit")
 	local heal_2 = act:object("medkit_army")
@@ -237,309 +682,766 @@ function system_outfit()
 	local heal_6 = act:object("irp-b")
 	local heal_7 = act:object("syh_pay_gde_3")
 	local heal_8 = act:object("syh_pay_spp5")
-	local band_1 = act:object("bandage")
-	local band_2 = act:object("zhgut")
-	local band_3 = act:object("antiseptic")
-	local band_4 = act:object("bandage_dmx")
 	
-	if not heal_1 or heal_2 or heal_3 or heal_4 or heal_5 or heal_6 or heal_7 or heal_8 or band_1 or band_2 or band_3 or band_4 then
-		heal_0 = false
-	else
-		heal_0 = true
-	end
-	
-	if (act.health <= 0.5) and heal_1 then --medkit
+	if heal_1 and (act.health <= 0.55) then --medkit
 		act:eat(heal_1)
-		local skat_supl = translate("skat15_sms_life_heal_suport_medkit")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_suport_medkit")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 9000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif (act.health <= 0.5) and heal_2 then --medkit_army
+		supp_check_en = true
+	elseif heal_2 and (act.health <= 0.55) then --medkit_army
 		act:eat(heal_2)
-		local skat_supl = translate("skat15_sms_life_heal_medkit_army")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_medkit_army")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 9000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif (act.health <= 0.5) and heal_3 then --medkit_scientic
+		supp_check_en = true
+	elseif heal_3 and (act.health <= 0.5) then --medkit_scientic
 		act:eat(heal_3)
-		local skat_supl = translate("skat15_sms_life_heal_medkit_scientic")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_medkit_scientic")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 9000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif (act.health <= 0.5) and heal_4 then --medkit_elite
+		supp_check_en = true
+	elseif heal_4 and (act.health <= 0.5) then --medkit_elite
 		act:eat(heal_4)
-		local skat_supl = translate("skat15_sms_life_heal_medkit_elite")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_medkit_elite")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 6000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif (act.health <= 0.5) and heal_5 then --suvorotka
+		supp_check_en = true
+	elseif heal_5 and (act.health <= 0.5) then --suvorotka
 		act:eat(heal_5)
-		local skat_supl = translate("skat15_sms_life_heal_suvorotka")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_suvorotka")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 6000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif (act.health <= 0.5) and heal_6 then --irp-b
+		supp_check_en = true
+	elseif heal_6 and (act.health <= 0.5) then --irp-b
 		act:eat(heal_6)
-		local skat_supl = translate("skat15_sms_life_heal_irp-b")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_irp-b")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 6000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif (act.health <= 0.5) and heal_7 then --syh_pay_gde_3
+		supp_check_en = true
+	elseif heal_7 and (act.health <= 0.5) then --syh_pay_gde_3
 		act:eat(heal_7)
-		local skat_supl = translate("skat15_sms_life_heal_syh_pay_gde_3")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_syh_pay_gde_3")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 6000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif (act.health <= 0.5) and heal_8 then --syh_pay_spp5
+		supp_check_en = true
+	elseif heal_8 and (act.health <= 0.5) then --syh_pay_spp5
 		act:eat(heal_8)
-		local skat_supl = translate("skat15_sms_life_syh_pay_spp5")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_syh_pay_spp5")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 6000)
+			system_interval = system_interval + 9500
+			end
 		f_1 = false
 		f_1_end = false
-	elseif act:get_bleeding() > 0.6 and band_1 then --bandage
-		act:eat(band_1)
-		local skat_supl = translate("skat15_sms_life_heal_bandage")
-		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
-		f_1 = false
-		f_1_end = false
-	elseif act:get_bleeding() > 0.6 and band_1 then --bandage when actor only bleeding.
-		act:eat(band_1)
-		local skat_supl = translate("skat15_sms_life_heal_bandage_2")
-		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
-		f_1 = false
-		f_1_end = false
-	elseif act:get_bleeding() > 0.6 and band_2 then --zhgut
-		act:eat(band_2)
-		local skat_supl = translate("skat15_sms_life_heal_zhgut")
-		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
-		f_1 = false
-		f_1_end = false
-	elseif act:get_bleeding() > 0.6 and band_3 then --antiseptic
-		act:eat(band_3)
-		local skat_supl = translate("skat15_sms_life_heal_antiseptic")
-		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
-		f_1 = false
-		f_1_end = false
-	elseif act:get_bleeding() > 0.6 and band_4 then --bandage_dmx
-		act:eat(band_4)
-		local skat_supl = translate("skat15_sms_life_heal_bandage_dmx")
-		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
-		f_1 = false
-	end
+		supp_check_en = true
+		end
 	if not f_1 then
-		local skat_supl = translate("skat15_sms_med_suppl_found")
-		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_med_suppl_found")
+			if SMS_used_supp and (not f_1) then
+			--	do_heal_sms(true, "suit_2", lf_support_1..skat_supl.." ", 10000)
+			system_interval = system_interval + 9500
+			end
 		f_1_end = false
 		return
-	elseif not f_1_end and not heal_0 then
-		local skat_supl = translate("skat15_sms_med_suppl_not_found")
-		do_heal(false,TB3D_text_color_1..lf_support_1..TB3D_text_color_1..skat_supl)
+	elseif (not suppl_heal) and (not f_1_end) then
+		local skat_supl = " - "..Text_color_red..translate("skat15_sms_med_suppl_not_found")
+			if SMS_used_supp and f_1 then
+				do_heal_sms(false, "suit_2", lf_support_1..skat_supl.." ", 10000)
+			system_interval = system_interval + 4000
+			end
 		f_1_end = true
 	end
 end
 
+local bleeding_interval = 0
+function new_system_bleeding()
+	-- local act = db.actor
+	if (act:get_bleeding() <= 0.3) then
+		f_5 = false		f_5_end = false
+		return
+	end
+
+	if (not f_5) and (not supp_check_en) and bleeding_interval < time_global() then
+		if SMS_danger_report then
+			local skat_supl = Text_color_yellow..translate("skat15_sms_life_suport_auto")
+			do_heal_sms(true, "suit_0", lf_support.." - "..skat_supl, 10000)
+			bleeding_interval = time_global() + 9500
+		end
+	end
+
+	f_5 = true
+
+	local band_1 = act:object("bandage")
+	local band_2 = act:object("zhgut")
+	local band_3 = act:object("antiseptic")
+	local band_4 = act:object("bandage_dmx")
+
+	if (act:get_bleeding() >= 0.45) and band_1 then --bandage
+		act:eat(band_1)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_bandage")
+			if SMS_used_supp and f_5 then
+				do_heal_sms(true, "suit_2", lf_support_5..skat_supl.." ", 6000)
+				bleeding_interval = bleeding_interval + 8000
+			end
+		f_5 = false
+		f_5_end = false
+		supp_check_en = true
+	elseif (act:get_bleeding() > 0.3) and band_2 then --zhgut
+		act:eat(band_2)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_zhgut")
+			if SMS_used_supp and f_5 then
+				do_heal_sms(true, "suit_2", lf_support_5..skat_supl.." ", 6000)
+				bleeding_interval = bleeding_interval + 8000
+			end
+		f_5 = false
+		f_5_end = false
+		supp_check_en = true
+	elseif (act:get_bleeding() > 0.3) and band_3 then --antiseptic
+		act:eat(band_3)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_antiseptic")
+			if SMS_used_supp and f_5 then
+				do_heal_sms(true, "suit_2", lf_support_5..skat_supl.." ", 6000)
+				bleeding_interval = bleeding_interval + 8000
+			end
+		f_5 = false
+		f_5_end = false
+		supp_check_en = true
+	elseif (act:get_bleeding() > 0.3) and band_4 then --bandage_dmx
+		act:eat(band_4)
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_bandage_dmx")
+			if SMS_used_supp and f_5 then
+				do_heal_sms(true, "suit_2", lf_support_5..skat_supl.." ", 6000)
+				bleeding_interval = bleeding_interval + 8000
+			end
+		f_5 = false
+		f_5_end = false
+		supp_check_en = true
+		return
+	elseif (not f_5_end) and (not suppl_bandage) then
+		local skat_supl = Text_color_red.." - "..translate("skat15_sms_med_suppl_not_found")
+			if SMS_used_supp and f_5 then
+				do_heal_sms(false, "suit_2", lf_support_1..skat_supl.." ", 9000)
+				bleeding_interval = bleeding_interval + 8000
+			end
+		f_5_end = true
+	end
+end
+
+local drink_c = 5
+local drink_interval = 0
+local radiation_interval = 0
 function new_system_rad()
-	local act = db.actor
-	if act.radiation < 0.75 then 
+	-- local act = db.actor
+	if act.radiation < 0.75 then
 		f_2 = false		f_2_end = false
-		return 
+		return
+	end
+
+	if SMS_danger_report and suppl_anti_rad and suppl_anti_rad_drink and radiation_interval < time_global() and (not f_2) then
+		local skat_supl = Text_color_yellow..translate("skat15_sms_cri_dose_of_rad_2")
+		do_heal_sms(true, "suit_4", lf_support.." - "..skat_supl, 12000)
+			radiation_interval = time_global() + 8500
+	elseif SMS_danger_report and (not suppl_anti_rad) and (not suppl_anti_rad_drink) and (not f_2) then
+		local skat_supl = Text_color_yellow..translate("skat15_sms_cri_dose_of_rad")
+		do_heal_sms(true, "suit_4", lf_support.." - "..skat_supl, 12000)
+			radiation_interval = time_global() + 4500
+	end
+
+	f_2 = true
+
+	if meceniy_enemy() then
+		drink_v = false
+	else
+		if suppl_anti_rad_drink then
+			drink_v = true
+		else
+			drink_v = false
+		end
 	end
 	
---[[	if not f_2 then
-		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_cri_dose_of_rad"), nil, nil, 30000)
-	end]]--
-	
---	f_2 = true
-	
-	local anti_0 = true
+	if (drink_c > 2) then
+		if drink_interval < time_global() then
+			drink_c = 0
+			drink_interval = time_global() + release_drink
+		end
+	end
+
 	local anti_1 = act:object("antirad")
 	local anti_2 = act:object("amfetamin")
-	local anti_3 = act:object("medkit_scientic")
-	local anti_4 = act:object("medkit_elite")
-	
-	if not anti_1 or anti_2 or anti_3 or anti_4 then
-		anti_0 = false
-	else
-		anti_0 = true
-	end
-	
-	if not f_2 and not anti_0 then   
-		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_cri_dose_of_rad"), nil, nil, 30000)
-	end	
-	
-	f_2 = true
-	
-	if (act.health <= 0.6) and anti_1 then
+	local anti_3 = act:object("suvorotka")
+	local anti_4 = act:object("medkit_scientic")
+	local anti_5 = act:object("medkit_elite")
+
+	if (act.radiation >= 0.65) and drink_v and (drink_c < 2) then	-- (act.health <= 0.6)	-- and suppl_anti_rad_drink
+			local item
+			check_multi_supplay = {"absolut_vodka", "smirnoff_vodka", "nemiroff_vodka", "beer_a", "pivo", "pivo_baltika", "vodka"}
+			for k, v in pairs(check_multi_supplay) do
+				item = act:object(v)
+				if item then
+					local skat_supl = Text_color_green.." - "..translate("skat15_sms_alcohol_dose_found")
+					if SMS_used_supp and f_2 then
+						do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." ", 10000)
+						radiation_interval = radiation_interval + 8500
+					end
+					act:eat(item)
+					rad_heal = rad_heal + 3
+					drink_c = drink_c + 1
+					break
+				end
+			end
+			f_2 = false
+			f_2_end = false
+			supp_check_en = true
+	elseif (act.radiation >= 0.65) and anti_1 then	-- (act.health <= 0.6)
 		act:eat(anti_1)
-		local skat_supl = translate("skat15_sms_antirad_antidote_dose_found")
-		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		rad_heal = rad_heal + 3
+		drink_c = drink_c + 1
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_antirad_antidote_dose_found")
+			if SMS_used_supp and f_2 then
+				do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." ", 6000)
+				radiation_interval = radiation_interval + 8500
+			end
 		f_2 = false
 		f_2_end = false
-    elseif (act.health <= 0.6) and anti_2 then
+		supp_check_en = true
+    elseif (act.radiation >= 0.65) and anti_2 then	--(act.health <= 0.6) --aleks1970
 		act:eat(anti_2)
-		local skat_supl = translate("skat15_sms_amfetamin_dose_found")
-		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		drink_c = drink_c + 1
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_amfetamin_dose_found")
+			if SMS_used_supp and f_2 then
+				do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." ", 6000)
+				radiation_interval = radiation_interval + 8500
+			end
 		f_2 = false
 		f_2_end = false
-    elseif (act.health <= 0.6) and anti_3 then
+	elseif (act.radiation >= 0.65) and (act.health <= 0.8) and anti_3 then	--(act.health <= 0.6) --aleks1970
 		act:eat(anti_3)
-		local skat_supl = translate("skat15_sms_scientic_med_dose_found")
-		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		drink_c = drink_c + 1
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_life_heal_suvorotka")
+			if SMS_used_supp and f_2 then
+				do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." ", 6000)
+				radiation_interval = radiation_interval + 8500
+			end
 		f_2 = false
 		f_2_end = false
-    elseif (act.health <= 0.6) and anti_4 then
+		supp_check_en = true
+    elseif (act.radiation >= 0.65) and (act.health <= 0.75) and anti_4 then	--(act.health <= 0.6) --aleks1970
 		act:eat(anti_4)
-		local skat_supl = translate("skat15_sms_medkit_elite_dose_found")
-		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		drink_c = drink_c + 1
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_scientic_med_dose_found")
+			if SMS_used_supp and f_2 then
+				do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." ", 6000)
+				radiation_interval = radiation_interval + 8500
+			end
 		f_2 = false
 		f_2_end = false
+		supp_check_en = true
+    elseif (act.radiation >= 0.65) and (act.health <= 0.60) and anti_5 then	--(act.health <= 0.6) --aleks1970
+		act:eat(anti_5)
+		drink_c = drink_c + 1
+		local skat_supl = Text_color_green.." - "..translate("skat15_sms_medkit_elite_dose_found")
+			if SMS_used_supp and f_2 then
+				do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." ", 6000)
+				radiation_interval = radiation_interval + 8500
+			end
+		f_2 = false
+		f_2_end = false
+		supp_check_en = true
 		return
-	elseif not f_2_end and not anti_0 then
-		local skat_supl = translate("skat15_sms_antidote_not_found")
-		do_heal(false,TB3D_text_color_1..lf_support_2..TB3D_text_color_1..skat_supl)
+	elseif (not suppl_anti_rad) and (not f_2_end) and (drink_c > 2) then
+		local skat_supl = " - "..Text_color_red..translate("skat15_sms_antidote_not_found")
+			if SMS_used_supp and f_2 then
+				do_heal_sms(false, "suit_3", lf_support_2..skat_supl.." ", 14000)
+				radiation_interval = radiation_interval + 1500
+			end
+		rad_heal = rad_heal + 2
+		drink_c = drink_c + 1
 		f_2_end = true
 	end
 end
 
 function new_anti_dot()
-	local act = db.actor
-	if db.actor.psy_health >= 0.5 then
+	-- local act = db.actor
+	if act.psy_health >= 0.70 then
 		f_3 = false		f_3_end = false
 		return
 	end
-	
-	if not f_3 then
-		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_zombi_proc_under"), nil, nil, 30000)
+
+	local a1 = act:object("antizombie")
+
+	if SMS_danger_report and (not f_3) and a1 then
+		local skat_supl = translate("skat15_sms_zombi_proc_under")
+		do_heal_sms(true, "suit_4", lf_support..Text_color_yellow.." - "..skat_supl, 12000)
 	end
-	
+
 	f_3 = true
-	
-	local a1 = act:object("antizombie") 
-	
-	if a1 then
+
+	if a1 and (act.psy_health >= 0.55) then
 		act:eat(a1)
 		local skat_supl = translate("skat15_sms_antizombin_adminst_now") --Antizombin
-		do_heal(true,TB3D_text_color_2..lf_support_4..TB3D_text_color_3..skat_supl)
+			do_heal_sms(true, "suit_5", lf_support_4..Text_color_green.." - "..skat_supl, 6000)
 		f_3 = false
 		f_3_end = false
 		return
-	elseif not f_3_end then
+	elseif (not f_3_end) and (not a1) then
 		local skat_supl = translate("skat15_sms_antizombin_not_found")
-		do_heal(false,TB3D_text_color_1..lf_support_4..TB3D_text_color_1..skat_supl)
+			do_heal_sms(false, "suit_5", lf_support_4..Text_color_red.." - "..skat_supl, 9000)
 		f_3_end = true
 	end
 end
 
+heal_suppl_log_delay = 0
+local energy_interval = 0
 function new_system_power()
-	local act = db.actor
-	if act.power > 0.25 then 
+	-- local act = db.actor
+	if act.health <= 0.35 then return end -- Workaround for the watch-dog error on player dead - aleks1970
+	if act.power > 0.30 then
 		f_4 = false		f_4_end = false
-		return 
+		return
 	end
-	
-	if not f_4 then
-		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_seek_energy_now"), nil, nil, 30000)
+
+	if (act.power > 0.28) and SMS_danger_report and (not f_4) and energy_interval < time_global() then
+		local skat_supl = translate("skat15_sms_seek_energy_now")
+		do_heal_sms(true, "suit_4", lf_support..Text_color_yellow..skat_supl, 10000)
+		energy_interval = time_global() + 20000
 	end
 	
 	f_4 = true
-	
-	local el_0 = true
+
 	local el_1 = act:object("energy_drink")
 	local el_2 = act:object("amfetamin")
 	local el_3 = act:object("energy_red_bull")
 	local el_4 = act:object("energy_ad_rush")
 	local el_5 = act:object("energy_non_stop")
 	local el_6 = act:object("energy_stalker")
-	
-	if not el_1 or el_2 or el_3 or el_4 or el_5 or el_6 then
-		el_0 = false
-	else
-		el_0 = true
-	end
-	
-	if el_1 then
+
+	if (act.power <= 0.25) and el_1 then
 		act:eat(el_1)
 		local skat_supl = translate("skat15_sms_administ_100_Rads_energy_now") --energy_drink
-		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+			if SMS_used_supp and f_4 then
+				do_heal_sms(true, "suit_5", lf_support_3..Text_color_green..skat_supl, 6000)
+				energy_interval = energy_interval + 10000
+			end
 		f_4 = false
 		f_4_end = false
-	elseif el_2 then
+		supp_check_en = true
+	elseif (act.power <= 0.25) and el_2 then
 		act:eat(el_2)
 		local skat_supl = translate("skat15_sms_administ_amfetamin_energy_now") --amfetamin
-		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+			if SMS_used_supp and f_4 then
+				do_heal_sms(true, "suit_5", lf_support_3..Text_color_green..skat_supl, 6000)
+				energy_interval = energy_interval + 10000
+			end
 		f_4 = false
 		f_4_end = false
-	elseif el_3 then
+		supp_check_en = true
+	elseif (act.power <= 0.25) and el_3 then
 		act:eat(el_3)
 		local skat_supl = translate("skat15_sms_administ_energy_red_bull_energy_now") --energy_red_bull
-		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+			if SMS_used_supp and f_4 then
+				do_heal_sms(true, "suit_5", lf_support_3..Text_color_green..skat_supl, 6000)
+				energy_interval = energy_interval + 10000
+			end
 		f_4 = false
 		f_4_end = false
-	elseif el_4 then
+		supp_check_en = true
+	elseif (act.power <= 0.25) and el_4 then
 		act:eat(el_4)
 		local skat_supl = translate("skat15_sms_administ_energy_ad_rush_energy_now") --energy_ad_rush
-		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+			if SMS_used_supp and f_4 then
+				do_heal_sms(true, "suit_5", lf_support_3..Text_color_green..skat_supl, 6000)
+				energy_interval = energy_interval + 10000
+			end
 		f_4 = false
 		f_4_end = false
-	elseif el_5 then
+		supp_check_en = true
+	elseif (act.power <= 0.25) and el_5 then
 		act:eat(el_5)
 		local skat_supl = translate("skat15_sms_administ_energy_non_stop_energy_now") --energy_non_stop
-		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+			if SMS_used_supp and f_4 then
+				do_heal_sms(true, "suit_5", lf_support_3..Text_color_green..skat_supl, 6000)
+				energy_interval = energy_interval + 10000
+			end
 		f_4 = false
 		f_4_end = false
-	elseif el_6 then
+		supp_check_en = true
+	elseif (act.power <= 0.25) and el_6 then
 		act:eat(el_6)
 		local skat_supl = translate("skat15_sms_administ_energy_stalker_energy_now") --energy_stalker
-		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+			if SMS_used_supp and f_4 then
+				do_heal_sms(true, "suit_5", lf_support_3..Text_color_green..skat_supl, 6000)
+				energy_interval = energy_interval + 10000
+			end
 		f_4 = false
 		f_4_end = false
+		supp_check_en = true
 		return
-	elseif not f_4_end and not el_0 then
+	elseif (not f_4_end) and (not suppl_energy_drink) then
 		local skat_supl = translate("skat15_sms_energy_sourc_rest")
-		do_heal(false,TB3D_text_color_1..lf_support_3..TB3D_text_color_1..skat_supl)
+			if SMS_used_supp and f_4 then
+				do_heal_sms(false, "suit_5", lf_support_3..Text_color_red..skat_supl, 8000)
+				energy_interval = energy_interval + 4000
+			end
 		f_4_end = true
 	end
 end
+-- ------------------------------------------------------------------------------------------------------
+local food_tabl = {["kolbasa"]=true, ["conserva"]=true, ["sandwich"]=true, ["sweetness"]=true, ["tuchenka"]=true, ["yantar"]=true, ["sardina"]=true, ["ogursi"]=true, ["sholad"]=true, ["kolbasadmx"]=true, ["olives"]=true, ["nuts"]=true, ["irp-b"]=true, ["syh_pay_gde_3"]=true, ["syh_pay_spp5"]=true}
+local sobj
+local sim = alife()
+
+function new_rad_food()
+-- local act = db.actor
+local eat_1 = act:object("bread")
+	if rad_heal == nil then
+		rad_heal = 0
+	end
+	if (not food_ok) and (rad_heal >= 4) and food_ok_interval <time_global() then
+		local skat_supl = Text_color_yellow..translate("skat15_sms_seek_food_now")
+		if SMS_used_supp then
+			do_heal_sms(false, "suit_6", lf_support_3.." - "..skat_supl.." ", 50000)
+		end
+		food_dif = true
+		food_ok_interval = time_global() + 100000
+	else
+		if (rad_heal >= 5) then
+			rad_heal = 5
+		end
+	end
+	if act.radiation > 0.15 or rad_heal >= 3 or food_dif then
+		if rad_food_interval <time_global() then
+			if eat_1 and rad_heal >= 1 then
+				local skat_supl = Text_color_green..translate("skat15_sms_administ_bread_now")
+				if SMS_used_supp then
+					do_heal_sms(true, "suit_6", lf_support_3.." - "..skat_supl.." ", 5000)
+				end
+				act:eat(eat_1)
+				food_ok = true
+				rad_heal = rad_heal - 2
+					if rad_heal <= 1 then
+						level.remove_pp_effector(77777773)
+					end
+				rad_food_interval = time_global() + 10000 -- function is performed once per second
+			else
+				db.actor:iterate_inventory(function(obj, item)
+					if food_tabl[item:section()] and (rad_heal >= 2) then
+						sobj = sim:object(item:id())
+						if sobj then
+							local skat_supl = Text_color_green..translate("skat15_sms_administ_bread_now")
+							if SMS_used_supp then
+								do_heal_sms(true, "suit_6", lf_support_3.." - "..skat_supl.." ", 5000)
+							end
+							act:eat(item)
+							rad_heal = rad_heal - 3
+							food_ok = true
+						end
+					end
+				end, nil)
+				if (rad_heal < 1) then
+					level.remove_pp_effector(77777773)
+					food_dif = false
+				end
+				rad_food_interval = time_global() + 20000 -- function is performed once per 2 second
+			end
+		else
+			if rad_heal >= 4 then
+				local skat_supl = Text_color_red..translate("skat15_sms_bread_sourc_rest")
+				if not food_ok then
+					if SMS_used_supp then
+						do_heal_sms(false, "suit_6", lf_support_3.." - "..skat_supl.." ", 20000)
+					end
+				end
+				level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
+				level.set_pp_effector_factor(999, 1.0)
+				level.add_pp_effector("nano.ppe", 77777773, true)
+				level.set_pp_effector_factor(77777773, 1.0)
+				--	level.add_pp_effector ("blink.ppe", 234, false)
+					--	level.add_pp_effector("agr_u_fade.ppe", 998, true)
+					--	level.set_pp_effector_factor(999, 10.0)
+				rad_heal = 3
+				food_ok = false
+			end
+		end
+	end
+end
+
+-- ------------------------------------------ new - supplay check ----------------------------------------
+--local antibled_supplay = {"bandage", "zhgut", "antiseptic", "bandage_dmx"}
+--local antirad_supplay = {"antirad", "amfetamin", "medkit_scientic", "medkit_elite"}
+--local healing_supplay = {"medkit", "medkit_army", "medkit_scientic", "medkit_elite", "suvorotka", "irp-b", "syh_pay_gde_3", "syh_pay_spp5"}
+--local drink_tabl		= {["vodka"]=true, ["energy_drink"]=true, ["beer_a"]=true, ["flaska"]=true, ["pivo"]=true, ["voda"]=true, ["absolut_vodka"]=true, ["nemiroff_vodka"]=true, ["smirnoff_vodka"]=true, ["mineral_water"]=true, ["energy_stalker"]=true, ["energy_non_stop"]=true, ["energy_ad_rush"]=true, ["energy_red_bull"]=true, ["pivo_baltika"]=true, ["sok"]=true}
+
+local suppl_log_delay = 0
+local suppl_check_delay = 0
+function supplay_check()
+	if (supp_check_en == nil) then
+		supp_check_en = true	-- first run enabled - aleks1970
+	elseif (supp_check_en == false) then return end
+--	if suppl_check_delay < time_global() then
+	local item
+	local check_multi_supplay = {"absolut_vodka", "smirnoff_vodka", "nemiroff_vodka", "beer_a", "pivo", "pivo_baltika", "vodka"}
+	for k, v in pairs(check_multi_supplay) do
+		item = act:object(v)
+		if item then
+			suppl_anti_rad_drink = true
+			break
+		else
+			suppl_anti_rad_drink = false
+		end
+	end
+
+	local check_multi_supplay = {"energy_drink", "amfetamin", "energy_red_bull", "energy_ad_rush", "energy_non_stop", "energy_stalker"}
+	for k, v in pairs(check_multi_supplay) do
+		item = act:object(v)
+		if item then
+			suppl_energy_drink = true
+			break
+		else
+			suppl_energy_drink = false
+		end
+	end
+
+	local check_multi_supplay = {"antirad", "amfetamin", "medkit_scientic", "medkit_elite", "suvorotka"}
+	for k, v in pairs(check_multi_supplay) do
+		item = act:object(v)
+		if item then
+			suppl_anti_rad = true
+			break
+		else
+			suppl_anti_rad = false
+		end
+	end
+
+	check_multi_supplay = {"medkit", "medkit_army", "medkit_scientic", "medkit_elite", "suvorotka", "irp-b", "syh_pay_gde_3", "syh_pay_spp5"}
+	for k, v in pairs(check_multi_supplay) do
+		item = act:object(v)
+		if item then
+			suppl_heal = true
+			break
+		else
+			suppl_heal = false
+		end
+	end
+
+	check_multi_supplay = {"bandage", "zhgut", "antiseptic", "bandage_dmx"}
+	for k, v in pairs(check_multi_supplay) do
+		item = act:object(v)
+		if item then
+			suppl_bandage = true
+			break
+		else
+			suppl_bandage = false
+		end
+	end
+	suppl_check_delay = time_global() + 3500
+	supp_check_en = false
+--	end
+end
+-- --**************************************- helper debug sms function -**************************************--
+local debug_sms = true
+function outfit_debug_sms(ini,stat,text,time)
+	if ini then
+		if debug_sms then
+			meceniy_send_tip_txt(act, stat, text, nil, "icon", time)
+			debug_sms = false
+		end
+		return true
+	else
+		if not debug_sms then
+			meceniy_send_tip_txt(act, stat, text, nil, "icon", time)
+			debug_sms = true
+		end
+		return false
+	end
+	--news_manager.send_tip_txt(act, str, nil, 20000)
+	--meceniy_send_tip_txt(act, stat, text, nil, "icon", time)
+end
+-- --*********************************************************************************************************--
 
 function exo_in_section(item)
 	local itm = item:section()
 	if itm == "exo_mil_exoskeleton_addx" then
-		alife():create(itm, db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
+		alife():create(itm, act:position(), act:level_vertex_id(), act:game_vertex_id(), act:id())
 		alife():release(alife():object(item:id()))
 	end
 end
 
 function delete_some_somth(section, count)
-	news_manager.relocate_item(db.actor, "out", section, count)
-	db.actor:iterate_inventory(
+	news_manager.relocate_item(act, "out", section, count)
+	act:iterate_inventory(
 	function(dummy, item)
 	if (count > 0) and (item:section() == section) then
 		alife():release(alife():object(item:id()))
 		count = count - 1
 	end
 	end,
-	db.actor)
+	act)
 end
 
-function do_heal(a,str)
-	if a then
-		play_snd([[meceniy\outfit\est_med]])
+local sound_delay = 0
+local audio_sms = true
+function do_heal_sms(a,stat,text,time) --aleks1970
+	if stat == "suit_0" or stat == "suit_4" or stat == "suit_7" or stat == "suit_8" or stat == "suit_9" then
+		audio_sms = false
 	else
-		play_snd([[meceniy\outfit\net_med]])
+		audio_sms = true
+		if audio_sms and SMS_sound_enabled and sound_delay < time_global() then
+			if a then
+				play_snd([[meceniy\outfit\est_med_new]])
+				sound_delay = time_global() + 2000
+			else
+				play_snd([[meceniy\outfit\net_med_new]])
+				sound_delay = time_global() + 2000
+			end
+		end
 	end
-	news_manager.send_tip_txt(db.actor, str, nil, nil, 30000)
+	--news_manager.send_tip_txt(act, str, nil, 20000)
+	meceniy_send_tip_txt(act, stat, text, nil, "icon", time)
 end
 
 function play_snd(snd)
 	local snd_obj = xr_sound.get_safe_sound_object(snd)
-	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+	snd_obj:play_no_feedback(act, sound_object.s2d, 0, vector(), 1.0)
 end
+-- --------------------------------------- new multifunctional news -----------------------------------------
+function meceniy_send_tip_txt(actor, outfit_id, meceniy_news_text, timeout, sender, showtime)
+	local send_meceniy_news = news_manager.give_game_news
+	local pda_tip_0 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat-nano_on]])	-- new sounds aleks1970
+--	local pda_tip_1 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_power_error]])
+	local pda_tip_1 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_power_error_2]])
+	local pda_tip_2 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_nano_con]])
+	local pda_tip_3 = xr_sound.get_safe_sound_object([[device\pda\pda_tip]])
+	if meceniy_news_text then
+		local tmout = timeout or 1
+		local icon_id = sender or 0
+		local sms_id = outfit_id or 0
+		local shwtme = showtime or 15000
+		if shwtme < 1 then shwtme = 15000 end
+		local player = pda_tip_0
+		if sms_id == "suit_0" then
+			player:play(act, tmout, sound_object.s2d)
+		elseif (sms_id == "suit_4") or (sms_id == "suit_9") then
+			player = pda_tip_3
+			player:play(act, tmout, sound_object.s2d)
+		elseif sms_id == "suit_7" then
+			player = pda_tip_1
+			player:play(act, tmout, sound_object.s2d)
+		elseif sms_id == "suit_8" then
+			player = pda_tip_2
+			player:play(act, tmout, sound_object.s2d)
+		end
+
+		if icon_id == "icon" then
+			if nano_heal then
+				if sms_id == "suit_0" then	-- new icons
+					icon_id = "nano_ok"
+				elseif sms_id == "suit_1" then
+					icon_id = "nano_ok"
+				elseif sms_id == "suit_2" then
+					icon_id = "nano_health"
+				elseif sms_id == "suit_3" then
+					icon_id = "nano_radiation"
+				elseif sms_id == "suit_4" then
+					icon_id = "nano_power"
+				elseif sms_id == "suit_5" then
+					icon_id = "nano_power"
+				elseif sms_id == "suit_6" then
+					icon_id = "nano_food"
+				elseif sms_id == "suit_7" then
+					icon_id = "nano_power"
+				elseif sms_id == "suit_8" then
+					icon_id = "skat_power"
+				end
+			else
+				if sms_id == "suit_0" then
+					icon_id = "skat_ok"
+				elseif sms_id == "suit_1" then
+					icon_id = "skat_ok"
+				elseif sms_id == "suit_2" then
+					icon_id = "skat_health"
+				elseif sms_id == "suit_3" then
+					icon_id = "skat_radiation"
+				elseif sms_id == "suit_4" then
+					icon_id = "skat_power"
+				elseif sms_id == "suit_5" then
+					icon_id = "skat_power"
+				elseif sms_id == "suit_6" then
+					icon_id = "skat_food"
+				elseif sms_id == "suit_7" then
+					icon_id = "skat_power"
+				elseif sms_id == "suit_8" then
+					icon_id = "skat_power"
+				end
+			end
+			if sms_id == "suit_9" then
+				icon_id = "default"
+			end
+		else
+			if icon_id == nil or meceniy_icons[icon_id] == nil then
+				icon_id = "default"
+			end
+		end
+		local x = meceniy_icons[icon_id][1]
+		local y = meceniy_icons[icon_id][2]
+		if TB3D_Modders.use_news_message then
+			TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(meceniy_news_text).."]") 
+		end
+		send_meceniy_news(meceniy_news_text, "ui\\ui_iconsTotal2", Frect():set(x,y,83,47), tmout, shwtme)
+	--	TB3D_Services.info_alert("news mgr: outfit id["..utils.to_str(sms_id).."] outfit-nano_heal ["..utils.to_str(nano_heal).."] sender id["..utils.to_str(sender).."] icon id["..utils.to_str(icon_id).."] show["..utils.to_str(showtime).."]")
+	--	TB3D_Services.info_alert("news mgr: give meceniy news["..utils.to_str(meceniy_news_text).."] outfit id["..utils.to_str(sms_id).."] icon id["..utils.to_str(sender).."] timeout["..utils.to_str(timeout).."] show["..utils.to_str(showtime).."]") 
+		return true
+	end
+	return false
+end
+-- ----------------------------- new icons info ----------------------------- --
+--	default			= {44,229},		-- suit_9, nil							  --
+--	skat_ok			= {0,330},		-- suit_0, suit_1						  --
+--	skat_power		= {166,435},	-- suit_4, suit_5, suit_7, suit_8		  --
+--	skat_health		= {0,424},		-- suit_2								  --
+--	skat_radiation	= {0,377},		-- suit_3								  --
+--	skat_food		= {332,435},	-- suit_6								  --
+--	nano_ok			= {83,330},		-- suit_0, suit_1						  --
+--	nano_power		= {249,435},	-- suit_4, suit_5, suit_7, suit_8		  --
+--	nano_health		= {83,424},		-- suit_2								  --
+--	nano_radiation	= {83,377},		-- suit_3								  --
+--	nano_food		= {415,435}		-- suit_6								  --
+-- -------------------------------------------------------------------------- --
 
 local cntr = 0
+local fail_counter = 0
 function exo_update(item)
 	local cond = item:condition()
 	local used = amk.load_variable("tb3d_acumm_use", 0)
-	local have_art_accum = db.actor:object("art_acumm")
+	local have_art_accum = act:object("art_acumm")
 	if not last_time then last_time = game.get_game_time() end
 	local tm_diff = game.get_game_time():diffSec(last_time)
 	last_time = game.get_game_time()
@@ -549,10 +1451,10 @@ function exo_update(item)
 			if have_art_accum then
 				meceniy_utils.delete_some_somth("art_acumm", 1)
 				amk.save_variable("tb3d_acumm_use", full_charge)
-				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_3..translate("skat15_sms_power_suit_full"), nil, nil, 30000)
+				do_heal_sms(true, "suit_0", skat_powersys..Text_color_green..translate("skat15_sms_power_suit_full"), 20000)
 				cntr = 0
 			else
-				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_4..translate("skat15_sms_power_suit_no_sourc_remain"), nil, nil, 30000)
+				do_heal_sms(true, "suit_7", skat_powersys..Text_color_yellow..translate("skat15_sms_power_suit_no_sourc_remain"), 40000)
 				amk.save_variable("tb3d_acumm_use", 0)
 			end
 		else	
@@ -561,28 +1463,30 @@ function exo_update(item)
 	elseif have_art_accum then
 		meceniy_utils.delete_some_somth("art_acumm", 1)
 		amk.save_variable("tb3d_acumm_use", full_charge)
-		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_3..translate("skat15_sms_power_suit_full"), nil, nil, 30000)
+		do_heal_sms(true, "suit_0", skat_powersys..Text_color_green..translate("skat15_sms_power_suit_full"), 20000)
 		cntr = 0
-	else
+	elseif fail_counter < time_global() then
 		cond = cond * 0.997
 		if cond < 0 then cond = 0 end
 		item:set_condition(cond)
 		if cond > 0.8 then
 			if cntr < 1 then
-				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_4..translate("skat15_sms_power_suit_null_add"), nil, nil, 30000)
+				do_heal_sms(true, "suit_8", skat_powersys..Text_color_yellow..translate("skat15_sms_power_suit_null_add"), 30000)
 				cntr = 1
 			end
 		elseif cond < 0.5 then
 			if cntr < 100 then
-				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_3..translate("skat15_sms_power_suit_demage_low"), nil, nil, 30000)
+				do_heal_sms(true, "suit_8", skat_powersys..Text_color_green..translate("skat15_sms_power_suit_demage_low"), 30000)
 				cntr=100
 			end
 		elseif cond < 0.1 then
 			if cntr < 100 then
-				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_1..translate("skat15_sms_power_suit_demage_high"), nil, nil, 30000)
+				do_heal_sms(true, "suit_8", skat_powersys..Text_color_red..translate("skat15_sms_power_suit_demage_high"), 30000)
 				cntr=100
 			end
 		end
+		fail_counter = time_global() + 1000
 	end
-	return cond
+	return used	--cond --function must have to return suit power state and not the suit condition level - aleks1970
 end
+-- --------------------------------------------------------------------------------------------------------------------------------------------

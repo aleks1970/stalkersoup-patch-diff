@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.3 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.0.9.9.9.4 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
--- use_rat_infests, moved hardcore_mobs, more spawns
-function my_ver() return "1.0.9.9.9.3" end
+-- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns
+function my_ver() return "1.0.9.9.9.4" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -967,7 +967,7 @@ function check_npp1_spawns()
 	local typ, qty = 5,6			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
-		qty = 20
+		qty = 10
 		spawn_mob(223.990,4.798,-94.440,94165,2389, typ, qty)			--under tower near radar exit
 		spawn_mob(278.937,-0.001,-220.131,115565,2350, typ, qty)		--camp near gen exit
 		spawn_mob(367.377,-0.104,-104.483,157701,2351, typ, qty)		--U in road in front of sarc
@@ -998,10 +998,10 @@ function check_npp2_spawns()
 	local typ, qty = 5,6			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
-		qty = 20
-		spawn_mob(975.748,-0.048,78.427,243783,2635, typ, qty)		--se corner
-		spawn_mob(1040.521,-0.101,192.322,245052,2636, typ, qty)	--e intersection
-		spawn_mob(1048.023,-0.000,380.676,245052,2636, typ, qty)	--ne corner
+		qty = 10
+		--spawn_mob(975.748,-0.048,78.427,243783,2635, typ, qty)		--se corner
+		--spawn_mob(1040.521,-0.101,192.322,245052,2636, typ, qty)	--e intersection
+		--spawn_mob(1048.023,-0.000,380.676,245052,2636, typ, qty)	--ne corner
 		spawn_mob(733.635,-0.104,300.891,212718,2643, typ, qty)		--cooling stacks
 		spawn_mob(565.675,-0.000,208.089,168082,2622, typ, qty)		--under tall chimney
 		spawn_mob(467.079,-0.100,270.656,160942,2622, typ, qty)		--below gens by pipes

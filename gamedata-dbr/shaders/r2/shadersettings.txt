@@ -1,5 +1,5 @@
-// TB3D 1.0.9.9.9.3 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
-// adj sun and now default to standard smap, f32, sun saturation, Meltac DX11, removed MELTAC20, some tweaks
+// TB3D 1.0.9.9.9.4 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
+// adj sun and now default to standard smap, f32, sun saturation, Meltac DX11, removed MELTAC20, some tweaks, Launcher
 //////////////////////////////////////////////////////////////////
 // Adapted from: DYNAMIC DEPTH OF FIELD SHADERS 1.02 - By Meltac
 // and Dynamic Shaders 2.0 Alpha - Extreme Preset - By Meltac, Kingo64, Sky4ce, JJ Walker, Daemonjax, K.D., Ketxxx
@@ -8,6 +8,7 @@
 // Feature Enable/Disable: Comment a feature (Add the //) to disable, or uncomment (Remove the //) to enable.
 // NOTE: <<< >>> indicates a warning message - options are for advanced users ==//
 //////////////////////////////////////////////////////////////////
+
 #ifndef SSM_Mount			// This entire module
 	#define SSM_Mount
 #endif
@@ -67,8 +68,10 @@
 		
 /////////////////////////// Direct X Support ////////////////////////////
 //== DX9 Default or DX11
-#ifndef DX11
-	//#define DX11 		// <<use only when running TB3D_Meltac20 custom DirectX 11 bin folder>>
+#ifndef DX11_LAUNCHER		// 109994, Launcher application takes precedence if used
+	#ifndef DX11
+		//#define DX11 		// <<use only when running TB3D_Meltac20 custom DirectX 11 bin folder>>
+	#endif
 #endif
 
 #ifdef DX11

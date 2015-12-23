@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.1 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog
-function my_ver() return "1.0.9.9.9.1" end
+-- TB3D 1.0.9.9.9.4 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric
+function my_ver() return "1.0.9.9.9.4" end
 
 local table_remove = table.remove
 local string_len = string.len
@@ -562,10 +562,15 @@ function CRandomTask:task_complete(p1, p2)
 			if string.find(p1, "eliminate_lager") ~= nil then
 				local oo = alife():object(sel_task.selected_target)
 				if oo then
-					--TB3D_Services.packet_alert("task mgr: task["..tostring(self.active_task_by_type[p1]).."] pop["..utils.to_str(oo.gulag:get_population_comed()).."]")
-					if oo.gulag:get_population_comed() == 0 then
+					--TB3D_Services.packet_alert("task mgr: task["..tostring(self.active_task_by_type[p1]).."] target["..utils.to_str(oo:name()).."] pop["..utils.to_str(oo.gulag:get_population_comed()).."]")
+					if oo.gulag:get_population_comed() < 1 then
 						self.task_info[self.active_task_by_type[p1]].status = "completed"
 						return true
+					elseif oo:name() == "esc2_st_fabric" then
+						if oo.gulag:get_population_comed() -1 == 0 then
+							self.task_info[self.active_task_by_type[p1]].status = "completed"
+							return true
+						end
 					end
 				end
 			elseif string.find(p1, "defend_lager") ~= nil then

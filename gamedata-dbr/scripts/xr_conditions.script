@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.0  optimized gulag checks, heli see actor fix, killed by actor fix for atp, val_sacrifice sids, killed by actor,
--- killed by actor eagle, db storage, gulag_population_ge, exclusives, killed_by_eagle, killed_by_actor
-function my_ver() return "1.0.9.9.8.0" end
+--TB3D 1.0.9.9.9.4  optimized gulag checks, heli see actor fix, killed by actor fix for atp, val_sacrifice sids, killed by actor,
+-- killed by actor eagle, db storage, gulag_population_ge, exclusives, killed_by_eagle, killed_by_actor, esc2_st_fabric
+function my_ver() return "1.0.9.9.9.4" end
 -- Each function in this file is used as a condition xr_logic: {= function "function"}
 -- If the function needs to pass parameters, then: {= function (param1: param2 :...)! Function (param1: param2 :...)}
 -- Format: function f (actor, npc). In the case of passing parameters: function f (actor, npc, p).
@@ -409,7 +409,6 @@ end
 
 -- true, if the gulag of the same name (or the story id) not exist or has no one
 function gulag_empty(actor, npc, p)
-	--if p[1] == "esc2_most" then return true end
 	local reslt = true						--default to true incase no data
 	if p[1] then
 		reslt = xr_gulag.getGulagPopulationComed( p[1] ) == 0
@@ -455,7 +454,6 @@ end
 
 -- true, if in that gulag came to the people more than necessary.
 function gulag_population_comed_ge(actor, npc, p)
-	--if p[1] == "esc2_st_fabric" then return true end
 	--if p[1] == "esc2_most" then return false end
 	local reslt
 	if p[1] and p[2] then

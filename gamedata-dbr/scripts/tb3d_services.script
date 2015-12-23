@@ -1,16 +1,16 @@
----TB3D 1.0.9.9.9.3 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.9.4 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
 -- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef
-function my_ver() return "1.0.9.9.9.3" end	--modders append with initials and rev.
+function my_ver() return "1.0.9.9.9.4" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.3}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.4}" end
 
-major_version = 109993							--used in saves
+major_version = 109994							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -2941,4 +2941,28 @@ function remove_bar_emi()			--109989, removes emi blocking wild territory
 			break
 		end
 	end
+end
+
+--109994, to be used in coop combat
+local targets = {
+	[1] = 0,				--zombied
+	[2] = 0,				--monolith
+	[3] = 0,				--bandits
+	[4] = 0,				--killer
+	[5] = 0					--lastday
+}
+function targets_killed(target)
+	--packet_alert("targets["..utils.to_str(target).."] = ["..utils.to_str(targets[target]).."]")
+	return targets[target]
+end
+function inc_targets_dead(target)
+	targets[target] = targets[target] + 1
+	--packet_alert("inc targets["..utils.to_str(target).."] = ["..utils.to_str(targets[target]).."]")
+end
+function clear_targets()
+	targets[1] = 0
+	targets[2] = targets[1]
+	targets[3] = targets[1]
+	targets[4] = targets[1]
+	targets[5] = targets[1]
 end

@@ -1,10 +1,10 @@
---' TB3D 1.0.9.9.9.0 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.0.9.9.9.4 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
--- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check
-function my_ver() return "1.0.9.9.9.0" end
+-- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls
+function my_ver() return "1.0.9.9.9.4" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -29,6 +29,9 @@ end
 function atp_propusk_have() 
 	return amk_utils.inventory_search("wpn_m_134",1) ~= false
 end
+function atp_propusk_have_info() 
+	return has_alife_info("atp_propusk_have")
+end
 
 --' give up the minigun Adrenalin, will receive the award and Adrenalin - each
 function atp_propusk_done(first_speaker, second_speaker)
@@ -41,7 +44,10 @@ end
 --' verify the presence of masking ekzy
 function arhara_ekza_have()
 	return amk_utils.inventory_search("meceniy_outfit_new",1) ~= false
-end 
+end
+function  arhara_ekza_have_info()
+	return has_alife_info("arhara_ekza_have")
+end
 
 --' surrender ekzu Voronin and received an award
 function arhara_ekza_done(first_speaker, second_speaker)
@@ -60,6 +66,9 @@ end
 function atp_propusk_shurup_have()
 	return amk_utils.inventory_search("tisku_arhara",1) ~= false
 end
+function atp_propusk_shurup_have_info()
+	return has_alife_info("atp_propusk_shurup_have")
+end
 
 --' spawn vices for screws
 function spawn_tisku()
@@ -76,6 +85,9 @@ end
 --' check availability antizombina
 function chaes_perexod_have()
 	return amk_utils.inventory_search("antizombie",1) ~= false
+end
+function chaes_perexod_have_info()
+	return has_alife_info("chaes_perexod_have")
 end
 
 --' surrender antizombin
@@ -141,6 +153,9 @@ end
 --' check availability disk, HS
 function arh_disk_have()
 	return amk_utils.inventory_search("disk_adren",1) ~= false
+end
+function arh_disk_have_info()
+	return has_alife_info("arh_disk_have")
 end
 
 --' surrender disc Adrenaline and received an award
@@ -209,6 +224,9 @@ end
 function sahar_sumka_have()
 	return amk_utils.inventory_search("sumka_arhara",1) ~= false
 end
+function sahar_sumka_have_info()
+	return has_alife_info("sahar_sumka_have")
+end
 
 --' give up the bag Sahara
 function sahar_sumka_done(first_speaker, second_speaker)
@@ -228,6 +246,9 @@ end
 --' verify the presence of a medallion in HS
 function med_dok_have()
 	return amk_utils.inventory_search("doc_medal",1) ~= false
+end
+function med_dok_have_info()
+	return has_alife_info("med_dok_have")
 end
 
 --' surrender a locket Doku
@@ -453,6 +474,9 @@ function lysyi_klad_nayti_have()
 	new_dialog.item_much("money2",3) ~= false and
 	new_dialog.item_much("money3",3) ~= false
 	return result
+end
+function lysyi_klad_nayti_have_info()
+	return has_alife_info("lysyi_klad_nayti_have")
 end
 
 --' spawn monsters in the cave and several artov
@@ -8020,6 +8044,9 @@ end
 function baty_zadanie_have()
 	return new_dialog.item_much("video_kasseta",1) ~= false and
 		new_dialog.item_much("detektor_baty",1) ~= false
+end
+function baty_zadanie_have_info()
+	return has_alife_info("baty_zadanie_have")
 end
 
 --' detector and surrender the tape and get the minigun

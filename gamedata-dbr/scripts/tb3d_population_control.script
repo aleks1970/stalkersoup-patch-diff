@@ -1,9 +1,9 @@
--- TB3D 1.0.9.9.9.3 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.0.9.9.9.4 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized,
--- pri_monolith_10, vampire, specnaz_dead, generators
-function my_ver() return "1.0.9.9.9.3" end
+-- pri_monolith_10, vampire, specnaz_dead, generators, esc2_ respawns
+function my_ver() return "1.0.9.9.9.4" end
 					
 -----over population control----
 local string_find = string.find
@@ -438,6 +438,8 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					else
 						result = true			--puzir, garbage, agro, bar and dv
 					end
+				elseif hdr5 == "esc2_" then			--109994
+						if has_alife_info("dark_btr1_spawn") then result = true else dont_spawn_online = true end
 				elseif hdr4 == "val_" then
 					if extended_levels == true then
 						if lname ~= "l01_escape" then result = true end
@@ -757,8 +759,10 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						else																	--must go online as may have task spot
 							result = true
 						end
-					elseif string_find(obj_name, "bandit") then
-						if has_alife_info("esc_darklab_documents_read") then					--keep them out until cordon story quests are done
+					elseif string_find(obj_name, "bandit_") then									--109994, gar_bandit_agr_, gar_bandit_seryi_
+						if extended_levels then
+							dont_spawn_online = true
+						elseif has_alife_info("esc_darklab_documents_read") then					--keep them out until cordon story quests are done
 							result = true
 						end
 					else

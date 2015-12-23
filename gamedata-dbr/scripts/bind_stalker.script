@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.0  added hide weapon option, The Collector, restored keylogger, abort_alert added,
+-- TB3D 1.0.9.9.9.4  added hide weapon option, The Collector, restored keylogger, abort_alert added,
 -- fov nvision fixed, added Meltac DDOF option, toggle dig NV, adjusted slices, re-wrote hiding weapons
 -- re-wrote on item take to add short-circuiting of section tests, dmx135, added art det, chgd modders interface
 -- removed vkluchit_generator_done as it has flaw in all.spawn, fixed save/load amkII error, chgd fixer, fixed ara_pda,
@@ -9,8 +9,8 @@
 -- sak_book4, grib_respawn to OAL, player_ogg.update, point_drop, rstr update 500, send_tip_id optimization, pause,
 -- force_garbage_collect, earth shake, xr_spawner, time_now, no avi in collector, update alert last, ftl time, debug,
 -- informer_out, blow(), on_item_take, removed blowout_wave, run_hide, active community, removed unused timers, restrictor slice,
--- mteleport updates, memory check on save, deactivated modders calls, slice levels, removed amk_utils cache
-function my_ver() return "1.0.9.9.9.0" end
+-- mteleport updates, memory check on save, deactivated modders calls, slice levels, removed amk_utils cache, meceniy_outfit-net_destroy
+function my_ver() return "1.0.9.9.9.4" end
 -- TB3D re-written 08/15/2011
 -- file from the mod "People Salsola 2009" from 14.06.
 -- Adapted to the Manager of weapons. Rulix aka Bak on 02/07/2009
@@ -122,6 +122,14 @@ function actor_binder:__init (obj) super(obj)
   self.is_saved = false
   TB3D_Services.report_gulags()
   task_manager.show_counts()
+  local d3d_mode = tb3d_net_manager.launcher_check()
+  if d3d_mode then
+	if d3d_mode == "dx11" then
+		TB3D_Modders.use_DX11 = true
+	else
+		TB3D_Modders.use_DX11 = false
+	end
+  end
   if TB3D_Modders.force_garbage_collect then collectgarbage("collect") end		-- force memory cleanup
 end
 
@@ -208,6 +216,7 @@ function actor_binder:net_spawn(data)
 			TB3D_Services.give_info("tb3d_force_weather")
 		end
 	end
+	TB3D_Services.clear_targets()			--109994
 	TB3D_Dyn_spawn.spawn_vehicles()
 	TB3D_Dyn_spawn.spawn_kill_zones()
 	TB3D_Dyn_spawn.spawn_fix_props()
@@ -238,6 +247,7 @@ function actor_binder:net_destroy()
 	xr_sound.stop_all_sound_object()
 	if biodetector then biodetector.net_destroy() end
 	if TB3D_dav_hunt then TB3D_dav_hunt.net_destroy() end
+	if meceniy_outfit then meceniy_outfit.net_destroy() end	--109994, aleks1970
 	TB3D_Triggers.on_net_destroy()	--bad torch, not used att
 	--if(actor_stats.remove_from_ranking~=nil) then
 		actor_stats.remove_from_ranking(self.object:id())
@@ -820,7 +830,7 @@ function actor_binder:update(delta)
 		if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - SAK["..utils.to_str(upd_timeSAK).."]") end
 		if TB3D_Modders.invisible then meceniy_work.set_invisible() end
 		if TB3D_Modders.hell == true then meceniy_in_hell.horrortime() end
-		meceniy_outfit.on_actor_update()
+		meceniy_outfit.on_actor_update(scopeUsed)
 		if TB3D_Modders.zombie == true then meceniy_work.mainw() end
 		--if TB3D_bsu_upd5 then TB3D_bsu_upd5.update(delta, self.object, time_now) end					-- modders interface		
 	end

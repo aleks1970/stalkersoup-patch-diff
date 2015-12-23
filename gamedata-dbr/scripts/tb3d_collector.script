@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.3 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.4 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started,
---ldk trigger, old_research_send, generators
-function my_ver() return "1.0.9.9.9.3" end
+--ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2
+function my_ver() return "1.0.9.9.9.4" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -996,6 +996,9 @@ function process_levels(lname, sname)
 				TB3D_Dialog.npp2_killers_npp1()
 			end
 			TB3D_Mobs.check_npp2_spawns()
+			if has_alife_info("tb3d_mush_arts_quest") and not has_alife_info("tb3d_found_in_npp2") then
+				tb3d_dialog.spawn_mushroom_arts_npp2()
+			end
 		elseif lname == "l12_stancia" then
 			if level_up == 1 then																				--Collector = ZEP, Gold Bars and treasure hunt
 				if sname == "yantar_old" then

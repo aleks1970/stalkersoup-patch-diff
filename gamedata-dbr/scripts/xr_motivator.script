@@ -1,10 +1,10 @@
---TB3D 1.0.9.9.8.9 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+--TB3D 1.0.9.9.9.4 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
 -- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
 -- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
 -- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions, radar_monolit_dead, generic_m_story_id,
 -- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update,
--- agro soldiers health, krysuk
-function my_ver() return "1.0.9.9.8.9" end
+-- agro soldiers health, krysuk, death callback
+function my_ver() return "1.0.9.9.9.4" end
 --[[------------------------------------------------------------------------------------------------------------------
 Author: Ruslan Didenko (Stohe)
 how to call methods of Binder:
@@ -621,13 +621,22 @@ function motivator_binder:death_callback(victim, who)
 	smart_terrain.on_death( self.object:id() )
 	amk.on_death(victim, who)										-- added by xStream for AMK miniSDK
 	local community = self.object:character_community()
-	if community == nil then community = "NIL" end
-	if community == "zombied"
-	  or community == "monolith"
-	  or community == "NIL"
-	  or community == "arena_enemy" then
-		--not registered
-	  else
+	if community == nil then
+		community = "NIL"
+	elseif community == "zombied" then		--not registered in ranking
+		TB3D_Services.inc_targets_dead(1)
+	elseif community == "monolith" then		--not registered in ranking
+		TB3D_Services.inc_targets_dead(2)
+	elseif community == "arena_enemy" then
+		--not registered in ranking
+	else	--registered in ranking
+		if community == "bandit" then
+			TB3D_Services.inc_targets_dead(3)
+		elseif community == "killer" then
+			TB3D_Services.inc_targets_dead(4)
+		elseif community == "lastday" then
+			TB3D_Services.inc_targets_dead(5)
+		end
 		actor_stats.remove_from_ranking(self.object:id())
 	end
 	local se_obj = alife():object(self.object:id())
