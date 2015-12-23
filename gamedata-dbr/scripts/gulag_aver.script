@@ -1,0 +1,260 @@
+--TB3D 1.0.9.9.7.5 new - from gulag_escape
+function my_ver() return "1.0.9.9.7.5" end
+local t = {}
+
+function load_job(sj, gname, type, squad, groups)
+	if type == "aver_kaban_gulag" then					--' 10kabanov on Avery
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_kaban_gulag", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+    elseif type == "aver_hunter" then						-- Gulag GREEN ON EARTH Undiscovered
+        t = { section = "logic@aver_hunter_kamp1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@aver_hunter_kamp2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@aver_hunter_walker3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@aver_hunter_walker4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+	elseif type == "land_arhara_sniper" then					--' Snipers on the Reconoitered Earth base
+		t = { section = "logic@land_arhara_sniper_snip1",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@land_arhara_sniper_snip2",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@land_arhara_sniper_snip3",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@land_arhara_sniper_snip4",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@land_arhara_sniper_snip5",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+	elseif type == "aver_arhara_sniper_mikrogulag1" then				--' Snipers on the unexplored Earth mikrogulag_1
+		t = { section = "logic@aver_arhara_sniper_mikrogulag1_tip1",
+			idle = 0,
+			prior = 30, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_arhara_sniper_mikrogulag1_tip2",
+			idle = 0,
+			prior = 30, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_arhara_sniper_mikrogulag1_tip3",
+			idle = 0,
+			prior = 30, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+	elseif type == "aver_arhara_sniper_makrogulag2" then					--' Snipers on the unexplored Earth gulag_2
+		t = { section = "logic@aver_arhara_sniper_makrogulag2_vrag1",
+			idle = 0,
+			prior = 15, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_arhara_sniper_makrogulag2_vrag2",
+			idle = 0,
+			prior = 15, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_arhara_sniper_makrogulag2_vrag3",
+			idle = 0,
+			prior = 15, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_arhara_sniper_makrogulag2_vrag4",
+			idle = 0,
+			prior = 15, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_arhara_sniper_makrogulag2_vrag5",
+			idle = 0,
+			prior = 15, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@aver_arhara_sniper_makrogulag2_vrag6",
+			idle = 0,
+			prior = 15, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+	elseif type == "aver_otshelnik" then						--- People Hermit ---
+         t = { section = "logic@aver_otshelnik_zimovie3",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+         t = { section = "logic@aver_otshelnik_zimovie4",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+         t = { section = "logic@aver_otshelnik_zimovie5",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+	else
+		--TB3D_Services.packet_alert("gulag escape: load job for type["..utils.to_str(type).."] not found")
+	end
+end
+
+function load_states(gname, type)
+	if type == "aver_hunter" then
+        return function(gulag) return 0 end
+	elseif type == "aver_otshelnik" then			--- Hermit ---
+        return function(gulag) return 0 end
+	elseif type == "land_arhara_sniper" then
+        return function(gulag) return 0 end
+	elseif type == "aver_arhara_sniper_mikrogulag1" then
+        return function(gulag) return 0 end
+	elseif type == "aver_arhara_sniper_makrogulag2" then
+        return function(gulag) return 0 end
+    elseif type == "aver_kaban_gulag" then        
+        return function(gulag) return 0 end
+	end
+	return nil
+end
+
+--------------------------------------------------------------------------
+-- Dynamic ltx
+--------------------------------------------------------------------------
+function load_ltx(gname, type)
+	return nil
+end
+
+function checkStalker(npc_community, gulag_type, npc_rank, se_obj)
+
+if gulag_type == "aver_hunter" then
+        return npc_community == "green"
+    end
+
+--- Hermit ---
+	if gulag_type == "aver_otshelnik" then
+		return npc_community == "stalker"
+	end
+
+    if gulag_type == "land_arhara_sniper" then
+		return npc_community == "sniper"
+	end
+
+    if gulag_type == "aver_arhara_sniper_mikrogulag1" then
+		return npc_community == "sniper"
+	end
+
+    if gulag_type == "aver_arhara_sniper_makrogulag2" then
+		return npc_community == "sniper"
+	end
+	
+	return false
+end
+
+function checkMonster(npc_community, gulag_type)
+
+     if gulag_type == "aver_kaban_gulag" then
+          return npc_community == "boar"
+     end
+	
+	return false
+end

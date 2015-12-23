@@ -1,0 +1,1451 @@
+--TB3D 1.0.9.9.7.5 npc_info and job checks, actor checks, lager, db, exclusives, gulag_generators, gulag_aver
+function my_ver() return "1.0.9.9.7.5" end
+-- (Stohe), (Chugai)
+local table_sort = table.sort
+local math_min = math.min
+local string_find = string.find
+
+level_gulags = {gulag_general, gulag_escape, gulag_garbage, gulag_agroprom, gulag_agroprom_underground, gulag_dark_valley, gulag_labx18, gulag_bar,
+                gulag_military, gulag_radar, gulag_radar_u, gulag_yantar, gulag_pripyat, gulag_kishka, gulag_sarcofag, gulag_generators, gulag_aver,
+                gulag_deadcity, gulag_amk, gulag_new, gulag_dd, gulag_rinok, gulag_pogost, gulag_vokzal} --, gulag_krasivay (kras_bandit bad logic, freezes game)
+
+level_groups = {l01_escape = 1, l02_garbage = 2, l03_agroprom = 3, l03u_agr_underground = 4,
+                l04_darkvalley = 5, l04u_labx18 = 6, l05_bar = 7, l06_rostok = 8,
+                l07_military = 9, l08_yantar = 10, l08u_brainlab = 11, l10_radar = 12,
+                l10u_bunker = 13, l11_pripyat = 14, l12_stancia = 15, l12u_sarcofag = 16, 
+                l12u_control_monolith = 17, l12_stancia_2 = 18, marsh = 19, dead_city = 20,
+				l02_dd = 21, l03_rinok = 22, l04_pogost = 23, l05_vokzal = 24, l01_krasivay = 25,
+				promzone = 26, predbannik = 27} --, level_f-1 = 28}
+
+local gulag_tasks_file_name  = "misc\\gulag_tasks.ltx"
+local gulag_tasks_ltx        = ini_file( gulag_tasks_file_name )
+
+local job_position_threshold = 120 --'50  -- расстояние до места работы при котором персонаж в онлайне считается достигшим места работы
+local job_idle_after_death   = 600 -- в течении такого периода времени после смерти персонажа его работа будет недоступна
+
+idle_nil  = nil
+idle_once = -1
+idle_none = -2
+
+local path_fields = { "path_walk", "path_main", "path_home", "center_point" }
+
+-----------------------------------------------------------------------
+class "gulag"
+
+-- конструктор
+function gulag:__init(smrttrn, type, squad, groups, npc_info, capacity)
+	if TB3D_Modders.use_smt_message and smrttrn:name() == TB3D_Modders.smt_to_log then TB3D_Services.packet_alert("xr gulag: __init["..smrttrn:name().."]") end
+	self.smrttrn  = smrttrn
+	self.name     = smrttrn:name()
+	self.type     = type
+	self.squad    = squad
+	self.groups   = groups or {}
+	self.npc_info = npc_info
+	self.capacity = capacity     -- общая ёмкость гулага
+--	self.capacity_non_exclusive  -  ёмкость гулага для неэксклюзивных персонажей
+	self.population = 0					-- Население гулага
+	self.population_comed = 0			-- Уже пришедшее население гулага
+	self.population_non_exclusive = 0	-- Неэксклюзивное население
+	self.Object                 = {} -- объекты по id. Значения: nil-нету такого, true-есть в офлайне, game_object-есть в онлайн
+	self.Object_begin_job       = {} -- по id. true/nil достиг ли объект места своей работы
+	self.Object_didnt_begin_job = {} -- по id. начинал ли объект хотя бы раз любую работу с момента добавления под смарт
+	self.ObjectJob              = {} -- по id. номер работы для каждого персонажа
+	self.JobLoaded              = {} -- для каждой работы загруженные из save данные
+	self.Job_avail_in_state     = nil
+	self.state      = 0
+	self.stateBegin = nil
+	self.casualities = 0
+	if TB3D_Modders.use_smt_message and smrttrn:name() == TB3D_Modders.smt_to_log then TB3D_Services.packet_alert("xr gulag: __init["..smrttrn:name().."] done ") end
+end
+
+-- загрузка работ
+function gulag:load_jobs()
+	if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: LOAD JOBS ["..utils.to_str(self.name).."]") end
+	self.Job                  = {}
+	self.Job_avail_in_state_0 = {}
+	gulag_tasks.loadJob( self.Job, self.name, self.type, self.squad, self.groups, self )
+	self:init_ltx( self.name, self.type )
+	table_sort( self.Job, function(a,b) return a.prior > b.prior end )
+	self:prepare_jobs_for_new_state()
+	local capacity = 0
+	for i, job in ipairs( self.Job ) do
+		if self:job_exists_in_state_0( job ) then
+			table.insert( self.Job_avail_in_state_0, job )
+			capacity = capacity + 1
+		end
+		if type( job.online ) == "string" then
+			job.online_condlist = job.online
+			job.online          = xr_logic.parse_condlist( self.smrttrn, "gulag:setup_job_online", "job_online", job.online_condlist )
+			if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then
+				TB3D_Services.packet_alert("XR GULAG: LOAD JOBS ["..utils.to_str(self.name).."] ["..utils.to_str(self.capacity).."]["..utils.to_str(job.on_line).."]["..utils.to_str(job.online_condlist).."]")
+			end
+		end
+	end
+	self.capacity               = math_min( capacity, self.capacity )
+	self.capacity_non_exclusive = self.capacity
+	if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then
+		TB3D_Services.packet_alert("XR GULAG: LOAD JOBS ["..utils.to_str(self.name).."] ["..utils.to_str(self.capacity).."] done")
+	end
+	-- DEBUG
+--	self:validate_jobs()
+end
+
+-- проверки правильности набора работ.
+-- а) в любом состоянии кол-во 100-но доступных работ должно быть >= ёмкости смарта
+function gulag:validate_jobs()
+	local jobs_avail_in_states = {}
+	for i, job in ipairs( self.Job ) do
+		if job.predicate == nil and
+		   job.idle == 0 and
+		   job.timeout == nil and
+		   job.fill_idle == nil
+		then
+			for j, state in ipairs( job.state ) do
+				jobs_avail_in_states[state] = (jobs_avail_in_states[state] or 0) + 1
+			end
+		end
+	end
+	for i, v in ipairs( jobs_avail_in_states ) do
+		if v < self.capacity then
+			if TB3D_Modders.show_tables then show_tables(self.Job, nil, "xr gulag") end
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("xr gulag: ["..utils.to_str(self.name).."] type=["..utils.to_str(self.type).."] state=["..utils.to_str(i).."] capacity=["..utils.to_str(self.capacity).."] too few available jobs") end
+		end
+	end
+end
+
+-- подготовка гулага к работе
+function gulag:initialize()
+	if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.smt_to_log) then TB3D_Services.packet_alert("xr gulag: initialize["..self.name.."]") end
+	self.ObjectJobPathName = {} --' по id. имя патрульного пути места работы персонажа
+	self.restrictors       = {} --' по id. назначенные гулагом рестрикторы для каждого персонажа
+	self:prepare_jobs()
+	self.calculateStates = gulag_tasks.loadStates( self.name, self.type )
+	local ini = self.smrttrn:spawn_ini()
+	local sect = "smart_terrain"
+	if not ini:section_exist( sect ) then
+		sect = "gulag1"
+	end
+	self.state_switch_0 = xr_logic.parse_condlist( self.smrttrn, "gulag1", "switch_0", utils.cfg_get_string(ini, sect, "switch_0", self.smrttrn, false, "", "") )
+	self.state_switch_1 = xr_logic.parse_condlist( self.smrttrn, "gulag1", "switch_1", utils.cfg_get_string(ini, sect, "switch_1", self.smrttrn, false, "", "") )
+	self.JobLoaded = nil
+end
+
+-- подготовить работы.
+-- подготовить данные о местоположении каждой работы; о объекте, который на ней занят.
+-- подсчитать ёмкость = min(кол-во работ в 0 состоянии, поле capacity в custom data)
+function gulag:prepare_jobs()
+	if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("xr gulag: prepare jobs for ["..self.name.."]") end
+	local ptrl, path_name
+	local job_loaded
+	local empty_table = {}
+	for i, job in ipairs( self.Job ) do
+		if job then
+			job.num              = i
+			path_name            = self:get_job_path_name( job )
+			if path_name then
+				ptrl                 	= patrol( path_name )
+				if ptrl and ptrl.game_vertex_id then
+					job.path_name        = path_name
+					job.game_vertex_id   = ptrl:game_vertex_id( 0 )
+					job.level_id		 = game_graph():vertex(job.game_vertex_id):level_id()
+					job.position         = ptrl:point( 0 )
+					job_loaded           = self.JobLoaded[i] or empty_table
+					job.begin            = job_loaded.begin
+					job.fill_idle        = job_loaded.fill_idle
+					job.idle_after_death_end = job_loaded.idle_after_death_end
+				end
+			elseif TB3D_Modders.use_abort_message == true then 
+				TB3D_Services.packet_alert("xr gulag: prepare_jobs["..self.name.."] path name[nil]!!!!")
+			end
+		end
+	end
+	local n_job
+	for obj_id, jobN in pairs( self.ObjectJob ) do
+		n_job = self.Job[jobN]
+		if n_job ~= nil then
+			n_job.object = obj_id
+			self.ObjectJobPathName[obj_id] = n_job.path_name
+		end
+	end
+end
+
+-- составить список работ существующих в данном состоянии гулага.
+-- освобождение npc с работ, не существующих в данном состоянии.
+-- обнулить fill_idle для всех работ.
+function gulag:prepare_jobs_for_new_state()
+	local Job_avail_in_state = {}
+	for i, job in ipairs( self.Job ) do
+		if self:availState(job.state, self.state) then
+			table.insert( Job_avail_in_state, job )
+		else
+			if job.object then
+				if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: prep new state["..utils.to_str(self.name).."] object["..utils.to_str(job.object).."]") end
+				self:free_obj_and_reinit( job.object, "prepare_jobs_for_new_state")
+			end
+		end
+		if job.fill_idle == idle_none then
+			job.fill_idle = idle_once
+		end
+	end
+	self.Job_avail_in_state = Job_avail_in_state
+end
+
+function gulag:job_exists_in_state_0( job )
+	for i, v in ipairs( job.state ) do
+		if v == 0 then
+			return true
+		end
+	end
+	return false
+end
+
+-- подгрузка ltx с секциями логики для работ.
+-- может подгрузить либо динамический ltx, либо статический (gulag_tasks.ltx)
+function gulag:init_ltx(name, type)
+	local ltx, ltx_name = gulag_tasks.loadLtx(name, type)
+	if ltx then
+		self.ltx      = ltx
+		self.ltx_name = ltx_name
+	else
+		self.ltx      = gulag_tasks_ltx
+		self.ltx_name = gulag_tasks_file_name
+	end
+end
+
+-- получить имя пути места работы
+function gulag:get_job_path_name( job )
+	local section = job.section
+	if not self.ltx:line_exist( section, "active" ) then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.packet_alert("xr gulag: ["..self.name.."] ltx["..utils.to_str(self.ltx_name).."] no section[active] in job!!!!" ) end
+	else
+		local active_section = self.ltx:r_string( section, "active" )
+		local path_field
+		for i, v in ipairs( path_fields ) do
+			if self.ltx:line_exist( active_section, v ) then
+				path_field = v
+				break
+			end
+		end
+		if not path_field then
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.packet_alert("xr gulag: ["..self.name.."] ltx["..utils.to_str(self.ltx_name).."] there is no path in active section!!!!") end
+		else
+			if path_field == "center_point" then --' TODO remove caulking
+				local path_name = self.name .. "_" .. self.ltx:r_string( active_section, path_field )
+				if level.patrol_path_exists( path_name .. "_task" ) then
+					return path_name .. "_task"
+				else
+					return path_name
+				end
+			else
+				return self.name .. "_" .. self.ltx:r_string( active_section, path_field )
+			end
+		end
+	end
+end
+
+-- maintain the general condition of the gulag
+function gulag:save_common( packet )
+	packet:w_u8( self.casualities )
+	packet:w_u8( self.state )
+	utils.w_CTime( packet, self.stateBegin or smart_terrain.CTime_0 )
+	packet:w_u8(self.population)
+	packet:w_u8(self.population_comed)
+	packet:w_u8(self.population_non_exclusive)
+	packet:w_u8( #self.Job )
+	for i, job in ipairs( self.Job ) do
+		packet:w_u32( job.begin            or 0 )
+		packet:w_u32( job.fill_idle        or 0 )
+		packet:w_u32( job.idle_after_death_end or 0 )
+	end
+end
+
+-- restore the general condition of the gulag
+function gulag:load_common( packet )
+	self.casualities = packet:r_u8()
+	self.state       = packet:r_u8()
+	self.stateBegin  = utils.r_CTime( packet )
+	self.population					= packet:r_u8()
+	self.population_comed			= packet:r_u8()
+	self.population_non_exclusive	= packet:r_u8()
+	local n = packet:r_u8()
+	local job
+	for i = 1, n do
+		job = {}
+		table.insert( self.JobLoaded, job )
+		job.begin            = packet:r_u32()
+		job.fill_idle        = packet:r_u32()
+		job.idle_after_death_end = packet:r_u32()
+		if job.fill_idle == 0 then
+			job.fill_idle = nil
+		end
+		if job.idle_after_death_end == 0 then
+			job.idle_after_death_end = nil
+		end
+	end
+end
+
+-- retaining information about an object
+function gulag:save_obj( packet, obj_id )
+	packet:w_bool ( self.Object_begin_job[obj_id] )
+	packet:w_bool ( self.Object_didnt_begin_job[obj_id] )
+	packet:w_u8   ( self.ObjectJob[obj_id] or 0 )
+end
+
+-- retrieving information about object
+function gulag:load_obj( packet, obj_id )
+	self.Object[obj_id]           = true
+	self.Object_begin_job[obj_id] = packet:r_bool()
+	self.Object_didnt_begin_job[obj_id] = packet:r_bool()
+	local jobN = packet:r_u8()
+	if jobN ~= 0 then
+		self.ObjectJob[obj_id] = jobN
+	end
+end
+
+-- add an item under the gulag.
+-- when adding an object is marked as the offline.
+-- called only from se_smart_terrain:register_npc()
+function gulag:addObject( obj_id )
+	self.Object_begin_job[obj_id]       = false
+	self.Object_didnt_begin_job[obj_id] = true
+	self:object_setup_offline( obj_id )
+	self.population = self.population + 1
+	if not self.npc_info[obj_id].exclusive then
+		self.population_non_exclusive = self.population_non_exclusive + 1
+	end
+end
+
+-- customize your character to work in offline.
+-- if it is at this time online, then call object_setup_online
+function gulag:object_setup_offline( obj_id, was_online )
+	if obj_id then
+		if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: name["..utils.to_str(self.name).."] object_setup_offline["..utils.to_str(self.npc_info[obj_id].name).."]") end 
+		self.Object[obj_id] = true
+		self:clear_restrictors_info( obj_id )
+		if not was_online then
+			local obj = level.object_by_id( obj_id )
+			if obj ~= nil then
+				self:object_setup_online( obj_id, obj, true )
+			end
+		end
+	end
+end
+
+-- настроить персонажа на работу в онлайне.
+-- вызывается у персонажей из net_spawn() и из gulag:object_setup_offline()
+-- если он уже пришёл на работу, настроить ему логику и рестрикторы (при необходимости).
+-- obj=game_object
+function gulag:object_setup_online( obj_id, obj, need_setup_logic, need_setup_restrictors )
+	if obj_id and obj then
+		if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: name["..utils.to_str(self.name).."] object_setup_online["..utils.to_str(obj:name()).."] need_setup_logic["..utils.to_str(need_setup_logic).."] need_setup_restrictors["..utils.to_str(need_setup_restrictors).."]") end
+		self.Object[obj_id] = obj
+		if self.ObjectJob[obj_id] then
+			local job = self.Job[self.ObjectJob[obj_id]]
+			if need_setup_logic then
+				self:setup_logic( obj, job.section )
+			end
+			if need_setup_restrictors then
+				self:set_restrictions( obj, job.out_rest, job.in_rest, job.info_rest )
+			end
+		end
+	end
+end
+
+-- удалить объект из гулага.
+-- вызывается только из se_smart_terrain:unregister_npc() !
+-- если объект жив и он в онлайне, то переинициализировать логику.
+function gulag:removeObject( obj_id )
+	if obj_id then
+		if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: remove object["..utils.to_str(obj_id).."]") end
+		local strn_n = ""
+		local strn_id = get_strn(obj_id)
+		if strn_id then
+			strn_n = strn_id:name()
+			if strn_n and self.name == strn_n then
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: remove object["..utils.to_str(strn_n).."]["..utils.to_str(strn_id).."]") end
+			else
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: remove object["..utils.to_str(strn_id).."]["..utils.to_str(strn_n).."]") end
+			end		
+		else
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: remove object["..utils.to_str(strn_id).."] not right obj") end
+		end
+		if self.npc_info[obj_id] then
+			if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("XR GULAG: remove object["..utils.to_str(self.name).."] object["..utils.to_str(strn_n).."]") end
+			self:free_obj_and_reinit( obj_id, "removeObject" )
+			self.Object[obj_id] = nil
+			self:clear_restrictors_info( obj_id )
+			if self.population > 0 then
+				self.population = self.population - 1
+			else
+				if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: remove object, self.population already ["..utils.to_str(self.population).."]") end
+				self.population = 0
+			end
+			if not self.npc_info[obj_id].exclusive then
+				if self.population_non_exclusive > 0 then
+					self.population_non_exclusive = self.population_non_exclusive - 1
+				else
+					if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: remove object, self.population_non_exclusive already was ["..utils.to_str(self.population_non_exclusive).."]") end
+					self.population = 0
+				end
+			end
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: <<ok<< remove object, self.population["..utils.to_str(self.population).."] non_exclusive["..utils.to_str(self.population_non_exclusive).."]") end
+		else
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: <<err<< remove object, no NPC info") end
+		end
+	end
+end
+
+-- Обновление гулага.
+function gulag:update()
+	local is_report = false
+	if not self.stateBegin then self.stateBegin = game.get_game_time() end
+	if TB3D_Modders.use_state_message and string_find(self.name, TB3D_Modders.npc_to_log) then is_report = true end
+	if is_report then TB3D_Services.packet_alert("xr gulag: update["..utils.to_str(self.name).."] start") end
+	self:update_objs()
+	self:update_beginning_jobs()
+	if self.calculateStates ~= nil and db.actor then
+		self:changeState(self.calculateStates(self))
+	end
+	self:updateJob()
+	self:update_beginning_jobs()
+	if is_report then self:print() end
+end
+
+-- убирает мёртвых.
+-- следит, кто прыгнул в офлайн и не сообщил об этом (случается при переходе с уровня на уровень
+-- когда биндер смарттеррейна убивается до персонажа).
+-- следит, дошёл ли персонаж до места работы.
+-- измененяет потери в лагере.
+-- вызывается из gulag:update() и smart_terrain.on_death()
+function gulag:update_objs()
+	local obj, cl_obj, online
+	for obj_id, npc_info in pairs( self.npc_info ) do
+		cl_obj = level.object_by_id( obj_id )
+		online = cl_obj ~= nil
+		if not self.Object[obj_id] and not online then
+			self:object_setup_offline( obj_id )
+		end
+		--'obj = cl_obj or npc_info.se_obj
+	end
+end
+
+--' Убирание мертвого чувака. Вызывается из смарттеррейна
+function gulag:clear_dead(obj_id)
+	if obj_id then
+		--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: clear dead obj_id["..utils.to_str(obj_id).."]") end
+		local strn_id = get_strn(obj_id)
+		local job
+		if self.ObjectJob[obj_id] then
+			self:changeCasualities( 1 )
+			if self.ObjectJob[obj_id] then job = self.Job[self.ObjectJob[obj_id]] end
+		end
+		if job then
+			job.idle_after_death_end = amk.game_milliseconds() + ( job.idle_after_death or job_idle_after_death ) * 1000
+		else
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: error no job") end
+		end
+		local n = self.npc_info[obj_id]
+		if n and n.se_obj and n.se_obj.id and strn_id and strn_id:name() == self.name then
+			if TB3D_Modders.use_smh2_message then 
+			TB3D_Services.packet_alert("XR GULAG: clear dead unregistered["..utils.to_str(strn_id:name()).."]") end
+			self.smrttrn:unregister_npc( n.se_obj )
+		else
+			if strn_id then
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: <<err<< ["..self.name.."] is not here") end
+			else
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: <<err<< ["..self.name.."] is not found["..utils.to_str(obj_id).."]") end
+			end
+			--if self.obj then remove_zavis.remove_obj(self.obj) end	--TB3D hard core remove
+		end
+	end
+end
+
+function gulag:update_beginning_jobs()
+	for obj_id, obj in pairs( self.Object ) do
+		if self:can_obj_begin_job( obj_id, obj ) then
+			self:beginJob( obj_id )
+			--if TB3D_Modders.use_smh2_message then
+				--local job = self.Job[self.ObjectJob[obj_id]]
+				--local jl = self:distance_to_job_location(obj_id, job)
+				--TB3D_Services.packet_alert(string.format("XR GULAG: [%s] %s < %s", alife():object(obj_id):name(), tostring(jl), tostring(job.position_threshold or job_position_threshold)))
+			--end
+		end
+	end
+end
+
+-- можно ли объекту начать работать?
+-- для этого проверить, не на работе ли уже.
+-- если нет, то проверить, достиг ли объект места работы.
+-- условия достижения персонажем места работы:
+-- а) в офлайне: персонаж пришёл на нужную точку графа
+-- б) в онлайне: персонаж продошёл на расстояние job_position_threshold
+function gulag:can_obj_begin_job( obj_id, obj )
+	if obj_id then
+		--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: obj_id["..utils.to_str(obj_id).."] obj["..utils.to_str(obj).."]") end	
+		local jobN = self.ObjectJob[obj_id]
+		if jobN and not self.Object_begin_job[obj_id] then
+			local job = self.Job[jobN]		
+			  if job ~= nil then
+				if job.position_threshold == "graph" then
+					local obj_gv, obj_pos = self:get_obj_game_vertex_and_position( obj_id )
+					if obj_gv == nil then return false end
+					local job_gv = game_graph():vertex( job.game_vertex_id )
+					if job_gv and obj_gv:level_vertex_id() == job_gv:level_vertex_id() then
+						return true
+					end
+					return false
+				end
+			else
+				return false
+		 end
+			return self:distance_to_job_location(obj_id, job) < (job.position_threshold or job_position_threshold)
+		else
+			return false
+		end
+	end
+	return false
+end
+
+-- сменить состояние гулага.
+-- Возобновляем все работы, доступные для наполнения только один раз.
+function gulag:changeState(state)
+	if self.state == nil or self.state ~= state then
+		self.state      = state
+		self.stateBegin = game.get_game_time()
+		self:prepare_jobs_for_new_state()
+	end
+end
+
+-- есть ли в текущем состоянии для объекта хоть одна подходящая работа?
+-- если персонаж НЕ эксклюзивный, то ищет только свободные работы,
+-- если персонаж эксклюзивный - ищет свободные работы и работы, занятые не эксклюзивными персонажами.
+function gulag:is_there_any_suitable_job( npc_info, exclusive )
+	for i, job in ipairs( self.Job_avail_in_state ) do
+		if job and (( not job.predicate or job.predicate( npc_info, self )) and self:availJob( job )) then
+			if job.object then
+				if exclusive and self.npc_info and not self.npc_info[job.object].exclusive then
+					return true
+				end
+			else
+				return true
+			end
+		end
+	end
+	return false
+end
+
+-- подходит ли работа первого персонажа второму?
+-- obj_id   - id первого персонажа
+-- npc_info - информация о втором персонаже
+function gulag:obj1_job_suits_obj2( obj_id, npc_info )
+	--TB3D_Services.packet_alert("XR GULAG: obj1_job_suits_obj2["..utils.to_str(self.name).."]["..utils.to_str(self.npc_info[obj_id].name).."]["..utils.to_str(npc_info).."]")
+	local job = self.Job[self.ObjectJob[obj_id]]
+	if job then
+		return not job.predicate or (npc_info and job.predicate( npc_info, self ))
+	end
+	if TB3D_Modders.use_smh2_message then
+		--TB3D_Services.packet_alert(string.format("XR GULAG: job=nil! obj=%s obj_id=%d", self.npc_info[obj_id].name, obj_id ))
+		--self:print()
+	end
+	--return false
+end
+
+-- существует ли указанное состояние в табличке?
+function gulag:availState(st, state)
+	for k,v in ipairs( st ) do
+		if v and v == state then
+			return true
+		end
+	end
+	return false
+end
+
+-- доступна ли работа?
+-- работа доступна, когда время idle истекло (или не задано)
+-- и занята работа, от которой зависит данная работа.
+function gulag:availJob(job)
+	if job and (job.begin == nil or amk.game_milliseconds() - job.begin > job.idle) then
+		if job.idle_after_death_end == nil or job.idle_after_death_end < amk.game_milliseconds() then
+			if job.fill_idle ~= nil then
+				if job.fill_idle == idle_none then
+					return false
+				elseif job.fill_idle ~= idle_once and job.fill_idle < amk.game_milliseconds() - job.begin then
+					return false
+				end
+			end
+			return true
+		end
+	end
+	return false
+end
+
+-- Текущая работа доступна, если не истекло ее время и занята работа, от которой она зависит
+function gulag:availCurrent(job)
+	if job then
+		if job.timeout == nil or
+		   job.begin == nil or amk.game_milliseconds() - job.begin < job.timeout
+		then
+			return true
+		end
+	end
+	return false
+end
+
+-- составить список доступных для распределения работ.
+-- освобождение npc с работ, ставших недоступными (например, вышел timeout).
+-- также освобождение недошедших до своих работ.
+-- dc	-- Здесь вообще АХТУНГ !
+	-- Оно вызывается черт-знает откуда по малейшему чиху и без такового.
+	-- todo: Найти - и заткнуть
+function gulag:prepare_available_jobs()
+	local Job_avail = {}
+	for i, job in ipairs( self.Job_avail_in_state ) do
+		if job and self:availJob( job ) then
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: info, %s, check object", log_head)) end
+			if job.object then -- ~= nil then
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: info, %s, object: %s", log_head, tostring(job.object))) end
+				if not self:availCurrent( job ) or not self.Object_begin_job[job.object] then
+					--TB3D_Services.packet_alert("XR GULAG: prep jobs["..utils.to_str(self.name).."] object["..utils.to_str(job.object).."]")
+					self:free_obj_and_reinit( job.object, "prepare_available_jobs" )
+				end
+			else
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: info, %s, no object", log_head)) end
+			end
+			table.insert( Job_avail, job )
+		else
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: job unavailable: %d %s", job.num, job.section )) end
+		end
+	end
+	return Job_avail
+end
+
+-- составить список персонажей, доступных для распределения по свободным работам
+function gulag:get_available_objs()
+	local obj_avail = {}
+	for obj_id, obj in pairs( self.Object ) do
+		if obj_id and self:getJob( obj_id ) == nil then
+			obj_avail[obj_id] = true
+		end
+	end
+	return obj_avail
+end
+
+-- посчитать условное расстояние от персонажа до места указанной работы.
+-- если на одном уровне, то считать по локальным позициям, иначе по глобальным позициям вершин гейм-графа.
+-- используется для определения ближайшего к месту работы персонажа.
+function gulag:distance_to_job_location( obj_id, job )
+	if obj_id and job then
+		local obj_gv, obj_pos = self:get_obj_game_vertex_and_position( obj_id )
+		local job_gv          = game_graph():vertex( job.game_vertex_id )
+		if obj_gv and job_gv then
+			if obj_gv:level_id() == job_gv:level_id() then
+				return obj_pos:distance_to( job.position )
+			end
+		end
+	end
+	return 10000
+end
+
+-- получить точку графа, на которой находится персонаж и его локальные координаты на уровне
+-- в зависимости от того, в офлайне или в онлайне персонаж, берётся по разному
+function gulag:get_obj_game_vertex_and_position( obj_id )
+	if obj_id then
+		local obj = self.Object[obj_id]
+		if obj and obj == true then
+			local sobj = self.npc_info[obj_id].se_obj
+			if sobj then
+				return game_graph():vertex( sobj.m_game_vertex_id ), sobj.position
+			else
+				return game_graph():vertex( obj:game_vertex_id() ), obj:position()
+			end
+		elseif obj then
+			return game_graph():vertex( obj:game_vertex_id() ), obj:position()
+		end
+	end
+end
+
+-- найти ближайшего подходящего персонажа из списка
+function gulag:find_nearest_suitable_obj( objs, job )
+	local predicate = job.predicate
+	local min_dist  = 1000000
+	local dist
+	local obj_nearest
+	for obj_id, v in pairs( objs ) do
+		if not predicate or predicate( self.npc_info[obj_id], self ) then
+			dist = self:distance_to_job_location( obj_id, job )
+			if dist < min_dist then
+				min_dist    = dist
+				obj_nearest = obj_id
+			end
+		end
+	end
+	return obj_nearest
+end
+
+-- посчитать табличку расстояний от всех персонажей к всем работам заданного приоритета
+function gulag:calc_distance_table( jobs, objs, prior_block_start )
+	local block_priority = jobs[prior_block_start].prior
+	local predicate
+	local dists          = {}
+	local t
+	local i              = prior_block_start
+	while i <= #jobs and jobs[i].prior == block_priority do
+		if jobs[i].object == nil then
+			predicate = jobs[i].predicate
+			for obj_id, v in pairs( objs ) do
+				if not predicate or predicate( self.npc_info[obj_id], self ) then
+					dist     = self:distance_to_job_location( obj_id, jobs[i] )
+					t        = {}
+					t.job    = jobs[i]
+					t.obj_id = obj_id
+					t.dist   = dist
+					table.insert( dists, t )
+				end
+			end
+		end
+		i = i + 1
+	end
+	return dists, i - 1
+end
+
+-- назначить персонажей на ближайшие работы используя табличку расстояний
+function gulag:assign_jobs_using_distance_table( jobs, objs, dists )
+	for i, t in ipairs( dists ) do
+		if objs[t.obj_id] and not t.job.object then
+			self:setJob( t.obj_id, t.job )
+			objs[t.obj_id] = nil
+		end
+	end
+end
+
+-- найти занятых персонажей, которые могут занять заданную работу.
+-- поиск ведётся начиная с самых низкоприоритетных работ
+function gulag:find_obj_on_jobLow_for_jobHigh( Job_avail, job_high )
+	local n = #Job_avail
+	local i = n
+	local job_low
+	local job_high_num = job_high.num
+	local predicate    = job_high.predicate
+	local priority     = nil
+	local obj_suitable = nil
+    if not job_high_num or not i then
+        return nil
+    end
+	while i > job_high_num and (not priority or priority == Job_avail[i].prior) and (Job_avail[i].prior < job_high.prior) do
+		job_low = Job_avail[i]
+		if job_low.object ~= nil and ( not predicate or predicate(self.npc_info[job_low.object], self) ) then
+			if not obj_suitable then
+				priority     = job_low.prior
+				obj_suitable = {}
+			end
+			obj_suitable[job_low.object] = true
+		end
+		i = i - 1
+	end
+	if obj_suitable then
+		return self:find_nearest_suitable_obj( obj_suitable, job_high )
+	else
+		return nil
+	end
+end
+
+-- для всех свободных работ заданного приоритета попытаться найти и назначить персонажей с работ с более низким приоритетом
+function gulag:try_to_fill_free_high_prior_jobs( jobs, prior_block_start, prior_block_end )
+	local obj_id
+	for i = prior_block_start, prior_block_end do
+		if not jobs[i].object then
+			obj_id = nil
+			obj_id = self:find_obj_on_jobLow_for_jobHigh( jobs, jobs[i] )
+			if obj_id then
+				--TB3D_Services.packet_alert("XR GULAG: try fill higher["..utils.to_str(self.name).."] object["..utils.to_str(jobs[i].object).."]")
+				self:free_obj_and_reinit( obj_id, "try_to_fill_free_high_prior_jobs" )
+				self:setJob( obj_id, jobs[i] )
+			end			
+		end
+	end
+end
+
+-- распределение работ.
+-- при распределении недошедшие персонажи приравниваются к свободным.
+-- работы с одинаковым приоритетом объединяются в блоки
+function gulag:updateJob()
+	local Job_avail = self:prepare_available_jobs()
+	local obj_avail = self:get_available_objs()
+	local prior_block_start = 1
+	local prior_block_end
+	if Job_avail and obj_avail then
+		while prior_block_start <= #Job_avail do
+			dists, prior_block_end = self:calc_distance_table( Job_avail, obj_avail, prior_block_start )
+			table_sort( dists, function(a,b) return a.dist < b.dist end )
+			self:assign_jobs_using_distance_table( Job_avail, obj_avail, dists )
+			self:try_to_fill_free_high_prior_jobs( Job_avail, prior_block_start, prior_block_end )
+			prior_block_start = prior_block_end + 1
+		end
+	end
+end
+
+-- вывод текущего состояния гулага (работы, объекты, состояние, население)
+function gulag:print()
+	local npc_info, going
+	if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG:  %s -- State: %d -- Total population: %d/%d -- Non exclusive population: %d/%d",self.name, self.state, self:get_population(), self.capacity, self:get_non_exclusive_population(), self.capacity_non_exclusive)) end
+	if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: Resources:") end
+	for k,v in pairs( self.Object ) do
+		if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG:id: %d name: %s", k, self.npc_info[k].name)) end
+	end
+	if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: Jobs in this state:") end
+	for k,v in ipairs( self.Job_avail_in_state ) do
+		if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: section: %s, prior %d", v.section, v.prior)) end
+		if v.object ~= nil then
+			npc_info = self.npc_info[v.object]
+			if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG:   ObjID: %d", v.object)) end
+			if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG:   Actor: %s, [%s][%s][%s]", npc_info.name, npc_info.team, npc_info.squad, npc_info.group)) end
+			if self.Object_begin_job[v.object] then
+				going = ""
+			else
+				going = "(going to job)"
+			end
+			if self.Object[v.object] == true then
+				if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG:   current section: <<<offline>>> %s", going)) end
+			else
+				if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG:   current section: %s %s", db.storage[v.object].active_section or "<<<nil>>>", going)) end
+			end
+		end
+	end
+	if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: print Jobs done") end
+end
+
+-- получить количество живых объектов под смартом
+function gulag:get_population()
+	return self.population
+end
+
+-- получить количество живых пришедших объектов под смартом
+function gulag:get_population_comed()
+	return self.population_comed or 0
+end
+
+-- получить количество живых неэксклюзивных объектов под смартом
+function gulag:get_non_exclusive_population()
+	return self.population_non_exclusive
+end
+
+-- получить тип объекта (сталкер/монстр)
+function gulag:get_stype( obj_id )
+	if obj_id then
+		if self.npc_info[obj_id] then
+			if IAmAStalker[self.npc_info[obj_id].class_id] then
+				return modules.stype_stalker
+			elseif IAmAMonster[self.npc_info[obj_id].class_id] then
+				return modules.stype_mobile
+			else
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("xr gulag: ["..self.name.."] obj["..obj_id.."] supports stalkers and monsters only!") end
+			end
+		end
+	end
+	return modules.stype_invalid
+end
+
+-- настроить логику для объекта, который в онлайне.
+-- obj=game_object
+function gulag:setup_logic( obj, section )
+	if obj and section then
+		xr_logic.configure_schemes( obj, self.ltx, self.ltx_name, self:get_stype(obj:id()), section, self.name )
+		local sect = xr_logic.determine_section_to_activate( obj, self.ltx, section, db.actor )
+		if utils.get_scheme_by_section( section ) == "nil" then
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("xr gulag: ["..self:name().."] section["..sect.."] section 'nil'!") end
+		end
+		if sect then xr_logic.activate_by_section( obj, self.ltx, sect, false ) end
+	end
+end
+
+-- установить squad и group в соответствии с работой
+function gulag:setup_squad_and_group( obj_id, job )
+	if obj_id then
+		local npc_info = self.npc_info[obj_id]
+		if npc_info then
+			if self.Object[obj_id] ~= true then
+				local obj = self.Object[obj_id]
+				local squad = level_groups[level.name()]
+				if not obj:alive() then
+					if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert(string.format("XR GULAG: CHANGE TEAM [%s] to [%s][%s][%s]. Object is DEAD, clearing", obj:name(), npc_info.team, squad or npc_info.o_squad, job.group or npc_info.o_group)) end
+					self:clear_dead(obj_id) --'Затычка против вылета.
+					return
+				end
+				if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert(string.format("XR GULAG: CHANGE TEAM [%s] to [%s][%s][%s]", obj:name(), npc_info.team, squad or npc_info.o_squad, job.group or npc_info.o_group )) end
+				obj:change_team( npc_info.team, squad or npc_info.o_squad, job.group or npc_info.o_group )
+				npc_info.squad = obj:squad()
+				npc_info.group = obj:group()
+			else
+				local obj = npc_info.se_obj
+				if obj then
+					obj.squad = job.squad or npc_info.o_squad
+					obj.group = job.group or npc_info.o_group
+					npc_info.squad = obj.squad
+					npc_info.group = obj.group
+				else
+					if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: ["..obj:name().."] failed to setup squad !!!!") end
+				end
+			end
+		end
+	end
+end
+
+-- установить npc работу, к ней рестрикторы, настроить логику, поменять squad, group
+function gulag:setJob(obj_id, job)
+	if obj_id then
+		--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: set job for ["..obj_id.."] in ["..self.name.."]") end
+		job.object = obj_id
+		job.idle_after_death_end = nil
+		self.Object_begin_job [obj_id] = false
+		self.ObjectJob        [obj_id] = job.num
+		self.ObjectJobPathName[obj_id] = job.path_name
+		self:setup_squad_and_group( obj_id, job )
+	end
+end
+
+-- заступить на работу.
+-- вызывается когда персонаж достиг места работы.
+-- установка времени начала работы.
+-- если в онлайне, то настройка логики и рестрикторов.
+-- вызвать спавнер.
+function gulag:beginJob( obj_id )
+	if obj_id then
+		local job = self.Job[self.ObjectJob[obj_id]]
+		--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: [smart_terrain %s] : beginJob: obj=%s job=%d %s", self.name, self.npc_info[obj_id].name, job.num, job.section )) end
+		self.Object_begin_job[obj_id] = true
+		job.begin = amk.game_milliseconds()
+		if job.fill_idle == idle_once then
+			job.fill_idle = idle_none
+		end
+		local se_obj = self.npc_info[obj_id].se_obj
+		self:setup_job_online( se_obj, job )
+		if self:get_stype( obj_id ) == modules.stype_mobile then
+			se_obj:smart_terrain_task_activate()
+		end
+		if self.Object[obj_id] ~= true then
+			local obj = self.Object[obj_id]
+			self:set_restrictions( obj, job.out_rest, job.in_rest, job.info_rest )
+			self:setup_logic( obj, job.section )
+		end
+		if self.Object_didnt_begin_job[obj_id] then
+			self.smrttrn:call_respawn()
+			self.Object_didnt_begin_job[obj_id] = false
+		end
+		self.population_comed = self.population_comed + 1 --' Увеличиваем счетчик пришедших персонажей
+		if TB3D_Modders.use_counter_message then TB3D_Services.packet_alert("xr gulag: increment["..self.name.."]["..tostring(self.population_comed).."]") end
+	end
+end
+
+-- установить серверному объекту персонажа упраление переключения онлайн/офлайн
+function gulag:setup_job_online( se_obj, job )
+	if se_obj then	--!!!!TB3D  CTD protection
+		if job then
+			se_obj.job_online_condlist = job.online_condlist
+			se_obj.job_online          = job.online
+		else
+			se_obj.job_online_condlist = nil
+			se_obj.job_online          = nil
+		end
+	end
+end
+
+-- установить объекту рестрикторы в онлайне.
+-- obj - game_object
+function gulag:set_restrictions(obj, r_out, r_in, r_info)
+	if obj then
+		local restr = self.restrictors[obj:id()]
+		if not restr then
+			self.restrictors[obj:id()] = {}
+			restr = self.restrictors[obj:id()]
+		end
+		local r_in_old  = restr.r_in  or ""
+		local r_out_old = restr.r_out or ""
+		local change_r_in, change_r_out = "", ""
+		if r_in_old ~= "" and r_in_old ~= r_in then
+			change_r_in = r_in_old
+			restr.r_in  = nil
+		end
+		if r_out_old ~= "" and r_out_old ~= r_out then
+			change_r_out = r_out_old
+			restr.r_out  = nil
+		end
+		if change_r_in ~= "" or change_r_out ~= "" then
+			if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("xr gulag: set restrictions remove restrictors["..utils.to_str(obj:name()).."]") end
+			obj:remove_restrictions( change_r_out, change_r_in )
+		end
+		change_r_in, change_r_out = "", ""
+		if r_in ~= "" and r_in_old ~= r_in then
+			change_r_in = r_in
+			restr.r_in  = r_in
+		end
+		if r_out ~= "" and r_out_old ~= r_out then
+			change_r_out = r_out
+			restr.r_out  = r_out
+		end
+		if change_r_in ~= "" or change_r_out ~= "" then
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: set restrictions [%s] SET: [%s] [%s]", obj:name(), change_r_out, change_r_in)) end
+			obj:add_restrictions( change_r_out, change_r_in )
+		end
+		--if TB3D_Modders.use_smh2_message then
+			--TB3D_Services.packet_alert(string.format("XR GULAG: RESTR [%s] AFTER (IN)  [%s]", obj:name(), obj:in_restrictions()  ))
+			--TB3D_Services.packet_alert(string.format("XR GULAG: RESTR [%s] AFTER (OUT) [%s]", obj:name(), obj:out_restrictions() ))
+		--end
+		db.add_restrictor(obj:id(), r_info)
+		--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: set restrictions [%s] RESTR [%s]", obj:name(), utils.to_str( r_info ) )) end
+		if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then 
+			TB3D_Services.packet_alert("XR GULAG: set restrictions for["..utils.to_str(obj:name()).."]:")
+			TB3D_Services.packet_alert("XR GULAG: restrictor  ["..utils.to_str(r_info).."]")
+			--if obj:in_restrictions then TB3D_Services.packet_alert("XR GULAG: HAVE (IN)  ["..utils.to_str(obj:in_restrictions()).."]") end
+			--if obj:out_restrictions then TB3D_Services.packet_alert("XR GULAG: HAVE (OUT) ["..utils.to_str(obj:out_restrictions()).."]") end
+			TB3D_Services.packet_alert("XR GULAG: NEED (IN)  ["..utils.to_str(r_in).."]")
+			TB3D_Services.packet_alert("XR GULAG: NEED (OUT) ["..utils.to_str(r_out).."]")
+		end
+	end
+end
+
+-- убрать записи о том, что смарт устанавливал объекту рестрикторы.
+-- obj - game_object
+function gulag:clear_restrictors_info( obj_id )
+	if obj_id  and self.restrictors then
+		self.restrictors[obj_id] = nil
+		db.del_restrictor(obj_id)
+		--db.info_restr[obj_id] = nil
+	end
+end
+
+-- получить работу, которую занимает объект
+function gulag:getJob(obj_id)
+	if obj_id then
+	local jobN = self.ObjectJob[obj_id]
+	return jobN and self.Job[jobN]
+	end
+end
+
+-- возвращает имя пути места работы персонажа
+function gulag:get_obj_job_path_name( obj_id )
+	if self.ObjectJobPathName then
+		return self.ObjectJobPathName[obj_id]
+	end
+	return nil
+end
+
+-- освободить объект от работы
+function gulag:free_obj( obj_id )
+	--TB3D_Services.packet_alert("xr gulag: free obj["..tostring(obj_id).."]")
+	if obj_id then
+		local jobN = self.ObjectJob[obj_id]
+		if jobN then
+			self.ObjectJob[obj_id] = nil
+			if self.Job[jobN] and self.Job[jobN].object then self.Job[jobN].object = nil end
+			self.ObjectJobPathName[obj_id] = nil
+			if self.npc_info and self.npc_info[obj_id] then
+				self:setup_job_online( self.npc_info[obj_id].se_obj, nil )
+				if self:get_stype( obj_id ) == modules.stype_mobile then
+					self.npc_info[obj_id].se_obj:smart_terrain_task_deactivate()
+				end
+			end
+			if self.Object[obj_id] ~= true and
+			   self.Object_begin_job[obj_id] == true
+			then
+				self:set_restrictions( self.Object[obj_id], "", "", nil )
+			end
+			if self.Object_begin_job[obj_id] == true then
+				self.population_comed = self.population_comed - 1
+				if TB3D_Modders.use_counter_message then TB3D_Services.packet_alert("xr gulag: decrement["..self.name.."]["..tostring(self.population_comed).."] killed["..tostring(obj_id).."]") end
+			end
+		end
+	end
+	--TB3D_Services.packet_alert("xr gulag: free obj["..tostring(obj_id).."] done")
+end
+
+-- освободить объект от работы и переинициализировать логику.
+-- если сталкер в онлайне и начал работу, то сбросить его схему поведения
+-- как будто он только что загрузился
+--==========  Kamikazze ==========
+function gulag:free_obj_and_reinit( obj_id, parent )
+	if obj_id then --and obj_id ~= expendable_object then
+		if TB3D_Modders.use_smh2_message then
+			TB3D_Services.packet_alert("xr_gulag: free obj and reinit["..tostring(obj_id).."]["..tostring(self.ObjectJob[obj_id]).."]["..tostring(parent).."]")
+		end
+		self:free_obj(obj_id)
+		local t = self.Object[obj_id]
+		if t ~= nil and t ~= true and self.Object_begin_job[obj_id] then
+			if check_game() then -- тут проверяется, запущена ли игра, если ли актор и жив ли он. Если да, делаем по новому.
+				local s_obj = alife():object(obj_id) -- проверим есть ли у цели разрегистрации валидный серверный объект
+				if s_obj and (IAmAStalker[s_obj:clsid()] or IAmAMonster[s_obj:clsid()]) and s_obj:alive() then -- если есть, он жив и сталкер или монстр
+					xr_logic.initialize_obj( t, nil, false, db.actor, self:get_stype( obj_id ) ) -- только тогда инициализируем логику
+				end
+			else -- а если игра не запущена, то как раньше. Это нужно для того, чтобы обработка запуска игры нормально работала.
+				xr_logic.initialize_obj( t, nil, false, db.actor, self:get_stype( obj_id ) )
+			end
+		end
+		if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("xr_gulag: free obj and reinit["..tostring(obj_id).."] done") end
+	end
+end
+
+-- Проверка, запущена ли игра
+function check_game()
+	if level.present() and (db.actor ~= nil) and db.actor:alive() then
+		return true
+	end
+	return false
+end
+
+-- получить id объекта, выполняющего работу
+function gulag:idNPCOnJob(job_name)
+	for k,v in ipairs( self.Job ) do
+		if v.section == job_name then
+			if v.object ~= nil then
+				return v.object
+			end
+		end
+	end
+	return nil
+end
+
+-- получить потери
+function gulag:getCasualities()
+	return self.casualities
+end
+
+-- изменить потери
+function gulag:changeCasualities(delta)
+	self.casualities = self.casualities + delta
+end
+
+-- TODO серверные объекты
+function gulag:set_relation( relation, target_obj )
+	for obj_id, obj in pairs( self.Object ) do
+		if obj ~= true and level.object_by_id( obj_id ) ~= nil then
+			obj:set_relation( relation, target_obj )
+		end
+	end
+end
+
+function gulag:set_goodwill( relation, target_obj )
+	for obj_id, obj in pairs( self.Object ) do
+		if obj ~= true and level.object_by_id( obj_id ) ~= nil then
+			obj:set_community_goodwill( goodwill, target_obj )
+		end
+	end
+end
+
+-- является ли персонаж врагом хотябы кому-то из данного смарта?
+function gulag:npc_is_enemy_to_anybody( target_obj )
+	for obj_id, obj in pairs( self.Object ) do
+		if obj ~= true and
+		   level.object_by_id( obj_id ) ~= nil and
+		   obj:relation( target_obj ) == game_object.enemy
+		then
+			return true
+		end
+	end
+	return false
+end
+-- dc -- todo: А нету ли здесь тормозов ?
+-- получить персонажа, который в онлайне, и который ближе всего к указанной позиции
+function gulag:get_nearest_online_obj( pos )
+	local min_dist    = 100000000
+	local nearest_obj = nil
+	local d
+	for obj_id, obj in pairs( self.Object ) do
+		obj = level.object_by_id( obj_id )
+		if obj then
+			d = obj:position():distance_to_sqr( pos )
+			if d < min_dist then
+				min_dist     = d
+				nearest_obj  = obj
+			end
+		end
+	end
+	return nearest_obj
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- Функции, которые могут вызываться извне
+----------------------------------------------------------------------------------------------------------------------
+
+-- установить логику и сообщить смарту, что объект перешёл в онлайн.
+-- вызывается из net_spawn() объектов
+function setup_gulag_and_logic_on_spawn( obj, st, sobject, stype, loaded )
+	if obj then
+		local sname, oname
+		if obj.name then
+			oname = obj:name()
+		else
+			oname = "nil"
+		end
+		if sobject.name then
+			sname = sobject:name()
+		else
+			sname = "nil"
+		end
+		local is_report = false
+		local sim = alife()
+		if TB3D_Modders.use_smh2_message or (TB3D_Modders.use_setup_message and string_find(sname, TB3D_Modders.npc_to_log)) then is_report = true end
+		if is_report then TB3D_Services.packet_alert("XR GULAG: setup gulog and logic on spawn obj["..utils.to_str(oname).."] sobj["..utils.to_str(sname).."]") end
+		if sim then
+			local strn_id
+			if sobject.smart_terrain_id then
+				strn_id = sobject:smart_terrain_id()
+			else
+				strn_id = expendable_object
+			end
+			if strn_id and strn_id ~= expendable_object then
+				local obj_id = obj:id()
+				local strn = sim:object(strn_id)
+				if is_report then TB3D_Services.packet_alert("XR GULAG: setup gulog and logic on spawn obj["..utils.to_str(oname).."] sobj["..utils.to_str(sname).."] strn id["..utils.to_str(strn_id).."]") end
+				if obj_id and strn and strn.gulag then
+					if is_report then TB3D_Services.packet_alert("XR GULAG: setup gulog and logic on spawn obj["..utils.to_str(oname).."] sobj["..utils.to_str(sname).."] setting up["..utils.to_str(strn:name()).."]") end
+					local need_setup_logic       = strn.gulag.Object_begin_job[obj_id] and not loaded
+					local need_setup_restrictors = strn.gulag.Object_begin_job[obj_id]
+					strn:initialize_if_needed()
+					strn.gulag:object_setup_online( obj_id, obj, need_setup_logic, need_setup_restrictors )
+					if need_setup_logic then return end
+				end
+			end
+		end
+		xr_logic.initialize_obj(obj, st, loaded, db.actor, stype)
+		if is_report then TB3D_Services.packet_alert("XR GULAG: setup gulog and logic on spawn obj["..utils.to_str(oname).."] sobj["..utils.to_str(sname).."] done") end
+	end
+end
+
+-- получить гулаг по имени смарта.
+-- работает только для смартов, которые в онлайне.
+function get_gulag_by_name( name )
+	local go_strn = db.zone_by_name[name]
+	if go_strn then
+		local strn = alife():object( go_strn:id() )
+		strn:initialize_if_needed()
+		return strn.gulag
+	else
+		return nil
+	end
+end
+
+-- получить гулаг по story id смарта
+-- работает всегда
+function get_gulag_by_sid( sid )
+	local strn = alife():story_object( sid )
+	strn:initialize_if_needed()
+	return strn.gulag
+end
+
+-- получить гулаг по имени или story id смарта
+function get_gulag( name_or_sid )
+	if type( name_or_sid ) == "number" then
+		return get_gulag_by_sid( name_or_sid )
+	else
+		return get_gulag_by_name( name_or_sid )
+	end
+end
+
+-- получить кол-во населения смарта по имени
+function getGulagPopulation( name_or_sid )
+	local gulag = get_gulag( name_or_sid )
+	if gulag then
+		return gulag:get_population_comed()
+	else
+		return 0
+	end
+end
+
+-- получить кол-во населения смарта по имени (только пришедшие персонажи)
+function getGulagPopulationComed( name_or_sid )
+	local gulag = get_gulag( name_or_sid )
+	if gulag then
+		return gulag:get_population_comed()
+	else
+		return 0
+	end
+end
+
+-- установить отношение всех членов смарта к указанному объекту
+function setGulagRelation( name_or_sid, relation, target_obj )
+	local gulag = get_gulag( name_or_sid )
+	if gulag then
+		gulag:set_relation( relation, target_obj )
+	end
+end
+
+-- установить расположенине всех членов смарта к указанному объекту
+function setGulagGoodwill( name_or_sid, goodwill, target_obj )
+	local gulag = get_gulag( name_or_sid )
+	if gulag then
+		gulag:set_goodwill( goodwill, target_obj )
+	end
+end
+
+-- сделать указанного персонажа врагом всех персонажей смарта
+function setGulagEnemy( name_or_sid, target_obj )
+	setGulagRelation( name_or_sid, game_object.enemy, target_obj )
+end
+
+-- сделать указанного персонажа врагом всех персонажей смарта, которые в онлайне
+function setGulagNeutral( name_or_sid, target_obj )
+	setGulagRelation( name_or_sid, game_object.neutral, target_obj )
+end
+
+-- получить номер состояния смарта по имени
+function getGulagState( name_or_sid )
+	local gulag = get_gulag( name_or_sid )
+	return ( gulag and gulag.state ) or 0
+end
+
+-- освободить персонажа от работы.
+-- obj=game_object
+function resetJob( obj, obj_id )
+	if obj and obj_id then
+		if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("xr_gulag rst job["..utils.to_str(obj_id).."]") end
+		local strn_id = get_strn(obj_id)
+		if strn_id then
+			strn_id:initialize_if_needed()
+			local gulag = strn_id.gulag
+			if gulag then
+				gulag:free_obj_and_reinit( obj_id, "resetJob" )
+				gulag:update()
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("xr_gulag rst job, %s, obj %s (id: %s) released from gulag %s, strn: %s (id: %s)", log_head, (obj:name() or "===nil==="), (gulag.name or "===nil==="), (strn:name() or "===nil==="), (strn_id or "===nil==="))) end
+				return true
+			else
+				--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("xr_gulag rst job, %s, unable to initialize gulag %s", log_head, (gulag.name or "===nil==="))) end
+			end
+		else
+			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("xr_gulag rst job, %s, no smart terrain (id: %s)!", log_head, (strn_id or "===nil==="))) end
+		end
+	end
+	return false
+end
+
+function clearJob(obj, obj_id )
+	if obj then
+		local sim = alife()
+		if sim then
+			--local sobj = sim:object(obj_id)
+			local strn = get_strn(obj_id)
+			if strn then
+				strn:initialize_if_needed()
+				--if TB3D_Modders.use_smh2_message then
+					TB3D_Services.packet_alert("xr_wounded: clear job npc["..utils.to_str(obj:name()).."] unregistered")
+				--end
+				strn:unregister_npc(obj)
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function changeCasualities( name_or_sid, delta )
+	local gulag = get_gulag( name_or_sid )
+	if gulag then
+		gulag:changeCasualities( delta )
+	end
+end
+
+function getCasualities( name_or_sid )
+	local gulag = get_gulag( name_or_sid )
+	return ( gulag and gulag:getCasualities() ) or 0
+end
+
+-- не находится ли источник информации вне информационного рестриктора?
+-- если вне, то информация будет запрещена
+-- функция кеширует game_object рестриктора
+function is_info_restricted( obj_id, info_pos )
+	if obj_id then
+		local r = db.info_restr[obj_id]
+		if r == nil then
+			return false
+		end
+		if type(r) == "string" then
+			r = db.zone_by_name[r]
+			if r == nil then
+				return false
+			end
+			db.add_restrictor(obj_id, r)
+			--db.info_restr[obj_id] = r
+		end
+		return not r:inside( info_pos )
+	end
+end
+
+-----------------------------------------------------------------------------------------------------------------
+function checkStalker(npc_community, gulag_type, npc_rank, se_obj)
+	if se_obj then
+		if gulag_type == "test" or gulag_type == "test1" or gulag_type == "test_restr_changer" or gulag_type == "test_out"  then
+			return true
+		end
+		if gulag_type == "campers" or
+		   gulag_type == "walkers" or
+		   gulag_type == "rest" or
+		   gulag_type == "search"
+		then
+			return npc_community ~= "military"
+		end
+		for i, v in pairs( level_gulags ) do
+			if v.checkStalker(npc_community, gulag_type, npc_rank, se_obj) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function checkMonster(npc_community, gulag_type, npc_rank, se_obj)
+	if se_obj then
+		if gulag_type == "test_mob" or gulag_type == "test_mob1" then
+			return true
+		end
+		for i, v in pairs( level_gulags ) do
+			if v.checkMonster(npc_community, gulag_type, npc_rank, se_obj) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function checkNpc(npc_community, is_stalker, gulag_type, npc_rank, se_obj)
+	if se_obj then
+		--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert(string.format("XR GULAG: checkNpc community[%s] type[%s]", npc_community, gulag_type)) end
+		if is_stalker then
+			return checkStalker(npc_community, gulag_type, npc_rank, se_obj)
+		else
+			return checkMonster(npc_community, gulag_type, npc_rank, se_obj)
+		end
+	end
+	return false
+end
+
+function get_strn(sobj_id)
+	local obj
+	local sim = alife()
+	if sobj_id then
+		if sim then obj = sim:object( sobj_id ) end
+		if obj then
+			if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: get strn try smart for obj["..utils.to_str(sobj_id).."]["..obj:name().."]") end
+			if obj.smart_terrain_id then
+				strn_id = obj:smart_terrain_id()
+				if strn_id and strn_id ~= expendable_object then return sim:object(strn_id) end
+			end
+			if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: get strn no smart for obj["..utils.to_str(sobj_id).."]") end
+		end
+		if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: get strn no smart for sobj["..utils.to_str(sobj_id).."]") end
+	end
+	return nil
+end
+
+-- получить гулаг персонажа
+-- obj=game_object
+function get_npc_gulag( obj, parent )
+	local	know_parents = { ["xr_remark.script:initialize_gulag_target"] = true }
+	if not (parent and know_parents[parent]) then
+		if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("[xr_gulag] get_npc_gulag: parent not listed !") end
+	end
+	local	strn_id = get_strn(obj:id())	--defend lager bug, now correct
+	if strn_id then
+		strn_id:initialize_if_needed()
+		return strn_id.gulag
+	else
+		return nil
+	end
+end

@@ -1,0 +1,626 @@
+-- TB3D 1.0.9.9.8.1, added old pda sound option, news_alert, save collector, message traps, db.actor vice actor in all calls,
+-- added count to relocate items, consolidated tips, dmx135, consolidated give_game_news and give_talk_message, rem dup snds,
+-- death news, send tip, storyline_eliminate_gunslinger, give_game_news, fast saves, \\n, storyline ghost, in item, companion message,
+-- gps tips, debug, autosave
+function my_ver() return "1.0.9.9.8.1" end
+
+local translate = game.translate_string
+local string_sub = string.sub
+local last_save_time
+
+coll_news = {
+	gar_direction_fire				= xr_sound.get_safe_sound_object([[characters_voice\scenario\garbage\junkyard_combat_ambush]]),
+	esc_direction_fire				= xr_sound.get_safe_sound_object([[characters_voice\scenario\escape\lager_fanat_attack]]),
+    pass_to_1st_door                = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\door1_password]]),
+    pass_to_2nd_door                = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\door2_password]])
+}
+
+news = {
+	tips_esc_trader_about_anomalies	= xr_sound.get_safe_sound_object([[characters_voice\scenario\trader\trader_tutorial_anomalies_1]]),
+	gar_dolg_warning				= xr_sound.get_safe_sound_object([[characters_voice\scenario\duty\duty_warning1]]),
+	esc_return_dv					= xr_sound.get_safe_sound_object([[characters_voice\scenario\trader\return_from_dv]]),
+	escape_fox_quest				= xr_sound.get_safe_sound_object([[characters_voice\scenario\trader\trader_pda_fox]]),
+	tip_petruha_report				= xr_sound.get_safe_sound_object([[characters_voice\scenario\escape\petruha_raport_p]]),
+
+	tips_agr_krot_sos				= xr_sound.get_safe_sound_object([[characters_voice\scenario\agroprom\krot_help_pda_1]]),
+	tips_agr_krot_sos1				= xr_sound.get_safe_sound_object([[characters_voice\scenario\agroprom\krot_help_pda_2]]),
+	tips_agr_krot_sos2				= xr_sound.get_safe_sound_object([[characters_voice\scenario\agroprom\krot_help_pda_2]]),
+    tips_agr_stalker_help_2			= xr_sound.get_safe_sound_object([[characters_voice\scenario\agroprom\stalker_help_2]]),
+    tips_agr_stalker_help_1			= xr_sound.get_safe_sound_object([[characters_voice\scenario\agroprom\stalker_help_1]]),
+--  ghost_tips						= xr_sound.get_safe_sound_object([[characters_voice\scenario\agroprom\strelok_pda]]),
+	tips_agr_trader_documents		= xr_sound.get_safe_sound_object([[characters_voice\scenario\agroprom\trader_pda_1]]),
+    pass_to_1st_door                = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\door1_password]]),
+    pass_to_2nd_door                = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\door2_password]]),
+
+	bar_ecolog_crush_heli_down		= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_1]]),
+	bar_freedom_attack_attract_actor= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_2]]),
+	bar_freedom_spam_1				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_6]]),
+	bar_freedom_spam_2				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_4]]),
+	bar_freedom_spam_3				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_3]]),
+	bar_freedom_spam_4				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_5]]),
+	bar_freedom_attack				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_7]]),
+	bar_freedom_attack_spy			= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\wolfhound_pda_8]]),
+	bar_ecolog_crush_start_heli		= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\kruglov_pda_1]]),
+	bar_ecolog_crush_attract_actor  = xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\kruglov_pda_2]]),
+	bar_ecolog_spam_1				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\kruglov_pda_3]]),
+	bar_ecolog_spam_2				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\kruglov_pda_4]]),
+	bar_ecolog_spam_3				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\kruglov_pda_5]]),
+	bar_ecolog_spam_4				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\kruglov_pda_6]]),
+	bar_ecolog_attack				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\Heli_crush\kruglov_pda_7]]),
+    rostok_kruglov_spam_1			= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\kruglov_pda_help_1]]),
+    rostok_kruglov_spam_2			= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\kruglov_pda_help_3]]),
+	bar_ecolog_escape				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\volkodav_pda_kruglov_escape_1]]),
+    storyline_vasilyev_tip			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\vasiliev_pda]]),
+    storyline_ghost_tip 			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\ghost_pda]]),
+    yan_saharov_message 			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\professor_to_actor_pda_3]]),
+	yan_saharov_message_2 			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\professor_to_actor_pda_4]]),
+    yan_saharov_message_3 			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\professor_to_actor_pda_5]]),
+	
+	yan_scientist_probe				= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\kruglov_radiation_quest_13]]),
+	yan_scientist_probe_1			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\kruglov_radiation_quest_11]]),
+	yan_scientist_probe_2			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\kruglov_radiation_quest_12]]),
+	yan_scientist_probe_3			= xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\kruglov_radiation_quest_6]]),
+	
+	rostok_kruglov_follow			= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\pda_kruglov_help_6]]),
+	bar_freedom_chase				= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\pda_kruglov_stop_enemy_1]]),
+	rostok_kruglov_follow_2			= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\pda_kruglov_stop_enemy_2]]),
+	rostok_kruglov_follow_3			= xr_sound.get_safe_sound_object([[characters_voice\scenario\Rostok\pda_kruglov_help_5]]),
+		
+	bar_territory_dolg_1_hit		= xr_sound.get_safe_sound_object([[characters_voice\scenario\bar\pda\voronin_gunfire_pda_1]]),
+	bar_territory_dolg_2_hit		= xr_sound.get_safe_sound_object([[characters_voice\scenario\bar\pda\voronin_gunfire_pda_2]]),
+	bar_territory_dolg_3_hit		= xr_sound.get_safe_sound_object([[characters_voice\scenario\bar\pda\voronin_gunfire_pda_3]]),
+	bar_territory_dolg_kill			= xr_sound.get_safe_sound_object([[characters_voice\scenario\bar\pda\voronin_gunfire_pda_4]]),
+	
+	tips_bun_komand                 = xr_sound.get_safe_sound_object([[characters_voice\scenario\bun\patrol_prikaz]]),
+
+	general_ecolog_tip_1            = xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\professor_to_actor_pda_1]]),
+    general_ecolog_tip_2            = xr_sound.get_safe_sound_object([[characters_voice\scenario\yantar\professor_to_actor_pda_2]]),
+
+    tips_gar_hellcar_alarm			= xr_sound.get_safe_sound_object([[characters_voice\scenario\garbage\neutrals_commander_pda_1]]),
+	gar_dolg_blokpost_warning		= xr_sound.get_safe_sound_object([[characters_voice\scenario\duty\duty_warning1]]),
+	gar_dolg_monster_rush			= xr_sound.get_safe_sound_object([[characters_voice\scenario\duty\duty_request1]]),
+	gar_direction_fire				= xr_sound.get_safe_sound_object([[characters_voice\scenario\garbage\junkyard_combat_ambush]]),
+	gar_hellcar_victory				= xr_sound.get_safe_sound_object([[characters_voice\scenario\garbage\junkyard_combat_end]]),
+	gar_actor_looser				= xr_sound.get_safe_sound_object([[characters_voice\scenario\garbage\duty_after_rush_bad]]),
+	gar_actor_normal				= xr_sound.get_safe_sound_object([[characters_voice\scenario\garbage\duty_after_rush_normal]]),
+	gar_actor_winner				= xr_sound.get_safe_sound_object([[characters_voice\scenario\garbage\duty_after_rush_good]]),
+
+	esc_direction_fire				= xr_sound.get_safe_sound_object([[characters_voice\scenario\escape\lager_fanat_attack]]),
+	esc_fanat_victory				= xr_sound.get_safe_sound_object([[characters_voice\scenario\escape\lager_fanat_victory]]),
+	
+	rad_barman_spam					= xr_sound.get_safe_sound_object([[characters_voice\scenario\radar\rad_barman_message]]),
+
+	val_monolith_trader_pda1		= xr_sound.get_safe_sound_object([[characters_voice\scenario\val\trader_dialog1]]),
+	o_soznanie_text					= xr_sound.get_safe_sound_object([[characters_voice\scenario\sarcofag\o_soznanie_call]]),
+
+-- dublicate sounds for scheme
+--  val_rob_leader_call             = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\rob_call_1_p]]),
+    val_rob_leader_jeer_1           = xr_sound.get_safe_sound_object([[characters_voice\scenario\val\rob_leader_jeer_1_p]]),
+
+-- dublicate sounds for scheme
+--	pri_followers_leader_phrase1_1  = xr_sound.get_safe_sound_object([[characters_voice\scenario\pri\followers_leader_phrase1_1_p]]),
+    pri_followers_leader_phrase1_2  = xr_sound.get_safe_sound_object([[characters_voice\scenario\pri\followers_leader_phrase1_2_p]]),
+    pri_followers_leader_phrase1_3  = xr_sound.get_safe_sound_object([[characters_voice\scenario\pri\followers_leader_phrase1_3_p]])
+}
+
+if amk.load_variable("option_helmets_snd", -1) == 1 then
+	pda_news = xr_sound.get_safe_sound_object([[device\pda\pda_news]])
+	pda_tips = xr_sound.get_safe_sound_object([[device\pda\pda_tip]])
+	pda_task = xr_sound.get_safe_sound_object([[device\pda\pda_objective]])
+else
+	pda_news = xr_sound.get_safe_sound_object([[device\pda_old\pda_news]])
+	pda_tips = xr_sound.get_safe_sound_object([[device\pda_old\pda_tip]])
+	pda_task = xr_sound.get_safe_sound_object([[device\pda_old\pda_objective]])
+end
+
+tips_icons = {
+     weaprep  = { 0, 517 },
+	default  = { 0, 658},
+	trader	 = { 332, 893},
+	dolg     = { 0, 658},
+	freedom  = { 0, 658},
+	ecolog   = { 498, 0},
+	arena    = { 332, 141},
+	stalker  = { 0, 658},
+	krot     = { 332, 47},
+	barman   = { 332, 235},
+	wolf	 = { 332, 940},
+	o_soznanie = { 498, 893},
+	monolith = { 0, 658},
+    saharov  = { 332, 470},
+    prizrak  = { 0, 658},
+    killer   = { 0, 658},
+	detector = { 83, 893},
+	wpn_repair       = {498, 423},		--!!!!TB3D new icons in 134
+	blowout_sms      = {249, 474}, --498, 376},
+	radio            = {498, 470},
+	totalizator      = {498, 564},
+	totalizator_dolg = {498, 517},
+	actor_sms        = {498, 611},
+	many_out         = {498, 658},
+	stalkers_chat    = {498, 705},
+	military_chat    = {498, 752},
+	inv_icon         = {0,   141},
+	pda_icon         = {498, 799},
+	medic_icon       = {498, 282},
+	common_channel   = {498,  47},
+	car_icon         = {0,   611},
+	tb3d_master		 = {498,188},
+	gps				 = {0,706}
+}
+
+function give_talk_message(news_text, texture, rect, atext)
+	--TB3D_Services.packet_alert("news mgr: give talk msg")
+	if news_text then
+		local txt = texture
+		local rct = rect
+		if txt == nil or rct == nil then
+			--TB3D_Services.packet_alert("news mgr: give talk msg [bad data]")
+			txt, rect = get_texture_info("ui_iconsTotal_locations", "ui_iconsTotal_locations")
+		end
+		local atxt = atext
+		if atxt == nil then atxt = "simple_answer_item" end
+		db.actor:give_talk_message(news_text, txt, rct, atxt)
+	end
+end
+
+function upload_message_id(news_id1, news_id2, texture, rect, atext)		--109977, from kostya
+	if news_id1 then
+		local txt = texture
+		local rct = rect
+		if txt == nil or rct == nil then
+			--TB3D_Services.packet_alert("news mgr: give talk msg [bad data]")
+			txt, rect = get_texture_info("ui_iconsTotal_locations", "ui_iconsTotal_locations")
+		end
+		local atxt = atext
+		if atxt == nil then atxt = "simple_answer_item" end
+		local news_text = TB3D_Services.get_text_color("system").."UPLOADED:".."  %c[default]"..translate(news_id1)
+		if news_id2 then
+			news_text = news_text.." "..translate(news_id2)
+		end
+		db.actor:give_talk_message(news_text, txt, rct, atxt)
+	end
+end
+
+function give_game_news(news_text, texture, rect, timeout, showtime)
+	if news_text then --and news_main.isIsolatedLevel(lname) == false then
+		--TB3D_Services.packet_alert("news mgr: give game news["..utils.to_str(news_text).."]")
+		local txt = texture
+		local rct = rect
+		if txt == nil then
+			txt = "ui\\ui_iconsTotal"
+			rct = Frect():set(0,47,83,47)
+		elseif rct == nil then
+			rct = Frect():set(0,47,83,47)
+		end
+		--TB3D_Services.info_alert("news mgr: give_game_news["..utils.to_str(news_text).."] timeout["..utils.to_str(timeout).."] show["..utils.to_str(showtime).."]") 
+		db.actor:give_game_news(news_text, txt, rct, timeout or 0, showtime or 20000)
+		--db.actor:give_talk_message(news_text, txt, rct, atxt)
+	end
+end
+
+function mmm_on_death(news_text)
+	local texture = "ui_npc_u_ucheniy_2"
+	local news_caption = translate(TB3D_Services.get_text_color("tip")..translate("st_tip").."  %c[default]"..news_text)
+	give_game_news(news_caption, texture, 1, 40*1000)
+end
+
+function terror_messg(news_text, header)
+	local player = pda_news
+	player:play(db.actor, 0, sound_object.s2d)
+	local news_text = translate(TB3D_Services.get_text_color("alert")..header.."  %c[default]"..news_text)
+	give_game_news(news_text, "ui\\ui_VDGicon", Frect():set(0,47,83,47), 0, 5000)
+end
+
+function gps_send_alert_tip(location, lname, cond, timeout, showtime)
+	local player = pda_tips
+	--' Play's default sound
+	if player and player.play then
+		player:play(db.actor, timeout, sound_object.s2d)
+	end
+	local x = tips_icons["gps"][1]	--0
+	local y = tips_icons["gps"][2]	--706
+	local news_text = TB3D_Services.get_text_color("alert").."GPS:".."  %c[default]"..translate(location).." "..lname.." "..translate(cond)
+	give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), 0, 5000)
+	return true
+end
+
+function gps_send_sys_tip(location, lname, cond, timeout, showtime)
+	local player = pda_tips
+	--' Play's default sound
+	if player and player.play then
+		player:play(db.actor, timeout, sound_object.s2d)
+	end
+	local x = tips_icons["gps"][1]	--0
+	local y = tips_icons["gps"][2]	--706
+	local news_text = TB3D_Services.get_text_color("system").."GPS:".."  %c[default]"..translate(location).." "..lname.." "..translate(cond)
+	give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), 0, 5000)
+	return true
+end
+
+--show TIPS
+function amk_send_tip_id(news_id, header_id, timeout, showtime, sender, sound)
+	if TB3D_Modders.use_news_message then 
+		TB3D_Services.info_alert("news mgr: AMK send tip["..news_id.."]") 
+	end
+	if news_id then
+		local tmout = timeout or 1
+		local shwtme = showtime or 5
+		if shwtme < 1 then shwtme = 5 end
+		local player
+		if sound=="news" then
+			player=pda_news
+		elseif sound=="task" then
+			player=pda_task
+		else
+			player=pda_tips
+		end   
+		--' Play's default sound
+		player:play(db.actor, tmout, sound_object.s2d)
+		if sender == nil or tips_icons[sender] == nil then sender = "default" end
+		local x = tips_icons[sender][1]
+		local y = tips_icons[sender][2]
+		local ntext
+		if header_id then ntext = translate(header_id) else ntext = translate("st_tip") end
+		ntext = TB3D_Services.get_text_color("tip")..ntext.." %c[default]"..translate(news_id)
+		if TB3D_Modders.use_news_message then
+			TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(ntext).."]") 
+		end
+		db.actor:give_game_news(ntext, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), tmout*1000, shwtme*1000)
+		return true
+	 end
+	 return false
+end
+
+function amk_send_tip(news_text, header, timeout, showtime, sender, sound)
+	if TB3D_Modders.use_news_message then 
+		TB3D_Services.info_alert("news mgr: send tip["..utils.to_str(news_text).."]") 
+	end
+	  if news_text then
+			local hdr 
+			if header then hdr = header else hdr = translate("st_tip") end
+			local tmout = timeout or 1
+			local shwtme = showtime or 5
+			if shwtme < 1 then shwtme = 5 end
+		  local player
+		  if sound=="news" then
+			player=pda_news
+		  elseif sound=="task" then
+			player=pda_task
+		  else
+			player=pda_tips
+		  end   
+		  --' Play's default sound
+		  player:play(db.actor, tmout, sound_object.s2d)
+		  if sender == nil or tips_icons[sender] == nil then
+			sender = "default"
+		  end
+		  local x = tips_icons[sender][1]
+		  local y = tips_icons[sender][2]
+			local ntext = TB3D_Services.get_text_color("tip")..hdr.."  %c[default]"..news_text
+			if TB3D_Modders.use_news_message then
+				TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(ntext).."]") 
+			end
+		  give_game_news(ntext, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), tmout*1000, shwtme*1000)
+	  return true
+	 end
+	 return false
+end
+
+function send_tip_txt(actor, news_text, timeout, sender, showtime)
+	if TB3D_Modders.use_news_message then 
+		TB3D_Services.info_alert("news mgr: send tip["..utils.to_str(news_text).."]") 
+	end
+	if news_text then
+		local tmout = timeout or 1
+		local shwtme = showtime or 15000
+		if shwtme < 1 then shwtme = 15000 end
+		local player=pda_tips
+		player:play(db.actor, tmout, sound_object.s2d)
+		if sender == nil or tips_icons[sender] == nil then
+			sender = "default"
+		end
+		local x = tips_icons[sender][1]
+		local y = tips_icons[sender][2]
+		if TB3D_Modders.use_news_message then
+			TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(news_text).."]") 
+		end
+		give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), tmout, shwtme)
+		return true
+	end
+	return false
+end
+
+function send_tip(actor, news_id, timeout, sender, showtime, sender_id)
+	if news_id then
+		--if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MGR: try to send tip["..translate(news_id).."] for ["..utils.to_str(sender_id).."]") end
+		if TB3D_Services.is_collector(800) == true then
+			if has_alife_info("tb3d_collector_done") then
+				if news_id == "gar_dolg_blokpost_warning" then
+					TB3D_Triggers.gar_dolg_blokpost_warning()	--spawn mercs, and send tip
+					return true
+				elseif news_id == "rad_barman_spam" then
+					TB3D_Triggers.rad_barman_spam()	--skip, sms when entering radar complex through break in wall
+					return true
+				elseif news_id == "storyline_vasilyev_tip" then	--skip it on startup
+					return true
+				elseif news_id == "mil_actor_blockpost" then	--skip barrier warning
+					return true
+				end
+			else
+				return true
+			end
+		else
+			--let it thru
+		end
+		send_the_tip(db.actor, news_id, timeout, sender, showtime, sender_id)
+		return true
+	end
+	return false
+end
+
+function send_the_tip(actor, news_id, timeout, sender, showtime, sender_id)
+	if sender_id ~= nil then
+		if TB3D_Modders.use_news_message == true then
+			TB3D_Services.info_alert("NEWS MGR: try to send tips for ["..utils.to_str(sender_id).."]")
+		end
+		local sim = alife()
+		if sim ~= nil then
+			local npc = sim:story_object(sender_id)
+			if npc ~= nil then
+--[[			if npc.online then
+					--Online check at the wounded
+					if xr_wounded.is_heavy_wounded_by_id(npc.id) then
+						if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MGR: [PDA]Cannot send tips ["..utils.to_str(news_id).."], sender is heavy wounded") end
+						return false
+					end
+				end]]--
+				-- in other cases, only to die
+				if not npc:alive() then
+					if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MGR: [PDA]Cannot send tips ["..utils.to_str(news_id).."], sender is dead") end
+					return false
+				end
+			end
+		end
+	end
+	if timeout == nil then timeout = 0 end
+	if showtime == nil then showtime = 15000 end
+	if TB3D_Services.is_collector(801) then
+		if coll_news[news_id] ~= nil then
+			--TB3D_Services.packet_alert("news mngr: play sound["..news_id.."]")
+			--' Play sound stuffy
+			news[news_id]:play(db.actor, timeout+1, sound_object.s2d)
+			--' Need to put the show on the length of the scene
+			local length = news[news_id]:length()
+			if length > showtime then
+				showtime = length
+			end
+		else
+			--TB3D_Services.packet_alert("news mngr: skipped sound["..news_id.."]")
+			pda_tips:play(db.actor, timeout, sound_object.s2d)		--' Play's default sound
+		end
+	else
+		if news[news_id] ~= nil then
+			if has_alife_info("tb3d_skip_group1") then
+				if news_id == "gar_dolg_monster_rush" or news_id == "tips_gar_hellcar_alarm"
+				  or news_id == "gar_actor_looser" or news_id == "gar_dolg_blokpost_warning"
+				  or news_id == "storyline_vasilyev_tip" or news_id == "storyline_ghost_tip" then
+					return false
+				end
+			end
+			--TB3D_Services.packet_alert("news mngr: play sound["..news_id.."]")
+			--' Play sound stuffy
+			news[news_id]:play(db.actor, timeout+1, sound_object.s2d)
+			--' Need to put the show on the length of the scene
+			local length = news[news_id]:length()
+			if length > showtime then
+				showtime = length
+			end
+		else
+			pda_tips:play(db.actor, timeout, sound_object.s2d)		--' Play's default sound
+		end
+	end
+	if sender == nil or tips_icons[sender] == nil then
+		sender = "default"
+	end
+	local x = tips_icons[sender][1]
+	local y = tips_icons[sender][2]
+	local ntext = TB3D_Services.get_text_color("tip")..translate("st_tip").."  %c[default]"..translate(news_id)
+	--if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("news mgr: sending the tip["..ntext.."]") end
+	give_game_news(ntext, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), timeout, showtime)
+	return true
+end
+function send_tip_nosound(actor, news_id, timeout, sender)
+	if news_id == nil then return end
+	timeout = 0
+	--' Play's default sound
+	pda_tips:play(db.actor, timeout, sound_object.s2d)
+	local news_sound = news[news_id]
+	return news_sound
+end
+
+local action_descr_by_type = {
+	new = "general_new_task",
+	update = "general_update_task",
+	complete = "general_complete_task",
+	fail = "general_fail_task"
+}
+function send_task(actor, type, task, objective)
+	if TB3D_Services.is_collector(802) == true and not has_alife_info("tb3d_collector_done") then return end 	--suppress info during start
+	if TB3D_Modders.use_news_message == true then
+		TB3D_Services.info_alert("NEWS MGR: send task["..task:get_id().."]") --["..translate(action_descr_by_type[type]).."]")
+	end
+	--' We take the coordinates of the Task texture
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_"..task:get_id(), "ui_iconsTotal_locations")
+	local news_text
+	pda_task:play(db.actor, 0, sound_object.s2d)	--' Play's default sound
+	if db.actor:is_talking() then	
+		news_text = TB3D_Services.get_text_color("task")..translate(action_descr_by_type[type]).."  %c[default]"..translate(task:get_title())
+		--TB3D_Services.packet_alert("NEWS MGR: send task talk msg["..news_text.."]")
+		give_talk_message(news_text, task_texture, task_rect)
+	else
+		news_text = TB3D_Services.get_text_color("task")..translate(action_descr_by_type[type]).."  %c[default]"..translate(task:get_title())
+		--TB3D_Services.packet_alert("NEWS MGR: send task game news["..news_text.."]")
+		give_game_news(news_text, task_texture, task_rect, 0, 3000)
+	end	
+	if type == "new" or	type == "update" then
+		if task:get_objectives_cnt() == objective:get_idx()+1 then return end							--no new subtask
+		news_text = translate(task:get_objective(objective:get_idx() + 1):get_description())			--Issue a new subjob
+	else
+		news_text = translate(action_descr_by_type[type])..translate("return_char")..translate(task:get_title())
+	end
+	local hud = get_hud()
+	hud:AddCustomStatic("main_task", true)
+	hud:GetCustomStatic("main_task"):wnd():SetTextST(news_text)
+	hud:GetCustomStatic("main_task").m_endTime = time_global()/1000 + 10
+	if amk.load_variable("option_autosave",1)~=0 and (type=="new" or type=="update" or type=="complete") then
+		if last_save_time == nil then last_save_time = 1 end
+		if time_global() > last_save_time then
+			local save_delay
+			local task_id = task:get_id()
+			--TB3D_Services.packet_alert("NEWS MGR: send task save["..news_text.."]["..task_id.."]")
+			if task_id == "storyline_eliminate_gunslinger" then											--saves too soon and breaks physics if loaded
+				save_delay = 0
+			elseif task_id == "hand_zombie"
+			  or string_sub(task_id, 1, 3) == "doc" then												--Akim, save immediately
+				save_delay = 1
+			elseif task_id == "agroprom_find_gunslinger_cache" or task_id == "agr_krot_pda" then		--mole at entrance to catacombs
+				save_delay = 1
+			else
+				save_delay = TB3D_Modders.autosave_wait_time or 5										--use delay to not break audio dialogs
+			end
+			if save_delay > 0 then 
+				if not (type == "new" or type == "update") then
+					news_text = translate(task:get_title())												--remake without color
+				end
+				if string.len(news_text)>48 then
+					news_text = string_sub(news_text,1,48)
+				end
+				if type == "complete" then
+					news_text = news_text.." "..translate("game_task_done")		--109970
+				end
+				amk.start_timer("autosave", save_delay, news_text)
+				last_save_time = time_global() + (save_delay * 1100)
+			end
+		end
+	end
+	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MGR: send task["..utils.to_str(news_text).."] done") end
+end
+
+function send_encyclopedy(type, title)								--TB3D - ONLY DIARY IS USED!!!!
+	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MGR: send encyclopedy type["..type.."] title["..title.."]") end
+	if type == "Diary" then
+		pda_news:play(db.actor, 0, sound_object.s2d)
+		--' We take the coordinates from the texture Tasca
+		local task_texture, task_rect = get_texture_info("ui_iconsTotal_locations", "ui_iconsTotal_locations")
+		if db.actor:is_talking() then	
+			local news_text = TB3D_Services.get_text_color("enc")..translate("st_found_new_pda").." %c[default]"..translate(title)
+			give_talk_message(news_text, task_texture, task_rect)
+		else
+			local news_text = TB3D_Services.get_text_color("enc")..translate("st_found_new_pda").." %c[default]"..translate(title)
+			give_game_news(news_text, task_texture, task_rect, 0, 3000)
+		end	
+	end
+end
+
+local 	level_name = {}
+		level_name["esc"]  = "Cordon"
+		level_name["gar"]  = "Garbage"
+		level_name["agr"]  = "the Agroprom"
+		level_name["agru"] = "Catacombs"
+		level_name["val"]  = "Dark Valley"
+		level_name["mil"]  = "Military Wharehouses"
+		level_name["yan"]  = "Yantar"
+		level_name["x16"]  = "Lab X16"
+		level_name["rad"]  = "Radar"
+		level_name["pri"]  = "Pripyat"
+		level_name["x18"]  = "Lab X18"
+		level_name["bar"]  = "Rostok"
+		level_name["ros"]  = "Wild Territory"
+function send_treasure(name)
+	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("send treasure") end
+	pda_news:play(db.actor, 0, sound_object.s2d)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_found_thing")
+	local level_key = string.sub(name,1,string.find(name,"_s",1,plain)-1)
+	local tmp_str = ""
+	if level_name[level_key] ~= nil then
+		tmp_str = level_name[level_key]..": "
+	end
+	local news_text = TB3D_Services.get_text_color("treasure")..translate("st_found_new_treasure").." "..TB3D_Services.get_text_color("name")..tmp_str.."%c[default]"..translate(name)	
+	give_game_news(news_text, task_texture, task_rect, 0, 3000)
+end
+
+function get_inv_name(section)
+	return repair_check.read_string_if_exist(system_ini(),section,"inv_name",section)
+	--return system_ini():r_string(section,"inv_name_short")
+end
+
+function relocate_item(actor, type, item, count)
+	if TB3D_Modders.use_news_message == true then
+		TB3D_Services.info_alert("news mgr: relocate item["..item.."] cnt["..utils.to_str(count).."]")
+	end
+	if db.actor == nil then return false end
+	local cnt = 1
+	if count and count > 1 then cnt = count end
+	--' Play's default sound
+	if type == "in" then
+		local task_texture, task_rect = get_texture_info("ui_iconsTotal_found_thing")
+		if db.actor:is_talking() then
+			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			give_talk_message(news_text, task_texture, task_rect)
+		else
+			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			give_game_news(news_text, task_texture, task_rect, 0, 3000)
+		end		
+	elseif type == "out" then
+		local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_thing")
+		if db.actor:is_talking() then
+			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			give_talk_message(news_text, task_texture, task_rect)
+		else
+			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_item").." %c[default]"..translate(get_inv_name(item)).." x"..utils.to_str(cnt)		
+			give_game_news(news_text, task_texture, task_rect, 0, 3000)
+		end		
+	end
+	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("news mgr: relocate item done") end
+end
+
+function relocate_money(actor, type, amount)
+if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("news mgr: relocate money") end
+	if db.actor == nil then return false end
+	--' Play's default sound
+	if type == "in" then
+		local task_texture, task_rect = get_texture_info("ui_iconsTotal_found_money")
+		if db.actor:is_talking() then
+			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_money").." %c[default]"..translate(tostring(amount))
+			give_talk_message(news_text, task_texture, task_rect)
+		else
+			local news_text = TB3D_Services.get_text_color("money")..translate("general_in_money").."  %c[default]"..translate(tostring(amount))
+			give_game_news(news_text, task_texture, task_rect, 0, 3000)
+		end		
+	elseif type == "out" then
+		local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+		if db.actor:is_talking() then
+			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_money").." %c[default]"..translate(tostring(amount))
+			give_talk_message(news_text, task_texture, task_rect)
+		else
+			local news_text = TB3D_Services.get_text_color("alert")..translate("general_out_money").."  %c[default]"..translate(tostring(amount))
+			give_game_news(news_text, task_texture, task_rect, 0, 3000)
+		end		
+	end
+	
+end
+
+function save_collector(news_text, is_now)
+	if last_save_time == nil then last_save_time = 1 end
+	local save_delay
+	if is_now then save_delay = 1 else save_delay = TB3D_Modders.autosave_wait_time or 4 end
+	if time_global()>last_save_time+(save_delay * 1100) then
+		amk.start_timer("autosave", save_delay, news_text)
+		last_save_time=time_global()
+	end
+end
+
+function send_companion_message(npc, msg1, msg2, timeout, showtime)
+	db.actor:give_game_news(translate(msg1).." "..npc:character_name().." "..translate(ms2), "ui\\ui_iconsTotal", Frect():set(0,235,83,47), timeout, showtime*1000)
+end

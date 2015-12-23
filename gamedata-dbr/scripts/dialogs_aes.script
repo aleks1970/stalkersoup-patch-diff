@@ -1,0 +1,18 @@
+--TB3D 1.0.9.9.1 new
+function my_ver() return "1.0.9.9.1" end
+
+function osoznanie_decline(npc, actor)
+    TB3D_Services.remove_info("oso_init_dialog")
+	npc:stop_talk()
+    actor:stop_talk()
+	xr_effects.enable_ui(db.actor, nil)	  
+	game.start_tutorial("mov_refuse_osoznanie")
+end
+
+function osoznanie_agree(npc, actor)
+	TB3D_Services.remove_info("oso_init_dialog")
+	npc:stop_talk()
+    actor:stop_talk()
+	xr_effects.enable_ui(db.actor, nil)	  
+	game.start_tutorial("mov_join_osoznanie")
+end

@@ -1,0 +1,1735 @@
+--TB3D 1.0.9.9.7.4 , optimized db.actor, forced 0 state on 'no actor'
+function my_ver() return "1.0.9.9.7.4" end
+-------------------------------------------------------------------------------------------
+-- Download works for Liberty
+-------------------------------------------------------------------------------------------
+function load_job_base (sj, gname, type, squad, groups)
+    local t
+    -----------------------------------------------------------------------
+    -- Normal state database
+    -----------------------------------------------------------------------
+    -- Lukash
+    t = {section = "logic@mil_freedom_lukash",
+		idle = 0,
+		prior = 20, state = {0, 3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and (info.profile_name == "mil_Svoboda_leader" and info.story_id == 707)
+		            end
+		}
+	table.insert(sj, t)		
+    -- Cook
+    t = {section = "logic@mil_freedom_cook",
+		idle = 0,
+		prior = 20, state = {0, 2, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_cook"
+		            end
+		}
+	table.insert(sj, t)		
+    -- Sniper  1
+    t = {section = "logic@mil_freedom_sniper1",
+		idle = 0,
+		prior = 20, state = {0, 2, 3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and (info.profile_name == "mil_Svoboda_sniper" and info.story_id == 704)
+		            end
+		}
+	table.insert(sj, t)		
+
+    -- Sniper  2
+    t = {section = "logic@mil_freedom_sniper2",
+		idle = 0,
+		prior = 20, state = {0, 2, 3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and (info.profile_name == "mil_Svoboda_sniper" and info.story_id == 731)
+		            end
+		}
+	table.insert(sj, t)		
+
+    -- Sniper  3
+    t = {section = "logic@mil_freedom_sniper5",
+		idle = 0,
+		prior = 20, state = {0, 2, 3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and (info.profile_name == "mil_Svoboda_sniper" and info.story_id == 730)
+		            end
+		}
+	table.insert(sj, t)		
+	
+    -- Sniper  4
+    t = {section = "logic@mil_freedom_sniper4",
+		idle = 0,
+		prior = 19, state = {0, 2, 3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_sniper"
+		            end
+		}
+	table.insert(sj, t)		
+
+    -- Sniper  5
+    t = {section = "logic@mil_freedom_sniper3",
+		idle = 0,
+		prior = 20, state = {0, 2, 3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and (info.profile_name == "mil_Svoboda_sniper" and info.story_id == 732)
+		            end
+		}
+	table.insert(sj, t)		
+	
+    -- Miser
+    t = {section = "logic@mil_freedom_trader",
+		idle = 0,
+		prior = 20, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and (info.profile_name == "mil_Svoboda_trader" and info.story_id == 734)
+		            end
+		}
+	table.insert(sj, t)	
+		
+    -- Guard Lucas
+    t = {section = "logic@mil_freedom_guard1",
+		idle = 0,
+		prior = 15, state = {0, 3 ,4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_specnaz"
+		            end
+		}
+	table.insert(sj, t)		
+    -- Guard Lucas
+    t = {section = "logic@mil_freedom_bodyguard1",
+		idle = 0,
+		prior = 19, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_bodyguard"
+		            end
+		}
+	table.insert(sj, t)		
+    -- Guard Lucas
+    t = {section = "logic@mil_freedom_bodyguard2",
+		idle = 0,
+		prior = 19, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_bodyguard"
+		            end
+		}
+	table.insert(sj, t)		
+	-- Guard the arsenal
+    t = {section = "logic@mil_freedom_aguard",
+		idle = 0,
+		prior = 15, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_specnaz"
+		            end
+		}
+	table.insert(sj, t)		
+	
+    
+    -- Max
+    t = {section = "logic@mil_freedom_max",
+		idle = 0,
+		prior = 20, state = {0, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_master_Max"
+		            end
+		}
+	table.insert(sj, t)		
+	
+	t = { section = "logic@mil_freedom_walker7",
+		idle = 0,
+		prior = 19, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+    	predicate = function (info)
+	                    return info and info.profile_name == "mil_Svoboda_engineer"
+	                end
+     	}
+	table.insert(sj, t)
+	------
+	-- man at a fire 1
+    t = {section = "logic@mil_freedom_stalker1",
+		idle = 0,
+		prior = 2, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)		
+
+    -- man at a fire 2
+    t = {section = "logic@mil_freedom_stalker2",
+		idle = 0,
+		prior = 2, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)	
+	
+    -- single patrol-based
+    t = {section = "logic@mil_freedom_stalker4",
+		idle = 0,
+		prior = 10, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_specnaz"
+		            end         
+		}
+	table.insert(sj, t)		
+
+    -- patrol on the basis of
+    t = {section = "logic@mil_freedom_stalker5",
+		idle = 0,
+		prior = 10, state = {0, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_specnaz"
+		            end         
+		}
+	table.insert(sj, t)		
+
+    --security guard at the entrance 
+    t = {section = "logic@mil_freedom_stalker8",
+		idle = 0,
+		prior = 13, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_zoneguard"
+		            end         
+		}
+	table.insert(sj, t)		
+	-- just a guy at the entrance
+    t = {section = "logic@mil_freedom_stalker9",
+		idle = 0,
+		prior = 10, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)		
+	-- just a guy at the entrance
+    t = {section = "logic@mil_freedom_stalker10",
+		idle = 0,
+		prior = 10, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)		
+
+        
+	t = { section = "logic@mil_freedom_walker1",
+		idle = 0,
+		prior = 1, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600
+--'		predicate = function (info)
+--'		                return (level.get_time_hours() > 6 and level.get_time_hours() < 21)
+--'		            end    
+	}
+	table.insert(sj, t)		
+	------
+	t = { section = "logic@mil_freedom_walker2",
+		idle = 0,
+		prior = 1, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600
+--'		predicate = function (info)
+--'		                return (level.get_time_hours() > 6 and level.get_time_hours() < 21)
+--'		            end    
+	}                         
+	table.insert(sj, t)		
+	------
+	t = { section = "logic@mil_freedom_walker3",
+		idle = 0,
+		prior = 1, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600
+--'		predicate = function (info)
+--'		                return (level.get_time_hours() > 6 and level.get_time_hours() < 21)
+--'		            end    
+	}
+	table.insert(sj, t)		
+	------
+	t = { section = "logic@mil_freedom_walker4",
+		idle = 0,
+		prior = 5, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	}
+	table.insert(sj, t)		
+	------
+	t = { section = "logic@mil_freedom_kamp1",
+		idle = 0,
+		prior = 1, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	    }
+	table.insert(sj, t)		
+	------
+	t = { section = "logic@mil_freedom_kamp2",
+		idle = 0,
+		prior = 1, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	}
+	table.insert(sj, t)
+	------
+	t = { section = "logic@mil_freedom_kamp3",
+		idle = 0,
+		prior = 1, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	}
+	table.insert(sj, t)
+	------
+	t = { section = "logic@mil_freedom_sleep1",
+		idle = 0,
+		prior = 1, state = {0, 3, 4},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	}
+	table.insert(sj, t)
+	------
+--	t = { section = "logic@mil_freedom_sleep2",
+		--idle = 0,
+		--prior = 1, state = {0, 3, 4},
+		--squad = squad, group = groups[0],
+		--position_threshold = 600,
+		--in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	--}
+	--table.insert(sj, t)
+	------
+	--t = { section = "logic@mil_freedom_walker5",
+		--idle = 0,
+		--prior = 1, state = {0, 3, 4},
+		--squad = squad, group = groups[0],
+		--position_threshold = 600,
+		--in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	--}
+	--table.insert(sj, t)
+	------
+	--t = { section = "logic@mil_freedom_camper6",
+		--idle = 0,
+		--prior = 1, state = {0, 3, 4},
+		--squad = squad, group = groups[0],
+		--position_threshold = 600,
+		--in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+	--}
+	--table.insert(sj, t)
+	
+	-------------------------------- combat state 1-----------------------------
+    -- Lukas
+    t = {section = "logic@mil_freedom_lukash_combat1",
+		idle = 0,
+		prior = 11, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "mil_headquarter_restrictor",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_leader"
+		            end
+		}
+	table.insert(sj, t)		
+    -- Miser
+    t = {section = "logic@mil_freedom_trader_combat1",
+		idle = 0,
+		prior = 11, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_trader"
+		            end
+		}
+	table.insert(sj, t)		
+    -- Guard Lucas
+    t = {section = "logic@mil_freedom_guard_combat1",
+		idle = 0,
+		prior = 11, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_specnaz"
+		            end
+		}
+	table.insert(sj, t)		
+    -- Guard Lucas
+    t = {section = "logic@mil_freedom_bodyguard1_combat1",
+		idle = 0,
+		prior = 11, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "mil_headquarter_restrictor",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_bodyguard"
+		            end
+		}
+	table.insert(sj, t)		
+    -- Guard Lucas
+    t = {section = "logic@mil_freedom_bodyguard2_combat1",
+		idle = 0,
+		prior = 11, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "mil_headquarter_restrictor",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_bodyguard"
+		            end
+		}
+	table.insert(sj, t)		
+
+	-------------------------------- combat state 2-----------------------------
+	local sec
+	for a = 1, 23, 1 do
+	    sec = string.format ("logic@mil_freedom_defence%d", a)
+        t = { section = sec,
+		    idle = 0,
+   		    prior = 8, state = {2},
+		    squad = squad, group = groups[0],
+    		position_threshold = 600,
+		    in_rest = "mil_freedom_wall_restrictor", out_rest = "mil_freedom_gulag_defense_res"
+	        }
+	    table.insert(sj, t)
+    end
+
+	-------------------------------- Attack of the hamlet of Debt-----------------------------
+	-- Макс
+    t = {section = "logic@mil_freedom_max_attack",
+		idle = 0,
+		prior = 18, state = {3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		online = true,
+		idle_after_death = 36000,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_master_Max"
+		            end
+		}
+	table.insert(sj, t)		
+	-- A man by the fire 1
+    t = {section = "logic@mil_freedom_stalker1_attack",
+		idle = 0,
+		prior = 15, state = {3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		idle_after_death = 36000,
+		online = true--,
+		--predicate = function (info)
+		                     --return info and info.profile_name == "mil_Svoboda_specnaz"
+		            --end
+		}
+	table.insert(sj, t)		
+	-- A man by the fire 2
+    t = {section = "logic@mil_freedom_stalker2_attack",
+		idle = 0,
+		prior = 15, state = {3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		idle_after_death = 36000,
+		online = true--,
+		--predicate = function (info)
+		                     --return info and info.profile_name == "mil_Svoboda_specnaz"
+		            --end
+		}
+	table.insert(sj, t)		
+	-- 
+    t = {section = "logic@mil_freedom_stalker4_attack",
+		idle = 0,
+		prior = 17, state = {3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		idle_after_death = 36000,
+		online = true--,
+		--predicate = function (info)
+		                     --return info and info.profile_name == "mil_Svoboda_specnaz"
+		            --end
+		}
+	table.insert(sj, t)		
+	-- 
+    t = {section = "logic@mil_freedom_stalker5_attack",
+		idle = 0,
+		prior = 15, state = {3},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		idle_after_death = 36000,
+		online = true--,
+		--predicate = function (info)
+		                     --return info and info.profile_name == "mil_Svoboda_specnaz"
+		            --end
+		}
+	table.insert(sj, t)		
+	-- 
+    t = {section = "logic@mil_freedom_stalker6_attack",
+		idle = 0,
+		prior = 15, state = {3},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		online = true,
+		idle_after_death = 36000,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)		
+	-- 
+    t = {section = "logic@mil_freedom_stalker7_attack",
+		idle = 0,
+		prior = 15, state = {3},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		online = true,
+		idle_after_death = 36000,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)		
+	-- 
+    t = {section = "logic@mil_freedom_stalker8_attack",
+		idle = 0,
+		prior = 15, state = {3},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		online = true,
+		idle_after_death = 36000,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)		
+	-- 
+    t = {section = "logic@mil_freedom_stalker9_attack",
+		idle = 0,
+		prior = 15, state = {3},
+		squad = squad, group = groups[0],
+		position_threshold = 600,
+		online = true,
+		idle_after_death = 36000,
+		in_rest = "mil_freedom_wall_restrictor", out_rest = ""
+		}
+	table.insert(sj, t)		
+	
+-- fourth state of the Gulag Freedom
+    -- Lukas
+    t = {section = "logic@mil_freedom_commander",
+		idle = 0,
+		prior = 20, state = {4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     if has_alife_info("mil_lukash_dead") then return true else
+		                     return info and (info.profile_name == "mil_Svoboda_leader" and info.story_id == 707) end
+		            end
+		}
+	table.insert(sj, t)
+	
+    -- Sniper  1
+    t = {section = "logic@mil_freedom_sniper14",
+		idle = 0,
+		prior = 20, state = {4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_sniper"
+		            end
+		}
+	table.insert(sj, t)		
+
+    -- Sniper  2
+    t = {section = "logic@mil_freedom_sniper24",
+		idle = 0,
+		prior = 20, state = {4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_sniper"
+		            end
+		}
+	table.insert(sj, t)		
+
+    -- Sniper  3
+    t = {section = "logic@mil_freedom_sniper54",
+		idle = 0,
+		prior = 20, state = {4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_sniper"
+		            end
+		}
+	table.insert(sj, t)		
+	
+    -- Sniper  4
+    t = {section = "logic@mil_freedom_sniper44",
+		idle = 0,
+		prior = 19, state = {4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_sniper"
+		            end
+		}
+	table.insert(sj, t)		
+
+    -- Sniper  5
+    t = {section = "logic@mil_freedom_sniper34",
+		idle = 0,
+		prior = 20, state = {4},
+		squad = squad, group = groups[0],
+		in_rest = "mil_freedom_wall_restrictor", out_rest = "",
+		position_threshold = 600,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_sniper"
+		            end
+		}
+	table.insert(sj, t)		
+	
+end
+
+-------------------------------------------------------------------------------------------
+-- Check the status of the Gulag Freedom
+-------------------------------------------------------------------------------------------
+function check_state(gulag)
+	if db.actor and gulag then
+		-- eliminates the fourth state.
+		if has_alife_info("mil_lukash_dead") or has_alife_info("mil_freedom_quests_end") then
+		   if this.check_enemy(gulag) == true then
+			  -- because the question of the relation of the actor is not going to be solved, then the output will be just that.
+			  if gulag:npc_is_enemy_to_anybody(db.actor) == true then
+				 relation_registry.set_community_goodwill("freedom", db.actor:id(), -50)
+				 xr_gulag.setGulagRelation("mil_freedom", game_object.enemy, db.actor)
+			  end   
+			  return 2
+		   else
+			  TB3D_Services.remove_info("mil_freedom_under_attack")
+				--printf ("[GULAG_FREEDOM] STATE 4")  
+			  return 4
+		   end          
+		end   
+		if gulag.state == 3 then
+		   if has_alife_info("mil_dolg_after_explode") or gulag:npc_is_enemy_to_anybody(db.actor) == true then
+			  TB3D_Services.remove_info("mil_freedom_attack")
+			  -- because the question of the relation of the actor is not going to be solved, then the output will be just that.
+			  if gulag:npc_is_enemy_to_anybody(db.actor) == true then
+				 relation_registry.set_community_goodwill("freedom", db.actor:id(), -50)
+				 xr_gulag.setGulagRelation("mil_freedom", game_object.enemy, db.actor)
+				 --xr_gulag.setGulagGoodwill("mil_freedom", -5000, db.actor)
+			  end   
+			  return 2
+		   end   
+		   if has_alife_info("mil_freedom_attack") then
+				--          printf ("[GULAG_FREEDOM] STATE 3")  
+			  return 3
+		   end
+		end        
+		if has_alife_info("mil_freedom_under_attack") then
+		   if this.check_enemy (gulag) == true or not has_alife_info("mil_dolg_dead") then
+				--          printf ("[GULAG_FREEDOM] STATE 2")    
+			  return 2
+		   else
+			  TB3D_Services.remove_info("mil_freedom_under_attack")
+				--          printf ("[GULAG_FREEDOM] STATE 0")    
+			  return 0
+		   end
+		end            
+		if has_alife_info("mil_freedom_attack") then
+			--       printf ("[GULAG_FREEDOM] STATE 3")   
+		   return 3
+		end   
+	end
+	--if gulag then return gulag.state end
+	--    printf ("[GULAG_FREEDOM] STATE 0")  
+    return 0
+end
+
+-------------------------------------------------------------------------------------------
+-- Check whether there is a gulag enemy
+-------------------------------------------------------------------------------------------
+function check_enemy(gulag)
+    for k,v in pairs(gulag.Object) do
+        if v ~= true then
+           if v:best_enemy() ~= nil and v:story_id() ~= 710 and is_object_monster(v:best_enemy()) == false then 
+              return true
+           end
+        end
+    end       
+    return false
+end
+-------------------------------------------------------------------------------------------
+-- Check whether there is an enemy of the Gulag - the actor
+-------------------------------------------------------------------------------------------
+function is_actor_enemy(gulag)
+	local e
+    for k,v in pairs(gulag.Object) do
+        if v ~= true then
+          e = v:best_enemy()
+          if e ~= nil and e:id() == db.actor:id() then
+             return true 
+          end
+        end  
+    end       
+    return false
+end
+
+
+
+-------------------------------------------------------------------------------------------
+-- Download papers for the checkpoint at the entrance to the Liberty Radar
+-------------------------------------------------------------------------------------------
+function load_job_fblockpost (sj, gname, type, squad, groups)
+    local t
+    -- state 0
+    --man at a fire 1    
+    t = {section = "logic@mil_fblockpost_stalker",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 2
+    t = {section = "logic@mil_fblockpost_stalker",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 3
+    t = {section = "logic@mil_fblockpost_stalker",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 4
+    t = {section = "logic@mil_fblockpost_stalker",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 5
+    t = {section = "logic@mil_fblockpost_stalker",
+		idle = 0,
+		prior = 5, state = {0},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --commander
+    t = {section = "logic@mil_fblockpost_commander",
+		idle = 0,
+		prior = 10, state = {0, 1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 100,
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_blockpost_leader"
+		            end
+		}
+	table.insert(sj, t)		
+    --patrol 1
+    t = {section = "logic@mil_fblockpost_patrol1",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --patrol 2
+    t = {section = "logic@mil_fblockpost_patrol2",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 1
+    t = {section = "logic@mil_fblockpost_camper3",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 2
+    t = {section = "logic@mil_fblockpost_camper6",
+		idle = 0,
+		prior = 5, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+	-- state 2
+    --Camper 1
+    t = {section = "logic@mil_fblockpost_camper1",
+		idle = 0,
+		prior = 5, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 2
+    t = {section = "logic@mil_fblockpost_camper2",
+		idle = 0,
+		prior = 5, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 3
+    t = {section = "logic@mil_fblockpost_camper3",
+		idle = 0,
+		prior = 5, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 4
+    t = {section = "logic@mil_fblockpost_camper4",
+		idle = 0,
+		prior = 5, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 5
+    t = {section = "logic@mil_fblockpost_camper5",
+		idle = 0,
+		prior = 5, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 6
+    t = {section = "logic@mil_fblockpost_camper6",
+		idle = 0,
+		prior = 5, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 7
+    t = {section = "logic@mil_fblockpost_camper7",
+		idle = 0,
+		prior = 5, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+end
+--------------------------------------------------------------------------
+-- Function to check the status of the Gulag Freedom from entering the Radar
+--------------------------------------------------------------------------
+function check_fblockpost_state(gulag)
+	if db.actor and gulag then
+		if gulag:npc_is_enemy_to_anybody(db.actor) == true then
+		   xr_gulag.setGulagEnemy("mil_fneutral", db.actor)
+		end 
+		if has_alife_info("mil_fblockpost_alarm") then
+		   return 2 
+		elseif TB3D_Services.is_night(false) == true then
+			return 1
+		end          
+	end
+	return 0
+	--if gulag then return gulag.state else return 0 end			--gulag.state causes permanent states to occur
+end
+
+-------------------------------------------------------------------------------------------
+-- Download papers for the checkpoint at the entrance to the neutrals Radar
+-------------------------------------------------------------------------------------------
+function load_job_fneutral (sj, gname, type, squad, groups)
+    local t
+    -- state 0
+    --man at a fire 1    
+    t = {section = "logic@mil_fneutral_stalker",
+		idle = 0,
+		prior = 1, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 2
+    t = {section = "logic@mil_fneutral_stalker",
+		idle = 0,
+		prior = 1, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 3
+    t = {section = "logic@mil_fneutral_stalker",
+		idle = 0,
+		prior = 1, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 4
+    t = {section = "logic@mil_fneutral_stalker",
+		idle = 0,
+		prior = 1, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --man at a fire 5
+    t = {section = "logic@mil_fneutral_stalker",
+		idle = 0,
+		prior = 1, state = {0},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --commander
+    --t = {section = "logic@mil_fneutral_commander",
+		--idle = 0,
+		--prior = 2, state = {0, 1},
+		--squad = squad, group = groups[0],
+		--position_threshold = 100,
+		--in_rest = "", out_rest = "",
+		--predicate = function (info)
+		                     --return info and info.profile_name == "mil_Stalker_master"
+		            --end
+		--}
+	--table.insert(sj, t)		
+    --Camper 1
+    t = {section = "logic@mil_fneutral_camper3",
+		idle = 0,
+		prior = 1, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 2
+    t = {section = "logic@mil_fneutral_camper5",
+		idle = 0,
+		prior = 1, state = {0, 1},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+	-- state 2
+    --Camper 1
+    t = {section = "logic@mil_fneutral_camper1",
+		idle = 0,
+		prior = 1, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 2
+    t = {section = "logic@mil_fneutral_camper2",
+		idle = 0,
+		prior = 1, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 3
+    t = {section = "logic@mil_fneutral_camper3",
+		idle = 0,
+		prior = 1, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 4
+    t = {section = "logic@mil_fneutral_camper4",
+		idle = 0,
+		prior = 1, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+    --Camper 5
+    t = {section = "logic@mil_fneutral_camper5",
+		idle = 0,
+		prior = 1, state = {2},
+		squad = squad, group = groups[0],
+		position_threshold = 100,
+		in_rest = "", out_rest = ""
+		}
+	table.insert(sj, t)		
+end
+--------------------------------------------------------------------------
+-- Function to check the status of the Gulag at the entrance to the neutrals Radar
+--------------------------------------------------------------------------
+function check_blockpost_state(gulag)
+	if db.actor and gulag then
+		if gulag:npc_is_enemy_to_anybody(db.actor) == true then
+		   xr_gulag.setGulagEnemy("mil_fblockpost", db.actor)
+		end
+		if has_alife_info("mil_fblockpost_alarm") then
+		   return 2 
+		elseif TB3D_Services.is_night(false) == true then
+			return 1
+		end          
+		if has_alife_info("mil_fblockpost_actor_outside") then return 0 end		--give actor a little looting time
+	end	
+	if TB3D_Services.is_night(false) == true then return 1 else return 0 end
+end
+
+
+
+--------------------------------------------------------------------------
+-- Dynamic ltx
+--------------------------------------------------------------------------
+function load_ltx(gname, type)
+	return nil
+end
+--------------------------------------------------------------------------
+-- Membership test stalkers gulag
+--------------------------------------------------------------------------
+function checkStalker(npc_community, gulag_type)
+	if gulag_type == "mil_fneutral" then
+	   return npc_community == "freedom"
+	end       
+	
+	if gulag_type == "mil_freedom" then
+	   return npc_community == "freedom"
+	end
+	
+	if gulag_type == "mil_fblockpost" then
+	   return npc_community == "freedom"
+	end   
+	
+	if gulag_type == "mil_village" then
+	   return npc_community == "freedom" 
+	end
+	
+	if gulag_type == "mil_dolg" then
+	   return  npc_community == "dolg" 
+	end   
+	
+	if gulag_type == "mil_monolit" then
+	   return npc_community == "monolith"
+	end
+	    
+	return false
+end
+
+--------------------------------------------------------------------------
+-- Download function works for the village
+--------------------------------------------------------------------------
+function load_job_village (sj, gname, type, squad, groups)
+    local t
+    --Moody
+    t = {section = "logic@mil_village_ugrumy",
+		idle = 0,
+		prior = 1, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_master_Ugrumiy"
+		            end
+		}
+	table.insert(sj, t)		
+    --Commando
+    t = {section = "logic@mil_village_soldier1",
+		idle = 0,
+		prior = 1, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_specnaz"
+		            end
+		}
+	table.insert(sj, t)		
+    --Private
+    t = {section = "logic@mil_village_soldier2",
+		idle = 0,
+		prior = 1, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_regular"
+		            end
+		}
+	table.insert(sj, t)		
+    --Moody
+    t = {section = "logic@mil_village_ugrumy_search",
+		idle = 0,
+		prior = 1, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_master_Ugrumiy"
+		            end
+		}
+	table.insert(sj, t)		
+    --Commando
+    t = {section = "logic@mil_village_specnaz_search",
+		idle = 0,
+		prior = 1, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_specnaz"
+		            end
+		}
+	table.insert(sj, t)		
+    --Private
+    t = {section = "logic@mil_village_regular_search",
+		idle = 0,
+		prior = 1, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		predicate = function (info)
+		                     return info and info.profile_name == "mil_Svoboda_regular"
+		            end
+		}
+	table.insert(sj, t)		
+end
+--------------------------------------------------------------------------
+-- Function to check the status of the Gulag village
+--------------------------------------------------------------------------
+function check_village_state(gulag)
+	if db.actor then
+		if has_alife_info("mil_miser_task_complete") or 
+		   has_alife_info("mil_after_hunt_talked") then 
+		   --printf ("VILLAGE GULAG CHANGE STATE TO 1")
+		   return 1 
+		end
+	end
+	--if gulag then return gulag.state end
+    --printf ("VILLAGE GULAG CHANGE STATE TO 0")
+    return 0    
+end
+
+--------------------------------------------------------------------------
+-- Download function works for Debt
+--------------------------------------------------------------------------
+function load_job_dolg (sj, gname, type, squad, groups)
+    local t
+    -- first state
+    t = {section = "logic@mil_dolg_skull",
+		idle = 0,
+		prior = 13, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and (info.community == "dolg" and info.story_id == 708)
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier1",
+		idle = 0,
+		prior = 10, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+
+    t = {section = "logic@mil_dolg_soldier2",
+		idle = 0,
+		prior = 12, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and (info.community == "dolg" and info.story_id == 711)
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier3",
+		idle = 0,
+		prior = 10, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier4",
+		idle = 0,
+		prior = 10, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier5",
+		idle = 0,
+		prior = 10, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier6",
+		idle = 0,
+		prior = 10, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+
+    t = {section = "logic@mil_dolg_soldier7",
+		idle = 0,
+		prior = 10, state = {0},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+    -- second state
+    t = {section = "logic@mil_dolg_skull_attack",
+		idle = 0,
+		prior = 13, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     if info and info.community ~= "dolg" then
+								return false
+							elseif has_alife_info("mil_scull_dead") then
+								return true
+							else
+								return info and info.story_id == 708
+							end
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier1_attack",
+		idle = 0,
+		prior = 10, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+
+    t = {section = "logic@mil_dolg_soldier2_attack",
+		idle = 0,
+		prior = 12, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and (info.community == "dolg" and info.story_id == 711)
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier3_attack",
+		idle = 0,
+		prior = 10, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier4_attack",
+		idle = 0,
+		prior = 11, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier5_attack",
+		idle = 0,
+		prior = 11, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier6_attack",
+		idle = 0,
+		prior = 11, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+
+    t = {section = "logic@mil_dolg_soldier7_attack",
+		idle = 0,
+		prior = 10, state = {1},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+    -- third state
+    t = {section = "logic@mil_dolg_skull_return",
+		idle = 0,
+		prior = 13, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     if info and info.community ~= "dolg" then
+								return false
+							elseif has_alife_info("mil_scull_dead") then
+								return true
+							else
+								return info and info.story_id == 708
+							end
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier1_return",
+		idle = 0,
+		prior = 10, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+
+    t = {section = "logic@mil_dolg_soldier2_return",
+		idle = 0,
+		prior = 12, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier3_return",
+		idle = 0,
+		prior = 10, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier4_return",
+		idle = 0,
+		prior = 10, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier5_return",
+		idle = 0,
+		prior = 10, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+	
+    t = {section = "logic@mil_dolg_soldier6_return",
+		idle = 0,
+		prior = 10, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+
+    t = {section = "logic@mil_dolg_soldier7_return",
+		idle = 0,
+		prior = 10, state = {2},
+		squad = squad, group = groups[0],
+		in_rest = "", out_rest = "",
+		position_threshold = 400,
+		predicate = function (info)
+		                     return info and info.community == "dolg"
+		            end
+		}
+	table.insert(sj, t)	
+end
+--------------------------------------------------------------------------
+-- Function to check the status of the Gulag Debt
+-- Return values:
+--              0 - first state (killing the patrol and gather in the barn)
+--              1 - sniper is dead, the attack on the base of Liberty
+--              2 - Lucas was killed - a return to the farm
+--------------------------------------------------------------------------
+function check_dolg_state (gulag)
+	--if db.actor then
+		if has_alife_info("mil_lukash_dead") == true then
+		   return 2
+		end    
+		if has_alife_info("mil_dolg_skull_talk") == true and not has_alife_info("mil_lukash_dead") then
+		   return 1
+		end
+	--end
+	return 0
+end
+
+
+--------------------------------------------------------------------------
+-- Download function works gulag at the exit on the radar Monolith
+--------------------------------------------------------------------------
+function load_job_monolith (sj, gname, type, squad, groups)
+    local t, a
+    
+    for a = 1, 3, 1 do
+        t = {section = "logic@mil_monolith_soldier1",
+	    	idle = 0,
+		    prior = a, state = {0},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = "",
+		    predicate = function (info)
+		                         return info and info.community == "monolith"
+		                end
+		    }
+	    table.insert(sj, t)	
+	    
+        t = {section = "logic@mil_monolith_soldier2",
+	    	idle = 0,
+		    prior = a, state = {0},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = "",
+		    predicate = function (info)
+		                         return info and info.community == "monolith"
+		                end
+		    }
+	    table.insert(sj, t)	
+	    
+        t = {section = "logic@mil_monolith_soldier3",
+	    	idle = 0,
+		    prior = a, state = {0},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = "",
+		    predicate = function (info)
+		                         return info and info.community == "monolith"
+		                end
+		    }
+	    table.insert(sj, t)	
+	    
+        t = {section = "logic@mil_monolith_soldier4",
+	    	idle = 0,
+		    prior = a, state = {0},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = "",
+		    predicate = function (info)
+		                         return info and info.community == "monolith"
+		                end
+		    }
+	    table.insert(sj, t)	
+	    
+        t = {section = "logic@mil_monolith_soldier5",
+	    	idle = 0,
+		    prior = a, state = {0},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = "",
+		    predicate = function (info)
+		                         return info and info.community == "monolith"
+		                end
+		    }
+	    table.insert(sj, t)	
+	    
+        t = {section = "logic@mil_monolith_soldier6",
+	    	idle = 0,
+		    prior = a, state = {0},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = "",
+		    predicate = function (info)
+		                         return info and info.community == "monolith"
+		                end
+		    }
+	    table.insert(sj, t)	
+	    
+--	     t = {section = "logic@mil_monolith_soldier7",
+--	    	idle = 0,
+--		    prior = a, state = {0},
+--		    squad = squad, group = groups[0],
+--		    in_rest = "", out_rest = "",
+--		    predicate = function (info)
+--		                         return info and info.community == "monolith"
+--		                end
+--		    }
+--	    table.insert(sj, t)	
+--	    
+--      t = {section = "logic@mil_monolith_soldier8",
+--	    	idle = 0,
+--		    prior = a, state = {0},
+--		    squad = squad, group = groups[0],
+--		    in_rest = "", out_rest = "",
+--		    predicate = function (info)
+--		                         return info and info.community == "monolith"
+--		                end
+--		    }
+--	    table.insert(sj, t)
+    end	    
+end
+-------------------------------------------------------------------------------------------
+-- Check the status of the Gulag Monolith
+-------------------------------------------------------------------------------------------
+function check_monolith_state (gulag)
+    return 0
+end
+
+
+
+-------------------------------------------------------------------------------------------
+-- Download works for mutants
+-------------------------------------------------------------------------------------------
+function load_job_mil_monster (sj, gname, type, squad, groups)
+    local t, a
+    
+    for a = 1, 10, 1 do
+        -- 
+        t = {section = "logic@mil_monster1",
+	    	idle = 0,
+		    prior = 1, state = {0},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = ""
+		    }
+	    table.insert(sj, t)	
+	    
+        t = {section = "logic@mil_monster2",
+	    	idle = 0,
+		    prior = 1, state = {1},
+		    squad = squad, group = groups[0],
+		    in_rest = "", out_rest = ""
+		    }
+	    table.insert(sj, t)	
+    end	    
+end
+-------------------------------------------------------------------------------------------
+-- Check the status of the Gulag mutants
+-------------------------------------------------------------------------------------------
+function check_mil_monster_state(gulag)
+    --create a variable, which is responsible for the fact that the mutants do not trample ago, when someone
+    --one dies
+	--if db.actor then
+		if gulag and gulag.state == 0 then
+		   --believe only those who have already come, or will create a situation where the gulag
+		   --formally filled, but the newcomers still walking in the nearby locations
+		   if gulag:get_population_comed() < 10 then 
+			  return 0
+		   end
+		   return 1
+		elseif gulag and gulag:get_population_comed() ~= 0 then  
+			return 1 
+		end
+	--end
+	return 0
+end
+
+-------------------------------------------------------------------------------------------
+-- Check for membership in the mutants we
+-------------------------------------------------------------------------------------------
+function checkMonster(npc_community, gulag_type)
+    if gulag_type == "mil_monster" then
+       return true
+    end    
+    return false   
+end
+
+
+-------------------------------------------------------------------------------------------
+-- The main function of work load
+-------------------------------------------------------------------------------------------
+function load_job (sj, gname, type, squad, groups)
+    if type == "mil_freedom" then 
+       this.load_job_base (sj, gname, type, squad, groups)
+       return
+    end
+    if type == "mil_fblockpost" then
+       this.load_job_fblockpost (sj, gname, type, squad, groups)
+       return 
+    end   
+    if type == "mil_fneutral" then
+       this.load_job_fneutral (sj, gname, type, squad, groups)
+       return
+    end   
+    if type == "mil_village" then
+       this.load_job_village (sj, gname, type, squad, groups)
+       return
+    end    
+    if type == "mil_dolg" then
+       this.load_job_dolg (sj, gname, type, squad, groups)
+       return
+    end   
+    if type == "mil_monolit" then
+       this.load_job_monolith (sj, gname, type, squad, groups)
+       return
+    end   
+    if type == "mil_monster" then
+       this.load_job_mil_monster (sj, gname, type, squad, groups)
+       return
+    end   
+end
+
+-------------------------------------------------------------------------------------------
+-- Function to check the states gulags
+-------------------------------------------------------------------------------------------
+function load_states (gname, type)
+    if type == "mil_freedom" then
+       return this.check_state -- (gulag)
+    elseif type == "mil_fblockpost" then
+       return this.check_fblockpost_state
+    elseif type == "mil_fneutral" then  
+       return this.check_blockpost_state
+    elseif type == "mil_village" then
+       return this.check_village_state    
+    elseif type == "mil_dolg" then
+       return this.check_dolg_state     
+    elseif type == "mil_monolit" then
+       return this.check_monolith_state    
+    elseif type == "mil_monster" then
+       return this.check_mil_monster_state    
+    end    
+		--TB3D_Services.packet_alert("gulag mil: load job for type["..utils.to_str(type).."] not found")
+	return nil
+end
+
+

@@ -1,0 +1,507 @@
+--<!-- TB3D 1.0.9.9.8.1 added non pulse option, pass scopeused, chgd scopeUsed, added werewolf (still need to add unique part),
+-- chgd update(), remove(), colors, winx, winy, corpse checked, harsh environment, pda_is_blocked
+function my_ver() return "1.0.9.9.8.1" end
+
+local need_update = true
+
+local counter = 0
+local max_dist = 60
+local screen_max_dist = 100
+local biomap_x = 780
+local biomap_y = 0
+local biomap_width = 256
+local biomap_heigth = 256
+local center_x = 0  --biomap_x + math.floor(biomap_width / 2 + 0.5)
+local center_y = 0 --biomap_y + math.floor(biomap_heigth / 2 + 0.5)
+local scrn_w = winx
+local scrn_h = winy
+local koef_x = 1.0							--get width ratio for aspect
+local koef_y = 1.0							--get height ratio for aspect
+local dots = {}
+local tex = [[ui\white_dot]]
+local alpha = 255
+local no_color = 0
+local qtr_color = 64
+local mid_color = 127
+local mqtr_color = 191
+local max_color = 255
+
+local colors = {
+	["npcs"] = {
+		["m_dog_e"]		= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color, no_color),					--oranges
+			["parts"]	= {"mutant_dog_tail"}
+		},
+		["dog_weak"]	= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color+10, no_color),
+			["parts"]	= {"mutant_dog_tail"}
+		},
+		["dog_normal"]	= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color+20, no_color),
+			["parts"]	= {"mutant_dog_tail"}
+		},
+		["dog_strong"]	= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color+30, no_color),
+			["parts"]	= {"mutant_dog_tail"}
+		},
+		["dog_habaruch"]	= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color+30, no_color),
+			["parts"]	= {"mutant_dog_tail"}
+		},
+		["tb3dm_dog_habaruch"]	= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color+30, no_color),
+			["parts"]	= {"mutant_dog_tail"}
+		},
+		["psy_dog"]		= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color+40, no_color),
+			["parts"]	= {"mutant_psevdodog_tail"}
+		},
+		["pseudodog"]	= {
+			["color"]	= GetARGB(alpha, max_color, mqtr_color+50, no_color),
+			["parts"]	= {"mutant_psevdodog_tail"}
+		},
+		["cat"]			= {
+			["color"]	= GetARGB(alpha, max_color, max_color, no_color),					--yellow
+			["parts"]	= {"mutant_tail_cat"}
+		},
+		["tb3dm_cat_strong"]			= {
+			["color"]	= GetARGB(alpha, max_color, max_color, no_color),					--yellow
+			["parts"]	= {"mutant_tail_cat"}
+		},
+		["rat"]			= {
+			["color"]	= GetARGB(alpha, max_color, no_color, mqtr_color),					--purples
+			["parts"]	= {"mutant_spleen_rat"}
+		},
+		["tb3dm_rat"]			= {
+			["color"]	= GetARGB(alpha, max_color, no_color, mqtr_color),					--purples
+			["parts"]	= {"mutant_spleen_rat"}
+		},
+		["tushkano"]	= {
+			["color"]	= GetARGB(alpha, max_color, no_color, mqtr_color+20),
+			["parts"]	= {"mutant_face_tushkano"}
+		},
+		["tb3dm_tushkano"]	= {
+			["color"]	= GetARGB(alpha, max_color, no_color, mqtr_color+20),
+			["parts"]	= {"mutant_face_tushkano"}
+		},
+		["tarakan_normal"]	= {
+			["color"]	= GetARGB(alpha, max_color, no_color, mqtr_color+40),
+			["parts"]	= {"part_tarakan_strong", "part_tarakan"}
+		},
+		["tarakan_strong"]	= {
+			["color"]	= GetARGB(alpha, max_color, no_color, mqtr_color+60),
+			["parts"]	= {"part_tarakan_strong", "part_tarakan"}
+		},
+		["tb3dm_tarakan"]	= {
+			["color"]	= GetARGB(alpha, max_color, no_color, mqtr_color+60),
+			["parts"]	= {"part_tarakan_strong", "part_tarakan"}
+		},
+		["flesh"]		= {
+			["color"]	= GetARGB(alpha, no_color, max_color, mid_color),				--cyan
+			["parts"]	= {"mutant_flesh_eye"}
+		},
+		["boar"]		= {
+			["color"]	= GetARGB(alpha, no_color, max_color, mqtr_color),
+			["parts"]	= {"mutant_boar_leg"}
+		},
+		["tb3dm_boar"]		= {
+			["color"]	= GetARGB(alpha, no_color, max_color, mqtr_color),
+			["parts"]	= {"mutant_boar_leg"}
+		},
+		["tb3dm_boar_kachok"]		= {
+			["color"]	= GetARGB(alpha, no_color, max_color, mqtr_color),
+			["parts"]	= {"mutant_boar_leg"}
+		},
+		["burer"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color, no_color, max_color),				--aquamarine
+			["parts"]	= {"mutant_burer_hand"}
+		},
+		["tb3dm_burer_normal"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color, no_color, max_color),				--aquamarine
+			["parts"]	= {"mutant_burer_hand"}
+		},
+		["fracture"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+20, no_color, max_color),
+			["parts"]	= {"mutant_fracture_hand"}
+		},
+		["tb3dm_izlom"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+20, no_color, max_color),
+			["parts"]	= {"mutant_fracture_hand"}
+		},
+		["tb3dm_izlom_swamp"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+20, no_color, max_color),
+			["parts"]	= {"mutant_fracture_hand"}
+		},
+		["snork"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color+40,  no_color, max_color),
+			["parts"]	= {"mutant_snork_leg"}
+		},
+		["tb3dm_snork_jumper"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color+40,  no_color, max_color),
+			["parts"]	= {"mutant_snork_leg"}
+		},
+		["tb3dm_snork_indoor"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color+40,  no_color, max_color),
+			["parts"]	= {"mutant_snork_leg"}
+		},
+		["gigant"]		= {
+			["color"]	= GetARGB(alpha, max_color,   no_color, no_color),				--bright red
+			["parts"]	= {"mutant_psevdogigant_hand"}
+		},
+		["tb3dm_gigant"]		= {
+			["color"]	= GetARGB(alpha, max_color,   no_color, no_color),				--bright red
+			["parts"]	= {"mutant_psevdogigant_hand"}
+		},
+		["tb3dm_gigant_strong"]		= {
+			["color"]	= GetARGB(alpha, max_color,   no_color, no_color),				--bright red
+			["parts"]	= {"mutant_psevdogigant_hand"}
+		},
+		["bibliotekar"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+60, no_color, no_color),
+			["parts"]	= {"part_digitis_biblio"}
+		},
+		["tb3dm_biblio"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+60, no_color, no_color),
+			["parts"]	= {"part_digitis_biblio"}
+		},
+		["controller"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+50, no_color, no_color),
+			["parts"]	= {"mutant_hand_kontroler"}
+		},
+		["bloodsucker"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+40, no_color, no_color),
+			["parts"]	= {"mutant_krovosos_jaw"}
+		},
+		["tb3dm_bloodsucker_strong"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+40, no_color, no_color),
+			["parts"]	= {"mutant_krovosos_jaw"}
+		},
+		["poltergeist"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+30, no_color, no_color),
+			["parts"]	= {"mutant_poltergeist_glas"}
+		},
+		["chimera"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color+20, no_color, no_color),
+			["parts"]	= {"mutant_chimera_kogot"}
+		},
+		["tb3dm_chimera_strong"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color+20, no_color, no_color),
+			["parts"]	= {"mutant_chimera_kogot"}
+		},
+		["tb3dm_chimera_x_ray"]		= {
+			["color"]	= GetARGB(alpha, mqtr_color+30, no_color, no_color),
+			["parts"]	= {"mutant_chimera_kogot"}
+		},
+		["werewolf"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+10, no_color, no_color),
+			["parts"]	= {"mutant_chimera_kogot"}
+		},
+		["tb3dm_wolf"]	= {
+			["color"]	= GetARGB(alpha, mqtr_color+10, no_color, no_color),
+			["parts"]	= {"mutant_chimera_kogot"}
+		},
+		["zombie"]		= {
+			["color"]	= GetARGB(alpha, mid_color, mid_color, max_color),
+			["parts"]	= {"mutant_zombie_hand", "mutant_zombie_teeth", "rudiment_big"}
+		},
+		["tb3dm_zombie_strong"]		= {
+			["color"]	= GetARGB(alpha, mid_color, mid_color, max_color),
+			["parts"]	= {"mutant_zombie_hand", "mutant_zombie_teeth", "rudiment_big"}
+		},
+		["tb3dm_zombie_babka_strong"]		= {
+			["color"]	= GetARGB(alpha, mid_color+20, mid_color, max_color),
+			["parts"]	= {"mutant_zombie_hand", "mutant_zombie_teeth", "rudiment_big"}
+		}
+	},
+	["stalker"]		= GetARGB(alpha, max_color, max_color,  max_color),				--bright white
+	["corpse"]		= GetARGB(alpha, mid_color, mid_color, mid_color),				--grey
+	["actor"]		= GetARGB(no_color, no_color, no_color, no_color),				--not visible					
+	["unknown"]		= GetARGB(alpha, mid_color, no_color, mid_color),				--light purple
+	["corpse_looted"]		= GetARGB(128, 40, 40, 40)								--dark grey, half visible
+}
+
+local math_atan2 = math.atan2
+local math_floor = math.floor
+local math_pi_180 = 180 / math.pi
+local max_dist_rel = screen_max_dist / max_dist
+
+function getColor(obj)
+	if obj:id() == db.actor:id() then
+		return colors["actor"]
+	else
+		local clsid = obj:clsid()
+		if clsid and IAmAStalker[clsid] then
+			if obj:alive() then
+				return colors["stalker"]
+			elseif db.check_corpse_looted(obj) and db.check_corpse_looted(obj) == 0 then		--looted and no protected items
+				return colors["corpse_looted"]
+			else
+				return colors["corpse"]
+			end
+		else
+			local sect = sectFound(obj:section())
+			if sect then
+				local sectData = colors["npcs"][sect]
+				if sectData then
+					if TB3D_Modders.biodetect_all == true then
+						if obj:alive() then
+							return sectData["color"]
+						elseif db.check_corpse_looted(obj) and db.check_corpse_looted(obj) == 0 then		--109981, looted and no protected items
+							return colors["corpse_looted"]
+						else
+							return colors["corpse"]
+						end 
+					else
+						local partOnBelt = false
+						for i = 1, #sectData["parts"] do
+							if inventory.belt[sectData["parts"][i]] then
+								partOnBelt = true
+								break
+							end
+						end
+						if partOnBelt then
+							if obj:alive() then
+								return sectData["color"]
+							elseif db.check_corpse_looted(obj) and db.check_corpse_looted(obj) == 0 then		--109981, looted and no protected items
+								return colors["corpse_looted"]
+							else
+								return colors["corpse"]
+							end 
+						end
+					end
+				end
+			end
+		end
+	end
+	return nil
+end
+
+function sectFound(sect)
+	local result
+	local str_fnd = string.find
+	for k, v in pairs(colors["npcs"]) do
+		if str_fnd(sect, k) then
+			result = k
+			break
+		end
+	end
+	return result
+end
+
+local biomap_sweep		 -- rotating window statics			!!!!TB3D now pulse
+local angle = 10			 -- was angle in radians, now fluctuating alpha
+local step_angle = 1  --1/math_pi_180 -- step-by-update (speed of rotation)
+--local old_dir=vector():set(0,0,0)	--direction of the camera at the last update
+--local lim_angle = 1000*2*math.pi -- thousand revolutions						;;;;
+
+function update()
+	if need_update == true then	--if changed than recalc
+		need_update = false
+		scrn_w = device().width
+		--TB3D_Services.packet_alert("biodetector: device width["..utils.to_str(scrn_w).."]")
+		scrn_h = device().height
+		koef_x = winx / scrn_w							--get width ratio for aspect
+		koef_y = winy / scrn_h							--get height ratio for aspect
+		biomap_width = math.floor((256 * koef_x) + 0.5)
+		biomap_heigth = math.floor((256 * koef_y) + 0.5)
+		biomap_x = winx - biomap_width					--1024 is SHOC HUD size (fixed!)
+		center_x = biomap_x + math.floor(biomap_width / 2) - 2
+		center_y = biomap_y + math.floor(biomap_heigth / 2) - 2
+		biodetectorRemove()								--force a reload
+	end
+	local hud = get_hud()
+	if not hud:GetCustomStatic("biomap") then
+		hud:AddCustomStatic("biomap", true)
+		--!!!!TB3D sweep, rotating texture so not easy to keep aspect without preform deg!!			
+		hud:AddCustomStatic("biomap_sweep", true)
+		biomap_sweep = hud:AddCustomStatic("biomap_sweep", true):wnd()
+		biomap_sweep:SetWndPos(biomap_x, biomap_y)
+		biomap_sweep:SetWidth(biomap_width)
+		biomap_sweep:SetHeight(biomap_heigth)
+		--	show the radar
+		local biomap_static=hud:GetCustomStatic("biomap")
+		biomap_static:wnd():SetWndPos(biomap_x, biomap_y)
+		biomap_static:wnd():SetWidth(biomap_width)
+		biomap_static:wnd():SetHeight(biomap_heigth)
+	end
+	if TB3D_Services.pda_is_blocked() == true then return end			--109978 stops working
+	local level_object_by_id = level.object_by_id
+	local o, stalker, monster
+	local actorPos = db.actor:position()
+	local objPos, x, y, dir, color
+	local custom_static
+	local dotName
+	local vect
+	local sdir = device().cam_dir
+	------rotation sucks!  old tech, this is better ----------!!!!TB3D
+	if TB3D_Modders.bio_map_pulse == true then
+		angle = angle + step_angle
+		if angle > 254 then step_angle = -1 end   --start counting down
+		if angle < 20 then step_angle = 1 end		--start counting up
+	else
+		angle = 200
+	end
+	biomap_sweep:SetColor(GetARGB(angle,20,250,angle-15)) -- set the color
+	counter = 1
+	local max_count = TB3D_Modders.bioradar_max_count   --40
+	if max_count > 100 then max_count = 100 end			--max number of target_dot in ui_custom_msgs
+	for id,obj in pairs(db.storage) do
+		o = level_object_by_id(id)
+		if o then
+			stalker = IAmAStalker[o:clsid()]
+			monster = IAmAMonster[o:clsid()]
+			objPos = o:position()
+			if (stalker or monster) and o.alive and o:alive() == true then
+				if objPos:distance_to_xz(actorPos) <= max_dist then
+					-- define the coordinates
+					--x, y = transform_coords(objPos)
+					dir = objPos:sub(actorPos)
+					vect = vector_rotate_y(vector():set(dir.x * max_dist_rel, 0, -dir.z * max_dist_rel), math_atan2(-sdir.x, sdir.z) * math_pi_180)
+					x = (vect.x * koef_x) + center_x
+					y = (vect.z * koef_y) + center_y		--!!TB3D added for aspect
+					--get_console():execute("load ~~~ biomap created, x: "..x..", y: "..y)
+					-- choosing the color
+					color = getColor(o)	--returns nil if not visible or not on belt(optional)
+					if color then
+						-- Draw point
+						dotName = "target_dot_"..counter
+						custom_static = hud:GetCustomStatic(dotName)
+						if not custom_static then
+							hud:AddCustomStatic(dotName, true)
+							custom_static = hud:GetCustomStatic(dotName)
+							custom_static:wnd():InitTexture(tex)
+							custom_static:wnd():SetColor(color)
+							custom_static:wnd():SetWndPos(x, y)
+							dots[counter] = {}
+							dots[counter]["color"] = color
+							dots[counter]["x"] = x
+							dots[counter]["y"] = y
+						else
+							if dots[counter]["color"] ~= color then
+								custom_static:wnd():SetColor(color)
+								dots[counter]["color"] = color
+							end
+							if dots[counter]["x"] ~= x or dots[counter]["y"] ~= y then
+								custom_static:wnd():SetWndPos(x, y)
+								dots[counter]["x"] = x
+								dots[counter]["y"] = y
+							end
+						end
+						counter = counter+1
+					end
+				end
+			end
+		end
+	end
+	if counter < max_count then
+		for id,obj in pairs(db.storage) do
+			o = level_object_by_id(id)
+			if o then
+				stalker = IAmAStalker[o:clsid()]
+				monster = IAmAMonster[o:clsid()]
+				objPos = o:position()
+				if (stalker or monster) and o.alive and o:alive() == false then
+					if objPos:distance_to_xz(actorPos) <= max_dist then
+						-- define the coordinates
+						--x, y = transform_coords(objPos)
+						dir = objPos:sub(actorPos)
+						vect = vector_rotate_y(vector():set(dir.x * max_dist_rel, 0, -dir.z * max_dist_rel), math_atan2(-sdir.x, sdir.z) * math_pi_180)
+						x = (vect.x * koef_x) + center_x
+						y = (vect.z * koef_y) + center_y		--!!TB3D added for aspect
+						--get_console():execute("load ~~~ biomap created, x: "..x..", y: "..y)
+						-- choosing the color
+						color = getColor(o)	--returns nil if not visible or not on belt(optional)
+						if color then
+							-- Draw point
+							dotName = "target_dot_"..counter
+							custom_static = hud:GetCustomStatic(dotName)
+							if not custom_static then
+								hud:AddCustomStatic(dotName, true)
+								custom_static = hud:GetCustomStatic(dotName)
+								custom_static:wnd():InitTexture(tex)
+								custom_static:wnd():SetColor(color)
+								custom_static:wnd():SetWndPos(x, y)
+								dots[counter] = {}
+								dots[counter]["color"] = color
+								dots[counter]["x"] = x
+								dots[counter]["y"] = y
+							else
+								if dots[counter]["color"] ~= color then
+									custom_static:wnd():SetColor(color)
+									dots[counter]["color"] = color
+								end
+								if dots[counter]["x"] ~= x or dots[counter]["y"] ~= y then
+									custom_static:wnd():SetWndPos(x, y)
+									dots[counter]["x"] = x
+									dots[counter]["y"] = y
+								end
+							end
+							counter = counter+1
+							if counter > max_count then break end
+						end
+					end
+				end
+			end
+		end
+	end
+	if counter<=max_count then
+		-- trimming irrelevant points
+		local custom_static
+		for i = counter, max_count do
+			if dots[i] then
+				dotName = "target_dot_"..i
+				--hud:RemoveCustomStatic(dotName)
+				custom_static = hud:GetCustomStatic(dotName)
+				if custom_static then
+					hud:RemoveCustomStatic(dotName)
+					--custom_static:wnd():SetWndPos(-100,-100)
+					--dots[counter]["x"] = -100
+					--dots[counter]["y"] = -100
+				end
+				dots[i] = nil
+			end
+		end
+	end
+	--get_console():execute("load ~~~ TIME SPEND biodetector.update(): "..t:time())
+end
+
+function biodetectorRemove()
+	local hud = get_hud()
+	local biomap_static = hud:GetCustomStatic("biomap")
+	if biomap_static then
+		hud:RemoveCustomStatic("biomap")
+		-------remove static, rotating					!!!!TB3D  in 133
+		hud:RemoveCustomStatic("biomap_sweep")
+		biomap_sweep=nil
+		-------------------------------------			;;;;
+	end
+	if dots then
+		local dotName
+		local custom_static
+		local max_count = TB3D_Modders.bioradar_max_count   --40
+		if max_count > 100 then max_count = 100 end			--max number of target_dot in ui_custom_msgs
+		for i = 1, max_count do
+			if dots[i] then
+				dotName = "target_dot_"..i
+				custom_static = hud:GetCustomStatic(dotName)
+				if custom_static then
+					hud:RemoveCustomStatic(dotName)
+					--custom_static:wnd():SetWndPos(-100,-100)
+					--dots[counter]["x"] = -100
+					--dots[counter]["y"] = -100
+				end
+			end
+		end
+		dots = {}
+	end 
+end
+
+function force_update()
+	need_update = true
+end
+
+function net_destroy()
+	if has_alife_info("tb3d_bioradar_on") then
+		biodetectorRemove()
+	end
+end

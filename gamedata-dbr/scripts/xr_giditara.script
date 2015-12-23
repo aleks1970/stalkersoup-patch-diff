@@ -1,0 +1,74 @@
+--TB3D 1.0.9.9.1 fixed CTD to nil music pointer
+function my_ver() return "1.0.9.9.1" end
+--[[ -----------------------------------------------------------------------------------------------
+ File       : xr_giditara.script
+ Description: GG+guitar
+ Copyright  : 2009 © Phoenix
+ Author     : PHOENIX - basis, Vlad - Refinement
+ Last update: 10.06.2010(by Evill Zone) 
+--]]-----------------------------------------------------------------------------------------------
+
+--[[
+local device_active = true
+local snd_obj,react
+
+function item_update()
+    local item = db.actor:active_item()
+    if not (item and item:section() == "guitar_b") then
+        if snd_obj and snd_obj:playing() then
+            snd_obj:stop()
+        end
+        return
+    end
+    if device_active then
+        snd_obj = sound_object("music\\guitar_"..tostring(math.random(1,24)))  
+		if snd_obj then
+			local stalker
+			snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
+			for k, v in pairs (db.storage) do
+				stalker = level.object_by_id(k)
+				if (stalker and IsStalker(stalker)) then
+					if stalker:position():distance_to(db.actor:position()) < 10 then
+						if not snd_obj:playing() then
+							react = sound_object("characters_voice\\human_01\\stalker\\reactions\\music\\reaction_music_"..tostring(math.random(1,11)))  
+							react:play_at_pos(stalker, stalker:position(), sound_object.s2d)
+							react.volume = 0.8
+						end
+					end
+				end
+			end
+			device_active = false
+		end
+    else
+        if not snd_obj:playing() then
+            device_active = true
+        end
+    end
+end]]
+
+-------------------dmx135------------------------------
+local snd_guitar
+function guitar_update()
+    local item = db.actor:active_item()
+	local reaction_snd = xr_sound.get_safe_sound_object("characters_voice\\human_01\\stalker\\reactions\\music\\reaction_music_"..math.random(11))
+    if item and item:section() == "guitar_b" then
+		if not (snd_guitar and snd_guitar:playing()) then
+			snd_guitar = sound_object("music\\guitar_"..math.random(24))
+			snd_guitar:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
+		end
+	else
+		local stalker
+		if snd_guitar then 
+		    for k, v in pairs(db.storage) do
+                stalker = level.object_by_id(k)
+				if stalker and (get_clsid(stalker) == clsid.script_stalker) and stalker:alive() then
+                    if stalker:position():distance_to(db.actor:position()) < 10 and not reaction_snd:playing() then
+				        reaction_snd:play_no_feedback(db.actor, sound_object.s2d, 0, stalker:position(), 1.0)
+                    end
+                end
+            end
+		    snd_guitar:stop() 
+			snd_guitar = nil 
+		end
+	end
+end

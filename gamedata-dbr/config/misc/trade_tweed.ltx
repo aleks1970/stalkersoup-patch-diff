@@ -1,0 +1,15 @@
+;<!-- TB3D 1.0.1e -->
+[trader]
+buy_condition = generic_buy
+sell_condition = generic_sell
+buy_supplies = {+tweed_book_have} supplies_after_book, {+tweed_zep2_start} supplies_after_gun, supplies_start
+
+#include "shop_tweed\tweed_supl.ltx"
+
+[generic_buy]
+#include "TB3D_QuestItemNoBuySell.ltx"
+
+
+[generic_sell]
+#include "TB3D_QuestItemNoBuySell.ltx"
+

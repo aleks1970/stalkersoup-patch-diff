@@ -1,0 +1,287 @@
+--TB3D 1.0.9.9.8.1
+function my_ver() return "1.0.9.9.8.1" end
+-- Atlas (Spawn Menu) Mod 1.1
+-- By: Helios (helios-50@hotmail.com)
+local translate = game.translate_string
+
+class "atlas" (CUIScriptWnd)
+
+function atlas:__init(owner,action) super()
+	self.action = action
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function atlas:__finalize() end
+
+function atlas:InitControls()
+	self:Init(50,50,550,450)
+	self:SetAutoDelete(true)		--109975
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_atlas.xml")
+	xml:InitStatic("back_video", self)
+	xml:InitStatic("background", self)
+
+	self:Register(xml:Init3tButton("title", self),"title")
+	self:Register(xml:Init3tButton("caption", self),"caption")
+	self:Register(xml:Init3tButton("caption2", self),"caption2")
+	self:Register(xml:InitEditBox("edit_box", self), "edit_box")
+	self:Register(xml:Init3tButton("btn_0", self),"btn_0")
+	self:Register(xml:Init3tButton("btn_1", self),"btn_1")
+	self:Register(xml:Init3tButton("btn_2", self),"btn_2")
+	self:Register(xml:Init3tButton("btn_3", self),"btn_3")
+	self:Register(xml:Init3tButton("btn_4", self),"btn_4")
+	self:Register(xml:Init3tButton("btn_5", self),"btn_5")
+	self:Register(xml:Init3tButton("btn_6", self),"btn_6")
+	self:Register(xml:Init3tButton("btn_7", self),"btn_7")
+	self:Register(xml:Init3tButton("btn_8", self),"btn_8")
+	self:Register(xml:Init3tButton("btn_9", self),"btn_9")
+	self:Register(xml:Init3tButton("btn_10", self),"btn_10")
+	self:Register(xml:Init3tButton("btn_11", self),"btn_11")
+	self:Register(xml:Init3tButton("btn_12", self),"btn_12")
+	self:Register(xml:Init3tButton("btn_13", self),"btn_13")
+	self:Register(xml:Init3tButton("btn_14", self),"btn_14")
+	self:Register(xml:Init3tButton("btn_15", self),"btn_15")
+	self:Register(xml:Init3tButton("btn_16", self),"btn_16")
+	self:Register(xml:Init3tButton("btn_17", self),"btn_17")
+	self:Register(xml:Init3tButton("btn_18", self),"btn_18")
+	self:Register(xml:Init3tButton("btn_19", self),"btn_19")
+	self:Register(xml:Init3tButton("btn_20", self),"btn_20")
+	self:Register(xml:Init3tButton("btn_21", self),"btn_21")
+	self:Register(xml:Init3tButton("btn_22", self),"btn_22")
+	self:Register(xml:Init3tButton("btn_23", self),"btn_23")
+	self:Register(xml:Init3tButton("btn_24", self),"btn_24")
+	self:Register(xml:Init3tButton("btn_25", self),"btn_25")
+	self:Register(xml:Init3tButton("btn_26", self),"btn_26")
+	self:Register(xml:Init3tButton("btn_27", self),"btn_27")
+	self:Register(xml:Init3tButton("btn_28", self),"btn_28")
+
+	local caption = self:GetButton("caption")
+	local caption2 = self:GetButton("caption2")
+	local title = self:GetButton("title")
+	local btn_0 = self:GetButton("btn_0")
+	local btn_1 = self:GetButton("btn_1")
+	local btn_2 = self:GetButton("btn_2")
+	local btn_3 = self:GetButton("btn_3")
+	local btn_4 = self:GetButton("btn_4")
+	local btn_5 = self:GetButton("btn_5")
+	local btn_6 = self:GetButton("btn_6")
+	local btn_7 = self:GetButton("btn_7")
+	local btn_8 = self:GetButton("btn_8")
+	local btn_9 = self:GetButton("btn_9")
+	local btn_10 = self:GetButton("btn_10")
+	local btn_11 = self:GetButton("btn_11")
+	local btn_12 = self:GetButton("btn_12")
+	local btn_13 = self:GetButton("btn_13")
+	local btn_14 = self:GetButton("btn_14")
+	local btn_15 = self:GetButton("btn_15")
+	local btn_16 = self:GetButton("btn_16")
+	local btn_17 = self:GetButton("btn_17")
+	local btn_18 = self:GetButton("btn_18")
+	local btn_19 = self:GetButton("btn_19")
+	local btn_20 = self:GetButton("btn_20")
+	local btn_21 = self:GetButton("btn_21")
+	local btn_22 = self:GetButton("btn_22")
+	local btn_23 = self:GetButton("btn_23")
+	local btn_24 = self:GetButton("btn_24")
+	local btn_25 = self:GetButton("btn_25")
+	local btn_26 = self:GetButton("btn_26")
+	local btn_27 = self:GetButton("btn_27")
+	local btn_28 = self:GetButton("btn_28")
+ 
+	if self.action == "spawn" then
+	caption:SetText(translate("Atlas_spawn_menu_2_script"))
+	caption2:SetText(translate("Enter_the_amount_then_select_ammo_script"))
+	title:SetText(translate("ammo_quick_spawn_menu_script"))
+	btn_0:SetText(translate("Exit_12_script"))
+	btn_1:SetText("Igla-M")
+	btn_2:SetText("7.6239mm 7N23")
+	btn_3:SetText("M72-M Gauss")
+	btn_4:SetText("Charge M209")
+	btn_5:SetText("Grenade RGD-5")
+	btn_6:SetText("F1 grenade")
+	btn_7:SetText("Charge of VOG-25")
+	btn_8:SetText("Charge VOG-25P")
+	btn_9:SetText("PG-7V round")
+	btn_10:SetText("7.62x54mm 7H13")
+	btn_11:SetText("7.62x54mm 7H14")
+	btn_12:SetText("5.56x45mm M995")
+	btn_13:SetText("5.56x45mm M855")
+	btn_14:SetText("9x39mm SP-6")
+	btn_15:SetText("5.45x39mm 7N22")
+	btn_16:SetText("12 caliber buckshot")
+	btn_17:SetText("7.62x39 mm 7N23")
+	btn_18:SetText("45ACP Federal Hydro-Shok")
+	btn_19:SetText("9x19mm NATO")
+	btn_20:SetText("9x18mm MSDS")
+	btn_21:SetText("Crossbow bolts")
+	btn_22:SetText("7.62x25 mm P")
+	btn_23:SetText("Capsule Springboard")
+	btn_24:SetText("Capsule hopper")
+	btn_25:SetText("Capsule carousel")
+	btn_26:SetText("Capsule Electra")
+	btn_27:SetText("Capsule Frying")
+	btn_28:SetText("Jelly Capsule")
+end
+end
+
+function atlas:InitCallBacks()
+	self:AddCallback("btn_0", ui_events.BUTTON_CLICKED, self.on_quit, self)
+	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.cheat1, self)
+	self:AddCallback("btn_2", ui_events.BUTTON_CLICKED, self.cheat2, self)
+	self:AddCallback("btn_3", ui_events.BUTTON_CLICKED, self.cheat3, self)
+	self:AddCallback("btn_4", ui_events.BUTTON_CLICKED, self.cheat4, self)
+	self:AddCallback("btn_5", ui_events.BUTTON_CLICKED, self.cheat5, self)
+	self:AddCallback("btn_6", ui_events.BUTTON_CLICKED, self.cheat6, self)
+	self:AddCallback("btn_7", ui_events.BUTTON_CLICKED, self.cheat7, self)
+	self:AddCallback("btn_8", ui_events.BUTTON_CLICKED, self.cheat8, self)
+	self:AddCallback("btn_9", ui_events.BUTTON_CLICKED, self.cheat9, self)
+	self:AddCallback("btn_10", ui_events.BUTTON_CLICKED, self.cheat10, self)
+	self:AddCallback("btn_11", ui_events.BUTTON_CLICKED, self.cheat11, self)
+	self:AddCallback("btn_12", ui_events.BUTTON_CLICKED, self.cheat12, self)
+	self:AddCallback("btn_13", ui_events.BUTTON_CLICKED, self.cheat13, self)
+	self:AddCallback("btn_14", ui_events.BUTTON_CLICKED, self.cheat14, self)
+	self:AddCallback("btn_15", ui_events.BUTTON_CLICKED, self.cheat15, self)
+	self:AddCallback("btn_16", ui_events.BUTTON_CLICKED, self.cheat16, self)
+	self:AddCallback("btn_17", ui_events.BUTTON_CLICKED, self.cheat17, self)
+	self:AddCallback("btn_18", ui_events.BUTTON_CLICKED, self.cheat18, self)
+	self:AddCallback("btn_19", ui_events.BUTTON_CLICKED, self.cheat19, self)
+	self:AddCallback("btn_20", ui_events.BUTTON_CLICKED, self.cheat20, self)
+	self:AddCallback("btn_21", ui_events.BUTTON_CLICKED, self.cheat21, self)
+	self:AddCallback("btn_22", ui_events.BUTTON_CLICKED, self.cheat22, self)
+	self:AddCallback("btn_23", ui_events.BUTTON_CLICKED, self.cheat23, self)
+	self:AddCallback("btn_24", ui_events.BUTTON_CLICKED, self.cheat24, self)
+	self:AddCallback("btn_25", ui_events.BUTTON_CLICKED, self.cheat25, self)
+	self:AddCallback("btn_26", ui_events.BUTTON_CLICKED, self.cheat26, self)
+	self:AddCallback("btn_27", ui_events.BUTTON_CLICKED, self.cheat27, self)
+	self:AddCallback("btn_28", ui_events.BUTTON_CLICKED, self.cheat28, self)
+end
+
+function atlas:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+	if dik == DIK_keys.DIK_ESCAPE then
+	self:on_quit()
+end	
+end
+	return true
+end
+
+function atlas:on_quit()
+	self:GetHolder():start_stop_menu (self,true)
+end
+
+function atlas:spawn_ammo(spawn_item,npc)
+	local number = self:GetEditBox("edit_box"):GetText()
+  	if npc==nil then 
+  	npc=db.actor 
+end
+	if number ~= "" then
+	local number2 = number + 0
+  	se_respawn.create_ammo(spawn_item, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id(), number2)
+end
+	if number == "" then
+  	se_respawn.create_ammo(spawn_item, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id(), 1)
+end
+end
+
+function atlas:spawn_inventory(spawn_item,npc)
+	local number = self:GetEditBox("edit_box"):GetText()
+  	if npc==nil then 
+  	npc=db.actor 
+end
+	if number ~= "" then
+	for i=1, number do
+  	alife():create(spawn_item, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
+      end
+end
+	if number == "" then
+  	alife():create(spawn_item, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
+end
+end
+
+function atlas:cheat1()
+self:spawn_ammo("ammo_igl")
+end
+function atlas:cheat2()
+self:spawn_ammo("ammo_7.62x39_ap")
+end
+function atlas:cheat3()
+self:spawn_ammo("ammo_gauss")
+end
+function atlas:cheat4()
+self:spawn_ammo("ammo_m209")
+end
+function atlas:cheat5()
+self:spawn_inventory("grenade_rgd5")
+end
+function atlas:cheat6()
+self:spawn_inventory("grenade_f1")
+end
+function atlas:cheat7()
+self:spawn_ammo("ammo_vog-25")
+end
+function atlas:cheat8()
+self:spawn_ammo("ammo_vog-25p")
+end
+function atlas:cheat9()
+self:spawn_ammo("ammo_og-7b")
+end
+function atlas:cheat10()
+self:spawn_ammo("ammo_7.62x54_ap")
+end
+function atlas:cheat11()
+self:spawn_ammo("ammo_7.62x54_7h14")
+end
+function atlas:cheat12()
+self:spawn_ammo("ammo_5.56x45_ap")
+end
+function atlas:cheat13()
+self:spawn_ammo("ammo_5.56x45_ss190")
+end
+function atlas:cheat14()
+self:spawn_ammo("ammo_9x39_ap")
+end
+function atlas:cheat15()
+self:spawn_ammo("ammo_5.45x39_ap")
+end
+function atlas:cheat16()
+self:spawn_ammo("ammo_12x70_buck")
+end
+function atlas:cheat17()
+self:spawn_ammo("ammo_7.62x39_ap")
+end
+function atlas:cheat18()
+self:spawn_ammo("ammo_11.43x23_hydro")
+end
+function atlas:cheat19()
+self:spawn_ammo("ammo_9x19_pbp")
+end
+function atlas:cheat20()
+self:spawn_ammo("ammo_9x18_pmm")
+end
+function atlas:cheat21()
+self:spawn_ammo("ammo_arbolt")
+end
+function atlas:cheat22()
+self:spawn_ammo("ammo_7.62x25_p")
+end
+function atlas:cheat23()
+self:spawn_inventory("caps_mosquito_bald")
+end
+function atlas:cheat24()
+self:spawn_inventory("caps_gravi")
+end
+function atlas:cheat25()
+self:spawn_inventory("caps_mincer")
+end
+function atlas:cheat26()
+self:spawn_inventory("caps_electra")
+end
+function atlas:cheat27()
+self:spawn_inventory("caps_zharka")
+end
+function atlas:cheat28()
+self:spawn_inventory("caps_ameba")
+end

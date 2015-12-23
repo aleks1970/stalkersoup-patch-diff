@@ -1,0 +1,326 @@
+--<!-- TB3D 1.0.9.9.8.1 ui dots error, added community to friend cheat, deadman_to_life, obj level--> 
+function my_ver() return "1.0.9.9.8.1" end
+-- initialization
+class "spawner" (CUIScriptWnd)
+--- List of People kvesovikov Salsola version of 01.22.2010 (may need to add) ------
+-- Format: section name {section number, seed}
+local translate = game.translate_string
+
+function spawner:__init(owner,action) super()
+	self.action = action
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function spawner:__finalize() end
+
+function spawner:InitControls()
+	-- Here we determine the coordinates of the upper-left corner and width-height
+	self:Init(50,50,550,450)
+	self:SetAutoDelete(true)		--109975
+
+	-- file descriptor of our elements
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_dots_wnd2.xml")
+
+	-- video in the background
+	xml:InitStatic("back_video", self)
+
+	-- frame
+	xml:InitStatic("background", self)
+
+	-- button
+	self:Register(xml:Init3tButton("caption", self),"caption")
+	self:Register(xml:Init3tButton("btn_1", self),"btn_1")
+	-- exit button
+	self:Register(xml:Init3tButton("btn_quit", self),"btn_quit")
+	self:Register(xml:InitEditBox("edit_box", self), "edit_box")
+
+  local caption = self:GetButton("caption")
+  local btn_1 = self:GetButton("btn_1")
+  if self.action == "spawn" then
+    caption:SetText(translate("section_desired_object_number_of_script"))
+    btn_1:SetText(translate("spawn_script"))
+  elseif self.action == "spawn2inv" then
+    caption:SetText(translate("the_amount_in_inventory_script"))
+    btn_1:SetText(translate("spawn2inventory_script"))
+
+  elseif self.action == "set_npc_goodwill" then
+    caption:SetText(translate("sec_desired_npc_script"))
+    btn_1:SetText(translate("set_friend_script"))
+
+--[[  elseif self.action == "info" then
+    caption:SetText(translate("info_to_add_script"))
+    btn_1:SetText(translate("writing_old_script"))]]
+	
+  elseif self.action == "find" then
+    caption:SetText(translate("part_object_to_search_for_script"))
+    btn_1:SetText(translate("search_script"))
+  elseif self.action == "remove" then
+    caption:SetText(translate("part_the_object_to_remove_script"))
+    btn_1:SetText(translate("remove_script"))
+  end
+end
+
+function spawner:InitCallBacks()
+	-- then interactive elements with a certain action is performed a given f-Ia
+	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.dots1, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit, self)
+end
+
+function spawner:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+-- to hang out Esc
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_quit()
+		end
+		if dik == DIK_keys.DIK_RETURN then
+			self:dots1()
+		end
+	end
+	return true
+end
+
+function show_actor_position()
+  if level.present() and (db.actor ~= nil) then
+	  local vid, gvid
+	  local a = vector()
+	  a = db.actor:position()
+	  vid = db.actor:level_vertex_id()
+	  gvid = db.actor:game_vertex_id()
+	  local text = string.format("TB3D_Position[%s]: (%.3f,%.3f,%.3f),%d,%d)",level.name(),a.x,a.y,a.z,vid,gvid)
+	news_manager.amk_send_tip(text,"TB3D Server Master",20,60,"tb3d_master")
+	  TB3D_Services.info_alert(text)
+	  a = db.actor:direction()
+	  text = string.format("TB3D_Direction[%s]: rad(%.3f,%.3f,%.3f) deg(%.3f,%.3f,%.3f)",level.name(),a.x,a.y,a.z,utils.rad2deg(a.x),utils.rad2deg(a.y),utils.rad2deg(a.z))
+	  TB3D_Services.info_alert(text)
+	end
+end
+
+function spawner:spawn(text,whre)
+	local type = text
+	local gde = tostring(whre)
+	local vid, gvid
+	local a = vector()
+	a = db.actor:position()
+	vid = db.actor:level_vertex_id()
+	gvid = db.actor:game_vertex_id()
+	local repiout =amk.load_variable("repair_item_outfit", 0)
+	local repiweap =amk.load_variable("repair_item_weapon", 0)
+  local n = 1
+	local sf = string.find(text,",")
+	if sf then
+	  n = string.sub(text,sf+1)+0
+	  if n==nil then
+	    n = 0
+	  elseif n>999 then
+	    n = 999
+	  end
+	  type = string.sub(text,1,sf-1)
+	end
+
+	if not system_ini():section_exist(type) then
+	  news_manager.amk_send_tip(translate("section_script").." "..type.." "..translate("there_is_no_script"),translate("Cheat_spawner_script"),0,10,"gen_info")
+	  return false
+	end
+
+	for i=1,n do
+		if gde=="1" then
+			a.x = a.x-1+math.random()*2
+			a.z = a.z-1+math.random()*2
+			alife():create(type,vector():set(a.x,a.y,a.z),vid,gvid,expendable_object)
+			TB3D_Services.info_alert(string.format("TB3D_Spawn: alife():create(\"%s\",vector():set(%.3f,%.3f,%.3f),%d,%d,expendable_object)",type,a.x,a.y,a.z,vid,gvid,expendable_object))
+		elseif gde=="2" then
+			if string.find(type,"repair_item_outfit")then
+				repiout = repiout + 1
+				amk.save_variable("repair_item_outfit", repiout)
+			elseif string.find(type,"repair_item_weapon")then
+				repiweap = repiweap + 1
+				amk.save_variable("repair_item_weapon", repiweap)
+			else
+				alife():create(type,db.actor:position(),vid,gvid,db.actor:id())
+				TB3D_Services.info_alert(string.format("TB3D_Spawn: alife():create(\"%s\",vector():set(%.3f,%.3f,%.3f),%d,%d,%d)",type,a.x,a.y,a.z,vid,gvid,db.actor:id()))
+			end
+		end
+	end
+
+  -- news_manager.amk_send_tip("Created "..type.." in the number of "..n.." pieces.","Cheat: Spawner",0,10,"gen_info")
+  return true
+end
+
+-- amk_zone_
+
+function spawner:remove_all (name)
+    local obj
+    local n=0
+    for a=first_object,last_object do
+	    obj = alife():object(a)
+		  if obj and string.find(obj:name(),name) then
+        alife():release(obj,true)
+        n = n+1
+	  	end
+  	end
+--  	news_manager.amk_send_tip("Deleted ["..n.."] Objects.","Cheat: Clear",0,10,"gen_info")
+	news_manager.amk_send_tip(translate("Deleted_1_script")..n..translate("objects_script"),translate("cheat_clear_script"),0,10,"gen_info")
+end
+
+function spawner:find_closest (type)
+    local min = 999999
+    local dist
+    local closest = -1
+    local obj
+    for a=first_object,last_object,1 do
+	    obj = alife():object(a)
+		  if obj and string.find(obj:name(),type) then
+        dist = obj.position:distance_to(db.actor:position())
+        if dist < min then
+          min = dist
+          closest = a
+        end
+	  	end
+  	end
+
+  	if closest>0 then
+  	  obj = alife():object(closest)
+  	  local map = TB3D_Services.get_obj_level(obj.m_game_vertex_id)
+  	  local text = obj:name().."; level="..game.translate_string(map)
+  	  if map ~= "" and map == level.name() then
+  	    local p1 = db.actor:position()
+  	    local p2 = obj.position
+  	    dist = obj.position:distance_to(db.actor:position())
+  	    local dx = p2.x - p1.x
+  	    local dy = p2.y - p1.y
+  	    local dz = p2.z - p1.z
+  	    text = string.format("%s; distance=%.2fì; dX=%.2f, dY=%.2f, dZ=%.2f", text, dist, dx,dy,dz)
+  	  end
+		  news_manager.amk_send_tip(text,translate("cheat_find_object_script"),0,30,"gen_info")
+		  return true
+  	else
+  	  news_manager.amk_send_tip(type..translate("not_found_script"),translate("cheat_find_object_script"),0,10,"gen_info")
+  	  return false
+  	end
+end
+
+function deadman_to_life()
+	local sim = alife()	
+	local actorpos = db.actor:position()
+	local posobj = actorpos
+	local id
+	for id,obj in pairs(db.corpses) do
+		if obj then
+			if IsStalker(obj) and not obj:alive() then
+				posobj = obj:position()
+				if (posobj:distance_to(actorpos) < 2) then
+					id = obj:id()
+					--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("NET PDA CREATE: "..string.format("2.Name: "..obj:name().." ID: "..obj:id())) end
+					amk.convert_npc[id] = true
+					sim:set_switch_online(id, false)
+					sim:set_switch_offline(id, true)
+					-- amk.oAmkLauncher:AddFunc("KolmogorRespawn", "ressurect.kolmogor_respawn(id)",5)
+					kolmogor_respawn(id)
+				end
+			end
+		end
+	end
+end
+
+function kolmogor_respawn(id)
+--[[	local obj = level.object_by_id(id)
+	if obj == nil then
+		--dbg.log("RES: real move offline")
+	else
+		--dbg.log("RES: wait offline")
+		return
+	end]]
+	--dbg.log("RES: update 3")
+	local sobj = alife():object(id)
+	--dbg.log("RES: update 4")
+	local t = amk.read_stalker_params(sobj)
+	--dbg.log("RES: update 5")
+	t.health=0.1
+	t.killerid=expendable_object
+	for i=1,8 do t.game_death_time[i] = 0 end
+	t.updhealth = 0.2
+	t.skeleton_flags=0
+	--dbg.log("RES: update 6")
+	amk.write_stalker_params(t, sobj)
+	-- sobj:set_relation(game_object.neutral,db.actor)
+end
+
+function spawner:set_npc_goodwill(text)
+	if text == "stalker" or text == "dolg" or text == "freedom" or text == "military" or text == "bandit"
+		or text == "zombied" or text == "ecolog" or text == "killer" or text == "monolith" or text == "sniper"
+		or text == "green" or text == "nebo" or text == "actor_dolg" or text == "arena_enemy" then
+			relation_registry.set_community_goodwill(text, db.actor:id(), 0)
+			news_manager.amk_send_tip(translate("community_script").." "..text.." ",translate("ch_set_goodwill_script"),0,10,"gen_info")
+	else
+		local stalker
+		local rel
+		if db.stalker then											--109981
+			for id,obj in pairs(db.stalker) do
+				stalker = nil
+				stalker=IsStalker(obj)
+				if (stalker) then
+					news_manager.amk_send_tip("NPC: "..obj:name().." ",translate("ch_GetAllNpcNames_script"),0,10,"gen_info")
+				end
+				if (stalker) and obj:alive() and string.find(obj:name(),text) then
+					rel = obj:relation(db.actor)
+				--	news_manager.amk_send_tip("NPC: "..obj:name()..", was rel: "..rel.." turnip: "..db.actor:character_reputation().." ","Cheat: SetNpcGoodwill",0,10,"gen_info")
+					news_manager.amk_send_tip("NPC: "..obj:name()..translate("was_rel_script").." "..rel.." "..translate("turnip_script").." "..db.actor:character_reputation().." ",translate("cheat_SetNpcGoodwill_script"),0,10,"gen_info")
+					-- obj:set_goodwill(1000,db.actor)
+					obj:set_relation(game_object.neutral,db.actor)
+					--TB3D_Services.change_reputation(db.actor, 10)
+					-- obj:relation(db.actor) = game_object.neutral
+				  -- local rel = obj:relation(db.actor)
+				  -- news_manager.amk_send_tip("NPC: "..obj:name()..", became rel: "..rel.."  turnip: "..db.actor:character_reputation().." ","Cheat: SetNpcGoodwill",0,10,"gen_info")
+			--    news_manager.amk_send_tip("NPC: "..obj:id().." ","Cheat: SetNpcGoodwill",0,10,"gen_info")
+			--    obj:relation(db.actor) = game_object.neutral	
+				end
+			  -- end
+			end
+		end
+	end
+end
+
+function spawner:dots1()
+	local text = self:GetEditBox("edit_box"):GetText()
+	if text ~= "" then
+	  if self.action == "spawn" then
+  	   self:spawn(text,1)
+
+	  elseif self.action == "spawn2inv" then
+  	   self:spawn(text,2)
+
+  	  elseif self.action == "set_npc_goodwill" then
+  	   self:set_npc_goodwill(text)
+
+--[[  	  elseif self.action == "info" then
+	--	local is_found = 0
+		for i = 1,table.getn(ui_si.info_portion_table),1 do
+			local info_port = ui_si.info_portion_table[i]
+			if (text == info_port) then
+		  	   TB3D_Services.give_info(text)
+		  	   news_manager.amk_send_tip(text.." "..translate("added_script"),translate("ch_add_Info_script),0,15,"gen_info")
+ 	--		   local is_found = 1
+			   break
+			end
+		end
+	--	if is_found == 0 then
+   	--	   news_manager.amk_send_tip(text.." unknown info!","Cheat: Add Info",0,15,"gen_info")
+	--	end]]
+
+  	  elseif self.action == "find" then
+  	   self:find_closest(text)
+  	  elseif self.action == "remove" then
+  	   self:remove_all(text)
+  	 end
+	end
+	self:on_quit()
+end
+
+function spawner:on_quit()
+	self:GetHolder():start_stop_menu (self,true)
+end
+

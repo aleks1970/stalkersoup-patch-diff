@@ -1,0 +1,374 @@
+--TB3D 1.0.9.9.7.5 new - from gulag_escape
+function my_ver() return "1.0.9.9.7.5" end
+local t = {}
+
+function load_job(sj, gname, type, squad, groups)
+	if type == "generators_flesh1" then					--' Flesh on the generators
+	  t = { section = "logic@generators_flesh1", 
+	   idle = 0,
+	   prior = 5, state = {0},
+	   in_rest = "", out_rest = ""
+	  }
+	  table.insert(sj, t)
+	  t = { section = "logic@generators_flesh1", 
+	   idle = 0,
+	   prior = 5, state = {0},
+	   in_rest = "", out_rest = ""
+	  }
+	  table.insert(sj, t)
+	  t = { section = "logic@generators_flesh1", 
+	   idle = 0,
+	   prior = 5, state = {0},
+	   in_rest = "", out_rest = ""
+	  }
+	  t = { section = "logic@generators_flesh1", 
+	   idle = 0,
+	   prior = 5, state = {0},
+	   in_rest = "", out_rest = ""
+	  }
+	  table.insert(sj, t)
+	elseif type == "generators_tushkano" then					--' Tushkany on generators
+		t = { section = "logic@generators_tushkano", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_tushkano", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_tushkano", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		t = { section = "logic@generators_tushkano", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_tushkano", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_tushkano", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+	elseif type == "generators_snork" then								--' Snork on generators
+		t = { section = "logic@generators_snork", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_snork", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_snork", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		t = { section = "logic@generators_snork", 
+		idle = 0,
+		prior = 5, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+	elseif type == "generators_gigant" then				--' Giant generators
+		t = { section = "logic@generators_gigant", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+	elseif type == "generators_chimera" then					--' Chimera generators
+		t = { section = "logic@generators_chimera", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_chimera", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+	elseif type == "generators_kaban" then					--' 3kabana on generators
+		t = { section = "logic@generators_kaban", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_kaban", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@generators_kaban", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+	elseif type == "gener_kaban_two" then				--' 5kabanov have Betonka on generators
+		t = { section = "logic@gener_kaban_two", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@gener_kaban_two", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@gener_kaban_two", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@gener_kaban_two", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+		t = { section = "logic@gener_kaban_two", 
+		idle = 0,
+		prior = 20, state = {0},
+		in_rest = "", out_rest = ""
+		}
+		table.insert(sj, t)
+    elseif type == "generators_orly" then					-- The Gulag of neutrals on the generators
+        t = { section = "logic@generators_orly_zemlyk",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_orly_kamp1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_orly_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_orly_walker3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_orly_walker4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_orly_kamp5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_orly_kamp6",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "black_generators" then					-- Gulag black on generators
+        t = { section = "logic@black_generators_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker6",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker7",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker8",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker9",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@black_generators_walker10",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "generators_svoboda" then					-- Gulag Freedom on generators
+        t = { section = "logic@generators_svoboda_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_svoboda_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_svoboda_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@generators_svoboda_kamp4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+	else
+		--TB3D_Services.packet_alert("gulag escape: load job for type["..utils.to_str(type).."] not found")
+	end
+end
+
+function load_states(gname, type)
+	if type == "generators_orly" then
+        return function(gulag) return 0 end
+	elseif type == "black_generators" then
+        return function(gulag) return 0 end
+	elseif type == "generators_svoboda" then
+        return function(gulag) return 0 end
+    elseif type == "generators_flesh1" then        
+        return function(gulag) return 0 end
+    elseif type == "generators_gigant" then        
+        return function(gulag) return 0 end
+    elseif type == "generators_chimera" then        
+        return function(gulag) return 0 end
+    elseif type == "generators_tushkano" then        
+        return function(gulag) return 0 end
+    elseif type == "generators_kaban" then       
+        return function(gulag) return 0 end
+    elseif type == "gener_kaban_two" then        
+        return function(gulag) return 0 end
+    elseif type == "generators_snork" then        
+        return function(gulag) return 0 end
+	end
+	return nil
+end
+
+--------------------------------------------------------------------------
+-- Dynamic ltx
+--------------------------------------------------------------------------
+function load_ltx(gname, type)
+	return nil
+end
+
+function checkStalker(npc_community, gulag_type, npc_rank, se_obj)
+
+    if gulag_type == "generators_orly" then
+		return npc_community == "stalker"
+	end
+
+    if gulag_type == "black_generators" then
+		return npc_community == "stalker"
+	end
+
+    if gulag_type == "generators_svoboda" then
+		return npc_community == "freedom"
+	end
+
+	return false
+end
+
+function checkMonster(npc_community, gulag_type)
+
+     if gulag_type == "generators_flesh1" then
+          return npc_community == "flesh"
+     end
+
+     if gulag_type == "generators_gigant" then
+          return npc_community == "pseudo_gigant"
+     end
+
+     if gulag_type == "generators_chimera" then
+          return npc_community == "chimera"
+     end
+
+     if gulag_type == "generators_tushkano" then
+          return npc_community == "tushkano"
+     end
+
+     if gulag_type == "generators_kaban" then
+          return npc_community == "boar"
+     end
+
+     if gulag_type == "gener_kaban_two" then
+          return npc_community == "boar"
+     end
+
+     if gulag_type == "generators_snork" then
+          return npc_community == "snork"
+     end
+	
+	return false
+end

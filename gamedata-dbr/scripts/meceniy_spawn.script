@@ -1,0 +1,15 @@
+--TB3D 1.0.9.9.7.7, moved effector spawn flag
+function my_ver() return "1.0.9.9.7.7" end
+--\\* Module "Spawn effectors" ... Spot (Shooter)
+--nafig rewritten all but invisible by Monnoroch
+local effectors = "bloodsucker_effector"
+
+--Spawn near the actor
+function effector_spawn()
+	local p = db.actor:position()
+	local l = db.actor:level_vertex_id()
+	local g = db.actor:game_vertex_id()
+	local x = math.random(5,50)
+	local z = math.random(10,100)
+	alife():create(effectors, vector():set( p.x + x, p.y, p.z + z ), l,g)
+end

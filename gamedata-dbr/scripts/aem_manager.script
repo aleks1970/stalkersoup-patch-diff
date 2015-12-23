@@ -1,0 +1,2421 @@
+-- TB3D 1.0.9.9.5.2    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem, fast saves
+function my_ver() return "1.0.9.9.5.2" end
+local time_open = 22	-- Time (h) the opening of the arena, min = 0, max = 23
+local time_close = 7	-- Time (h) closing, min = 0, max = 23
+local delay_min = 0		-- minimum number of clear days (days) between the opening and closing arena, min = 0
+local delay_max = 2		-- maximum number of clear days (days) between the opening and closing arena, min = 1
+local delay_mut = 4		-- number of clear days (days) before the opening of a complete list of mutants, min = 0
+local stake1 = 500		-- rate number 1 in the betting (RR)
+local stake2 = 1000		-- bet number 2 in the pari-mutuel (RR)
+local stake3 = 2000		-- rate number 3 in the betting (RR)
+local perc_min = 30		-- minimum percentage of income from the amount of bets
+local perc_max = 100	-- the maximum percentage of income from the amount of bets
+---------------------------------------------------------------------------------------------------
+local arenaext = nil	-- object manager
+local time_def = nil	-- time in the world at the start of the game (CTime)
+local update_time = game.CTime()
+---------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------
+-- functions for working with ltx
+---------------------------------------------------------------------------------------------------
+
+function read_string(ini, section, field, candef, def)
+	if ini:section_exist(section) and ini:line_exist(section, field) then
+		return ini:r_string(section, field)
+	end
+	if candef == false then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM read_string: can't read string field '" .. field .. "' from section [" .. section .. "]") end
+	end
+	return def
+end
+
+function read_number(ini, section, field, candef, def)
+	if ini:section_exist(section) and ini:line_exist(section, field) then
+		return ini:r_float(section, field)
+	end
+	if candef == false then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM read_number: can't read number field '" .. field .. "' from section [" .. section .. "]") end
+	end
+	return def
+end
+
+function parse_place(line)
+	if line == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM parse_place1: no value for section [place] in aem_manager.ltx") end
+	else
+		local t = se_respawn.parse_names(line)
+		local n = table.getn(t)
+		if n ~= 5 then
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM parse_place2: inalid value for section [place] in aem_manager.ltx") end
+		end
+		local place = {}
+		place.pos = vector():set(tonumber(t[1]), tonumber(t[2]), tonumber(t[3]))
+		place.lvid = tonumber(t[4])
+		place.gvid = tonumber(t[5])
+		return place
+	end
+end
+
+function load_team(ini, section)
+	--printf("load_team('%s')", section)
+	local info = {}
+	info.name   = read_string(ini, section, "name", true, "aem_" .. section)
+	info.name1  = read_string(ini, section, "name1", true, "aem_" .. section .. "1")
+	info.name2  = read_string(ini, section, "name2", true, "aem_" .. section .. "2")
+	info.intro  = read_string(ini, section, "intro", true, nil)
+	info.extro  = read_string(ini, section, "extro", true, nil)
+	info.spawn1 = se_respawn.parse_names(read_string(ini, section, "spawn1", true, ""))
+	info.spawn2 = se_respawn.parse_names(read_string(ini, section, "spawn2", true, ""))
+	info.place1 = se_respawn.parse_names(read_string(ini, section, "place1", false, nil))
+	info.place2 = se_respawn.parse_names(read_string(ini, section, "place2", false, nil))
+	info.humans_min = read_number(ini, section, "humans_min", true, 6)
+	info.humans_max = read_number(ini, section, "humans_max", true, 6)
+	info.mutants_min = read_number(ini, section, "mutants_min", true, 6)
+	info.mutants_max = read_number(ini, section, "mutants_max", true, 6)
+	return info
+end
+
+function load_group(ini, section)
+	--printf("load_group('%s')", section)
+	local info = {}
+	if section == "turnament" then
+		info.title  = read_string(ini, section, "title", true, "aem_" .. section)
+		info.info   = read_string(ini, section, "info", true, "aem_" .. section .. "_info")
+		info.done   = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
+		info.teams  = se_respawn.parse_names(read_string(ini, section, "teams", false, nil))
+		info.fights = se_respawn.parse_names(read_string(ini, section, "fights", false, nil))
+		info.dlg_size = 100 + 100 * (table.getn(info.teams) * (table.getn(info.teams) - 1))
+	elseif section == "stakes" then
+		info.title  = read_string(ini, section, "title", true, "aem_" .. section)
+		info.info   = read_string(ini, section, "info", true, "aem_" .. section .. "_info")
+		info.done   = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
+		info.teams1 = se_respawn.parse_names(read_string(ini, section, "teams1", false, nil))
+		info.teams2 = se_respawn.parse_names(read_string(ini, section, "teams2", false, nil))
+		info.fights = se_respawn.parse_names(read_string(ini, section, "fights", false, nil))
+		info.dlg_size = 100 + 100 * (table.getn(info.teams1) * table.getn(info.teams2))
+	else
+		info.title  = read_string(ini, section, "title", true, "aem_" .. section)
+		info.info   = read_string(ini, section, "info", true, "aem_" .. section .. "_info")
+		info.done   = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
+		info.fights = se_respawn.parse_names(read_string(ini, section, "fights", false, nil))
+		info.dlg_size = 100
+	end
+	return info
+end
+
+function load_fight(ini, section, group)
+	--printf("load_fight('%s')", section)
+	local info = {}
+	info.group = group
+	if group == "turnament" then
+		info.done  = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
+		info.intro = read_string(ini, section, "intro", true, nil)
+		info.extro = read_string(ini, section, "extro", true, nil)
+		info.team1 = read_string(ini, section, "team1", true, "aem_" .. section .. "_1")
+		info.team2 = read_string(ini, section, "team2", true, "aem_" .. section .. "_2")
+		info.winer = read_string(ini, section, "winer", true, nil)
+		info.dlg_size = 0
+	elseif group == "stakes" then
+		info.done  = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
+		info.intro = read_string(ini, section, "intro", true, nil)
+		info.extro = read_string(ini, section, "extro", true, nil)
+		info.team1 = read_string(ini, section, "team1", true, "aem_" .. section .. "_1")
+		info.team2 = read_string(ini, section, "team2", true, "aem_" .. section .. "_2")
+		info.dlg_size = 0
+	else
+		info.title = read_string(ini, section, "title", true, "aem_" .. section)
+		info.done  = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
+		info.intro = read_string(ini, section, "intro", true, nil)
+		info.extro = read_string(ini, section, "extro", true, nil)
+		info.spawn = se_respawn.parse_names(read_string(ini, section, "spawn", false, nil))
+		info.place = se_respawn.parse_names(read_string(ini, section, "place", false, nil))
+		info.money = read_number(ini, section, "money", false, 0)
+		info.bonus_5s = read_number(ini, section, "bonus_5s", true, 0)
+		info.bonus_10s = read_number(ini, section, "bonus_10s", true, 0)
+		info.bonus_15s = read_number(ini, section, "bonus_15s", true, 0)
+		info.bonus_20s = read_number(ini, section, "bonus_20s", true, 0)
+		info.bonus_30s = read_number(ini, section, "bonus_30s", true, 0)
+		info.bonus_40s = read_number(ini, section, "bonus_40s", true, 0)
+		info.bonus_50s = read_number(ini, section, "bonus_50s", true, 0)
+		info.bonus_60s = read_number(ini, section, "bonus_60s", true, 0)
+		info.bonus = read_string(ini, section, "bonus", true, nil)
+		info.unlimit = read_string(ini, section, "unlimit", true, nil)
+		info.nounlimit = read_string(ini, section, "nounlimit", true, nil)
+		info.dlg_size = 100
+	end
+	return info
+end
+
+---------------------------------------------------------------------------------------------------
+-- proper arena manager
+---------------------------------------------------------------------------------------------------
+
+class "CArenaext"
+function CArenaext:__init()
+	--printf("CArenaext:__init")
+	local n, n2, id, id2, value, info, result
+	time_def = time_get_start()
+	self.lt = amk.load_variable("aem_lt", 0)	-- last update time (update)
+	self.nt = amk.load_variable("aem_nt", 0)	-- the last / next open arena
+	self.it = amk.load_variable("aem_it", 0)	-- the last time the real activation (reinit)
+	self.mt = amk.load_variable("aem_mt", 0)	-- the last battles with monsters
+	self.mk = amk.load_variable("aem_mk", 0)	-- bitmask destroyed by gangs
+	self.mk_all = 0
+	local ini = ini_file("misc\\aem_manager.ltx")						-- reading LTX
+	self.arena_items = {}												-- things you can not make a scene (deleted when you exit the arena)
+	if ini:section_exist("arena_items") then
+		n = ini:line_count("arena_items")
+		for i=0,n-1 do
+			result, id, value = ini:r_line("arena_items",i,"",nil)
+			--printf(" arena_items: '%s'", id)
+			self.arena_items[id] = true
+		end
+	end
+	self.remove_items = {}												-- forbidden to fight in the arena of things
+	if ini:section_exist("remove_items") then
+		n = ini:line_count("remove_items")
+		for i=0,n-1 do
+			result, id, value = ini:r_line("remove_items",i,"",nil)
+			--printf(" remove_items: '%s'", id)
+			self.remove_items[id] = true
+		end
+	end
+	self.keep_items = {}												-- things that must be left alone
+	if ini:section_exist("keep_items") then
+		n = ini:line_count("keep_items")
+		for i=0,n-1 do
+			result, id, value = ini:r_line("keep_items",i,"",nil)
+			--printf(" keep_items: '%s'", id)
+			self.keep_items[id] = true
+		end
+	end
+	if not ini:section_exist("places") then								-- Reading the list of starting positions
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM arena init 1: no section [places] in aem_manager.ltx") end
+	end
+	self.places = {}
+	n = ini:line_count("places")
+	for i=0,n-1 do
+		result, id, value = ini:r_line("places",i,"",nil)
+		--printf(" places: '%s'-'%s'", id, value)
+		self.places[id] = parse_place(value)
+	end
+	if not ini:section_exist("teams") then								-- reading instruction
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM arena init 2: no section [teams] in aem_manager.ltx") end
+	end
+	self.teams = {}
+	n = ini:line_count("teams")
+	for i=0,n-1 do
+		result, id, value = ini:r_line("teams",i,"",nil)
+		--printf(" teams: '%s'-'%s'", id, value)
+		self.teams[id] = load_team(ini, id)
+	end
+	if not ini:section_exist("groups") then								-- reading groups and fighting
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM arena init 3: no section [groups] in aem_manager.ltx") end
+	end
+	self.groups = {}
+	self.fights = {}
+	self.groups_order = se_respawn.parse_names(read_string(ini, "groups", "order", false, nil))
+	n = table.getn(self.groups_order)
+	local bit = 1
+	for i=1,n do
+		id = self.groups_order[i]
+		self.groups[id] = load_group(ini, id)
+
+		n2 = table.getn(self.groups[id].fights)
+		for j=1,n2 do
+			id2 = self.groups[id].fights[j]
+			self.fights[id2] = load_fight(ini, id2, id)
+		end
+
+		if id ~= "mutants" and id ~= "special" then
+			self.groups[id].mk = bit
+			self.mk_all = self.mk_all + bit
+			bit = bit * 2
+		end
+	end
+	id = "stakes"													-- reading 'stakes'
+	self.groups[id] = load_group(ini, id)
+	n2 = table.getn(self.groups[id].fights)
+	for j=1,n2 do
+		id2 = self.groups[id].fights[j]
+		self.fights[id2] = load_fight(ini, id2, id)
+	end
+	id = "turnament"												-- reading 'turnament'
+	self.groups[id] = load_group(ini, id)
+	n2 = table.getn(self.groups[id].fights)
+	for j=1,n2 do
+		id2 = self.groups[id].fights[j]
+		self.fights[id2] = load_fight(ini, id2, id)
+	end
+	local dlg_id = 100												-- setting id phrases dialogue
+	for i,value in pairs(self.groups) do							-- for groups
+		self.groups[i].dlg_id = dlg_id
+		dlg_id = dlg_id + self.groups[i].dlg_size
+	end
+	for i,value in pairs(self.fights) do							-- for fighting
+		self.fights[i].dlg_id = dlg_id
+		dlg_id = dlg_id + self.fights[i].dlg_size
+	end
+	self.stakes_phrase = {}											-- auxiliary tables for the search phrases of dialogue id
+	self.turnament_phrase = {}
+	info = self.groups["stakes"]
+	value = info.dlg_id + 100
+	n = table.getn(info.teams1)
+	n2 = table.getn(info.teams2)
+	for i=1, n do
+		for j=1, n2 do
+			self.stakes_phrase[info.teams1[i] .. info.teams2[j]] = value
+			value = value + 100
+		end
+	end
+	info = self.groups["turnament"]
+	value = info.dlg_id + 100
+	n = table.getn(info.teams)
+	for i=1, n do
+		for j=1, n do
+			if i ~= j then
+				self.turnament_phrase[info.teams[i] .. info.teams[j]] = value
+				value = value + 100
+			end
+		end
+	end
+end
+
+-------
+-- returns the name of the current battle
+-------
+function CArenaext:current()
+	return amk.load_variable("aem_cr")
+end
+
+-------
+-- returns a description of the battle with the specified name
+-------
+function CArenaext:description(name)
+	return self.fights[name]
+end
+
+-------
+-- whether the current fight betting
+-------
+function CArenaext:is_stake()
+	local info = self:description(self:current())
+	return (info.group == "stakes" or info.group == "turnament")
+end
+
+-------
+-- won a bid
+-------
+function CArenaext:is_stake_win()
+	return	((has_alife_info("aem_stake_team1") and amk.load_variable("aem_team1") > 0) or
+		 (has_alife_info("aem_stake_team2") and amk.load_variable("aem_team2") > 0))
+end
+
+-------
+-- how much time (hours) elapsed since the last fight with the mutants
+-------
+function CArenaext:get_mutants_time()
+	return (time_get_curr() - self.mt)
+end
+
+-------
+-- Were all the factions destroyed labeled At least once
+-------
+function CArenaext:is_stalkers_evil()
+	return (bit_and(self.mk, self.mk_all) == self.mk_all)
+end
+
+-------
+-- checks the current group battle
+-------
+function CArenaext:is_group_name(name)
+	local info = self:description(self:current())
+	if info then return info.group == name end
+end
+
+-------
+-- checks the primary voice acting of the current battle
+-------
+function CArenaext:is_intro_name(name)
+	local info = self:description(self:current())
+	if info then return info.intro == name end
+end
+
+-------
+-- Check the end of the current battlefield voiceovers
+-------
+function CArenaext:is_extro_name(name)
+	local info = self:description(self:current())
+	if info.extro ~= nil then
+		return info.extro == name
+	end
+	-- to tote two voice depending on the result
+	if info.group == "stakes" or info.group == "turnament" then
+		if amk.load_variable("aem_team1") > 0 then
+			local team = amk.load_variable(info.team2, "")
+			--aem_lights.win_team1()
+			return self.teams[team].extro == name
+		elseif amk.load_variable("aem_team2") > 0 then
+			local team = amk.load_variable(info.team1, "")
+			--aem_lights.win_team2()
+			return self.teams[team].extro == name
+		end
+	end
+	-- voice could not be found
+	return false
+end
+
+-------
+-- invoked in case of death of each member battle
+-------
+function CArenaext:on_death(npc, team)
+	--printf("CArenaext:on_death('%s'-'%s')", team, npc:section())
+	if team ~= "team1" and team ~= "team2" then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM arena on death: CArenaext:on_death('invalid team')") end
+	end
+	-- decrements team
+	local cnt = amk.load_variable("aem_" .. team, 0)
+	if cnt > 0 then
+		cnt = cnt - 1
+		if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("on death: dec cnt["..utils.to_str(cnt).."]") end
+		amk.save_variable("aem_" .. team, cnt)
+	end
+	if has_alife_info("aem_timeover") then
+		-- murder on the expiration of the time a criminal offense
+		if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("on death: time over") end
+		TB3D_Services.give_info("aem_fight_foul")
+	elseif cnt == 0 and has_alife_info("aem_fight_done") == false then
+		if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("on death: fight done") end
+		-- team destroyed, you must finish the fight
+		TB3D_Services.give_info("aem_fight_done")
+		-- flashers for betting fights
+		--local info = self:description(self:current())
+		--if info.group ~= "turnament" and info.group ~= "stakes" then
+			--aem_lights.win()
+		--end
+	end
+end
+
+-------
+-- invoked when exiting the arena
+-------
+function CArenaext:on_done_fight()
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("done fight") end
+	local name = self:current()
+	--printf("CArenaext:on_done_fight('%s')", name)
+	local info = self:description(name)
+	-- prohibit the battle for dialogue
+	TB3D_Services.give_info(info.done)
+	local cnt_t1 = amk.load_variable("aem_team1")
+	local cnt_t2 = amk.load_variable("aem_team2")
+	-- output to the next round for the tournament
+	if info.group == "turnament" then
+		if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("done fight: tournament") end
+		if info.winer ~= nil and info.winer ~= "" then
+			local winer
+			if cnt_t1 > 0 then
+				winer = amk.load_variable(info.team1, "")
+			elseif cnt_t2 > 0 then
+				winer = amk.load_variable(info.team2, "")
+			else
+				-- !!! draw, what shall we do?
+				winer = amk.load_variable(info.team1, "")
+			end
+			amk.save_variable(info.winer, winer)
+		end
+	end
+	-- conditions for the organization of special fights
+	-- only if the opponent really iznichtozhit and not timeout
+	if cnt_t1 == 0 then
+		if info.group == "mutants" then
+			if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("done fight: mutant") end
+			-- remember the date of the last destruction of the mutants
+			self.mt = time_get_curr()
+			amk.save_variable("aem_mt", self.mt)
+		else
+			if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("done fight: npc") end
+			-- to remember the destruction of actor large groups of commands
+			local group = self.groups[info.group]
+			if group.mk ~= nil then
+				if table.getn(info.spawn) == 6 then
+					self.mk = bit_or(self.mk, group.mk)
+					amk.save_variable("aem_mk", self.mk)
+					--printf("mk=%x", self.mk)
+				end
+			end
+		end
+	end
+	-- check the whole group of fights
+	local t = self.groups[info.group].fights
+	local cnt = table.getn(t)
+	local done = true
+	for i=1,cnt do
+		if not has_alife_info(self.fights[t[i]].done) then
+			done = false
+			if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("done fight: next fight number["..utils.to_str(i).."]") end
+			break
+		end
+	end
+	-- all the battles of this group completed
+	if done == true then
+		if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("done fight: last fight of this type") end
+		self:on_done_group(info.group)
+	end
+end
+
+-------
+-- called in the event of the completion of fighting
+-------
+function CArenaext:on_done_group(name)
+	--printf("CArenaext:on_done_group('%s')", name)
+	local info = self.groups[name]
+	-- prohibit a group for dialogue
+	TB3D_Services.give_info(info.done)
+	-- check all the groups can have all finished?
+	local done = true
+	for id, info in pairs(self.groups) do
+		if not has_alife_info(info.done) then
+			done = false
+			break
+		end
+	end
+	-- all the fights finished, the arena is passed
+	if done == true then
+		self:on_done_all()
+	end
+end
+
+-------
+-- invoked in the case of the completion of all the fighting arena
+-------
+function CArenaext:on_done_all()
+	--printf("CArenaext:on_done_all()")
+	TB3D_Services.give_info("aem_done")
+end
+
+-------
+-- initialization mode
+-------
+function CArenaext:startup()
+	if not has_alife_info("aem_startup") then
+		TB3D_Services.give_info("aem_spam")
+		TB3D_Services.give_info("aem_startup")
+		local ct = level.get_time_minutes()
+		amk.save_variable("aem_ct", ct)
+		-- cleaning dispenser
+		local box = level_object_by_sid(574)
+		if box ~= nil then
+			clear_box(box)
+		else
+			clear_offline_box(574)
+		end
+		-- Remove 'wooden' dolgovtsa
+		local obj = alife():object("level_prefix_physic_object_0004")
+		if obj ~= nil then
+			alife():release(obj)
+		end
+		-- vacated the seat at the bar, if it is occupied
+		local obj = alife():object("bar_bar_visitors_1_2")
+		if obj ~= nil then
+			alife():release(obj)
+		end
+	end
+	timeup()
+end
+
+function CArenaext:timeup()
+	self.lt = time_get_curr()
+	self.nt = time_get_next(self.lt + 12)	-- at least a 12:00 wait
+	self.it = 0
+	self.mt = self.nt
+	self.mk = 0
+	TB3D_Services.give_info(self.groups["special"].done)
+-- Test first initialized, that would not wait long
+--	self.nt = time_get_next(self.lt - 3)
+-- Test reinitialization
+--	self.nt = time_get_next(self.lt - 3)
+--	self.it = self.nt
+-- test of all monsters
+--	self.nt = time_get_next(self.lt - 3)
+--	self.it = self.nt
+--	self.mt = 0
+-- Test Team
+--	self.nt = time_get_next(self.lt - 3)
+--	self.it = self.nt
+--	self.mk = self.mk_all
+-- Test team, has passed into the next activation
+--	self.nt = time_get_next(self.lt - 3)
+--	self.it = self.nt
+--	TB3D_Services.remove_info(self.groups["special"].done)
+	amk.save_variable("aem_lt", self.lt)
+	amk.save_variable("aem_nt", self.nt)
+	amk.save_variable("aem_it", self.it)
+	amk.save_variable("aem_mt", self.mt)
+	amk.save_variable("aem_mk", self.mk)
+end
+
+-------
+-- Remove Fashion
+-------
+function CArenaext:cleanup()
+	local i, n, result, id, value, obj, section
+	--printf("CArenaext:cleanup()")
+	-- Read LTX
+	local ini = ini_file("misc\\aem_manager.ltx")
+	-- Returns the standard lighting in the arena
+	--aem_lights.remove_all_aem_lamps()
+	--aem_lights.turn_arena_lamps_on()
+	-- create a list of deleted infoporshinov
+	local info = {}
+	if ini:section_exist("info") then
+		n = ini:line_count("info")
+		for i=0,n-1 do
+			result, id, value = ini:r_line("info",i,"",nil)
+			table.insert(info, id)
+		end
+	end
+	for id, value in pairs(self.groups) do
+		table.insert(info, value.done)
+	end
+	for id, value in pairs(self.fights) do
+		table.insert(info, value.done)
+	end
+	-- create a list of deleted variables
+	local pstor = {}
+	if ini:section_exist("pstor") then
+		n = ini:line_count("pstor")
+		for i=0,n-1 do
+			result, id, value = ini:r_line("pstor",i,"",nil)
+			table.insert(pstor, id)
+		end
+	end
+	for id, value in pairs(self.fights) do
+		if value.group == "stakes" or value.group == "turnament" then
+			table.insert(pstor, value.team1)
+			table.insert(pstor, value.team2)
+		end
+	end
+	local storage = db.storage[db.actor:id()].pstor
+	-- Remove infoporshinov
+	for id, value in pairs(info) do
+		TB3D_Services.remove_info(value)
+	end
+	-- removal of variables
+	for id, value in pairs(pstor) do
+		if storage[value] ~= nil then
+			storage[value] = nil
+		end
+	end
+	-- Deleting Objects
+	for id=0, last_object do
+		obj = alife():object(id)
+		if obj ~= nil then
+			if string.find(obj:name(), "aem_") then
+				alife():release(obj)
+			end
+		end
+	end
+	news_manager.amk_send_tip(game.translate_string("sms_mod_deleted"),game.translate_string("sms_arena"),1,30,"arena")
+end
+
+-------
+-- Generate accessible fights
+-------
+function CArenaext:reinit()
+	--printf("CArenaext:reinit()")
+	local name, info, t, tt, i, j, n, nn, cnt, rnd, fight
+	---- right here, before you install info_portion
+	local special = self:is_stalkers_evil() or not has_alife_info(self.groups["special"].done)
+	-- prohibit all groups
+	for name, info in pairs(self.groups) do
+		TB3D_Services.give_info(info.done)
+	end
+	-- prohibit all battles
+	for name, info in pairs(self.fights) do
+		TB3D_Services.give_info(info.done)
+	end
+	-- mutants
+	info = self.groups["mutants"]
+	TB3D_Services.remove_info(info.done)	-- allow a group of mutants
+	if is_init_mutants() then			-- allow all the fights
+		for i, name in pairs(info.fights) do
+			TB3D_Services.remove_info(self.fights[name].done)
+		end
+	else						-- 4.3 allow random battle
+		t = {}
+		for i, name in pairs(info.fights) do
+			table.insert(t, name)
+		end
+		n = math.random(3, 4)
+		for i=1, n do
+			cnt = table.getn(t)
+			rnd = math.random(cnt)
+			TB3D_Services.remove_info(self.fights[t[rnd]].done)
+			table.remove(t, rnd)
+		end
+	end
+	-- initialization stakes
+	t = {}
+	tt = {}
+	info = self.groups["stakes"]
+	TB3D_Services.remove_info(info.done)
+	for i, name in pairs(info.teams1) do
+		table.insert(t, name)
+	end
+	for i, name in pairs(info.teams2) do
+		table.insert(tt, name)
+	end
+	n = table.getn(info.fights)	
+	nn = math.random(3, 4)
+	if nn > n then nn = n end	
+	for i=1, n do
+		fight = self.fights[info.fights[i]]
+		if i <= nn then
+			cnt = table.getn(t)
+			rnd = math.random(cnt)
+			amk.save_variable(fight.team1, t[rnd])
+			table.remove(t, rnd)
+			cnt = table.getn(tt)
+			rnd = math.random(cnt)
+			amk.save_variable(fight.team2, tt[rnd])
+			table.remove(tt, rnd)
+			TB3D_Services.remove_info(fight.done)
+		else
+			amk.save_variable(fight.team1, "")
+			amk.save_variable(fight.team2, "")
+			TB3D_Services.give_info(fight.done)
+		end
+	end
+	-- initialization turnament
+	t = {}
+	info = self.groups["turnament"]
+	TB3D_Services.remove_info(info.done)
+	for i, name in pairs(info.teams) do
+		table.insert(t, name)
+	end
+	for i=1, 2 do
+		fight = self.fights[info.fights[i]]
+		cnt = table.getn(t)
+		rnd = math.random(cnt)
+		amk.save_variable(fight.team1, t[rnd])
+		table.remove(t, rnd)
+		rnd = math.random(cnt-1)
+		amk.save_variable(fight.team2, t[rnd])
+		table.remove(t, rnd)
+		TB3D_Services.remove_info(fight.done)
+	end
+	fight = self.fights[info.fights[3]]
+	amk.save_variable(fight.team1, "")
+	amk.save_variable(fight.team2, "")
+	TB3D_Services.remove_info(fight.done)
+	-- initialization of other groups or fighting
+	if special then						-- battle with the team
+		info = self.groups["special"]
+		TB3D_Services.remove_info(info.done)
+		for i, name in pairs(info.fights) do
+			TB3D_Services.remove_info(self.fights[name].done)
+		end
+		-- reset statistics, what would the phrase does not appear in the dialogue more than once
+		-- if the fight is not complete, it will move to the next activation of info_portion
+		self.mk = 0
+	else
+		t = {}
+		for name, info in pairs(self.groups) do
+			if name ~= "mutants" and name ~= "special" and
+			   name ~= "stakes" and name ~= "turnament"
+			then
+				table.insert(t, name)
+			end
+		end
+		n = math.random(3, 4)  -- Number of random groups
+		for i=1, n do
+			cnt = table.getn(t)
+			rnd = math.random(cnt)
+			info = self.groups[t[rnd]]
+			table.remove(t, rnd)
+			TB3D_Services.remove_info(info.done)
+			tt = {}
+			for j, name in pairs(info.fights) do  -- compilation of 'tables' bouts for each group
+				table.insert(tt, name)
+			end
+			nn = math.random(1, 4)  -- Number of resolved fights
+			for j=1, nn do
+				cnt = table.getn(tt)
+				rnd = math.random(cnt)
+				TB3D_Services.remove_info(self.fights[tt[rnd]].done)
+				table.remove(tt, rnd)
+			end
+		end
+	end
+	-- restriction fragment update every time you start a new arena
+	for id=0, last_object do
+		obj = level.object_by_id(id)
+		if obj ~= nil then
+			section = obj:section()
+			if section == "aem_sound" or section == "aem_timer" then
+				alife():release(alife():object(id), true)
+			end
+		end
+	end
+	-- restrictor, which will carry voice acting and exit from the arena
+	alife():create("aem_sound", vector():set(150.14, -14.16, 74.03), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+	-- restrictor, which will serve as a timer for battles at the time
+	alife():create("aem_timer", vector():set(150.14, -14.16, 74.03), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+	self.it = self.nt
+	amk.save_variable("aem_it", self.it)
+	TB3D_Services.give_info("aem_ready")
+end
+
+-------
+-- called from "bind_stalker.script" <actor_binder:update(delta)>
+-------
+function CArenaext:update()
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("aem mgr: update["..utils.to_str(time_global()).."]") end
+	local curr = time_get_curr()
+	local id, npc, ctm, rt, ct
+	id = amk.load_variable("aem_id", 0)
+	-- remove Arnie and create its clone
+	if id == 0 then
+		npc = alife():object("bar_arena_man")
+		if npc ~= nil then
+			alife():release(npc)
+			if npc:alive() ~= true then
+				-- dead
+				TB3D_Services.give_info("aem_arny_dead")
+				TB3D_Services.give_info("aem_arny_dis_1")
+				admin_dead()
+			else
+				-- live
+				local obj = alife():create("aem_arny", vector():set(149.561569213867,0.429975032806396,69.2308807373047), 40035, 1180)
+				-- conservation id
+				amk.save_variable("aem_id", obj.id)
+			end
+		else
+			TB3D_Services.give_info("aem_arny_spread_out")
+			TB3D_Services.give_info("aem_arny_dis_2")
+			admin_dead()
+		end
+	end
+	-- checking Arnie (admin) on preservation id: dead or destroyed	
+	if update_time < game.get_game_time() then
+		local idle_time = game.CTime()
+		idle_time:setHMSms(0, 5, 0, 0)
+		update_time = game.get_game_time() + idle_time
+		--printf("CArenaext:update(30sec_update_done)")
+		if id > 0 then	
+			id = amk.load_variable("aem_id")
+			npc = alife():object(id)
+			if npc ~= nil and npc:clsid() == clsid.script_stalker then
+				if npc:alive() ~= true then
+					-- dead
+					if npc:profile_name() == "aem_arny" then
+						TB3D_Services.give_info("aem_arny_dead")
+						TB3D_Services.give_info("aem_arny_dis_1")
+					elseif string.find(npc:name(), "aem_admin") then
+						TB3D_Services.give_info("aem_admin_dead")
+					else
+						-- Arnie (admin) broke - "zaspavnilsya left id -> left dead -> update
+						if not has_alife_info("aem_arny_dis_1") and not has_alife_info("aem_arny_dis_2") then
+							TB3D_Services.give_info("aem_arny_spread_out")
+							TB3D_Services.give_info("aem_arny_dis_2")
+						else
+							TB3D_Services.give_info("aem_admin_spread_out")
+						end
+					end
+					admin_dead()
+				else
+					-- live
+					if npc:profile_name() ~= "aem_arny" and not string.find(npc:name(), "aem_admin") then
+						-- destroyed (torn in anomalies)
+						if not has_alife_info("aem_arny_dis_1") and not has_alife_info("aem_arny_dis_2") then
+							TB3D_Services.give_info("aem_arny_spread_out")
+							TB3D_Services.give_info("aem_arny_dis_2")
+						else
+							TB3D_Services.give_info("aem_admin_spread_out")
+						end
+						admin_dead()
+					end
+				end
+			else
+				-- destroyed (torn in anomalies)
+				if not has_alife_info("aem_arny_dis_1") and not has_alife_info("aem_arny_dis_2") then
+					TB3D_Services.give_info("aem_arny_spread_out")
+					TB3D_Services.give_info("aem_arny_dis_2")
+				else
+					TB3D_Services.give_info("aem_admin_spread_out")
+				end
+				admin_dead()
+			end
+		end
+	end
+	-- issuing reports on the restoration of the arena
+	-- initialize spawn admin
+	rt = amk.load_variable("aem_rt")
+	if rt ~= nil then
+		if (curr + rt >= self.nt) and (self.lt + rt < self.nt) then
+			msg("aem_restore")
+			TB3D_Services.remove_info("aem_arny_dead")
+			TB3D_Services.remove_info("aem_admin_dead")
+			TB3D_Services.remove_info("aem_arny_spread_out")
+			TB3D_Services.remove_info("aem_admin_spread_out")
+			TB3D_Services.give_info("aem_spam")
+			admin_spawn()
+			amk.del_variable("aem_rt")
+		end
+	end
+	-- 5 min. after the closing of the arena: post + info to change the restriction fragment
+	ct = amk.load_variable("aem_ct")
+	if ct ~= nil then
+		ctm = level.get_time_minutes()
+		
+		if ctm >= ct then
+			x = 0
+		else --if ctm < ct
+			x = 60
+		end
+		
+		if ctm >= ct + 5 - x then
+			if has_alife_info("aem_spam") then
+				local txt = {"aem_drunk_1", "aem_drunk_2", "aem_drunk_3", "aem_drunk_4"}
+				local cnt = table.getn(txt)
+				local rnd = math.random(cnt)
+				msg(txt[rnd])
+			end
+			TB3D_Services.give_info("aem_go_bar")
+			db.storage[db.actor:id()].pstor["aem_ct"] = nil
+		end
+	end
+	if has_alife_info("aem_startup") then
+		if has_alife_info("aem_open") then
+			if has_alife_info("aem_done") then
+				--printf("CArenaext:update(~aem_open)")
+				self.nt = time_get_next(curr + 1) -- at least a hour break
+				amk.save_variable("aem_nt", self.nt)
+				TB3D_Services.remove_info("aem_done")
+				TB3D_Services.remove_info("aem_open")
+				TB3D_Services.remove_info("aem_ready")
+				if has_alife_info("aem_spam") then
+					msg("aem_msg_done")
+				end
+				-- Off megaphone and lighting shield "Arena"
+				TB3D_Services.remove_info("aem_megafone")
+				--aem_lights.shield_off()
+				-- remember during the closing scene
+				local ct = level.get_time_minutes()
+				amk.save_variable("aem_ct", ct)
+			elseif time_need_close(curr, self.nt) and
+				not has_alife_info("bar_arena_fight") and
+				not has_alife_info("aem_fight_wait")
+			then
+				--printf("CArenaext:update(~aem_open)")
+				self.nt = time_get_next(curr + 1) -- at least a hour break
+				amk.save_variable("aem_nt", self.nt)
+				TB3D_Services.remove_info("aem_open")
+				TB3D_Services.remove_info("aem_ready")
+				if has_alife_info("aem_spam") then
+					msg("aem_msg_close")
+				end
+				-- Off megaphone and lighting shield "Arena"
+				TB3D_Services.remove_info("aem_megafone")
+				--aem_lights.shield_off()
+				-- remember during the closing scene
+				local ct = level.get_time_minutes()
+				amk.save_variable("aem_ct", ct)
+			end
+		else
+			if curr >= self.nt then
+				--printf("CArenaext:update(aem_open)")
+				TB3D_Services.give_info("aem_open")
+				TB3D_Services.remove_info("aem_go_bar")
+			elseif (curr + 3 >= self.nt) and (self.lt + 3 < self.nt) then
+				-- the inclusion of a megaphone and lighting shield "Arena"
+				TB3D_Services.give_info("aem_megafone")
+				--aem_lights.shield_on()
+				TB3D_Services.remove_info("aem_go_bar")
+			end
+			if has_alife_info("aem_spam") then
+				if (curr >= self.nt) and (self.lt < self.nt) then
+					msg("aem_msg_open")
+				elseif (curr + 3 >= self.nt) and (self.lt + 3 < self.nt) then
+					msg("aem_msg_3h")
+				elseif (curr + 6 >= self.nt) and (self.lt + 6 < self.nt) then
+					msg("aem_msg_6h")
+				elseif (curr + 12 >= self.nt) and (self.lt + 12 < self.nt) then
+					msg("aem_msg_12h")
+				elseif (curr + 24 >= self.nt) and (self.lt + 24 < self.nt) then
+					msg("aem_msg_24h")
+				elseif (curr + 48 >= self.nt) and (self.lt + 48 < self.nt) then
+					msg("aem_msg_48h")
+				elseif (curr + 72 >= self.nt) and (self.lt + 72 < self.nt) then
+					msg("aem_msg_72h")
+				elseif (curr + 96 >= self.nt) and (self.lt + 96 < self.nt) then
+					msg("aem_msg_96h")
+				end
+			end
+		end
+		-- checking for dialogue after a gap of transferring money to bet
+		if not db.actor:is_talking() and has_alife_info("aem_fight_wait") then
+			self:start_stake()		
+		end
+		-- remove grenades so can't cheat
+		if self.grenads then
+			if aem_grenade.unload2(self.grenads) then
+				self.grenads = nil
+			end
+		end
+	end
+	if self.lt ~= curr then	--no need to save if hasn't changed
+		self.lt = curr
+		amk.save_variable("aem_lt", self.lt)
+	end
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("aem mgr: update done["..utils.to_str(time_global()).."]") end
+end
+
+-------
+-- start a fight
+-------
+function CArenaext:start(phr_id)
+	local name = self:fight_by_phrase(phr_id)
+	--printf("CArenaext:start('%s')", name)
+
+	-- remember the name of the battlefield
+	amk.save_variable("aem_cr", name)
+
+	-- remember the group HS
+	--amk.save_variable("aem_cm", db.actor:character_community())
+
+	local info = self.fights[name]
+		local spawn
+		local place
+
+	if info.group == "stakes" then
+		
+		-- spawn the first team - mutants
+		local team1 = self.teams[amk.load_variable(info.team1, "")]
+		local a1 = team1.mutants_min
+		local b1 = team1.mutants_max
+		local n1 = math.random(a1,b1)
+		
+		amk.save_variable("aem_team1", n1)
+		for i=1, n1 do
+			spawn = team1.spawn1[i]
+			place = self.places[team1.place1[i]]
+			alife():create(spawn, place.pos, place.lvid, place.gvid)
+		end
+		
+		-- spawn the second team - the people
+		local team2 = self.teams[amk.load_variable(info.team2, "")]
+		local a2 = team1.humans_min
+		local b2 = team1.humans_max
+		local n2 = math.random(a2,b2)
+		
+		amk.save_variable("aem_team2", n2)
+		for i=1, n2 do
+			spawn = team2.spawn2[i]
+			place = self.places[team2.place2[i]]
+			alife():create(spawn, place.pos, place.lvid, place.gvid)
+		end
+		
+		-- rate
+		if has_alife_info("aem_stake1") then
+			manage_money(stake1, "out")
+		elseif has_alife_info("aem_stake2") then
+			manage_money(stake2, "out")
+		elseif has_alife_info("aem_stake3") then
+			manage_money(stake3, "out")
+		end
+		
+		-- delayed start
+		TB3D_Services.give_info("aem_fight_wait")
+		
+	elseif info.group == "turnament" then
+		
+		-- spawn first team
+		local team1 = self.teams[amk.load_variable(info.team1, "")]
+		local n1 = table.getn(team1.spawn1)
+		amk.save_variable("aem_team1", n1)
+		for i=1, n1 do
+			spawn = team1.spawn1[i]
+			place = self.places[team1.place1[i]]
+			alife():create(spawn, place.pos, place.lvid, place.gvid)
+		end
+		
+		-- spawn second-team
+		local team2 = self.teams[amk.load_variable(info.team2, "")]
+		local n2 = table.getn(team2.spawn2)
+		amk.save_variable("aem_team2", n2)
+		for i=1, n2 do
+			spawn = team2.spawn2[i]
+			place = self.places[team2.place2[i]]
+			alife():create(spawn, place.pos, place.lvid, place.gvid)
+		end
+		
+		-- rate 
+		if has_alife_info("aem_stake1") then
+			manage_money(stake1, "out")
+		elseif has_alife_info("aem_stake2") then
+			manage_money(stake2, "out")
+		elseif has_alife_info("aem_stake3") then
+			manage_money(stake3, "out")
+		end
+		
+		-- delayed start
+		TB3D_Services.give_info("aem_fight_wait")
+		
+	else
+		
+		-- spawn participants
+		local n = table.getn(info.spawn)
+		amk.save_variable("aem_team1", n)
+		for i=1, n do
+			spawn = info.spawn[i]
+			place = self.places[info.place[i]]
+			alife():create(spawn, place.pos, place.lvid, place.gvid)
+		end
+		
+		-- 'Magic' box
+		local box = level_object_by_sid(574)
+		-- robbing HS dangerous things
+		put_items_to_box(box, self.remove_items)
+		
+		-- remove grenades
+		self.grenads = aem_grenade.unload1()
+		
+		-- run a bunch of logic tied to this info_portion
+		TB3D_Services.give_info("bar_arena_fight")
+		
+	end
+end
+
+-------
+-- start a pending battle
+-------
+function CArenaext:start_stake()
+	-- disable delayed start
+	TB3D_Services.remove_info("aem_fight_wait")
+
+	-- 'Magic' box
+	local box = level_object_by_sid(574)
+	-- subtract from HS all but the most necessary, that he did not intervene in the battle
+	put_items_to_box_except(box, self.keep_items)
+
+	-- HS temporarily swell the ranks of traders
+	TB3D_Services.set_community(db.actor, "trader", 0, 0, true)
+	--db.actor:set_character_community("trader",0,0)
+
+	-- Teleport to the audience
+	level.add_pp_effector ("teleport.ppe", 2006, false)
+	db.actor:set_actor_position(vector():set(140.05,-13.387,108.039))
+	db.actor:set_actor_direction(1.57)
+
+	-- run a bunch of logic tied to this info_portion
+	TB3D_Services.give_info("bar_arena_fight")
+	
+	-- change groups to team2
+	local npc
+	for id=0, last_object do
+		npc = level.object_by_id(id)
+		if npc ~= nil and string.find(npc:section(),"_t2_") then
+			TB3D_Services.set_community(npc, "stalker", 0, 0, false)
+			--npc:set_character_community("stalker", 0, 0)
+		end
+	end
+end
+
+-------
+-- exit from the arena after the final Voice
+-------
+function CArenaext:finish()
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("finish arena") end
+	local name = self:current()
+	--printf("CArenaext:finish('%s')", name)
+	local info = self.fights[name]
+
+	-- the battle is over, mark it and something else
+	self:on_done_fight()
+
+	-- Teleport to Arnie
+	level.add_pp_effector ("blink.ppe", 234, false)
+	db.actor:set_actor_position(patrol("t_walk_2"):point(0))
+	local dir = patrol("t_look_2"):point(0):sub(patrol("t_walk_2"):point(0))
+	db.actor:set_actor_direction(-dir:getH())
+
+--TB3D_Services.packet_alert("finish arena1")
+	-- HS leaves the ranks of traders
+	--local community = amk.load_variable("aem_cm")
+	TB3D_Services.restore_community(db.actor)
+	--db.actor:set_character_community(community,0,0)
+	--amk.del_variable("aem_cm")
+
+--TB3D_Services.packet_alert("finish arena2")
+	-- removal of weapons illegally handed down from the arena
+	if info.group ~= "turnament" or info.group ~= "stakes" then
+		clear_items(self.arena_items)
+	end
+
+	-- 'Magic' box
+	local box = level_object_by_sid(574)
+	-- Returns HS previously selected items
+	get_items_from_box(box)
+
+	-- reset logic restriction fragment
+	TB3D_Services.remove_info("bar_arena_fight")
+	TB3D_Services.remove_info("bar_arena_fight_begin")
+--TB3D_Services.packet_alert("finish arena3")
+
+	-- the massacre of enemies left on the scene after the release of GH
+	local bot
+	for id=0, last_object do
+		bot = level.object_by_id(id)
+		if bot ~= nil and bot:alive() == true then
+			if string.find(bot:out_restrictions(),"bar_arena_restrictor") then
+				bot:kill(bot)
+			end
+		end
+	end
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("finish arena done") end
+end
+
+-------
+-- receive the award and clean Old about this fight, so you can proceed to the next
+-------
+function CArenaext:close()
+	local name = self:current()
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem: close["..utils.to_str(name).."]") end
+	local info = self.fights[name]
+	if info.group == "turnament" or info.group == "stakes" then
+		if (has_alife_info("aem_stake_team1") and amk.load_variable("aem_team1",0) > 0) or
+		   (has_alife_info("aem_stake_team2") and amk.load_variable("aem_team2",0) > 0) then
+			local money = 0
+			if has_alife_info("aem_stake1") then
+				money = stake1 + math.random(stake1*perc_min/100, stake1*perc_max/100)
+			elseif has_alife_info("aem_stake2") then
+				money = stake2 + math.random(stake2*perc_min/100, stake2*perc_max/100)
+			elseif has_alife_info("aem_stake3") then
+				money = stake3 + math.random(stake3*perc_min/100, stake3*perc_max/100)
+			end
+			manage_money(money, "in")
+		else
+			manage_money(0, "in")
+		end
+		TB3D_Services.remove_info("aem_stake_team1")
+		TB3D_Services.remove_info("aem_stake_team2")
+		TB3D_Services.remove_info("aem_stake1")
+		TB3D_Services.remove_info("aem_stake2")
+		TB3D_Services.remove_info("aem_stake3")
+	else
+		if has_alife_info("aem_fight_foul") then
+			manage_money(info.money, "out")
+		elseif has_alife_info("aem_timeover") then
+			manage_money(0, "in")
+		else
+			manage_money(info.money, "in")
+			if has_alife_info("aem_bonus") and has_alife_info("aem_timeover") == false then
+				local money = 0
+				if has_alife_info("aem_bonus_5s") then
+					money = info.bonus_5s
+				elseif has_alife_info("aem_bonus_10s") then
+					money = info.bonus_10s
+				elseif has_alife_info("aem_bonus_15s") then
+					money = info.bonus_15s	
+				elseif has_alife_info("aem_bonus_20s") then
+					money = info.bonus_20s
+				elseif has_alife_info("aem_bonus_30s") then
+					money = info.bonus_30s
+				elseif has_alife_info("aem_bonus_40s") then
+					money = info.bonus_40s
+				elseif has_alife_info("aem_bonus_50s") then
+					money = info.bonus_50s
+				elseif has_alife_info("aem_bonus_60s") then
+					money = info.bonus_60s
+				end
+				
+				if money ~= nil and money > 0 then
+					manage_money(money, "in")
+				end
+			end
+		end
+		TB3D_Services.remove_info("aem_bonus")
+		TB3D_Services.remove_info("aem_bonus_5s")
+		TB3D_Services.remove_info("aem_bonus_10s")
+		TB3D_Services.remove_info("aem_bonus_15s")
+		TB3D_Services.remove_info("aem_bonus_20s")
+		TB3D_Services.remove_info("aem_bonus_30s")
+		TB3D_Services.remove_info("aem_bonus_40s")
+		TB3D_Services.remove_info("aem_bonus_50s")
+		TB3D_Services.remove_info("aem_bonus_60s")
+		TB3D_Services.remove_info("aem_timeover")
+		TB3D_Services.remove_info("aem_fight_foul")
+	end
+	-- Cleaning the arena (if you do finish, that is, bugs)
+	xr_zones.purge_arena_items("bar_arena")		--!!!!TB3D
+	-- discharge lighting after the battle
+	--aem_lights.remove_all_aem_lamps()
+	TB3D_Services.remove_info("aem_fight_done")
+	amk.del_variable("aem_cr")
+	amk.del_variable("aem_team1")
+	amk.del_variable("aem_team2")
+	if amk.load_variable("option_autosave",1)~=0 then
+		news_manager.save_collector("Ext Arena fight "..name, true)				--109952  added is_fast
+	end
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem: close["..utils.to_str(name).."] done") end
+end
+
+---------------------------------------------------------------------------------------------------
+-- functions to work with a dynamic dialogue
+---------------------------------------------------------------------------------------------------
+--
+-- There are fights, Arnie?
+--   That is all, the arena is closed.
+--   Choose ...
+--     <group1>
+--     <group2>
+--     ...
+--     ret
+--
+-- <single>
+-- Dolzhanov
+--   What Number?
+--     One
+--       How long will you need?
+--         10 seconds
+--         20 seconds
+--         30 seconds
+--         40 seconds
+--         <ret>
+--     ...
+--     <ret>
+--
+-- <stake>
+-- Tote
+--   What fight?
+--     Military vs. Liberty
+--      You put on someone?
+--         Military
+--           How much?
+--             1000
+--               Well, it all bets are made.
+--                 Gone
+--             2000
+--               Well, it all bets are made.
+--                 Gone
+--             3000
+--               Well, it all bets are made.
+--                 Gone
+--             <nomoney>
+--             <ret>
+--         Freedom
+--           How much?
+--             1000
+--				Well, it all bets are made.
+--                 Gone
+--             2000
+--               Well, it all bets are made.
+--                 Gone
+--             3000
+--               Well, it all bets are made.
+--                 Gone
+--             <nomoney>
+--             <ret>
+--         <ret>
+--     ...
+--     <ret>
+--
+-- <turnament>
+-- Tournament
+--   What fight?
+--     War against Liberty.
+--       You put on someone?
+--         Military
+--           How much?
+--             1000
+--               And so, all bets are made.
+--                 Gone
+--             2000
+--               And so, all bets are made.
+--                 Gone
+--             3000
+--               And so, all bets are made.
+--                 Gone
+--             <nomoney>
+--             <ret>
+--         Freedom
+--           How much?
+--             1000
+--               And so, all bets are made.
+--                 Gone
+--             2000
+--               And so, all bets are made.
+--                 Gone
+--             3000
+--               And so, all bets are made.
+--                 Gone
+--             <nomoney>
+--             <ret>
+--         <ret>
+--     <ret>
+--
+---------------------------------------------------------------------------------------------------
+
+-------
+-- Added by DEXXX
+-- Check the version of the game and substitute the desired data type
+-------
+function chk_ver(pid)
+	--if tonumber(_G.main_menu.get_main_menu():GetGSVer()) <= 1.0004 then
+		--return pid
+	--else
+		if pid == -1 then
+			return ""
+		else
+			return tostring(pid)
+		end
+	--end
+end
+
+function chk_ver_back(ph_curr)
+	--if tonumber(_G.main_menu.get_main_menu():GetGSVer()) <= 1.0004 then
+		--return ph_curr
+	--else
+		return tonumber(ph_curr)
+	--end
+end
+
+-------
+-- actor creates a dialogue, which will be issued to the job
+-------
+function CArenaext:dlg_init(dlg)
+	--printf("CArenaext:dlg_init(...)")
+
+	local phr = dlg:AddPhrase("aem_job_quest", chk_ver(0), chk_ver(-1), -10000)
+	local phr_script = phr:GetPhraseScript()
+
+	phr = dlg:AddPhrase("aem_job_closed", chk_ver(1), chk_ver(0), -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddDontHasInfo("aem_ready")
+
+	phr = dlg:AddPhrase("aem_job_select", chk_ver(2), chk_ver(0), -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddHasInfo("aem_ready")
+
+	phr = dlg:AddPhrase("aem_job_extra", chk_ver(3), chk_ver(2), -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.is_stakes_or_turnament_valid")
+
+	phr = dlg:AddPhrase("aem_job_extra_info", chk_ver(4), chk_ver(3), -10000)
+
+	self:dlg_init_stakes(dlg, 4)
+	self:dlg_init_turnament(dlg, 4)
+	
+	local i
+	local count = table.getn(self.groups_order)
+	for i=1, count do
+		self:dlg_init_group(dlg, self.groups_order[i], 2)
+	end
+
+	dlg:AddPhrase("aem_job_extra_reject", chk_ver(5), chk_ver(4), -10000)
+
+	dlg:AddPhrase("aem_job_reject", chk_ver(6), chk_ver(2), -10000)
+end
+
+-------
+-- adds to the dialogue group of ordinary fights
+-------
+function CArenaext:dlg_init_group(dlg, name, parent)
+	--printf("CArenaext:dlg_init_group('%s')", name)
+
+	local group = self.groups[name]
+	local dlg_id = group.dlg_id
+
+	local phr = dlg:AddPhrase(group.title, dlg_id, parent, -10000)
+	local phr_script = phr:GetPhraseScript()
+	phr_script:AddDontHasInfo(group.done)
+
+	dlg:AddPhrase(group.info, dlg_id+1, dlg_id, -10000)
+
+	local i
+	local count = table.getn(group.fights)
+	for i=1, count do
+		self:dlg_init_fight(dlg, group.fights[i], dlg_id+1)
+	end
+
+	dlg:AddPhrase("aem_job_group_reject", dlg_id+2, dlg_id+1, -10000)
+end
+
+-------
+-- adds to the dialogue one regular fight
+-------
+function CArenaext:dlg_init_fight(dlg, name, parent)
+	--printf("CArenaext:dlg_init_fight('%s')", name)
+
+	local fight = self.fights[name]
+	local dlg_id = fight.dlg_id
+
+	local phr = dlg:AddPhrase(fight.title, dlg_id, parent, -10000)
+	local phr_script = phr:GetPhraseScript()
+	phr_script:AddDontHasInfo(fight.done)
+
+	if fight.bonus ~= nil then
+		phr = dlg:AddPhrase(fight.bonus, dlg_id+1, dlg_id, -10000)
+	else
+		phr = dlg:AddPhrase("aem_job_time_quest", dlg_id+1, dlg_id, -10000)
+	end
+
+	if fight.nounlimit == nil then
+		if fight.unlimit ~= nil then
+			phr = dlg:AddPhrase(fight.unlimit, dlg_id+10, dlg_id+1, -10000)
+		else
+			phr = dlg:AddPhrase("aem_job_time_unlimited", dlg_id+10, dlg_id+1, -10000)
+		end
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddDisableInfo("aem_bonus")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	if fight.bonus_5s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_5", dlg_id+9, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_5s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	if fight.bonus_10s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_10", dlg_id+8, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_10s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	if fight.bonus_15s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_15", dlg_id+7, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_15s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	if fight.bonus_20s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_20", dlg_id+6, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_20s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	if fight.bonus_30s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_30", dlg_id+5, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_30s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	if fight.bonus_40s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_40", dlg_id+4, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_40s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	if fight.bonus_50s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_50", dlg_id+3, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_50s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+		if fight.bonus_60s > 0 then
+		phr = dlg:AddPhrase("aem_job_time_60", dlg_id+2, dlg_id+1, -10000)
+		phr_script = phr:GetPhraseScript()
+		phr_script:AddGiveInfo("aem_bonus")
+		phr_script:AddGiveInfo("aem_bonus_60s")
+		phr_script:AddAction("aem_manager.start_fight")
+		phr_script:AddAction("dialogs.break_dialog")
+	end
+	dlg:AddPhrase("aem_job_time_reject", dlg_id+11, dlg_id+1, -10000)
+end
+
+-------
+-- adds to the dialogue group stakes
+-------
+function CArenaext:dlg_init_stakes(dlg, parent)
+	--printf("CArenaext:dlg_init_stakes()")
+
+	local group = self.groups["stakes"]
+	local dlg_id = group.dlg_id
+
+	local phr = dlg:AddPhrase(group.title, dlg_id, parent, -10000)
+	local phr_script = phr:GetPhraseScript()
+	phr_script:AddDontHasInfo(group.done)
+
+	dlg:AddPhrase(group.info, dlg_id+1, dlg_id, -10000)
+
+	local i, j
+	local name1, name2
+	local fight_id = dlg_id + 100
+	local n1 = table.getn(group.teams1)
+	local n2 = table.getn(group.teams2)
+	for i=1, n1 do
+		name1 = group.teams1[i]
+		for j=1, n2 do
+			name2 = group.teams2[j]
+			self:dlg_init_stakes_fight(dlg, name1, name2, dlg_id+1, fight_id)
+			fight_id = fight_id + 100
+		end
+	end
+
+	dlg:AddPhrase("aem_job_group_reject", dlg_id+2, dlg_id+1, -10000)
+end
+
+-------
+-- adds to the dialogue one more fight stakes
+-------
+function CArenaext:dlg_init_stakes_fight(dlg, name1, name2, parent, dlg_id)
+	--printf("CArenaext:dlg_init_stakes_fight('%s vs %s')", name1, name2)
+
+	local team1 = self.teams[name1]
+	local team2 = self.teams[name2]
+
+	local title = game.translate_string(team1.name1)
+	title = title .. " "
+	title = title .. game.translate_string("aem_job_stake_vs")
+	title = title .. " "
+	title = title .. game.translate_string(team2.name2)
+
+	local phr = dlg:AddPhrase(title, dlg_id, parent, -10000)
+	local phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.is_stakes_valid")
+
+	dlg:AddPhrase("aem_job_stake_quest", dlg_id+1, dlg_id, -10000)
+
+	phr = dlg:AddPhrase(team1.name, dlg_id+2, dlg_id+1, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddGiveInfo("aem_stake_team1")
+	phr_script:AddDisableInfo("aem_stake_team2")
+
+	dlg:AddPhrase("aem_job_stake_money", dlg_id+3, dlg_id+2, -10000)
+	self:dlg_init_stake_tree(dlg, dlg_id+10, dlg_id+3)
+
+	phr = dlg:AddPhrase(team2.name, dlg_id+4, dlg_id+1, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddGiveInfo("aem_stake_team2")
+	phr_script:AddDisableInfo("aem_stake_team1")
+
+	dlg:AddPhrase("aem_job_stake_money", dlg_id+5, dlg_id+4, -10000)
+	self:dlg_init_stake_tree(dlg, dlg_id+50, dlg_id+5)
+
+	dlg:AddPhrase("aem_job_stake_reject", dlg_id+6, dlg_id+1, -10000)
+end
+
+-------
+-- adds to the dialogue group turnament
+-------
+function CArenaext:dlg_init_turnament(dlg, parent)
+	--printf("CArenaext:dlg_init_turnament()")
+
+	local group = self.groups["turnament"]
+	local dlg_id = group.dlg_id
+
+	local phr = dlg:AddPhrase(group.title, dlg_id, parent, -10000)
+	local phr_script = phr:GetPhraseScript()
+	phr_script:AddDontHasInfo(group.done)
+
+	dlg:AddPhrase(group.info, dlg_id+1, dlg_id, -10000)
+
+	local i, j
+	local name1, name2
+	local fight_id = dlg_id + 100
+	local n = table.getn(group.teams)
+	for i=1, n do
+		name1 = group.teams[i]
+		for j=1, n do
+			if i ~= j then
+				name2 = group.teams[j]
+				self:dlg_init_turnament_fight(dlg, name1, name2, dlg_id+1, fight_id)
+				fight_id = fight_id + 100
+			end
+		end
+	end
+
+	dlg:AddPhrase("aem_job_group_reject", dlg_id+2, dlg_id+1, -10000)
+end
+
+-------
+-- adds to the dialogue one more fight turnament
+-------
+function CArenaext:dlg_init_turnament_fight(dlg, name1, name2, parent, dlg_id)
+	--printf("CArenaext:dlg_init_turnament_fight('%s vs %s')", name1, name2)
+
+	local team1 = self.teams[name1]
+	local team2 = self.teams[name2]
+
+	local title = game.translate_string(team1.name1)
+	title = title .. " "
+	title = title .. game.translate_string("aem_job_stake_vs")
+	title = title .. " "
+	title = title .. game.translate_string(team2.name2)
+
+	local phr = dlg:AddPhrase(title, dlg_id, parent, -10000)
+	local phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.is_turnament_valid")
+
+	dlg:AddPhrase("aem_job_stake_quest", dlg_id+1, dlg_id, -10000)
+
+	phr = dlg:AddPhrase(team1.name, dlg_id+2, dlg_id+1, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddGiveInfo("aem_stake_team1")
+	phr_script:AddDisableInfo("aem_stake_team2")
+
+	dlg:AddPhrase("aem_job_stake_money", dlg_id+3, dlg_id+2, -10000)
+	self:dlg_init_stake_tree(dlg, dlg_id+10, dlg_id+3)
+
+	phr = dlg:AddPhrase(team2.name, dlg_id+4, dlg_id+1, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddGiveInfo("aem_stake_team2")
+	phr_script:AddDisableInfo("aem_stake_team1")
+
+	dlg:AddPhrase("aem_job_stake_money", dlg_id+5, dlg_id+4, -10000)
+	self:dlg_init_stake_tree(dlg, dlg_id+50, dlg_id+5)
+
+	dlg:AddPhrase("aem_job_stake_reject", dlg_id+6, dlg_id+1, -10000)
+end
+
+-------
+-- adds to the dialogue with the rates of branch
+-------
+function CArenaext:dlg_init_stake_tree(dlg, stake, parent)
+
+	local tm = " "..game.translate_string("aem_job_stake_money_tm")
+
+	local phr = dlg:AddPhrase(tostring(stake1)..tm, stake, parent, -10000)
+	local phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.has_money_1")
+
+	phr = dlg:AddPhrase("aem_job_stake_ready", stake+1, stake, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddGiveInfo("aem_stake1")
+	phr_script:AddAction("aem_manager.start_fight")
+
+	phr = dlg:AddPhrase("aem_job_stake_go", stake+2, stake+1, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddAction("dialogs.break_dialog")
+
+	phr = dlg:AddPhrase(tostring(stake2)..tm, stake+10, parent, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.has_money_2")
+
+	phr = dlg:AddPhrase("aem_job_stake_ready", stake+11, stake+10, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddGiveInfo("aem_stake2")
+	phr_script:AddAction("aem_manager.start_fight")
+
+	phr = dlg:AddPhrase("aem_job_stake_go", stake+12, stake+11, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddAction("dialogs.break_dialog")
+
+	phr = dlg:AddPhrase(tostring(stake3)..tm, stake+20, parent, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.has_money_3")
+
+	phr = dlg:AddPhrase("aem_job_stake_ready", stake+21, stake+20, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddGiveInfo("aem_stake3")
+	phr_script:AddAction("aem_manager.start_fight")
+
+	phr = dlg:AddPhrase("aem_job_stake_go", stake+22, stake+21, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddAction("dialogs.break_dialog")
+
+	phr = dlg:AddPhrase("aem_job_stake_money_empty", stake+30, parent, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.hasnt_money")
+
+	phr = dlg:AddPhrase("aem_job_stake_money_reject", stake+31, parent, -10000)
+	phr_script = phr:GetPhraseScript()
+	phr_script:AddPrecondition("aem_manager.has_money_1")
+end
+
+-------
+-- returns the id phrase battle turnament
+-------
+function CArenaext:turnament_phrase_id(name)
+	local info = self.fights[name]
+	local name1 = amk.load_variable(info.team1, "")
+	local name2 = amk.load_variable(info.team2, "")
+	return self.turnament_phrase[name1 .. name2]
+end
+
+-------
+-- returns the id phrase battle stakes
+-------
+function CArenaext:stakes_phrase_id(name)
+	local info = self.fights[name]
+	local name1 = amk.load_variable(info.team1, "")
+	local name2 = amk.load_variable(info.team2, "")
+	return self.stakes_phrase[name1 .. name2]
+end
+
+-------
+-- returns the name of the battle by id phrases
+-------
+function CArenaext:fight_by_phrase(phr_id)
+	local name, info
+
+	info = self.groups["turnament"]
+	if (phr_id >= info.dlg_id) and (phr_id < info.dlg_id + info.dlg_size) then
+		local i, id
+		local n = table.getn(info.fights)
+		for i=1, n do
+			name = info.fights[i]
+			id = self:turnament_phrase_id(name)
+			if (id ~= nil) and (phr_id >= id) and (phr_id < id + 100) then
+				return name
+			end
+		end
+		return ""
+	end
+
+	info = self.groups["stakes"]
+	if (phr_id >= info.dlg_id) and (phr_id < info.dlg_id + info.dlg_size) then
+		local i, id
+		local n = table.getn(info.fights)
+		for i=1, n do
+			name = info.fights[i]
+			id = self:stakes_phrase_id(name)
+			if (id ~= nil) and (phr_id >= id) and (phr_id < id + 100) then
+				return name
+			end
+		end
+		return ""
+	end
+
+	for name, info in pairs(self.fights) do
+		if (phr_id >= info.dlg_id) and (phr_id < info.dlg_id + info.dlg_size) then
+			return name
+		end
+	end
+	return ""
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- function to control manager-th
+---------------------------------------------------------------------------------------------------
+
+-------
+-- obtain and initialize an object of class
+-------
+function get_aem()
+	if arenaext == nil then
+		arenaext = CArenaext()
+	end
+	return arenaext
+end
+
+-------
+-- delete an object class
+-------
+function clear_aem()
+	arenaext = nil
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- functions to support inventory and box
+---------------------------------------------------------------------------------------------------
+
+-------
+-- moves the specified items from the inventory of HH in the box
+-- void put_items_to_box(game_object box, {["section1"]=true, ["section2"]=true, ...} items)
+-------
+function put_items_to_box(box, items)
+	--TB3D_Services.packet_alert("aem mgr: put_items_to_box["..utils.to_str(box:name()).."]")
+	local obj
+	local cnt = db.actor:object_count()
+	for i=0, cnt-1 do
+		obj = db.actor:object(i)
+		if items[obj:section()] == true then
+			--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] transfered")
+			db.actor:transfer_item(obj, box)
+		else
+			--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not transfered")
+		end
+	end
+end
+
+-------
+-- brings all things, unless specifically, from the inventory of HH in the box
+-- void put_items_to_box_exept(game_object box, {["section1"]=true, ["section2"]=true, ...} exept)
+-------
+function put_items_to_box_except(box, except)
+	--TB3D_Services.packet_alert("aem mgr: put_items_to_box_except["..utils.to_str(box:name()).."]")
+	local obj
+	local cnt = db.actor:object_count()
+	for i=0, cnt-1 do
+		obj = db.actor:object(i)
+		if obj:clsid() ~= clsid.equ_stalker_s then -- leave HS suit
+			if except[obj:section()] ~= true then
+				--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] transfered")
+				db.actor:transfer_item(obj, box)
+			else
+				--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not transfered")
+			end
+		end
+	end
+end
+
+-------
+-- brings all things out of the box in invertar HS
+-- void get_items_from_box(game_object box)
+------
+function get_items_from_box(box)
+	--TB3D_Services.packet_alert("aem mgr: get_items_from_box["..utils.to_str(box:name()).."]")
+	local obj
+	local ids = enum_box_items(box)
+	for i, id in pairs(ids) do
+		obj = level.object_by_id(id)
+		if obj ~= nil then
+			--printf(" section='%s'", obj:section())
+			box:transfer_item(obj, db.actor)
+		end
+	end
+end
+
+-------
+-- removes specified items from the inventory HS
+-- void clear_items({["section1"]=true, ["section2"]=true, ...} items)
+-------
+function clear_items(items)
+	--TB3D_Services.packet_alert("aem mgr: clear_items from actor")
+	local obj
+	local cnt = db.actor:object_count()
+	for i=0, cnt-1 do
+		obj = db.actor:object(i)
+		if items[obj:section()] == true then
+			--printf(" section='%s'", obj:section())
+			alife():release(alife():object(obj:id()), true)
+		end
+	end
+end
+
+-------
+-- clean box online
+-- void clear_box(game_object box)
+-------
+function clear_box(box)
+	--TB3D_Services.packet_alert("aem mgr: clear_box["..utils.to_str(box:name()).."]")
+	local obj
+	local ids = enum_box_items(box)
+	for i, id in pairs(ids) do
+		alife():release(alife():object(id), true)
+	end
+end
+
+-------
+-- clear box to the top of
+-- void clear_offline_box(number sid)
+-------
+function clear_offline_box(sid)
+	--TB3D_Services.packet_alert("aem mgr: clear_offline_box")
+	local obj = alife():story_object(sid)
+	if obj then
+		local box = obj.id
+		--local id
+		for id=0, last_object do
+			obj = alife():object(id)
+			if obj and obj.parent_id == box then
+				--printf("release(%s)", obj:name())
+				alife():release(obj, true)
+			end
+		end
+	end
+end
+
+-------
+-- id get a list of things lying in a box
+-- {id1, id2, ...} enum_box_items(game_object box)
+-------
+function enum_box_items(box)
+	--TB3D_Services.packet_alert("aem mgr: enum_box_items["..utils.to_str(box:name()).."]")
+	local obj
+	local own
+	local ids = {}
+	for id=0, last_object do
+		obj = level.object_by_id(id)
+		if obj ~= nil then
+			own = obj:parent()
+			if own ~= nil and own:id() == box:id() then
+				--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] in box")
+				table.insert(ids, id)
+			else
+				--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not in box")
+			end
+		end
+	end
+	return ids
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- overdetermined binder-s, as an alternative net_spawn
+---------------------------------------------------------------------------------------------------
+
+-------
+-- binder to bind to the stalkers 'bar_arena_restrictor'
+-------
+function bind_npc(npc)
+	npc:add_restrictions("bar_arena_restrictor","")
+	bind_stalker.init(npc)
+end
+
+-------
+-- binder to bind to the admins 'bar_restrictor'
+-------
+function bind_admin(npc)
+	if has_alife_info("aem_go_bar") then
+		npc:add_restrictions("bar_restrictor", "")
+	else
+		npc:remove_all_restrictions()
+	end
+	bind_stalker.init(npc)
+end
+
+-------
+-- binder to bind to the monsters 'bar_arena_restrictor'
+-- !!! does not work for the Comptroller !!!
+-------
+function bind_mob(mob)
+	mob:add_restrictions("bar_arena_restrictor","")
+	bind_monster.bind(mob)
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- receipt and withdrawal of money without reference to NPC
+---------------------------------------------------------------------------------------------------
+function manage_money(num, type)
+	if db.actor then
+		if type == "in" then
+			db.actor:give_money(num)
+			if TB3D_Modders.log_game_stats == true then game_stats.money_quest_update (num) end
+		elseif type == "out" then
+			db.actor:give_money(-num)
+			if TB3D_Modders.log_game_stats == true then game_stats.money_quest_update(-num) end
+		end
+		news_manager.relocate_money(db.actor, type, num)
+	end
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- messages displayed on the arena
+---------------------------------------------------------------------------------------------------
+function msg(text)
+	local npc, who, icon, msg, snd
+	if has_alife_info("aem_arny_dead") or 
+		has_alife_info("aem_admin_dead") or
+		has_alife_info("aem_arny_spread_out") or
+		has_alife_info("aem_admin_spread_out") then
+		who = game.translate_string("aem_barman")
+		icon = Frect():set(332,235,84,45)
+	else
+		npc = alife():object(amk.load_variable("aem_id"))
+		if npc ~= nil and npc:alive() == true then
+			if npc:profile_name() == "aem_arny" then
+				who = game.translate_string("bar_arny_name")
+				icon = Frect():set(332,141,84,45)
+			else
+				who = game.translate_string("aem_admin")
+				icon = Frect():set(83,329,84,45)
+			end
+		end
+	end
+
+	msg = game.translate_string(text)
+	snd = xr_sound.get_safe_sound_object([[device\pda\pda_tip]])
+	snd:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+	news_manager.give_game_news(TB3D_Services.get_text_color("aem")..who..":\\n%c[default]"..msg, "ui\\ui_iconstotal", icon, 0, 15000)
+end
+
+function npc(npc)
+	return npc
+end
+---------------------------------------------------------------------------------------------------
+-- functions for working with time
+---------------------------------------------------------------------------------------------------
+
+-------
+-- during the game (for good to read from the ltx game)
+-------
+function time_get_start()
+	local t = game.CTime()
+	t:set(2012,5,1, 0,0,0,0)
+	return t
+end
+
+-------
+-- time in hours elapsed from the start of the game
+-------
+function time_get_curr()
+	local t = game.get_game_time()
+	local s = t:diffSec(time_def)
+	return math.floor(s/3600)
+end
+
+-------
+-- next time you open
+-------
+function time_get_next(curr)
+	-- assignment of a random interval following the opening of the arena
+	if delay_min < 1 then
+		curr = curr + (math.random(delay_max) - 1) * 24
+	else
+		curr = curr + math.random(delay_min, delay_max) * 24
+	end
+
+	local days = math.floor(curr / 24)
+	local hour = curr - days * 24
+
+	local next = days * 24 + time_open
+	if hour >= time_open then
+		next = next + 24
+	end
+	return next
+end
+
+-------
+-- check whether it is time to close the arena
+-------
+function time_need_close(curr, open)
+	local need = open + time_close - time_open
+	if time_close < time_open then
+		need = need + 24
+	end
+	return curr >= need
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- creating dialogue fights extradition
+---------------------------------------------------------------------------------------------------
+function dlg_init(dlg, npc)
+	get_aem():dlg_init(dlg)
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- Checking the conditions dialogues - precondition
+---------------------------------------------------------------------------------------------------
+
+-------
+-- check the possibility of displaying the dialog branches additional fights
+-------
+function is_stakes_or_turnament_valid()
+	local arena = get_aem()
+	return	 not has_alife_info(arena.groups["stakes"].done) or
+		not has_alife_info(arena.groups["turnament"].done)
+end
+
+-------
+-- check the possibility of displaying the dialog battle 'stakes'
+-------
+function is_stakes_valid(npc1, npc2, dlg_name, phr_prev, phr_curr)
+	phr_curr = chk_ver_back(phr_curr)
+	local arena = get_aem()
+	name = arena:fight_by_phrase(phr_curr)
+	if name == "" then
+		return false
+	end
+	return not has_alife_info(arena.fights[name].done)
+end
+
+-------
+-- check the possibility of displaying the dialog battle 'turnament'
+-------
+function is_turnament_valid(npc1, npc2, dlg_name, phr_prev, phr_curr)
+	phr_curr = chk_ver_back(phr_curr)
+	local arena = get_aem()
+	name = arena:fight_by_phrase(phr_curr)
+	if name == "" then
+		return false
+	end
+	return not has_alife_info(arena.fights[name].done)
+end
+
+-------
+-- check the availability of money at stake
+-------
+function has_money_1()
+	return db.actor:money() >= stake1
+end
+
+function has_money_2()
+	return db.actor:money() >= stake2
+end
+
+function has_money_3()
+	return db.actor:money() >= stake3
+end
+
+function hasnt_money()
+	return db.actor:money() < stake1
+end
+
+-------
+-- check the options dialogue award for battle
+-------
+
+-- bid wins
+--
+function is_reward_stake_win()
+	if not get_aem():is_stake() then
+		return false
+	end
+	return get_aem():is_stake_win()
+end
+
+-- rate of lost
+--
+function is_reward_stake_fail()
+	if not get_aem():is_stake() then
+		return false
+	end
+	return not get_aem():is_stake_win()
+end
+
+-- battle with no time limit
+--
+function is_reward_nostake_unlimit()
+	if get_aem():is_stake() then
+		return false
+	end
+	if has_alife_info("aem_bonus") == false then
+		return true --false		--TB3D 109940
+	end
+	return false --true			--TB3D 109940
+end
+
+-- battle with the time limit - win
+--
+function is_reward_nostake_bonus()
+	if get_aem():is_stake() then
+		return false
+	end
+	if has_alife_info("aem_bonus") == false then
+		return false
+	end
+	return not has_alife_info("aem_timeover")
+end
+
+-- battle with the restriction of time - a draw
+--
+function is_reward_nostake_timeover()
+	if get_aem():is_stake() then
+		return false
+	end
+	if has_alife_info("aem_bonus") == false or has_alife_info("aem_timeover") == false then
+		return false
+	end
+	return not has_alife_info("aem_fight_foul")
+end
+
+-- bout time limited - Fall
+--
+function is_reward_nostake_foul()
+	if get_aem():is_stake() then
+		return false
+	end
+	if has_alife_info("aem_bonus") == false or has_alife_info("aem_timeover") == false then
+		return false
+	end
+	return has_alife_info("aem_fight_foul")
+end
+
+-------
+-- check the options dialog to initialize the arena
+-------
+
+-- first activation
+--
+function is_init_first()
+	return get_aem().init_t == 0
+end
+
+-- is not the first activation
+--
+function is_init_not_first()
+	return not is_init_first()
+end
+
+-- Team
+--
+function is_init_stalkers()
+	return get_aem():is_stalkers_evil()
+end
+
+-- no team
+--
+function is_init_not_stalkers()
+	return not is_init_stalkers()
+end
+
+-- mutants
+--
+function is_init_mutants()
+	return get_aem():get_mutants_time() >= delay_mut*24
+end
+
+-- no mutants
+--
+function is_init_not_mutants()
+	return not is_init_mutants()
+end
+
+
+---------------------------------------------------------------------------------------------------
+-- features dialogues - action
+---------------------------------------------------------------------------------------------------
+
+-------
+-- initialization mode
+-------
+function startup()
+	get_aem():startup()
+end
+
+function timeup()
+	get_aem():timeup()
+end
+-------
+-- Remove Fashion
+-------
+function cleanup()
+	get_aem():cleanup()
+end
+
+-------
+-- done in the arena lighter
+-------
+function lights_on()
+	--aem_lights.lights_on(TB3D_Modders.aem_light_style)	
+end
+
+-------
+-- return to previous coverage
+-------
+function lights_off()
+	--aem_lights.lights_off(TB3D_Modders.aem_light_style)
+end
+
+-------
+-- 'Daily' battles reinitialization
+-------
+function reinit()
+	get_aem():reinit()
+end
+
+-------
+-- start a fight, what kind - is determined by the id phrase
+-------
+function start_fight(npc1, npc2, dlg_name, phr_curr)
+-- cutoff case closed arena during the dialogue
+	if has_alife_info("aem_ready") == false then
+		TB3D_Services.remove_info("aem_bonus")
+		TB3D_Services.remove_info("aem_bonus_5s")
+		TB3D_Services.remove_info("aem_bonus_10s")
+		TB3D_Services.remove_info("aem_bonus_15s")
+		TB3D_Services.remove_info("aem_bonus_20s")
+		TB3D_Services.remove_info("aem_bonus_30s")
+		TB3D_Services.remove_info("aem_bonus_40s")
+		TB3D_Services.remove_info("aem_bonus_50s")
+		TB3D_Services.remove_info("aem_bonus_60s")
+		TB3D_Services.remove_info("aem_stake_team1")
+		TB3D_Services.remove_info("aem_stake_team2")
+		TB3D_Services.remove_info("aem_stake1")
+		TB3D_Services.remove_info("aem_stake2")
+		TB3D_Services.remove_info("aem_stake3")
+		dialogs.break_dialog(npc1, npc2)
+		return
+	end
+	phr_curr = chk_ver_back(phr_curr)
+	get_aem():start(phr_curr)
+end
+
+-------
+-- Closing the battle and receive rewards if it is
+-------
+function close_fight()
+	get_aem():close()
+end
+
+-------
+-- function of the initialization of death arena managers
+-------
+function admin_dead()
+	if has_alife_info("aem_arny_dead") then
+		msg("aem_arny_dead")
+	elseif has_alife_info("aem_arny_spread_out") then
+		msg("aem_arny_spread_out")
+	elseif has_alife_info("aem_admin_dead") then
+		local txt = {"aem_barm_1", "aem_barm_2", "aem_barm_3", "aem_barm_4"}
+		local cnt = table.getn(txt)
+		local rnd = math.random(cnt)
+		msg(txt[rnd])
+	elseif has_alife_info("aem_admin_spread_out") then
+		msg("aem_admin_spread_out")
+	end
+	if has_alife_info("aem_startup") == false then
+		timeup()
+	end
+	-- simulates the closing scene
+	TB3D_Services.remove_info("aem_spam")
+	TB3D_Services.remove_info("aem_megafone")
+	
+	rt = math.random(5,11)
+	amk.save_variable("aem_rt", rt)
+	amk.save_variable("aem_id", -1)
+end
+
+-------
+-- zaspavnim-ka a new administrator for the arena
+-------
+function admin_spawn()
+	local obj = alife():create("aem_admin", vector():set(153.451, -0.00164, 42.0269), 40777, 1230)
+	-- preservation of the new admin id
+	amk.save_variable("aem_id", obj.id)
+end
+
+function transfer_to_box(box)		--used by xr_effects for bar arena
+	-- reading LTX
+	local id, value, result
+	local ini = ini_file("misc\\aem_manager.ltx")
+
+	local keep_items = {}
+	if ini:section_exist("keep_items") then
+		n = ini:line_count("keep_items")
+		for i=0,n-1 do
+			result, id, value = ini:r_line("keep_items",i,"",nil)
+			--TB3D_Services.packet_alert("aem mgr: id["..utils.to_str(id).."] keeper")
+			keep_items[id] = true
+		end
+	end
+	
+	local obj
+	local cnt = db.actor:object_count()
+	for i=0, cnt-1 do
+		obj = db.actor:object(i)
+		if keep_items[obj:section()] == true then
+			--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not transfered")
+		else
+			--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] transfered")
+			db.actor:transfer_item(obj, box)
+		end
+	end
+	keep_items = nil
+	ini = nil
+end

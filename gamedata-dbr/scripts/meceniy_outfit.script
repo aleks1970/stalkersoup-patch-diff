@@ -1,0 +1,511 @@
+--TB3D 1.0.9.9.7.2  removed upd, changed addrs to addx as addrs is a quest item, is_pleer
+-- Localization
+function my_ver() return "1.0.9.9.7.2" end
+
+--\\"NanoEkzoSkelet Skat-15M "" .. With the system of life support (SZHP) and upgradeable .. Spot (Shooter)..
+local t_upd = 0
+local f_1 = false
+local f_1_end = false
+
+local f_2 = false
+local f_2_end = false
+
+local f_3 = false
+local f_3_end = false
+
+local f_4 = false
+local f_4_end = false
+
+local is_pleer = false
+
+local con_skat_1 = 1
+local con_skat_2 = 1
+local con_skat_3 = 1
+local con_skat_4 = 1 -- DMX UPGRADE
+
+local flag_skat_1 = false
+local flag_skat_2 = false
+local flag_skat_3 = false
+local flag_skat_4 = false -- DMX UPGRADE
+
+local suppl_heal = false
+local suppl_energy = false
+local suppl_anti_rad = false
+local suppl_anti_zombi = false
+
+local translate = game.translate_string
+local TB3D_text_color_1 = TB3D_Services.get_text_color("alert")
+local TB3D_text_color_2 = TB3D_Services.get_text_color("system")
+local TB3D_text_color_3 = TB3D_Services.get_text_color("money")
+local TB3D_text_color_4 = TB3D_Services.get_text_color("tip")
+local lf_support = translate("skat15_sms_life_suport")
+local lf_support_1 = translate("skat15_sms_life_suport_1")
+local lf_support_2 = translate("skat15_sms_life_suport_2")
+local lf_support_3 = translate("skat15_sms_life_suport_3")
+local lf_support_4 = translate("skat15_sms_life_suport_4")
+local lf_support_5 = translate("skat15_sms_life_suport_5")
+local skat_system = translate("skat15_sms_skat_system_m")
+local lf_admin_supp = translate("skat15_sms_life_adminis_aid_proced_suport")
+
+function on_actor_update()
+--	on_sub_actor_update()	
+	local outfit = db.actor:item_in_slot(6)
+	if not is_pleer then
+		player_ogg.start_pleer_post_save()
+		is_pleer = true
+	end
+	if outfit and string.find(outfit:section(), "exo_mil_exoskeleton_") then
+		local suit_type = 0
+		if flag_skat_1 then		
+			local e_up1 = db.actor:object("exo_mil_exoskeleton_add")
+			if e_up1 then
+				e_up1:set_condition(con_skat_1)
+				suit_type = 1
+			end
+			flag_skat_1 = false
+		elseif flag_skat_2 then		
+			local e_up2 = db.actor:object("exo_mil_exoskeleton_addr")
+			if e_up2 then
+				e_up2:set_condition(con_skat_2)
+				suit_type = 2
+			end
+			flag_skat_2 = false
+		elseif flag_skat_3 then		
+			local e_up3 = db.actor:object("exo_mil_exoskeleton_addx")
+			if e_up3 then
+				e_up3:set_condition(con_skat_3)
+				suit_type = 3
+			end
+			flag_skat_3 = false
+		elseif flag_skat_4 then		-- DMX UPGRADE ON
+			local e_up4 = db.actor:object("exo_mil_exoskeleton_dmx")
+			if e_up4 then
+				e_up4:set_condition(con_skat_4)
+				suit_type = 4
+			end
+			flag_skat_4 = false     -- DMX UPGRADE OFF
+		end
+		local used = amk.load_variable("tb3d_acumm_use", 0)
+		--TB3D_Services.packet_alert("meceniy outifit: suit type["..utils.to_str(suit_type).."] used["..utils.to_str(used).."]")
+		if used > 0 then
+			if suit_type == 1 then
+				system_outfit()
+			elseif suit_type == 2 then
+				system_outfit()
+				new_system_rad()
+			elseif suit_type == 3 then
+				system_outfit()
+				new_system_rad()
+				new_system_power()
+				new_anti_dot()
+			elseif suit_type == 4 then
+				system_outfit()
+				new_system_rad()
+				new_system_power()
+				new_anti_dot()                                        -- DMX UPGRADE OFF
+			--else
+				--is_pleer = false
+			end
+		end
+	--else
+		--is_pleer = false
+	end
+end
+
+function on_item_drop(obj)
+	if obj then
+		local sect = obj:section()
+		if sect then
+			if sect == "doc_1" then						--1,8,10 spawn after monolith over
+				doc_use()
+			elseif sect == "doc_8" then
+				doc_use_2()
+			elseif sect == "doc_10" then
+				doc_use_3()
+			elseif sect == "dmx_skat15_upgrade" then  	-- syslov quest
+				doc_use_4()
+			end
+		end
+	end
+end
+
+function doc_use()
+	local e1 = db.actor:object("exo_mil_exoskeleton")
+	if e1 then
+		con_skat_1 = e1:condition()
+		--amk.remove_item_from_inventory(e1, db.actor)
+		alife():release(alife():object(e1:id()))
+		amk.spawn_item_in_inv("exo_mil_exoskeleton_add")
+		flag_skat_1 = true
+		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_upg_complete_m"), nil, nil, 10000)
+		alife():create("art_acumm",vector():set(-89.387,-2.457,-25.271),19105,2875)
+	else
+		amk.spawn_item_in_inv("doc_1")
+	end
+end
+
+function doc_use_2()
+	local e2 = db.actor:object("exo_mil_exoskeleton_add")
+	if e2 then
+		con_skat_2 = e2:condition()
+		--amk.remove_item_from_inventory(e2, db.actor)
+		alife():release(alife():object(e2:id()))
+		amk.spawn_item_in_inv("exo_mil_exoskeleton_addr")
+		flag_skat_2 = true
+		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_upg_complete_m1"), nil, nil, 10000)
+	else
+		amk.spawn_item_in_inv("doc_8")
+	end
+end
+
+function doc_use_3()
+	local e3 = db.actor:object("exo_mil_exoskeleton_addr")
+	local have_art_accum = db.actor:object("art_acumm")
+	if e3 and have_art_accum then
+		con_skat_3 = e3:condition()
+		--amk.remove_item_from_inventory(e3, db.actor)
+		alife():release(alife():object(e3:id()))
+		amk.spawn_item_in_inv("exo_mil_exoskeleton_addx")
+		flag_skat_3 = true
+		news_manager.send_tip(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_upg_complete_m2"), nil, nil, 10000)
+	else
+		if e3 then news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_1..translate("skat15_sms_req_energy"), nil, nil, 20000) end
+		amk.spawn_item_in_inv("doc_10")
+	end
+end
+
+function doc_use_4()     -- DMX UPGRADE ON
+	local e4 = db.actor:object("exo_mil_exoskeleton_addx")
+	if e4 then
+		con_skat_4 = e4:condition()
+		--amk.remove_item_from_inventory(e4, db.actor)
+		alife():release(alife():object(e4:id()))
+		amk.spawn_item_in_inv("exo_mil_exoskeleton_dmx")
+		flag_skat_4 = true
+		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_system..TB3D_text_color_3..translate("skat15_sms_final_upg_complete"), nil, nil, 10000)
+	else
+		amk.spawn_item_in_inv("dmx_skat15_upgrade")
+	end
+end                      -- DMX UPGRADE OFF
+
+function system_outfit()
+	local act = db.actor
+	if (act.health > 0.5) and (act:get_bleeding() <= 0.3) then 
+		f_1 = false		f_1_end = false
+		return 
+	end
+	
+	if (act.health <= 0.5) and (not f_1) then
+		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_health_below_auto"), nil, nil, 30000)
+	elseif (act:get_bleeding() > 0.3) and (not f_1) then	
+		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_3..translate("skat15_sms_life_suport_auto"), nil, nil, 30000)
+	end
+	
+	f_1 = true
+	
+	local heal_0 = true
+	local heal_1 = act:object("medkit")
+	local heal_2 = act:object("medkit_army")
+	local heal_3 = act:object("medkit_scientic")
+	local heal_4 = act:object("medkit_elite")
+	local heal_5 = act:object("suvorotka")
+	local heal_6 = act:object("irp-b")
+	local heal_7 = act:object("syh_pay_gde_3")
+	local heal_8 = act:object("syh_pay_spp5")
+	local band_1 = act:object("bandage")
+	local band_2 = act:object("zhgut")
+	local band_3 = act:object("antiseptic")
+	local band_4 = act:object("bandage_dmx")
+	
+	if not heal_1 or heal_2 or heal_3 or heal_4 or heal_5 or heal_6 or heal_7 or heal_8 or band_1 or band_2 or band_3 or band_4 then
+		heal_0 = false
+	else
+		heal_0 = true
+	end
+	
+	if (act.health <= 0.5) and heal_1 then --medkit
+		act:eat(heal_1)
+		local skat_supl = translate("skat15_sms_life_heal_suport_medkit")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif (act.health <= 0.5) and heal_2 then --medkit_army
+		act:eat(heal_2)
+		local skat_supl = translate("skat15_sms_life_heal_medkit_army")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif (act.health <= 0.5) and heal_3 then --medkit_scientic
+		act:eat(heal_3)
+		local skat_supl = translate("skat15_sms_life_heal_medkit_scientic")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif (act.health <= 0.5) and heal_4 then --medkit_elite
+		act:eat(heal_4)
+		local skat_supl = translate("skat15_sms_life_heal_medkit_elite")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif (act.health <= 0.5) and heal_5 then --suvorotka
+		act:eat(heal_5)
+		local skat_supl = translate("skat15_sms_life_heal_suvorotka")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif (act.health <= 0.5) and heal_6 then --irp-b
+		act:eat(heal_6)
+		local skat_supl = translate("skat15_sms_life_heal_irp-b")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif (act.health <= 0.5) and heal_7 then --syh_pay_gde_3
+		act:eat(heal_7)
+		local skat_supl = translate("skat15_sms_life_heal_syh_pay_gde_3")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif (act.health <= 0.5) and heal_8 then --syh_pay_spp5
+		act:eat(heal_8)
+		local skat_supl = translate("skat15_sms_life_syh_pay_spp5")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif act:get_bleeding() > 0.6 and band_1 then --bandage
+		act:eat(band_1)
+		local skat_supl = translate("skat15_sms_life_heal_bandage")
+		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif act:get_bleeding() > 0.6 and band_1 then --bandage when actor only bleeding.
+		act:eat(band_1)
+		local skat_supl = translate("skat15_sms_life_heal_bandage_2")
+		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif act:get_bleeding() > 0.6 and band_2 then --zhgut
+		act:eat(band_2)
+		local skat_supl = translate("skat15_sms_life_heal_zhgut")
+		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif act:get_bleeding() > 0.6 and band_3 then --antiseptic
+		act:eat(band_3)
+		local skat_supl = translate("skat15_sms_life_heal_antiseptic")
+		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
+		f_1 = false
+		f_1_end = false
+	elseif act:get_bleeding() > 0.6 and band_4 then --bandage_dmx
+		act:eat(band_4)
+		local skat_supl = translate("skat15_sms_life_heal_bandage_dmx")
+		do_heal(true,TB3D_text_color_2..lf_support_5..TB3D_text_color_3..skat_supl)
+		f_1 = false
+	end
+	if not f_1 then
+		local skat_supl = translate("skat15_sms_med_suppl_found")
+		do_heal(true,TB3D_text_color_2..lf_support_1..TB3D_text_color_3..skat_supl)
+		f_1_end = false
+		return
+	elseif not f_1_end and not heal_0 then
+		local skat_supl = translate("skat15_sms_med_suppl_not_found")
+		do_heal(false,TB3D_text_color_1..lf_support_1..TB3D_text_color_1..skat_supl)
+		f_1_end = true
+	end
+end
+
+function new_system_rad()
+	local act = db.actor
+	if act.radiation < 0.75 then 
+		f_2 = false		f_2_end = false
+		return 
+	end
+	
+--[[	if not f_2 then
+		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_cri_dose_of_rad"), nil, nil, 30000)
+	end]]--
+	
+--	f_2 = true
+	
+	local anti_0 = true
+	local anti_1 = act:object("antirad")
+	local anti_2 = act:object("amfetamin")
+	local anti_3 = act:object("medkit_scientic")
+	local anti_4 = act:object("medkit_elite")
+	
+	if not anti_1 or anti_2 or anti_3 or anti_4 then
+		anti_0 = false
+	else
+		anti_0 = true
+	end
+	
+	if not f_2 and not anti_0 then   
+		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_cri_dose_of_rad"), nil, nil, 30000)
+	end	
+	
+	f_2 = true
+	
+	if (act.health <= 0.6) and anti_1 then
+		act:eat(anti_1)
+		local skat_supl = translate("skat15_sms_antirad_antidote_dose_found")
+		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		f_2 = false
+		f_2_end = false
+    elseif (act.health <= 0.6) and anti_2 then
+		act:eat(anti_2)
+		local skat_supl = translate("skat15_sms_amfetamin_dose_found")
+		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		f_2 = false
+		f_2_end = false
+    elseif (act.health <= 0.6) and anti_3 then
+		act:eat(anti_3)
+		local skat_supl = translate("skat15_sms_scientic_med_dose_found")
+		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		f_2 = false
+		f_2_end = false
+    elseif (act.health <= 0.6) and anti_4 then
+		act:eat(anti_4)
+		local skat_supl = translate("skat15_sms_medkit_elite_dose_found")
+		do_heal(true,TB3D_text_color_2..lf_support_2..TB3D_text_color_3..skat_supl)
+		f_2 = false
+		f_2_end = false
+		return
+	elseif not f_2_end and not anti_0 then
+		local skat_supl = translate("skat15_sms_antidote_not_found")
+		do_heal(false,TB3D_text_color_1..lf_support_2..TB3D_text_color_1..skat_supl)
+		f_2_end = true
+	end
+end
+
+function new_anti_dot()
+	local act = db.actor
+	if db.actor.psy_health >= 0.5 then
+		f_3 = false		f_3_end = false
+		return
+	end
+	
+	if not f_3 then
+		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_zombi_proc_under"), nil, nil, 30000)
+	end
+	
+	f_3 = true
+	
+	local a1 = act:object("antizombie") 
+	
+	if a1 then
+		act:eat(a1)
+		local skat_supl = translate("skat15_sms_antizombin_adminst_now") --Antizombin
+		do_heal(true,TB3D_text_color_2..lf_support_4..TB3D_text_color_3..skat_supl)
+		f_3 = false
+		f_3_end = false
+		return
+	elseif not f_3_end then
+		local skat_supl = translate("skat15_sms_antizombin_not_found")
+		do_heal(false,TB3D_text_color_1..lf_support_4..TB3D_text_color_1..skat_supl)
+		f_3_end = true
+	end
+end
+
+function new_system_power()
+	local act = db.actor
+	if act.power > 0.25 then 
+		f_4 = false		f_4_end = false
+		return 
+	end
+	
+	if not f_4 then
+		news_manager.send_tip_txt(act, TB3D_text_color_2..lf_support..TB3D_text_color_4..translate("skat15_sms_seek_energy_now"), nil, nil, 30000)
+	end
+	
+	f_4 = true
+	
+	local el_0 = true
+	local el_1 = act:object("energy_drink")
+	local el_2 = act:object("amfetamin")
+	local el_3 = act:object("energy_red_bull")
+	local el_4 = act:object("energy_ad_rush")
+	local el_5 = act:object("energy_non_stop")
+	local el_6 = act:object("energy_stalker")
+	
+	if not el_1 or el_2 or el_3 or el_4 or el_5 or el_6 then
+		el_0 = false
+	else
+		el_0 = true
+	end
+	
+	if el_1 then
+		act:eat(el_1)
+		local skat_supl = translate("skat15_sms_administ_100_Rads_energy_now") --energy_drink
+		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+		f_4 = false
+		f_4_end = false
+	elseif el_2 then
+		act:eat(el_2)
+		local skat_supl = translate("skat15_sms_administ_amfetamin_energy_now") --amfetamin
+		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+		f_4 = false
+		f_4_end = false
+	elseif el_3 then
+		act:eat(el_3)
+		local skat_supl = translate("skat15_sms_administ_energy_red_bull_energy_now") --energy_red_bull
+		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+		f_4 = false
+		f_4_end = false
+	elseif el_4 then
+		act:eat(el_4)
+		local skat_supl = translate("skat15_sms_administ_energy_ad_rush_energy_now") --energy_ad_rush
+		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+		f_4 = false
+		f_4_end = false
+	elseif el_5 then
+		act:eat(el_5)
+		local skat_supl = translate("skat15_sms_administ_energy_non_stop_energy_now") --energy_non_stop
+		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+		f_4 = false
+		f_4_end = false
+	elseif el_6 then
+		act:eat(el_6)
+		local skat_supl = translate("skat15_sms_administ_energy_stalker_energy_now") --energy_stalker
+		do_heal(true,TB3D_text_color_2..lf_support_3..TB3D_text_color_3..skat_supl)
+		f_4 = false
+		f_4_end = false
+		return
+	elseif not f_4_end and not el_0 then
+		local skat_supl = translate("skat15_sms_energy_sourc_rest")
+		do_heal(false,TB3D_text_color_1..lf_support_3..TB3D_text_color_1..skat_supl)
+		f_4_end = true
+	end
+end
+
+function exo_in_section(item)
+	local itm = item:section()
+	if itm == "exo_mil_exoskeleton_addx" then
+		alife():create(itm, db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
+		alife():release(alife():object(item:id()))
+	end
+end
+
+function delete_some_somth(section, count)
+	news_manager.relocate_item(db.actor, "out", section, count)
+	db.actor:iterate_inventory(
+	function(dummy, item)
+	if (count > 0) and (item:section() == section) then
+		alife():release(alife():object(item:id()))
+		count = count - 1
+	end
+	end,
+	db.actor)
+end
+
+function do_heal(a,str)
+	if a then
+		play_snd([[meceniy\outfit\est_med]])
+	else
+		play_snd([[meceniy\outfit\net_med]])
+	end
+	news_manager.send_tip_txt(db.actor, str, nil, nil, 30000)
+end
+
+function play_snd(snd)
+	local snd_obj = xr_sound.get_safe_sound_object(snd)
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+end

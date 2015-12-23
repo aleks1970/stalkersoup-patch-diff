@@ -1,0 +1,23 @@
+--TB3D 1.0.9.9.3.0 removed update
+function my_ver() return "1.0.9.9.3.0" end
+--\\* Module Settings .. Fashion Spot (Shooter) ..
+
+--Function to read from the config
+function ini(section,parametr) return system_ini():r_s32(section, parametr) end
+
+function net_spawn_callback()
+	meceniy_intellectual.rem()
+end
+
+function delete_some_somth(section, count)
+	news_manager.relocate_item(db.actor, "out", section, count)
+	db.actor:iterate_inventory(
+		function(dummy, item)
+			if (count > 0) and (item:section() == section) then
+				alife():release(alife():object(item:id()))
+				count = count - 1
+			end
+		end,
+		db.actor
+	)
+end

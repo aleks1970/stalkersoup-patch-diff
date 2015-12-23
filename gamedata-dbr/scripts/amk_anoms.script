@@ -1,0 +1,943 @@
+-- TB3D 1.0.9.9.8.1  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug
+function my_ver() return "1.0.9.9.8.1" end
+
+--[[-------------------------- variable and table --------------------------]]
+local table_sort=table.sort
+local math_random=math.random
+local string_find=string.find
+local string_sub = string.sub
+
+local anoms_classes={
+	[clsid.zone_bfuzz_s]=true,
+	[clsid.zone_electra_s]=true,
+	[clsid.zone_galant_s]=true,
+	[clsid.zone_ice_s]=true,
+	[clsid.zone_mbald_s]=true,
+	[clsid.zone_mincer_s]=true,
+	[clsid.zone_zharka_s]=true
+	--[clsid.zone_smallrain_s]=true,
+	--[clsid.zone_zavesa_s]=true,
+	--[clsid.zone_fountain_s]=true,
+	--[clsid.zone_sphere_s]=true,
+	--[clsid.zone_ogon_s]=true,
+	--[clsid.zone_monolith_s]=true
+ }
+
+local anoms_sections={
+	buzz={"buzz",{shtype=0,radius=1.5,center={0,0,0}}},
+	electra={"witches_galantine",{shtype=0,radius=4,center={0,0,0}}},
+	fountain={"fountain",{shtype=0,radius=2.5,center={0,0,0}}},
+	gravi={"gravi_zone",{shtype=0,radius=3,center={0,0,0}}},
+	mincer={"mincer",{shtype=0,radius=3.5,center={0,0,0}}},
+	mosquito_bald={"mosquito_bald",{shtype=0,radius=3,center={0,0,0}}},
+	sakbuzz={"sakbuzz",{shtype=0,radius=4,center={0,0,0}}},
+	smallrain={"smallrain",{shtype=0,radius=4,center={0,0,0}}},
+	sphere={"sphere",{shtype=0,radius=2.8,center={0,0,0}}},
+	zavesa={"zavesa",{shtype=0,radius=3,center={0,0,0}}},
+	zharka_static={"zharka_static",{shtype=1,v1={1,0,0},v2={0,5,0},v3={0,0,1},offset={0,0,0}}}
+}
+
+local anti_spawn_zones={}
+
+local arts_sections={
+	--acumm = "art_acumm",							--109974 acumm is battery for minigun
+	armor_1="af_armor_1",
+	babka_1="af_babka_1",
+	balb_1="af_medusa",
+	balb_2="af_cristall_flower",
+	balb_3="af_night_star",
+	buzz_1="af_ameba_slime",
+	buzz_2="af_ameba_slug",
+	buzz_3="af_ameba_mica",
+	cry_1="af_cry_1",
+	dik_1="af_dik_1",
+	dummy_1="af_dummy_spring",
+	dummy_2="af_dummy_dummy",
+	dummy_3="af_dummy_battery",
+	dummy_4="af_dummy_pellicle",
+	dummy_5="af_fuzz_kolobok",
+	dummy_6="af_dummy_glassbeads",
+	electra_1="af_electra_sparkler",
+	electra_2="af_electra_flash",
+	electra_3="af_electra_moonlight",
+	gravi_1="af_vyvert",
+	gravi_2="af_gravi",
+	gravi_3="af_gold_fish",
+	kol_1="af_kol_1",
+	mincer_1="af_blood",
+	mincer_2="af_mincer_meat",
+	mincer_3="af_soul",
+	pudd_1="af_pudd_1",
+	rusty_1="af_rusty_thorn",
+	rusty_2="af_rusty_kristall",
+	rusty_3="af_rusty_sea-urchin",
+	spirit_1="af_spirit_1",
+	voron_1="af_eye_voron",
+	zharka_1="af_drops",
+	zharka_2="af_fireball",
+	zharka_3="af_cristall"
+}
+
+local game_vertexes={
+	l01_escape={0,251},
+	l02_garbage={252,415},
+	l03_agroprom={416,702},
+	-- l03u_agr_underground={703,810},
+	l04_darkvalley={811,1108},
+	-- l04u_labx18={1109,1167},
+	l05_bar={1168,1307},
+	l06_rostok={1308,1437},
+	l08_yantar={1438,1528},
+	-- l08u_brainlab={1529,1544},
+	l07_military={1545,1861},
+	l10_radar={1862,2116},
+	l11_pripyat={2117,2272},
+	l12_stancia={2273,2401},
+	-- l12u_sarcofag={2402,2466},
+	-- l12u_control_monolith={2467,2516},		----!!!!TB3D
+	l12_stancia_2={2517,2660},
+	-- l10u_bunker={2661,2791},
+	atp_for_test22={2792,2861},
+	peshera={2862,2880},
+	puzir={2881,2885},
+	aver={2886,2908},
+	--av_peshera={2909,2987},
+	limansk={2988,3027},
+	hospital={3028,3075},
+	generators={3076,3152},
+	-- warlab={3153,3223},
+	red_forest={3224,3323},
+	lost_village={3324,3336},
+	marsh={3337,3581},
+	dead_city={3582,3659},
+	zaton={3660,3699},
+	jupiter={3700,3747},
+	pripyat={3748,3770},
+	-- jupiter_underground={3771,3829}
+	predbannik={3870,4031},
+	yantar_old={4338,4384},
+	--swamp_old={4391,4392},
+	hiding_road={4400,4595},
+	k01_darkscape={4596,4657},
+	--dark_forest={4658,4678},
+	--level_f-1={4679,4680},			--TB3D f-1 causes compile failure
+	promzone={4681,5042}
+	--l01_krasivay={5244,5281},
+	--l02_dd={5282,5304},
+	--l03_rinok={5305,5312},
+	--l04_pogost={5313,5339},
+	--l05_vokzal={5340,5342},
+	--l01_poligon={5390,5390}
+	---------------underground/not used------------------------
+	--cs_agroprom_underground={3851,3869},
+	--digger_stash={5343,5362},
+	--lab_x14={5363,5388},
+	--collector22={5389,5389},		--not used
+	--deadcity={5043,5243},		--not used
+	--garbage_old={4032,4337},		--not used
+}
+
+local level_vertexes={
+	l01_escape = 595499,
+	l02_garbage = 382663,
+	l03_agroprom = 437421,
+	l04_darkvalley=390125,
+	l05_bar=99539,
+	l06_rostok=67713,
+	l07_military=418268,
+	l08_yantar=141471,
+	l10_radar=227189,
+	l11_pripyat=261219,
+	l12_stancia=477923,
+	l12_stancia_2=24841,
+	puzir=377572,
+	aver=1790762,
+	marsh=528961,
+	limansk=61524,
+	hospital=7865,
+	red_forest=166431,
+	lost_village=49127,
+	generators=752337,
+	atp_for_test22=1049687,
+	dead_city=551769,
+	zaton=1851251,
+	jupiter=1486320,
+	pripyat=487255,
+	predbannik=1216832,
+	yantar_old=585301,
+	--swamp_old=1176089,	--1735357,
+	hiding_road=1075194,
+	k01_darkscape=1037728,
+	--dark_forest={4658,4678},
+	--level_f-1=580812,			--TB3D f-1 causes compile failure
+	promzone=518999
+	--l01_krasivay={5244,5281},
+	--l02_dd={5282,5304},
+	--l03_rinok={5305,5312},
+	--l04_pogost={5313,5339},
+	--l05_vokzal={5340,5342},
+	--l01_poligon={5390,5390}
+}
+--[swamp_old]: (-272.066,0.826,-94.379),560261,4387)		--w edge
+--[swamp_old]: (126.579,2.779,321.442),1424547,4390)		--n edge
+
+level_anoms={
+	l01_escape={100,170,1000,{electra=6, zavesa=2, smallrain=1, fountain=2, gravi=5, mincer=4, buzz=4, sakbuzz=2, mosquito_bald=10, sphere=4}}, 
+	l02_garbage={100,160,800,{mosquito_bald=12, mincer=12, smallrain=2, zavesa=3, electra=15, gravi=10, buzz=12, sakbuzz=3, sphere=3, fountain=2}}, 
+	l03_agroprom={100,140,800,{mosquito_bald=12, mincer=8, smallrain=1, fountain=2, zavesa=2, electra=12, buzz=12, gravi=10, sakbuzz=3, sphere=3}},
+	l04_darkvalley={110,150,1000,{mincer=8, mosquito_bald=12, fountain=2, zavesa=3, smallrain=2, electra=12, buzz=10, zharka_static=8, gravi=8, sakbuzz=5, sphere=4}}, 
+	l05_bar={70,90,300,{mosquito_bald=8, mincer=10, zavesa=3, fountain=1, smallrain=1, electra=10, buzz=5, gravi=8, sakbuzz=2, zharka_static=4, sphere=2}}, 
+	l06_rostok={70,100,800,{mincer=7, mosquito_bald=7, smallrain=1, electra=10, zavesa=2, zharka_static=25, gravi=7, buzz=10, sphere=2, fountain=1}}, 
+	l08_yantar={80,110,400,{mosquito_bald=8, mincer=8, fountain=1, smallrain=1, zavesa=3, electra=10, buzz=8, zharka_static=5, gravi=8, sakbuzz=3, sphere=3}},
+	l07_military={110,150,1000,{mincer=12 , mosquito_bald=15, fountain=2, smallrain=2, zavesa=3, electra=12, zharka_static=8, gravi=10, sakbuzz=3, buzz=10, sphere=4}}, 
+	l10_radar={120,140,1000,{mincer=14, mosquito_bald=11, fountain=2, smallrain=2, electra=15, zavesa=3, buzz=10, zharka_static=12, gravi=10, sakbuzz=5, sphere=4}}, 
+	l11_pripyat={110,150,900,{mincer=10, mosquito_bald=10, zavesa=3, fountain=1, smallrain=1, electra=10,  zharka_static=8, gravi=10, buzz=10, sakbuzz=2, sphere=3}}, 
+	l12_stancia={70,90,700,{mincer=12, mosquito_bald=10, smallrain=3, electra=10, fountain=1, zavesa=3, buzz=10, zharka_static=7, gravi=8, sakbuzz=4, sphere=4}},
+	puzir={150,170,450,{mincer=15, mosquito_bald=15, smallrain=3, zavesa=3, electra=14, buzz=12, zharka_static=5, gravi=14, sakbuzz=3, sphere=4, fountain=1}},
+	aver={180,190,750,{mincer=12, mosquito_bald=12, smallrain=5, electra=16, zavesa=4, buzz=15, zharka_static=5, gravi=15, sakbuzz=4, sphere=5, fountain=1}},
+	marsh={140,180,900,{mincer=13, mosquito_bald=11, electra=12, smallrain=4, zavesa=6, zharka_static=12, gravi=10, buzz=13, sakbuzz=5, sphere=5, fountain=2}},
+	limansk={50,60,300,{mosquito_bald=10, mincer=10, smallrain=1, fountain=1, zavesa=2, electra=15, gravi=10, buzz=10, sakbuzz=2, zharka_static=8, sphere=3}},
+	hospital={10,20,200,{mincer=8, mosquito_bald=8, zavesa=2, fountain=1, electra=7, buzz=8, gravi=5, sakbuzz=2, zharka_static=5, sphere=2}},
+	red_forest={110,150,400,{mincer=15, mosquito_bald=10, zavesa=4, fountain=2, smallrain=3, electra=10, zharka_static=8, gravi=10, buzz=10, sakbuzz=4, sphere=5}},
+	lost_village={80,100,250,{mincer=8, mosquito_bald=8, zavesa=3, fountain=1, smallrain=1, electra=10, zharka_static=5, gravi=5, buzz=5, sakbuzz=2, sphere=3}},
+	generators={160,190,350,{mincer=15, mosquito_bald=11, fountain=1, zavesa=5, smallrain=2, electra=15, zharka_static=5, gravi=10, buzz=16, sakbuzz=6, sphere=4}},
+	atp_for_test22={160,180,400,{mincer=13, mosquito_bald=10, fountain=2, smallrain=2, zavesa=4, electra=15, zharka_static=10, gravi=10, buzz=20, sakbuzz=4, sphere=4}},
+	dead_city={110,150,900,{mincer=10, mosquito_bald=10, zavesa=3, fountain=2, smallrain=2, electra=10, zharka_static=8, gravi=10, buzz=10, sakbuzz=1, sphere=4}},
+	zaton={180,190,1000,{electra=15, zavesa=4, smallrain=6, fountain=8, gravi=15, mincer=12, buzz=15, sakbuzz=4, mosquito_bald=15, sphere=8, zharka_static=5}},
+	jupiter={180,190,1000,{electra=15, zavesa=4, smallrain=8, fountain=4, gravi=15, mincer=10, buzz=15, sakbuzz=2, mosquito_bald=15, sphere=8}},
+	pripyat={140,160,1000,{electra=15, zavesa=2, smallrain=1, fountain=1, gravi=15, mincer=10, buzz=15, sakbuzz=2, mosquito_bald=15, sphere=8}},
+	predbannik={110,150,900,{mincer=10, mosquito_bald=10, zavesa=3, fountain=1, smallrain=1, electra=10,  zharka_static=8, gravi=10, buzz=10, sakbuzz=2, sphere=3}},
+	yantar_old={80,110,400,{mosquito_bald=8, mincer=8, fountain=1, smallrain=1, zavesa=3, electra=10, buzz=8, zharka_static=5, gravi=8, sakbuzz=3, sphere=3}},
+	--swamp_old={140,180,900,{mincer=13, mosquito_bald=11, electra=12, smallrain=4, zavesa=6, zharka_static=12, gravi=10, buzz=13, sakbuzz=5, sphere=5, fountain=2}},
+	hiding_road={70,100,800,{mincer=7, mosquito_bald=7, smallrain=1, electra=10, zavesa=2, zharka_static=25, gravi=7, buzz=10, sphere=2, fountain=1}},
+	k01_darkscape={110,150,1000,{mincer=8, mosquito_bald=12, fountain=2, zavesa=3, smallrain=2, electra=12, buzz=10, zharka_static=8, gravi=8, sakbuzz=5, sphere=4}},
+	--dark_forest={4658,4678},
+	--level_f-1={70,90,300,{mosquito_bald=8, mincer=10, zavesa=3, fountain=1, smallrain=1, electra=10, buzz=5, gravi=8, sakbuzz=2, zharka_static=4, sphere=2}},
+	promzone={140,160,1000,{electra=15, zavesa=2, smallrain=1, fountain=1, gravi=15, mincer=10, buzz=15, sakbuzz=2, mosquito_bald=15, sphere=8}}
+	--l01_krasivay={5244,5281},
+	--l02_dd={5282,5304},
+	--l03_rinok={5305,5312},
+	--l04_pogost={5313,5339},
+	--l05_vokzal={5340,5342},
+	--l01_poligon={5390,5390}
+}
+
+level_anoms_easy={
+	l01_escape={100,170,1000,{smallrain=1, gravi=1, mincer=1, buzz=1, sakbuzz=1, sphere=4}}, 
+	l02_garbage={100,160,800,{mincer=12, smallrain=2, gravi=10, buzz=12, sakbuzz=3, sphere=3}}, 
+	l03_agroprom={100,140,800,{mincer=8, smallrain=1, buzz=12, gravi=10, sakbuzz=3, sphere=3}},
+	l04_darkvalley={110,150,1000,{mincer=8, smallrain=2, buzz=10, zharka_static=8, gravi=8, sakbuzz=5, sphere=4}}, 
+	l05_bar={70,90,300,{mincer=10, smallrain=1, buzz=5, gravi=8, sakbuzz=2, zharka_static=4, sphere=2}}, 
+	l06_rostok={70,100,800,{mincer=7, smallrain=1, zharka_static=25, gravi=7, buzz=10, sphere=2}}, 
+	l08_yantar={80,110,400,{mincer=8, smallrain=1, buzz=8, zharka_static=5, gravi=8, sakbuzz=3, sphere=3}},
+	l07_military={110,150,1000,{mincer=12, smallrain=2, zharka_static=8, gravi=10, sakbuzz=3, buzz=10, sphere=4}}, 
+	l10_radar={120,140,1000,{mincer=14, smallrain=2, buzz=10, zharka_static=12, gravi=10, sakbuzz=5, sphere=4}}, 
+	l11_pripyat={110,150,900,{mincer=10, smallrain=1,  zharka_static=8, gravi=10, buzz=10, sakbuzz=2, sphere=3}}, 
+	l12_stancia={70,90,700,{mincer=12, smallrain=3, buzz=10, zharka_static=7, gravi=8, sakbuzz=4, sphere=4}},
+	puzir={150,170,450,{mincer=15, smallrain=3, buzz=12, zharka_static=5, gravi=14, sakbuzz=3, sphere=4}},
+	aver={180,190,750,{mincer=12, smallrain=5, buzz=15, zharka_static=5, gravi=15, sakbuzz=4, sphere=5}},
+	marsh={140,180,900,{mincer=13, smallrain=4, zharka_static=12, gravi=10, buzz=13, sakbuzz=5, sphere=5}},
+	limansk={50,60,300,{mincer=10, smallrain=1, gravi=10, buzz=10, sakbuzz=2, zharka_static=8, sphere=3}},
+	hospital={10,20,200,{mincer=8, buzz=8, gravi=5, sakbuzz=2, zharka_static=5, sphere=2}},
+	red_forest={110,150,400,{mincer=15, smallrain=3, zharka_static=8, gravi=10, buzz=10, sakbuzz=4, sphere=5}},
+	lost_village={80,100,250,{mincer=8, smallrain=1, zharka_static=5, gravi=5, buzz=5, sakbuzz=2, sphere=3}},
+	generators={160,190,350,{mincer=15, smallrain=2, zharka_static=5, gravi=10, buzz=16, sakbuzz=6, sphere=4}},
+	atp_for_test22={160,180,400,{mincer=13, smallrain=2, zharka_static=10, gravi=10, buzz=20, sakbuzz=4, sphere=4}},
+	dead_city={110,150,900,{mincer=10, smallrain=2, zharka_static=8, gravi=10, buzz=10, sakbuzz=1, sphere=4}},
+	zaton={180,190,1000,{smallrain=16, gravi=15, mincer=12, buzz=15, sakbuzz=14, sphere=18, zharka_static=15}},
+	jupiter={180,190,1000,{smallrain=8, gravi=15, mincer=10, buzz=15, sakbuzz=2, sphere=8}},
+	pripyat={140,160,1000,{smallrain=1, gravi=15, mincer=10, buzz=15, sakbuzz=2, sphere=8}},
+	predbannik={110,150,1000,{mincer=12, smallrain=2, zharka_static=8, gravi=10, sakbuzz=3, buzz=10, sphere=4}},
+	yantar_old={80,110,400,{mincer=8, smallrain=1, buzz=8, zharka_static=5, gravi=8, sakbuzz=3, sphere=3}},
+	--swamp_old={140,180,900,{mincer=13, smallrain=4, zharka_static=12, gravi=10, buzz=13, sakbuzz=5, sphere=5}},
+	hiding_road={70,100,800,{mincer=7, smallrain=1, zharka_static=25, gravi=7, buzz=10, sphere=2}},
+	k01_darkscape={110,150,1000,{mincer=8, smallrain=2, buzz=10, zharka_static=8, gravi=8, sakbuzz=5, sphere=4}},
+	--dark_forest={4658,4678},
+	--level_f-1={50,60,300,{mincer=10, smallrain=1, gravi=10, buzz=10, sakbuzz=2, zharka_static=8, sphere=3}},
+	promzone={140,160,1000,{smallrain=1, gravi=15, mincer=10, buzz=15, sakbuzz=2, sphere=8}}
+	--l01_krasivay={5244,5281},
+	--l02_dd={5282,5304},
+	--l03_rinok={5305,5312},
+	--l04_pogost={5313,5339},
+	--l05_vokzal={5340,5342},
+	--l01_poligon={5390,5390}
+}
+
+level_arts={ 
+	l01_escape={2,4,{balb_1=24, balb_2=2, balb_3=0, gravi_1=23, gravi_2=5, gravi_3=0, mincer_1=25, mincer_2=0, mincer_3=0, electra_1=9, electra_2=1, electra_3=0, zharka_1=0, zharka_2=0, zharka_3=0, buzz_1=0, buzz_2=0, buzz_3=0, rusty_1=5, rusty_2=0, rusty_3=0, armor_1=1, babka_1=1, pudd_1=1, spirit_1=1}},
+	l02_garbage={2,4,{balb_1=19, balb_2=5, balb_3=0, gravi_1=25, gravi_2=5, gravi_3=0, mincer_1=20, mincer_2=5, mincer_3=0, electra_1=10, electra_2=0, electra_3=0, zharka_1=0, zharka_2=0, zharka_3=0, buzz_1=0, buzz_2=0, buzz_3=0, rusty_1=5, rusty_2=0, rusty_3=0, armor_1=1, cry_1=1, kol_1=1, pudd_1=1}},
+	l03_agroprom={3,6,{balb_1=12, balb_2=5, balb_3=0, gravi_1=13, gravi_2=5, gravi_3=0, mincer_1=10, mincer_2=5, mincer_3=0, electra_1=10, electra_2=5, electra_3=0, zharka_1=10, zharka_2=5, zharka_3=0, buzz_1=10, buzz_2=0, buzz_3=0, rusty_1=5, rusty_2=0, rusty_3=0, armor_1=1, babka_1=1, pudd_1=1}},
+	l04_darkvalley={6,8,{balb_1=1, balb_2=9, balb_3=0, gravi_1=5, gravi_2=8, gravi_3=0, mincer_1=5, mincer_2=10, mincer_3=0, electra_1=5, electra_2=9, electra_3=0, zharka_1=10, zharka_2=10, zharka_3=0, buzz_1=10, buzz_2=3, buzz_3=0, rusty_1=5, rusty_2=2, voron_1=1, armor_1=1, babka_1=1, dik_1=1, pudd_1=1, spirit_1=1}},
+	l05_bar={2,4,{balb_1=18, balb_2=7, balb_3=0, gravi_1=18, gravi_2=0, gravi_3=0, mincer_1=20, mincer_2=0, mincer_3=0, electra_1=10, electra_2=0, electra_3=0, zharka_1=0, zharka_2=0, zharka_3=0, buzz_1=5, buzz_2=3, buzz_3=0, rusty_1=5, rusty_2=3, rusty_3=0, dummy_1=1, dummy_2=1, dummy_3=0, dummy_4=1, dummy_5=1, babka_1=1, dik_1=1, spirit_1=1}},
+	l06_rostok={2,5,{balb_1=0, balb_2=2, balb_3=2, gravi_1=0, gravi_2=0, gravi_3=0, mincer_1=0, mincer_2=2, mincer_3=2, electra_1=8, electra_2=10, electra_3=0, zharka_1=20, zharka_2=10, zharka_3=5, buzz_1=5, buzz_2=0, buzz_3=0, rusty_1=10, rusty_2=10, rusty_3=5, dummy_1=0, dummy_2=1, dummy_3=1, dummy_4=1, dummy_5=0, babka_1=1, cry_1=1, pudd_1=1, spirit_1=1}},
+	l08_yantar={4,8,{balb_1=1, balb_2=3, balb_3=2, gravi_1=8, gravi_2=5, gravi_3=3, mincer_1=6, mincer_2=5, mincer_3=2, electra_1=8, electra_2=5, electra_3=2, zharka_1=8, zharka_2=5, zharka_3=2, buzz_1=8, buzz_2=5, buzz_3=1, rusty_1=9, rusty_2=3, rusty_3=2, armor_1=1, cry_1=1, dik_1=2, kol_1=1, pudd_1=1, spirit_1=1}},
+	l07_military={4,7,{balb_1=2, balb_2=4, balb_3=2, gravi_1=3, gravi_2=5, gravi_3=3, mincer_1=6, mincer_2=5, mincer_3=5, electra_1=8, electra_2=5, electra_3=2, zharka_1=6, zharka_2=5, zharka_3=3, buzz_1=8, buzz_2=2, buzz_3=0, rusty_1=8, rusty_2=5, rusty_3=2, dummy_1=0, dummy_2=1, dummy_3=1, dummy_4=0, dummy_5=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, pudd_1=1, spirit_1=1}},
+	l10_radar={4,8,{balb_1=3, balb_2=5, balb_3=5, gravi_1=4, gravi_2=3, gravi_3=3, mincer_1=6, mincer_2=6, mincer_3=5, electra_1=5, electra_2=4, electra_3=3, zharka_1=5, zharka_2=5, zharka_3=5, buzz_1=5, buzz_2=5, buzz_3=0, rusty_1=7, rusty_2=6, rusty_3=5, armor_1=1, babka_1=1, kol_1=1, pudd_1=1, spirit_1=1}},
+	l11_pripyat={4,7,{balb_1=3, balb_2=3, balb_3=3, gravi_1=3, gravi_2=3, gravi_3=3, mincer_1=4, mincer_2=4, mincer_3=3, electra_1=4, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=4, buzz_1=8, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=5, rusty_3=4, dummy_1=1, dummy_2=2, dummy_3=1, dummy_4=1, dummy_5=1, armor_1=2, cry_1=2, kol_1=1, pudd_1=1}},
+	l12_stancia={2,4,{balb_1=2, balb_2=3, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=6, mincer_2=4, mincer_3=3, electra_1=7, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, dummy_5=1, armor_1=1, dik_1=1, pudd_1=1}},
+	puzir={2,4,{balb_1=3, balb_2=3, balb_3=0, gravi_1=5, gravi_2=5, gravi_3=0, mincer_1=10, mincer_2=5, mincer_3=0, electra_1=12, electra_2=5, electra_3=0, zharka_1=10, zharka_2=5, zharka_3=0, buzz_1=12, buzz_2=8, buzz_3=5, rusty_1=5, rusty_2=2, rusty_3=0, armor_1=1, babka_1=1, cry_1=1, kol_1=1, spirit_1=1}},
+	aver={4,8,{balb_1=2, balb_2=3, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=5, mincer_2=4, mincer_3=1, electra_1=7, electra_2=5, electra_3=2, zharka_1=4, zharka_2=4, zharka_3=1, buzz_1=8, buzz_2=6, buzz_3=4, rusty_1=7, rusty_2=4, rusty_3=4, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, dummy_5=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, pudd_1=1, spirit_1=1}},
+	marsh={8,10,{balb_1=2, balb_2=3, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=6, mincer_2=4, mincer_3=3, electra_1=7, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, voron_1=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, spirit_1=1}},
+	limansk={2,4,{balb_1=2, balb_2=4, balb_3=5, gravi_1=5, gravi_2=5, gravi_3=5, mincer_1=4, mincer_2=5, mincer_3=5, electra_1=5, electra_2=5, electra_3=5, zharka_1=5, zharka_2=5, zharka_3=5, buzz_1=5, buzz_2=5, buzz_3=0, rusty_1=5, rusty_2=5, rusty_3=5, armor_1=1, cry_1=1, pudd_1=1, spirit_1=2}},
+	hospital={2,4,{balb_1=3, balb_2=4, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=6, mincer_2=4, mincer_3=3, electra_1=7, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, dummy_5=1, babka_1=1, dik_1=1, spirit_1=1}},
+	red_forest={4,8,{balb_1=3, balb_2=9, balb_3=5, gravi_1=4, gravi_2=3, gravi_3=3, mincer_1=6, mincer_2=6, mincer_3=5, electra_1=5, electra_2=4, electra_3=3, zharka_1=5, zharka_2=5, zharka_3=5, buzz_1=5, buzz_2=5, voron_1=1, rusty_1=6, rusty_2=6, armor_1=1, babka_1=1, cry_1=1, dik_1=1, kol_1=1, spirit_1=1}},
+	lost_village={3,6,{balb_1=6, balb_2=7, balb_3=5, gravi_1=7, gravi_2=3, gravi_3=3, mincer_1=8, mincer_2=7, mincer_3=5, electra_1=8, electra_2=7, electra_3=2, zharka_1=5, zharka_2=5, zharka_3=5, buzz_1=5, buzz_2=5, dummy_1=5, cry_1=1, kol_1=1}},
+	generators={4,8,{balb_1=2, balb_2=4, balb_3=3, gravi_1=4, gravi_2=3, gravi_3=3, mincer_1=5, mincer_2=4, mincer_3=3, electra_1=4, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=4, buzz_1=8, buzz_2=4, buzz_3=3, rusty_2=9, dummy_1=5, dummy_2=5, dummy_3=1, dummy_4=1, dummy_5=1, armor_1=1, babka_1=1, cry_1=1, dik_1=1, kol_1=1, spirit_1=1}},
+	atp_for_test22={4,8,{balb_1=2, balb_2=4, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=4, mincer_2=4, mincer_3=1, electra_1=5, electra_2=5, electra_3=2, zharka_1=6, zharka_2=4, zharka_3=1, buzz_1=8, buzz_2=6, buzz_3=4, rusty_1=7, rusty_2=4,dummy_1=5, dummy_2=1, dummy_3=1, dummy_4=1, voron_1=1, armor_1=1, babka_1=1, cry_1=1, dik_1=1, pudd_1=1}},
+	dead_city={3,6,{balb_1=4, balb_2=4, balb_3=3, gravi_1=4, gravi_2=3, gravi_3=3, mincer_1=5, mincer_2=4, mincer_3=3, electra_1=4, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=4, buzz_1=8, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=5, rusty_3=4, dummy_1=1, dummy_2=2, dummy_3=1, dummy_4=1, dummy_5=1, armor_1=1, cry_1=1, kol_1=1, pudd_1=1}},
+	zaton={6,10,{balb_1=4, balb_2=6, balb_3=6, gravi_1=8, gravi_2=8, gravi_3=6, mincer_1=8, mincer_2=8, mincer_3=6, electra_1=7, electra_2=8, electra_3=6, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=4, dummy_2=4, dummy_3=4, dummy_4=4, voron_1=4, armor_1=4, babka_1=4, cry_1=8, kol_1=4, spirit_1=4}},
+	jupiter={4,8,{balb_1=2, balb_2=3, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=6, mincer_2=4, mincer_3=3, electra_1=7, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, voron_1=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, spirit_1=1}},
+	pripyat={4,8,{balb_1=2, balb_2=3, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=6, mincer_2=4, mincer_3=3, electra_1=7, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, voron_1=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, spirit_1=1}},
+	predbannik={4,7,{balb_1=2, balb_2=4, balb_3=2, gravi_1=3, gravi_2=5, gravi_3=3, mincer_1=6, mincer_2=5, mincer_3=5, electra_1=8, electra_2=5, electra_3=2, zharka_1=6, zharka_2=5, zharka_3=3, buzz_1=8, buzz_2=2, buzz_3=0, rusty_1=8, rusty_2=5, rusty_3=2, dummy_1=0, dummy_2=1, dummy_3=1, dummy_4=0, dummy_5=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, pudd_1=1, spirit_1=1}},
+	yantar_old={4,8,{balb_1=1, balb_2=3, balb_3=2, gravi_1=8, gravi_2=5, gravi_3=3, mincer_1=6, mincer_2=5, mincer_3=2, electra_1=8, electra_2=5, electra_3=2, zharka_1=8, zharka_2=5, zharka_3=2, buzz_1=8, buzz_2=5, buzz_3=1, rusty_1=9, rusty_2=3, rusty_3=2, armor_1=1, cry_1=1, dik_1=2, kol_1=1, pudd_1=1, spirit_1=1}},
+	--swamp_old={8,10,{balb_1=2, balb_2=3, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=6, mincer_2=4, mincer_3=3, electra_1=7, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, voron_1=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, spirit_1=1}},
+	hiding_road={2,4,{balb_1=2, balb_2=4, balb_3=5, gravi_1=5, gravi_2=5, gravi_3=5, mincer_1=4, mincer_2=5, mincer_3=5, electra_1=5, electra_2=5, electra_3=5, zharka_1=5, zharka_2=5, zharka_3=5, buzz_1=5, buzz_2=5, buzz_3=0, rusty_1=5, rusty_2=5, rusty_3=5, armor_1=1, cry_1=1, pudd_1=1, spirit_1=2}},
+	k01_darkscape={6,8,{balb_1=1, balb_2=9, balb_3=0, gravi_1=5, gravi_2=8, gravi_3=0, mincer_1=5, mincer_2=10, mincer_3=0, electra_1=5, electra_2=9, electra_3=0, zharka_1=10, zharka_2=10, zharka_3=0, buzz_1=10, buzz_2=3, buzz_3=0, rusty_1=5, rusty_2=2, voron_1=1, armor_1=1, babka_1=1, dik_1=1, pudd_1=1, spirit_1=1}},
+	--dark_forest={4658,4678},
+	--level_f-1={2,4,{balb_1=18, balb_2=7, balb_3=0, gravi_1=18, gravi_2=0, gravi_3=0, mincer_1=20, mincer_2=0, mincer_3=0, electra_1=10, electra_2=0, electra_3=0, zharka_1=0, zharka_2=0, zharka_3=0, buzz_1=5, buzz_2=3, buzz_3=0, rusty_1=5, rusty_2=3, rusty_3=0, dummy_1=1, dummy_2=1, dummy_3=0, dummy_4=1, dummy_5=1, babka_1=1, dik_1=1, spirit_1=1}},
+	promzone={4,8,{balb_1=2, balb_2=3, balb_3=3, gravi_1=6, gravi_2=4, gravi_3=3, mincer_1=6, mincer_2=4, mincer_3=3, electra_1=7, electra_2=4, electra_3=3, zharka_1=7, zharka_2=4, zharka_3=3, buzz_1=7, buzz_2=4, buzz_3=3, rusty_1=7, rusty_2=4, rusty_3=3, dummy_1=1, dummy_2=1, dummy_3=1, dummy_4=1, voron_1=1, armor_1=1, babka_1=1, cry_1=1, kol_1=1, spirit_1=1}}
+	--l01_krasivay={5244,5281},
+	--l02_dd={5282,5304},
+	--l03_rinok={5305,5312},
+	--l04_pogost={5313,5339},
+	--l05_vokzal={5340,5342},
+	--l01_poligon={5390,5390}
+}
+
+--[[-------------------------- variable and table ---------------------end--]]
+--[[-------------------------- function for spawn --------------------------]]
+function init()
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("amk anoms: init") end
+	local lname=level.name()
+	if not level_vertexes[lname] then return end
+	local iniFileName="scripts\\amk\\anoms\\anoms.ltx"
+	if iniLineSectionExist(lname,iniFileName) then
+		local result, id, value = nil, nil, nil 
+		local s
+		for a=0,iniLinesCount(lname,iniFileName)-1 do
+			result,id,value=getIniLine(lname,a,"","",iniFileName)
+			if id~=nil and amk.trim(id)~="" and amk.trim(id)~=nil then
+				s = amk.str_explode(",", id, true)
+				if s[1]==nil or s[2]==nil or s[3]==nil or s[4]==nil then 
+					--if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK ANOM: init: amk_anoms:init() - error while parsing safe zones for "..lname.." at section's line #"..(a+1)) end
+				end 
+				table.insert(anti_spawn_zones,{vector():set(tonumber(s[1]),tonumber(s[2]),tonumber(s[3])),tonumber(s[4])})
+			end
+		end
+	end
+	if not TB3D_Services.blow() then						--109980, blowout phase (0 thru 6)
+		pre_blow_off()			--109976 removed arts from blowout process
+		generate_anoms()
+	end
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("amk anoms: init done") end
+end 
+
+function after_blow_on()
+	local lname=level.name()
+	--generate_arts(lname)			--109976 removed arts from blowout process
+	if level_vertexes[lname] then
+		generate_anoms() 
+		move_mgr.invalidate_pp_accessibility()
+	end
+	--bind_det_arts.refresh_list()			--109976 removed arts from blowout process
+end
+
+function pre_blow_off()
+	local sobj
+	local cnt = 0
+	local map=nil
+	local status=""
+	for i=first_object,last_object do
+		sobj=alife():object(i)
+		if sobj then
+			map=TB3D_Services.get_obj_level(sobj.m_game_vertex_id)
+			if is_anomaly(sobj:clsid()) then
+				if map ~= "" and not check_exclusion(sobj,map) then
+					status=get_anomaly_status(sobj)
+					if status=="" or status=="on" then set_anomaly_status(sobj,"del") alife():release(sobj,true) cnt=cnt+1 end
+				end
+			end
+		end
+	end
+	--TB3D_Services.packet_alert("amk anoms: removed["..utils.to_str(cnt).."] anoms")
+end
+
+local arts_amk={
+	["af_armor_1"]=true,
+	["af_babka_1"]=true,
+	["af_medusa"]=true,
+	["af_cristall_flower"]=true,
+	["af_night_star"]=true,
+	["af_ameba_slime"]=true,
+	["af_ameba_slug"]=true,
+	["af_ameba_mica"]=true,
+	["af_cry_1"]=true,
+	["af_dik_1"]=true,
+	["af_dummy_spring"]=true,
+	["af_dummy_dummy"]=true,
+	["af_dummy_battery"]=true,
+	["af_dummy_pellicle"]=true,
+	["af_fuzz_kolobok"]=true,
+	["af_dummy_glassbeads"]=true,
+	["af_electra_sparkler"]=true,
+	["af_electra_flash"]=true,
+	["af_electra_moonlight"]=true,
+	["af_vyvert"]=true,
+	["af_gravi"]=true,
+	["af_gold_fish"]=true,
+	["af_kol_1"]=true,
+	["af_blood"]=true,
+	["af_mincer_meat"]=true,
+	["af_soul"]=true,
+	["af_pudd_1"]=true,
+	["af_rusty_thorn"]=true,
+	["af_rusty_kristall"]=true,
+	["af_rusty_sea-urchin"]=true,
+	["af_spirit_1"]=true,
+	["af_eye_voron"]=true,
+	["af_drops"]=true,
+	["af_fireball"]=true,
+	["af_cristall"]=true
+}
+function dynamic_art(obj_name, lname, sect)
+	local result = true																--default: is a dynamic art so don't remove
+	if TB3D_Services.is_collector() or TB3D_Modders.dyn_arts_always then			--109981, default = start dyn arts on levelup 1
+		if lname ~= "" then
+			if arts_amk[sect] == true then											--109981, must be in list
+				if level_vertexes[lname] then										--must be one of the dyn levels
+					if string_sub(obj_name, 1, 3) == "af_" then result = false end	--make sure it is not level specific else remove
+				end
+			end
+		else
+			result = false  														--bad vert so remove
+		end
+	end
+	return result
+end
+
+function generate_anoms()
+	local lname=level.name()
+	local v = {}
+	if TB3D_Modders.easy_anoms == true then
+		v=level_anoms_easy[lname]	--only easy to detect and harmless ones spawn
+	else
+		v=level_anoms[lname]		--default NS table
+	end
+	if v then
+		local forced_rank = nil
+		local flevel = TB3D_Services.get_level_up()		--109978
+		if TB3D_Modders.Cadet_level_anomolies == true then
+			flevel = 0
+			forced_rank = 200
+		elseif TB3D_Modders.hardcore_anomolies == true then
+			forced_rank = 2500
+		end
+		local mxx
+		if TB3D_Modders.least_anomolies then
+			mxx = v[1]
+		else
+			local koef = math.ceil(TB3D_Services.global_koef(flevel, forced_rank))
+			mxx = math_random(v[1],v[2]) * koef
+			if mxx < v[1] then mxx = v[1] elseif mxx > v[2] then mxx = v[2] end
+		end
+		local cnt = 0
+		while cnt < mxx do
+			if generate_anomaly() then cnt=cnt+1 end
+		end
+		TB3D_Services.packet_alert("amk anoms: generated["..utils.to_str(cnt).."] anoms")
+	end
+end
+ 
+function generate_arts(lname)
+	if TB3D_Services.is_collector() or TB3D_Modders.dyn_arts_always then				--109981, wait for levelup to do dyn arts
+		local existing = bind_det_arts.art_count()
+		local max_arts = TB3D_Modders.arts_total or 20									--109976 per level
+		--if lname == "puzir" and not has_alife_info("otdan_q") then return end			--many arts in quest
+		if level_vertexes[lname] and existing < max_arts then 
+			local v=level_arts[lname]
+			local added = 0
+			if v then
+				local cnt, mxx = 0, math_random(v[1],v[2])
+				if TB3D_Modders.less_arts == true then
+					mxx = mxx * 0.5
+				end
+				if mxx > cnt then
+					while cnt < mxx do
+						if generate_art(lname) then
+							cnt = cnt + 1
+							added = added + 1
+						end
+					end
+				end
+			end
+			if added > 0 then
+				if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("amk anoms: added["..utils.to_str(added).."] artefacts") end
+				bind_det_arts.refresh_list()
+			end
+			--generate_test(lname)
+		end
+	end
+end
+
+function generate_anomaly()
+	local lname=level.name()
+	local gvn,gvx,lvx = game_vertexes[lname][1], game_vertexes[lname][2], level_vertexes[lname]
+	local new_lv=math_random(1,lvx)
+	local actor_pos=db.actor:position()
+	local pos = level.vertex_position(new_lv)
+	if actor_pos:distance_to(pos)<5 then return false end
+	if not check_coordinates(lname, pos) then return false end
+	local new_gv = 0
+	local min_dist = 100000 
+	for a = gvn, gvx do 
+		g1 = game_graph():vertex(a):game_point()
+		if g1:distance_to(pos)<min_dist then 
+			min_dist = g1:distance_to(pos) 
+			new_gv = a
+		end
+	end
+	if game_graph():valid_vertex_id(new_gv) then return spawn_rand_anom(pos,new_gv,new_lv) end
+end 
+
+function generate_art(lname)
+	local gvn,gvx,lvx = game_vertexes[lname][1], game_vertexes[lname][2], level_vertexes[lname]
+	local new_lv=math_random(1,lvx)
+	local pos = level.vertex_position(new_lv)
+	if not check_coordinates_arts(lname, pos) then return false end
+	local new_gv = 0
+	local min_dist = 100000 
+	for a = gvn, gvx, 1 do 
+		g1 = game_graph():vertex(a):game_point()
+		if g1:distance_to(pos)<min_dist then 
+			min_dist = g1:distance_to(pos) 
+			new_gv = a
+		end
+	end
+	if game_graph():valid_vertex_id(new_gv) then return spawn_rand_arts(pos,new_gv,new_lv,lname) end
+end
+
+--[[
+function generate_test(lname)
+	local gvn,gvx,lvx = game_vertexes[lname][1], game_vertexes[lname][2], level_vertexes[lname]
+	local new_lv=math_random(1,lvx)
+	local pos = level.vertex_position(new_lv)
+	if not check_coordinates_arts(lname, pos) then return false end
+	local new_gv = 0
+	local min_dist = 100000 
+	for a = gvn, gvx, 1 do 
+		g1 = game_graph():vertex(a):game_point()
+		if g1:distance_to(pos)<min_dist then 
+			min_dist = g1:distance_to(pos) 
+			new_gv = a
+		end
+	end
+	if game_graph():valid_vertex_id(new_gv) then return spawn_test(pos,new_gv,new_lv,lname) end
+end
+]]--
+
+function spawn_rand_anom(pos,gv,lv)
+	local lname=level.name()
+	local shapes,shape1={},{}
+	local section = "zone_ice"
+	local rnd=math_random()*100
+	if 5>rnd then
+		shape1={shtype=0,radius=4,center={0,0,0}}
+	else
+		local vt = {}
+		if TB3D_Modders.easy_anoms then vt = level_anoms_easy[lname][4] else vt = level_anoms[lname][4]  end
+		local rnd_max = 0
+		for k,v in pairs(vt) do
+			rnd_max = rnd_max + v
+		end
+		rnd=math_random()*rnd_max
+		for k,v in pairs(vt) do
+			if rnd<=v then section=anoms_sections[k] break end
+			rnd=rnd-v
+		end
+		local anom_prefix="amk_zone_"
+		local suffix_num=math_random(1,3)
+		local suffix=anom_suffix(suffix_num)
+		shape1=section[2]
+		section=anom_prefix..section[1]..suffix
+	end
+	shapes[1]={}
+	shapes[1].shtype=shape1.shtype
+	if shape1.shtype == 0 then
+		shapes[1].radius = shape1.radius
+		shapes[1].center = vector():set(shape1.center[1],shape1.center[2],shape1.center[3])
+	else
+		shapes[1].v1 = vector():set(shape1.v1[1],shape1.v1[2],shape1.v1[3])
+		shapes[1].v2 = vector():set(shape1.v2[1],shape1.v2[2],shape1.v2[3])
+		shapes[1].v3 = vector():set(shape1.v3[1],shape1.v3[2],shape1.v3[3])
+		shapes[1].offset = vector():set(shape1.offset[1],shape1.offset[2],shape1.offset[3])
+	end
+	local status="on"
+	return spawn_anomaly(section,pos,gv,lv,shapes,status)
+end
+
+function spawn_rand_arts(pos,gv,lv,lname)
+	local rnd_max=0
+	for k,v in pairs(level_anoms[lname][4]) do
+		rnd_max=rnd_max+v
+	end
+	local rnd=0
+	rnd=math_random()*rnd_max
+	for k,v in pairs(level_arts[lname][3]) do
+		if rnd<=v then section=arts_sections[k] break end
+		rnd=rnd-v
+	end
+	return spawn_art(section,pos,gv,lv) 
+end
+
+function spawn_anomaly(section,pos,gv,lv,shape,status)
+	local sobj
+	sobj=amk.spawn_item(section,pos,gv,lv)
+	if sobj then
+		local tbl = amk.get_anomaly_data(sobj) 
+		tbl.shapes=shape
+		tbl.custom=modify_anomaly_custom_data(tbl.custom,status) 
+		amk.set_anomaly_data(tbl, sobj) 
+	end
+	return sobj
+end
+
+function spawn_art(section,pos,gv,lv)
+	local sobj
+	sobj=amk.spawn_item(section,pos,gv,lv)
+	if sobj then return sobj end
+end
+
+--function spawn_test(pos,gv,lv,lname)
+	--local section="testsak_"..lname
+	--return amk.spawn_item(section,pos,gv,lv)
+--end
+
+function check_exclusion(obj,map)
+	local obj_name=obj:name()
+	if string_find(obj_name,"amk_") or string_find(obj_name,"zone_ice") then return false end
+	if not level_vertexes[map] then return true end
+	return string_find(obj_name,"esc_zone_witches") or string_find(obj_name,"zone_topolinypuh") or string_find(obj_name,"red_zone_acidic") or string_find(obj_name,"podval_tornado_strong") or string_find(obj_name,"dcity_fontan_fountain_average") or string_find(obj_name,"rostok_zone_witches") or string_find(obj_name,"rostok_zone_zharka_static") or string_find(obj_name,"tutorial") or string_find(obj_name,"zone_solynka") or (string_find(obj_name,"_mincer") and map~="l11_pripyat")
+end
+
+function anom_suffix(suffix_num)
+	local suffix=""
+	if suffix_num==1 then suffix="_weak"
+	elseif suffix_num==2 then suffix="_average"
+	else suffix="_strong"
+	end
+	return suffix
+end
+
+function check_coordinates(lname, pos)
+	local hides=amk_hideouts.hide[lname]
+	local tmp
+	if hides then
+		for i,o in ipairs(hides) do
+			if o.zone then
+				for j,v in ipairs(o.zone) do
+					if v.p3 then
+						tmp=amk.check_npc_in_box(pos,vector():set(unpack(v.p1)),vector():set(unpack(v.p2)),vector():set(unpack(v.p3)))
+					else
+						tmp=amk.check_npc_in_box(pos,vector():set(unpack(v.p1)),vector():set(unpack(v.p2)))
+					end
+					if tmp==true then return false end
+				end
+			end
+		end
+	end
+	for k,v in pairs(anti_spawn_zones) do
+		if pos:distance_to(v[1])<=v[2] then return false end
+	end
+	return true
+end
+
+function check_coordinates_arts(lname, pos)
+	--for k,v in pairs(anti_spawn_zones) do
+		--if pos:distance_to(v[1])<=v[2] then return false end
+	--end
+	local hides=amk_hideouts.hide[lname]
+	local tmp
+	if hides then
+		for i,o in ipairs(hides) do
+			if o.zone then
+				for j,v in ipairs(o.zone) do
+					if v.p3 then
+						tmp=amk.check_npc_in_box(pos,vector():set(unpack(v.p1)),vector():set(unpack(v.p2)),vector():set(unpack(v.p3)))
+					else
+						tmp=amk.check_npc_in_box(pos,vector():set(unpack(v.p1)),vector():set(unpack(v.p2)))
+					end
+					if tmp==true then return false end 
+				end
+			end
+		end
+	end
+	return true
+end
+
+function get_anomaly_status(sobj)
+	local tbl = amk.get_anomaly_data(sobj)
+	local cd=tbl.custom
+	cd=amk.parse_custom_data(cd)
+	if not cd.dyn_anom then return "" end
+	if not cd.dyn_anom.status then return "" end
+	return cd.dyn_anom.status
+end
+
+function is_anomaly(class_id)
+	return (class_id and anoms_classes[class_id]==true)
+end
+function is_art(class_id)
+	return (class_id and arts_sections[class_id]==true)
+end
+
+function modify_anomaly_custom_data(cd,status)
+	cd=amk.parse_custom_data(cd)
+	if not cd then cd={} end
+	if not cd.dyn_anom then cd.dyn_anom={} end 
+	cd.dyn_anom.status=status
+	return amk.gen_custom_data(cd)
+end
+
+function set_anomaly_status(sobj,status)
+	if sobj then
+		local anom_id=sobj.id
+		if status=="del" then end
+		local tbl=amk.get_anomaly_data(sobj)
+		tbl.custom=modify_anomaly_custom_data(tbl.custom,status)
+		amk.set_anomaly_data(tbl, sobj)
+		set_online_anomaly_status(anom_id,status)
+	end
+end
+
+function set_online_anomaly_status(obj_id,status)
+	local obj=level.object_by_id(obj_id)
+	if obj then
+		if status=="off" or status=="del" then
+			obj:disable_anomaly()
+			amk_anoms.remove_anomaly(obj_id)
+			amk_anoms.restrictor_deleted(obj_id,obj:name())
+		else
+			obj:enable_anomaly()
+			local sobj=alife():object(obj_id)
+			amk_anoms.add_anomaly(obj_id,sobj.position,sobj.radius)
+		end
+	end
+end
+--[[-------------------------- function for spawn ---------------------end--]]
+--[[-------------------------- npc and anom_binder -------------------------]]
+local anoms_for_npc={}
+local npcs_for_anom={}
+local actual_anoms_for_npc={}
+local npc_restrictors_need_update={}
+
+function init_if_needed(nid)
+	if (not anoms_for_npc[nid]) then anoms_for_npc[nid]={} end
+	if (not actual_anoms_for_npc[nid]) then
+		actual_anoms_for_npc[nid]={}
+	end
+	return anoms_for_npc[nid],actual_anoms_for_npc[nid]
+end
+
+function add_restriction(npc,id,name)
+	local nid=npc:id()
+	if name==nil then
+		name=(level.object_by_id(id) and level.object_by_id(id):name())
+	end
+	if TB3D_Modders.Global_Debug == true then 
+		TB3D_Services.packet_alert("AMK ANOM: add restrictor["..utils.to_str(name).."] for["..utils.to_str(npc:name()).."]")
+	end
+	if not name then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK ANOM: add_restriction() Warning! Nonexistent restrictor id["..utils.to_str(id).."]") end
+		return
+	end
+	init_if_needed(nid)
+	if anoms_for_npc[nid][id] then
+		else anoms_for_npc[nid][id]=name npc_restrictors_need_update[nid]=true
+	end
+end
+
+function remove_restriction(npc,id,name,immed)
+	local nid=npc:id()
+	if name==nil then name=(level.object_by_id(id) and level.object_by_id(id):name()) end
+	if TB3D_Modders.Global_Debug == true then 
+		TB3D_Services.packet_alert("AMK ANOM: remove restrictor["..utils.to_str(name).."] from["..utils.to_str(npc:name()).."]")
+	end
+	if not name then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK ANOM: rem restrictor: remove_restriction(): Nonexistent restrictor id "..id) end
+		return
+	end
+	init_if_needed(nid)
+	if immed then
+		if actual_anoms_for_npc[nid][id] then npc:remove_restrictions("",name) actual_anoms_for_npc[nid][id]=nil npcs_for_anom[id][nid]=nil end
+		if anoms_for_npc[nid][id] then anoms_for_npc[nid][id]=nil end
+	else
+		if anoms_for_npc[nid][id] then anoms_for_npc[nid][id]=nil npc_restrictors_need_update[nid]=true	end
+	end
+end
+
+function restrictor_deleted(id,name)
+	for nid,anoms in pairs(anoms_for_npc) do
+		if anoms[id] then anoms[id]=nil npc_restrictors_need_update[nid]=true end
+	end
+end
+
+function clear_to_release(id)
+	local cnt
+	if npcs_for_anom[id] then
+		for nid in pairs(npcs_for_anom[id]) do
+			cnt=cnt+1
+		end
+		return cnt==0
+	else
+		return true
+	end
+end
+
+function have_pending_sync(npc)
+	local nid=npc:id()
+	return npc_restrictors_need_update[nid]==true
+end
+
+local max_dynamic_restrictors_count=40
+
+function syncronize(npc)
+	local nid=npc:id()
+	local cnt=0
+	local anoms,actual=init_if_needed(nid)
+	local disttbl={} for id in pairs(anoms) do cnt=cnt+1 end
+	if cnt>max_dynamic_restrictors_count then
+		local disttbl={}
+		for id in pairs(anoms) do
+			local dist=0
+			local sobj=alife():object(id)
+			if sobj then
+				dist=npc:position():distance_to_sqr(sobj.position)
+			else
+				dist=1000000
+			end
+			table.insert(disttbl,{id=id,dist=dist})
+		end
+		table_sort(disttbl,function(a,b)
+		return a.dist>b.dist end)
+		for i=1,cnt-max_dynamic_restrictors_count do
+			anoms[disttbl[i].id]=nil
+		end
+	end
+	local add,rem="",""
+	local first=true
+	for id,name in pairs(actual) do
+		if not anoms[id] then
+			if first then first=false rem=name else rem=name..","..rem end
+			if npcs_for_anom[id] then npcs_for_anom[id][nid]=nil end
+			actual[id]=nil
+		end
+	end
+	first=true
+	for id,name in pairs(anoms) do
+		if not actual[id] then
+			if first then first=false add=name else add=name..","..add end
+			if not npcs_for_anom[id] then npcs_for_anom[id]={} end
+			npcs_for_anom[id][nid]=true
+			actual[id]=name
+		end
+	end
+		--TB3D_Services.packet_alert("AMK ANOM: synch npc reset restrictors["..utils.to_str(npc:name()).."]")
+	npc:remove_restrictions("",rem)
+	npc:add_restrictions("",add)
+	npc_restrictors_need_update[nid]=false
+end
+
+function unreg_in_anom_manager(npc)
+	local nid=npc:id()
+	local anoms=anoms_for_npc[nid]
+	if anoms then
+		for aid in pairs(anoms) do
+			if npcs_for_anom[aid] then npcs_for_anom[aid][nid]=nil end
+		end
+		anoms_for_npc[nid]=nil
+	end
+end
+
+function bind(obj)
+	obj:bind_object(anom_binder(obj))
+end
+
+class "anom_binder" ( object_binder )
+
+function anom_binder:__init(obj) super(obj) end
+
+function anom_binder:net_spawn(sobj)
+	if not object_binder.net_spawn( self,sobj ) then return false end
+	local status=get_anomaly_status(sobj)
+	if status=="del" or status=="off" then
+		if status=="del" then
+		end
+		self.object:disable_anomaly()
+	else
+		amk_anoms.add_anomaly(sobj.id,sobj.position,sobj.radius)
+	end
+	return true
+end
+
+function anom_binder:net_destroy()
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
+	amk_anoms.remove_anomaly(self.object:id())
+	object_binder.net_destroy(self)
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(self.object:name()).."] done") end
+end
+
+local anom_list={}
+
+function get_radius_for_section(section)
+	return getIniValueFloat(section,"effective_radius",2,nil)
+end
+
+function add_anomaly(id,pos,radius)
+	if anom_list==nil then anom_list={} end 
+	anom_list[id]={pos=pos,radius=radius or 0.0}
+end
+
+function remove_anomaly(id)
+	if anom_list then anom_list[id]=nil end
+end
+
+function get_nearest_anomaly(npc)
+	return get_nearest_anomaly_for_pos(npc:position())
+end
+
+function get_nearest_anomaly_for_pos(posn)
+	local anomid
+	local pos,radius
+	local mindist=10000000
+	for id,o in pairs(anom_list) do
+		local dist=posn:distance_to(o.pos)-o.radius
+		if dist<mindist then
+			mindist=dist
+			anomid=id
+			pos=o.pos
+			radius=o.radius
+		end
+	end
+	return anomid,pos,radius,mindist
+end
+
+function get_anomaly_list(npc,radius)
+	return get_anomaly_list_for_pos(npc:position(),radius)
+end
+
+function get_anomaly_list_for_pos(posn,radius)
+	local ret={}
+	if anom_list then
+		for id,o in pairs(anom_list) do
+			local obj=level.object_by_id(id)
+			if obj then
+				local dist=posn:distance_to(o.pos)-o.radius
+				if dist<radius then
+					table.insert(ret,{id=id,name=obj:name(),pos=o.pos,radius=o.radius})
+				end
+			end
+		end
+	end
+	return ret
+end
+--[[-------------------------- npc and anom_binder --------------------end--]]

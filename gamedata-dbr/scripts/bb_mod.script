@@ -1,0 +1,57 @@
+-- TB3D 1.0.9.9.1 added my_ver, dmx135 
+function my_ver() return "1.0.9.9.1" end
+
+local explosive_weapons = {
+	["wpn_rg-6"] = true,
+	["wpn_rg6_m1"] = true,
+	["wpn_rpg7"] = true,
+	["wpn_rpg7_m1"] = true,
+	["wpn_m79"] = true,
+	["grenade_f1"]	= true,
+	["grenade_rgd5"]	= true,
+	["grenade_7643b"] = true,
+	["grenade_m61"]   = true,
+	["grenade_m67"]   = true,
+	["w_dynamite"] = true}
+
+ function npcondeath(victim, who)
+	if who:id() == db.actor:id() then
+		local active_item = db.actor:active_item()
+		local active_slot = db.actor:active_slot()
+		if active_item and (active_slot == 1 or active_slot == 2 or active_slot == 3) then
+			local section = active_item:section()
+			if explosive_weapons[section] or string.find(section, "grenade_") then
+				particles_object("gore_efx\\gore_explode"):play_at_pos(victim:bone_position("bip01_head"))
+			end
+		end
+	end
+end
+----------------------------------------------------------
+--[[
+local effect_for_wpn = {
+["wpn_rg-6"]	= "gore_efx\\gore_explode",
+wpn_rg6_m1	= "gore_efx\\gore_explode",
+wpn_rpg7	= "gore_efx\\gore_explode",
+wpn_rpg7_m1  = "gore_efx\\gore_explode",	--133
+wpn_m79     = "gore_efx\\gore_explode",		--133
+grenade_f1	= "gore_efx\\gore_explode",
+grenade_rgd5	= "gore_efx\\gore_explode",
+grenade_7643b = "gore_efx\\gore_explode",		--133
+grenade_m61   = "gore_efx\\gore_explode",		--133
+grenade_m67   = "gore_efx\\gore_explode",		--133
+w_dynamite    = "gore_efx\\gore_explode"		--133
+}
+
+local pParams = particle_params(vector():set(0,0,0.3),vector():set(0,0,0),vector():set(1,0,0))
+
+function npcondeath(victim, who)
+	if db.actor ~= nil and who:id() == db.actor:id() then
+		local cur_weapon = db.actor:active_item()
+		if cur_weapon ~= nil then
+			local cur_weapon_sec = cur_weapon:section()
+			if effect_for_wpn[cur_weapon_sec] ~= nil then
+				action(victim, particle(effect_for_wpn[cur_weapon_sec], "bip01_head", pParams, false),cond(cond.time_end, 1000))
+			end
+		end
+	end
+end]]

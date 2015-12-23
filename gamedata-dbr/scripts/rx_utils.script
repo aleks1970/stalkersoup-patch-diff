@@ -1,0 +1,218 @@
+--TB3D 1.0.9.9.3.0, consold pkt svcs
+function my_ver() return "1.0.9.9.3.0" end
+
+function init()
+end
+
+--------------------------------------ini---------------------------------------
+function read_from_ini(ini,sec,lin,def,typ)
+	--if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("rx utils: read from ini") end
+	if not ini then
+		ini = system_ini()
+	end
+	if sec and lin and ini:section_exist(sec) and ini:line_exist(sec,lin) then
+		if typ == 0 then
+			return ini:r_bool(sec,lin)
+		elseif typ == 1 then
+			return ini:r_string(sec,lin)
+		elseif typ == 2 then
+			return ini:r_string_wq(sec,lin)
+		else
+			return ini:r_float(sec,lin)
+		end
+	else
+		return def
+	end
+end
+
+function read_from_ini_new(iniFileName,sec,lin,def,typ)
+	--if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("rx utils: read from ini new") end
+	--if sec and lin and ini:section_exist(sec) and ini:line_exist(sec,lin) then
+	if sec and lin then
+		if typ == 0 then
+			--return ini:r_bool(sec,lin)
+			return getIniValueBool(sec,lin,def,iniFileName)
+		elseif typ == 1 then
+			--return ini:r_string(sec,lin)
+			return getIniValueString(sec,lin,def,iniFileName)
+		elseif typ == 2 then
+			--return ini:r_string_wq(sec,lin)
+			return getIniValueStringWQ(sec,lin,def,iniFileName)
+		else
+			--return ini:r_float(sec,lin)
+			return getIniValueFloat(sec,lin,def,iniFileName)
+		end
+	else
+		return def
+	end
+end
+
+function collect_sections(ini,sections)
+	local r,p = {},{}
+	local n
+	local res,id,val
+	for k,v in ipairs(sections) do
+		if ini:section_exist(v) then
+			n = ini:line_count(v)
+			if n > 0 then
+				for i = 0,n-1 do
+					res,id,val = ini:r_line(v,i,"","")
+					if r[id] == nil then
+						r[id] = val
+					end
+				end
+			end
+			p[k] = n
+		else
+			p[k] = 0
+		end
+	end
+	return r,p
+end
+
+function collect_sections_new(iniFileName,sections)
+	local r,p = {},{}
+	local n
+	local res,id,val
+	for k,v in ipairs(sections) do
+		if iniLineSectionExist(v, iniFileName) then
+			n = iniLinesCount(v, iniFileName)
+			if n > 0 then
+				for i = 0,n-1 do
+					res,id,val = getIniLine(v,i,"","", iniFileName)
+					if r[id] == nil then
+						r[id] = val
+					end
+				end
+			end
+			p[k] = n
+		else
+			p[k] = 0
+		end
+	end
+	return r,p
+end
+
+function parse_list(ini,sec,val,convert)
+	--if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("rx utils: parse list") end
+	local tmp = amk.str_explode(",",read_from_ini(ini,sec,val,"",1),true)
+	if convert and #tmp ~= 0 then
+		local t = {}
+		for i,v in ipairs(tmp) do
+			t[v] = true
+		end
+		return t
+	end
+	return tmp
+end
+
+function parse_list_new(iniFileName,sec,val,convert)
+	--if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("rx utils: parse list new") end
+	local tmp = amk.str_explode(",",read_from_ini_new(iniFileName,sec,val,"",1),true)
+	if convert and #tmp ~= 0 then
+		local t = {}
+		for i,v in ipairs(tmp) do
+			t[v] = true
+		end
+		return t
+	end
+	return tmp
+end
+
+--------------------------------------class---------------------------------------
+function item_is_fa(o,c)
+	if not c then
+		c = o and o:clsid()
+	end
+	local t = {
+	[clsid.wpn_pm_s] = true,
+	[clsid.wpn_walther_s] = true,
+	[clsid.wpn_usp45_s] = true,
+	[clsid.wpn_hpsa_s] = true,
+	[clsid.wpn_bm16_s] = true,
+	[clsid.wpn_shotgun_s] = true,
+	[clsid.wpn_ak74_s] = true,
+	[clsid.wpn_lr300_s] = true,
+	[clsid.wpn_groza_s] = true,
+	[clsid.wpn_val_s] = true,
+	[clsid.wpn_vintorez_s] = true,
+	[clsid.wpn_svu_s] = true,
+	[clsid.wpn_svd_s] = true,
+	[clsid.wpn_rg6_s] = true,
+	[clsid.wpn_rpg7_s] = true,
+	[clsid.wpn_knife_s] = true}
+	if c and t[c] then
+		return true
+	end
+	return false
+end
+
+function is_actor(o,c)
+	if not c then
+		c = o and o:clsid()
+	end
+	return c == clsid.actor
+end
+
+--------------------------------------sch---------------------------------------
+function add_anim(npc,anim,move)
+	if anim then
+		npc:add_animation(anim)
+	end
+end
+
+function get_sound(snd)
+	if snd then
+		return xr_sound.get_safe_sound_object(snd)
+	end
+end
+
+--------------------------------------addons---------------------------------------
+local adt = {}
+
+function get_addon_status(wpn,addon)
+	if TB3D_Modders.use_weapon_message then TB3D_Services.info_alert("rx utils: get addon status") end
+	local sec = wpn:section()
+	if not adt[sec] then
+		adt[sec] = {}
+	end
+	if not adt[sec][addon] then
+		local ast = {sc = "scope_status",sl = "silencer_status",gl = "grenade_launcher_status"}
+		adt[sec][addon] = read_from_ini(nil,sec,ast[addon],0)
+	end
+	return adt[sec][addon]
+end
+
+local rep_mem = {}
+
+function get_addon_flag(wpn,with_int)
+	local id,tg = wpn:id(),time_global()
+	if tg == rep_mem.tg and rep_mem.id == id and rep_mem.wi == with_int then
+		return rep_mem.fl
+	else
+		local flag = amk.get_weapon_data(alife():object(wpn:id())).addon_flags or 0
+		if with_int then
+			if get_addon_status(wpn,"sc") == 1 then
+				flag = flag+1
+			end
+			if get_addon_status(wpn,"sl") == 1 then
+				flag = flag+4
+			end
+			if get_addon_status(wpn,"gl") == 1 then
+				flag = flag+2
+			end
+		end
+		rep_mem = {tg = tg,id = id,wi = with_int,fl = flag}
+		return flag
+	end
+end
+
+function addon_attached(wpn,addon,flag)
+	local ft = {sc = {[1] = true,[3] = true,[5] = true,[7] = true},
+				sl = {[4] = true,[5] = true,[6] = true,[7] = true},
+				gl = {[2] = true,[3] = true,[6] = true,[7] = true}}
+	if ft[addon] then
+		return ft[addon][flag or get_addon_flag(wpn,true)] == true
+	end
+	return false
+end

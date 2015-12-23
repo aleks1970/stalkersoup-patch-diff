@@ -1,0 +1,790 @@
+-- TB3D 1.0.9.9.7.6 new in 135, removed if use_dmx_cars, check_btr_hud, rafiq in village
+function my_ver() return "1.0.9.9.7.6" end
+--[[-----------------------------------------------------------------------------------------------
+ File         : dmx_cars.script
+ Description  : Function machines
+ Copyright    : DMX MOD
+ Author       : Shadows & Charsi (capture system in the car alarm)
+ Date         : 12.04.2011
+ Last edit    : 31.05.2012
+--]]-----------------------------------------------------------------------------------------------
+local translate = game.translate_string
+local string_find = string.find
+local target = nil
+local last_target = nil
+in_btr = false
+
+local car_id
+local current_car
+local script_car
+local hud = get_hud()
+local snd_btr_war, snd_police, snd_radio
+local has_weapon = false
+
+function set_current_car(car)
+	if car and car > 0 then
+		car_id = car
+		current_car = level.object_by_id(car_id)
+		amk.save_variable("car", car_id)
+		if inside_section_car() == "vehicle_btr" or (current_car and string_find(current_car:name(), "btr")) then
+			script_car = current_car:get_car()
+			has_weapon = script_car and script_car:HasWeapon()
+			in_btr = true
+		end
+	else
+		in_btr = false
+		has_weapon = false
+		car_id = nil
+		current_car = nil
+		amk.del_variable("car")
+	end
+end
+
+function on_vehicle_enter()
+	if db.actor then
+		if in_btr then
+			bind_stalker.hide_weapon(true)
+			sound_warning_btr()
+			check_btr_hud()
+			if has_weapon then enable_gun() end
+		else	
+			car_speedometer()
+		end
+		if inside_section_car() == "vehicle_moskvitch_police" then TB3D_hit_styles.hit_car(current_car) end
+		return not (current_car and current_car:get_car():engaged())
+	end
+end
+
+function on_vehicle_exit()
+	if db.actor then
+		sound_doors()
+		if in_btr then
+			disable_gun()
+			if snd_btr_war then
+				snd_btr_war:stop()
+				snd_btr_war = nil
+			end
+			in_btr = false
+			hud_info()
+			check_btr_hud()
+			bind_stalker.restore_weapon()
+		else
+			hud:RemoveCustomStatic("hud_speedometer_background")
+			hud:RemoveCustomStatic("hud_speedometer_pointer")
+		end
+		if snd_police then snd_police:stop() snd_police = nil car_stroboscope(false) end
+		car_radio_stop()
+		bind_physic_object.restore_actor_inside_car()
+		set_current_car(nil)
+	end
+end
+
+function on_vehicle_input(id)
+	if db.actor then
+		set_current_car(id)	--sets btr flag
+		level.add_call(on_vehicle_enter, on_vehicle_exit)
+		sound_doors()
+		car_encyclopedy()
+		car_uniq()
+		dmx_mod.actor_blockpost_propusk()
+	end
+end
+
+function actor_inside_car()
+	return car_id and car_id > 0 
+end
+
+function actor_inside_btr()
+	return car_id and car_id > 0 and in_btr == true
+end
+
+
+function inside_section_car()
+	return car_id and car_id > 0 and current_car and current_car:section() or ""
+end
+
+------------------------
+-- Sound door machine --
+------------------------
+function sound_doors()
+	if current_car:get_car():GetfHealth() > 0 then
+		local car = inside_section_car()
+		if in_btr then --car == "vehicle_btr80" or car == "vehicle_btr80_uniq" or car == "vehicle_btr80_camo" or car == "vehicle_btr90" then
+			dmx_mod.play_sound([[car\car_door_btr]])
+		elseif not (car == "vehicle_sport_baggi"
+				or car == "vehicle_dodge"
+				or car == "vehicle_icarus260"
+				or car == "vehicle_laz4202"
+				or car == "vehicle_armored_car"
+				or car == "vehicle_rover_bot"
+				or car == "vehicle_t40") then
+			dmx_mod.play_sound([[car\car_door]])
+		end
+	end
+end
+
+--------------------------------
+-- Sound risk undermining the BTR --
+--------------------------------
+function sound_warning_btr()
+	if in_btr and current_car:get_car():GetfHealth() < 0.3 then
+		if not (snd_btr_war and snd_btr_war:playing()) then
+			snd_btr_war = sound_object("device\\pda\\timer_blowout")
+			snd_btr_war:play_at_pos(db.actor, vector(), 0, sound_object.s2d + sound_object.looped)
+		end
+	elseif snd_btr_war then
+		snd_btr_war:stop() snd_btr_war = nil
+	end
+end
+
+---------------------
+-- Horn cars --
+---------------------
+function car_signal_sound()
+	if actor_inside_car() then
+		local car = inside_section_car()
+		if car == "vehicle_uaz_fsb"
+		  or car == "vehicle_moskvitch_police" then
+			if not (snd_police and snd_police:playing()) then
+				snd_police = sound_object("car\\car_signal_police")
+				snd_police:play_at_pos(db.actor, vector(), 0, sound_object.s2d + sound_object.looped)
+				car_stroboscope(true)
+			else
+				snd_police:stop() snd_police = nil
+				car_stroboscope(false)
+			end
+		elseif car == "vehicle_kamaz"
+		  or car == "vehicle_kamaz_truck"
+		  or car == "vehicle_kamaz_military"
+		  or car == "vehicle_zil130"
+		  or car == "vehicle_zil130_truck"
+		  or car == "vehicle_zil131"
+		  or car == "vehicle_ural4320"
+		  or car == "vehicle_ural4320_green"
+		  or car == "vehicle_ural4320_military" then
+			dmx_mod.play_sound([[car\car_signal_truck]])
+		elseif car ~= "vehicle_laz4202"
+		  and car ~= "vehicle_armored_car"
+		  and car ~= "vehicle_btr80"
+		  and car ~= "vehicle_btr80_camo"
+		  and car ~= "vehicle_btr80_uniq"
+		  and car ~= "vehicle_btr90"
+		  and car ~= "vehicle_gaz66"
+		  and car ~= "vehicle_zaz965"
+		  and car ~= "vehicle_t40"
+		  and car ~= "vehicle_rover_bot" then
+			dmx_mod.play_sound([[car\car_signal]])
+		end
+	end
+end
+
+---------------------
+-- Radio cars --
+---------------------
+function car_radio_play()
+	if actor_inside_car() and not in_btr and not snd_radio then
+		if not amk_mod.blowout() then
+			snd_radio = sound_object("car_music\\music_"..math.random(25))
+			snd_radio:play_at_pos(db.actor, vector(), 0, sound_object.s2d + sound_object.looped)
+			hud:AddCustomStatic("car_equalize")
+			dmx_pda_notepad.pda_radio_stop()
+		else
+			news_manager.amk_send_tip(translate("sms_car_blowout"),translate("sms_incomming"), 1, 10, "radio")
+		end
+	else
+		car_radio_stop()
+	end
+end
+
+function car_radio_stop()
+	if snd_radio and snd_radio:playing() then
+		snd_radio:stop() snd_radio = nil
+		hud:RemoveCustomStatic("car_equalize")
+	end
+end
+
+---------------
+-- Speedometer --
+---------------
+function car_speedometer()
+	local speed = current_car and current_car:get_car():CurrentVel():magnitude() or 0
+	local background = hud:GetCustomStatic("hud_speedometer_background")
+	local pointer = hud:GetCustomStatic("hud_speedometer_pointer")
+	if background and pointer then
+		background:wnd():SetText(math.floor(speed*3.6)..translate("speed_kmh"))
+		pointer:wnd():SetHeading(-21.99-0.6*0.154*speed)
+	else
+		hud:AddCustomStatic("hud_speedometer_background")
+		hud:AddCustomStatic("hud_speedometer_pointer")
+	end
+end
+
+---------------------------
+-- Repair Kit for cars --
+---------------------------
+function car_repair(obj)
+	if obj:section() == "item_car_repair" then
+		if actor_inside_car() then
+			current_car:get_car():SetfHealth(1)
+			dmx_mod.play_sound([[inventory\inv_repair]])
+		else
+			news_manager.amk_send_tip(translate("sms_car_repair"),translate("sms_incomming"), 1, 10, "car_icon")
+			amk.spawn_item_in_inv("item_car_repair")
+		end
+	end
+end
+
+------------------------
+-- Encyclopedia of cars --
+------------------------
+function car_encyclopedy()
+	local car = inside_section_car()
+	if car ~= "m_car" and car ~= "vehicle_btr" and car ~= "vehicle_rover_bot" and not has_alife_info(car.."_info") then
+		TB3D_Services.give_info(car.."_info")
+	end
+end
+
+----------------
+-- Strobe --
+----------------
+function car_stroboscope(type)
+	if inside_section_car() == "vehicle_moskvitch_police" then
+		local stroboscope = current_car:get_physics_shell():get_joint_by_bone_name("top_flasher")
+		xr_logic.mob_capture(current_car, true)
+		if type == true then
+			stroboscope:set_max_force_and_velocity(100, 4, 1)
+			action(current_car, object("top_light", object.activate), cond(cond.time_end, time_infinite))
+		elseif type == false then
+			stroboscope:set_max_force_and_velocity(0, 0, 0)
+			action(current_car, object("top_light", object.deactivate), cond(cond.time_end, time_infinite))
+		end
+	end
+end
+
+------------------------
+-- Marking machines --
+------------------------
+local signaling_cars = {
+	["vehicle_lada2103"] = true,
+	["vehicle_lada2103_red"] = true,
+	["vehicle_lada2103_green"] = true,
+	["vehicle_volga_gray"] = true,
+	["vehicle_volga_black"] = true,
+	["vehicle_moskvitch"] = true,
+	["vehicle_moskvitch_police"] = true,
+	["vehicle_moskvitch_black"] = true,
+	["vehicle_niva"] = true,
+	["vehicle_niva_white"] = true,
+	["vehicle_niva_sport"] = true,
+	["vehicle_uaz469_uniq"] = true,
+	["vehicle_uaz469_open"] = true,
+	["vehicle_uaz_buhanka"] = true,
+	["vehicle_ferrari"] = true,
+	["vehicle_hummer"] = true
+}
+local snd_alarms = sound_object("car\\car_alarms")
+local signaling_timer, cycle, car = 0, 0
+
+function signaling_start(obj)			--called by bind_physic_object:on_use
+	if not db.actor:object("car_key") and not db.actor:object("car_key_2") then
+		if signaling_cars[obj:section()] then
+			if snd_alarms:playing() then snd_alarms:stop() end
+			snd_alarms:play_at_pos(db.actor, vector(), 0, sound_object.s2d)
+			cycle = 12
+			car = obj
+		end
+	end
+end
+
+function signaling_light_activation()
+	if cycle > 0 and signaling_timer < time_global() then
+		signaling_timer = time_global() + 500
+		cycle = cycle - 1
+		if math.fmod(cycle, 2) == 0 then light_turn_off(car) else light_turn_on(car) end
+	end
+end
+
+function light_turn_on(car)
+	xr_logic.mob_capture(car, true)
+	action(car, object("left_light", object.activate), cond(cond.time_end, time_infinite))
+	xr_logic.mob_capture(car, true)
+	action(car, object("right_light", object.activate), cond(cond.time_end, time_infinite))
+end
+
+function light_turn_off(car)
+	xr_logic.mob_capture(car, true)
+	action(car, object("left_light", object.deactivate), cond(cond.time_end, time_infinite))
+	xr_logic.mob_capture(car, true)
+	action(car, object("right_light", object.deactivate), cond(cond.time_end, time_infinite))
+end
+
+----------------------------
+-- Search for unique machines --
+----------------------------
+local uniq_cars = {
+	["vehicle_armored_car"] = true,
+	["vehicle_btr80_uniq"] = true,
+	["vehicle_vezdehod"] = true,
+	["vehicle_niva_uniq"] = true,
+	["vehicle_niva_sport"] = true,
+	["vehicle_ferrari"] = true
+}
+function quest_cars_spawn()
+	alife():create("vehicle_niva_uniq",vector():set(-48.993,-4.192,-304.541),191893,449) -- Unique Niva on Agriculture
+	alife():create("vehicle_btr80_uniq",vector():set(-59.787,-6.780,-166.340),45850,1281) -- The secret of BTR's bar
+	alife():create("vehicle_niva_sport",vector():set(-145.993,-2.391,54.897),2263,2141) -- Athletic Field in Pripyat
+	alife():create("vehicle_vezdehod",vector():set(987.635,-0.098,-10.298),442550,2279) -- All-terrain vehicle at CHASE1
+	alife():create("vehicle_armored_car",vector():set(-294.539,60.492,171.217),52891,2939) -- Armored car in a maze
+	alife():create("vehicle_ferrari",vector():set(209.524,-0.427,-277.424),425007,3765) -- Ferrari California on the East River
+end
+function car_uniq()
+	local car = inside_section_car()
+	if uniq_cars[car] and not has_alife_info(car.."_found_info") then
+		local count = amk.load_variable("car_found", 0) + 1
+		if count == 6 then
+			news_manager.amk_send_tip(translate("sms_car_found_all"),translate("sms_incomming"), 1, 15, "car_icon")
+			sound_object([[ambient\found_all_cars]]):play_no_feedback(db.actor, sound_object.s2d, 2, vector(), 1.0)
+			amk.spawn_item_in_inv("wpn_minigun_m134")
+			amk.spawn_ammo_in_inv("ammo_minigun", 500)
+		else
+			news_manager.amk_send_tip(translate("sms_car_found")..count..translate("sms_car_total"),translate("sms_incomming"), 1, 15, "car_icon")
+			sound_object([[ambient\found_car]]):play_no_feedback(db.actor, sound_object.s2d, 2, vector(), 1.0)
+		end
+		amk.save_variable("car_found", count)
+		TB3D_Services.give_info(car.."_found_info")
+	end
+end
+
+-----------------------
+-- Car Spawn --
+-----------------------crack in ds (-230.163,-0.019,549.891),135473,4608)(-225.980,-0.024,549.881),139007,4608)(-220.618,-0.049,549.750),143767,4608)
+-- the default locations
+function car_spawn()
+	--------------------------------------------- use elsewhere 109950 ---------------------------------------
+	--alife():create("vehicle_t40",vector():set(-66.353,-2.167,-83.612),36924,2258) -- Tractor in Pripyat
+	--alife():create("vehicle_btr90",vector():set(-149.101,-29.921,-385.627),100755,15) -- BTR-90 at Cordon
+	--alife():create("vehicle_moskvitch",vector():set(-63.113,-9.931,-41.508),212929,78) -- Moskvich in Cordon
+	--alife():create("vehicle_kamaz_truck",vector():set(-225.980,-0.024,549.881),139007,4608) -- KAMAZ Lite in ds
+	--alife():create("vehicle_raf",vector():set(53.094,3.958,-40.312),29613,3334) -- Rafiq on a hill in the old village
+	--------------------------------------------------------------------------------------------------------------
+	---- Garbage ----
+	alife():create("vehicle_uaz469_open",vector():set(75.669,0.616,159.661),245557,364) -- Desert Jeep in a landfill
+	alife():create("vehicle_kavz685",vector():set(88.885,-1.066,-60.931),256615,394) -- Bus to landfill
+	alife():create("vehicle_zaz968",vector():set(-167.780,-2.633,-162.953),52758,278) -- ZAZ 968 at the dump
+	---- Agroprom ---
+	alife():create("vehicle_laz4202",vector():set(-68.849,0.017,-19.148),172430,456) -- Bus LAZ on Agriculture
+	alife():create("vehicle_gaz66",vector():set(14.951,13.739,138.549),254934,516) -- GAZ 66 on a hillock on the Agriculture
+	---- Dark Valley ---
+	alife():create("vehicle_volga_black",vector():set(143.807,0.152,-293.076),341842,970) -- Black Volga in DV
+	alife():create("vehicle_zil131",vector():set(-101.147,0.825,-237.562),57918,851) -- ZIL 131 in DV
+	alife():create("vehicle_moskvitch_police",vector():set(23.769,0.083,31.604),203467,1001) -- Police based in DV Moskvich
+	alife():create("vehicle_lada2106",vector():set(23.874,1.727,-323.951),202986,842) -- LADA on a bridge in DV
+	---- Bar ---
+	alife():create("vehicle_sport_baggi",vector():set(384.715,13.035,-342.460),47432,1281) -- Buggy bar
+	---- Yantar ---
+	alife():create("vehicle_land_rover",vector():set(70.988,-10.605,-252.723),76616,1450) -- Land Rover on Amber
+	alife():create("vehicle_zil130",vector():set(125.887,0.393,-158.229),108502,1466) -- Blue Zil on Amber
+	alife():create("vehicle_uaz_buhanka",vector():set(146.265,-2.155,58.384),122077,1522) -- UAZ Loaf on Amber
+	---- Military ---
+	alife():create("vehicle_icarus260",vector():set(-288.171,-22.688,238.667),52795,1787) -- IKARUS in the village
+	alife():create("vehicle_lada2103_green",vector():set(-7.089,-8.875,-46.398),300155,1591) -- Lada green
+	alife():create("vehicle_kamaz",vector():set(-24.654,-24.853,262.020),283054,1745) -- KAMAZ
+	---- Radar ---
+	alife():create("vehicle_niva_white",vector():set(-6.142,-1.960,43.527),8515,2020) -- White Field on the radar
+	alife():create("vehicle_zaz965",vector():set(613.128,-43.827,187.442),220505,1907) -- Humpback Constipation in zakutke on the radar
+	alife():create("vehicle_zil130_truck",vector():set(559.006,-59.086,-232.911),194942,1873) -- Zil Lite on the radar
+	---- Pripyat ---
+	alife():create("vehicle_lada2106_pricep",vector():set(19.764,-0.628,252.000),126108,2150) -- LADA with trailer in Pripyat
+	alife():create("vehicle_moskvitch_police",vector():set(-22.810,-2.392,71.012),75879,2165) -- Police Moskvich in Pripyat
+	alife():create("vehicle_ural4320_green",vector():set(173.667,-2.204,194.150),254625,2146) -- Green Ural in the right part of the Sky
+	alife():create("vehicle_zaz968",vector():set(-1.124,-2.393,-170.287),100206,2118) -- ZAZ 968 in Pripyat
+	---- NPP 1 ---
+	alife():create("vehicle_kamaz",vector():set(922.057,-0.000,-252.523),407042,2273) -- KAMAZ at CHASE1
+	alife():create("vehicle_hummer",vector():set(305.495,-0.001,-224.646),127863,2350) -- Humvee at CHASE1
+	---- NPP 2 ---
+	alife():create("vehicle_ural4320_military",vector():set(257.631,-0.099,303.551),91963,2591) -- Military Ural by CHASE2
+	alife():create("vehicle_uaz_fsb",vector():set(-40.335,-0.036,81.551),10327,2517) -- UAZ FSB at CHASE2
+	alife():create("vehicle_niva",vector():set(499.683,-0.053,257.824),159035,2606) -- Military Field on CHASE2
+	alife():create("vehicle_btr80",vector():set(660.714,-0.101,183.902),192065,2621) -- APC CHASE2
+	alife():create("vehicle_dodge",vector():set(1042.453,-0.100,170.960),245052,2636) -- Dodge at CHASE2
+	---- Puzir ---
+	alife():create("vehicle_kamaz_military",vector():set(-43.682,-0.780,-128.205),152548,2882) -- Military Trucks in a forgotten Forest
+	alife():create("vehicle_btr80_camo",vector():set(-142.396,-11.555,194.576),75493,2881) -- Camouflage BTR in a forgotten Forest
+	---- Avir ---
+	alife():create("vehicle_lada2103",vector():set(-331.438,-8.477,18.477),300707,2889) -- LADA 2103 about Transfered to NC
+	alife():create("vehicle_niva_white",vector():set(-146.709,-54.365,-178.671),616962,2897) -- White swamp West of Niwa, NZ
+	alife():create("vehicle_zil130",vector():set(115.161,-4.548,-284.677),1070948,2900) -- Blue Zil on NZ in the camp of the Avengers
+	---- red forest ---
+	alife():create("vehicle_zaz968_yellow",vector():set(194.455,-6.734,-25.100),127254,3317) -- Yellow Lock near the tank in the Red Forest
+	alife():create("vehicle_uaz_ukrainian",vector():set(-115.459,-0.403,-248.444),9686,3241) -- A police vehicle near the bridge in the Red Forest
+	alife():create("vehicle_moskvitch_black",vector():set(44.683,-0.000,-4.334),89205,3290) -- Black Lightning about Forester in the Red Forest
+	---- East Pripyat ---
+	alife():create("vehicle_kamaz_military",vector():set(121.296,-0.508,-195.751),346973,3765) -- Military Trucks near the laundry room to the East of Pripyat
+	alife():create("vehicle_icarus260",vector():set(82.764,-0.507,195.872),303751,3764) -- IKARUS near the school on the East River
+	alife():create("vehicle_lada2103",vector():set(-4.389,-0.737,-19.660),191527,3759) -- LADA 2103 in the garage on the East River
+	alife():create("vehicle_moskvitch_black",vector():set(-165.859,-0.507,-177.442),43855,3752) -- Black Lightning around the supermarket in the East River
+	alife():create("vehicle_zil130_truck",vector():set(269.813,-0.368,291.999),467874,3769) -- ZIL 130 without bodywork on the pier in the East River
+	alife():create("vehicle_btr80_camo",vector():set(33.909,-0.508,396.480),242773,3760) -- The BTR cover for cinema in the East River
+	---- lost village ---
+	alife():create("vehicle_niva",vector():set(85.383,10.720,53.689),39525,3333) -- Military Field in a garage in Staraya Derevnya
+	alife():create("vehicle_uaz",vector():set(-33.115,1.654,14.520),5769,3326) -- Vehicle INTERIOR in a bog in Staraya Derevnya
+	---- Limansk ---
+	alife():create("vehicle_lada2103_red",vector():set(35.145,-0.060,-280.733),45055,3019) -- Red Fret to the South in Disguised
+	alife():create("vehicle_ural4320",vector():set(-51.423,-4.992,-254.526),2974,2992) -- Ural House in Disguised
+	---- ATP ---
+	alife():create("vehicle_volga_gray",vector():set(313.994,-6.438,-292.728),826216,2847) -- Grey Volga in the forest on the ATP
+end
+
+function rover_bot_spawn()
+	alife():create("vehicle_rover_bot",vector():set(50.182,-11.880,-280.311),65136,1480) -- Zone Rover Bot in Amber
+	alife():create("rover_bot_stancion",vector():set(51.918,-11.688,-261.338),65886,1480) -- Robot station on Amber
+end
+
+---- OGSE style usable BTR 109950 ----------------------------------------------------------------------	
+function check_btr()
+	local position = nil
+	if current_car and in_btr then
+		if has_weapon and target then
+			local targ = level.object_by_id(target)
+			if targ then
+				if not targ:alive() then
+					target = nil
+					targ = nil
+				end
+				-- if targ and script_car:IsObjectVisible(targ) then
+				if targ then
+					--TB3D_Services.packet_alert("dmx cars: check car ["..current_car:name().."] set turret")
+					if targ and IsStalker(targ) or IsMonster(targ) then
+						position = targ:bone_position("bip01_head")
+					else
+						if string_find(targ:name(), "turret") then
+							position = targ:bone_position("wpn_body1")
+						elseif string_find(targ:name(), "heli") then
+							position = targ:bone_position("pilot2")
+						elseif string_find(targ:name(), "btr") then
+							position = targ:bone_position("kabina")
+						elseif string_find(targ:name(), "vehicle") then
+							position = targ:bone_position("root")
+						else
+							position = targ:position()
+						end
+					end
+				end
+			end
+			if position == nil then
+				target = nil
+				--position = device().cam_pos():add(device().cam_dir():mul(4))
+			end
+			if position then script_car:SetParam(CCar.eWpnDesiredPos, position) end
+		--else
+			--TB3D_Services.packet_alert("dmx cars: check car ["..current_car:name().."] no weapon")
+		end		
+	end
+	--target = nil
+	hud_info()
+end
+
+local periscope
+local saved_aspect = 0
+function add_btr_hud()
+	local screen = device()
+	local scr_width = screen.width
+	local scr_height = screen.height		
+	local screen_aspect_ratio = ui_rad.orig_aspect
+	if scr_width > 0 and scr_height > 0 then
+		screen_aspect_ratio = scr_width / scr_height
+	end	
+	if get_hud():GetCustomStatic("periscope") == nil then
+		saved_aspect = screen_aspect_ratio
+		get_hud():AddCustomStatic("periscope")
+		periscope = get_hud():GetCustomStatic("periscope"):wnd()
+		periscope:SetWidth(0)
+		periscope:SetColor(GetARGB(0,255,255,255))
+		periscope:SetWndRect(Frect():set(0,0,winx,winy))
+	else	
+		if (screen_aspect_ratio ~= saved_aspect) then
+			if (math.abs(screen_aspect_ratio - saved_aspect) > 0.1) then
+				saved_aspect = screen_aspect_ratio
+				get_hud():RemoveCustomStatic("periscope")
+				get_hud():AddCustomStatic("periscope")
+				periscope = get_hud():GetCustomStatic("periscope"):wnd()
+				periscope:SetWidth(0)
+				periscope:SetColor(GetARGB(0,255,255,255))
+				periscope:SetWndRect(Frect():set(0,0,winx,winy))			
+			end
+		end
+	end
+end
+
+function check_btr_hud()
+	local suithud = amk.load_variable("option_hud",-1)
+	if in_btr then
+		if amk_mod.get_my_suit_hud() then
+			--amk_mod.blood_intensity = 0
+			--amk_mod.set_blood()
+			--amk_mod.suithud_enable = 0
+			amk_mod.setmysuithud(nil)
+		end
+		periscope = get_hud():GetCustomStatic("periscope")
+		if periscope then
+			periscope = get_hud():GetCustomStatic("periscope"):wnd()
+			periscope:SetColor(GetARGB(255,255,255,255))				
+		end
+	else
+		if suithud > 0 and not amk_mod.get_my_suit_hud() then
+			amk_mod.setmysuithud(amk_mod.get_my_suit_hud())
+		end
+		--biodetector.update("off")	
+		periscope = get_hud():GetCustomStatic("periscope")
+		if periscope then
+			periscope = get_hud():GetCustomStatic("periscope"):wnd()
+			periscope:SetColor(GetARGB(0,255,255,255))	
+		end
+	end
+end
+
+local check_count = 0
+function hud_info()
+	local is_target = false
+	local istarg = hud:GetCustomStatic("btr_hastarget")
+	local targ = hud:GetCustomStatic("btr_target")
+	local critical = hud:GetCustomStatic("btr_critical")
+	local armor = hud:GetCustomStatic("btr_armor")
+	if in_btr then	
+		if not armor then hud:AddCustomStatic("btr_armor", true) end
+		local script_car = current_car:get_car()							--- check for weapon
+		local health = script_car and script_car:GetfHealth()
+		if health and health < 0.25 then
+			--target = nil
+			if istarg then hud:RemoveCustomStatic("btr_hastarget") end	
+			if targ then hud:RemoveCustomStatic("btr_target") end			
+			if not critical then hud:AddCustomStatic("btr_critical", true) end
+			critical = hud:GetCustomStatic("btr_critical"):wnd()
+			if check_count == 0 then
+				if math.random() > 0.5 then
+					critical:SetText(translate("fire_emerg"))
+				else
+					critical:SetText(translate("ammo_emerg"))
+				end
+			end
+			check_count = check_count + 1
+			if check_count >= 50 then
+				check_count = 0
+			end
+			armor = hud:GetCustomStatic("btr_armor"):wnd()
+			armor:SetText(translate("armor_cond")..tostring(math.floor(health*100)).." %")
+		elseif health then
+			if critical then hud:RemoveCustomStatic("btr_critical") end				
+			if not targ then hud:AddCustomStatic("btr_target", true) end
+			targ = hud:GetCustomStatic("btr_target"):wnd()
+			if has_weapon then
+				if target then
+					if last_target and target == last_target then
+						return
+					else
+						local target_descr = level.object_by_id(target)
+						if target_descr and script_car:IsObjectVisible(target_descr) then
+							local str = resolve_target(target_descr)
+							if str then
+								targ:SetText(translate("current_target")..translate(str).." -")
+							else	
+								targ:SetText(translate("unknown_target"))
+							end
+							is_target = true
+						else	
+							targ:SetText(translate("range_target"))
+						end
+					end
+				else
+					targ:SetText(translate("no_target"))
+				end
+			else
+				targ:SetText(translate("weapon_malfunc"))
+			end
+			if is_target then
+				if not istarg then hud:AddCustomStatic("btr_hastarget", true) end
+				istarg = hud:GetCustomStatic("btr_hastarget"):wnd()
+				istarg:SetText(translate("has_target"))
+				last_target = target
+			else
+				target = nil
+				if istarg then hud:RemoveCustomStatic("btr_hastarget") end	
+			end
+			armor = hud:GetCustomStatic("btr_armor"):wnd()
+			armor:SetText(translate("armor_cond")..tostring(math.floor(health*100)).." %")
+		else
+			if istarg then hud:RemoveCustomStatic("btr_hastarget") end	
+			if armor then hud:RemoveCustomStatic("btr_armor") end	
+			if critical then hud:RemoveCustomStatic("btr_critical") end				
+			if not targ then hud:AddCustomStatic("btr_target", true) end
+			targ = hud:GetCustomStatic("btr_target"):wnd()
+			targ:SetText(translate("system_malfunc"))
+		end
+	else
+		if istarg then hud:RemoveCustomStatic("btr_hastarget") end	
+		if targ then hud:RemoveCustomStatic("btr_target") end
+		if armor then hud:RemoveCustomStatic("btr_armor") end	
+		if critical then hud:RemoveCustomStatic("btr_critical") end				
+	end
+end
+
+function actor_target(object)
+	if db.actor and object then
+		local dangerang = 1/object:position():distance_to(device().cam_pos)
+		local ang = horz_angle(device().cam_dir, object:position():sub(device().cam_pos))
+		local tgt = ang > -dangerang and ang < dangerang
+		if tgt then return true end
+	end
+	return false
+end
+
+local cannon_firing = false
+function enable_gun()
+	if current_car then
+		local script_car = current_car:get_car()
+		if script_car and script_car:HasWeapon() then
+			script_car:Action(CCar.eWpnActivate,1)
+		end	
+	end	
+end
+
+function disable_gun()
+	if current_car then
+		local script_car = current_car:get_car()
+		if script_car and script_car:HasWeapon() then
+			script_car:Action(CCar.eWpnActivate,0)
+		end	
+	end	
+	cannon_firing = false
+end
+
+function start_firing()
+	if current_car then
+		local script_car = current_car:get_car()
+		if script_car and script_car:HasWeapon() then
+			script_car:Action(CCar.eWpnAutoFire,1)
+			script_car:Action(CCar.eWpnFire, 1)						
+			cannon_firing = true
+		end	
+	end		
+end
+
+function stop_firing()
+	if cannon_firing == true then
+		if current_car then
+			local script_car = current_car:get_car()		
+			if script_car and script_car:HasWeapon() then
+				script_car:Action(CCar.eWpnFire, 0)
+				script_car:Action(CCar.eWpnAutoFire,0)
+			end					
+		end		
+		cannon_firing = false
+	end
+end
+
+function horz_angle(vec1,vec2)
+  local x = vec2.x*vec1.x+vec2.z*vec1.z
+  local y = -vec2.z*vec1.x+vec2.x*vec1.z    
+  return math.atan2(y,x)
+end
+
+function resolve_target(target)
+local descript = nil
+	if target then
+		if IsStalker(target) then
+			descript = target:character_community()
+			if string_find(descript, "stalker") then
+				descript = "stalker_target"
+			elseif string_find(descript, "monolith") then
+				descript = "mono_target"
+			elseif string_find(descript, "military") then
+				descript = "mil_target"
+			elseif string_find(descript, "killer") then
+				descript = "killer_target"
+			elseif string_find(descript, "ecolog") then
+				descript = "ecolog_target"
+			elseif string_find(descript, "dolg") then
+				descript = "dolg_target"
+			elseif string_find(descript, "freedom") then
+				descript = "freedom_target"
+			elseif string_find(descript, "bandit") then
+				descript = "bandit_target"
+			elseif string_find(descript, "zombied") then
+				descript = "zombied_target"
+			elseif string_find(descript, "stranger") then
+				descript = "stranger_target"
+			elseif string_find(descript, "trader") then
+				descript = "trader_target"
+			elseif string_find(descript, "csky") then
+				descript = "csky_target"
+			end			
+		elseif IsMonster(target) then
+			descript = target:section()
+			if string_find(descript, "boar") then
+				descript = "boar_target"
+			elseif string_find(descript, "bloodsucker") then
+				descript = "blood_target"	
+			elseif string_find(descript, "flesh") then
+				descript = "flesh_target"
+			elseif string_find(descript, "dog") then
+				descript = "dog_target"	
+			elseif string_find(descript, "pseudodog") then
+				descript = "pseudodog_target"
+			elseif string_find(descript, "cat") then
+				descript = "cat_weak"
+			elseif string_find(descript, "chimera") then
+				descript = "chimera_weak"	
+			elseif string_find(descript, "giant") then
+				descript = "pseudo_gigant_target"
+			elseif string_find(descript, "zombie") then
+				descript = "zombie_target"
+			elseif string_find(descript, "burer") then
+				descript = "burer_target"	
+			elseif string_find(descript, "controller") then
+				descript = "controller_target"	
+			elseif string_find(descript, "poltergeist") then
+				descript = "poltergeist_target"
+			elseif string_find(descript, "snork") then
+				descript = "snork_target"
+			elseif string_find(descript, "fracture") then
+				descript = "fracture_weak"	
+			elseif string_find(descript, "bird") then
+				descript = "crow_weak"	
+			elseif string_find(descript, "rat") then
+				descript = "rat_normal"	
+			elseif string_find(descript, "tushkano") then
+				descript = "tushkano_normal"	
+			end			
+		else
+			descript = target:section()
+			if string_find(descript, "helicop") then
+				descript = "heli_target"
+			elseif string_find(descript, "turret") then
+				descript = "turret_target"		
+			elseif string_find(descript, "btr") then
+				descript = "btr_target"					
+			end
+		end
+	end
+	return descript
+end
+function set_target(obj_id)
+	if obj_id then target = obj_id else target = nil end
+end
+
+function btr_kill(victim)
+	relation_registry.set_community_goodwill(victim:character_community(), db.actor:id(), -100)
+	if victim:relation(db.actor) == game_object.neutral then
+		db.actor:change_character_reputation(db.actor:character_reputation() - 50);
+	elseif victim:relation(db.actor) == game_object.friend then
+		db.actor:change_character_reputation(db.actor:character_reputation() - 100);
+	end
+	for id=first_object,last_object do
+	local obj = level.object_by_id(id)
+		if obj and obj:alive() and IsStalker(obj) and obj:character_community() == victim:character_community() and obj:position():distance_to(victim:position()) < 30 then
+			obj:set_relation(game_object.enemy, db.actor)
+		end	
+	end
+end	
+-------------------------------------------------------------------------------------------------------------
+	

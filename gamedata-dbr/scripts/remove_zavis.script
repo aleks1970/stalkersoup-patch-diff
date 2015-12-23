@@ -1,0 +1,26 @@
+--TB3D 1.0.9.9.1.5 hit styles
+function my_ver() return "1.0.9.9.1.5" end
+function remove_obj(obj)
+	local npc_id = obj:id()
+	if IAmAStalker[obj:clsid()] or IAmAMonster[obj:clsid()] then
+	  
+	local npc = level.object_by_id(npc_id)
+	if npc then
+		if TB3D_Modders.zavis_hit == true then TB3D_hit_styles.burn(npc, npc, 3, 3, vector():set(0,0,0)) end
+		if obj and IAmAStalker[obj:clsid()] then amk.make_suicide(npc) end
+	end
+	  -- amk.dump_table(amk.read_stalker_params(npc))
+	  -- killing a hung
+	  -- switch_offline(obj)
+	  -- clean up the corpse
+	  if obj then
+		local npc_name = obj:name()
+		alife():release(alife():object(npc_id), true)
+		--if not obj then
+		  local text1 = "hanging "..npc_name.." id: "..npc_id.." removed"
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("REMOVE ZAVIS: remove object: "..text1) end     
+		--end
+		-- return
+	  end
+    end
+end

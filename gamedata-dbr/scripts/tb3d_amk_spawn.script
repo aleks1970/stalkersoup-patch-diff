@@ -1,0 +1,14 @@
+--TB3D 1.0.9.9.7.0
+--optional file for testing
+
+function init()			--called  from amk_mod.check_spawn()
+--[[--------------set direction test---------------------------
+	obj = alife():create("vehicle_kavz685",vector():set(34.275,2.831,50.974),315023,90) -- bus in ds
+	if obj then
+		alife():set_switch_online(obj,false)
+		alife():set_switch_offline(obj,true)
+		obj.direction = vector():set(1,0,0)
+		alife():set_switch_online(obj,true)
+		alife():set_switch_offline(obj,false)
+	end
+]]--------------------------------------------------------------

@@ -1,0 +1,93 @@
+--TB3D 1.0.9.9.7.6  dmx135, backpack spot, obj level, net spawn, obj_is_protected
+function my_ver() return "1.0.9.9.7.6" end
+--[[-----------------------------------------------------------------------------------------------
+ File         : dmx_treasure.script
+ Description  : Adding to the inventory reset button stuff
+ Copyright    : DMX MOD
+ Author       : Charsi
+ Date         : 07.03.2011 
+--]]-----------------------------------------------------------------------------------------------
+local items_in_slots={}
+local drop_items={}
+
+-- These items do not throw down
+local no_drop_items = {["separator"]=true, ["remontnyi_box"]=true, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true, ["amk_metka"]=true, ["amk_transmutator"]=true}
+
+function on_btn_drop_ckliked() -- it hangs on the button
+	local actor = db.actor
+	items_in_slots={}
+	drop_items={}
+	if amk.load_variable("dmx_box",0)==0 then
+		local cnt = 0
+		-- obtain a list of items in the slots
+		local item
+		for i=0,12 do
+			item=actor:item_in_slot(i)
+			if item then
+				items_in_slots[item:id()]=true
+			end
+		end
+		-- with a belt, too, not to throw
+		for id,_ in pairs (inventory.belt_id) do
+		  items_in_slots[id]=true
+		end
+		-- Consider that you can throw
+		actor:iterate_inventory(function (dummy,item)
+			if items_in_slots[item:id()]~=true and no_drop_items[item:section()]~=true and protected_items.obj_is_protected(item)~=true
+			then drop_items[item:id()]=true cnt=cnt+1 end
+		end,nil)
+		if cnt>0 then
+			local pos=actor:position()
+			pos.y = pos.y + 0.1		--insure it does not fall through floor
+			local bag=alife():create("m_dmx_box",pos, actor:level_vertex_id(), actor:game_vertex_id())
+			local sobj=alife():create("dmx_box_nevedimka", pos, actor:level_vertex_id(), actor:game_vertex_id())
+			level.client_spawn_manager():add(sobj.id,0,spawn_call_back,true)
+			amk.add_spot_on_map(bag.id,"red_location","Backpack")
+			amk.save_variable("dmx_box",sobj.id)
+		end
+	else
+		news_manager.send_tip_txt(db.actor, "Can not be anything more out of my backpack!")
+	end
+end
+
+function return_items()
+	local box_id=amk.load_variable("dmx_box",0)
+	local box=level.object_by_id(box_id)
+	if box_id>0 and box~=nil then
+		local actor=db.actor
+		-- get all the items in the box
+		bind_stalker.dmx_transfer = true
+		local items_in_box={}
+		local sim=alife()
+		local sobj
+		for i=first_object,last_object do
+			sobj=sim:object(i)
+			if sobj and sobj.parent_id==box_id then table.insert(items_in_box,i) end
+		end
+		-- transferred to the actor
+		local level_obj_by_id=level.object_by_id
+		for k,item_id in pairs (items_in_box) do	--TB3D chg _ to k
+		   box:transfer_item(level_obj_by_id(item_id),actor)
+		end
+		amk.save_variable("dmx_box",0)
+	end
+end
+
+function net_spawn()
+	local box_id=amk.load_variable("dmx_box",0)
+	if box_id and box_id ~= 0 then
+		local obj_lvl = TB3D_Services.get_obj_level(alife():object(box_id).m_game_vertex_id)
+		if obj_lvl ~= "" and level.name()==obj_lvl then
+			level.client_spawn_manager():add(box_id,0,spawn_call_back,false)
+		end
+	end
+end
+
+function spawn_call_back(arg,box_id,box)
+	switch_online(box_id)
+	if arg then
+		local actor=db.actor
+		actor:iterate_inventory(function (dummy,item) if drop_items[item:id()] then actor:transfer_item(item,box) end end,nil)
+	end
+end
+ 

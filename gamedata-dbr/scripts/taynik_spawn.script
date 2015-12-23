@@ -1,0 +1,417 @@
+--TB3D 1.0.9.9.7.7   removed table.getn(), changed points2, give talk message
+function my_ver() return "1.0.9.9.7.7" end
+
+local translate = game.translate_string
+
+--'*******************************************************************************
+--'   **   **   **   **   **    **   **   **      QUEST_AF_STAR        **   ** 
+--'*******************************************************************************
+local sp_points={
+	{
+		position={x=-24.2727108001709,y=-12.1660995483398,z=-100.200202941895},
+		gv=0,
+		lv=73868
+	},
+	{
+		position={x=159.56,y=4.72,z=88.60},
+		gv=155,
+		lv=463808
+	},
+	{
+		position={x=-4.11,y=2.90,z=108.09},
+		gv=85,
+		lv=272619
+	}
+}
+
+function spawn_star(actor,npc,p1,p2)
+    local a = sp_points[math.random(#sp_points)]
+    local obj = alife():create("amk_af_night_star", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	if obj then
+		if TB3D_Modders.show_news_spots == true then add_spot_on_map(obj.id, "red_location", "art") end
+	end
+	news_manager.upload_message_id(Kostya_af_star, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+end --spawn star
+
+--'*******************************************************************************
+--'   **   **   **   **   **    **   **   **      Caches       **   **   **   **    **   **   **   ** 
+--'*******************************************************************************
+local points={
+    {
+        position={x=-102.70054626465,y=4.7556557655334,z=74.453811645508},
+        gv=81,
+        lv=158594,
+		desc="kostya_p1_1",
+		tag="kostya_tag_les"
+        },
+    {
+        position={x=212.46,y=7.62,z=105.02},
+        gv=152,
+        lv=505646,
+		desc="kostya_p1_2",
+		tag="kostya_tag_lager"
+        },
+    {
+        position={x=2.71,y=-18.06,z=-153.95},
+        gv=108,
+        lv=280621,
+		desc="kostya_p1_3",
+		tag="kostya_tag_atr"
+        }
+}
+
+function new_inventory(actor,npc,p1,p2)
+    local a = points[math.random(1,3)] --table.getn(points))]
+    local se_obj = alife():create("m_inventory_box_new", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("escape_kostya_taynik1_start"..translate(a.tag))
+	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+function cs_new_inventory()
+    local a = points[math.random(1,3)] --table.getn(points))]
+    local se_obj = alife():create("m_inventory_box_new", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("escape_kostya_taynik1_start"..translate(a.tag))
+	news_manager.send_tip_txt(db.actor,  TB3D_Services.get_text_color("name").."Kostya:  %c[default]Marked One.. please help me find my PDA "..m_where.." it is stashed with valuables that you can keep .. it is there somewhere ... I know what I'm talking about .. trust me... I'll be in the Garbage if you find it...\\n", nil, nil, 20000)
+end
+
+local points2={
+    {
+        position={x=259.698,y=-9.766,z=-130.645},
+        gv=404,
+        lv=372139,
+		desc="kostya_p2_1"
+        },
+    {
+        position={x=-287.32369995117,y=-3.7418723106384,z=-196.30404663086},
+        gv=260,
+        lv=1722,
+		desc="kostya_p2_2"
+        },
+	{
+        position={x=-56.452835083008,y=20.14591217041,z=-120.13655090332},
+        gv=286,
+        lv=148568,
+		desc="kostya_p2_3"
+        },
+	{
+        position={x=74.864242553711,y=21.927677154541,z=35.098571777344},
+        gv=391,
+        lv=239287,
+		desc="kostya_p2_4"
+        },	
+    {
+        position={x=-16.215585708618,y=18.029029846191,z=112.12741088867},
+        gv=332,
+        lv=176991,
+		desc="kostya_p2_5"
+        }
+}
+
+function new_inventory2(actor,npc,p1,p2)
+	local rndm = math.random(1,5)
+    local a = points2[rndm] --table.getn(points2))]
+    local obj = alife():create("m_inventory_box2", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("kostya_svalka_taynik_start"..utils.to_str(rndm))
+	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+
+
+local points3={
+    {
+        position={x=-168.85943603516,y=0.9873458147049,z=61.529857635498},
+        gv=674,
+        lv=67155,
+		desc="kostya_p3_1"
+        },
+    {
+        position={x=-183.40927124023,y=1.4218996763229,z=-315.2578125},
+        gv=689,
+        lv=51620,
+		desc="kostya_p3_2"
+        },
+	{
+        position={x=90.513534545898,y=1.0542855262756,z=-222.10577392578},
+        gv=636,
+        lv=324127,
+		desc="kostya_p3_3"
+        },
+	{
+        position={x=124.20618438721,y=7.5138783454895,z=139.70709228516},
+        gv=578,
+        lv=356279,
+		desc="kostya_p3_4"
+        },	
+    {
+        position={x=-119.97692108154,y=9.6019630432129,z=162.54815673828},
+        gv=523,
+        lv=123463,
+		desc="kostya_p3_5"
+        },
+	{
+        position={x=-57.475730895996,y=4.3864607810974,z=-100.95944213867},
+        gv=543,
+        lv=184552,
+		desc="kostya_p3_6"
+        }
+}
+
+function new_inventory5(actor,npc,p1,p2)
+	local rndm = math.random(1,6)
+    local a = points3[rndm]
+    local obj = alife():create("m_inventory_box5", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("kostya_agroprom_taynik_start"..utils.to_str(rndm))
+	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+
+local points4={
+    {
+        position={x=6.60,y=-12.40,z=14.90},
+        gv=1155,
+        lv=4086,
+		desc="kostya_p4_1"
+        },
+    {
+        position={x=35.54,y=-5.80,z=-20.32},
+        gv=1142,
+        lv=7213,
+		desc="kostya_p4_2"
+        },
+    {
+        position={x=5.80,y=-8.48,z=60.98},
+        gv=1162,
+        lv=3591,
+		desc="kostya_p4_3"
+        }
+}
+
+function new_inventory3(actor,npc,p1,p2)
+	local rndm = math.random(1,3)
+    local a = points4[rndm]
+    local se_obj = alife():create("m_inventory_box3", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("kostya_x18_taynik_start"..utils.to_str(rndm))
+	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+
+local points5={
+    {
+        position={x=95.66,y=0.49,z=25.55},
+        gv=1512,
+        lv=87213,
+		desc="kostya_p5_1"
+        },
+    {
+        position={x=77.80,y=0.20,z=41.75},
+        gv=1511,
+        lv=80162,
+		desc="kostya_p5_2"
+        },
+	{
+        position={x=61.63,y=-0.77,z=-0.50},
+        gv=1508,
+        lv=71385,
+		desc="kostya_p5_3"
+        },
+	{
+        position={x=35.38,y=6.91,z=-3.55},
+        gv=1507,
+        lv=54187,
+		desc="kostya_p5_4"
+        },	
+    {
+        position={x=50.71,y=3.10,z=-54.19},
+        gv=1443,
+        lv=67561,
+		desc="kostya_p5_5"
+        },
+	{
+        position={x=4.80,y=14.27,z=14.596878051758},
+        gv=1502,
+        lv=42135,
+		desc="kostya_p5_6"
+        }
+}
+
+function new_inventory4(actor,npc,p1,p2)
+	local rndm = math.random(1,6)
+    local a = points5[rndm]
+    local obj = alife():create("m_inventory_box4", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("kostya_yantar_taynik_start"..utils.to_str(rndm))
+	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+
+local points6={
+    {
+        position={x=-53.20,y=-22.35,z=378.87}, 		--tree by chopper
+        gv=1820,
+        lv=255911,
+		desc="kostya_p6_1"
+        },
+    {
+        position={x=-275.25,y=-20.00,z=260.50},  	--house near tower and car
+        gv=1832,
+        lv=62913,
+		desc="kostya_p6_2"
+        },
+	{
+        position={x=-296.14,y=-15.13,z=291.81},   	--chimney of house near road and tower
+        gv=1833,
+        lv=45227,
+		desc="kostya_p6_3"
+        },
+	{
+        position={x=-293.15,y=-15.03,z=195.96}, 	--dead tree accross from elect station 
+        gv=1789,
+        lv=56324,
+		desc="kostya_p6_4"
+        },	
+    {
+        position={x=-228.67,y=-13.68,z=201.36},  	--behind chimney on roof near stalker camp
+        gv=1765,
+        lv=104514,
+		desc="kostya_p6_5"
+        },
+	{
+        position={x=51.54,y=-4.17,z=175.32},  		--fallen tree at end of row of pipes in minefield
+        gv=1668,
+        lv=349460,
+		desc="kostya_p6_6"
+        }
+}
+
+function new_inventory6(actor,npc,p1,p2)
+	local rndm = math.random(1,6)
+    local a = points6[rndm]
+    local obj = alife():create("m_inventory_box6", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("kostya_as_taynik_start"..utils.to_str(rndm))
+	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+
+local points7={
+    {
+        position={x=356.06,y=-40.24,z=-190.06},   
+        gv=2099,
+        lv=97701,
+		desc="kostya_p7_1"
+        },
+    {
+        position={x=308.90,y=-38.46,z=-56.53},  
+        gv=2033,
+        lv=72013,
+		desc="kostya_p7_2"
+        },
+    {
+        position={x=463.00,y=-52.88,z=-276.35},   
+        gv=2062,
+        lv=158222,
+		desc="kostya_p7_3"
+        },
+	{
+        position={x=410.24,y=-46.00,z=-330.56},  
+        gv=2065,
+        lv=128601,
+		desc="kostya_p7_4"
+        }
+}
+
+function new_inventory7(actor,npc,p1,p2)
+	local rndm = math.random(1,4)
+    local a = points7[rndm]
+    local se_obj = alife():create("m_inventory_box7", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("kostya_radar_taynik_start"..utils.to_str(rndm))
+	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+
+local points8={
+    {
+        position={x=138.54,y=-0.83,z=-52.73},   
+        gv=2239,
+        lv=238927
+        },
+    {
+        position={x=-96.64,y=6.47,z=-39.94},  
+        gv=2257,
+        lv=22357
+        },
+    {
+        position={x=-72.89,y=3.99,z=6.77},   
+        gv=2254,
+        lv=33121
+        }
+}
+
+function new_inventory8(actor,npc,p1,p2)
+	local rndm = math.random(1,3)
+    local a = points8[rndm]
+    local se_obj = alife():create("m_inventory_box8", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+	TB3D_Services.give_info("kostya_pripyat_taynik"..utils.to_str(rndm))
+-- Soundtrack
+	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)    
+end
+
+local points9={
+    {
+        position={x=110.59,y=3.99,z=115.99},   
+        gv=2173,
+        lv=227060
+        },
+    {
+        position={x=103.69,y=7.53,z=149.56},  
+        gv=2185,
+        lv=213116
+        },
+    {
+        position={x=106.79,y=7.53,z=119.41},   
+        gv=2182,
+        lv=218881
+        }
+}
+
+function new_inventory9(actor,npc,p1,p2)
+    local a = points9[math.random(1,3)]
+    local se_obj = alife():create("m_inventory_box9", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+end
+
+local points10={
+    {
+        position={x=-129.93,y=-1.56,z=99.67},  
+        gv=2216,
+        lv=5056
+        },
+    {
+        position={x=199.98,y=-1.35,z=206.91},  
+        gv=2219,
+        lv=261102
+        },
+    {
+        position={x=-122.08,y=-1.34,z=100.03},   
+        gv=2216,
+        lv=6240
+        }
+}
+
+function new_inventory10(actor,npc,p1,p2)
+    local a = points10[math.random(1,3)]
+    local se_obj = alife():create("m_inventory_box10", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
+end
+

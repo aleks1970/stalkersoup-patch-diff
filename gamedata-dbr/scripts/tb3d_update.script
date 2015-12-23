@@ -1,0 +1,790 @@
+-- TB3D 1.0.9.9.7.0 re-written for speed and better task management, added monolit tele, shortened disp time, update, petruha toz, new levels, \\n
+function my_ver() return "1.0.9.9.7.0" end
+--[[ --------------------------------------------------------------------------------------------
+ File        : TB3D_Update:  adapted from max.script
+ Description : Quick-Use Slots in the fashion of Call of Pripyat
+ TB3D Desc   : Extended task manager for NS level entry and Collector task mangement 09/05/11
+--]]--------------------------------------------------------------------------------------------
+
+local ini =""
+local result_shown
+function update_start()
+	local lvln = level.name()
+	ini = ini_file("misc\\TB3D_tasks.ltx") 
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("tb3d update: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]") end
+	result_shown = false
+	if ini:section_exist("tasks") then
+		if lvln=="l01_escape" then -----------------------------------------------------------ESCAPE
+			show_result(0)
+			if has_alife_info("arhara_omlet_akim_start") and not has_alife_info("arhara_omlet_akim_done") then
+				show_result(1)
+			end
+			if has_alife_info("arhara_omlet_akim_have") and not has_alife_info("arhara_omlet_akim_done") then
+				show_result(2)
+			end
+			if has_alife_info("akim_kubik_nayti_have") and not has_alife_info("akim_kubik_nayti_done") then
+				show_result(3)
+			end
+			if has_alife_info("kvest_art_started") and not has_alife_info("test_quest_art_otdan") then
+				show_result(4)
+			end
+			if has_alife_info("test_quest_art_vziat") and not has_alife_info("test_quest_art_otdan") then
+				show_result(5)
+			end
+			if has_alife_info("fox_kriss_have") and not has_alife_info("fox_kriss_done") then
+				show_result(6)
+			end
+			if has_alife_info("about_life_heart_start") and not has_alife_info("life_heart_final") then
+				show_result(7)
+			end
+			if has_alife_info("life_heart_sidor_have") and not has_alife_info("life_heart_sidor_done") then
+				show_result(8)
+			end
+			if has_alife_info("fanat_teleport_04_have") and not has_alife_info("fanat_teleport_04_done") then
+				show_result(9)
+			end
+			if has_alife_info("fanat_teleport_05_have") and not has_alife_info("fanat_teleport_05_done") then
+				show_result(10)
+			end
+			if has_alife_info("fanat_teleport_06_have") and not has_alife_info("fanat_teleport_06_done") then
+				show_result(11)
+			end
+			if has_alife_info("esc_find_groza_have") and not has_alife_info("esc_find_groza_done") then
+				show_result(12)
+			end
+			if has_alife_info("escape_lager_volk_document_have") and not has_alife_info("escape_lager_volk_document_done") then
+				show_result(13)
+			end
+			if has_alife_info("mil_volk_resiver_start") and not has_alife_info("mil_volk_resiver_1have") then
+				show_result(14)
+			end
+			if has_alife_info("esc_tolik_five_teil_have") and not has_alife_info("esc_tolik_five_teil_done") then
+				show_result(15)
+			end
+			if has_alife_info("esc_petruha_toz_have") and not has_alife_info("esc_petruha_toz_done")
+				and not has_alife_info("esc_novice_attacker1_umer") then
+				show_result(16)
+			end
+			if has_alife_info("esc_shustryi_medusa_have") and not has_alife_info("esc_shustryi_medusa_done") then
+				show_result(17)
+			end
+			if has_alife_info("esc_bridge_vodka_have") and not has_alife_info("esc_bridge_vodka_done") then
+				show_result(18)
+			end
+			if has_alife_info("esc_fox_medkit_have") and not has_alife_info("esc_fox_medkit_done") then
+				show_result(19)
+			end
+			if has_alife_info("gar_dram_novice_mp5_m1_have") and not has_alife_info("gar_dram_novice_mp5_m1_done") then
+				show_result(20)
+			end
+			if has_alife_info("gar_dram_novice_burer_hand_have") and not has_alife_info("gar_dram_novice_burer_hand_done") then
+				show_result(21)
+			end
+			if has_alife_info("mil_Svoboda_trader_outfit_start") and not has_alife_info("mil_Svoboda_trader_outfit_have") then
+				show_result(22)
+			end
+			if has_alife_info("mil_Svoboda_trader_ammo_start") and not has_alife_info("mil_Svoboda_trader_ammo_have") then
+				show_result(23)
+			end
+			if has_alife_info("sak_repair_box_start") and not has_alife_info("sak_repair_box_have") then
+				show_result(24)
+			end
+			if has_alife_info("yan_kruglov_art_start") and not has_alife_info("yan_kruglov_art_have") then
+				show_result(25)
+			end
+			if has_alife_info("mil_lukash_find_dinamit_start") and not has_alife_info("mil_lukash_find_dinamit_have") then
+				show_result(26)
+			end
+			if has_alife_info("petr_sidor_vzyt_have") and not has_alife_info("petr_sidor_vzyt_done") then
+				show_result(27)
+			end
+			if has_alife_info("escape_kostya_taynik1_startles") and not has_alife_info("kostya_pda_have") then
+				show_result(28)
+			end
+			if has_alife_info("escape_kostya_taynik1_startlager") and not has_alife_info("kostya_pda_have") then
+				show_result(28)
+			end
+			if has_alife_info("escape_kostya_taynik1_startatr") and not has_alife_info("kostya_pda_have") then
+				show_result(28)
+			end
+			if has_alife_info("kostya_art_start") and not has_alife_info("kostya_art_have") then
+				show_result(31)
+			end
+		elseif lvln=="l05_bar" then -------------------------------------------------------------BAR
+			show_result(99)
+			if has_alife_info("arhara_ekza_have") and not has_alife_info("arhara_ekza_done") then
+				show_result(100)
+			end
+			if has_alife_info("voronin_flesh_have") and not has_alife_info("voronin_flesh_done") then
+				show_result(101)
+			end
+			if has_alife_info("informator_pda_have") and not has_alife_info("informator_pda_done") then
+				show_result(102)
+			end
+			if has_alife_info("freeman_eagle_have") and not has_alife_info("freeman_eagle_done") then
+				show_result(103)
+			end
+			if has_alife_info("freeman_case_have") and not has_alife_info("freeman_case_done") then
+				show_result(104)
+			end
+			if has_alife_info("bland_flash_have") and not has_alife_info("bland_flash_done") then
+				show_result(105)
+			end
+			if has_alife_info("barmen_simbion_have") and not has_alife_info("barmen_simbion_done") then
+				show_result(106)
+			end
+			if has_alife_info("atak_larger_have") and not has_alife_info("atak_larger_done") then
+				show_result(107)
+			end
+			if has_alife_info("zahar_vstrecha_start") and not has_alife_info("zahar_vstrecha_done") then
+				show_result(108)
+			end
+			if has_alife_info("barrem_talk_have") and not has_alife_info("barrem_talk_est") then
+				show_result(109)
+			end
+			if has_alife_info("docent_detector1_have") and not has_alife_info("docent_detector1_done") then
+				show_result(110)
+			end
+			if has_alife_info("docent_detector2_have") and not has_alife_info("docent_detector2_done") then
+				show_result(111)
+			end
+			if has_alife_info("docent_detector3_have") and not has_alife_info("docent_detector3_done") then
+				show_result(112)
+			end
+			if has_alife_info("about_life_heart_start") and not has_alife_info("life_heart_final") then
+				show_result(113)
+			end
+			if has_alife_info("life_heart_barman_have") and not has_alife_info("life_heart_barman_done") then
+				show_result(114)
+			end
+			if has_alife_info("bar_dolg_base_guard_art_have") and not has_alife_info("bar_dolg_base_guard_art_done") then
+				show_result(115)
+			end
+			if has_alife_info("bar_dolg_petrenko_gaussgan_have") and not has_alife_info("bar_dolg_petrenko_gaussgan_done") then
+				show_result(116)
+			end
+			if has_alife_info("bar_dolg_petrenko_electra_flash_have") and not has_alife_info("bar_dolg_petrenko_electra_flash_done") then
+				show_result(117)
+			end
+			if has_alife_info("bar_dolg_petrenko_exo_have") and not has_alife_info("bar_dolg_petrenko_exo_done") then
+				show_result(118)
+			end
+			if has_alife_info("bar_ivancov_rg6_have") and not has_alife_info("bar_ivancov_rg6_done") then
+				show_result(119)
+			end
+			if has_alife_info("bar_ivancov_playboy_have") and not has_alife_info("bar_ivancov_playboy_done") then
+				show_result(120)
+			end
+			if has_alife_info("bar_dolg_leader_find_case_have") and not has_alife_info("bar_dolg_leader_find_case_done") then
+				show_result(121)
+			end
+			if has_alife_info("esc_reward_case_start") and not has_alife_info("esc_reward_case_done") then
+				show_result(122)
+			end
+			if has_alife_info("lysyi_klad_nayti_have") and not has_alife_info("lysyi_klad_nayti_done") then
+				show_result(123)
+			end
+			if has_alife_info("dolgovyzui_lentyi_have") and not has_alife_info("dolgovyzui_lentyi_done") then
+				show_result(124)
+			end
+			if has_alife_info("voronin_termos_naity_have") and not has_alife_info("voronin_termos_naity_done") then
+				show_result(125)
+			end
+			if has_alife_info("garik_vopros_have") and not has_alife_info("garik_vopros_done") then
+				show_result(126)
+			end
+			if has_alife_info("voronin_stol_dostat_have") and not has_alife_info("voronin_stol_dostat_done") then
+				show_result(127)
+			end
+			if has_alife_info("kostya_x18_taynik_have") and not has_alife_info("kostya_x18_taynik_done") then
+				show_result(128)
+			end
+			if has_alife_info("kostya_agroprom_taynik_have") and not has_alife_info("kostya_agroprom_taynik_done") then
+				show_result(128)
+			end
+			if has_alife_info("chemodan_voronin_done") and not has_alife_info("chemodan_voronin_done") then
+				show_result(130)
+			end
+			if has_alife_info("yurik_pomer_plan_start") and not has_alife_info("yurik_pomer_plan_have") then
+				show_result(131)
+			end
+		elseif lvln=="l07_military" then ----------------------------------------------------------MILITARY
+				show_result(199)
+			if has_alife_info("atp_propusk_shurup_have") and not has_alife_info("atp_propusk_shurup_done") then
+				show_result(200)
+			end
+			if has_alife_info("shurup_flash_have") and not has_alife_info("shurup_flash_done") then
+				show_result(201)
+			end
+			if has_alife_info("chaes_perexod_have") and not has_alife_info("chaes_perexod_done") then
+				show_result(202)
+			end
+			if has_alife_info("svoboda_lukash_have") and not has_alife_info("svoboda_lukash_done") then
+				show_result(203)
+			end
+			if has_alife_info("arhara_omlet_have") and not has_alife_info("arhara_omlet_done") then
+				show_result(204)
+			end
+			if has_alife_info("voronin_flesh_start") and not has_alife_info("voronin_flesh_done") then
+				show_result(205)
+			end
+			if has_alife_info("gavr_pda_have") and not has_alife_info("gavr_pda_done") then
+				show_result(206)
+			end
+			if has_alife_info("gavr_doc_have") and not has_alife_info("gavr_doc_done") then
+				show_result(207)
+			end
+			if has_alife_info("yakut_treasure_have") and not has_alife_info("yakut_treasure_done") then
+				show_result(208)
+			end
+			if has_alife_info("mil_trader_teleport_07_have") and not has_alife_info("mil_trader_teleport_07_done") then
+				show_result(209)
+			end
+			if has_alife_info("mil_max_teleport_08_have") and not has_alife_info("mil_max_teleport_08_done") then
+				show_result(210)
+			end
+			if has_alife_info("mil_cook_teleport_09_have") and not has_alife_info("mil_cook_teleport_09_done") then
+				show_result(211)
+			end
+			if has_alife_info("mil_volk_resiver_have") and not has_alife_info("mil_volk_resiver_done") then
+				show_result(212)
+			end
+			if has_alife_info("mil_Svoboda_trader_outfit_have") and not has_alife_info("mil_Svoboda_trader_outfit_done") then
+				show_result(213)
+			end
+			if has_alife_info("mil_Svoboda_trader_ammo_have") and not has_alife_info("mil_Svoboda_trader_ammo_done") then
+				show_result(214)
+			end
+			if has_alife_info("mil_Svoboda_trader_plan_have") and not has_alife_info("mil_Svoboda_trader_plan_done") then
+				show_result(215)
+			end
+			if has_alife_info("sak_reward_outfit_start") and not has_alife_info("sak_reward_outfit_have") then
+				show_result(216)
+			end
+			if has_alife_info("bar_ivancov_rg6_start") and not has_alife_info("bar_ivancov_rg6_have") then
+				show_result(217)
+			end
+			if has_alife_info("mil_lukash_find_dinamit_have") and not has_alife_info("mil_lukash_find_dinamit_done") then
+				show_result(218)
+			end
+			if has_alife_info("kostya_yantar_taynik_have") and not has_alife_info("kostya_yantar_taynik_done") then
+				show_result(219)
+			end
+			if has_alife_info("kostya_as_taynik_start1") and not has_alife_info("kostya_as_taynik_have") then
+				show_result(220)
+			end
+			if has_alife_info("kostya_as_taynik_start2") and not has_alife_info("kostya_as_taynik_have") then
+				show_result(220)
+			end
+			if has_alife_info("kostya_as_taynik_start3") and not has_alife_info("kostya_as_taynik_have") then
+				show_result(220)
+			end
+			if has_alife_info("kostya_as_taynik_start4") and not has_alife_info("kostya_as_taynik_have") then
+				show_result(220)
+			end
+			if has_alife_info("kostya_as_taynik_start5") and not has_alife_info("kostya_as_taynik_have") then
+				show_result(220)
+			end
+			if has_alife_info("kostya_as_taynik_start6") and not has_alife_info("kostya_as_taynik_have") then
+				show_result(220)
+			end
+			if has_alife_info("kostya_as_taynik_have") and not has_alife_info("kostya_as_taynik_done") then
+				show_result(226)
+			end
+			if has_alife_info("kostya_radar_taynik_have") and not has_alife_info("kostya_radar_taynik_done") then
+				show_result(226)
+			end
+			if has_alife_info("kostya_x10_taynik_have") and not has_alife_info("kostya_x10_taynik_done") then
+				show_result(226)
+			end
+			if has_alife_info("chemodan_lukash_done") and not has_alife_info("chemodan_lukash_done") then
+				show_result(229)
+			end
+		elseif lvln=="l08_yantar" then -----------------------------------------------------------YANTAR
+			show_result(299)
+			if has_alife_info("atp_propusk_start") and not has_alife_info("atp_propusk_done") then
+				show_result(300)
+			end
+			if has_alife_info("treasure_ecolog_have") and not has_alife_info("treasure_ecolog_done") then
+				show_result(301)
+			end
+			if has_alife_info("sahar_sumka_have") and not has_alife_info("sahar_sumka_done") then
+				show_result(302)
+			end
+			if has_alife_info("system_ecolog_have") and not has_alife_info("system_ecolog_done") then
+				show_result(303)
+			end
+			if has_alife_info("saharov_pda_have") and not has_alife_info("saharov_pda_done") then
+				show_result(304)
+			end
+			if has_alife_info("about_life_heart_start") and not has_alife_info("life_heart_final") then
+				show_result(305)
+			end
+			if has_alife_info("life_heart_sahar_have") and not has_alife_info("life_heart_sahar_done") then
+				show_result(306)
+			end
+			if has_alife_info("mil_max_teleport_08_start") and not has_alife_info("mil_max_teleport_08_have") then
+				show_result(307)
+			end
+			if has_alife_info("bar_dolg_petrenko_exo_start") and not has_alife_info("bar_dolg_petrenko_exo_have") then
+				show_result(308)
+			end
+			if has_alife_info("yan_kruglov_decoder_have") and not has_alife_info("yan_kruglov_decoder_done") then
+				show_result(309)
+			end
+			if has_alife_info("yan_kruglov_art_have") and not has_alife_info("yan_kruglov_art_done") then
+				show_result(310)
+			end
+			if has_alife_info("yan_kruglov_green_art_have") and not has_alife_info("yan_kruglov_green_art_done") then
+				show_result(311)
+			end
+			if has_alife_info("yan_scientist_books_have") and not has_alife_info("yan_scientist_books_done") then
+				show_result(312)
+			end
+			if has_alife_info("yan_scientist_find_af_dummy_glassbeads_have") and not has_alife_info("yan_scientist_find_af_dummy_glassbeads_done") then
+				show_result(313)
+			end
+			if has_alife_info("yan_scientist_find_case_have") and not has_alife_info("yan_scientist_find_case_done") then
+				show_result(314)
+			end
+			if has_alife_info("kostya_yantar_taynik_start1") and not has_alife_info("kostya_yantar_taynik_have") then
+				show_result(315)
+			end
+			if has_alife_info("kostya_yantar_taynik_start2") and not has_alife_info("kostya_yantar_taynik_have") then
+				show_result(315)
+			end
+			if has_alife_info("kostya_yantar_taynik_start3") and not has_alife_info("kostya_yantar_taynik_have") then
+				show_result(315)
+			end
+			if has_alife_info("kostya_yantar_taynik_start4") and not has_alife_info("kostya_yantar_taynik_have") then
+				show_result(315)
+			end
+			if has_alife_info("kostya_yantar_taynik_start5") and not has_alife_info("kostya_yantar_taynik_have") then
+				show_result(315)
+			end
+			if has_alife_info("kostya_yantar_taynik_start6") and not has_alife_info("kostya_yantar_taynik_have") then
+				show_result(315)
+			end
+			if has_alife_info("kostya_sacharov_start") and not has_alife_info("kostya_sacharov_done") then
+				show_result(321)
+			end
+			if has_alife_info("kostya_sacharov_pda_have") and not has_alife_info("kostya_sacharov_pda_done") then
+				show_result(322)
+			end
+			if has_alife_info("kostya_sacharov_teleport_have") and not has_alife_info("kostya_sacharov_teleport_done") then
+				show_result(323)
+			end
+		elseif lvln=="l03_agroprom" then  ----------------------------------------------------------------AGROPROM
+			show_result(400)
+			if has_alife_info("atp_propusk_have") and not has_alife_info("atp_propusk_done") then
+				show_result(416)
+			end
+			if has_alife_info("adren_flash_have") and not has_alife_info("adren_flash_done") then
+				show_result(417)
+			end
+			if has_alife_info("arh_disk_have") and not has_alife_info("arh_disk_done") then
+				show_result(418)
+			end
+			if has_alife_info("dan_grab_start") and not has_alife_info("dan_grab_done") then
+				show_result(419)
+			end
+			if has_alife_info("yakut_help_have") and not has_alife_info("yakut_help_done") then
+				show_result(420)
+			end
+			if has_alife_info("treasure_ecolog_start") and not has_alife_info("treasure_ecolog_have") then
+				show_result(421)
+			end
+			if has_alife_info("system_ecolog_start") and not has_alife_info("system_ecolog_arhara") then
+				show_result(422)
+			end
+			if has_alife_info("agroprom_vodka_have") and not has_alife_info("agroprom_military_case_have") then
+				show_result(423)
+			end
+			if has_alife_info("mil_Svoboda_trader_plan_faze") and not has_alife_info("mil_Svoboda_trader_plan_2faze") then
+				show_result(424)
+			end
+			if has_alife_info("val_escort_PDA_start") and not has_alife_info("val_escort_PDA_have") then
+				show_result(425)
+			end
+			if has_alife_info("kostya_agroprom_taynik_start1") and not has_alife_info("kostya_agroprom_taynik_have") then
+				show_result(426)
+			end
+			if has_alife_info("kostya_agroprom_taynik_start2") and not has_alife_info("kostya_agroprom_taynik_have") then
+				show_result(426)
+			end
+			if has_alife_info("kostya_agroprom_taynik_start3") and not has_alife_info("kostya_agroprom_taynik_have") then
+				show_result(426)
+			end
+			if has_alife_info("kostya_agroprom_taynik_start4") and not has_alife_info("kostya_agroprom_taynik_have") then
+				show_result(426)
+			end
+			if has_alife_info("kostya_agroprom_taynik_start5") and not has_alife_info("kostya_agroprom_taynik_have") then
+				show_result(426)
+			end
+			if has_alife_info("kostya_agroprom_taynik_start6") and not has_alife_info("kostya_agroprom_taynik_have") then
+				show_result(426)
+			end
+		elseif lvln=="l04_darkvalley" then -----------------------------------------------------DARK VALLEY	
+			show_result(500)
+			if has_alife_info("gar_hellcar_outfit_have") and not has_alife_info("gar_hellcar_outfit_done") then
+				show_result(532)
+			end
+			if has_alife_info("akim_kubik_nayti_start") and not has_alife_info("akim_kubik_nayti_done") then
+				show_result(533)
+			end
+			if has_alife_info("borov_11_have") and not has_alife_info("borov_11_done") then
+				show_result(534)
+			end
+			if has_alife_info("bar_dolg_petrenko_gaussgan_start") and not has_alife_info("bar_dolg_petrenko_gaussgan_have") then
+				show_result(535)
+			end
+		elseif lvln=="atp_for_test22" then -------------------------------------------------------------ATP		
+			show_result(600)
+			if has_alife_info("arhara_ekza_start") and not has_alife_info("arhara_ekza_done") then
+				show_result(636)
+			end
+			if has_alife_info("atp_propusk_shurup_start") and not has_alife_info("atp_propusk_shurup_done") then
+				show_result(637)
+			end
+			if has_alife_info("arh_disk_start") and not has_alife_info("arh_disk_done") then
+				show_result(638)
+			end
+			if has_alife_info("arhara_ekza_start") and not has_alife_info("arhara_ekza_done") then
+				show_result(639)
+			end
+		elseif lvln=="l10_radar" then ------------------------------------------------------------RADAR
+			show_result(700)
+			if has_alife_info("shurup_flash_start") and not has_alife_info("shurup_flash_done") then
+				show_result(740)
+			end
+			if has_alife_info("dan_flash_done") and not has_alife_info("yakut_treasure_done") then
+				show_result(741)
+			end
+			if has_alife_info("sak_repair_box_have") and not has_alife_info("sak_repair_box_done") then
+				show_result(742)
+			end
+			if has_alife_info("sak_gold_fish_have") and not has_alife_info("sak_gold_fish_done") then
+				show_result(743)
+			end
+			if has_alife_info("sak_find_seif_have") and not has_alife_info("sak_find_seif_done") then
+				show_result(744)
+			end
+			if has_alife_info("sak_reward_outfit_have") and not has_alife_info("sak_reward_outfit_done") then
+				show_result(745)
+			end
+			if has_alife_info("kostya_radar_taynik_start1") and not has_alife_info("kostya_radar_taynik_have") then
+				show_result(746)
+			end
+			if has_alife_info("kostya_radar_taynik_start2") and not has_alife_info("kostya_radar_taynik_have") then
+				show_result(746)
+			end
+			if has_alife_info("kostya_radar_taynik_start3") and not has_alife_info("kostya_radar_taynik_have") then
+				show_result(746)
+			end
+			if has_alife_info("kostya_radar_taynik_start4") and not has_alife_info("kostya_radar_taynik_have") then
+				show_result(746)
+			end
+		elseif lvln=="l12_stancia" then ----------------------------------------------------------STANCIA
+			show_result(800)
+			if has_alife_info("sahar_sumka_start") and not has_alife_info("sahar_sumka_done") then
+				show_result(850)
+			end
+			if has_alife_info("treasure_sysh_have") and not has_alife_info("treasure_sysh_done") then
+				show_result(851)
+			end
+			if has_alife_info("life_heart_sahar_start") and not has_alife_info("life_heart_sahar_done") then
+				show_result(852)
+			end
+		elseif lvln=="l11_pripyat" then -----------------------------------------------------------PRIYAT
+			show_result(900)
+			if has_alife_info("med_dok_start") and not has_alife_info("med_dok_done") then
+				show_result(953)
+			end
+			if has_alife_info("med_dok_have") and not has_alife_info("med_dok_done") then
+				show_result(954)
+			end
+			if has_alife_info("about_life_heart_sidor") and has_alife_info("about_life_heart_barman") and has_alife_info("about_life_heart_sahar") and not has_alife_info("life_heart_final") then
+				show_result(955)
+			end
+			if has_alife_info("life_heart_barman_start") and not has_alife_info("life_heart_barman_done") then
+				show_result(956)
+			end
+			if has_alife_info("strelok_pda_have") and not has_alife_info("strelok_pda_done") then
+				show_result(957)
+			end
+			if has_alife_info("fanat_teleport_06_start") and not has_alife_info("fanat_teleport_06_have") then
+				show_result(958)
+			end
+			if has_alife_info("kostya_pripyat_taynik1") and not has_alife_info("kostya_pripyat_taynik_have") then
+				show_result(959)
+			end
+			if has_alife_info("kostya_pripyat_taynik2") and not has_alife_info("kostya_pripyat_taynik_have") then
+				show_result(959)
+			end
+			if has_alife_info("kostya_pripyat_taynik3") and not has_alife_info("kostya_pripyat_taynik_have") then
+				show_result(959)
+			end
+		elseif lvln=="puzir" then ------------------------------------------------------------PUZIR
+			show_result(1100)
+			if has_alife_info("arhara_omlet_start") and not has_alife_info("arhara_omlet_done") then
+				show_result(1162)
+			end
+			if has_alife_info("shaxter_fonar_dost_start") and not has_alife_info("shaxter_fonar_dost_done") then
+				show_result(1163)
+			end
+		elseif lvln=="peshera" then ----------------------------------------------------------PESHERA
+			show_result(1200)
+			if has_alife_info("shaxter_fonar_dost_have") and not has_alife_info("shaxter_fonar_dost_done") then
+				show_result(1201)
+			end
+			if has_alife_info("shax_kniga_naity_have") and not has_alife_info("shax_kniga_naity_done") then
+				show_result(1202)
+			end
+			if has_alife_info("pda_shaxt_strelok_naity_have") and not has_alife_info("pda_shaxt_strelok_naity_done") then
+				show_result(1203)
+			end
+		elseif lvln=="l02_garbage" then ----------------------------------------------------------GARBAGE
+			show_result(1300)
+			if has_alife_info("fox_kriss_start") and not has_alife_info("fox_kriss_done") then
+				show_result(1301)
+			end
+			if has_alife_info("prapor_jaw_have") and not has_alife_info("prapor_jaw_done") then
+				show_result(1302)
+			end
+			if has_alife_info("prapor_apt_have") and not has_alife_info("prapor_apt_done") then
+				show_result(1303)
+			end
+			if has_alife_info("doctor_drug_start") and not has_alife_info("doctor_drug_done") then
+				show_result(1304)
+			end
+			if has_alife_info("mil_volk_resiver_1have") and not has_alife_info("mil_volk_resiver_have") then
+				show_result(1305)
+			end
+			if has_alife_info("gar_dram_novice_mp5_m1_start") and not has_alife_info("gar_dram_novice_mp5_m1_have") then
+				show_result(1306)
+			end
+			if has_alife_info("gar_dolg_flesh_eye_have") and not has_alife_info("gar_dolg_flesh_eye_done") then
+				show_result(1307)
+			end
+			if has_alife_info("gar_dolg_krovosos_jaw_have") and not has_alife_info("gar_dolg_krovosos_jaw_done") then
+				show_result(1308)
+			end
+			if has_alife_info("gar_dolg_psevdodog_tail_have") and not has_alife_info("gar_dolg_psevdodog_tail_done") then
+				show_result(1309)
+			end
+			if has_alife_info("val_pula_boar_leg_have") and not has_alife_info("val_pula_boar_leg_done") then
+				show_result(1310)
+			end
+			if has_alife_info("val_escort_PDA_have") and not has_alife_info("val_escort_PDA_done") then
+				show_result(1311)
+			end
+			if has_alife_info("kostya_pda_have") and not has_alife_info("kostya_pda_done") then
+				show_result(1312)
+			end
+			if has_alife_info("kostya_svalka_taynik_start1") and not has_alife_info("kostya_svalka_taynik_have") then
+				show_result(1313)
+			end
+			if has_alife_info("kostya_svalka_taynik_start2") and not has_alife_info("kostya_svalka_taynik_have") then
+				show_result(1313)
+			end
+			if has_alife_info("kostya_svalka_taynik_start3") and not has_alife_info("kostya_svalka_taynik_have") then
+				show_result(1313)
+			end
+			if has_alife_info("kostya_svalka_taynik_start4") and not has_alife_info("kostya_svalka_taynik_have") then
+				show_result(1313)
+			end
+			if has_alife_info("kostya_svalka_taynik_start5") and not has_alife_info("kostya_svalka_taynik_have") then
+				show_result(1313)
+			end
+			if has_alife_info("kostya_svalka_taynik_have") and not has_alife_info("kostya_svalka_taynik_done") then
+				show_result(1318)
+			end
+		elseif lvln=="marsh" then ------------------------------------------------------------MARSH
+			show_result(1400)
+			if has_alife_info("informator_pda_start") and not has_alife_info("informator_pda_done") then
+				show_result(1401)
+			end
+			if has_alife_info("dan_pda_est") and not has_alife_info("dan_pda_sdal") then
+				show_result(1402)
+			end
+			if has_alife_info("dan_grab_have") and not has_alife_info("dan_grab_done") then
+				show_result(1403)
+			end
+			if has_alife_info("yakut_treasure_start") and not has_alife_info("dan_flash_done") then
+				show_result(1404)
+			end
+			if has_alife_info("dan_flash_have") and not has_alife_info("dan_flash_done") then
+				show_result(1405)
+			end
+			if has_alife_info("atak_larger_start") and not has_alife_info("atak_larger_begin") then
+				show_result(1406)
+			end
+			if has_alife_info("yurik_pomer_pivo_have") and not has_alife_info("yurik_pomer_pivo_done") then
+				show_result(1407)
+			end
+			if has_alife_info("yurik_pomer_plan_have") and not has_alife_info("yurik_pomer_plan_done") then
+				show_result(1408)
+			end
+		elseif lvln=="l06_rostok" then -----------------------------------------------------------ROSTOK
+			show_result(1500)
+			if has_alife_info("freeman_eagle_start") and not has_alife_info("freeman_eagle_done") then
+				show_result(1501)
+			end
+			if has_alife_info("freeman_case") and not has_alife_info("freeman_case_done") then
+				show_result(1502)
+			end
+			if has_alife_info("zahar_naemnik_start") and not has_alife_info("zahar_naemnik_done") then
+				show_result(1503)
+			end
+		elseif lvln=="l10u_bunker" then -----------------------------------------------------------BUNKER
+			show_result(1600)
+			if has_alife_info("arhara_ekza_start") and not has_alife_info("gavr_doc_done") then
+				show_result(1601)
+			end
+			if has_alife_info("treasure_sysh_start") and not has_alife_info("treasure_sysh_done") then
+				show_result(1602)
+			end
+			if has_alife_info("kostya_x10_taynik_start") and not has_alife_info("kostya_x10_taynik_have") then
+				show_result(1603)
+			end
+		elseif lvln=="l03u_agr_underground" then ----------------------------------------------------AGRO UNDERGROUND
+			show_result(1700)
+			if has_alife_info("yakut_help_start") and not has_alife_info("yakut_help_done") then
+				show_result(1701)
+			end
+			if has_alife_info("gar_hellcar_outfit_start") and not has_alife_info("gar_hellcar_outfit_have") then
+				show_result(1702)
+			end
+			if has_alife_info("sar_monolith_go") then
+				TB3D_Services.remove_info("sar_monolith_go")
+				TB3D_Services.give_info("tb3d_wish_granted")
+				show_result(1703)
+			end
+		elseif lvln=="l04u_LabX18" then ---------------------------------------------------------LAB X18
+			show_result(1800)
+			if has_alife_info("dan_flash_start") and not has_alife_info("dan_flash_done") then
+				show_result(1801)
+			end
+			if has_alife_info("system_ecolog_arhara") and not has_alife_info("system_ecolog_have") then
+				show_result(1802)
+			end
+			if has_alife_info("fanat_teleport_04_start") and not has_alife_info("fanat_teleport_04_have") then
+				show_result(1803)
+			end
+			if has_alife_info("sak_find_seif_start") and not has_alife_info("sak_find_seif_have") then
+				show_result(1804)
+			end
+			if (has_alife_info("kostya_x18_taynik_start1")
+			  or has_alife_info("kostya_x18_taynik_start2")
+			  or has_alife_info("kostya_x18_taynik_start3"))
+			  and not has_alife_info("kostya_x18_taynik_have") then
+				show_result(1805)
+			end
+		elseif lvln=="l08u_brainlab" then -------------------------------------------------------BRAIN LAB
+			show_result(1900)
+			if has_alife_info("fanat_teleport_05_start") and not has_alife_info("fanat_teleport_05_have") then
+				show_result(1901)
+			end
+			if has_alife_info("kostya_sacharov_pda_start") and not has_alife_info("kostya_sacharov_pda_have") then
+				show_result(1902)
+			end
+		elseif lvln=="zaton" then -------------------------------------------------------Backwater
+			if has_alife_info("tb3d_agr_knockdown") then
+				TB3D_Triggers.zaton_lost()
+				TB3D_Services.remove_info("tb3d_agr_knockdown")
+				show_result(2001)
+			else
+				show_result(2000)
+			end
+		elseif lvln=="jupiter" then -----------------------------------------------------Jupiter
+				show_result(2100)
+		elseif lvln=="jupiter_underground" then -------------------------------------------------Jupiter Tunnel
+				show_result(2200)
+		elseif lvln=="dead_city" then -----------------------------------------------------Dead City
+				show_result(2300)
+		elseif lvln=="av_peshera" then ---------------------------------------------------------Labrynth
+				show_result(2400)
+		elseif lvln=="l12_stancia_2" then -----------------------------------------------------NPP2 exit
+				show_result(2500)
+		elseif lvln=="l12u_sarcofag" then -----------------------------------------------------Sarcofagus
+				show_result(2600)
+		elseif lvln=="l12u_control_monolith" then ---------------------------------------------monolith
+				show_result(2700)
+		elseif lvln=="generators" then -------------------------------------------------------Generators
+				show_result(2800)
+		elseif lvln=="hospital" then ---------------------------------------------------------Hosptal
+				show_result(2900)
+		elseif lvln=="aver" then ------------------------------------------------------------Cave
+				show_result(3000)
+		elseif lvln=="limansk" then ---------------------------------------------------------Limansk
+				show_result(3100)
+		elseif lvln=="red_forest" then ------------------------------------------------------Red Forest
+				show_result(3200)
+		elseif lvln=="warlab" then ----------------------------------------------------------War Lab
+				show_result(3300)
+		elseif lvln=="lost_village" then ----------------------------------------------------Lost Village
+				show_result(3400)
+		elseif lvln=="pripyat" then ---------------------------------------------------------East Pripyat
+				show_result(3500)
+		elseif lvln=="labx8" then ----------------------------------------------------------Lab x8
+				show_result(3600)
+		elseif lvln=="cs_agroprom_underground" then -----------------------------------------Tunnels
+				show_result(3700)
+		elseif lvln=="predbannik" then ------------------------------------------------------Waiting Room
+				show_result(3800)
+		elseif lvln=="yantar_old" then ------------------------------------------------------Research Station
+				show_result(3900)
+		elseif lvln=="swamp_old" then -------------------------------------------------------Dead Marshes
+				show_result(4000)
+		elseif lvln=="hiding_road" then -----------------------------------------------------Broken Road
+				show_result(4100)
+		elseif lvln=="k01_darkscape" then ---------------------------------------------------Darkscape
+				show_result(4200)
+		elseif lvln=="dark_forest" then -----------------------------------------------------Wasted Woodland
+				show_result(4300)
+		elseif lvln=="level_f-1" then -------------------------------------------------------Facility F1
+				show_result(4400)
+		elseif lvln=="promzone" then --------------------------------------------------------Techniques
+				show_result(4500)
+		elseif lvln=="digger_stash" then ----------------------------------------------------hole in the Ground
+				show_result(4600)
+		elseif lvln=="l01_krasivay" then ----------------------------------------------------Distribution Center
+				show_result(4700)
+		elseif lvln=="l02_dd" then ----------------------------------------------------------Courtyards
+				show_result(4800)
+		elseif lvln=="l03_rinok" then -------------------------------------------------------Black Market
+				show_result(4900)
+		elseif lvln=="l04_pogost" then ------------------------------------------------------Cemetery
+				show_result(5000)
+		elseif lvln=="l05_vokzal" then ------------------------------------------------------End Station
+				show_result(5100)
+		elseif lvln=="lab_x14" then ---------------------------------------------------------Secret Lab
+				show_result(5200)
+		elseif lvln=="l01_poligon" then -----------------------------------------------------Firing Range
+				show_result(5300)
+		else
+			show_result(9999,lvln)
+		end
+	end	
+	if not result_shown then
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D: %c[default]"..game.translate_string(lvln), nil, "tb3d_master", 10000)
+	end
+	ini = ""
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("tb3d update: done") end
+end
+
+function show_result(indx,lvln)
+	if ini:line_exist("tasks",tostring(indx)) then
+		local strg	= ""
+		if indx == 9999 then
+			strg = ini:r_string_wq("tasks",tostring(indx))..": "..game.translate_string(lvln)
+		else
+			strg = ini:r_string_wq("tasks",tostring(indx))
+		end
+  --TB3D_Services.info_alert("tb3d update["..strg.."]")
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D: %c[default]"..strg, nil, "tb3d_master", 10000)
+		strg = ""
+		result_shown = true
+	end
+end
+

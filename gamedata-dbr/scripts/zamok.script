@@ -1,0 +1,148 @@
+--TB3D 1.0.9.9.5.2 obj level
+function my_ver() return "1.0.9.9.5.2" end
+
+--local table_sort = table.sort
+--local table_remove = table.remove
+local table_insert = table.insert
+
+--[[					--testing only
+local gvtab ={}
+function GameVertexId()
+    local i = 0
+	local ln
+    while ln ~= "" do
+        ln = TB3D_Services.get_obj_level(i.m_game_vertex_id)
+		if ln ~= "" then
+			if not gvtab[ln] then
+				gvtab[ln] = {}
+			end
+			table.insert(gvtab[ln], i)
+			i = i+1
+		end
+    end
+    amk.dump_table(gvtab)  --Calls a function for display screen
+end
+
+local lvtab ={}
+function LevelVertexId()
+    local i = 0
+	local ln
+	local lv
+    while ln ~= "" do  
+		lv = game_graph():vertex(i):level_vertex_id()  --vertex to obtain a Level Game vertex
+         --obtain the name of the level of its number of sections in  game_graph
+        ln = TB3D_Services.get_obj_level(i.m_game_vertex_id)
+		if ln ~= "" then
+			if not lvtab[ln] then  
+				lvtab[ln] ={}  
+			end
+			table.insert(lvtab[ln], i..":"..lv)   --fill table
+			i = i+1
+		end
+    end
+	amk.dump_table(lvtab)  --Calls a function for display screen
+end
+
+function test_r_line()
+	local result, section, value
+	local ammo = {}
+	-- here we take the full size packs
+	local sys = system_ini()
+	-- list of patrons take out "death_generic.ltx"
+	local ini = ini_file("misc\\death_generic.ltx")
+	local n = ini:line_count("ammo_sections")
+	for i=0,n-1 do
+		result, section, value = ini:r_line("ammo_sections",i,"","")
+		ammo[section] = {}
+		ammo[section].repack = false
+		ammo[section].box = sys:r_u32(section, "box_size")
+	end
+	amk.dump_table(ammo)
+	ammo = {}
+	-- here we take the full size packs
+	--local sys = system_ini()
+	-- sections in "death_generic.ltx"
+	--ini = ini_file("misc\\death_generic.ltx")
+	n = iniLinesCount("ammo_sections", "misc\\death_generic.ltx")
+	for i=0,n-1 do
+		result, section, value = getIniLine("ammo_sections",i,"","", "misc\\death_generic.ltx")
+		ammo[section] = {}
+		ammo[section].repack = false
+		ammo[section].box = getIniValueFloat(section, "box_size", 1, nil)
+	end
+	amk.dump_table(ammo)
+end
+]]--
+
+function on_drop(item)
+	if item then
+		local sitem = alife():object(item:id()) -- obtain the server object
+		if sitem then
+			local se_box = alife():object(sitem.parent_id) -- get server object owner
+			if se_box and se_box:clsid() == clsid.inventory_box then
+				table_insert(amk_offline_alife.protected.ids, se_box.id)
+				amk_offline_alife.update_tables(level.name())
+				news_manager.amk_send_tip("The cache has been securely locked", nil, nil, 5)
+			end
+		end
+	end
+end
+
+function restore()
+	--GameVertexId()
+	--LevelVertexId()
+	--meceniy_art.art_respawn_test()
+	--test_r_line()
+	local sect = ""
+	local parents = {}
+	local items = {}
+	local itemsCount = 0
+	local sim = alife()
+	local se_obj, se_box --, se_parent
+	for i = first_object, last_object do
+		se_obj = sim:object(i)
+		if se_obj and se_obj:section_name() == "zamok" and se_obj.parent_id and se_obj.parent_id ~= 0 and se_obj.parent_id ~= expendable_object then
+			se_box = sim:object(se_obj.parent_id) -- get server object owner
+			if se_box then
+				--local se_box_section = se_box:section_name()
+				--local se_box_class = se_box:clsid()
+				--get_console():execute("load ~~~ se_box_section: "..se_box_section.." se_box_class: "..se_box_class)
+				if se_box:clsid() == clsid.inventory_box then
+					--get_console():execute("load ~~~ restore protect box ID: "..se_box.id.." story ID: "..se_box.m_story_id.." name: "..se_box:name())
+					table_insert(amk_offline_alife.protected.ids, se_box.id)
+				end
+			else
+				if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("ZAMOK: FAILED restore protect box id: ["..i.."] name: ["..protected_items.get_obj_name(se_obj).."]") end
+			end
+		end
+	end
+	--get_console():execute("load ~~~ zamok ok")
+	--local i1 = system_ini()
+	--local i2 = system_ini()
+	--get_console():execute("load ~~~ system_ini(), system_ini() : "..tostring(i1)..", "..tostring(i2))
+	--[[
+	get_console():execute("load ~~~ itemsCount: "..itemsCount)
+	local t = {}
+	for sect, count in pairs(items) do
+		table.insert(t, {sect, count})
+	end
+	table_sort(t, sortItems)
+	amk.dump_table(t)
+	t = {}
+	for name, data in pairs(parents) do
+		table.insert(t, {name, data})
+	end
+	table_sort(t, sortParents)
+	amk.dump_table(t)
+	]]--
+end
+
+function sortItems(t1, t2)
+	return t1[2] > t2[2]
+end
+
+function sortParents(t1, t2)
+	return t1[2]["count"] > t2[2]["count"]
+end
+
+

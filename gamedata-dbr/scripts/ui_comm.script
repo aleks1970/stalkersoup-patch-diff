@@ -1,0 +1,67 @@
+--TB3D 1.0.9.9.7.5 
+function my_ver() return "1.0.9.9.7.5" end
+class "ui_ms_community" (CUIScriptWnd)
+
+function ui_ms_community:__init(owner) super()
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function ui_ms_community:__finalize() 
+
+end
+
+function ui_ms_community:InitControls()
+self:Init(50,50,550,450)
+	self:SetAutoDelete(true)		--109975
+local xml = CScriptXmlInit()
+xml:ParseFile("ui_ms.xml")
+xml:InitStatic("back_video", self)
+xml:InitStatic("background", self)
+self:Register(xml:Init3tButton("caption", self),"caption")
+self:Register(xml:Init3tButton("btn_1", self),"btn_1")
+self:Register(xml:Init3tButton("btn_quit", self),"btn_quit")
+self:Register(xml:InitEditBox("edit_box", self), "edit_box")
+local caption = self:GetButton("caption")
+local btn_1 = self:GetButton("btn_1")
+caption:SetText("Select Grouping")
+btn_1:SetText("To Community")
+end
+
+function ui_ms_community:InitCallBacks()
+self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.set, self)
+self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_close, self)
+end
+
+function ui_ms_community:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_close()
+		end		
+	end
+	return true
+end
+
+function ui_ms_community:set()
+local text = self:GetEditBox("edit_box"):GetText()
+if text~="" then
+self:set_coom(text)
+end
+end
+
+function ui_ms_community:set_coom(str)
+	if system_ini():line_exist("communities_relations",str) then	
+		TB3D_Services.set_community(db.actor, str, 0, 0)
+		--db.actor:set_character_community(str, 0, 0)
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]You have entered the:"..str,nil,nil,1000)
+	else
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."INCOMING:  %c[default]No such group:"..str,nil,nil,1000)
+	end
+		self:on_close()	
+end
+
+function ui_ms_community:on_close()
+	self:GetHolder():start_stop_menu (self,true)
+end

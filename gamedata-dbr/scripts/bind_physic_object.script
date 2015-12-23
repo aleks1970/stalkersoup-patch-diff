@@ -1,0 +1,209 @@
+-- TB3D 1.0.9.9.7.0   use_DMX_cars, db calls, use_binder_message
+function my_ver() return "1.0.9.9.7.0" end
+----------------------------------------------------------------------------------------------------
+-- Physic objects binding
+----------------------------------------------------------------------------------------------------
+-- Developer: Evgeniy Negrobov (Jon) jon@gsc-game.kiev.ua
+-- Revised: Andrey Fidrya (Zmey) af@svitonline.com
+----------------------------------------------------------------------------------------------------
+local actor_inside_car = false
+function restore_actor_inside_car()
+    actor_inside_car = false
+end
+
+function init(obj)
+	----------------------------------------------------------------------------------------
+	-- Old scheme
+	----------------------------------------------------------------------------------------
+	local ini = obj:spawn_ini()
+	if ini and ini:section_exist("animation") then
+		--obj:bind_object(handing_lamp_binder(obj))
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("bind physic object init: animation section is deprecated, use logic + impulse combination object["..obj:name().."]") end
+		return
+	end
+	----------------------------------------------------------------------------------------
+	-- New schemes
+	----------------------------------------------------------------------------------------
+	-- Bindi the subject does not make sense, if it has no section logic
+	if not ini or not ini:section_exist("logic") then
+		-- Searchlight to Bindi, even without logic
+		if ini and not ini:section_exist("drop_box") then
+			if obj:clsid() ~= clsid.projector then
+				return
+			end
+		end
+	end
+	if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("bind physic object: bind["..utils.to_str(obj:name()).."] section["..obj:section().."]") end
+	db.init_my_storage(obj)
+	local new_binder = generic_physics_binder(obj)
+	obj:bind_object(new_binder)
+end
+
+---------------------------------------------------------------------------------------------
+class "generic_physics_binder" (object_binder)
+function generic_physics_binder:__init(obj) super(obj)
+	self.initialized = false
+	self.loaded = false
+end 
+
+function generic_physics_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function generic_physics_binder:reinit()
+	object_binder.reinit(self)
+	--printf("generic_physics_binder:reinit()")
+	--printf("_bp: generic_physics_binder: %s", self.object:name())
+	db.init_my_storage(self.object)
+	self.st = db.storage[self.object:id()]
+  self.health=self.object:get_car() and self.object:get_car():GetfHealth()
+end
+
+function generic_physics_binder:update(delta)
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("bind phys obj: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta["..utils.to_str(delta).."]")
+	end
+	object_binder.update(self, delta)
+	if not self.initialized and db.actor then
+		self.initialized = true
+		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_item)        
+        --' Run associated with the object particle.
+        local particle = utils.cfg_get_string(self.st.ini, self.st.section_logic, "particle", self.object, false, "", nil)
+        if particle ~= nil then
+            self.particle = particles_object(particle)
+            self.particle:play_at_pos(self.object:position())
+        end
+        --' disable association with the object graph
+        local graph_point_marker = utils.cfg_get_string(self.st.ini, self.st.section_logic, "graph_point_marker", self.object, false, "", nil)
+        if graph_point_marker ~= nil then
+            self.disable_graph_point = patrol(graph_point_marker):game_vertex_id(0)
+            game_graph():accessible(self.disable_graph_point, false)
+            --printf("GRAPH POINT DISABLED")
+        end
+	end
+	if self.st.active_section ~= nil or (self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true) then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
+		--if not self.callbackset then
+  		self.object:set_callback(callback.hit, generic_physics_binder.hit_callback, self)
+  		self.object:set_callback(callback.death, generic_physics_binder.death_callback, self)
+  		self.object:set_callback(callback.use_object, generic_physics_binder.use_callback, self)
+		--self.callbackset=true
+		--end
+		-- for BTR hit_callback not called. shut this hole.
+		if self.health and (not self.nofixonhit) then
+			local health=self.object:get_car() and self.object:get_car():GetfHealth()
+			if health then
+				if self.health-health>0.00001 then
+					-- amk.mylog("health decrease for "..self.object:name())
+					self.health=health
+					self:hit_callback(self.object, self.health-health, vector():set(1,0,0), db.actor, 0)
+					self.nofixonhit=nil
+				end
+			end
+		end
+	else
+		--self.callbackset=false
+	end
+	if not actor_inside_car and self.object:clsid() == clsid.car_s and self.object:get_car():engaged() then
+		dmx_cars.on_vehicle_input(self.object:id())
+		actor_inside_car = true
+	end
+	dmx_cars.signaling_light_activation()
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind phys obj: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done") end
+end
+
+function generic_physics_binder:net_spawn(data)
+	if not object_binder.net_spawn(self, data) then
+		return false
+	end
+	local sobj = self.object
+	--TB3D_Services.packet_alert("bind physic object: net spawn["..sobj:name().."]")
+	if sobj:clsid() == clsid.projector then
+		db.add_sl(sobj)
+	end
+	if sobj:spawn_ini() ~= nil and sobj:spawn_ini():section_exist("drop_box") == true then
+		self.box_items = xr_box.ph_item_box(sobj)
+	end
+	if sobj:clsid() == clsid.car_s or sobj:section() == "m_car" then db.add_car_to_fix(sobj) end		--109950
+	amk.on_net_spawn(sobj)
+	return true
+end
+
+function generic_physics_binder:net_destroy()
+	--TB3D_Services.packet_alert("bind physic object: net destroy")
+	local sobj = self.object
+	local st = db.storage[sobj:id()]
+	if sobj then
+		if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy["..utils.to_str(sobj:name()).."] section["..sobj:section().."]") end
+		if st and (st.active_scheme) then
+			xr_logic.issue_event(sobj, st[st.active_scheme], "net_destroy")
+		end
+		if self.particle ~= nil then
+			self.particle:stop()
+		end
+		if (sobj.clsid) and sobj:clsid() == clsid.projector then
+			db.del_sl(sobj)
+		end
+		db.destroy_my_storage(sobj)
+		object_binder.net_destroy(self)
+	end
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy done") end
+end
+
+function generic_physics_binder:net_save_relevant()
+	--printf("generic_physics_binder:net_save_relevant(): self.object:name()='%s'", self.object:name())
+	return true
+end
+
+function generic_physics_binder:save(packet)
+	--printf("generic_physics_binder:save(): self.object:name()='%s'", self.object:name())
+	object_binder.save(self, packet)
+	xr_logic.save_obj(self.object, packet)
+end
+
+function generic_physics_binder:load(reader)
+	self.loaded = true
+	--printf("generic_physics_binder:load(): self.object:name()='%s'", self.object:name())
+	object_binder.load(self, reader)
+	xr_logic.load_obj(self.object, reader)
+end
+
+function generic_physics_binder:use_callback(obj, who)
+	--TB3D_Services.packet_alert("bind physics object: use["..obj:name().."]")
+	if self.st.active_section then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
+	end
+	if obj:clsid() == clsid.car_s then
+		dmx_cars.signaling_start(self.object)  --dmx135
+	end
+	amk.on_use(obj, who)	--AMK UTILS
+end
+
+function generic_physics_binder:hit_callback(obj, amount, local_direction, who, bone_index)
+	amk.on_ph_obj_hit(obj, amount, local_direction, who, bone_index)	--AMK UTILS
+	--printf("_bp: generic_physics_binder:hit_callback: obj='%s'", obj:name())
+	self.nofixonhit=true
+	if self.st.ph_on_hit then
+		xr_logic.issue_event(self.object, self.st.ph_on_hit, "hit_callback", obj, amount, local_direction, who, bone_index)
+	end
+	if self.st.active_section then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "hit_callback", obj, amount, local_direction, who, bone_index)
+	end
+end
+
+function generic_physics_binder:death_callback(victim, who)
+	--printf("_bp: generic_physics_binder:death_callback: obj='%s'", victim:name())
+	if self.st.active_section then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who)
+	end
+    if self.particle ~= nil then
+        self.particle:stop()
+    end
+    if self.disable_graph_point ~= nil then
+        game_graph():accessible(self.disable_graph_point, true)
+        --printf("GRAPH POINT ENABLED")
+    end
+	if self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true then
+		self.box_items:spawn_items()
+	end
+end

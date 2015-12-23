@@ -1,0 +1,853 @@
+--TB3D 1.0.9.9.8.1 added my_ver, counts, spawn and destroy, removed creatures and added corpses, reporting,
+-- car fix, optimized, state_mgr, trade
+function my_ver() return "1.0.9.9.8.1" end
+--[[------------------------------------------------------------------------------------------------
+Database live online sites, zones, and actor restrictor
+Chugai Alexander
+--------------------------------------------------------------------------------------------------]]
+artefacts_count		= 0			--set by bind_det_arts
+
+actor               = nil		-- all
+--actor_proxy         = actor_proxy.actor_proxy()		-- se_monster, se_respawn, se_stalker, smart_terrain
+trader        		= nil		-- mob_trader
+storage             = {}		-- all  
+zone_by_name        = {}		-- gulag_dark_valley, gulag_general, m_bar, sr_danger, xr_conditions, xr_gulag, xr_logic, xr_meet
+artefacts           = {}		-- dind_det_arts, se_zones
+sound               = {}		-- sound_theme, xr_sound
+heli                = {}		-- xr_heli_hunter
+turret              = {}		-- turret_mgun
+camp_storage        = {}		-- mob_camp
+story_by_id         = {}		-- xr_info, xr_kamp
+smart_terrain_by_id = {}		-- xr_motivator
+smart_terrains_by_name = {}		-- smart_terrain
+info_restr          = {}		-- xr_gulag
+stalker		    	= {}		-- bind_soul_cube  DMX MOD, invuln/monolith hit counter
+monster		    	= {}		-- bind_soul_cube  DMX MOD
+corpses				= {}		-- ui_cheat_spawner (dead man to life)
+communities			= {}		-- meceniy_work (zombied community) filled straight from ini
+sl_by_name        	= {}		-- bind_physic_object (clsid.projector)
+cars_to_fix			= {}		-- bind_physic_object cars to hit on updates
+ammo_box_sizes		= {}		-- TB3D_ammo_stacker ammo box sizes
+dont_probe			= {}		-- TB3D_ammo_stacker items probed that are not ammo
+smart_terrains		= {}		-- smart_terrain
+exclusives			= {}		-- smart_terrain, se_monster, se_stalker
+respawners			= {}		-- se_respawn
+amk_respawner_control = {}		-- se_respawn
+amk_named_respawner_control = {}	-- se_respawn
+schemes = {} 						-- _g schema modules
+stypes = {} 						-- _g types of schemes
+trade = {}				-- trade_manager		109981
+
+local storage_count = 0
+function del_storage(obj)								--local only
+	if storage[obj:id()] then
+		storage[obj:id()] = nil
+		storage_count = storage_count - 1
+		if storage_count < 0 then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused storage_count to go negative !!!!")
+			storage_count = 0
+		elseif TB3D_Modders.use_db_message then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."]")
+		end
+	end
+end
+
+local corpses_count = 0
+function add_corpse( obj )								--local only
+	corpses[obj:id()] = obj
+	corpses_count = corpses_count + 1
+	--TB3D_Services.packet_alert("db: add corpse["..utils.to_str(obj:name()).."]")
+end
+function del_corpse( obj )								--local only
+	if corpses[obj:id()] then
+		corpses[obj:id()] = nil
+		corpses_count = corpses_count - 1
+		if corpses_count < 0 then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused corpses_count to go negative !!!!")
+			corpses_count = 0
+		elseif TB3D_Modders.use_db_message then
+			TB3D_Services.packet_alert("db: del corpse["..utils.to_str(obj:name()).."]")
+		end
+	end
+	del_storage(obj)
+end
+
+local zone_count = 0
+function add_zone( zone )						--bind_restrictor, bind_smart_terrain
+	if zone then
+		zone_by_name[zone:name()] = zone
+		zone_count = zone_count + 1
+		--TB3D_Services.packet_alert("db: add zone["..utils.to_str(zone:name()).."]")
+	end
+end
+function del_zone( zone )						--bind_restrictor, bind_smart_terrain
+	if zone then
+		if zone_by_name[zone:name()] then
+			zone_by_name[zone:name()] = nil
+			zone_count = zone_count - 1
+			if zone_count < 0 then
+				TB3D_Services.packet_alert("db: del_storage["..utils.to_str(zone:name()).."] caused zone_count to go negative !!!!")
+				zone_count = 0
+			elseif TB3D_Modders.use_db_message then
+				TB3D_Services.packet_alert("db: del zone["..utils.to_str(zone:name()).."]")
+			end
+		end
+		del_storage(zone)
+	end
+end
+
+local sl_count = 0
+function add_sl( sl )							--bind_physic_object (clsid.projector)
+	if sl then
+		--TB3D_Services.packet_alert("db: add sl["..utils.to_str(sl:name()).."]")
+		sl_by_name[sl:name()] = sl
+		sl_count = sl_count + 1
+	end
+end
+function del_sl( sl )							--bind_physic_object (clsid.projector)
+	if sl then
+		if sl_by_name[sl:name()] then
+			--TB3D_Services.packet_alert("db: del sl["..utils.to_str(sl:name()).."]")
+			sl_by_name[sl:name()] = nil
+			sl_count = sl_count - 1
+			if sl_count < 0 then
+				TB3D_Services.packet_alert("db: del_storage["..utils.to_str(sl:name()).."] caused sl_count to go negative !!!!")
+				sl_count = 0
+			end
+		end
+		del_storage(sl)
+	end
+end
+
+local actor_count = 0
+function add_actor( obj )						--bind_stalker
+	if obj then
+		actor = obj
+		--init_my_storage(obj)
+		--actor_proxy:net_spawn( obj )
+		actor_count = actor_count + 1
+		--TB3D_Services.packet_alert("db: add actor["..utils.to_str(obj:name()).."]")
+	end
+end
+function del_actor(obj)							--bind_stalker
+	if obj then
+		del_storage(obj)
+		--actor_proxy:net_destroy(obj)
+		actor = nil
+		actor_count = actor_count - 1
+		if actor_count < 0 then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused actor_count to go negative !!!!")
+			actor_count = 0
+		end
+		--TB3D_Services.packet_alert("db: del actor["..utils.to_str(obj:name()).."]")
+	end
+end
+
+local heli_count = 0
+function add_heli(obj)  						--bind_heli
+	if obj then
+		heli[obj:id()] = obj
+		heli_count = heli_count + 1
+		--TB3D_Services.packet_alert("db: add heli["..utils.to_str(obj:name()).."]")
+	end
+end 
+function del_heli(obj)  						--bind_heli
+	if obj then
+		if heli[obj:id()] then
+			heli[obj:id()] = nil
+			heli_count = heli_count - 1
+			if heli_count < 0 then
+				 TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused heli_count to go negative !!!!")
+				heli_count = 0
+			elseif TB3D_Modders.use_db_message then
+				TB3D_Services.packet_alert("db: del heli["..utils.to_str(obj:name()).."]")
+			end
+		end
+		del_storage(obj)
+	end
+end 
+
+local turret_count = 0
+function add_turret(obj)						--turret_mgun
+	if obj then
+		turret[obj:id()] = obj
+		turret_count = turret_count + 1
+		--TB3D_Services.packet_alert("db: add turret["..utils.to_str(obj:name()).."]")
+	end
+end
+function del_turret(obj)						--turret_mgun
+	if obj then
+		if turret[obj:id()] then
+			turret[obj:id()] = nil
+			turret_count = turret_count - 1
+			if turret_count < 0 then
+				TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused turret_count to go negative !!!!")
+				turret_count = 0
+			elseif TB3D_Modders.use_db_message then
+				TB3D_Services.packet_alert("db: del turret["..utils.to_str(obj:name()).."]")
+			end
+		end
+		del_storage(obj)
+	end
+end
+
+local respawners_count = 0
+function add_respawner(obj)
+	if not respawners[obj:name()] then
+		respawners[obj:name()] = obj
+		respawners_count = respawners_count + 1
+	end
+end
+
+local amk_respawner_count = 0
+function set_respawner_control(obj)
+	if not amk_respawner_control[obj:name()] then
+		amk_respawner_control[obj:name()] = obj
+		amk_respawner_count = amk_respawner_count + 1
+	end
+end
+
+local amk_named_count = 0
+function set_named_respawner_control(obj)
+	if not amk_named_respawner_control[obj.amk_name] then
+		amk_named_respawner_control[obj.amk_name] = obj
+		amk_named_count = amk_named_count + 1
+	end
+end
+
+local restrictor_count = 0
+function add_restrictor(obj_id, obj)						--xr_gulag
+	if obj_id and obj then
+		info_restr[obj_id] = obj
+		restrictor_count = restrictor_count + 1
+		--TB3D_Services.packet_alert("db: add res["..utils.to_str(obj:name()).."]")
+	end
+end
+function del_restrictor(obj_id)						--xr_gulag
+	if obj_id and info_restr[obj_id] then
+		--TB3D_Services.packet_alert("db: del res["..utils.to_str(info_restr[obj_id]:name()).."]")
+		info_restr[obj_id] = nil
+		restrictor_count = restrictor_count - 1
+		if restrictor_count < 0 then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj_id).."] caused restrictor_count to go negative !!!!")
+			restrictor_count = 0
+		end
+	end
+end
+
+local sid_count = 0
+function create_sid(obj_id)						--xr_info, xr_kamp
+	if obj_id then
+		if story_by_id[obj_id] == nil then
+			story_by_id[obj_id] = {}
+			sid_count = sid_count + 1
+			--TB3D_Services.packet_alert("db: create sid["..utils.to_str(obj_id).."]")
+		end
+	end
+end
+
+local camp_count = 0
+function create_camp(obj_id)						--mob_camp
+	if obj_id then
+		if camp_storage[obj_id] == nil then
+			camp_storage[obj_id] = {}
+			camp_count = camp_count + 1
+			--TB3D_Services.packet_alert("db: create camp["..utils.to_str(obj_id).."]")
+		end
+	end
+end
+function del_camp(obj)								--mob_camp
+	if obj and camp_storage[obj.st.home_point] then
+		camp_storage[obj.st.home_point] = nil
+		camp_count = camp_count - 1
+		if camp_count < 0 then
+			TB3D_Services.packet_alert("db: del_camp["..utils.to_str(obj:name()).."] caused camp_count to go negative !!!!")
+			camp_count = 0
+		end
+	end
+end	
+
+local sound_count = 0
+function create_sound(obj)						--sound_theme, xr_sound
+	if obj then
+		if sound[obj:id()] == nil then
+			sound[obj:id()] = {}
+			sound_count = sound_count + 1
+			--TB3D_Services.packet_alert("db: create sound["..utils.to_str(obj:name()).."]")
+		end
+	end
+end
+function del_sound(obj)							--sound_theme, xr_sound
+	if obj and sound[obj:id()] then
+		sound[obj:id()] = nil
+		sound_count = sound_count - 1
+		if sound_count < 0 then
+			TB3D_Services.packet_alert("db: del_sound["..utils.to_str(obj:name()).."] caused sound_count to go negative !!!!")
+			sound_count = 0
+		end
+	end
+end	
+
+function init_torch(obj)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].light_state = false
+		storage[obj:id()].npc_control = false
+	end
+end
+
+local ammo_cnt = 0
+function add_ammo_box(sect, size)
+	if ammo_box_sizes[sect] == nil then
+		ammo_box_sizes[sect] = size
+		ammo_cnt = ammo_cnt + 1
+	end
+end
+
+function get_ammo_box(sect)
+	if ammo_box_sizes[sect] then
+		return ammo_box_sizes[sect]
+	end
+end
+
+local probe_cnt = 0
+function add_dont_probe(sect)
+	if dont_probe[sect] == nil then
+		dont_probe[sect] = true
+		probe_cnt = probe_cnt + 1
+	end
+end
+
+function check_can_probe(sect)
+	if dont_probe[sect] then
+		return false
+	end
+	return true
+end
+
+--------------------------------------------------------- DMX MOD Soul Cube register
+local stalker_count = 0
+function add_stalker(obj)						--xr_motivator
+	if obj then
+		stalker[obj:id()] = obj
+		stalker_count = stalker_count + 1
+	end
+end	
+function del_stalker(obj)						--xr_motivator
+	if obj and stalker[obj:id()] then
+		stalker[obj:id()] = nil
+		stalker_count = stalker_count - 1
+		if stalker_count < 0 then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused stalker_count to go negative !!!!")
+			stalker_count = 0
+		end
+		add_corpse(obj)
+	end
+end	
+
+local monster_count = 0
+function add_monster(obj)						--bind_monster
+	if obj then
+		monster[obj:id()] = obj
+		monster_count = monster_count + 1
+	end
+end	
+function del_monster(obj)						--bind_monster
+	if obj and monster[obj:id()] then
+		monster[obj:id()] = nil
+		monster_count = monster_count - 1
+		if monster_count < 0 then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused monster_count to go negative !!!!")
+			monster_count = 0
+		end
+	end
+end	
+
+local fix_count
+function add_car_to_fix(obj)
+	if not fix_count then fix_count = 1
+	else fix_count = fix_count + 1 end
+	if obj then
+		if not cars_to_fix[fix_count] then
+			--TB3D_Services.packet_alert("db: car to fix["..utils.to_str(fix_count).."]["..obj:name().."]")
+			cars_to_fix[fix_count] = obj
+		end
+	end
+end
+
+function check_car_fix()
+	if not fix_count then fix_count = 0 end
+	while fix_count > 0 do
+		if cars_to_fix[fix_count] then
+			TB3D_hit_styles.hit_car(cars_to_fix[fix_count])
+			cars_to_fix[fix_count] = nil
+		end
+		fix_count = fix_count - 1
+	end
+end
+
+--------------------------------------------------------------- DMX MOD
+
+local smart_count = 0
+function add_smart_terrain( obj )				--bind_smart_terrain
+	if obj then
+		smart_terrain_by_id[obj.id] = obj
+		smart_count = smart_count + 1
+	end
+end
+function del_smart_terrain( obj )				--bind_smart_terrain
+	if obj then
+		smart_terrain_by_id[obj.id] = nil
+		smart_count = smart_count - 1
+		if smart_count < 0 then
+			TB3D_Services.packet_alert("db: del_storage["..utils.to_str(obj:name()).."] caused smart_count to go negative !!!!")
+			smart_count = 0
+		end
+	end
+end
+
+--TB3D safe 'write' interfaces ------------------------------
+function init_trade_mgr(npc_id, cfg)
+	trade[npc_id] = {}
+	trade[npc_id].cfg_ltx = cfg
+	trade[npc_id].config = ini_file(cfg)
+end
+function clear_trade(npc_id)
+	trade[npc_id] = {}
+end
+
+function set_buy_condition(npc_id, cond)
+	if trade[npc_id] then trade[npc_id].buy_condition = cond end
+end
+
+function set_sell_condition(npc_id, cond)
+	if trade[npc_id] then trade[npc_id].sell_condition = cond end
+end
+
+function set_buy_supplies(npc_id, cond)
+	if trade[npc_id] then trade[npc_id].buy_supplies = cond end
+end
+
+function init_my_storage(obj)
+	if obj then
+		if storage[obj:id()] == nil then						--don't dup
+			storage_count = storage_count + 1
+			if TB3D_Modders.use_db_message then
+				TB3D_Services.packet_alert("db: init_storage["..utils.to_str(obj:name()).."]")
+			end
+		end
+		storage[obj:id()] = {}									--create empty table
+	end
+end
+
+function destroy_my_storage(obj)
+	if obj then del_storage(obj) end							--destroy the table
+end
+
+function init_my_pstor(obj)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].pstor = {} 					--create empty table
+	end
+end
+
+function set_pstor(obj, var, value)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if var and storage[obj:id()].pstor then					--insert or change a value in the pstor table
+			storage[obj:id()].pstor[var] = value
+		end
+	end
+end
+
+function set_my_section(obj, value)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].active_section = value		--name of section or nil
+	end
+end
+
+function init_my_scheme(obj, scheme)		--xr_logic assign_storage_and_bind
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()][scheme] = {}					--create empty table
+	end
+end
+
+function set_my_scheme(obj, value)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].active_scheme = value			--name of scheme or nil
+	end
+end
+
+function set_blowout_hit(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if storage[obj:id()].blowout_scheme then	--stores last time npc was hit in blowout
+			storage[obj:id()].blowout_scheme.washitat = time
+		end
+	end
+end
+
+function set_disable_input_time(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].disable_input_time = time
+	end
+end
+
+function set_disable_input_idle(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].disable_input_idle = time
+	end
+end
+
+function set_sleep_rel_time(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].sleep_relocate_time = time
+	end
+end
+
+function set_sleep_rel_idle(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].sleep_relocate_idle = time
+	end
+end
+
+function set_sleep_rel_point(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].sleep_relocate_point = time
+	end
+end
+
+function set_sleep_rel_look(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].sleep_relocate_look = time
+	end
+end
+
+function set_obj_alive(obj, is_alive)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].alive = is_alive
+	end
+end
+
+function set_overrides(obj, value)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].overrides = value
+	end
+end
+
+function set_activation_time(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].activation_time = time
+	end
+end
+
+function set_activation_game_time(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		storage[obj:id()].activation_game_time = time
+	end
+end
+
+function set_punch(obj, is_hit)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if storage[obj:id()].punch then storage[obj:id()].punch.enabled = is_hit end
+	end
+end
+
+function set_meet(obj, is_meet)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if storage[obj:id()].meet then storage[obj:id()].meet.enabled = is_meet end
+	end
+end
+
+function set_meet_wait_begin(obj, time)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if storage[obj:id()].meet.begin_wait_to_see then storage[obj:id()].meet.begin_wait_to_see.begin = time end
+	end
+end
+
+function set_meet_buyer(obj, buyer)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if storage[obj:id()].meet then storage[obj:id()].meet.buyer = buyer end
+	end
+end
+
+function set_robber(obj, is_robber)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if storage[obj:id()].robber then storage[obj:id()].robber.enabled = is_robber end
+	end
+end
+
+function set_followers(obj)
+	if obj then
+		if not storage[obj.object:id()] then init_my_storage(obj.object) end
+		storage[obj.object:id()].followers = {}
+	end
+end
+
+function init_trade(obj)				--mob_trade
+	if obj then
+		if not storage[obj.object:id()] then init_my_storage(obj.object) end
+		storage[obj.object:id()].trade = {}
+	end
+end
+
+function set_corpse_checked(obj, prot_items)
+	if obj then
+		if not storage[obj:id()] then init_my_storage(obj) end
+		if storage[obj:id()] then storage[obj:id()].check_corpse = prot_items end
+	end
+end
+function check_corpse_looted(obj)
+	if obj and storage[obj:id()] then
+		if storage[obj:id()].check_corpse then return storage[obj:id()].check_corpse end
+	end
+	return nil
+end
+
+function disable_combat_handler(npc)
+	if npc then
+		if not storage[npc:id()] then init_my_storage(npc) end
+		if storage[npc:id()].combat then
+			storage[npc:id()].combat.enabled = false
+		end
+		if storage[npc:id()].mob_combat then
+			storage[npc:id()].mob_combat.enabled = false
+		end
+	end
+end
+
+function disable_combat_ignore(npc)
+	if npc then
+		if not storage[npc:id()] then init_my_storage(npc) end
+		if storage[npc:id()].combat_ignore then
+			storage[npc:id()].combat_ignore.enabled = false
+		end
+	end
+end
+
+function set_combat_type(npc, type)
+	if npc then
+		if not storage[npc:id()] then init_my_storage(npc) end
+		storage[npc:id()].script_combat_type = type				--109974
+	end
+end
+
+function set_enemy(npc)
+	if npc then
+		if not storage[npc:id()] then init_my_storage(npc) end
+		storage[npc:id()].enemy = npc:best_enemy()				--109974
+	end
+end
+
+function set_state(npc, state_name, callback, timeout, target, emerg, synsound, extrakeys)		--109975
+	if storage[npc:id()].state_mgr then
+		storage[npc:id()].state_mgr:set_state(state_name, callback, timeout, target, emerg, synsound, extrakeys)
+	else
+		TB3D_Services.packet_alert("db: set_state["..npc:name().."] has no state manager !!!!")
+	end
+end
+
+function get_state(npc)											--109975
+	if storage[npc:id()].state_mgr then
+		return storage[npc:id()].state_mgr:get_state()
+	else
+		TB3D_Services.packet_alert("db: get_state["..npc:name().."] has no state manager !!!!")
+	end
+	return nil
+end
+
+local smarts_count = 0
+local smart_levels = 0
+function set_smart_terrain(level_name, obj)
+	if not smart_terrains[level_name] then
+		smart_terrains[level_name] = {}
+		smart_levels = smart_levels + 1
+	end
+	if not smart_terrains[level_name][obj.id] then
+		smart_terrains[level_name][obj.id] = obj
+		smart_terrains_by_name[obj:name()] = obj
+		smarts_count = smarts_count + 1
+		if TB3D_Modders.use_db_message then TB3D_Services.packet_alert("db: set smart terrain["..obj:name().."] level["..level_name.."]") end
+	end
+end
+
+function remove_smart_terrain(obj)
+	local level_name = obj:get_level_name()
+	if smart_terrains[level_name] then
+		if smart_terrains[level_name][obj.id] then
+			smart_terrains[level_name][obj.id] = nil
+			smarts_count = smarts_count - 1
+			if TB3D_Modders.use_db_message then TB3D_Services.packet_alert("db: remove smart terrain["..obj:name().."] level["..level_name.."]") end
+		end
+		smart_terrains_by_name[obj:name()] = nil
+	end
+end
+
+function remove_exclusives(name)
+	exclusives[name] = nil
+end
+
+function spawn_monster(npc)									--109940
+	if npc then
+		--add_obj(npc)
+		if npc.alive and npc:alive() then
+			add_monster(npc) -- add to the Soul Cube register
+		end
+	end
+end
+
+function spawn_stalker(npc)									--109940
+	if npc then
+		--add_obj(npc)
+		if npc.alive and npc:alive() then
+			add_stalker(npc) -- add to the Soul Cube register
+		else
+			add_corpse(npc)
+		end
+	end
+end
+
+function destroy_monster(obj)									--109940
+	if obj then
+		--if obj.alive and obj:alive() then    -- Cube Shadow	
+			del_monster(obj) -- remove from Soul Cube register
+		--end
+		del_storage(obj)
+	end
+end
+
+function destroy_stalker(obj)									--109940 xr motivator on removing corpse
+	if obj then
+		--if obj.alive and obj:alive() then
+			del_stalker(obj) -- remove from the Soul Cube register
+		--end
+		del_storage(obj)
+	end
+end
+
+function spawn_aem(obj)
+	if obj then
+		--add_obj(obj)
+	end
+end
+
+function destroy_aem(obj)
+	if obj then
+		del_storage(obj)
+	end
+end
+
+function spawn_net_packet(obj)
+	if obj then
+		--add_obj(obj)
+	end
+end
+
+function destroy_net_packet(obj)
+	if obj then
+		del_storage(obj)
+	end
+end
+
+function show_counts()
+	TB3D_Services.packet_alert("db: actors["..utils.to_str(actor_count).."]")
+	TB3D_Services.packet_alert("db: stalkers["..utils.to_str(stalker_count).."]["..utils.to_str(#stalker).."]")
+	TB3D_Services.packet_alert("db: dead stalkers["..utils.to_str(corpses_count).."]["..utils.to_str(#corpses).."]")
+	TB3D_Services.packet_alert("db: monsters["..utils.to_str(monster_count).."]["..utils.to_str(#monster).."]")
+	TB3D_Services.packet_alert("db: communities["..utils.to_str(#communities).."]")
+	TB3D_Services.packet_alert("db: amk respawners["..utils.to_str(amk_respawner_count).."]["..utils.to_str(#amk_respawner_control).."]")
+	TB3D_Services.packet_alert("db: amk named respawners["..utils.to_str(amk_named_count).."]["..utils.to_str(#amk_named_respawner_control).."]")
+	TB3D_Services.packet_alert("db: smarts["..utils.to_str(smarts_count).."]["..utils.to_str(#smart_terrains).."]")
+	TB3D_Services.packet_alert("db: smarts by id["..utils.to_str(smart_count).."]["..utils.to_str(#smart_terrain_by_id).."]")
+	TB3D_Services.packet_alert("db: info rest["..utils.to_str(restrictor_count).."]["..utils.to_str(#info_restr).."]")
+	TB3D_Services.packet_alert("db: sids["..utils.to_str(sid_count).."]["..utils.to_str(#story_by_id).."]")
+	TB3D_Services.packet_alert("db: camps["..utils.to_str(camp_count).."]["..utils.to_str(#camp_storage).."]")
+	TB3D_Services.packet_alert("db: turrets["..utils.to_str(turret_count).."]["..utils.to_str(#turret).."]")
+	TB3D_Services.packet_alert("db: heli["..utils.to_str(heli_count).."]["..utils.to_str(#heli).."]")
+	TB3D_Services.packet_alert("db: sound["..utils.to_str(sound_count).."]["..utils.to_str(#sound).."]")
+	TB3D_Services.packet_alert("db: zones["..utils.to_str(zone_count).."]["..utils.to_str(#zone_by_name).."]")
+	TB3D_Services.packet_alert("db: projectors["..utils.to_str(sl_count).."]["..utils.to_str(#sl_by_name).."]")
+	TB3D_Services.packet_alert("db: ammo box count["..utils.to_str(ammo_cnt).."]["..utils.to_str(#ammo_box_sizes).."]")
+	TB3D_Services.packet_alert("db: no probe count["..utils.to_str(probe_cnt).."]["..utils.to_str(#dont_probe).."]")
+	TB3D_Services.packet_alert("db: arts["..utils.to_str(artefacts_count).."]["..utils.to_str(#artefacts).."]")
+	TB3D_Services.packet_alert("db: storage["..utils.to_str(storage_count).."]["..utils.to_str(#storage).."]")
+end
+
+function clear_database()
+	TB3D_Services.packet_alert("db: clear database")
+	clear_table(trade)
+	clear_table(stypes)
+	clear_table(schemes)
+	clear_table(amk_named_respawner_control)
+	clear_table(amk_respawner_control)
+	clear_table(respawners)
+	clear_table(exclusives)
+	clear_table(smart_terrains)
+	clear_table(dont_probe)
+	clear_table(ammo_box_sizes)
+	clear_table(cars_to_fix)
+	clear_table(sl_by_name)
+	clear_table(communities)
+	clear_table(corpses)
+	clear_table(monster)
+	clear_table(stalker)
+	clear_table(info_restr)
+	clear_table(smart_terrains_by_name)
+	clear_table(smart_terrain_by_id)
+	clear_table(story_by_id)
+	clear_table(camp_storage)
+	clear_table(turret)
+	clear_table(heli)
+	clear_table(sound)
+	clear_table(artefacts)
+	clear_table(zone_by_name)
+	clear_table(storage)
+	trade = {}
+	stypes = {} 						-- _g types of schemes
+	schemes = {} 						-- _g schema modules
+	amk_named_respawner_control = {}
+	amk_respawner_control = {}
+	respawners			= {}
+	exclusives			= {}
+	smart_terrains		= {}
+	dont_probe			= {}
+	ammo_box_sizes		= {}
+	cars_to_fix			= {}
+	sl_by_name        	= {}
+	communities			= {}
+	corpses				= {}
+	monster		    	= {}
+	stalker		    	= {}
+	info_restr          = {}
+	smart_terrains_by_name = {}
+	smart_terrain_by_id = {}
+	story_by_id         = {}
+	camp_storage        = {}
+	turret              = {}
+	heli                = {}
+	sound               = {}
+	artefacts           = {}
+	zone_by_name        = {}
+	storage             = {}
+	artefacts_count		= nil
+	--collectgarbage("collect")					-- force memory cleanup
+	TB3D_Services.packet_alert("db: clear database done")
+end

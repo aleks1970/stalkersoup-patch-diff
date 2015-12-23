@@ -1,0 +1,1206 @@
+---TB3D 1.0.9.9.8.1 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+-- added monolith_over, added game ending alternatives for free play, night creatures,
+-- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
+-- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
+-- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
+-- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
+-- spawn_enemy_at, random koef
+function my_ver() return "1.0.9.9.8.1" end
+---these trigger points are being re-used for the Collector gameplay
+local math_random=math.random
+local translate = game.translate_string
+
+--[[	TB3D_Services.remove_info("my1")		to be used as modders interface
+	TB3D_Services.remove_info("my2")
+	TB3D_Services.remove_info("my3")
+	TB3D_Services.remove_info("my4")
+	TB3D_Services.remove_info("my5")
+	TB3D_Services.remove_info("my6")
+	TB3D_Services.remove_info("my7")
+	TB3D_Services.remove_info("my8")
+	TB3D_Services.remove_info("my9")
+	TB3D_Services.remove_info("my10")
+	TB3D_Services.remove_info("my11")]]--
+
+---------------------------------- Cordon --------------------------------------------------
+-- from arhara_dialog.script 'spawn outfit to Zvedocheta and give to stalker'
+-- split into two dialog parts for better response
+-- these items are spawned directly, will crash if item non-existant!
+function noz_dat1(first_speaker, second_speaker) 
+	if TB3D_Modders.default_items then
+		amk.spawn_in_inv("bolt", 1)
+		amk.spawn_item_in_inv("novice_outfit_rain_1", second_speaker)
+		if use_ammo_belt then amk.spawn_item_in_inv("razgruzka",first_speaker) end
+		dialogs.relocate_item_section(second_speaker, "novice_outfit_rain_1","in")
+	else   ---------give it to me baby!!!
+		amk.spawn_item_in_inv("outfit_specnaz_m1",first_speaker)
+		amk.spawn_item_in_inv("razgruzka",first_speaker)  --ammo vest
+		amk.spawn_item_in_inv("wpn_fn2000_sniper",first_speaker)
+		amk.spawn_item_in_inv("wpn_spas12",first_speaker)
+		amk.spawn_item_in_inv("wpn_fs",first_speaker)
+		amk.spawn_in_inv("af_blood", 4)
+		amk.spawn_in_inv("bolt", 20)
+		amk.spawn_in_inv("ammo_7.62x54_ap", 6)
+		amk.spawn_in_inv("ammo_zhekan_izomorf", 6)
+		amk.spawn_in_inv("ammo_5.7x28_ss190", 6)
+		amk.spawn_in_inv("ammo_m209", 4)
+		amk.spawn_in_inv("grenade_rgd5", 6)
+		amk.spawn_item_in_inv("detektor_amorf",first_speaker)
+		amk.spawn_item_in_inv("det_artefact_super",first_speaker)
+		amk.spawn_item_in_inv("detector_elite_john",first_speaker)
+		amk.spawn_item_in_inv("amk_transmutator",first_speaker)
+		amk.spawn_item_in_inv("mine_detector",first_speaker)
+	end
+end
+
+--' obtain first-aid kit knife and binoculars from Zvedocheta
+function noz_dat2(first_speaker, second_speaker)
+	if TB3D_Modders.default_items then
+		dialogs.relocate_item_section(second_speaker, "wpn_pm","in")
+		dialogs.relocate_item_section(second_speaker, "wpn_knife","in")
+		dialogs.relocate_item_section(second_speaker, "medkit","in")
+		dialogs.relocate_item_section(second_speaker, "wpn_binoc","in")
+	else   -----------------------------------------------------------item testing
+		amk.spawn_item_in_inv("fake_wpn_arm_binoc",first_speaker)
+		amk.spawn_item_in_inv("fake_wpn_knife",first_speaker)
+		amk.spawn_item_in_inv("medkit",first_speaker)
+		amk.spawn_item_in_inv("player",first_speaker)
+		amk.spawn_item_in_inv("matras",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_1",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_2",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_3",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_4",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_5",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_6",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_7",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_8",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_9",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_10",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_11",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_12",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_13",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_14",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_15",first_speaker)
+		amk.spawn_item_in_inv("ogg_flash_16",first_speaker)
+	end
+end
+
+function save_start()
+	amk.start_timer("autosave",10,"STALKER Start")					--initial save for stalker level
+end
+
+function bandranen_pda()				--in collector mode
+	news_manager.amk_send_tip_id("sms_bandranen_pda","sms_unknown",20,20,"killer")
+end
+
+function spawn_esc_medkit()
+	alife():create("esc_medkit", vector():set(-86.2782745361328,-4.92963171005249,-78.3331451416016),594270,0)	--tolik wounded medkit	
+end
+
+function moroz_sms()	--message about backpacks
+	--taynik_spawn.cs_new_inventory()	--kostya pda
+	spawn_alife_rand("dog_normal",-68.769,-4.010,-86.216,204914,76,12)	--add more fun to the area
+	spawn_alife_rand("boar_normal",-29.255,-11.466,-88.712,247847,111,8)
+	spawn_alife_rand("boar_normal",-88.425,-8.670,-134.431,176700,107,8)
+	spawn_alife_rand("dog_habaruch",-69.532,-12.072,-143.237,203836,107,8)
+	spawn_alife_rand("tarakan_normal",-253.517,-13.797,-13.596,8840,67,18)
+	spawn_alife_rand("tarakan_normal",-247.438,-14.354,-18.323,11500,67,10)
+	spawn_alife_rand("tarakan_normal",-253.517,-13.797,-13.596,8840,67,16)
+end
+
+function sidor_piyn_sms()	--Sid's door, arhara_dialog.script
+	--news_manager.amk_send_tip_id("sms_coll_greet","sms_sid",10,20,"trader")
+	spawn_alife_rand("dog_strong",-80.955,-4.894,-74.731,186568,76,6)	--add more fun to the area
+	spawn_alife_rand("dog_habaruch",-80.955,-4.894,-74.731,186568,76,6)
+end
+
+function kanal_sms()	--warning about artifacts
+	news_manager.amk_send_tip_id("sms_plenty_ammo","sms_tb3d",10,20,"tb3d_master")
+	spawn_alife_rand("flesh_strong",45.923,1.076,319.172,329924,192,8)
+	spawn_alife_rand("dog_habaruch",70.505,0.709,356.311,362035,195,6)
+	spawn_alife_rand("dog_strong",122.305,1.829,365.377,426437,229,6)
+	spawn_alife_rand("bloodsucker_normal",106.758,1.541,459.684,408586,221,3)
+	spawn_alife_rand("tarakan_normal",106.758,1.541,459.684,408586,221,18)
+end
+
+function esc_fox_quest()
+	news_manager.amk_send_tip_id("sms_being_hunted","sms_tb3d",10,20,"tb3d_master")
+	spawn_alife_rand("dog_strong",122.305,1.829,365.377,426437,229,12)
+end
+
+---------------------------------Garbage ---------------------------------------------------
+function gar_dolg_blokpost_warning()	--entering duty territory, news_manager.script
+	spawn_alife_rand("killer_master",13.389,0.399,151.491,186643,357,1)
+	spawn_alife_rand("killer_regular",19.532,0.310,148.898,192610,357,1)
+	spawn_alife_rand("killer_regular",52.169,0.599,171.018,225365,358,1)
+	spawn_alife_rand("killer_veteran",77.902,-0.353,181.149,247370,363,1)
+	spawn_alife_rand("killer_veteran",95.748,7.534,180.608,262841,363,1)
+end
+
+function broken_pda_mobs()				--in garbage after returning from cordon with broken pda
+	spawn_alife_rand("dog_strong",37.773,0.412,-287.243,211389,262,12)
+	spawn_alife("bloodsucker_strong",37.222,1.842,-292.221,216694,253,1)
+	spawn_alife("killer_regular",-10.319,-0.927,-178.361,168593,287,1)
+	spawn_alife_rand("dog_strong",93.498,-2.973,-258.185,260603,263,12)
+	if TB3D_Services.is_night() then
+		spawn_alife("werewolf",69.510,1.919,-36.638,239874,394,1)
+		spawn_alife("werewolf",19.905,0.818,-101.172,192275,290,1)
+		spawn_alife("werewolf",92.353,0.087,-120.527,259548,397,1)
+		spawn_alife("werewolf",62.764,0.817,78.695,234710,371,1)
+		wolf_howls(true)
+	else
+		spawn_alife("chimera_x_ray",69.510,1.919,-36.638,239874,394,1)
+		spawn_alife("chimera_x_ray",19.905,0.818,-101.172,192275,290,1)
+		spawn_alife("chimera_x_ray",92.353,0.087,-120.527,259548,397,1)
+		spawn_alife("chimera_x_ray",62.764,0.817,78.695,234710,371,1)
+	end
+end
+
+--------------------------------Agroprom ---------------------------------------------------
+function agro_krot_sos1()	--first enter agro
+end
+
+function agro_krot_sos2()	--help mole
+end
+
+function spawn_sak_trader()
+	local obj = alife():story_object(9506)
+	if not obj then
+		obj = alife():create("sak_military_stalker",vector():set(21.711,-2.134,-222.385),261021,436) 
+		local tbl = amk.read_stalker_params(obj)
+		tbl.sid = 9506
+		amk.write_stalker_params(tbl, obj)
+		--TB3D_Services.info_alert("tb3d triggers: sak_military_stalker spawn")
+	end
+end
+
+-------------------------------Agro Underground --------------------------------------------
+function agro_knockdown()	--Strelok's hideout entrance, never called as agro_knockdown.ltx modified
+	--do nothing, being used for ZatLost teleport
+end
+
+function agr_cam_effect()	--doctor cam, never called as agro_knockdown.ltx modified
+end
+
+function agro_contuz()	--psi blackout sounds, never called as agro_knockdown.ltx modified
+end
+
+----------------------------------Bar-----------------------------------------------------
+function spawn_burer_bar()	--' couple Burers at the bar, arh_disk_nayty_6 in arhara_dialog.script
+	spawn_alife_rand("tushkano_normal",99.368,1.213,-122.928,45947,1173,8)
+	spawn_alife_rand("tarakan_normal",158.990,4.012,-108.175,45947,1173,16)
+	spawn_alife_rand("rat_normal",99.368,1.213,-122.928,45947,1173,10)
+	spawn_alife_rand("rat_weak",158.990,4.012,-108.175,45947,1173,18)
+end
+
+function bloodsucker()	--3 bloodsuckers at bar, freeman desert eagle quest start, braad_test.script
+	spawn_alife_rand("tarakan_normal",99.368,1.213,-122.928,45947,1173,8)				--roaches
+	spawn_alife_rand("tarakan_normal",158.990,4.012,-108.175,45947,1173,6)
+	spawn_alife_rand("rat_weak",99.368,1.213,-122.928,45947,1173,8)						--rats
+	spawn_alife_rand("rat_normal",158.990,4.012,-108.175,45947,1173,6)
+	spawn_alife_rand("tarakan_normal",97.246,-1.959,-161.316,45850,1281,6)				--roaches and rats at atp lc
+	spawn_alife_rand("rat_normal",97.246,-1.959,-161.316,45850,1281,8)
+	spawn_alife_rand("boar_strong",69.267,-6.325,-159.720,45850,1281,8)					--boars beyond atp lc
+end
+
+function broken_pda()				--in rostok
+	spawn_alife_rand("tushkano_normal",350.597,11.740,-435.072,85922,1289,16)
+	if TB3D_Services.is_night() then
+		--spawn_alife("werewolf",377.697,24.649,-505.079,84356,1285,1)
+		--spawn_alife("werewolf",330.617,23.706,-491.006,73703,1301,1)
+		spawn_alife("werewolf",368.467,26.961,-309.708,47432,1281,1)--hill, left, truck
+		spawn_alife("werewolf",355.832,12.796,-109.928,80145,1284,1)--hill, right, fence area
+		wolf_howls(true)
+	else
+		--spawn_alife("chimera_x_ray",330.617,23.706,-491.006,73703,1301,1)--hill, left, end
+		--spawn_alife("chimera_x_ray",377.697,24.649,-505.079,84356,1285,1)--hill, right, end
+		spawn_alife("chimera_x_ray",368.467,26.961,-309.708,47432,1281,1)--hill, left, truck
+		spawn_alife("chimera_x_ray",355.832,12.796,-109.928,80145,1284,1)--hill, right, fence area
+	end
+	--(368.902,25.552,-414.520),47432,1281)--hill, left, mid
+	--(358.803,23.039,-422.457),47432,1281)--hill, left, tree
+	--(352.297,8.555,-492.889),76317,1168)--in fenced area
+	--(418.766,26.039,-373.474),84356,1285)--hill, right, mid
+end
+----------------------------------dv-----------------------------------------------------
+function x18_dream(is_start)
+	if is_start == true then TB3D_Services.give_info("dar_x18_dream") end					--terminates dream state and spawns mil
+end
+
+--function hogg_chimera()
+	--spawn_alife("chimera_x_ray",191.856,5.002,-361.756,388538,938,2)
+--end
+
+function fanat_laptop_have()
+	TB3D_Services.give_info("dark_btr2_spawn")
+	spawn_alife("chimera_x_ray",170.777,0.150,-239.972,371429,976,1)
+	spawn_alife("chimera_x_ray",181.418,0.125,-284.652,381719,972,1)
+	spawn_alife("bloodsucker_strong",-3.341,-10.815,-0.926,2259,1143,1)
+	spawn_alife("bloodsucker_strong",1.212,9.350,-4.252,2983,1109,1)
+	spawn_alife("kontroller_yazva",1.006,4.190,-0.710,2897,1124,1)
+	spawn_alife_rand("zombie_strong",1.006,4.190,-0.710,2897,1124,8)
+end
+
+function dark_btr1_sms()
+end
+
+----------------------------------Yantar-----------------------------------------------------
+function yantar_dream(is_start)
+	if is_start == true then TB3D_Services.give_info("yantar_find_ghost_task_start") end	--terminates dream state and opens gate
+end
+
+function yan_ghost_pda()
+end
+
+------------------------------------radar------------------------------------------------------
+function rad_barman_spam()		--when entering through break in wall
+	spawn_suit(1,32.356,-0.431,-50.813,19121,1993)	--attic of trader house
+end
+
+function rad_psi_hit()
+end
+
+function radar_dream(is_start)
+	if is_start == true then
+		--TB3D_Services.give_info("bun_patrol_start")
+		--xr_effects.enable_ui()
+	end
+end
+
+function bun_deactivate_radar_ltx()			--executes this instead of dream state timer
+	--alife():create("nebo_heavy_outfit", vector():set(32.356,-0.431,-50.813),19121,1993)	--attic of trader house	
+end
+
+---------------------------------------pripyat-----------------------------
+function aes_mapspot()
+	--TB3D_Services.give_info("pri_undeground_respawn_start")
+	TB3D_Services.give_info("pri_followers_leader_give_info")
+	TB3D_Services.give_info("pri_show_zones")
+	--TB3D_Services.give_info("pri_wave7_end")
+	--if xr_gulag.getGulagPopulation(823) == 0 then
+		--TB3D_Services.give_info("pri_followers_all_dead")
+	--end
+end
+
+--------------------------------------marsh--------------------------------
+--function spawn_marmor()
+	--alife():create("nebo_heavy_outfit", vector():set(-279.112,15.244,22.397),7073,3351)	--abandoned tower	
+--end
+
+function npp_chaes_exit()
+	alife():create("nano_outfit_addw_bastplus", vector():set(-47.442,1.568,252.281),115721,3399)	--below water tower	
+	alife():create("medkit_elite", vector():set(-47.442,1.568,252.281),115721,3399)	
+	spawn_item_rand("ammo_12x70_buck", -26.723,17.721,268.084,128980,3411,4)						--top of tower
+	spawn_alife_rand("tb3dm_snork_jumper",-33.054,1.687,284.845,123510,3402,4)
+	spawn_alife("tb3dm_wolf",-39.537,0.898,310.379,120214,3402,2)
+	spawn_alife_rand("tb3dm_snork_jumper",-60.545,0.594,270.346,107834,3399,4)
+	spawn_alife("tb3dm_wolf",-60.637,0.534,269.422,107425,3399,1)
+	spawn_alife_rand("tb3dm_snork_jumper",-48.952,0.704,250.903,114938,3399,2)
+	spawn_alife_rand("tb3dm_snork_jumper",-3.568,1.578,280.225,137286,3420,4)
+	wolf_howls(true)
+end
+
+function spawn_quest_suits()
+	local grp = math_random(100)
+	if grp > 70 then
+		spawn_suit(1,-182.412,3.324,-325.288,49717,3365)									--swamp trader loft
+		spawn_suit(1,-172.895,5.015,418.147,55994,3361)										--swamp NW shack roof
+	elseif grp > 30 then
+		spawn_suit(1,607.257,6.464,419.050,520564,3578)										--swamp NE house attic
+		spawn_suit(1,-172.895,5.015,418.147,55994,3361)										--swamp NW shack roof
+	else
+		spawn_suit(1,273.002,13.626,-161.033,317054,3531)									--swamp church tower
+		spawn_suit(1,180.358,12.341,532.991,239674,3484)									--swamp train car agro exit
+	end
+end
+
+---------------------------------red forest -------------------------------
+function tunnel_rat()
+	spawn_alife_rand("tarakan_normal",-196.338,3.399,15.292,1271,3240,6)				--chamber 2
+	spawn_alife_rand("tarakan_normal",-146.506,0.780,30.413,7071,3240,6)				--chamber 3
+	spawn_alife_rand("rat_normal",-141.767,4.940,14.674,7245,3240,6)					--tunnel opening
+	spawn_alife_rand("rat_normal",-100.433,0.798,28.918,12285,3240,6)					--chamber 1
+	spawn_alife_rand("rat_normal",-111.545,-5.984,-57.600,10390,3240,6)					--pit
+	spawn_suit(6,-136.159,0.380,34.015,7478,3240)
+	--intersect1: (-137.315,0.673,24.377),7432,3240)
+	alife():create("wpn_sg552_fss_de", vector():set(-177.644,3.123,-25.667),3556,3240)	--behind gate
+	news_manager.amk_send_tip_id("sms_tunnel_rat","sms_sid",10,30,"trader")
+end
+
+function tunnel_rat2()				--grabbed weapon, start sequence here
+	if amk.load_variable("tb3d_ald_weapons", 0) == 2 then
+		spawn_item_rand("ammo_5.56x45_ap", -100.370,0.769,29.004,12285,3240,8)				--tunnel beside chamber
+		spawn_item_rand("ammo_5.56x45_ap", -166.593,1.601,19.635,4582,3240,8)				--dead end
+		spawn_alife("werewolf",-146.183,0.672,32.542,7074,3240,1)							--dead end
+		db.actor:set_actor_position(vector():set(-108.197,0.609,21.772))					--chamber, spawn following grab gun
+		wolf_howls(false)
+		amk.save_variable("tb3d_ald_weapons", 3)											--starts sequence in actor update
+	end
+end
+
+function tunnel_rat3()
+	spawn_alife("werewolf",-152.996,2.250,8.064,6207,3240,1)							--end of tracks behind cart
+	spawn_alife("werewolf",-178.473,2.267,-20.508,3407,3240,1)							--locked gate
+	wolf_howls(true)
+end
+
+function tunnel_rat4()
+	spawn_alife("werewolf",-111.545,-5.984,-57.600,10390,3240,2)						--pit
+	spawn_alife("werewolf",-185.679,2.377,-51.694,2744,3240,1)							--blocked tracks
+	wolf_howls(true)
+end
+
+-------------------------------------------NPP1-----------------------------------------------------------
+function spawn_aes_stampede()
+	alife():create("tb3dm_gigant_strong", vector():set(39.666,-0.002,-285.541),386473,2400,expendable_object)	--stampede behind actor
+	alife():create("tb3dm_gigant_strong", vector():set(39.417,-0.000,-296.101),386473,2400,expendable_object)
+	alife():create("tb3dm_gigant_strong", vector():set(17.593,-0.002,-290.086),386473,2400,expendable_object)
+	alife():create("tb3dm_gigant_strong", vector():set(20.350,-0.000,-302.154),386473,2400,expendable_object)
+	alife():create("tb3dm_gigant_strong", vector():set(39.6,-0.002,-285.541),386473,2400,expendable_object)
+	alife():create("tb3dm_gigant_strong", vector():set(39.4,-0.000,-296.101),386473,2400,expendable_object)
+	alife():create("tb3dm_gigant_strong", vector():set(17.5,-0.002,-290.086),386473,2400,expendable_object)
+	alife():create("tb3dm_gigant_strong", vector():set(20.3,-0.000,-302.154),386473,2400,expendable_object)
+	alife():create("tb3dm_gigant_strong", vector():set(139.595,-7.922,-265.308),386473,2400,expendable_object)	--far south sump
+	alife():create("tb3dm_gigant_strong", vector():set(159.587,-7.921,-221.581),386473,2400,expendable_object)	--corner by portal
+end
+
+function spawn_aes_stampede2()
+	if amk.load_variable("level_on_save", "nil") == "k01_darkscape" then
+		TB3D_Mobs.spawn_snorks(350.645,-0.001,-390.844,389488,2400,6)
+	else
+		TB3D_Mobs.spawn_snorks(369.062,0.150,-404.876,389488,2400,3)
+		TB3D_Mobs.spawn_snorks(369.264,0.150,-391.710,389488,2400,3)
+		TB3D_Mobs.spawn_snorks(369.603,0.147,-338.303,386839,2400,3)
+	end
+	TB3D_Mobs.spawn_snorks(369.978,0.150,-320.853,386473,2400,3)	--snorks on bridge over viaduct
+	TB3D_Mobs.spawn_snorks(363.191,-0.101,-360.855,389488,2400,3)	--s. viduct on tracks
+end
+
+----------------------------------Sarcofag-----------------------------------------------------
+function osoznanie_call(actor, npc)
+	news_manager.amk_send_tip_id("sms_osoznanie_call","sms_incoming",10,20,"o_soznanie")
+	local sound_obj_l   = xr_sound.get_safe_sound_object( [[affects\psy_blackout_l]] )
+	local sound_obj_r   = xr_sound.get_safe_sound_object( [[affects\psy_blackout_r]] )
+	sound_obj_l:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
+	sound_obj_r:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
+end
+
+function sar2_scene_start()
+end
+
+function death_monolith_ghosts()
+end
+
+function spawn_sarc_pack(count)		--way back behind wish granter
+	spawn_alife_rand("werewolf",79.442,71.975,-32.248,6403,2417,count)
+	wolf_howls(true)
+end
+
+-----------------------------------------zaton----------------------------------------
+function zaton_lost()
+	alife():create("m_poltergeist_strong_flame",vector():set(-199.406,6.393,27.741),543661,3674,expendable_object)
+	spawn_alife("m_poltergeist_strong_flame",-421.097,-6.691,154.488,230735,3666,2)	--chopper in swirls
+	alife():create("kontroller_yazva",vector():set(-221.778,-6.183,165.204),500584,3670,expendable_object)	--viaduct
+	alife():create("kontroller_yazva",vector():set(-423.613,36.258,-397.799),142983,3664,expendable_object)
+	alife():create("af_cristall_flower",vector():set(430.570,33.254,-318.276),1671859,3694)
+	alife():create("af_cristall_flower",vector():set(429.551,6.755,-282.545),1670653,3696,3694)
+  	spawn_item_rand("ammo_5.56x45_ap", 405.235,33.366,-440.100,1632001,3694,4)	--old factory
+  	spawn_item_rand("medkit_scientic", 405.235,33.366,-440.100,1632001,3694,4)	--large storage container
+	alife():create("af_cristall_flower",vector():set(288.217,29.474,-399.527),1457658,3690,3670)
+  	spawn_item_rand("ammo_5.56x45_ap", 288.217,29.474,-399.527,1457658,3690,4)
+  	spawn_item_rand("medkit_scientic", 288.217,29.474,-399.527,1457658,3690,4)
+  	spawn_item_rand("sandwich", -221.778,-6.180,165.204,500584,3670,6)
+  	spawn_item_rand("antirad", -221.778,-6.180,165.204,500584,3670,4)
+	alife():create("af_fireball",vector():set(-199.406,6.393,27.741),543661,3674)
+	alife():create("af_cristall_flower",vector():set(-171.915,7.542,103.861),596577,3670)
+  	spawn_item_rand("ammo_5.56x45_ap", -221.778,-6.183,165.204,500584,3670,4)
+  	spawn_item_rand("medkit_scientic", -221.778,-6.183,165.204,500584,3670,4)
+	alife():create("af_cristall_flower",vector():set(-421.097,-6.691,154.488),230735,3666)
+	alife():create("af_vyvert_green",vector():set(-455.100,-4.365,152.6498),106689,3660)
+	alife():create("af_cristall_flower",vector():set(-423.613,36.258,-397.799),142983,3664)	--lab entrance
+  	spawn_item_rand("ammo_5.56x45_ap", -423.613,36.258,-397.799,142983,3664,4)
+  	spawn_item_rand("ammo_12x70_buck", -423.613,36.258,-397.799,142983,3664,4)
+  	alife():create("neytral_exo_antigas_outfit_blackwhiteplus", vector():set(-423.613,36.258,-397.799),142983,3664)
+	alife():create("af_gold_fish",vector():set(-70.115,12.223,-168.374),802854,3679,expendable_object)	--twisted tree
+	alife():create("af_cristall_flower",vector():set(-149.779,-23.300,-181.774),642848,3673)
+  	spawn_item_rand("ammo_5.56x45_ap", -149.779,-23.300,-181.774,642848,3673,12)
+  	spawn_item_rand("ammo_12x70_buck", -149.779,-23.300,-181.774,642848,3673,8)
+  	alife():create("af_water_flower1", vector():set(-149.779,-23.300,-181.774),642848,3673)
+  	alife():create("af_eye_voron", vector():set(-149.779,-23.300,-181.774),642848,3673)
+  	spawn_item_rand("ammo_5.56x45_ap", 327.670,44.208,-401.420,1513907,3690,8)	--factory near bridge
+  	alife():create("wpn_fn2000_sniper", vector():set(327.670,44.208,-401.420),1513907,3690)
+  	spawn_item_rand("ammo_5.56x45_ap", 322.413,42.826,-404.901,1507608,3690,8)
+  	alife():create("fake_wpn_wakizashi", vector():set(322.413,42.826,-404.901),1507608,3690)
+  	spawn_item_rand("ammo_12x70_buck", 308.473,33.723,-401.669,1488318,3690,8)
+  	alife():create("wpn_kriss_super_v", vector():set(296.110,34.281,-392.063),1469740,3690)
+  	spawn_item_rand("ammo_12x70_buck", -363.139,23.928,-181.069,233705,3662,4)	--on bench near twisted tree
+  	spawn_item_rand("ammo_5.56x45_ap",7.111,-5.214,37.411,958190,3677,4)
+  	spawn_item_rand("ammo_12x70_buck",7.111,-5.214,37.411,958190,3677,4)
+  	spawn_item_rand("ammo_5.56x45_ap",7.111,-5.214,37.411,958190,3677,4)
+  	spawn_item_rand("ammo_5.56x45_ap",55.248,-9.187,32.501,1050641,3677,4)
+  	spawn_item_rand("ammo_12x70_buck",55.248,-9.187,32.501,1050641,3677,4)
+  	spawn_item_rand("medkit_scientic",55.248,-9.187,32.501,1050641,3677,4)
+  	spawn_item_rand("ammo_5.56x45_ap",105.488,1.360,179.663,1152919,3686,4)
+  	spawn_item_rand("ammo_12x70_buck",105.488,1.360,179.663,1152919,3686,4)
+  	spawn_item_rand("ammo_flame",105.488,1.360,179.663,1152919,3686,4)
+  	spawn_item_rand("ammo_5.56x45_ap", 152.482,-6.824,-139.548,1227074,3688,4)	--hunter's barge
+  	spawn_item_rand("ammo_12x70_buck", 152.482,-6.824,-139.548,1227074,3688,4)
+	alife():create("artifact_electro_crystal_thorn", vector():set(-416.169,-10.524,209.710),182015,3666)	--arts in swirls
+	alife():create("af_cristall_flower", vector():set(-431.574,-9.825,183.083),183045,3666)
+	alife():create("af_gold_fish", vector():set(-447.110,-9.220,161.355),184065,3666)
+	alife():create("af_rusty_kristall", vector():set(-436.729,-8.900,156.869),184065,3666)
+end
+
+function start_black_doc_sms()
+	local count = amk.load_variable("black_doc", 0)
+	if count == 0 then
+		TB3D_Services.give_info("spawn_prizrak_na_chaes1")
+		arhara_dialog.dell_new_prizrak()
+		amk.save_variable("black_doc", 1)
+		amk.start_timer("black_doc_timer",10)
+	elseif count == 1 then
+		arhara_dialog.gg_black_doc_sms1()
+		amk.save_variable("black_doc", 2)
+		amk.start_timer("black_doc_timer",20)
+	elseif count == 2 then
+		arhara_dialog.gg_black_doc_sms2()
+		amk.save_variable("black_doc", 3)
+		amk.start_timer("black_doc_timer",20)
+	elseif count == 3 then
+		arhara_dialog.gg_black_doc_sms3()
+		amk.save_variable("black_doc", 4)
+		amk.start_timer("black_doc_timer",20)
+	elseif count == 4 then
+		arhara_dialog.gg_black_doc_sms4()
+		amk.save_variable("black_doc", 5)
+		amk.start_timer("black_doc_timer",25)
+	elseif count == 5 then
+		arhara_dialog.gg_black_doc_sms5()
+		amk.save_variable("black_doc", 6)
+		amk.start_timer("black_doc_timer",15)
+	elseif count == 6 then
+		arhara_dialog.gg_black_doc_sms6()
+		amk.del_variable("black_doc")
+	end
+end
+
+---spawn night creatures at midnight for certain levels, after wish granter
+function creatures_of_the_night()	--only called once after midnight
+	local ln = level.name()
+	local is_pack = nil
+		--TB3D_Services.info_alert("night creatures")
+		if ln == "l01_escape" then
+				spawn_alife_rand("werewolf",384.692,20.200,284.930,595047,251,2)	--tunnel at end of tracks
+				is_pack = true
+		elseif ln == "l02_garbage" then
+				spawn_alife_rand("werewolf",155.752,7.682,29.582,311457,385,2)		--far east, end of pile
+				is_pack = true
+		elseif ln == "l03_agroprom" then
+		elseif ln == "l03u_agr_underground" then
+		elseif ln == "l04_darkvalley" then
+				spawn_alife_rand("werewolf",-48.131,-2.958,-143.643,117685,879,2)		--pit with tractor
+				spawn_alife_rand("werewolf",132.106,14.174,-404.274,329386,943,2)		--rocks above pond
+				is_pack = true
+		elseif ln == "l04u_labX18" then
+		elseif ln == "l06_rostok" then
+		elseif ln == "l05_bar" then
+		elseif ln == "l08_yantar" then
+		elseif ln == "l08u_brainlab" then
+		elseif ln == "l07_military" then
+		elseif ln == "l10_radar" then
+		elseif ln == "l10u_bunker" then
+		elseif ln == "l11_pripyat" then
+		elseif ln == "l12_stancia" then
+		elseif ln == "l12_stancia_2" then
+		elseif ln == "l12u_sarcofag" then
+		elseif ln == "l12u_control_monolith" then
+		elseif ln == "atp_for_test22" then
+		elseif ln == "peshera" then
+		elseif ln == "av_peshera" then
+		elseif ln == "puzir" then
+				spawn_alife_rand("werewolf",-94.990,19.603,130.544,111887,2881,2)	--on northern rocks
+				is_pack = true
+		elseif ln == "aver" then
+				spawn_alife_rand("werewolf",-102.563,23.455,73.455,693513,2894,2)	--center peak on rocks
+				spawn_alife_rand("werewolf",369.703,45.638,120.780,1531112,2906,2)	--far E. peak on rocks
+				is_pack = true
+		elseif ln == "limansk" then
+		elseif ln == "hospital" then
+		elseif ln == "generators" then
+		elseif ln == "warlab" then
+		elseif ln == "red_forest" then
+				spawn_alife_rand("werewolf",145.121,-0.190,-182.607,106526,3304,2)	--small cave
+				is_pack = true 
+		elseif ln == "lost_village" then
+				spawn_alife_rand("werewolf",124.927,9.906,-19.391,48990,3336,2)		--east tunnel
+				is_pack = true
+		elseif ln == "marsh" then
+				spawn_alife_rand("werewolf",-94.524,0.826,464.607,119948,3393,2)	--northern tracks
+				is_pack = true
+		elseif ln == "dead_city" then
+		elseif ln == "zaton" then
+				spawn_alife_rand("werewolf",-111.639,-6.296,-227.265,717557,3673,4)	--in cave under station
+				is_pack = true
+				spawn_alife_rand("werewolf",-10.250,1.678,250.123,923280,3677,4)	--in cave under burnt ranch
+		elseif ln == "jupiter" then
+		elseif ln == "pripyat" then	--east pripyat
+				spawn_alife_rand("werewolf",234.454,0.547,22.189,452741,3768,4)		--near the hospital
+				is_pack = true
+		elseif ln == "jupiter_underground" then
+		elseif ln == "labx8" then
+		elseif ln == "cs_agroprom_underground" then
+		elseif ln == "predbannik" then
+				spawn_alife_rand("werewolf",-269.439,46.687,238.627,524489,4024,4)	--peak above cave
+				is_pack = true
+		elseif ln == "yantar_old" then
+				spawn_alife_rand("werewolf",231.216,8.801,65.287,543778,4382,4)	--east woods
+				spawn_alife_rand("werewolf",188.130,13.851,202.517,496024,4381,4)	--top of bunker
+				is_pack = true
+		elseif ln == "swamp_old" then
+				spawn_alife_rand("werewolf",283.068,5.104,-278.998,1762433,4395,2)	--sw road gate
+				spawn_alife_rand("werewolf",-188.400,-5.488,-156.304,743914,4387,2)	--sw corner below tower
+				is_pack = true
+		elseif ln == "hiding_road" then
+				spawn_alife_rand("werewolf",-270.456,-0.077,107.009,67606,4409,4)	--west train tunnel
+				is_pack = true
+		elseif ln == "k01_darkscape" then
+				spawn_alife_rand("werewolf",364.145,26.607,220.181,875143,4646,4)	--sw side of rail tunnel
+				spawn_alife_rand("werewolf",442.302,29.191,385.688,944682,4649,4)	--ne side
+				is_pack = true
+		elseif ln == "dark_forest" then
+		elseif ln == "level_f-1" then
+		elseif ln == "promzone" then
+				spawn_alife_rand("werewolf",-30.338,19.704,-475.190,138458,4817,2)	--south end
+				spawn_alife_rand("werewolf",116.248,20.592,-357.635,419106,4973,3)	--behind south trash pile
+				spawn_alife_rand("werewolf",-41.726,21.354,445.734,121518,4796,3)	--peak above pipes end
+				is_pack = true
+		elseif ln == "digger_stash" then
+		elseif ln == "l01_krasivay" then
+		elseif ln == "l02_dd" then
+		elseif ln == "l03_rinok" then
+		elseif ln == "l04_pogost" then
+		elseif ln == "l05_vokzal" then
+		elseif ln == "lab_x14" then
+		elseif ln == "l01_poligon" then
+		end
+		if is_pack ~= nil then wolf_howls(is_pack) end
+	return true	--sets TB3D_Services.spawned
+end
+
+function eprip_spawns()	--called when Shadows spawns in the swamp
+	--undergrounds in shop area with tools
+  	spawn_item_rand("ammo_5.56x45_ap",-132.733,-11.074,-224.099,66013,3752,2)
+  	spawn_item_rand("ammo_12x70_buck",-135.834,-11.177,-225.825,63897,3752,2)
+  	spawn_item_rand("ammo_5.56x45_ap",-115.729,-11.154,-229.668,78936,3752,2)
+	alife():create("af_cristall_flower",vector():set(-108.143,-3.408,-238.140),85071,3752)
+  	spawn_item_rand("ammo_12x70_buck",-135.834,-11.177,-225.825,63897,3752,2)
+	alife():create("af_fireball",vector():set(-120.424,0.488,-254.691),75244,3752)
+  	spawn_item_rand("ammo_12x70_buck",-31.836,8.036,-276.651,156332,3756,2)
+	alife():create("af_cristall_flower",vector():set(-31.836,8.036,-276.651),156332,3756)
+	alife():create("zone_cockroach",vector():set(-124.223,0.600,-264.911),71235,3752)	--in the toilet
+  	spawn_item_rand("ammo_11.43x23_hydro",-124.223,0.600,-264.911,71235,3752,2)			--in the toilet
+  	spawn_item_rand("ammo_5.56x45_ss190",-124.223,0.600,-264.911,71235,3752,4)			--in the toilet
+  	spawn_item_rand("grenade_f1",-124.223,0.600,-264.911,71235,3752,4)					--in the toilet
+	alife():create("wpn_fw900k",vector():set(-103.962,-2.652,-233.178),87982,3752)		--on table under light
+	------
+end
+
+function dist_center_ambush()						--top of construction site
+	spawn_alife_rand("ldk1_troop",-10.013,17.029,162.646,23978,5281,1)	--npc sw corner
+	spawn_alife_rand("ldk1_troop",-32.594,17.027,172.092,10786,5281,1)	--npc se corner
+	spawn_alife_rand("ldk1_troop",-41.417,17.029,148.853,6981,5281,1)	--npc ne corner
+	spawn_alife_rand("ldk1_troop",-24.139,17.029,139.272,15227,5281,1)	--npc n edge
+	spawn_alife_rand("ldk1_troop",-11.047,17.028,136.517,22828,5281,1)	--npc nw corner
+	spawn_item_rand("glow_grenade_red",-38.397,17.910,148.480,7823,5281,1)	--on stack of vent ducts
+	spawn_item_rand("glow_grenade_green",-38.397,17.910,148.480,7823,5281,1)
+	spawn_item_rand("glow_grenade_blue",-38.397,17.910,148.480,7823,5281,1)
+	spawn_item_rand("glow_grenade_yellow",-38.397,17.910,148.480,7823,5281,1)
+end
+
+function wolf_howls(is_pack)			--NEED MAKE SINGLE HOWL!!!!
+	local snd_obj
+	if is_pack then
+		snd_obj = xr_sound.get_safe_sound_object( [[monsters\\werewolf\\howls_dist]] )
+	else
+		snd_obj = xr_sound.get_safe_sound_object( [[monsters\\werewolf\\howls_dist]] )
+	end
+	if snd_obj then
+		--TB3D_Services.packet_alert("triggers: werewolf howl")
+		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 2.0)
+	end
+end
+
+function spawn_alife(name, x, y, z, lv, gv, count)
+	for i=1, count do
+		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)
+	end
+end
+function spawn_alife_rand(name, x, y, z, lv, gv, count)
+	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
+	local cnt = math.floor(math_random(1,count) * flevel)
+	if cnt < 1 then cnt = 1 end
+	--TB3D_Services.packet_alert("tb3d_triggers: spawn alife random koef["..utils.to_str(flevel).."] count["..utils.to_str(cnt).."]")
+	for i=1, cnt do
+		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+	end
+end
+
+function spawn_item(name, x, y, z, lv, gv, count)
+	for i=1, count do
+		alife():create(name, vector():set(x,y,z),lv,gv)
+	end
+end
+function spawn_item_rand(name, x, y, z, lv, gv, count)
+	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should decrease as koef increases
+	local cnt = math.ceil(math_random(1,count) / flevel)
+	if cnt < 1 then cnt = 1 end
+	--TB3D_Services.packet_alert("tb3d_triggers: spawn item random koef["..utils.to_str(flevel).."] count["..utils.to_str(cnt).."]")
+	for i=1, cnt do
+		alife():create(name, vector():set(x,y,z),lv,gv)
+	end
+end
+
+function on_net_destroy()
+	--if TB3D_Services.remove_info("tb3d_torch_on") then					--shut it down
+		--if particles_object(19990) then level.remove_pp_effector(19990) end		--NV off
+	--end
+end
+
+--------------------------------- game endings -----------------------------------------------------
+function monolith_over()													--after wish granter vid
+	TB3D_Services.give_info("tb3d_chaes_done")
+	TB3D_Services.give_info("sar_monolith_go")
+	--dmx_mod.create_level_changer_sarc_to_bar()			--109975 too soon
+	--dmx_mod.create_level_changer_sarc_to_chaes()
+	dmx_mod.spawn_upgrades()												--109974, skat15 upgrades
+	TB3D_Services.teleportate("mon_over")									--agrounder
+end
+
+function join_osoznanie()													--after osozni vids
+	TB3D_Services.give_info("tb3d_chaes_done")
+	TB3D_Services.teleportate("joined")
+end
+function refuse_osoznanie()
+	TB3D_Services.give_info("tb3d_chaes_done")
+	TB3D_Services.teleportate("refused")
+end
+
+function chaes_tower_portal()												--aes final portal
+	if TB3D_Services.give_info("tb3d_chaes_done") then
+		TB3D_Services.give_info("bar_dolg_video_start")
+	else
+		dmx_mod.create_level_changer_marsh_yantar()
+		TB3D_Services.teleportate("npp_chaes_exit")							--to marsh
+	end
+end
+
+function set_freeplay()														--arhara_dialog.dell_dcity_norman() 109955
+	if TB3D_Services.is_collector(100) == false then
+		TB3D_Services.give_info("tb3d_game_end")
+	end
+	TB3D_Services.teleportate("finish")
+end
+
+function treasure_hunt_ending()
+	if not has_alife_info("tb3d_ready_for_tunnel") then
+		news_manager.amk_send_tip_id("sms_finish_goldbars","sms_unknown",20,20,"killer")
+	elseif has_alife_info("tb3d_ready_for_tunnel") and not has_alife_info("tb3d_x14_done") then
+		news_manager.amk_send_tip_id("sms_finish_secretlab","sms_unknown",20,20,"default")
+	end
+	if has_alife_info("tweed_zep1_start") and not has_alife_info("tweed_zep1_done") then
+		news_manager.amk_send_tip_id("sms_finish_tweedbook","sms_tweed",20,20,"default")
+	end
+end
+----------------------------------------------------------------------------------------------------
+
+function look_for_object(object)
+	--TB3D_Services.packet_alert("tb3d trig: look for object["..utils.to_str(object).."]")
+	local obj
+	for a=first_object,last_object,1 do
+		obj = alife():object(a)
+		if obj and obj.name and string.find(obj:name(), utils.to_str(object)) then
+			--TB3D_Services.packet_alert("tb3d trig: found object["..utils.to_str(obj.id).."]")
+			return obj
+		end
+	end
+	return nil
+end
+
+function spawn_zone_teleports()
+	if TB3D_Services.give_info("tb3d_zone_teleports") then
+		local v = vector()
+		local se_obj = look_for_object("zone_teleport_new")			--clearsky enter
+		if not se_obj then
+			alife():create("zone_teleport_new",v:set(-208.9479,0.86408543,-291.8642),37124,3362)
+		end
+		se_obj = look_for_object("zone_teleport_new_out")			--clearsky exit
+		if not se_obj then
+			alife():create("zone_teleport_new_out",v:set(34.4663,0.87717,-287.2317),156875,3436)
+		end
+		if TB3D_Services.is_collector(101) == false then			--not starting as collector
+			se_obj = look_for_object("lim_zone_teleport1")
+			if not se_obj then
+				alife():create("lim_zone_teleport1",vector():set(40.821,11.0686,215.0173),48310,3020)
+			end
+			se_obj = look_for_object("lim_zone_teleport2")
+			if not se_obj then
+				alife():create("lim_zone_teleport2",vector():set(49.1074,2.948,300.0252),51380,3022)
+			end
+			se_obj = look_for_object("hos_zone_teleport1")
+			if not se_obj then
+				alife():create("hos_zone_teleport1",v:set(-86.273,25.844,674.829),3736,3044)
+			end
+			se_obj = look_for_object("hos_zone_teleport2")
+			if not se_obj then
+				alife():create("hos_zone_teleport2",v:set(-104.113,34.25,615.65),127,3028)
+			end
+			se_obj = look_for_object("hos_zone_teleport3")
+			if not se_obj then
+				alife():create("hos_zone_teleport3",v:set(-92.780,33.493,719.939),1801,3034)
+			end
+		end
+		amk.del_variable("m_teleport_31")			--useless vars in saves
+		amk.del_variable("m_teleport_32")
+		amk.del_variable("m_teleport_33")
+		amk.del_variable("m_teleport_34")
+		amk.del_variable("m_teleport_exit")
+		amk.del_variable("m_teleport_hospital")
+	end
+end
+
+function remove_zone_teleports()
+	local se_obj = look_for_object("lim_zone_teleport1")
+	if se_obj then alife():release(se_obj, true) end
+	se_obj = look_for_object("lim_zone_teleport2")
+	if se_obj then alife():release(se_obj, true) end
+	se_obj = look_for_object("hos_zone_teleport1")
+	if se_obj then alife():release(se_obj, true) end
+	se_obj = look_for_object("hos_zone_teleport2")
+	if se_obj then alife():release(se_obj, true) end
+	se_obj = look_for_object("hos_zone_teleport3")
+	if se_obj then alife():release(se_obj, true) end
+end
+
+function spawn_bar_portals()
+	----------- bar-warhouses -----------------------------------
+	--need portal: tower to warehouse exit
+	--need target: from tower to warehouse exit
+	--need portal: warehouse exit to roof
+	--[l05_bar]: (109.662,3.438,71.878),33033,1225)		--target from warhouse exit, roof over hunters
+	----------- bar-garbage -------------------------------------
+	--[l05_bar]: (155.955,4.948,71.171),41158,1180)		--portal arena roof to garbage exit
+	--[l05_bar]: (357.757,10.930,-442.953),83911,1289)	--target to garbage exit from arena roof
+	--[l05_bar]: (351.671,11.766,-435.218),85666,1289)	--portal garbage exit to bar
+	--[l05_bar]: (206.206,0.220,51.474),49958,1177)		--target from garbage exit portal, door in entry
+end
+
+-- Spawn places to sleep
+--  place_of_sleep if bed exists
+--  place_of_sleep_vid to spawn bed w/pillow
+function spawn_sleep_places()
+	TB3D_Services.packet_alert("tb3d triggers: spawn sleep places")
+	alife():create("place_of_sleep",vector():set(-210.765,-22.881,-122.198),42632,59) -- Cordon in the basement of the village
+	alife():create("place_of_sleep",vector():set(47.043,1.567,243.461),219251,359) -- Dump - on the outpost of Debt
+	alife():create("place_of_sleep",vector():set(-135.309,1.424,-318.204),77666,3374) -- marsh - base CHN
+	alife():create("place_of_sleep",vector():set(-183.689,2.193,537.252),110573,3393) -- marsh - cave
+	alife():create("place_of_sleep_vid",vector():set(-410.158,0.771,69.751),162553,2889) -- NC - infirmary
+	alife():create("place_of_sleep",vector():set(48.180,1.101,-59.024),235536,1083) -- AP - At the bandits
+	alife():create("place_of_sleep",vector():set(-213.998,1.396,91.526),122710,3600) -- MG - House Perfume
+	alife():create("place_of_sleep",vector():set(117.971,0.206,66.106),34340,1252) -- Bar - a room about Zahara
+	alife():create("place_of_sleep_vid",vector():set(42.121,7.499,-17.377),279888,664) -- Agroprom - about Adrenaline
+	alife():create("place_of_sleep",vector():set(-68.412,-6.368,-68.965),3552,717) -- Agro Underground
+	alife():create("place_of_sleep",vector():set(138.037,-7.041,-71.337),575215,2830) -- ATP - in the center
+	alife():create("place_of_sleep",vector():set(9.233,-7.186,20.183),316476,1582) -- AC - in barracks
+	alife():create("place_of_sleep",vector():set(27.627,-10.949,-280.456),54978,1480) -- Yantar (Amber) - the bunker
+	alife():create("place_of_sleep",vector():set(36.312,-3.370,-48.361),22448,1996) -- Radar - the home Syaka
+	alife():create("place_of_sleep",vector():set(99.587,4.333,131.124),210226,2171) -- Pripyat - the flat arrow
+	alife():create("place_of_sleep",vector():set(146.228,5.035,-172.466),375746,3765) -- East Pripyat - laundry
+	alife():create("place_of_sleep",vector():set(-45.021,-0.778,-252.296),4671,2994) -- Limansk - the house on the corner
+	alife():create("place_of_sleep_vid",vector():set(19.020,9.701,29.558),19080,3330) -- Old Village - The Staff
+	alife():create("place_of_sleep",vector():set(-122.429,38.783,-523.148),194437,3089) -- Generators - Neutral Village
+	alife():create("place_of_sleep",vector():set(12.903,0.268,-39.544),74533,3290) -- Red Forest - trailer near Woodman
+	alife():create("place_of_sleep_vid",vector():set(-31.129,0.556,-129.076),162684,2882) -- Forgotten Forest - Cross in the camp
+	alife():create("place_of_sleep_vid",vector():set(-172.368,-2.678,-72.607),1765,2863) -- Cave - in miners
+	alife():create("place_of_sleep",vector():set(-259.608,61.695,199.170),77941,2939) -- Labrynth in unlocked room
+	alife():create("place_of_sleep",vector():set(104.962,-0.887,185.068),1149482,3686) -- backwater - ship
+	alife():create("place_of_sleep",vector():set(23.365,4.674,363.584),992729,3682) -- backwater - cave
+	--alife():create("place_of_sleep",vector():set(155.726,-6.558,-138.531),1231927,3688) -- hunter's barge
+	alife():create("place_of_sleep_vid",vector():set(-145.177,23.583,-428.528),652504,3678) -- factory behind gas station
+	alife():create("place_of_sleep_vid",vector():set(-99.547,25.127,723.881),291,3035) -- Hosp - stairs
+	alife():create("place_of_sleep",vector():set(-76.493,19.628,563.786),6740,3075) -- Hosp - stairs at exit
+	alife():create("place_of_sleep",vector():set(-95.800,31.033,591.607),854,3038) -- hosp - doc's level
+	alife():create("place_of_sleep",vector():set(-50.014,-0.540,201.961),636203,3717) -- Jup Station
+	alife():create("place_of_sleep_vid",vector():set(-254.878,-3.897,88.693),8119,1382) -- Wild Territory - on boxes in tunnel
+	alife():create("place_of_sleep_vid",vector():set(303.978,-39.390,-22.460),67636,1930) -- Radar - room with Warlab lc
+	-----new levels-------------------------
+	alife():create("place_of_sleep",vector():set(-257.365,20.140,258.838),543291,3938) 		-- waiting room - in cave
+	alife():create("place_of_sleep",vector():set(-285.401,-1.344,343.176),289906,4678)		--dark_forest shed
+	alife():create("place_of_sleep",vector():set(-42.290,10.440,-83.721),729659,4660)		--dark forest tent
+	alife():create("place_of_sleep",vector():set(-315.727,2.989,74.119),465856,4399)		--dead marshes main base
+	alife():create("place_of_sleep",vector():set(190.235,3.496,-41.043),1562777,4399)		--dead marshes clinic
+	alife():create("place_of_sleep",vector():set(-54.999,30.265,-125.271),231786,4679)		--f1 old bar couch
+	alife():create("place_of_sleep",vector():set(241.647,0.823,21.572),853563,4554)			--broken road house behind garage
+	alife():create("place_of_sleep",vector():set(-10.910,1.655,-43.447),22644,5277)			--dist. center
+	alife():create("place_of_sleep",vector():set(255.166,0.057,-182.168),674905,4633)		--darkscape house
+	alife():create("place_of_sleep",vector():set(171.073,13.131,-91.392),484361,5025)		--techniques
+	alife():create("place_of_sleep",vector():set(-90.449,4.926,-1.491),134,5312)			--market
+	alife():create("place_of_sleep",vector():set(-2.859,-8.126,2.400),117,5355)				--hole
+	alife():create("place_of_sleep",vector():set(-430.777,12.411,-142.672),282924,3908)		--waiting room hq top floor
+	TB3D_Services.packet_alert("tb3d triggers: spawn sleep places done")
+end
+
+-------------------------tb3d_suits---------------------------------
+--1 = agro tunnel - 109934
+--2 = radar after deact - 109934
+--3 = hotel room, decoder docs - 109934
+--7 = locker in east prip - 109980
+--10 = prip on lockers near zep doc 4 - 109950
+function spawn_suit(type, x, y, z, lv, gv)
+	local suit
+	if type == 1 then
+		suit = "merc_scientific_outfit"				--cube quest suit
+	elseif type == 2 then
+		suit = "hunter_novice_outfit"
+	elseif type == 3 then
+		suit = "military_outfit"					--scat9
+	elseif type == 4 then
+		suit = "dolg_outfit_good"
+	elseif type == 5 then
+		suit = "outfit_soldier_m1_defaultplus"
+	elseif type == 6 then
+		suit = "stalker_outfit_blackwhiteplus"
+	elseif type == 7 then
+		suit = "militaryspec_outfit_psy"			--scat10 + nv
+	elseif type == 8 then
+		suit = "military_outfit_bastplus"			--scat9 + nv
+	elseif type == 9 then
+		suit = "specops_outfit_kat_eyeplus"
+	elseif type == 10 then
+		suit = "monolit_exoskeleton"
+	elseif type == 11 then
+		suit = "neytral_exo_antigas_outfit_default"
+	elseif type == 12 then
+		suit = "nebo_scientific_outfit_good"
+	elseif type == 13 then
+		suit = "bandit_outfit_blue_plus"
+	else
+		suit = "novice_outfit"
+	end
+	alife():create(suit, vector():set(x,y,z),lv,gv)
+end
+
+function delayed_action(info_id)					--called from timers
+	TB3D_Services.give_info(info_id)
+end
+
+function check_bar_drop(barnum)
+	local seq = amk.load_variable("tb3d_bar_seq", 0)
+	if seq == 0 then
+		if barnum == 2 then dropped = true end
+	elseif seq == 1 then
+		if barnum == 3 then dropped = true end
+	elseif seq == 2 then
+		if barnum == 4 then dropped = true end
+	elseif seq == 3 then
+		if barnum == 5 then dropped = true end
+	elseif seq == 4 then
+		if barnum == 13 then dropped = true end
+	elseif seq == 5 then
+		if barnum == 12 then dropped = true end
+	elseif seq == 6 then
+		if barnum == 11 then dropped = true end
+	elseif seq == 7 then
+		if barnum == 10 then dropped = true end
+	elseif seq == 8 then
+		if barnum == 6 then dropped = true end
+	elseif seq == 9 then
+		if barnum == 7 then dropped = true end
+	elseif seq == 10 then
+		if barnum == 15 then dropped = true end
+	end
+	if dropped == true then
+		if barnum == 15 then
+			--local snd_obj = xr_sound.get_safe_sound_object( [[tb3d\\bar_dropped]] )
+			--if snd_obj then
+				--snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 2.0)
+			--end
+			create_tunnel_ports()
+			tb3d_dyn_spawn.spawn_tunnels_markers()
+			TB3D_Services.give_info("tb3d_gb1_done")
+		end
+		xr_effects.aes_earthshake(db.actor)
+		amk.save_variable("tb3d_bar_seq", seq + 1)
+		return true
+	end
+	return false
+end
+
+function create_tunnel_ports()
+	local obj = alife():story_object(1999978)		--ws6 pump station lookout
+	if not obj then
+		dmx_mod.create_level_changer(1999978, vector():set(67.289,-19.291,-179.899),1190,3868, 	
+			136294,3414, vector():set(-5.511,11.181,21.070), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"marsh",1,1,"to_swamp") 													
+	end
+	obj = alife():story_object(1999979)				--wn5	room in old compound
+	if not obj then
+		dmx_mod.create_level_changer(1999979, vector():set(76.439,-19.294,-165.031),1426,3868, 	
+			216009,4679, vector():set(-69.871,30.352,-62.691), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"level_f-1",1,1,"to_f1") 													
+	end
+	obj = alife():story_object(1999980)				--ws3	box on train car
+	if not obj then
+		dmx_mod.create_level_changer(1999980, vector():set(102.585,-19.291,-166.463),2501,3868, 	
+			274024,95, vector():set(-2.880,21.937,156.883), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"l01_escape",1,1,"to_cordon") 													
+	end
+	obj = alife():story_object(1999981)				--wn2	strange hut
+	if not obj then
+		dmx_mod.create_level_changer(1999981, vector():set(101.998,-19.294,-148.729),2626,3868, 	
+			91881,4412, vector():set(-243.896,24.862,-201.748), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"hiding_road",1,1,"to_broken") 													
+	end
+	obj = alife():story_object(1999982)				--n0	top of the hill
+	if not obj then
+		dmx_mod.create_level_changer(1999982, vector():set(112.343,-19.292,-131.400),3760,3868, 	
+			539987,4024, vector():set(-260.011,46.838,243.201), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"predbannik",1,1,"to_waiting") 													
+	end
+	obj = alife():story_object(1999983)				--s0	tree by the lake
+	if not obj then
+		dmx_mod.create_level_changer(1999983, vector():set(124.621,-19.291,-135.644),4148,3868, 	
+			1002308,2902, vector():set(69.502,14.894,-71.124), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"aver",1,1,"to_ff") 													
+	end
+	obj = alife():story_object(1999984)				--es2	between the globes
+	if not obj then
+		dmx_mod.create_level_changer(1999984, vector():set(128.237,-19.200,-110.850),4793,3868, 	
+			189412,2619, vector():set(490.354,17.102,365.571), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"l12_stancia_2",1,1,"to_npp2") 													
+	end
+	obj = alife():story_object(1999985)				--en3	center
+	if not obj then
+		dmx_mod.create_level_changer(1999985, vector():set(114.846,-19.291,-98.598),4245,3868, 	
+			350468,3110, vector():set(12.485,38.105,-231.626), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"generators",1,1,"to_generators") 													
+	end
+	obj = alife():story_object(1999986)				--es4	top of the stairs
+	if not obj then
+		dmx_mod.create_level_changer(1999986, vector():set(128.183,-19.293,-86.628),4638,3868, 	
+			13655,5309, vector():set(23.628,4.225,0.825), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"l03_rinok",1,1,"to_market") 													
+	end
+	obj = alife():story_object(1999987)				--es6	tunnel near station
+	if not obj then
+		dmx_mod.create_level_changer(1999987, vector():set(128.180,-19.291,-62.492),4673,3868, 	
+			969226,4653, vector():set(493.525,-1.866,-424.212), 							
+			vector():set(0.0,0.0,-1.0), 												
+			"k01_darkscape",1,1,"to_darkscape") 													
+	end
+end
+
+function spawn_df_killers()
+	spawn_alife_rand("dav_ldk_veteran_respawn1",-370.220,8.902,-361.284,139403,4675,2)
+	spawn_alife_rand("dav_ldk_master_respawn1",-338.456,15.736,-61.428,194849,4677,2)
+	spawn_alife_rand("dav_ldk_veteran_respawn1",-334.423,9.107,250.325,202652,4678,3)
+	spawn_alife_rand("dav_ldk_veteran_respawn1",-286.992,-1.760,341.979,287392,4678,3)
+	spawn_alife_rand("dav_ldk_master_respawn1",-447.698,-1.152,149.022,8747,4677,2)
+	spawn_alife_rand("dav_ldk_master_respawn1",-450.163,0.189,-364.263,4632,4675,2)
+	spawn_alife_rand("dav_ldk_master_respawn1",-452.346,-0.001,-434.817,1149,4675,1)
+end
+
+function hr_spawns(idx)			--109978
+	local is_save = false
+	if idx == 0 then
+		alife():create("vehicle_tb3d_btr", vector():set(-43.379,-3.021,1.548),393882,4467)			--in village
+		alife():create("vehicle_tb3d_btr", vector():set(-76.988,3.001,338.276),342695,4458)			--in motorpool
+		is_save = true
+	elseif idx == 1 then
+		alife():create("grenade_rgd6", vector():set(-245.593,30.712,-201.925),89566,4412)		--stash1 - roof
+		alife():create("grenade_rgd12", vector():set(-240.129,20.390,-201.870),95903,4416)		--stash1
+		alife():create("grenade_rgd6", vector():set(-240.129,20.390,-201.870),95903,4416)		--stash1
+		alife():create("grenade_rgd11", vector():set(-343.482,10.232,-167.246),21706,4404)		--stash2 - rocks
+		alife():create("grenade_rgd7", vector():set(-343.482,10.232,-167.246),21706,4404)		--stash2
+		alife():create("grenade_rgd8", vector():set(-343.482,10.232,-167.246),21706,4404)		--stash2
+		alife():create("grenade_rgd9", vector():set(-343.482,10.232,-167.246),21706,4404)		--stash2
+		alife():create("tb3dm_gigant_strong", vector():set(-275.012,11.994,-203.376),63256,4410,expendable_object)		--gigant1
+		alife():create("tb3dm_gigant_strong", vector():set(-247.722,12.109,-172.212),87437,4412,expendable_object)		--gigant2
+		--alife():create("tb3dm_gigant_strong", vector():set(-221.770,14.858,-223.422),119816,4416,expendable_object)		--gigant3
+		is_save = true
+	end
+	if is_save then amk.save_variable("hr_spawns", idx+1) end
+end
+
+function warlab_spawns(idx)			--109978
+	if idx == 0 then
+		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,1,false)			--around lab entrance
+		TB3D_Mobs.spawn_killer_squad(158.189,30.681,-499.143,518915,3131,6,1,false)
+		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,1,false)
+	end
+end
+
+function npp_spawns(idx)			--109978
+	local is_save = false
+	if idx == 0 then
+		alife():create("vehicle_tb3d_btr", vector():set(966.393,-0.037,-219.751),432458,2285)	--drivable tank at entrance
+		alife():create("vehicle_tb3d_btr", vector():set(516.691,-0.101,-41.436),229322,2304)	--drivable tank near large pipes
+		alife():create("vehicle_tb3d_sport", vector():set(873.004,-0.102,-361.184),389488,2400)	--buggy behind gate for fast travel
+	end
+	if is_save then amk.save_variable("npp1_spawns", idx+1) end
+end
+
+function eprip_spawns(idx)			--109978
+	local is_save = false
+	if idx == 0 then
+		alife():create("ammo_9x39_izomorf", vector():set(-174.123,1.031,-199.342),39113,3748)			--in locker
+		alife():create("grenade_rgd11", vector():set(-174.123,1.031,-199.342),39113,3748)
+		alife():create("grenade_rgd7", vector():set(-174.123,1.031,-199.342),39113,3748)
+		alife():create("grenade_rgd8", vector():set(-174.123,1.031,-199.342),39113,3748)
+		alife():create("grenade_rgd9", vector():set(-174.123,1.031,-199.342),39113,3748)
+		spawn_suit(7,-174.123,1.031,-199.342,39113,3748)									--scat10 plus nv
+		is_save = true
+	end
+	if is_save then amk.save_variable("eprip_spawns", idx+1) end
+end
+
+function zat_spawns(idx)			--109978
+	local is_save = false
+	if idx == 0 then
+		TB3D_Mobs.spawn_killer_squad(-333.718,9.476,397.311,284411,3665,6,6,false)						--npc in center of mill
+		TB3D_Mobs.check_zaton_spawns1()
+		TB3D_dialog.stack_money(-76.915,7.619,254.742,783122,3675,1,6)		--109976, in hot spot of fiery cave
+		TB3D_dialog.stack_money(-76.821,7.623,255.320,783122,3675,2,9)
+		TB3D_dialog.stack_money(-77.176,7.612,255.547,783122,3675,3,7)
+		alife():create("vehicle_tb3d_btr_80", vector():set(252.653,27.686,-458.967),1397665,3685)		--drivable tank far north near factory
+		is_save = true
+	elseif idx == 1 then
+		TB3D_Mobs.spawn_killer_squad(315.418,9.193,-77.785,1498606,3688,6,4,false)
+		TB3D_Mobs.spawn_killer_squad(41.830,8.339,-239.381,1014781,3681,6,4,false)
+		TB3D_Mobs.check_zaton_spawns2()
+		spawn_suit(1,112.014,4.006,183.493,1158849,3686)								--suit type 1 on roof of ship cabin
+		is_save = true
+	elseif idx == 2 then
+		TB3D_Mobs.spawn_killer_squad(162.406,4.821,-194.288,1243956,3688,6,4,false)
+		TB3D_Mobs.spawn_killer_squad(170.868,10.786,-260.843,1258149,3683,6,4,false)
+		TB3D_Mobs.check_zaton_spawns1()
+		is_save = true
+	elseif idx == 3 then
+		TB3D_Mobs.spawn_killer_squad(315.418,9.193,-77.785,1498606,3688,6,4,false)
+		TB3D_Mobs.spawn_killer_squad(41.830,8.339,-239.381,1014781,3681,6,4,false)
+		TB3D_Mobs.check_zaton_spawns2()
+		is_save = true
+	elseif idx == 4 then
+		TB3D_Mobs.spawn_killer_squad(162.406,4.821,-194.288,1243956,3688,6,4,false)
+		TB3D_Mobs.spawn_killer_squad(170.868,10.786,-260.843,1258149,3683,6,4,false)
+		TB3D_Mobs.check_zaton_spawns2()
+		TB3D_Mobs.spawn_killer_squad(-333.718,9.476,397.311,284411,3665,6,6,false)				--npc in center of mill
+		idx = 1																					--rotate through 2 and 4 for now
+		is_save = true
+	end
+	if is_save then amk.save_variable("zat_spawns", idx+1) end
+end
+
+function bunker_spawns(idx)			--109978
+	local is_save = false
+	if idx == 0 then
+		if TB3D_Services.give_info("tb3d_portals_x10") then							--quick way back out
+			local se_obj = alife():create("m_teleport_tb3d2",vector():set(7.162,-23.572,15.393),7695,2773)	--lower door
+			local t = amk.get_anomaly_data(se_obj) 
+			t.sid = 1999902
+			amk.set_anomaly_data(t, se_obj)
+			se_obj = alife():create("m_teleport_tb3d3",vector():set(-59.914,-21.214,16.735),267,2723)		--midway
+			t = amk.get_anomaly_data(se_obj) 
+			t.sid = 1999903
+			amk.set_anomaly_data(t, se_obj)
+			se_obj = alife():create("m_teleport_tb3d4",vector():set(-21.673,-8.990,5.378),3159,2674)		--upper room
+			t = amk.get_anomaly_data(se_obj) 
+			t.sid = 1999904
+			amk.set_anomaly_data(t, se_obj)
+			is_save = true
+		end
+	end
+	if is_save then amk.save_variable("bunker_spawns", idx+1) end
+end
+
+function sarc_spawns(idx)			--109978
+	local is_save = false
+	if idx == 0 then
+		if has_alife_info("tb3d_gold_bar_15") then
+			dmx_mod.create_level_changer_sarc_to_bar()
+			dmx_mod.create_level_changer_sarc_to_chaes()
+			is_save = true
+		end
+	elseif idx == 1 then
+		--future use
+	end
+	if is_save then amk.save_variable("sarc_spawns", idx+1) end
+end
+
+function ds_spawns(idx)			--109978
+	local is_save = false
+	if idx == 0 then
+		if has_alife_info("zep24_have") then
+			spawn_ds_portals()
+			is_save = true
+		end
+	end
+	if is_save then amk.save_variable("ds_spawns", idx+1) end
+end
+
+function spawn_ds_portals()			--109978, moved here
+	alife():create("ds_nexit_tele", vector():set(-451.410,13.797,559.419),35192,4599)		--n exit portal to w tunnel return
+	alife():create("zone_teleport", vector():set(-451.410,13.797,559.419),35192,4599)		--marker
+	alife():create("ds_wtunnel_tele", vector():set(337.312,20.109,285.644),889710,4646)		--w tunnel portal to n exit return
+	alife():create("zone_teleport", vector():set(337.312,20.109,285.644),889710,4646)		--marker
+	alife():create("ds_etunnel_tele", vector():set(470.296,20.117,285.721),948720,4646)		--e tunnel portal to se tunnel return
+	alife():create("zone_teleport", vector():set(470.296,20.117,285.721),948720,4646)		--marker
+	alife():create("ds_setunnel_tele", vector():set(518.712,-1.468,-420.649),971751,4653)	--se tunnel portal to e tunnel return
+	alife():create("zone_teleport", vector():set(518.712,-1.468,-420.649),971751,4653)		--marker
+end
+
+function signal_green(x,y,z,lv,gv)			--109978, moved here
+	if TB3D_Services.is_night() then
+		alife():create("glow_stick_green",vector():set(x,y+1,z),lv,gv)
+	end
+	alife():create("zone_green_smoke_signal_tb3d", vector():set(x,y,z),lv,gv)
+end
+
+function spawn_enemy_at(npc)							--109981, used to motivate non-mob traders on supply change
+	if npc then
+		local pos = npc:position()
+		spawn_alife_rand("tushkano_normal",pos.x,pos.y,pos.z+2,npc:level_vertex_id(),npc:game_vertex_id(),1)
+	end
+end
+
+function spawn_x14_guard()
+	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(24.278,0.148,44.296),28106,3806) ,"vehicle_btr","jupu")
+	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(4.060,8.066,243.872),16039,3796) ,"vehicle_btr","jupu")
+	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(9.147,8.047,308.679),19257,3789) ,"vehicle_btr","jupu")
+	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(-1.018,8.032,405.489),13189,3787) ,"vehicle_btr","jupu")
+	spawn_suit(6,64.986,4.131,-0.547,39059,3808)													--desk in booth
+	alife():create("wpn_rg-6",vector():set(54.844,2.798,11.796),33426,3808)							--side room
+	alife():create("ammo_vog-25",vector():set(54.844,2.798,11.796),33426,3808)
+	alife():create("ammo_vog-25",vector():set(54.844,2.798,11.796),33426,3808)
+	alife():create("ammo_vog-25",vector():set(54.844,2.798,11.796),33426,3808)
+	alife():create("ammo_vog-25",vector():set(2.375,9.427,381.752),14489,3793)						--jeep near last tank
+	alife():create("ammo_vog-25",vector():set(2.375,9.427,381.752),14489,3793)
+	alife():create("ammo_vog-25",vector():set(2.375,9.427,381.752),14489,3793)
+	alife():create("ammo_vog-25",vector():set(3.775,8.982,325.709),14902,3785)						--jeep halfway
+	alife():create("ammo_vog-25",vector():set(3.775,8.982,325.709),14902,3785)
+	alife():create("ammo_vog-25",vector():set(3.775,8.982,325.709),14902,3785)
+	alife():create("ammo_vog-25",vector():set(52.941,18.506,252.425),33351,3798)					--behind pillar before tank
+	alife():create("ammo_vog-25",vector():set(52.941,18.506,252.425),33351,3798)
+	alife():create("ammo_vog-25",vector():set(52.941,18.506,252.425),33351,3798)
+	alife():create("ammo_vog-25",vector():set(15.797,9.570,203.948),23746,3798)						--open container before tank
+	alife():create("ammo_vog-25",vector():set(15.797,9.570,203.948),23746,3798)
+	alife():create("ammo_vog-25",vector():set(15.797,9.570,203.948),23746,3798)
+end

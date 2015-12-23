@@ -1,0 +1,502 @@
+--<!-- TB3D 1.0.9.9.8.1 new in dmx135, optimized db.actor, soul cube, \\n, redesign, current_time, hdr
+
+function my_ver() return "1.0.9.9.8.1" end
+--[[-----------------------------------------------------------------------------------------------
+ File         : dmx_pda_dialogs.script
+ Description  : Chat
+ Copyright    : DMX MOD
+ Authors      : Shadows & Charsi
+ Date         : 11.07.2011
+ Last edit    : 24.05.2012
+--]]-----------------------------------------------------------------------------------------------
+local string_find = string.find
+local string_sub = string.sub
+
+local curse_question = {
+	"shit",
+	"fuck",
+	"cunt",
+	"bitch",
+	"prick",
+	"queer",
+	"fagot",
+	"asshole"
+}
+local curse_answer = {
+	"Such languge will not be tolerated, please rephrase!",
+	"Kiss off you retrobate!",
+	"Someone get him off the air!",
+	"you should try sivility sometime..."
+}
+--------------- first word in sentence can be a command else send as spam ------------------
+local commands = {
+	"where",
+	"when",
+	"what",
+	"who",
+	"why",
+	"how",
+	"hello",
+	"help",
+	"wish",
+	"teleport",
+	"tell",
+	"send",
+	"call",
+	"text",
+	"link",
+	"jump",
+	"break",
+	"disconnect",
+	"hi",
+	"greetings",
+	"cube",
+	"soul",
+	"@",
+	"reset"
+}
+-------------- based on command, use one of the following ----------------------------
+local blowout_question = {
+	"release",
+	"emission",
+	"blowout"
+}
+
+local clock_question = {
+	"time",
+	"clock",
+	"watch"
+}
+local current_time = string.format("%02d:%02d min", level.get_time_hours(), level.get_time_minutes())		--109975
+local clock_answer = {
+	"Now "..current_time..".",
+	"I'm on the clock "..current_time..".",
+	"Stalker, what, watch lost?))",
+	"By Kim go ask...",
+	"Heh... "..current_time.."."
+}
+
+local drive_question = {
+	"drive",
+	"car",
+	"tank",
+	"apc"
+}
+local drive_answer = {
+	"If you have a key and a working vehicle then press ']' to start your engine, rest you should get.. moron!",
+	"How hard is it to press ']' and stear?!!!",
+	"Got a key? Then press ']' to start your engine, rest you should get.. moron!"
+}
+
+local general_question = {
+	"going",
+	"have",
+	"are you"
+}
+local general_answer = {
+	"In principle OK...",
+	"Ok.",
+	"Yes everything is as usual... And do you have?",
+	"Just perfect! Today's ruling two absolute found)))",
+	"Normalek :)",
+	"Hard Time. Today, Springboard, flew far PPC-Baska bursting.",
+	"Kid! Soria if Cho, but it is where you can find the artifacts?  Need 7 please",
+	"Well as you say... By the way, you need the IPB? Come to the Marshes, on the basis of pure Heaven. Find me there.",
+	"Achtung! He was right about the radar with cronies with one... So he had the brains to bekren steel! Started me shoot! Alas, had to calm down...",
+	"Herovo! I thought! You do not want to work! PRA Cut myself! This message is barely wrote... You don't know what's the problem?",
+	"Hi stalker! You said cool pocan) You're on the stump village, was to give the Haymaker! A little here? Hera S? Haha ... Not cool)"
+}
+
+local hello_answer = {
+	"Hello! How are you?",
+	"Who the hell are you?",
+	"Welcome, just don't cause trouble.",
+	"Hi :)",
+	"whatup?",
+	"Hello... how are times...",
+	"Hello, got any work? Paying in cash of course...",
+	"Greetings",
+	"Got any money to spare?"
+}
+
+local goodbye_answer = {
+	"Be well..",
+	"Goodbye stalker...",
+	"bye",
+	"see ya :)",
+	"Hosta la Vista Baby!",
+	"Good hunting Marked One",
+	"You still here?..",
+	"Don't you owe me money?!...",
+	"About time..."
+}
+
+local soulcube_question = {
+	"sale",
+	"sell"
+}
+local soulcube_answer = {
+	"Stalker well, we come to the perimeter in a few hours.",
+	"We are interested. Where are you staying now? We can come to you... Or, okay, wait for us around the perimeter.",
+	"No crap? you joke, stalker? OK, waiting for you around the perimeter of the Cordon..."
+}
+
+local escape_army_question = {
+	"stupid",
+	"military",
+	"berserk"
+}
+local escape_army_answer = {
+	"Stalker, oborzel??? Sas we you mouth close...",
+	"Prepare the SOAP and rope.",
+	"The first is the first, are going to take off..."
+}
+
+local name, sname
+function pda_dialogs(text)
+	if string_sub(text, 1, 1) == "@" then
+		send_private_message(text)
+	else
+		name, sname = TB3D_Services.get_names()
+		for i = 1, #curse_question do										--first check for bad language
+			if string_find(text, curse_question[i]) then
+				sensorship(1)
+				return
+			end
+		end
+		local lname = level.name()
+		local command = 0													--start as spam
+		local s_command
+		local spc = string_find(text, " ", 1, true)
+		--TB3D_Services.packet_alert("dmx pda dialogs: text["..utils.to_str(text).."] space["..utils.to_str(spc).."]")
+		if spc and spc > 2 then
+			s_command = amk.trim(string_sub(text, 1, spc))
+		else
+			s_command = amk.trim(text)
+		end
+		for i = 1, #commands do
+			if s_command == commands[i] then
+				command = i
+				break
+			end
+		end
+		--TB3D_Services.packet_alert("dmx pda dialogs: command["..utils.to_str(s_command).."] id["..utils.to_str(command).."]")
+		--------------------------------IF COMMAND THEN PROCESS------------------------------------
+		if command == 1 then						--where is something
+			--TODO
+		elseif command == 2 then					--when is something
+			------------------
+			-- next release
+			------------------
+			local blowout_answer = {}
+			local timers ={}
+			local interval
+			local h,m
+			for i = 1, #blowout_question do
+				if string_find(text, blowout_question[i]) then
+					timers = amk.load_table("timers")
+					for i = #timers, 1, -1 do
+						if timers[i][1] == "blow_shift" then
+							interval = (timers[i][2] - amk.game_milliseconds()) / 1000
+							h = math.floor(interval / 3600)
+							m = math.floor((interval - h * 3600) / 60)
+							if m > 30 then h = h + 1 end
+							blowout_answer = {
+							"According to devices, the release will happen in about "..dmx_mod.string_declension(h, "m", "hours", "hours")..".",
+							"Hello, apparently unstable, but maybe "..dmx_mod.string_declension(h, "h", "h", "h").."."
+							}
+							news_manager.amk_send_tip(blowout_answer[math.random(#blowout_answer)], "Professor Sakharov", 7, 15, "saharov")
+						end
+					end
+					return
+				end
+			end
+		elseif command == 3 then					--what is something
+			------------------
+			-- time
+			------------------
+			for i = 1, #clock_question do
+				if string_find(text, clock_question[i]) then
+					news_manager.amk_send_tip(clock_answer[math.random(#clock_answer)], name.." "..sname, 7, 15, "common_channel")
+					return
+				end
+			end
+		elseif command == 4 then					--who is something
+			--TODO
+		elseif command == 5 then					--why is something
+			--TODO
+		elseif command == 6 then					--how is something
+			-------------------
+			-- to drive
+			-------------------
+			for i = 1, #general_question do
+				if string_find(text, drive_question[i]) then
+					news_manager.amk_send_tip(drive_answer[math.random(#drive_answer)], name.." "..sname, 7, 15, "common_channel")
+					news_manager.amk_send_tip("OH and use 'tab' to fire and 'shift' to change gears.", name.." "..sname, 7, 15, "common_channel")
+					return
+				end
+			end
+			------------------
+			-- Miscellaneous
+			------------------
+			for i = 1, #general_question do
+				if string_find(text, general_question[i]) then
+					news_manager.amk_send_tip(general_answer[math.random(#general_answer)], name.." "..sname, 7, 15, "common_channel")
+					return
+				end
+			end
+		elseif command == 7 or command == 19 or command == 20 then					--hello, hi, greetings
+			------------------
+			-- Greetings
+			------------------
+			news_manager.amk_send_tip(hello_answer[math.random(#hello_answer)], name.." "..sname, 7, 15, "common_channel")
+			return
+		elseif command == 8 then					--help
+			news_manager.amk_send_tip("The first word in a sentence is the command or question like: what, when, sell, cube... use '@' plus name for private messages like '@tweed bla bla bla'...", name.." "..sname, 7, 15, "common_channel")
+			return
+		elseif command == 9 then					--wish
+			--TODO
+		elseif command == 10 then					--teleport
+			--TODO
+		elseif command == 11 then					--tell
+			--TODO
+		elseif command == 12 then					--send
+			--TODO
+		elseif command == 13 then					--call
+			--TODO
+		elseif command == 14 then					--text
+			--TODO
+		elseif command == 15 then					--link
+			--TODO
+		elseif command == 16 then					--jump
+			--TODO
+		elseif command == 17 or command == 18 then	--break, disconnect
+			------------------
+			-- goodbye
+			------------------
+			news_manager.amk_send_tip(goodbye_answer[math.random(#goodbye_answer)], name.." "..sname, 7, 15, "common_channel")
+			return
+		elseif command == 19 or command == 20 then										--cube commands
+			if lname == "pripyat" and not has_alife_info("tb3d_cube_answered") then
+				------------------
+				-- Shadow Cube Quest
+				------------------
+				for i = 1, #soulcube_question do
+					if string_find(text, soulcube_question[i]) then
+						news_manager.amk_send_tip(soulcube_answer[math.random(#soulcube_answer)], "Anonymous message", 15, 15, "stalkers_chat")
+						TB3D_Services.delayed_action(1, "tb3d_cube_answered", 20)
+						return
+					end
+				end
+			end
+		elseif command == 24 then
+			process_reset_command(text)
+		end										--spam
+		if lname == "l01_escape" then
+			------------------
+			-- Military attack
+			------------------
+			for i = 1, #escape_army_question do
+				if string_find(text, escape_army_question[i]) and string_find(text, curse_question[i]) then
+					news_manager.amk_send_tip(escape_army_answer[math.random(#escape_army_answer)], "Military", 5, 15, "military_chat")
+					TB3D_Services.give_info("esc_btr_killed")
+					return
+				end
+			end
+		end
+	end
+end
+
+local private_possesive = {
+	"found",
+	"have",
+	"got",
+	"located"
+}
+local private_searching = {
+	"find",
+	"where",
+	"not here",
+	"not found",
+	"no luck"
+}
+local private_names = {
+	"astrologer",
+	"voronin",
+	"doctor",
+	"barman",
+	"borov",
+	"tweed",
+	"wolf",
+	"fox",
+	"sid",
+	"sidoravich",
+	"saharov"
+}
+local private_tweed = {
+	"Marked One  what is it you want?",
+	"What about the book?  Did you find it?",
+	"WOW GREAT Marked One.. I owe you!   come soon!",
+	"I remember sleeping on a couch.. maybe look around one of those."
+}
+
+function send_private_message(text)
+	local pname = 0
+	local s_pname
+	local spc = string_find(text, " ", 1, true)
+	--TB3D_Services.packet_alert("dmx pda dialogs: text["..utils.to_str(text).."] space["..utils.to_str(spc).."]")
+	if spc and spc > 3 then
+		s_pname = amk.trim(string_sub(text, 2, spc))
+	else
+		return											--no message so ignore
+	end
+	for i = 1, #private_names do
+		if s_pname == private_names[i] then
+			pname = i
+			break
+		end
+	end
+	--TB3D_Services.packet_alert("dmx pda dialogs: command["..utils.to_str(s_pname).."] id["..utils.to_str(pname).."]")
+	--------------------------------IF PNAME THEN PROCESS------------------------------------
+	local msg = 1				--start with 'not understood' message
+	if pname == 1 then						--astrologer
+	elseif pname == 2 then					--voronin
+	elseif pname == 3 then					--doctor
+	elseif pname == 4 then					--barman
+	elseif pname == 5 then					--borov
+	elseif pname == 6 then					--tweed
+		if string_find(text, "book") then
+			msg = 2															--about the book
+			for i = 1, #private_searching do
+				if string_find(text, private_searching[i]) then				--can't find it
+					msg = 4
+					break
+				end
+			end
+			if msg == 2 then
+				for i = 1, #private_possesive do
+					if string_find(text, private_possesive[i]) then				--found it
+						msg = 3
+						break
+					end
+				end
+			end
+		end
+		news_manager.amk_send_tip(private_tweed[msg], "Tweed", 12, 15, "common_channel")
+	elseif pname == 7 then							--wolf
+	elseif pname == 8 then							--fox
+	elseif pname == 9 or pname == 10 then			--sid, sidoravich
+	elseif pname == 11 then							--saharov
+	end
+end
+
+local reset_command = {
+	"bloom",
+	"parallax",
+	"sun",
+	"hdr",
+	"gloss",
+	"all"
+}
+local reset_response = {
+	"Did not understand, RESET what: sun, hdr, bloom, gloss, parallax or all?",
+	"BLOOM RESET",
+	"PARALLAX RESET",
+	"SUN RESET",
+	"HDR RESET",
+	"GLOSS RESET",
+	"ALL RESET"
+}
+function process_reset_command(text)
+	local pname = 0
+	local s_pname
+	local spc = string_find(text, " ", 1, true)
+	--TB3D_Services.packet_alert("dmx pda dialogs: text["..utils.to_str(text).."] space["..utils.to_str(spc).."]")
+	if spc and spc > 3 then
+		s_pname = amk.trim(string_sub(text, 1, spc))
+	else
+		return											--no message so ignore
+	end
+	for i = 1, #reset_command do
+		if string_find(text, reset_command[i]) then
+			pname = i
+			break
+		end
+	end
+	--TB3D_Services.packet_alert("dmx pda dialogs: command["..utils.to_str(s_pname).."] id["..utils.to_str(pname).."]")
+	--------------------------------IF PNAME THEN PROCESS------------------------------------
+	local msg = 1							--start with 'not understood' message
+	if pname == 1 then						--bloom
+		msg = 2
+	elseif pname == 2 then					--parallax
+		msg = 3
+	elseif pname == 3 then					--sun
+		msg = 4
+	elseif pname == 4 then					--hdr
+		msg = 5
+	elseif pname == 5 then					--gloss
+		msg = 6
+	elseif pname == 6 then					--all
+		msg = 7
+	end
+	news_manager.amk_send_tip(reset_response[msg], "Potap", 12, 15, "common_channel")
+	if pname == 1 or pname == 6 then
+		get_console():execute("r2_ls_bloom_kernel_scale "..utils.to_str(TB3D_Modders.bloom_intensity))
+		get_console():execute("r2_ls_bloom_threshold "..utils.to_str(TB3D_Modders.bloom_threshold))
+		get_console():execute("r2_ls_bloom_speed "..utils.to_str(TB3D_Modders.bloom_speed))
+	end
+	if pname == 2 or pname == 6 then
+		get_console():execute("r2_parallax_h "..utils.to_str(TB3D_Modders.parallax_height))
+	end
+	if pname == 3 or pname == 6 then
+		get_console():execute("r2_sun_lumscale "..utils.to_str(TB3D_Modders.sun_intensity))
+		get_console():execute("r2_sun_lumscale_amb "..utils.to_str(TB3D_Modders.sun_ambient))
+	end
+	if pname == 4 or pname == 6 then
+		get_console():execute("r2_tonemap_middlegray "..utils.to_str(TB3D_Modders.hdr_midpoint))
+		get_console():execute("r2_tonemap_lowlum "..utils.to_str(TB3D_Modders.hdr_lowlum))
+		get_console():execute("r2_tonemap_amount "..utils.to_str(TB3D_Modders.hdr_hilum))
+		get_console():execute("r2_tonemap_adaptation "..utils.to_str(TB3D_Modders.hdr_adapt))
+	end
+	if pname == 5 or pname == 6 then
+		get_console():execute("r2_gloss_factor "..utils.to_str(TB3D_Modders.gloss_factor))
+	end
+end
+
+function sensorship(type)
+	if type == 1 then
+		local money
+		news_manager.amk_send_tip(curse_answer[math.random(#curse_answer)], name.." "..sname, 5, 15, "common_channel")
+		if db.actor:money() >= 100 then													-- fines for Ale at a rate of 10% of the capital
+			money = math.floor(db.actor:money()*0.1)
+			db.actor:give_money(-money)
+			news_manager.amk_send_tip("You have been fined!", "Potap", 12, 15, "common_channel")
+			if TB3D_Modders.log_game_stats == true then game_stats.money_quest_update(-money) end
+		end
+		local fines = amk.load_variable("has_fines", 0)
+		if fines == 0 then
+			news_manager.amk_send_tip("Be warned! Repeated offenses will get you banned!", "Potap", 12, 15, "common_channel")
+		elseif fines == 1 then
+			-- Ban, save this for on-line
+			TB3D_Services.give_info("actor_ban_chat_info")
+			news_manager.amk_send_tip("You have been banned!", "Potap", 12, 15, "common_channel")
+			amk.g_start_timer("actor_ban_chat_timer", 1, 0, 0)
+			fines = 2
+		elseif fines == 2 then														-- do stalkers as enemies If we disobey our warnings
+			if has_alife_info("actor_enemy_info") then
+				relation_registry.set_community_goodwill("stalker", "actor", -1500)
+			end
+			db.actor:change_character_reputation(db.actor:character_reputation() - 500)
+			TB3D_Services.give_info("actor_enemy_info")
+			news_manager.amk_send_tip("You have been banned with prejudice!", "Potap", 12, 15, "common_channel")
+			TB3D_Services.give_info("actor_ban_chat_info")
+			amk.g_start_timer("actor_ban_chat_timer", 1, 0, 0)
+			fines = 3
+		elseif fines == 3 then
+			news_manager.amk_send_tip("You have been permanently banned!", "Potap", 12, 15, "common_channel")
+			TB3D_Services.give_info("actor_ban_chat_info")
+			fines = 4
+		end
+		amk.save_variable("has_fines", fines)
+	end
+end

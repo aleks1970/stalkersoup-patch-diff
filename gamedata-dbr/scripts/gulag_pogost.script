@@ -1,0 +1,213 @@
+--TB3D 1.0.9.9.4.0 new 10/31/13 to support new levels
+function my_ver() return "1.0.9.9.4.0" end
+
+local t = {}
+
+function load_job(sj, gname, type, squad, groups)
+
+	if type == "pogost_mil_tcex" then		
+		t = { section = "logic@pogost_mil_tcex_h1",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_mil_tcex_h2",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h3",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_mil_tcex_h4",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_mil_tcex_h5",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h6",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h7",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_mil_tcex_h8",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h9",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h10",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_mil_tcex_h1112",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h1112",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h1314",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_mil_tcex_h1314",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h15",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_mil_tcex_h16",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)				
+		
+	end
+
+	
+	if type == "pogost_stalk_tcex" then	
+		t = { section = "logic@pogost_stalk_tcex_h1",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)				
+		t = { section = "logic@pogost_stalk_tcex_h1",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)	
+		t = { section = "logic@pogost_stalk_tcex_h1",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)	
+		t = { section = "logic@pogost_stalk_tcex_h1",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)	
+		t = { section = "logic@pogost_stalk_tcex_h1",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)			
+	end	
+
+	
+	if type == "pogost_monster_kaban" then		
+		t = { section = "logic@pogost_monster_kaban",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_monster_kaban",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)
+		
+		t = { section = "logic@pogost_monster_kaban",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+		
+		t = { section = "logic@pogost_monster_kaban",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)		
+
+		t = { section = "logic@pogost_monster_kaban",
+			idle = 0,
+			prior = 2, state = {0},
+			in_rest = "", out_rest = ""
+		}	table.insert(sj, t)			
+	end	
+end
+
+--------------------------------------------------------------------------
+	
+function load_states(gname, type)
+	
+	if type == "pogost_mil_tcex" then
+		return function(gulag)
+			return 0
+		end
+	end	
+	if type == "pogost_stalk_tcex" then
+		return function(gulag)
+			return 0
+		end
+	end		
+	if type == "pogost_monster_kaban" then
+		return function(gulag)
+			return 0
+		end
+	end	
+	
+end	
+
+--------------------------------------------------------------------------
+function load_ltx(gname, type)
+	return nil
+end
+
+function checkMonster(npc_community, gulag_type, npc_rank, se_obj)
+	if gulag_type == "pogost_monster_kaban" then
+		return npc_community == "boar"
+	end
+	return false
+end
+
+function checkStalker(npc_community, gulag_type, npc_rank, se_obj)
+	if gulag_type == "pogost_mil_tcex" then
+		return npc_community == "killer"
+	end
+	if gulag_type == "pogost_stalk_tcex" then
+		return npc_community == "stalker"
+	end
+	
+	return false
+end

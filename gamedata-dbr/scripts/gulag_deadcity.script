@@ -1,0 +1,771 @@
+--TB3D 1.0.9.9.7.5 new - from gulag_escape
+function my_ver() return "1.0.9.9.7.5" end
+local t = {}
+
+function load_job(sj, gname, type, squad, groups)
+    if type == "dead_city_naymitu" then							-- Gulag mercenaries MG
+        t = { section = "logic@dead_city_naymitu_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_naymitu_kamp1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_naymitu_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_naymitu_walker3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_naymitu_walker4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_naymitu_walker5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_naymitu_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_naymitu_kamp5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "dead_city_banda" then						-- Gulag Bandos at MG
+        t = { section = "logic@dead_city_banda_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_banda_kamp1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_banda_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_banda_walker3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_banda_walker4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_banda_walker5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_banda_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_banda_kamp5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "dead_city_stalkers" then				-- Gulag colliding in the MG
+        t = { section = "logic@dead_city_stalkers_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_stalkers_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_stalkers_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_stalkers_walker4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@dead_city_stalkers_kamp5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "hospital_black" then						-- Gulag black at the Hospital
+        t = { section = "logic@hospital_black_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@hospital_black_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@hospital_black_walker3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "village_gulag_big" then						-- Gulag colliding in the village at the headquarters
+        t = { section = "logic@village_gulag_big_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_big_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_big_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_big_kamp4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_big_walker5",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_big_walker6",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_big_walker7",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "village_gulag_small" then					-- Gulag collide in a village near the fire
+        t = { section = "logic@village_gulag_small_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_small_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@village_gulag_small_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "lost_village_bandit" then						-- Gulag bandits in the countryside
+        t = { section = "logic@lost_village_bandit_walker1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@lost_village_bandit_walker2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@lost_village_bandit_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@lost_village_bandit_kamp4",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "rost_naem_koster" then						-- mikrogulag mercenaries on the germ of a campfire
+        t = { section = "logic@rost_naem_koster_kamp1",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@rost_naem_koster_kamp2",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@rost_naem_koster_kamp3",
+            idle = 0,
+            prior = 10, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+    elseif type == "warlab_svobodovzu" then						-- Gulag Freedom on VARLABE
+        t = { section = "logic@warlab_svobodovzu_walker1",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker2",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker3",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker4",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_kamp5",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_kamp6",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker7",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_kamp8",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_kamp9",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker10",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_kamp11",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_kamp12",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker13",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker14",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker15",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker16",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker17",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker18",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+        t = { section = "logic@warlab_svobodovzu_walker19",
+            idle = 0,
+            prior = 5, state = {0},
+            in_rest = "", out_rest = ""
+        }
+        table.insert(sj, t)
+	elseif type == "atp_fabrika_bandit" then						--' Bandits on the ATP
+		t = { section = "logic@atp_fabrika_bandit_walker1",
+			idle = 0,
+			prior = 5, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker2",
+			idle = 0,
+			prior = 5, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker3",
+			idle = 0,
+			prior = 5, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker4",
+			idle = 0,
+			prior = 5, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)		
+		t = { section = "logic@atp_fabrika_bandit_walker5",
+			idle = 0,
+			prior = 5, state = {0},
+			in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker6",
+			idle = 0,
+			prior = 5, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker7",
+			idle = 0,
+			prior = 5, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker8",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker9",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker10",
+			idle = 0,
+  		     prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker11",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker12",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_fabrika_bandit_walker13",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+                t = { section = "logic@atp_fabrika_bandit_walker14",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                t = { section = "logic@atp_fabrika_bandit_walker15",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                t = { section = "logic@atp_fabrika_bandit_walker16",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                t = { section = "logic@atp_fabrika_bandit_walker17",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                t = { section = "logic@atp_fabrika_bandit_walker18",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+               t = { section = "logic@atp_fabrika_bandit_walker19",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+               t = { section = "logic@atp_fabrika_bandit_walker20",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+               t = { section = "logic@atp_fabrika_bandit_walker21",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+        table.insert(sj, t)
+               t = { section = "logic@atp_fabrika_bandit_walker22",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+       table.insert(sj, t)
+                t = { section = "logic@atp_fabrika_bandit_walker23",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+      table.insert(sj, t)
+                t = { section = "logic@atp_fabrika_bandit_walker24",
+			idle = 0,
+			prior = 5, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+      table.insert(sj, t)
+	elseif type == "labirint_monolit" then							--' Monolith in a maze
+		t = { section = "logic@labirint_monolit_walker1",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker2",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker3",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker4",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)		
+		t = { section = "logic@labirint_monolit_walker5",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker6",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker7",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker8",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker9",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker10",
+			idle = 0,
+  		     prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+            		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker11",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker12",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+		t = { section = "logic@labirint_monolit_walker13",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+                  t = { section = "logic@labirint_monolit_kamp14",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                  t = { section = "logic@labirint_monolit_kamp15",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                  t = { section = "logic@labirint_monolit_kamp16",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                  t = { section = "logic@labirint_monolit_kamp17",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+          		}
+		table.insert(sj, t)
+                  t = { section = "logic@labirint_monolit_kamp18",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+                t = { section = "logic@labirint_monolit_kamp19",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+                t = { section = "logic@labirint_monolit_kamp20",
+			idle = 0,
+			prior = 10, state = {0},
+              in_rest = "", out_rest = ""
+           		}
+		table.insert(sj, t)
+	elseif type == "atp_brigada" then					--- Kalinin and his men ---
+		t = { section = "logic@atp_brigada_walker1",
+			idle = 0,
+			prior = 10, state = {0},
+               online = true,
+			in_rest = "", out_rest = ""
+                  }
+        table.insert(sj, t)
+		t = { section = "logic@atp_brigada_kamp2",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_brigada_walker3",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_brigada_walker4",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_brigada_walker5",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+		t = { section = "logic@atp_brigada_walker6",
+			idle = 0,
+			prior = 10, state = {0},
+			in_rest = "", out_rest = ""
+             		}
+		table.insert(sj, t)
+	else
+		--TB3D_Services.packet_alert("gulag escape: load job for type["..utils.to_str(type).."] not found")
+	end
+end
+
+function load_states(gname, type)
+	if type == "warlab_svobodovzu" then
+        return function(gulag) return 0 end
+	elseif type == "atp_brigada" then				--- Kalinin ---
+        return function(gulag) return 0 end
+	elseif type == "labirint_monolit" then
+        return function(gulag) return 0 end
+	elseif type == "atp_fabrika_bandit" then
+        return function(gulag) return 0 end
+	elseif type == "village_gulag_big" then
+        return function(gulag) return 0 end
+	elseif type == "village_gulag_small" then
+        return function(gulag) return 0 end
+	elseif type == "lost_village_bandit" then
+        return function(gulag) return 0 end
+	elseif type == "hospital_black" then
+        return function(gulag) return 0 end
+	elseif type == "rost_naem_koster" then
+        return function(gulag) return 0 end
+	elseif type == "dead_city_stalkers" then
+        return function(gulag) return 0 end
+	elseif type == "dead_city_banda" then
+        return function(gulag) return 0 end
+	elseif type == "dead_city_naymitu" then
+        return function(gulag) return 0 end
+	end
+	return nil
+end
+
+--------------------------------------------------------------------------
+-- Dynamic ltx
+--------------------------------------------------------------------------
+function load_ltx(gname, type)
+	return nil
+end
+
+function checkStalker(npc_community, gulag_type, npc_rank, se_obj)
+
+if gulag_type == "warlab_svobodovzu" then
+        return npc_community == "freedom"
+    end
+
+    if gulag_type == "labirint_monolit" then
+		return npc_community == "monolith"
+	end
+
+    if gulag_type == "atp_fabrika_bandit" then
+		return npc_community == "bandit"
+	end
+
+    if gulag_type == "village_gulag_big" then
+		return npc_community == "stalker"
+	end
+
+    if gulag_type == "village_gulag_small" then
+		return npc_community == "stalker"
+	end
+
+    if gulag_type == "lost_village_bandit" then
+		return npc_community == "bandit"
+	end
+
+    if gulag_type == "hospital_black" then
+		return npc_community == "stalker"
+	end
+
+    if gulag_type == "rost_naem_koster" then
+		return npc_community == "killer"
+	end
+
+    if gulag_type == "dead_city_stalkers" then
+		return npc_community == "stalker"
+	end
+
+    if gulag_type == "dead_city_banda" then
+		return npc_community == "bandit"
+	end
+
+     if gulag_type == "dead_city_naymitu" then
+		return npc_community == "killer"
+	end
+	
+	return false
+end
+
+function checkMonster(npc_community, gulag_type)
+	return false
+end

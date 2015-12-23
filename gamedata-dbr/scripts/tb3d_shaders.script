@@ -1,0 +1,275 @@
+-- TB3D 1.0.9.9.7.0  new 02/26/12, chgd scopeUsed, ddof to ingame menu, corrected indoor NV, mblur removed
+function my_ver() return "1.0.9.9.7.0" end
+----------------------------------------------------------------------------
+-- digital zoom, DDOF shaders
+-- using Meltac shaders, based on MAX 1.02 by Kingo64 and Sky4Ace
+-- presently only the aa_weight is fully functional in the shaders
+-- target distancing: WIP 02/28/12
+----------------------------------------------------------------------------
+
+-- General variables
+local enabled = 2
+local zoom_state = 0
+local last_fov = nil
+local dnvUsed = false
+local scopeUsed = dnvUsed
+local ddof_kernal = 0
+
+local digital_weapons =
+{
+	"wpn_arm_binoc",
+	"wpn_fn2000_sniper",
+	"wpn_wa2000_mw2",
+	"wpn_ak47_m1",
+	"wpn_crossbow"
+}
+local excludes_weapons =
+{
+	"wpn_binoc",
+	"wpn_arm_binoc",
+	"wpn_fn2000_sniper",
+	"wpn_wa2000_mw2",
+	"wpn_ak47_m1",
+	"wpn_crossbow"
+}
+
+-----------------------------------------------------------------------Active nightvision shader, WIP
+--[[ List of NV scope colors (not listed means normal color)
+local nv_colors =
+{
+	wpn_binoc = {0.25, 0.95, 0.45}, 
+	wpn_g36 = {0.80, 0.95, 0.20},
+	wpn_svd = {0.10, 0.95, 0.20},
+	wpn_svu = {0.10, 0.95, 0.20},
+	wpn_fn2000 = {0.70, 0.45, 0.80},
+	wpn_vintorez = {0.10, 0.95, 0.20},
+	wpn_sig550 = {0.10, 0.95, 0.20},
+	wpn_l85 = {1, 1, 1},
+	wpn_p90 = {1, 1, 1},
+	wpn_dsr1 = {0.10, 0.75, 0.85},
+	wpn_lr300 = {0.10, 0.95, 0.20},
+	wpn_rpg7 = {0.95, 0.55, 0.25}
+}
+
+function advanced_nv()
+	local cur_item = db.actor:active_item()
+	if cur_item ~= nil then
+		local wpn_name = string.lower(tostring(cur_item:section()))
+		if wpn_name and not table_contains(excludes_weapons, wpn_name) and nv_colors[wpn_name] then
+			get_console():execute("r2_aa_break "..tostring(nv_colors[wpn_name][1]..",".. nv_colors[wpn_name][2]..",".. nv_colors[wpn_name][3]))
+			return
+		end
+	end
+end
+--]]-----------------------------------------------------------------not functioning in shaders at present TB3D	
+
+local is_ready = false
+function broken_torch(is_scope)
+	local ghost = particles_object([[amik\grost\grost]])
+	if ghost:playing() then															--stop while playing
+		if is_scope == 1 then														--end zoom
+			amk.save_variable("use_scope", 0)
+			level.remove_pp_effector(1034)											--NV off
+		end
+		is_ready = true
+	else
+		if is_ready == true then													--flashing NV effect
+			if is_scope == false then
+				amk.save_variable("use_scope", 1)
+				level.add_pp_effector("bast.ppe", 1034, true)						--NV on
+			end
+			is_ready = false
+		else
+			if is_scope then
+				amk.save_variable("use_scope", 0)
+				level.remove_pp_effector(1034)										--NV off
+				--count_down = math.random(10,20)
+			--else
+				--amk.save_variable("use_scope", 1)
+				--level.add_pp_effector("bast.ppe", 1034, true)						--NV on
+				--count_down = 5 --math.random(4,8)
+			end
+		end
+	end
+end
+
+function digital_zoom()
+	--if has_alife_info("tb3d_bad_torch") then
+		--broken_torch(is_scope)
+	--else
+		local fv = device().fov
+		if fv < 65 then 																	--in zoom
+			if last_fov == nil then last_fov = fv end											--set it for the first time
+			fv = (fv+last_fov)*0.5																--smooth by averaging
+			if fv < last_fov then zoom_state = 1												--zoomming in
+			elseif fv > last_fov then zoom_state = 2											--zoomming out
+			else zoom_state = 0 end																--no change
+			last_fov = fv																		--keep smoothed value for next time
+			local item = db.actor:active_item()
+			if item then
+				local is_digital = table_contains(digital_weapons, item:section())
+				if item:section() == "wpn_binoc" or is_digital then
+					scopeUsed = true
+				elseif scopeUsed == false and IAmAWeapon[item:clsid()] then
+					local t = amk.get_weapon_data(alife():object(item:id()))
+					scopeUsed = (bit_and(t.addon_flags, 1) == 1 or rx_utils.get_addon_status(item, "sc") == 1)
+					--amk.dump_table(t)
+				end
+				if is_digital then
+					if fv < TB3D_Modders.fov_nv then												--when to activate NV
+						if dnvUsed == false and (has_alife_info("tb3d_nv_always")
+						  or TB3D_Services.is_night()
+						  or level_weathers.is_indoor(level.name())) then
+							level.add_pp_effector("bast.ppe", 1034, true)						--NV on
+							dnvUsed = true
+							--if TB3D_Modders.advanced_nightvision == true then advanced_nv() end	--advanced NV, shaders are WIP
+						end
+					elseif dnvUsed == true then														--end zoom
+						level.remove_pp_effector(1034)												--NV off
+						dnvUsed = false
+					end
+				elseif dnvUsed == true then														--not a digital weapon
+					level.remove_pp_effector(1034)												--NV off
+					dnvUsed = false
+				end
+			elseif dnvUsed == true then														--no item
+				level.remove_pp_effector(1034)												--NV off
+				dnvUsed = false
+			end	--if item
+		else
+			if dnvUsed == true then														--end zoom
+				level.remove_pp_effector(1034)												--NV off
+				dnvUsed = false
+			end
+			scopeUsed = false
+		end	--fov
+		if scopeUsed or dnvUsed then
+			amk.save_variable("use_scope", 1)
+			if enabled > 0 then ddof_zoom(zoom_state, fv, true) end
+			scopeUsed = true
+		else
+			amk.save_variable("use_scope", 0)
+			if enabled > 0 then ddof_zoom(zoom_state, fv, false) end
+			scopeUsed = false
+		end
+	--end	--broken torch
+	return scopeUsed
+end
+
+local in_blur = false
+local in_dof = false
+function ddof_zoom(zoom_state, fv, is_zoom)
+	if is_zoom == true then
+		--local target_dist = level.get_target_dist()							--not functioning yet
+		if zoom_state == 0 then			--fully zoomed
+			in_blur = false
+			if in_dof == false then
+				local nfv = fv * 0.01														--67.5 = 0.675 to 7.5(max bino) = 0.075
+				if enabled == 2 then nfv = nfv - 0.05	end									--little more spread
+				local dist_val = nfv + 0.25													--valid values 0.001 to 1.0 -- 1 to 1000 meters
+				local falloff = 1-nfv														--greater zoom, further target is
+				--get_console():execute("r2_mblur 0.0")											--must be off for effect to work
+				get_console():execute("r2_aa_weight "..tostring(nfv)..","..tostring(nfv)..",0.0")	
+				get_console():execute("r2_aa_break "..tostring(dist_val)..","..tostring(falloff)..",0.0")	
+				get_console():execute("r2_aa on")
+				in_dof = true
+			end
+		else	--zooming in or out
+			in_dof = false
+			if in_blur == false then
+				get_console():execute("r2_aa off")
+				--get_console():execute("r2_mblur 1.0")	
+				in_blur = true
+			end
+			--local nfv = 1 --fv * 0.01														--67.5 = 0.675 to 7.5(max bino) = 0.075
+			--if enabled == 2 then nfv = nfv - 0.05	end									--little more spread
+			--local dist_val = 0 -- nfv													--valid values 0.001 to 1.0 -- 1 to 1000 meters
+			--local falloff = nfv														--greater zoom, further target is
+			--get_console():execute("r2_aa_break "..tostring(dist_val)..","..tostring(nfv)..","..tostring(dist_val))	
+			--get_console():execute("r2_aa_weight "..tostring(dist_val)..","..tostring(nfv)..",0.5")	
+			--get_console():execute("r2_aa on")
+			--TB3D_Services.packet_alert("tb3d shaders: fov["..tostring(fv).."] nvfov["..tostring(nfv).."]")
+		end
+	else
+		in_blur = false
+		if in_dof == false then
+			in_dof = true
+			--get_console():execute("r2_mblur 0.0")											--must be off for effect to work
+			get_console():execute("r2_aa_weight 0.25,0.25,0.0")	
+			get_console():execute("r2_aa_break 0.8,0.5,0.0")	
+			get_console():execute("r2_aa on")
+		end
+	end
+end
+
+--- called by AMK_MOD.check_spawn for initial settings
+function on_spawn()
+	enabled = amk.load_variable("option_ddof", 0)
+	if enabled == 3 then
+		ddof_kernal = TB3D_Modders.ddof_kernel_G										--on gaussian blur
+		--get_console():execute("r2_mblur 0.0")											--must be off for effect to work
+		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on gaussian blur
+		get_console():execute("r2_aa on")	
+	elseif enabled == 2 then
+		ddof_kernal = TB3D_Modders.ddof_kernel_C										--on classic blur
+		--get_console():execute("r2_mblur 0.0")	
+		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on classic
+		get_console():execute("r2_aa on")	
+	elseif enabled == 1 then
+		ddof_kernal = 0																	--no blur
+		--get_console():execute("r2_mblur "..tostring(TB3D_Modders.motion_blur))			--restore user setting
+		get_console():execute("r2_aa off")	
+	else
+		ddof_kernal = 0																	--no blur
+		--get_console():execute("r2_mblur 0.0")											--off
+		get_console():execute("r2_aa off")	
+		enabled = 0
+	end
+	get_console():execute("r2_aa_weight 0.25,0.25,0.0")	
+	get_console():execute("r2_aa_break 0.8,0.5,0.0")	
+end
+
+-- Enables or disables the DDOF modes. in Modders Options menu
+function set_dof(mode)
+	if enabled == mode then return end
+	if mode == 1 then	--mblur only
+		ddof_kernal = 0																	--no blur
+		get_console():execute("r2_aa off")	
+		--get_console():execute("r2_mblur "..tostring(TB3D_Modders.motion_blur))			--restore user setting
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Motion Blur enabled")
+		enabled = 1
+	elseif mode == 2 then	--classic
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Classsic DDOF enabled")
+		enabled = 2
+		ddof_kernal = TB3D_Modders.ddof_kernel_C										--on classic blur
+		--get_console():execute("r2_mblur 0.0")	
+		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on classic
+		get_console():execute("r2_aa on")	
+	elseif mode == 3 then	--gauss
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]gaussian DDOF enabled")
+		enabled = 3
+		ddof_kernal = TB3D_Modders.ddof_kernel_G										--on gaussian blur
+		--get_console():execute("r2_mblur 0.0")	
+		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on gaussian blur
+		get_console():execute("r2_aa on")	
+	else		--off
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]DOF/Mblur disabled")
+		enabled = 0
+		ddof_kernal = 0																	--no blur
+		get_console():execute("r2_aa off")	
+		--get_console():execute("r2_mblur 0.0")
+		--get_console():execute("r2_aa_weight 0.25,0.25,0.0")	
+		--get_console():execute("r2_aa_break 0.8,0.5,0.0")	
+	end
+end
+
+-- Checks whether the specified table (or array) contains the given element, and returns true or false.
+function table_contains(array_or_table, element)
+  for k, value in pairs(array_or_table) do
+    if	value == element or string.find(value, element) then
+		return true
+	else
+    end
+  end  
+  return false
+end

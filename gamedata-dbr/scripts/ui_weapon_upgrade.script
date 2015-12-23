@@ -1,0 +1,423 @@
+--TB3D 1.0.9.9.7.6  fixed two button texts, dmx135
+function my_ver() return "1.0.9.9.7.6" end
+--[[-----------------------------------------------------------------------------------------------
+ File         : ui_weapon_upgrade.script
+ Description  : Graphical frontend upgrade weapons
+ Copyright    : DMX MOD\People Salsola
+ Author       : Charsi, with minor revisions by Shadows
+ Last edit    : 03.03.2011
+ Version      : 0.5
+--]]-----------------------------------------------------------------------------------------------
+
+local pos_x = 130
+local pos_y = 110
+local pos_y2 = 130
+local icon_up_w = 90
+local icon_up_h = 44
+
+-- create window and show it
+function main_wnd()
+	level.start_stop_menu(up_wnd1(),true)
+end
+
+function get_coords_by_sect(sItemSection)
+	local ini=system_ini()
+	local x      = ini:r_u32     (sItemSection, "inv_grid_x")*50
+	local y      = ini:r_u32     (sItemSection, "inv_grid_y")*50
+	local width  = ini:r_u32     (sItemSection, "inv_grid_width")*50
+	local height = ini:r_u32     (sItemSection, "inv_grid_height")*50
+	return x,y,width,height
+end
+
+class "up_wnd1" (CUIScriptWnd)
+
+function up_wnd1:__init() super()
+	self:Init(262,160,winx,winy)
+	self.back_ground=CUIStatic()
+	self.back_ground:InitTexture("ui\\ui_upgrade_menu")
+	self.back_ground:SetOriginalRect(0,0,500,450)
+	self:AttachChild(self.back_ground)
+	self.act_slot = 0 -- number of slots, weapons which will be upgraded
+	local x,y,w,h
+	local k = 0.8 -- the size of icons in the first and the second window, factory de. = 1
+	self.slot1=CUIButton()
+	self.slot1:SetAutoDelete(true)
+	self:AttachChild(self.slot1)
+	local item=db.actor:item_in_slot(1)
+	if isWeapon(item) then
+		self.slot1:SetWindowName("btn_slot1")
+		self.slot1:InitTexture("ui\\ui_icon_equipment")
+		x,y,w,h=get_coords_by_sect(item:section())
+		self.slot1:SetOriginalRect(x,y,w,h)
+		self.slot1:Init(pos_x,pos_y,w*k,h*k)
+		self.slot1:SetStretchTexture(true)
+		self.slot1:Enable(is_upgrade(item:section())) -- include, if available upgrade
+		self:AddCallback("btn_slot1",ui_events.BUTTON_CLICKED,self.OnButton_slot1_clicked,self)
+	end
+	-- button the second slot
+	self.slot2=CUIButton()
+	self.slot2:SetAutoDelete(true)
+	self:AttachChild(self.slot2)
+	item=db.actor:item_in_slot(2)
+	if isWeapon(item) then
+		self.slot2:SetWindowName("btn_slot2")
+		self.slot2:InitTexture("ui\\ui_icon_equipment")
+		x,y,w,h=get_coords_by_sect(item:section())
+		self.slot2:SetOriginalRect(x,y,w,h)
+		self.slot2:Init(pos_x,pos_y + pos_y2,w*k,h*k)
+		self.slot2:SetStretchTexture(true)
+		self.slot2:Enable(is_upgrade(item:section())) -- include, if available upgrade
+		self:AddCallback("btn_slot2",ui_events.BUTTON_CLICKED,self.OnButton_slot2_clicked,self)
+	end
+	------------------- upgrade by weight
+	self.btn_ves=CUIButton()
+	self.btn_ves:SetAutoDelete(true)
+	self.btn_ves:SetWindowName("btn_ves")
+	self.btn_ves:InitTexture("ui\\ui_icon_upgrades")
+	self.btn_ves:Init(55,265,90,40)
+	self.btn_ves:SetStretchTexture(true)
+	self.btn_ves:Show(false)
+	self:AttachChild(self.btn_ves)
+	self:AddCallback("btn_ves",ui_events.BUTTON_CLICKED,self.OnButton_btn_ves_clicked,self)
+	self.cs_ves=CUIStatic()
+	self.cs_ves:SetAutoDelete(true)
+	self.cs_ves:SetOriginalRect(90,310,90,40)
+	self.cs_ves:Init(0,0,90,40)
+	self.btn_ves:AttachChild(self.cs_ves)
+	------------------- Upgrade in size
+	self.btn_kalibr=CUIButton()
+	self.btn_kalibr:SetAutoDelete(true)
+	self.btn_kalibr:SetWindowName("btn_kalibr")
+	self.btn_kalibr:InitTexture("ui\\ui_icon_upgrades")
+	self.btn_kalibr:SetStretchTexture(true)
+	self.btn_kalibr:Init(200,265,90,40)
+	self.btn_kalibr:Show(false)
+	self:AttachChild(self.btn_kalibr)
+	self:AddCallback("btn_kalibr",ui_events.BUTTON_CLICKED,self.OnButton_btn_kalibr_clicked,self)
+	self.cs_kalibr=CUIStatic()
+	self.cs_kalibr:SetAutoDelete(true)
+	self.cs_kalibr:SetOriginalRect(90,310,90,40)
+	self.cs_kalibr:Init(00,0,90,40)
+	self.btn_kalibr:AttachChild(self.cs_kalibr)
+	-------------------- upgrade to accuracy (return)
+	self.btn_otdaca=CUIButton()
+	self.btn_otdaca:SetAutoDelete(true)
+	self.btn_otdaca:SetWindowName("btn_otdaca")
+	self.btn_otdaca:InitTexture("ui\\ui_icon_upgrades")
+	self.btn_otdaca:Init(345,265,90,40)
+	self.btn_otdaca:SetStretchTexture(true)
+	self.btn_otdaca:Show(false)
+	self:AttachChild(self.btn_otdaca)
+	self:AddCallback("btn_otdaca",ui_events.BUTTON_CLICKED,self.OnButton_btn_otdaca_clicked,self)
+	self.cs_otdaca=CUIStatic()
+	self.cs_otdaca:SetAutoDelete(true)
+	self.cs_otdaca:SetOriginalRect(90,310,90,40)
+	self.cs_otdaca:Init(0,0,90,40)
+	self.btn_otdaca:AttachChild(self.cs_otdaca)
+	-------------------- Return to the choice of slots
+	self.back_btn=CUIButton()
+	self.back_btn:SetAutoDelete(true)
+	self.back_btn:SetWindowName("back_btn")
+	self.back_btn:Init("ui\\ui_upgrade_menu",17,405,80,30)
+	self.back_btn:SetOriginalRect(160,460,80,30)
+	self.back_btn:Show(false)
+	self.back_btn:SetText("back")
+	self.back_btn:SetTextAlign(CGameFont.alLeft)
+	self.back_btn:SetTextX(9)
+	self.back_btn:SetTextY(-1)
+	self:AttachChild(self.back_btn)
+	self:AddCallback("back_btn",ui_events.BUTTON_CLICKED,self.OnButton_back_btn_clicked,self)
+	-------------------- Calling it Quits
+	self.exit_btn=CUIButton()
+	self.exit_btn:SetAutoDelete(true)
+	self.exit_btn:SetWindowName("exit_btn")
+	self.exit_btn:Init("ui\\ui_upgrade_menu",408,405,80,30)
+	self.exit_btn:SetOriginalRect(260,460,80,30)
+	self.exit_btn:SetText("output")
+	self.exit_btn:SetTextAlign(CGameFont.alRight)
+	self.exit_btn:SetTextX(-14)
+	self.exit_btn:SetTextY(-1)
+	self:AttachChild(self.exit_btn)
+	self:AddCallback("exit_btn",ui_events.BUTTON_CLICKED,self.OnButton_exit_btn_clicked,self)
+end
+
+function up_wnd1:OnButton_btn_ves_clicked()
+	self.YesNoDlg=up_wnd2(self.act_slot,"reduce weight",self)
+	self:GetHolder():start_stop_menu(self.YesNoDlg, true)
+end
+
+function up_wnd1:OnButton_btn_kalibr_clicked()
+	self.YesNoDlg=up_wnd2(self.act_slot,"caliber change",self)
+	self:GetHolder():start_stop_menu(self.YesNoDlg, true)
+end
+
+function up_wnd1:OnButton_btn_otdaca_clicked()
+	self.YesNoDlg = up_wnd2(self.act_slot,"diminishing returns",self)
+	self:GetHolder():start_stop_menu(self.YesNoDlg, true)
+end
+
+function up_wnd1:OnButton_slot1_clicked()
+	self.act_slot = 1
+	self:show_up_buttons()
+	self.slot2:Show(false)
+	self.slot1:Enable(false)
+	self.slot1:SetWndPos( pos_x ,pos_y - 50 )
+end
+
+function up_wnd1:OnButton_slot2_clicked()
+	self.act_slot = 2
+	self:show_up_buttons()
+	self.slot1:Show(false)
+	self.slot2:Enable(false)
+	self.slot2:SetWndPos( pos_x ,pos_y - 50 )
+end
+
+function up_wnd1:OnButton_back_btn_clicked()
+	self.back_ground:SetOriginalRect(0,0,500,450)
+	self.btn_ves:Show(false)
+	self.btn_kalibr:Show(false)
+	self.btn_otdaca:Show(false)
+	self.back_btn:Show(false)
+	self.slot1:Show(true)
+	local item=db.actor:item_in_slot(1)
+	if isWeapon(item) then
+		self.slot1:Enable(is_upgrade(item:section())) -- disabled if an upgrade is not available
+	end
+	self.slot1:SetWndPos(pos_x,pos_y)
+	self.slot2:Show(true)
+	local item=db.actor:item_in_slot(2)
+	if isWeapon(item) then
+		self.slot2:Enable(is_upgrade(item:section())) -- disabled if an upgrade is not available
+	end
+	self.slot2:SetWndPos(pos_x,pos_y+pos_y2)
+end
+
+function up_wnd1:show_up_buttons()
+	self.back_ground:SetOriginalRect(2,495,500,450)
+	self.back_btn:Show(true)
+	local sect = db.actor:item_in_slot(self.act_slot):section()
+	local b_sect=base_sect(sect)
+	local cs_color="red"
+	local y = db.actor:item_in_slot(self.act_slot):condition()<0.95 or cost(self.act_slot) > db.actor:money()
+	-- weight
+	local icons
+	if string.find(sect,"_ves") then	
+		self.btn_ves:Show(true)
+		self.btn_ves:Enable(false)
+		cs_color="red"
+		icons=icon_ves(b_sect)
+		self.btn_ves:SetOriginalRect(icons[1],icons[2],icon_up_w,icon_up_h)
+	else
+		icons=icon_ves(sect)
+		if icons then
+			self.btn_ves:Show(true)
+			self.btn_ves:SetOriginalRect(icons[1],icons[2],icon_up_w,icon_up_h)
+			cs_color= y and "yello" or "green"
+		else				
+			self.btn_ves:Show(false)
+		end
+	end
+	self.cs_ves:InitTexture("ui\\ui_btn_up_"..cs_color)
+	-- caliber
+	if string.find(sect,"_kalibr") then	
+		self.btn_kalibr:Show(true)
+		self.btn_kalibr:Enable(false)
+		cs_color="red"
+		icons=icon_kalibr(b_sect)
+		self.btn_kalibr:SetOriginalRect(icons[1],icons[2],icon_up_w,icon_up_h)
+	else
+		icons=icon_kalibr(sect)
+		if icons then			
+			self.btn_kalibr:Show(true)
+			self.btn_kalibr:SetOriginalRect(icons[1],icons[2],icon_up_w,icon_up_h)
+			cs_color= y and "yello" or "green"
+		else				
+			self.btn_kalibr:Show(false)
+		end
+	end
+	self.cs_kalibr:InitTexture("ui\\ui_btn_up_"..cs_color)
+	--return
+	if string.find(sect,"_otdaca") then	
+		self.btn_otdaca:Show(true)
+		self.btn_otdaca:Enable(false)
+		cs_color="red"
+		icons=icon_otdaca(b_sect)
+		self.btn_otdaca:SetOriginalRect(icons[1],icons[2],icon_up_w,icon_up_h)
+	else
+		icons=icon_otdaca(sect)			
+		if icons then			
+			self.btn_otdaca:Show(true)
+			self.btn_otdaca:SetOriginalRect(icons[1],icons[2],icon_up_w,icon_up_h)
+			cs_color= y and "yello" or "green"
+		else				
+			self.btn_otdaca:Show(false)
+		end
+	end
+	self.cs_otdaca:InitTexture("ui\\ui_btn_up_"..cs_color)
+end
+
+function up_wnd1:OnButton_exit_btn_clicked()
+	self:GetHolder():start_stop_menu(self,true)
+end
+
+-------------------------- A confirmation window / deselect--------------------------
+class "up_wnd2" (CUIScriptWnd)
+
+function up_wnd2:__init(n,type_up,owner) super()
+	self.owner = owner
+	self:Init(262,255,500,200)
+	-- background
+	self.back_ground=CUIStatic()
+	self.back_ground:InitTexture("ui\\ui_upgrade_menu")
+	self.back_ground:SetOriginalRect(500,0,500,200)
+	self:AttachChild(self.back_ground)
+	-- button "OK"
+	self.btn_ok=CUI3tButton()
+	self.btn_ok:SetAutoDelete(true)
+	self.btn_ok:SetWindowName("btn_ok")
+	self.btn_ok:Init("ui_button_ordinary",225,150,117,29)
+	--self.btn_ok:Init(180,140,114,26)
+	self.btn_ok:SetText("OK")
+	self.btn_ok:SetTextColor(255,216,186,140)
+	--self.btn_ok:SetTextY(-1)
+	self.btn_ok:SetTextAlign(CGameFont.alCenter)
+	--self.btn_ok:InitTexture("ui\\ui_up_ckliked")
+	--self.btn_ok:SetOriginalRect(0,0,114,26)
+	self:AttachChild(self.btn_ok)
+	self:AddCallback("btn_ok",ui_events.BUTTON_CLICKED,self.OnButton_btn_ok_clicked,self)
+	local up_name = "trader_upgrade_weapon_s"..n
+	if type_up == "reduce weight" then up_name = up_name.."_ves"
+	elseif type_up == "caliber change" then up_name = up_name.."_kalibr"
+	elseif type_up == "diminishing returns" then up_name = up_name.."_otdaca"
+	end
+	self.up_name=up_name
+	local cost = cost(n)
+	local text = "For weapons in "..n.." slot "..type_up.." for "..cost.." RUB."
+	local text_btn_no = "CANCEL"
+	if cost > db.actor:money() then
+		text = "For this upgrade requires more "..(cost-db.actor:money()).. " RUB."	--!!!!TB3D missing "
+		text_btn_no = "OK"
+		self.btn_ok:Show(false)
+	end
+	if 0.95 > db.actor:item_in_slot(n):condition() then
+		text = "Arms too worn, have it repaired."
+		text_btn_no = "OK"
+		self.btn_ok:Show(false)
+	end
+	-- Description of upgrade
+	self.st_desc=CUIStatic()
+	self.st_desc:Init(120,80,350,30)
+	self.st_desc:SetText(text)
+	self.st_desc:SetTextAlign(CGameFont.alRight)
+	self.st_desc:SetTextColor(255,216,186,140)
+	--self.st_desc:SetTextY(-1)
+	self:AttachChild(self.st_desc)
+	-- Cancel button
+	self.btn_no=CUI3tButton()
+	self.btn_no:SetAutoDelete(true)
+	self.btn_no:SetWindowName("btn_no")
+	self.btn_no:Init("ui_button_ordinary",350,150,117,29)
+	--self.btn_no:Init(350,140,114,26)
+	self.btn_no:SetText(text_btn_no)
+	--self.btn_no:SetText("NO")
+	--self.btn_no:SetTextY(-1)
+	self.btn_no:SetTextColor(255,216,186,140)
+	self.btn_no:SetTextAlign(CGameFont.alCenter)
+	--self.btn_no:InitTexture("ui\\ui_up_ckliked")
+	--self.btn_no:SetOriginalRect(0,0,114,26)
+	self:AttachChild(self.btn_no)
+	self:AddCallback("btn_no",ui_events.BUTTON_CLICKED,self.OnButton_btn_no_clicked,self)
+end
+
+function up_wnd2:OnButton_btn_ok_clicked()
+	level.start_stop_menu(self,true)
+	level.start_stop_menu(self.owner,true)
+	local d=alife():object("dolgovazyi")
+	repair_check[self.up_name](db.actor,level.object_by_id(d.id))
+	news_manager.send_tip_txt(db.actor,"When the upgrade completed - will send you SMS.\\nWill do everything in three hours, wait. Go until the beer pops - Bartender today, like, good.", nil, "wpn_repair", 25000)
+end
+
+function up_wnd2:OnButton_btn_no_clicked()
+	level.start_stop_menu(self,true)
+end
+
+function cost(slot_number)
+	return math.floor( db.actor:item_in_slot(slot_number):cost() * 2 )
+end
+
+-- Initial (original trunks). Available to change the caliber
+local wpn_to_upgrade_kalibr ={
+ ["wpn_ak74"]={207,40},	 	    ["wpn_aks74m"]={207,254}, 	        ["wpn_ak74u"]={207,112},
+ ["wpn_abakan"]={207,183},	    ["wpn_bizon"]={207,472}, 	        ["wpn_scorpion"]={207,764},
+ ["wpn_mp5"]={207,399}, 	    ["wpn_mp7a3"]={207,618},	        ["wpn_uzi"]={207,691},
+ ["wpn_mp5k"]={207,543},	    ["wpn_fn2000"]={207,908},	        ["wpn_g36"]={207,977},    ["wpn_lr300"]={548,40},
+ ["wpn_sig550"]={548,112},	    ["wpn_sg552_sk1"]={548,254}, 	    ["wpn_l85"]={548,183},
+ ["wpn_famas_p3_sk1"]={548,326},["wpn_m16a2_sk1"]={548,399}, 	    ["wpn_tavor"]={548,472},  ["wpn_m4"]={548,543}}
+
+-- Initial (original trunks). Available to reduce recoil.
+local wpn_to_upgrade_otdaca = {
+ ["wpn_ak74"]={110,40}, 	    ["wpn_aks74m"]={110,254}, 	          ["wpn_ak74u"]={110,112},
+ ["wpn_abakan"]={110,183}, 	    ["wpn_bizon"]={110,472},	          ["wpn_mp5"]={110,399},
+ ["wpn_mp7a3"]={110,618}, 	    ["wpn_uzi"]={110,691}, 		          ["wpn_fn2000"]={110,908},
+ ["wpn_g36"]={110,977}, 	    ["wpn_lr300"]={451,40}, 	          ["wpn_sig550"]={451,112},
+ ["wpn_sg552_sk1"]={451,254},	["wpn_l85"]={451,183}, 		          ["wpn_famas_p3_sk1"]={451,326},
+ ["wpn_m16a2_sk1"]={451,399}, 	["wpn_tavor"]={451,472}, 	          ["wpn_ak47"]={451,977},
+ ["wpn_hk417_sk1"]={451,618},	["wpn_sr25_mk11_mod0_sk1"]={451,691}, ["wpn_m4"]={451,543},
+ ["wpn_mp5k"]={110,543}, 	    ["wpn_scorpion"]={110,764}}
+
+-- Initial (original trunks). Available to reduce weight
+local wpn_to_upgrade_ves = {
+ ["wpn_ak74_kalibr"]={13,40},		["wpn_aks74m_kalibr"]={13,254},
+ ["wpn_ak74u_kalibr"]={13,112},	 	["wpn_abakan_kalibr"]={13,183},	     ["wpn_bizon_kalibr"]={13,472},
+ ["wpn_mp5_kalibr"]={13,399},	 	["wpn_mp7a3_kalibr"]={13,618},	     ["wpn_uzi_kalibr"]={13,691},
+ ["wpn_fn2000_kalibr"]={13,908},	["wpn_g36_kalibr"]={13,977},	     ["wpn_lr300_kalibr"]={354,40},
+ ["wpn_sig550_kalibr"]={354,112},	["wpn_sg552_sk1_kalibr"]={354,254},	 ["wpn_l85_kalibr"]={354,183},
+ ["wpn_famas_p3_sk1_kalibr"]={354,326},["wpn_m16a2_sk1_kalibr"]={354,399},["wpn_tavor_kalibr"]={354,472},
+ ["wpn_ak74_otdaca"]={13,40},	 	["wpn_aks74m_otdaca"]={13,254},	     ["wpn_ak74u_otdaca"]={13,112},
+ ["wpn_abakan_otdaca"]={13,183},	["wpn_bizon_otdaca"]={13,472},	     ["wpn_mp5_otdaca"]={13,399},
+ ["wpn_mp7a3_otdaca"]={13,618},	 	["wpn_uzi_otdaca"]={13,691},	     ["wpn_fn2000_otdaca"]={13,908},
+ ["wpn_g36_otdaca"]={13,977},	 	["wpn_lr300_otdaca"]={354,40},	     ["wpn_sig550_otdaca"]={354,112},
+ ["wpn_sg552_sk1_otdaca"]={354,254},["wpn_l85_otdaca"]={354,183},	     ["wpn_famas_p3_sk1_otdaca"]={354,326},
+ ["wpn_m16a2_sk1_otdaca"]={354,399},["wpn_tavor_otdaca"]={354,472},	     ["wpn_ak47_otdaca"]={354,977},
+ ["wpn_hk417_sk1_otdaca"]={354,618},["wpn_sr25_mk11_mod0_sk1_otdaca"]={354,691},	 			        ["wpn_ak74"]={13,40},
+ ["wpn_ak74u"]={13,112},	 	    ["wpn_abakan"]={13,183},	         ["wpn_bizon"]={13,472},	    ["wpn_mp5"]={13,399},	 	 ["wpn_mp7a3"]={13,618},
+ ["wpn_uzi"]={13,691},	 		    ["wpn_fn2000"]={13,908},	         ["wpn_g36"]={13,977},	 		["wpn_lr300"]={354,40},		 ["wpn_sig550"]={354,112},
+ ["wpn_sg552_sk1"]={354,254},	 	["wpn_l85"]={354,183},	 	         ["wpn_famas_p3_sk1"]={354,326},["wpn_m16a2_sk1"]={354,399},
+ ["wpn_tavor"]={354,472},		    ["wpn_ak47"]={354,977},		         ["wpn_hk417_sk1"]={354,618},	["wpn_sr25_mk11_mod0_sk1"]={354,691},
+ ["wpn_groza"]={13,326},	 	    ["wpn_val"]={110,326},	 	         ["wpn_svd"]={354,764},	 		["wpn_svu"]={451,764},	 	 ["wpn_m1891_30_scope"]={354,838},
+ ["wpn_vintorez"]={548,764},	 	["wpn_b94"]={451,838},	 	         ["wpn_awm"]={548,838},	 		["wpn_saiga12c"]={354,908},	 ["wpn_spas12"]={691,40},
+ ["wpn_wincheaster1300"]={788,40},	["wpn_bm16"]={885,40},		         ["wpn_toz34"]={691,112},		["wpn_ppsh41_sk2"]={13,838},
+ ["wpn_kriss_super_v"]={110,838},	["wpn_p90"]={207,838},	 	         ["wpn_pkm"]={207,326},	 		["wpn_m4"]={354,543},	 	 ["wpn_m4_kalibr"]={354,543},
+ ["wpn_m4_otdaca"]={354,543},	 	["wpn_m4super90"]={451,908},	     ["wpn_m79"]={548,908},	 		["wpn_mp5k"]={13,543},
+ ["wpn_mp5k_kalibr"]={13,543},	 	["wpn_mp5k_otdaca"]={13,543},	     ["wpn_protecta"]={788,112},
+ ["wpn_scorpion"]={13,764},	 	    ["wpn_scorpion_kalibr"]={13,764},    ["wpn_scorpion_otdaca"]={13,764},["wpn_aks74m"]={13,254}}
+
+function icon_ves(sect)
+	return wpn_to_upgrade_ves[sect]
+end
+
+function icon_otdaca(sect)
+	return wpn_to_upgrade_otdaca[sect]
+end
+
+function icon_kalibr(sect)
+	return wpn_to_upgrade_kalibr[sect]
+end
+
+function is_upgrade(sect)
+	return (wpn_to_upgrade_ves[sect] or wpn_to_upgrade_otdaca[sect] or wpn_to_upgrade_kalibr[sect])~=nil
+end
+
+function base_sect(sect)
+local t={"wpn_ak74u","wpn_ak74", "wpn_aks74m","wpn_abakan", "wpn_bizon", "wpn_mp5k", "wpn_mp7a3",
+ "wpn_uzi", "wpn_fn2000", "wpn_g36", "wpn_lr300", "wpn_sig550", "wpn_sg552_sk1", "wpn_l85",
+ "wpn_famas_p3_sk1", "wpn_m16a2_sk1", "wpn_tavor", "wpn_hk417_sk1", "wpn_sr25_mk11_mod0_sk1",
+ "wpn_ak47","wpn_groza", "wpn_val", "wpn_svd", "wpn_svu", "wpn_m1891_30_scope", "wpn_vintorez",
+ "wpn_b94", "wpn_awm", "wpn_saiga12c", "wpn_spas12", "wpn_wincheaster1300", "wpn_bm16",
+ "wpn_toz34", "wpn_ppsh41_sk2", "wpn_kriss_super_v", "wpn_p90", "wpn_pkm", "wpn_m4","wpn_m4super90",
+ "wpn_m79", "wpn_mp5", "wpn_protecta", "wpn_scorpion"}
+for k,v in pairs(t) do
+	if string.find(sect,v) then return v end
+end
+return "wpn_ak74"
+end

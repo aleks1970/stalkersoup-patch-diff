@@ -1,0 +1,90 @@
+-- TB3D 1.0.9.9.3.4 hit styles, protection
+function my_ver() return "1.0.9.9.3.4" end
+-- AMK Support for the functionality of the dialogues
+-- Initial release by Red75
+
+function make_kill_task_failed(actor,npc,p1,p2) 
+  local nid=npc:id()
+  if nid==db.actor:id() then
+    nid=actor:id()
+  end
+  local targets=task_manager.amk_kill_targets()
+  for n,v in pairs(targets) do
+    if v.id==nid then
+      task_manager.make_task_failed(v.task_id)
+    end
+  end  
+end
+
+rndval=nil
+
+function act_rnd_init(actor,npc) -- initializes the value of a random number and creates a validation function
+  setfenv(1,amk_dialogs)
+  if pre_rnd_0_100==nil then
+    for a=0,90,10 do
+      for b=10,100,10 do
+        if a<b then
+          if a==0 then
+            amk_dialogs["pre_rnd_"..a.."_"..b]=function()
+              return rndval<b
+              end
+          elseif b==100 then
+            amk_dialogs["pre_rnd_"..a.."_"..b]=function()
+              return rndval>=a
+              end
+          elseif a==0 and b==100 then
+            amk_dialogs["pre_rnd_"..a.."_"..b]=function()
+              return true
+              end
+          else
+            amk_dialogs["pre_rnd_"..a.."_"..b]=function()
+              return rndval>=a and rndval<b
+              end
+          end
+        end
+        setfenv(amk_dialogs["pre_rnd_"..a.."_"..b],amk_dialogs)            
+      end
+    end
+  end
+  rndval=math.random(1,100)
+end
+
+
+
+function frenzy_humanoid(talker,listener) -- You can call as in the phrase HS and NPC
+	if TB3D_Modders.default_hit == true then
+		local tgt=talker
+		if tgt:id()==db.actor:id() then	tgt=listener end
+		TB3D_hit_styles.wound(db.actor, tgt, "bip01_spine", 0, 0, tgt:direction())
+	end
+end
+
+function scare_humanoid(talker,listener) -- You can call as in the phrase HS and NPC
+  local tgt=talker
+  if tgt:id()==db.actor:id() then
+    tgt=listener
+  end
+  tgt:set_custom_panic_threshold(1.0)
+	if TB3D_Modders.default_hit == true then TB3D_hit_styles.frenzy_hit(tgt:direction(), 0.5) end
+  tgt.morale=0
+--  local hc=tgt:get_holder_class()
+--  TB3D_Services.info_alert("morale ".. tgt.morale .. " hclass " .. type(hc) .. " mor " .. type(hc.SetMorale))
+end
+
+
+function info_received()
+  news_manager.amk_send_tip("",game.translate_string("st_found_new_pda"),0,10,"gen_info")
+end
+
+function actor_has_money_30000()
+  return db.actor:money()>=30000
+end
+
+function give_money_30000(t1,t2)
+  local npc=t1
+  if npc:id()==db.actor:id() then
+    npc=t2
+  end
+  dialogs.relocate_money(npc,30000,"out")
+end
+ 

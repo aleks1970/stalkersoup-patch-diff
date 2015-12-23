@@ -1,0 +1,1755 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!-- TB3D 1.0.9.9.7.2 minor edits 700 - end of file, hand_radio, attachable_item, Astrologer, The Doctor, gold bars, fosfor_r,g,b,y -->
+<string_table>
+#include "text\eng\string_table_amk_matras.xml"
+#include "text\eng\string_table_amk_metka.xml"
+#include "text\eng\string_table_enc_sigaret.xml"
+#include "text\eng\string_table_ogg_player.xml"
+
+<!-- excluded section-1 
+	<string id="the_Teleport_of_monoLithuanians">
+		<text>Monolithian Teleport</text>
+	</string>	 excluded section-1 -->
+	<string id="Antirad">
+		<text>Anti-radiation drugs</text>
+	</string>
+	<string id="Antirad_s">
+		<text>Anti-radiation</text>
+	</string>
+	<string id="Arm-heavy">
+		<text>Heavy S.T.A.L.K.E.R. gear</text>
+	</string>
+	<string id="Arm-light">
+		<text>Light S.T.A.L.K.E.R. gear</text>
+	</string>
+	<string id="Arm-medium">
+		<text>Medium S.T.A.L.K.E.R. gear</text>
+	</string>
+	<string id="bandage">
+		<text>Bandages</text>
+	</string>
+	<string id="bandage_s">
+		<text>Bandages</text>
+	</string>
+	<string id="Binocul">
+		<text>Binoculars</text>
+	</string>
+	<string id="Binocul_s">
+		<text>Binoculars</text>
+	</string>
+	<string id="Bread">
+		<text>Bread</text>
+	</string>
+	<string id="Bread_s">
+		<text>Bread</text>
+	</string>
+	<string id="item_mozg">
+		<text>Brain of the 2nd Chernobyl Controller</text>
+	</string>
+	<string id="item_mozg_s">
+		<text>Brain</text>
+	</string>
+	<string id="cit_deadcity_maps_desc">
+		<text>A detailed map of the Dead City including all known Mercenary fortifications</text>
+	</string>
+	<string id="cit_deadcity_maps_name">
+		<text>Map of the Dead City</text>
+	</string>
+	<string id="cit_doctors_key_desc">
+		<text>Doctor's key to a secret stash somewhere in the dead city of Pripyat</text>
+	</string>
+	<string id="cit_doctors_key_short_desc">
+		<text>Doctor's key</text>
+	</string>
+	<string id="Conserva">
+		<text>Canned Food</text>
+	</string>
+	<string id="Conserva_s">
+		<text>Canned Food</text>
+	</string>
+	<string id="Detect1">
+		<text>Anomaly detector (DA-2)</text>
+	</string>
+	<string id="Detect2">
+		<text>Dosimeter</text>
+	</string>
+	<string id="Detect3">
+		<text>Anomaly Detector</text>
+	</string>
+	<string id="Detect4">
+		<text>Elite Anomaly Detector</text>
+	</string>
+	<string id="Devic">
+		<text>Instruments and Devices</text>
+	</string>
+	<string id="device-PDA">
+		<text>PDA</text>
+	</string>
+	<string id="device-torch">
+		<text>Flashlight</text>
+	</string>
+	<string id="device-torch_s">
+		<text>Flashlight</text>
+	</string>
+	<string id="enc_equipment_arhara_tele">
+		<text>Monolithian Teleport</text>
+	</string>
+	<string id="enc_equipment_arhara_tele_s">
+		<text>Monolithian Teleport</text>
+	</string>
+	<string id="enc_equipment_arhara_tele_descr">
+		<text>Manual teleportion allowing for fast travel of either one ore more persons to any point within Chernobyl/2. Extremely hard to find. The principles upon which it operates are as of yet unclear ... A limited use of five teleports are available ...</text>
+	</string>
+	<string id="enc_equipment_armors_arm-heavy">
+		<text>Protective Suit. Weight: 18kg. Details: Protects the body from Jelly, Burnt Fuzz, most anomalies and physical damage. The torso and back are protected by built-in bio-metallic plates. The suit is equipped with an airtight, reinforced plastic helmet and two oxygen bottles. Note: During extended periods of use the suit tears through and gradually deteriorates beyond use.</text>
+	</string>
+	<string id="enc_equipment_armors_arm-light">
+		<text>Protective Suit. Weight: 8 kg. Details: Protects the body from weak anomalies and physical damage. Equipped with an oxygen mask. Note: During extended periods of use the suit tears through and gradually deteriorates beyond use.</text>
+	</string>
+	<string id="enc_equipment_armors_arm-medium">
+		<text>Protective suit. Weight: 12 kg. Details: Protects the user from Jelly, Burnt Fuzz, many anomalies, and physical damage. Equipped with an airtight helmet and an oxygen bottle. Note: During extended periods of use the suit tears through and gradually deteriorates beyond use.</text>
+	</string>
+	<string id="enc_equipment_armors_sci2">
+		<text>A red S.C.A.P.E suit with an airtight helmet. Weight: 11kg. Description: Protects the body from fire, acid, toxic gas, various anomalies, Burnt Fuzz and physical damage. Equipped with two oxygen bottles. Note: During extended periods of use the suit tears through and gradually deteriorates beyond use.</text>
+	</string>
+	<string id="enc_equipment_devic_binocul1">
+		<text>The U.S.S.R. has had a long history of quality military optics. At the end of WWII, the Soviet Army had captured most of the German optical plants, including the famous Carl Zeiss-Jena factory. They took the technology back to Russia, added their own refinements and began to built similar and sometimes even more powerfull binoculars. For many years these binoculars were strictly for military issue. In the late 1980's, some researchers proved that these 8x30 BPC Military Binoculars outmatch their predecessor - world-famous Zeiss 8x30's ...</text>
+	</string>
+	<string id="enc_equipment_devic_detect1">
+		<text>Simple Anomaly Detector. Emits a geiger sound when near anomalies. Functions when worn on belt.</text>
+	</string>
+	<string id="enc_equipment_devic_detect2">
+		<text>Device defining presence of abnormal fields and indignations and informing on them by a sound signal. For work it is necessary to activate, having placed the device on a belt.</text>
+	</string>
+	<string id="enc_equipment_devic_detect3">
+		<text>Elite Anomaly Detector invented by Scientists witin the Zone. Indicates the presence of abnormal fields and indignations, and also shows them on the map. Must be worn on belt in order to function</text>
+	</string>
+	<string id="enc_equipment_devic_device-PDA1">
+		<text>Personal Digital Assistant - indispensable in the Zone.</text>
+	</string>
+	<string id="enc_equipment_devic_device-torch1">
+		<text>A powerful flashlight. Quite useful in areas with insufficient lighting.</text>
+	</string>
+	<string id="enc_equipment_devic_device-torch1_m1">
+		<text>A powerful flashlight. Battery recharge time has been reduced thanks to a modernized transformer.</text>
+	</string>
+	<string id="enc_equipment_energydrink">
+		<text>Energy Drink consisting of caffeine, taurine and a suspicious mixture of rejuvenating "vitamins". Just the ticket when you're too tired to push forward!! ... the warning label states: consumed in excessive quantities has proven lethal!!!</text>
+	</string>
+	<string id="enc_equipment_energydrinka">
+		<text>Unknown object. No, that can't be... is that a beer?!</text>
+	</string>
+	<string id="enc_equipment_food_bread1">
+		<text>Hard to say who manages to bake these loaves in the Zone, but the bread isn't contaminated and is perfectly edible. Well, at least none of the S.T.A.L.K.E.R.s have any complaints about it ...</text>
+	</string>
+	<string id="enc_equipment_food_mozg">
+		<text>Brain of the Experienced Controller within Chernobyl NPP(2). This is Extremely rare!!!. Upon successful cranial trepanation, and dissection of the Controller's brain .. it acquires elasticity, and a spherical form upon contact with the air. It is edible, and possesses unique properties - completely satisfies hunger, restores health, reduces radiation and weariness. It is known to be extracted by Monolithian Field Surgeons. It is highly sought after both inside and outside the ZONE...</text>
+	</string>
+	<string id="enc_equipment_food_conserva1">
+		<text>Canned food from Army Warehouses throughout the Zone which are raided by experienced S.T.A.L.K.E.R.s on a regular basis ... The best-before period hasn't expired as of yet, so it should still be safe to eat ...</text>
+	</string>
+	<string id="enc_equipment_food_kolbasa1">
+		<text>Made from a mix of chicken and soya, this disgusting sausage is often, for lack of any other edible option, a S.T.A.L.K.E.R's breakfast, lunch and dinner all wrapped in one ...</text>
+	</string>
+	<string id="enc_equipment_food_vodka1">
+		<text>Vodka made by the GSC company out of Kiev, Ukraine. Goes down quite easily, and will significantly reduce the effects of radiation, but for obvious reasons should be enjoyed in moderation.</text>
+	</string>
+	<string id="enc_equipment_medi_antirad1">
+		<text>Significantly reduces the effects of radiation ... can make the difference between life and death in the zone ...</text>
+	</string>
+	<string id="enc_equipment_medi_bandage1">
+		<text>Bandages .. to help stop minor bleeding.</text>
+	</string>
+	<string id="enc_equipment_medi_medkit1">
+		<text>An all-purpose medkit. Used to treat injuries of various types and severities - wounds, burns, poisonings, etc.</text>
+	</string>
+	<string id="enc_equipment_medi_medkit2">
+		<text>A specialized medical kit used to prevent further physical damage and blood loss. In it is included a special compound for blood coagulation, antibiotics, immunal stimulators, and painkillers.</text>
+	</string>
+	<string id="enc_equipment_medi_medkit3">
+		<text>Medical kit designed especially for work in the Zone. Includes the means to heal serious wounds as well as meds that eliminate various radionucleodes from the body. Prevents the development of radioactive sickness and lowers the level of accumulated radiation.</text>
+	</string>
+	<string id="energy_drink_name">
+		<text>100*Rads</text>
+	</string>
+	<string id="energy_drink_name_dbeer">
+		<text>Beer of unknown origin</text>
+	</string>
+	<string id="energy_drink_name_dbeer_short">
+		<text>Beer of unknown origin</text>
+	</string>
+	<string id="amk_ballon_name">
+		<text>Colloidal Gas</text>
+	</string>
+	<string id="amk_ballon_name_short">
+		<text>Jerrycan filled with Colloidal Gas</text>
+	</string>
+	<string id="amk_ballon_opisalovo">
+		<text>These canisters were used in research laboratories throughout the Zone for unknown purposes. It is known, however, that the contents are extremely volatile, explosive, and may contain unidentified chemical agents ...</text>
+	</string>
+	<string id="amk_kanistra_name">
+		<text>Gasoline Canister</text>
+	</string>
+	<string id="amk_kanistra_name_short">
+		<text>Gasoline Canister</text>
+	</string>
+	<string id="amk_kanistra_opisalovo">
+		<text>Robust fuel container made from pressed steel. It was originally designed in Germany in the 1930s for military use and holds 20 litres of fuel. The development of the 'Jerrycan' was a huge improvement on earlier designs, which required tools and funnels to use...</text>
+	</string>
+	<string id="energy_drink_short_name">
+		<text>100*Rads</text>
+	</string>
+	<string id="Equipment">
+		<text>Equipment</text>
+	</string>
+	<string id="Food">
+		<text>Canned Food</text>
+	</string>
+	<string id="Kolbasa">
+		<text>Sausage</text>
+	</string>
+	<string id="Kolbasa_s">
+		<text>Sausage</text>
+	</string>
+	<string id="item_Kolbasa3">
+		<text>Sausage</text>
+	</string>
+	<string id="item_Kolbasa3_s">
+		<text>Sausage</text>
+	</string>
+	<string id="item_Kolbasa4">
+		<text>Sausage</text>
+	</string>
+	<string id="item_Kolbasa4_s">
+		<text>Sausage</text>
+	</string>
+	<string id="Orange_Kolbasa">
+		<text>Orange sausage, supposedly has cheese added.</text>
+	</string>
+	<string id="Kolbasa_blond_item">
+		<text>Sausage</text>
+	</string>
+	<string id="Kolbasa_blond_item_s">
+		<text>Sausage</text>
+	</string>
+	<string id="Blond_Kolbasa">
+		<text>Blond sausage that looks horrific but has a sweet taste.</text>
+	</string>
+	<string id="Medi">
+		<text>Medication</text>
+	</string>
+	<string id="Medkit">
+		<text>First-Aid Kit</text>
+	</string>
+	<string id="Medkit_s">
+		<text>First-Aid Kit</text>
+	</string>
+	<string id="Medkit_army">
+		<text>Army First-Aid kit</text>
+	</string>
+	<string id="Medkit_army_s">
+		<text>First-Aid kit</text>
+	</string>
+	<string id="Medkit_army4">
+		<text>Army First-Aid kit</text>
+	</string>
+	<string id="Medkit_army4_s">
+		<text>First-Aid kit</text>
+	</string>
+	<string id="Medkit_scientific">
+		<text>Scientific First-Aid kit</text>
+	</string>
+	<string id="Medkit_scientific_s">
+		<text>Scientific First-Aid kit</text>
+	</string>
+	<string id="Sci2">
+		<text>Scientific EXP-4</text>
+	</string>
+	<string id="Vodka5">
+		<text>Cossacks vodka</text>
+	</string>
+	<string id="Vodka5_s">
+		<text>Cossacks</text>
+	</string>
+	<string id="st_detector">
+		<text>Dosimeter</text>
+	</string>
+	<string id="st_detector_s">
+		<text>Dosimeter</text>
+	</string>
+	<string id="st_detector2">
+		<text>Anomaly Detector</text>
+	</string>
+	<string id="st_detector2_s">
+		<text>Anomaly Detector</text>
+	</string>
+	<string id="st_detector3">
+		<text>Elite Anomaly Detector</text>
+	</string>
+	<string id="st_detector3_s">
+		<text>Elite Detector</text>
+	</string>
+	<string id="st_detector_descr1">
+		<text>Dosimeter - the device measuring a dose or capacity of ionising radiation. For work it is necessary to activate, having placed the device on a belt.</text>
+	</string>
+	<string id="st_detector_descr2">
+		<text>Device defining presence of abnormal fields and indignations and informing on them by a sound signal. For work it is necessary to activate, having placed the device on a belt.</text>
+	</string>
+	<string id="st_detector_descr3">
+		<text>Anomaly Detector invented by scientists in the Zone. Defines not only presence of abnormal fields and indignations, but also shows on a map their arrangement, informs on them a sound signal. For work it is necessary to activate, having placed the device on a belt.</text>
+	</string>
+	<string id="bolt_descr">
+		<text>Bolt 32x100. Stalker's best friend.</text>
+	</string>
+	<string id="item_disket">
+		<text>Computer Disk</text>
+	</string>
+	<string id="item_disket_desc">
+		<text>Typical computer disk. The information on it has encrypted, and can only be accessed with a password ...</text>
+	</string>
+	<string id="item_tisku">
+		<text>Vice</text>
+	</string>
+	<string id="item_tisku_desc">
+		<text>Typical iron vice. A bit worn, and rusty, but still quite efficient ...</text>
+	</string>
+	<string id="item_sumka">
+		<text>Sakharov's Bag</text>
+	</string>
+	<string id="item_sumka_desc">
+		<text>Sakharov's old medical bag. The isignia is practically worn off completely. The Professor claims that it is a gift from the Doctor himself ...</text>
+	</string>
+	<string id="item_doc_medal">
+		<text>Medallion of The Doctor</text>
+	</string>
+	<string id="item_doc_medal_desc">
+		<text>Gold medallion once belonging to The Doctor. Apparently, he lost it several years ago, and it has not been seen since ...</text>
+	</string>
+	<string id="item_bezoar">
+		<text>Bezoar</text>
+	</string>
+	<string id="item_bezoar_s">
+		<text>Bezoar</text>
+	</string>
+	<string id="enc_equipment_bezoar">
+		<text>A mass of densely matted hair generated inside the stomach of a Controller. It is a piece of partially digested, decayed and smelly slime it is poisonous, lowers many vital signs and causes sharp disgust in all who are unfortunate enough to see it... However, Professor Sakharov apparently knows how to transform this piece of shit into a useful artefact!!!</text>
+	</string>
+	<string id="zamok">
+		<text>Lock</text>
+	</string>
+	<string id="zamok_s">
+		<text>Lock</text>
+	</string>
+	<string id="enc_zamok_desc">
+		<text>Coded lock made from titanium alloy to break it it is impossible, no less than to pick up a code. This expensive gadget of 100% will protect your hiding place from any encroachments.</text>
+	</string>
+	<string id="item_lekarstvo">
+		<text>Medicine for the Akim</text>
+	</string>
+	<string id="item_lekarstvo_s">
+		<text>Medicine</text>
+	</string>
+	<string id="enc_equipment_lekarstvo">
+		<text>Vial filled with medicine. Contains a tincture of strange grasses, and ointments ... Possesses an extremely unpleasant odor, and tastes terrible to say the very least. Some such vials may have been lost by the Military in the Cordon.</text>
+	</string>
+	<string id="vorona_egg">
+		<text>Carrion crow egg</text>
+	</string>
+	<string id="enc_equipment_egg">
+		<text>Ordinary carrion crow egg. Rather high-calorie product, satisfies hunger, raises health a little, and slightly reduces radiation. With the absence of hens and other egg laying fowl in the Zone, these are considered a delicacy.</text>
+	</string>
+	<string id="equip_snotvornoe_tele">
+		<text>Strange Medicine</text>
+	</string>
+	<string id="equip_snotvornoe_tele_s">
+		<text>Medicine</text>
+	</string>
+	<string id="enc_equipment_snotvornoe_tele">
+		<text>Gathering of marsh grasses of unknown origin, possessing soporific, potenmtially hallucenagenic side-effects. The exact composition is known only to the Doctor himself .. and he's not telling .. I suppose i should drink this, otherwise; nobody here will trust me .. and will continue to treat me like an 'Outsider' .. hhhhmmmm... </text>
+	</string>
+	<string id="equip_shaxter_tele">
+		<text>Miner's Medicine</text>
+	</string>
+	<string id="equip_shaxter_tele_s">
+		<text>Medicine</text>
+	</string>
+	<string id="enc_equipment_shaxter_tele">
+		<text>Medicine from the Miner. The compopsition is very much similar to that which The Doctor gave me. The one that puit me in this bloody Cave in the first place!!! Perhaps if I drink this, I can get the hell out of here...</text>
+	</string>
+	<string id="item_fonarik">
+		<text>Small Flashlight</text>
+	</string>
+	<string id="item_fonarik_s">
+		<text>Flashlight</text>
+	</string>
+	<string id="enc_item_fonarik_descr">
+		<text>Battery-powered flashlight. Not commonly used by S.T.A.L.K.E.R.s due to the inconvenience of having to hold it in one hand ...</text>
+	</string>
+	<string id="item_kubik">
+		<text>Rubik's Cube</text>
+	</string>
+	<string id="item_kubik_desc">
+		<text>The Rubik's Cube is a 3-D mechanical puzzle invented in 1974 by Hungarian sculptor and professor of architecture Erno Rubik. Originally called the "Magic Cube", the puzzle was licensed by Rubik to be sold by Ideal Toys in 1980 and won the German Game of the Year special award for Best Puzzle that year. As of January 2009, 350 million cubes have sold worldwide making it the world's top-selling puzzle game. It is widely considered to be the world's best-selling toy. Most likely brought into the Zone by some of the Rookies ...</text>
+	</string>
+	<string id="item_book_xabarych">
+		<text>Miner's Book</text>
+	</string>
+	<string id="item_book_xabarych_s">
+		<text>Miner's Book</text>
+	</string>
+	<string id="enc_book_xabarych_descr">
+		<text>Book belonging to the Miner's father. An ordinary small volume containing stories about hunting... The book is badly decayed, as it has been left out in the open air for many years ...</text>
+	</string>
+	<string id="equip_money3_silver">
+		<text>Silver Rouble</text>
+	</string>
+	<string id="equip_money3_silver_s">
+		<text>Silver Rouble</text>
+	</string>
+	<string id="enc_equip_money3_silver_descr">
+		<text>Antique silver Russian rouble. The date on it reads 1747 ... may be quite valuable to the right buyer ...</text>
+	</string>
+	<string id="equip_money2_silver">
+		<text>Antique Silver Rouble</text>
+	</string>
+	<string id="equip_money2_silver_s">
+		<text>Antique Silver Rouble</text>
+	</string>
+	<string id="enc_equip_money2_silver_descr">
+		<text>Antique silver Russian rouble. The date on it reads 1749 ... would demand quite a nice price outside of the Zone ...</text>
+	</string>
+	<string id="equip_money1_gold">
+		<text>Gold Chervonet</text>
+	</string>
+	<string id="equip_money1_gold_s">
+		<text>Gold Chervonet</text>
+	</string>
+	<string id="enc_equip_money1_descr">
+		<text>Gold Chervonets from the 18th Century. Often found in old abandoned mine shafts or caves.</text>
+	</string>
+	<string id="equip_money_rouble">
+		<text>Silver Rouble</text>
+	</string>
+	<string id="equip_money_rouble_s">
+		<text>Silver Rouble</text>
+	</string>
+	<string id="enc_equip_money_descr">
+		<text>Ancient silver Russian rouble. Outside of the Zone, it would demand a hefty price ...</text>
+	</string>
+	<string id="item_arhara_listok">
+		<text>Strelok's Note</text>
+	</string>
+	<string id="item_arhara_listok_s">
+		<text>Note</text>
+	</string>
+	<string id="enc_item_arhara_listok_descr">
+		<text>Wanderer... I want to warn you: you have only two choices - the first: - to go further, and seek out a secret doorway and the second: - to use my teleporter and return to the Army warehouses and try to locate my PDA. It contains valuable data on the Zone and on the secret work of a stationary Teleport which is activated here, at the Monolith by means of an artefact known as the "Goldfish" ... I have left a copy of the contents of my PDA on a storage disk with the Miner who lives in an old cave... But if you choose the risk of pressing on further to Chernobyl, this information will most likely prove useful to you ... if not essential. Good luck to you, Marked One.\nStrelok.</text>
+	</string>
+	<string id="item_arhara_obman">
+		<text>Strelok's Teleport</text>
+	</string>
+	<string id="item_arhara_obman_s">
+		<text>Strelok's Teleport</text>
+	</string>
+	<string id="enc_item_arhara_obman_descr">
+		<text>Manual teleport left by Strelok. Destination: Army Warehouses</text>
+	</string>
+	<string id="akku_anomal">
+		<text>Accumulator</text>
+	</string>
+	<string id="akku_anomal_s">
+		<text>Accumulator</text>
+	</string>
+	<string id="enc_akku_anomal_descr">
+		<text>The Accumulator produces an electric current at the frequency + wavelength of a microwave. It is produced by immersing a typical "uneffected" accumulator inside of the "Springboard" anomaly at a specific time of day when the conditions are just right. Nobody produces these accumulators, and only the Military have been seen using them ... they produce an increased rate of fire, and increased effectiveness for the weapon upon which it has been equipped.</text>
+	</string>
+	<string id="item_arhara_instruk_s">
+		<text>Suit Instructions</text>
+	</string>
+	<string id="item_arhara_instruk_s">
+		<text>Suit Instructions</text>
+	</string>
+	<string id="enc_item_arhara_instruk_descr">
+		<text>Instructions for, as well as an upgrade for a new suit "S.L.O.P.E." \nIt is located on the roof of one of buildings in the vicinity of the factory referred to as "Amber" \n It is possible for upgrades to be found: \n 1. Nearby some cars in the Wild Territory\n 2. Near the Radar on the roof of one of the structures containing ariels \n 3. In the Miner's hiding place, near a box, close to one of the fire barrels.\n To use, it is necessary to do the following:\n 1. Activate system modules\n 2. The first block ...\n3. The second block ...\n With each upgrade, the suit acquires new properties. After all 3 upgrades have been applied, the suit will start to absorb "black" energy, which is caused by emissions, and may possibly be obtained from Sakharov\n the effects of this artefact will only last for two (2) hours, after which point the suit is automatically removedthen the suit is automatically removed. It will only be activated again if another "Black Energy" artefact is obtained, and henceforth equipped.</text>
+	</string>
+	<string id="item_umn_tel">
+		<text>Manual teleport with enhanced capabilities. Two similar examples were produced several years ago, based on the use of particles taken from the "Lift" anomaly. The main reason for its disappearance can be traced directly to the fact that this anomoly is quite rare indeed ... The use of this teleport requires a fair amount of experience, and as such is not adviseable for amateurs to attempt using it ...</text>
+	</string>
+	<string id="item_umn_tel_1">
+		<text>Incomplete manual for the "Lift" teleport. Although virtually incomprehensible, these instructions may be put to good use by someone with the right technical skills ... and a bit of luck.</text>
+	</string>
+	<string id="item_flyga">
+		<text>Petrenko's '9 Rota' Flask</text>
+		<string id="item_flyga_s">
+</string>
+		<text>Petrenko's '9 Rota' Flask</text>
+	</string>
+	<string id="enc_item_flyga_descr">
+		<text>Colonel Petrenko's drinking flask. It was presented to him for exemplary service in battle in Afghanistan, where he was the sole surviving member of the infamous "9th Company". Somehow, it became lost here in the Zone... It is easily recognizable, as it is decorated with an ornate gilded pattern of purest Sterling Silver.</text>
+	</string>
+	<string id="electro_charge_12">
+		<text>Micro-Circuit Repair-Kit</text>
+	</string>
+	<string id="electro_charge_12_s">
+		<text>Micro-Circuit Repair-Kit</text>
+	</string>
+	<string id="enc_electro_charge_12_descr">
+		<text>Repair-kit containing a set of various micro-circuits. Used by the Military to repair the Mobile Transmitter located in the Cordon.</text>
+	</string>
+	<string id="item_termos_big">
+		<text>Large Thermos</text>
+	</string>
+	<string id="item_termos_big_s">
+		<text>Large Thermos</text>
+	</string>
+	<string id="enc_item_termos_big_descr">
+		<text>a big, three-liter thermos with a wide neck. Made from stainless steel. Maintains heat for a full, long day ...</text>
+	</string>
+	<string id="item_termos_small">
+		<text>Small Thermos</text>
+	</string>
+	<string id="item_termos_small_s">
+		<text>Small Thermos</text>
+	</string>
+	<string id="enc_item_termos_small_descr">
+		<text>a small, one-liter thermos with a narrow neck. Made from stainless steel. Maintains heat for half a day ...</text>
+	</string>
+	<string id="item_kuvalda">
+		<text>Sledgehammer</text>
+	</string>
+	<string id="item_kuvalda_s">
+		<text>Sledgehammer</text>
+	</string>
+	<string id="enc_item_kuvalda_descr">
+		<text>a Heavy sledge hammer with a wooden handle. Weight: 25kg.</text>
+	</string>
+	<string id="item_kluch">
+		<text>Wrench</text>
+	</string>
+	<string id="item_kluch_s">
+		<text>Wrench</text>
+	</string>
+	<string id="enc_item_kluch_descr">
+		<text>an ordinary 32x36 wrench ... quite large, and heavy. It is made of iron. Nothing remarkable about it ...</text>
+	</string>
+	<string id="item_otvertka">
+		<text>Screwdriver</text>
+	</string>
+	<string id="item_otvertka_s">
+		<text>Screwdriver</text>
+	</string>
+	<string id="enc_item_otvertka_descr">
+		<text>a typical screwdriver with a slotted head. Nothing remarkable. By the looks of it, it has seen better days back in the U.S.S.R.</text>
+	</string>
+	<string id="item_malyva">
+		<text>Notebook for Borov</text>
+	</string>
+	<string id="item_malyva_s">
+		<text>Notebook</text>
+	</string>
+	<string id="enc_item_malyva_descr">
+		<text>Your biggest mistake was to cross Duty ... I will not waste time with small talk ... I am taking away this video-portable radio set ... I shall leave it near the Army Warehouses when I no longer need it - in the village, in one the abandoned houses - if it is required - you will find it there ...\n Kirkor Phillips.</text>
+	</string>
+	<string id="item_3d_raziy">
+		<text>Portable Radio [audio/visual]</text>
+	</string>
+	<string id="item_3d_raziy_s">
+		<text>Portable Radio</text>
+	</string>
+	<string id="enc_item_3d_raziy_descr">
+		<text>a portable video conferencing monitor with a range of up to 30km ... it is necessary to hook this up to a computer terminal in order for it to function properly. Older technology now, but during the Cold War, this would have been "cutting edge" for sure ...</text>
+	</string>
+	<string id="item_pribor">
+		<text>Computer [audio/visual]</text>
+	</string>
+	<string id="item_pribor_s">
+		<text>Computer [audio/visual]</text>
+	</string>
+	<string id="enc_item_pribor_descr">
+		<text>a Computer terminal capable of recording both video images, and voice messages from various sources. It was used during the Cold War to intercept and decipher messages both foreign and domestic ...</text>
+	</string>
+	<string id="item_telefon">
+		<text>'Manpack' Portable Radio</text>
+	</string>
+	<string id="item_telefon_s">
+		<text>'Manpack' Portable Radio</text>
+	</string>
+	<string id="enc_item_telefon_descr">
+		<text>an Army-Issue mobile, portable capable of sending and receiving messages for up to 70km ...</text>
+	</string>
+	<string id="enc_equipment_suvorotka">
+		<text>Whey Tablets</text>
+	</string>
+	<string id="enc_equipment_suvorotka_s">
+		<text>Whey Tablets</text>
+	</string>
+	<string id="enc_equipment_suvorotka_descr">
+		<text>Whey Tablets are universally known to surpass all known first-aid kits and other medical concoctions. An excellent means for healing wounds and treatment of various illnesses. These are extremely rare, as they were only distributed amongst the Special Forces "Spetsnaz" units whilst on secretive missions throughout the Zone.</text>
+	</string>
+	<string id="gonets_flash_desc">
+		<text>Messenger's USB-Stick</text>
+	</string>
+	<string id="gonets_flash_desc_s">
+		<text>Messenger's USB-Stick</text>
+	</string>
+	<string id="enc_gonets_flash_descr">
+		<text>Flash-drive containing the information for Kalinin. It has been encrypted, and will require some work to decipher, and unlock it ...</text>
+	</string>
+	<string id="item_kod_kamera">
+		<text>Prison Log-Book</text>
+	</string>
+	<string id="item_kod_kamera_s">
+		<text>Prison Log-Book</text>
+	</string>
+	<string id="enc_item_kod_kamera_descr">
+		<text>The Log-Book. It is passed along to the next shift at the changing of the Post. Within it is written the code to the Prisoner's Cell: 208568. The rest appears to be rhetorical jibberish ... and barely legible ...</text>
+	</string>
+	<string id="item_soap">
+		<text>Bar of Soap</text>
+	</string>
+	<string id="item_soap_s">
+		<text>Soap</text>
+	</string>
+	<string id="enc_item_soap_descr">
+		<text>An ordinary bar of fresh, clean soap. Even after all these years left here to rot in the wastes with everything else, it still appears new, and unused. A rare find indeed!!!</text>
+	</string>
+	<string id="item_amulet">
+		<text>Monolithian Amulet</text>
+	</string>
+	<string id="item_amulet_s">
+		<text>Amulet</text>
+	</string>
+	<string id="enc_item_amulet_descr">
+		<text>A Monolithian Amulet. Given to the "Elite" within the Monolith Faction as a symbol of faithfull service. Extremely rare, and hard to find. Very strange indeed .. contains 'Runic Symbols' that appear to be a long forgotten language of sorts...</text>
+	</string>
+	<string id="item_remontnyi_box">
+		<text>Field Repair-Kit</text>
+	</string>
+	<string id="item_remontnyi_box_s">
+		<text>Repair-Kit</text>
+	</string>
+	<string id="enc_item_remontnyi_box_descr">
+		<text>Small box containing all of the tools necessary to repair, and maintain weapons in the Zone .. quite a nice find .. and certainly a valuable asset ...</text>
+	</string>
+	<string id="item_shkatulka">
+		<text>Casket</text>
+	</string>
+	<string id="item_shkatulka_s">
+		<text>Casket</text>
+	</string>
+	<string id="enc_item_shkatulka_descr">
+		<text>On the reverse side reads an inscription: "Master Khabarych" ... On the inside there are papers with two numbers written down: 434018 and 206018 and a short message: "Coded doors in Bunker #3, I could find only 2, and that means that there must be one more ... but, where? I have heard of a place where there is a safe ... still locked, but intact ... within it may be the answer ... the missing 'code' .. There is nothing more inside .. just scribbles ...</text>
+	</string>
+	<string id="item_arhara_seif">
+		<text>Small Safe</text>
+	</string>
+	<string id="item_arhara_seif_s">
+		<text>Small Safe</text>
+	</string>
+	<string id="enc_item_arhara_seif_descr">
+		<text>an old fireproof safe, small in size. Covered in rust, but still tightly sealed. It is protected by a coded lock ... impossible to open without the proper code. Contents unknown. Judging by the weight, it could even be empty?! ...</text>
+	</string>
+	<string id="item_kluch_dell_teleport">
+		<text>Damaged Teleporter</text>
+	</string>
+	<string id="item_kluch_dell_teleport_s">
+		<text>Damaged Teleporter</text>
+	</string>
+	<string id="enc_item_kluch_dell_teleport_descr">
+		<text>Broken manual-teleport. It was modified by a strange fellow ... now a Hospital patient. It is activated by means of a bio-field, and has a 200 meter radius. Unfortunately, using it can deactivate other teleports ...</text>
+	</string>
+	<string id="item_kluch_dell_teleport1">
+		<text>Damaged Teleporter</text>
+	</string>
+	<string id="item_kluch_dell_teleport1_s">
+		<text>Damaged Teleporter</text>
+	</string>
+	<string id="enc_item_kluch_dell_teleport1_descr">
+		<text>Broken manual-teleport. It was modified by a strange fellow ... now a Hospital patient. It is activated by means of a bio-field, and has a 200 meter radius. Unfortunately, using it can deactivate other teleports ...</text>
+	</string>
+	<string id="item_kluch_dell_teleport2">
+		<text>Damaged Teleporter</text>
+	</string>
+	<string id="item_kluch_dell_teleport2_s">
+		<text>Damaged Teleporter</text>
+	</string>
+	<string id="enc_item_kluch_dell_teleport2_descr">
+		<text>Broken manual-teleport. It was modified by a strange fellow ... now a Hospital patient. It is activated by means of a bio-field, and has a 200 meter radius. Unfortunately, using it can deactivate other teleports ...</text>
+	</string>
+	<string id="item_parcel">
+		<text>Parcel of Medicine</text>
+	</string>
+	<string id="item_parcel_s">
+		<text>Parcel of Medicine</text>
+	</string>
+	<string id="enc_item_parcel_descr">
+		<text>A bag containing medicinal ointments, and other assorted medical supplies .. it's purpose is unknown .. Nothing extraordinary about it at all. It should be handed over to the Gynecologist...</text>
+	</string>
+	<string id="item_box_with_weapon">
+		<text>Weapon Box</text>
+	</string>
+	<string id="item_box_with_weapon_s">
+		<text>Weapon Box</text>
+	</string>
+	<string id="enc_item_box_with_weapon_descr">
+		<text>A heavy enough box. There appears to be a weapon inside.</text>
+	</string>
+	<string id="item_tabletki">
+		<text>Strange Tablets</text>
+	</string>
+	<string id="item_tabletki_s">
+		<text>Tablets</text>
+	</string>
+	<string id="enc_item_tabletki_descr">
+		<text>Strange tablets. Purpose unknown. Could be some form of medication ... possibly not. Best be careful withy these ...</text>
+	</string>
+	<string id="item_tabletki1">
+		<text>Strange Tablets</text>
+	</string>
+	<string id="item_tabletki1_s">
+		<text>Tablets</text>
+	</string>
+	<string id="enc_item_tabletki1_descr">
+		<text>Strange tablets. Purpose unknown. Could be some form of medication ... possibly not. Best be careful withy these ...</text>
+	</string>
+	<string id="item_tabletki2">
+		<text>Strange Tablets</text>
+	</string>
+	<string id="item_tabletki2_s">
+		<text>Tablets</text>
+	</string>
+	<string id="enc_item_tabletki2_descr">
+		<text>Strange tablets. Purpose unknown. Could be some form of medication ... possibly not. Best be careful withy these ...</text>
+	</string>
+	<string id="item_shpriz">
+		<text>Dirty Syringe</text>
+	</string>
+	<string id="item_shpriz_s">
+		<text>Dirty Syringe</text>
+	</string>
+	<string id="enc_item_shpriz_descr">
+		<text>An old, re-useable syringe. already fairly filthy... one would have to be rather desperate to have to use this thing ..  a recipe for disease, and infection...</text>
+	</string>
+	<string id="item_akkumulytor">
+		<text>Accumulator</text>
+	</string>
+	<string id="item_akkumulytor_s">
+		<text>Accumulator</text>
+	</string>
+	<string id="enc_item_akkumulytor_descr">
+		<text>An Accumulator. Quite worn out, and almost un-useable. How it ended up here ... is anyone's guess ...</text>
+	</string>
+	<string id="item_starik_chasy">
+		<text>Gold Pocket Watch</text>
+	</string>
+	<string id="item_starik_chasy_s">
+		<text>Gold Watch</text>
+	</string>
+	<string id="enc_item_starik_chasy_descr">
+		<text>Gold pocket watch. Possibly, belonging to the Old man. In spite of of everything, and the poor shape that it's in ... it still works!!!</text>
+	</string>
+	<string id="detect_john">
+		<text>A Detector that is capable of defining all known anomalies. These are hard to come by in the Zone, and even skilled S.T.A.L.K.E.R.s and Faction Leaders have never seen one. Represents an update to the known E.L.I.T.E. detector developed by Scientists and upgraded by a Professor Sakharovym. A couple of prototypes were located inside of the Scientific Research Institute, another in a dark, deserted cave. These are highly sought after by both Military, and non-Military personnel, and are constantly at risk of being stolen by one side or the other ...</text>
+	</string>
+	<string id="item_britva">
+		<text>Razor</text>
+	</string>
+	<string id="item_britva_s">
+		<text>Razor</text>
+	</string>
+	<string id="enc_item_britva_descr">
+		<text>A shaving razor. Not exceptionally sharp, but could certainly do in a pinch, as such simple luxuries are very hard to come by ...</text>
+	</string>
+	<string id="item_land_disketka">
+		<text>Computer Disk</text>
+	</string>
+	<string id="item_land_disketka_s">
+		<text>Disk</text>
+	</string>
+	<string id="enc_item_land_disketka_descr">
+		<text>Computer Disk with something written on it .. hard to tell what it says, as it is almost completely worn away...</text>
+	</string>
+	<string id="item_kolba_pustay">
+		<text>'Mica' Flask</text>
+	</string>
+	<string id="item_kolba_pustay_s">
+		<text>'Mica' Flask</text>
+	</string>
+	<string id="enc_item_kolba_pustay_descr">
+		<text>%c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+10\n%c[default]an empty flask made from a strange looking glass. It has been said that it is hand-blown using materials from the "Mica" artefact. Has a protective metal casing, and a specially designed valve. Exactly what it was used for is a mystery ...</text>
+	</string>
+	<string id="item_ekza_akkumul">
+		<text>Exoskeleton Power Unit</text>
+	</string>
+	<string id="item_ekza_akkumul_s">
+		<text>Exoskeleton Unit</text>
+	</string>
+	<string id="enc_item_ekza_akkumul_descr">
+		<text>A Power-Unit for "Freedom" Faction Exoskeleton Armour ... Differs from other Exoskeleton Armour in that it has been modified to support an increased socket capacity...</text>
+	</string>
+	<string id="item_elek_plata">
+		<text>Payment Details</text>
+	</string>
+	<string id="item_elek_plata_s">
+		<text>Payment Details</text>
+	</string>
+	<string id="enc_item_elek_plata_descr">
+		<text>Payment, with details about an old Babineau tape recorder. Quite possibly a bit too expensive, but as it was manufactured in the sovdepovskoy pre-perestroika period, the build-quality is good, and quite reliable ...</text>
+	</string>
+	<string id="item_kolba_siniy_poln">
+		<text>Rejuvenating Flask</text>
+	</string>
+	<string id="item_kolba_siniy_poln_s">
+		<text>Rejuvenating Flask</text>
+	</string>
+	<string id="enc_item_kolba_siniy_poln_descr">
+		<text>%c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+10\n%c[default]a Flask filled with a dark blue liquid of unknown origin. It is equipped with air-tight valves. When worn on the belt, it can restore Health and Energy ...</text>
+	</string>
+	<string id="item_kolba_orand_poln">
+		<text>Rejuvenating Flask</text>
+	</string>
+	<string id="item_kolba_orand_poln_s">
+		<text>Rejuvenating Flask</text>
+	</string>
+	<string id="enc_item_kolba_orand_poln_descr">
+		<text>%c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+10\n%c[default]a Flask filled with a bright orange liquid of unknown origin. It is equipped with air-tight valves. When worn on the belt, it can speed up the healing process by stopping blood loss ...</text>
+	</string>
+	<string id="item_trupak">
+		<text>Controller's Corpse</text>
+	</string>
+	<string id="item_trupak_s">
+		<text>Controller's Corpse</text>
+	</string>
+	<string id="enc_item_trupak_descr">
+		<text>Corpse of the Experienced Controller. It looks as though it was killed about five (5) days ago ... as the decomposition process has already begun. Strangely, there appears to be no physical damage ... Cause of death: unknown...</text>
+	</string>
+	<string id="item_sidor_head">
+		<text>Stuffed Head of 'Sidorovich'</text>
+	</string>
+	<string id="item_sidor_head_s">
+		<text>Stuffed Head of 'Sidorovich'</text>
+	</string>
+	<string id="enc_item_sidor_head_descr">
+		<text>What appears to be the head of Sidorovich. made by head-hunters out of the head of a Controller, it bears an uncanny resemblance... oddly enough, however, this Sidorovich is better looking...</text>
+	</string>
+	<string id="item_perfuzor_pust">
+		<text>Perfuzor Flask [empty]</text>
+	</string>
+	<string id="item_perfuzor_pust_s">
+		<text>Perfuzor Flask [empty]</text>
+	</string>
+	<string id="enc_item_perfuzor_pust_descr">
+		<text>Empty flask with air-tight seals ... potentially useful, but nevertheless ... empty.</text>
+	</string>
+	<string id="item_perfuzor_poln">
+		<text>Perfuzor Flask [full]</text>
+	</string>
+	<string id="item_perfuzor_poln_s">
+		<text>Perfuzor Flask [full]</text>
+	</string>
+	<string id="enc_item_perfuzor_poln_descr">
+		<text>Completely functional, and filled flask. Contains a dose of medicinal whey.</text>
+	</string>
+	<string id="item_kukla_1">
+		<text>Old Doll</text>
+	</string>
+	<string id="item_kukla_1_s">
+		<text>Old Doll</text>
+	</string>
+	<string id="enc_item_kukla_1_descr">
+		<text>A tattered, and worn children's doll ... I wonder who this belonged to ... poor kid...</text>
+	</string>
+	<string id="item_kluk_karta">
+		<text>'Canine's Map</text>
+	</string>
+	<string id="item_kluk_karta_s">
+		<text>'Canine's Map</text>
+	</string>
+	<string id="enc_item_kluk_karta_descr">
+		<text>An Old, torn, shabby map from the second World War. It is said that it once belonged to a S.T.A.L.K.E.R. known as 'Canine'...</text>
+	</string>
+	<string id="item_kluk_karta_kopiy">
+		<text>Copy of Canin's Map</text>
+	</string>
+	<string id="item_kluk_karta_kopiy_s">
+		<text>Copy of Canin's Map</text>
+	</string>
+	<string id="enc_item_kluk_karta_kopiy_descr">
+		<text>A copy of Canine's map, only without transition markers. It is a very well made copy ... obviously the work of an expert Cartographer.</text>
+	</string>
+	<string id="item_naem_bloknot">
+		<text>Mercenary's Notebook</text>
+	</string>
+	<string id="item_naem_bloknot_s">
+		<text>Mercenary's Notebook</text>
+	</string>
+	<string id="enc_item_naem_bloknot_descr">
+		<text>Greetings .. We've heard that the "Marked One" was pulled from one of the 'Death Trucks' .. so listen here ... - we know where the Ring is, and it is very important to us. we will pay good money - as well as other certain plans to that effect, we can and will share with you. Other dealings - at a personal meeting. I send to you the messenger - you will tell him where it is...\n\n Ostolom</text>
+	</string>
+	<string id="item_amul_naemn">
+		<text>Mercenary's Ring</text>
+	</string>
+	<string id="item_amul_naemn_s">
+		<text>Mercenary's Ring</text>
+	</string>
+	<string id="enc_item_amul_naemn_descr">
+		<text>The Mercenary's Ring. It belonged to one of the leaders of this group ... he passed it on to one of his few friends before leaving the Zone. A practice familiar to the Mercenary creed ... but this "friend" who now has the Ring .. nobody knows .. and nobody cares...</text>
+	</string>
+	<string id="item_amul_naemn1">
+		<text>Mercenary's Ring</text>
+	</string>
+	<string id="item_amul_naemn1_s">
+		<text>Mercenary's Ring</text>
+	</string>
+	<string id="enc_item_amul_naemn1_descr">
+		<text>The Mercenary's Ring. It belonged to one of the leaders of this group ... he passed it on to one of his few friends before leaving the Zone. A practice familiar to the Mercenary creed ... but this "friend" who now has the Ring .. nobody knows .. and nobody cares...</text>
+	</string>
+	<string id="item_kluch_dell_teleport_warlab">
+		<text>Deactivated Teleport</text>
+	</string>
+	<string id="item_kluch_dell_teleport_warlab_s">
+		<text>Deactivated Teleport</text>
+	</string>
+	<string id="enc_item_kluch_dell_teleport_warlab_descr">
+		<text>Deactivated Teleport in a secret part of the Military Lab. From whence it came to be, and as to why the key has not worked from its bio-field is a mystery ...</text>
+	</string>
+	<string id="item_chuchelo_body">
+		<text>Stuffed Pseudodog</text>
+	</string>
+	<string id="item_chuchelo_body_s">
+		<text>Stuffed Pseudodog</text>
+	</string>
+	<string id="enc_item_chuchelo_body_descr">
+		<text>A stuffed Pseudodog. Possibly made by the ones that managed to kill it. Quite a trophy to be had ... the pride of anyone in the Zone ...</text>
+	</string>
+	<string id="item_disk_pantera">
+		<text>Computer Disk [contains data]</text>
+	</string>
+	<string id="item_disk_pantera_s">
+		<text>Computer Disk</text>
+	</string>
+	<string id="enc_item_disk_pantera_descr">
+		<text>Computer Disk (containing data) .. appears to be in decent shape, but who knows until you actually plug these things into a working computer, which is a rather difficult thing to find here in the Zone...</text>
+	</string>
+	<string id="equipment_bullion_gild">
+		<text>Gold Ingot</text>
+	</string>
+	<string id="equipment_bullion_gild_s">
+		<text>Gold Ingot</text>
+	</string>
+	<string id="enc_equipment_bullion_gild_descr">
+		<text>Gold Ingot. Gold bars which are cast rather than stamped, and therefore often thicker (deeper) than stamped bars are often called Ingots. This one is engraved with the markings of a Faction ... which is unclear ... Probably forged in one of the old Laboratories here in the Zone...</text>
+	</string>
+	<string id="item_zapiska_ranennogo">
+		<text>Dead S.T.A.L.K.E.R.s Note</text>
+	</string>
+	<string id="item_zapiska_ranennogo_s">
+		<text>Dead S.T.A.L.K.E.R.s Note</text>
+	</string>
+	<string id="enc_item_zapiska_ranennogo_descr">
+		<text>"I Write this in advance, as I do not know what awaits for me tomorrow ... I came to the Zone like so many others ... to seek my fortune. I did not know, that here, just as behind the Zone's perimeter, reign a filth and treachery so vile ... that it would eventually be my own undoing. I only ask that the one who finds this note .... please get it to my family somehow, and tell them that that I do love them, and that I will miss them dearly ..." There is also a number scribbled: 89115683244 ... perhaps a code?! ... maybe.</text>
+	</string>
+	<string id="item_pda_art_mod">
+		<text>PDA containing information on Artefact Modification</text>
+	</string>
+	<string id="item_pda_art_mod_s">
+		<text>PDA</text>
+	</string>
+	<string id="enc_item_pda_art_mod_descr">
+		<text>You will need several things to successfully transmutate an artefact: \n 1. a Recipe - You must have the recipe for the artifact you're trying to transmute.\n 2. Correct Anomaly - Dropping an artefact in the wrong anomaly won't do anything at all. (See the Encyclopedia of anomalies with descriptions in order to identify the right type)\n 3. Correct artefact - Dropping the wrong type of artefact will also get you nowhere.\n 4. Correct time of day - It must be night time (between 18:00 pm and 06:00) for you to start artefact transmutation. As long as you START before 06:00 am it will work - it doesn't need to finish before 06:00 am ... \n\n For example: you have the recipe for the "Skin" and you want to make it. Look up the "Skin" artefact on the chart and notice the entries under the "Parent artefact", "Parent anomaly", and "Time" headings. Basically, what this means is that if you want to make a "Skin" artefact, open up your inventory and drop a "Pellicle" into a Springboard anomaly and wait four (4) hours. You'll see a bright flash of white light for a second letting you know that the anomaly has accepted the artifact for transmutation ... there you have it.</text>
+	</string>
+	<string id="item_x_ray_antenna">
+		<text>Portable Psi-Antenna</text>
+	</string>
+	<string id="item_x_ray_antenna_s">
+		<text>Psi-Antenna</text>
+	</string>
+	<string id="enc_item_x_ray_antenna_descr">
+		<text>A Portable psi-antenna developed as part of the "About-Consciousness" program, and used for experiments regarding the effects of radiation on live organisms. The aerial's current generates not only psi-energy, but possesses an hallucinogenic effect as well. But, its most significant quality - the ability to teleport mutants. To switch off such an aerial without any special means of psi/radiation protection is practically suicidal. It has an effective radius of up to 70 meters</text>
+	</string>
+	<string id="klyak_forest_doc">
+		<text>Documents from the Red Forest</text>
+	</string>
+	<string id="klyak_forest_doc_descr">
+		<text>Documents found by Hunters in the Red Forest</text>
+	</string>
+	<string id="rukzak_green">
+		<text>Hunting Backpack</text>
+	</string>
+	<string id="rukzak_green_descr">
+		<text>A normal looking backpack, but equipped with a combination lock. Useful for keeping things safe from Thieves, and other unsavory characters throughout the Zone...</text>
+	</string>
+	<string id="lekar_kalmyak">
+		<text>Medicine from Kalmyak</text>
+	</string>
+	<string id="item_hand_radio">
+		<text>Portable Radio</text>
+	</string>
+	<string id="item_hand_radio_s">
+		<text>Radio</text>
+	</string>
+	<string id="enc_item_hand_radio_descr">
+		<text>Military issue hand-radio. Reception Radius is limited to 10 kilometers. Useful for communicating with others throughout the Zone, but it is anyone's guess who might be listening ...</text>
+	</string>
+	<string id="item_hand_radio3">
+		<text>Portable Radio</text>
+	</string>
+	<string id="item_hand_radio3_s">
+		<text>Radio</text>
+	</string>
+	<string id="enc_item_hand_radio3_descr">
+		<text>Military issue hand-radio. Reception Radius is limited to 10 kilometers. Useful for communicating with others throughout the Zone, but it is anyone's guess who might be listening ...</text>
+	</string>
+	<string id="attachable_item1">
+		<text>Attachable Item</text>
+	</string>
+	<string id="attachable_item1_s">
+		<text>Attachable Item</text>
+	</string>
+	<string id="enc_attachable_item1_descr">
+		<text>-</text>
+	</string>
+	<string id="attachable_item2">
+		<text>Attachable Item</text>
+	</string>
+	<string id="attachable_item2_s">
+		<text>Attachable Item</text>
+	</string>
+	<string id="enc_attachable_item2_descr">
+		<text>-</text>
+	</string>
+	<!-- ***************** !!!!TB3D new in 134 ****************** -->
+	<string id="amanita_mushroom">
+		<text>Amanita Mushroom</text>
+	</string>
+	<string id="amanita_mushroom_s">
+		<text>Amanita</text>
+	</string>
+	<string id="enc_equipment_amanita_mushroom">
+		<text>The Amanita Mushroom is slightly radioactive. Edible after prolonged boiling, lightly fonit. Often used by local drug addicts, for the manufacture of potent tranquilizers and pain medication. It grows mostly in marshland.</text>
+	</string>
+	<!-- Duplicated section!!! - game will use text from "dmx_mod_items.xml" file instead -aleks1970 -->
+	<!-- excluded section-2 
+	<string id="cigara">
+		<text>Cuba Cigar</text>
+	</string>
+	<string id="enc_cigara">
+		<text>This Cuban cigar. In the Zone gets smuggled. According to this, local merchants to sell cigars can be bought and they can not be the same. Tobacco natural, strength and flavor excellent. Complementing the picture beautiful form of cigars, which makes smoking a real pleasure when you consider that we are in the Zone.</text>
+	</string>
+	<string id="sandwich">
+		<text>Sandwich</text>
+	</string>
+	<string id="enc_sandwich">
+		<text>The most common sausage sandwich. Prepared in advance, so that you can eat on the go, without a knife uncovered and not digging in his backpack in search of food ingredients.</text>
+	</string>
+	<string id="beer_a">
+		<text>Beer</text>
+	</string>
+	<string id="enc_beer_a">
+		<text>Beer of local production. Composition of the course has been written. A good way to get drunk to the blue tomato.</text>
+	</string>
+	<string id="flaska">
+		<text>Flask</text>
+	</string>
+	<string id="enc_flaska">
+		<text>Flask, filled to the edge of water from a pure spring. Cleaner water in these places do not find.</text>
+	</string>
+	<string id="sweetness">
+		<text>Bar of chocolate</text>
+	</string>
+	<string id="enc_sweetness">
+		<text>A delicious chocolate bar. Soybeans in excess, the presence of natural cocoa is doubtful. Well satisfies hunger and positive effect on brain activity.</text>
+	</string>
+	<string id="box_cigara">
+		<text>Cigar Box</text>
+	</string>
+	<string id="enc_box_cigara">
+		<text>A box with Cuban cigars. Very expensive thing.</text>
+	</string>
+	<string id="balalaika_a">
+		<text>Balalaika</text>
+	</string>
+	<string id="enc_balalaika_a">
+		<text>Normal balalaika. A wonderful Russian folk instrument. In the Zone, too, lacks the masters of playing.</text>
+	</string>
+	<string id="det_artefact_indy">
+		<text>Detector artifacts</text>
+	</string>
+	<string id="det_art_indy_info">
+		<text>This is the first detector artifacts, designed by local craftsmen. The device is ineffective because it does not reach over and 40 meters, and the presence of an artifact is recognized only an audible signal. But in its time, with the help of this device has been found so many artifacts.</text>
+	</string>
+	<string id="det_artefact_super">
+		<text>Improved detection of artifacts</text>
+	</string>
+	<string id="det_art_ultra_info">
+		<text>This is an improved version of the detector artifacts, past upgrades among scientists. Added map of the area with the output label on it. Range increased to 70 meters. In connection with the reasonable price and improved performance, its use is considered preferable.</text>
+	</string>
+	<string id="detektor_amorf">
+		<text>The detector is isomorphic</text>
+	</string>
+	<string id="detector_elite_john">
+		<text>Detector Holograms</text>
+	</string>
+	 excluded section-2 -->
+	<!-- Mayor Documents -->
+	<!-- excluded section-3
+	<string id="doc_garbage">
+		<text>Old paper from the landfill</text>
+	</string>
+	<string id="enc_doc_garbage">
+		<text>Documents found in the Garbage. Formula, write a foreign language. By type - ravings of a madman...</text>
+	</string>
+	<string id="doc_agro">
+		<text>Old paper with agricultural industry</text>
+	</string>
+	<string id="enc_doc_agro">
+		<text>A stack of documents found in the catacombs of agricultural industry. Formula, write a foreign language. By type - not very much like the previous...</text>
+	</string>
+	<string id="doc_x18_1">
+		<text>The old document. Part I</text>
+	</string>
+	<string id="enc_doc_x18_1">
+		<text>Documents found in Dark Valley. By all appearances this is the first part.</text>
+	</string>
+	<string id="doc_x18_2">
+		<text>The old document. Part II</text>
+	</string>
+	<string id="enc_doc_x18_2">
+		<text>The second part doumentov found in the laboratory X-18.</text>
+	</string>
+	<string id="doc_x18_3">
+		<text>The old document. Part III</text>
+	</string>
+	<string id="enc_doc_x18_3">
+		<text>The third part doumentov found in the laboratory X-18.</text>
+	</string>
+	<string id="doc_x18_4">
+		<text>The old document. Part IV</text>
+	</string>
+	<string id="enc_doc_x18_4">
+		<text>Last quarter of doumentov found in the laboratory X-18.</text>
+	</string>
+	<string id="doc_x16">
+		<text>Old document from the X-16</text>
+	</string>
+	<string id="enc_doc_x16">
+		<text>Documents found in the laboratory X-16. Formula, write a foreign language. Apparently this is the last part of the documents found.</text>
+	</string>
+	<string id="pda_info">
+		<text>Broken PDA</text>
+	</string>
+	<string id="enc_pda_info">
+		<text>A typical PDA, which many in the Zone. Besides - a non-working and bruised. It is evident that the former owner was with him not very frugal. Insert a PDA can not be due to a broken screen. Flash card no. In general, nothing can fuck.</text>
+	</string>
+	<string id="hand_teleporter_arhara">
+		<text>Faulty manual teleportator</text>
+	</string>
+	<string id="hand_teleporter">
+		<text>Hand teleportator</text>
+	</string>
+	excluded section-3 -->
+	<!--=Documents at Uhud -->
+	<string id="bloknot_pantera">
+		<text>Panthers Notebook</text>
+	</string>
+	<string id="bloknot_pantera_s">
+		<text>Panthers Notebook</text>
+	</string>
+	<string id="enc_equipment_bloknot_pantera">
+		<text>Personal notebook Panthers. It was written a few sentences and some code: 25,190,456. To view a document, insert in pistol slot.</text>
+	</string>
+	<string id="dosye_zvez">
+		<text>Astrologer Profile</text>
+	</string>
+	<string id="dosye_zvez_s">
+		<text>Astrologer Profile</text>
+	</string>
+	<string id="enc_equipment_dosye_zvez">
+		<text>Quick profile on Astrologer. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="foto_kukla">
+		<text>Photo Doll</text>
+	</string>
+	<string id="foto_kukla_s">
+		<text>Photo</text>
+	</string>
+	<string id="enc_equipment_foto_kukla">
+		<text>Old photo normal infant dolls. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="pilot_zapiska">
+		<text>Letter to the pilot</text>
+	</string>
+	<string id="pilot_zapiska_s">
+		<text>'Letter'</text>
+	</string>
+	<string id="enc_equipment_pilot_zapiska">
+		<text>Letter from a helicopter pilot with important information. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="foto_chaes_truba">
+		<text>Photo Driver</text>
+	</string>
+	<string id="foto_chaes_truba_s">
+		<text>Photo</text>
+	</string>
+	<string id="enc_equipment_foto_chaes_truba">
+		<text>Photo taken a helicopter pilot. It is visible to a large pipe with the burning helicopter. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="foto_aver_mono">
+		<text>Photo of</text>
+	</string>
+	<string id="foto_aver_mono_s">
+		<text>Photo</text>
+	</string>
+	<string id="enc_equipment_foto_aver_mono">
+		<text>Group photo, fired on the helicopter. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="foto_aver_zvezd">
+		<text>Photos of the leader</text>
+	</string>
+	<string id="foto_aver_zvezd_s">
+		<text>Photo</text>
+	</string>
+	<string id="enc_equipment_foto_aver_zvezd">
+		<text>Photos of the leader who fired on the helicopter. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="chaes2_karta_kluk">
+		<text>Chernobyl Photo</text>
+	</string>
+	<string id="chaes2_karta_kluk_s">
+		<text>Chernobyl...</text>
+	</string>
+	<string id="enc_equipment_chaes2_karta_kluk">
+		<text>Photo northern region of Chernobyl. It marked a rough passage on the other - the south side of the Chernobyl NPP. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="kreditka">
+		<text>Credit Card</text>
+	</string>
+	<string id="kreditka_s">
+		<text>Credit Card</text>
+	</string>
+	<string id="enc_equipment_kreditka">
+		<text>Credit Card Bank of America in denominations 5 mil. USD. To view the credit card insert in pistol slot.</text>
+	</string>
+	<string id="razved_karta">
+		<text>Scrap maps</text>
+	</string>
+	<string id="razved_karta_s">
+		<text>Scrap maps</text>
+	</string>
+	<string id="enc_equipment_razved_karta">
+		<text>Old scrap card with the coordinates of the transition. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="karta_peschera">
+		<text>Map of Cave</text>
+	</string>
+	<string id="karta_peschera_s">
+		<text>Map of Cave</text>
+	</string>
+	<string id="enc_equipment_karta_peschera">
+		<text>An old map of the Cave. It shows all the moves and tunnels. There's also a label with the outputs of the Cave. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="recipi_bpb">
+		<text>Note stalker</text>
+	</string>
+	<string id="recipi_bpb_s">
+		<text>Note stalker</text>
+	</string>
+	<string id="enc_equipment_recipi_bpb">
+		<text>Note an unknown stalker. There is information on the modification of the artifacts. Insert in Pistol slot to view.</text>
+	</string>
+	<string id="stukach_book">
+		<text>Notebook informer</text>
+	</string>
+	<string id="stukach_book_s">
+		<text>Notebook informer</text>
+	</string>
+	<string id="stukach_book_desc">
+		<text>Notebook informer group of Liberty. There is information about the new artmod. Insert in Pistol slot to view.</text>
+	</string>
+	<!-- HAND TELEPORT-->
+	<string id="device_teleport">
+		<text>Disposable Teleport</text>
+	</string>
+	<string id="device_teleport_s">
+		<text>Teleport</text>
+	</string>
+	<string id="enc_device_teleport">
+		<text>Instantaneous Spatial Transfer Device that will provide instant teleportation. The choices are limited - stay where you are, or fly off in an unknown direction. Suitable, perhaps, only in extreme cases, when you need to get out of desperate situations .. and simply disappear to somewhere else .. anywhere but here!!!</text>
+	</string>
+	<string id="science_teleport">
+		<text>Cordon Teleport</text>
+	</string>
+	<string id="science_teleport_s">
+		<text>Cordon Teleport</text>
+	</string>
+	<string id="enc_science_teleport">
+		<text>This teleport was built, and configured by Professor Sakharov. He requires both the 'Battery', and 'Moonlight' artefacts in order to build it...</text>
+	</string>
+	<string id="science_teleport2">
+		<text>Bar Area Teleport</text>
+	</string>
+	<string id="science_teleport2_s">
+		<text>Bar Area Teleport</text>
+	</string>
+	<string id="science_teleport3">
+		<text>Yantar Teleport</text>
+	</string>
+	<string id="science_teleport3_s">
+		<text>Yantar Teleport</text>
+	</string>
+	<string id="enc_quest_kostya_gold_fish">
+		<text>%c[1,1,1,1]______ %c[255,255,255,255]Radiation %c[255,255,1,1]+10\n%c[default]Special Gold Fish Artefact in the Cordon .. Kostya must have this particular one...</text>
+	</string>
+	<string id="kostya_pda">
+		<text>PDA #1</text>
+	</string>
+	<string id="enc_kostya_pda">
+		<text>PDA found in a hiding place in the Cordon .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda2">
+		<text>PDA #2</text>
+	</string>
+	<string id="enc_kostya_pda2">
+		<text>PDA found in a hiding place at the Dump .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda3">
+		<text>PDA #3</text>
+	</string>
+	<string id="enc_kostya_pda3">
+		<text>PDA found in a hiding place in Laboratory X-18 .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda4">
+		<text>PDA #4</text>
+	</string>
+	<string id="enc_kostya_pda4">
+		<text>PDA found in a hiding place in Yantar .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda5">
+		<text>PDA #5</text>
+	</string>
+	<string id="enc_kostya_pda5">
+		<text>PDA found in a hiding place at Agroprom .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda6">
+		<text>PDA #6</text>
+	</string>
+	<string id="enc_kostya_pda6">
+		<text>PDA found in a hiding place at the Army Warehouses .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda7">
+		<text>PDA #7</text>
+	</string>
+	<string id="enc_kostya_pda7">
+		<text>PDA found in a hiding place at the Radar .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda8">
+		<text>PDA #8</text>
+	</string>
+	<string id="enc_kostya_pda8">
+		<text>PDA found in a hiding place in Pripyat .. Important data transferred...</text>
+	</string>
+	<string id="kostya_pda9">
+		<text>PDA #9</text>
+	</string>
+	<string id="enc_kostya_pda9">
+		<text>PDA found in a hiding place in Laboratory X-10 .. Contains one, singular important entry: 'Code Decryption Complete: .. 2 ... 9 ... 7 ... Good luck S.T.A.L.K.E.R.!!'.</text>
+	</string>
+	<string id="kostya_documents">
+		<text>Documentation on Teleports</text>
+	</string>
+	<string id="enc_kostya_documents">
+		<text>Folder containing strange documents from Laboratory X-10 .. a veritable treasure trove of raw information. Contains details on how a Teleport functions, along with a complete list of the eccentric equipment required in order to build one... What the hell were these people up to here, anyways?! ... and who sent them here in the first place!?..</text>
+	</string>
+	<string id="pda_vasilyev">
+		<text>Vasiliev's PDA</text>
+	</string>
+	<string id="enc_pda_vasilyev">
+		<text>PDA containing valuable Scientific information obtained from Laboratory X-16</text>
+	</string>
+	<string id="novice_pda">
+		<text>Novice PDA</text>
+	</string>
+	<string id="novice_pda_s">
+		<text>PDA</text>
+	</string>
+	<string id="enc_novice_pda_descr">
+		<text>PDA from the beginner...</text>
+	</string>
+	<string id="clerik_pda">
+		<text>Clerik PDA</text>
+	</string>
+	<string id="clerik_pda_s">
+		<text>PDA</text>
+	</string>
+	<string id="clerik_pda_desc">
+		<text>PDA of the Clerik</text>
+	</string>
+	<string id="naem_pda">
+		<text>Naem PDA</text>
+	</string>
+	<string id="naem_pda_s">
+		<text>PDA</text>
+	</string>
+	<string id="naem_pda_desc">
+		<text>PDA of the swamp guards</text>
+	</string>
+	<string id="old_notebook">
+		<text>Old Notebook</text>
+	</string>
+	<string id="old_notebook_s">
+		<text>Notebook</text>
+	</string>
+	<string id="old_notebook_desc">
+		<text>Old scientist's notebook</text>
+	</string>
+<string id="gold_bar2_desc">
+<text>WS-6\nComposition: 0.98733</text>
+</string>
+<string id="gold_bar3_desc">
+<text>WN-5\nComposition: 0.98752</text>
+</string>
+<string id="gold_bar4_desc">
+<text>WS-3\nComposition: 0.98812</text>
+</string>
+<string id="gold_bar5_desc">
+<text>WN-2\nComposition: 0.98834</text>
+</string>
+<string id="gold_bar6_desc">
+<text>N-0\nComposition: 0.99999</text>
+</string>
+<string id="gold_bar7_desc">
+<text>S-0\nComposition: 0.99999</text>
+</string>
+<string id="gold_bar10_desc">
+<text>ES-2\nComposition: 0.98911</text>
+</string>
+<string id="gold_bar11_desc">
+<text>EN-3\nComposition: 0.98800</text>
+</string>
+<string id="gold_bar12_desc">
+<text>ES-4\nComposition: 0.98702</text>
+</string>
+<string id="gold_bar13_desc">
+<text>ES-6\nComposition: 0.98637</text>
+</string>
+<string id="gold_bar15_desc">
+<text>C-C\nComposition: 0.99999</text>
+</string>
+
+<string id="fosfor_r">
+<text>Red Glowstick</text>
+</string>
+<string id="fosfor_g">
+<text>Green Glowstick</text>
+</string>
+<string id="fosfor_b">
+<text>Blue Glowstick</text>
+</string>
+<string id="fosfor_y">
+<text>Yellow Glowstick</text>
+</string>
+	<!-- document and other text string from .ltx files ... aleks1970 -->
+	<string id="item_document">
+		<text>Document</text>
+	</string>
+	<string id="item_document_s">
+		<text>Document</text>
+	</string>
+	<string id="enc_item_document_descr">
+		<text>-</text>
+	</string>
+	<string id="item_downed_helicopter">
+		<text>The downed Helicopter</text>
+	</string>
+	<string id="item_downed_helicopter_s">
+		<text>Helicopter</text>
+	</string>
+	<string id="enc_item_downed_helicopter_descr">
+		<text>-</text>
+	</string>
+	<string id="item_1_simulator">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_1_simulator_s">
+		<text>Simulator</text>
+	</string>
+	<string id="enc_item_1_simulator_descr">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_2_simulator">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_2_simulator_s">
+		<text>Simulator</text>
+	</string>
+	<string id="enc_item_2_simulator_descr">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_3_simulator">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_3_simulator_s">
+		<text>Simulator</text>
+	</string>
+	<string id="enc_item_3_simulator_descr">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_4_simulator">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_4_simulator_s">
+		<text>Simulator</text>
+	</string>
+	<string id="enc_item_4_simulator_descr">
+		<text>Simulator-1</text>
+	</string>
+	<string id="item_videocassette">
+		<text>Videocassette</text>
+	</string>
+	<string id="item_videocassette_s">
+		<text>Videocassette</text>
+	</string>
+	<string id="enc_item_videocassette_descr">
+		<text>Videocassette with recorded information on it. Contents Unknown. For one reason or another, the Military want to get their hands on it. Most likely containing some old information on the Zone's formation, and other confidential data .. I will exchange it with Sakharov for a Minigun, and wash my hands clean of it ASAP .. The less you know .. the better you sleep...</text>
+	</string>
+	<string id="item_detector1">
+		<text>'Special' Detector</text>
+	</string>
+	<string id="item_detector1_s">
+		<text>'Special' Detector</text>
+	</string>
+	<string id="enc_item_detector1_descr">
+		<text>Special Detector invented by Sakharov. Able to pick up nearby signals within a radius of ten meters...</text>
+	</string>
+	<string id="item_ammo_545x39">
+		<text>5.45x39mm 'Isomorphic'</text>
+	</string>
+	<string id="item_ammo_545x39_s">
+		<text>5.45x39mm 'Isomorphic'</text>
+	</string>
+	<string id="enc_item_ammo_545x39_descr">
+		<text>5.45x39mm 'Isomorphic' ammunition</text>
+	</string>
+	<string id="item_ammo_backpack">
+		<text>Isomorphic Backpack</text>
+	</string>
+	<string id="item_ammo_backpack_s">
+		<text>Isomorphic Backpack</text>
+	</string>
+	<string id="enc_item_ammo_backpack_descr">
+		<text>Backpack containing 'Isomorphic' ammunition</text>
+	</string>
+	<string id="item_photo_backpack">
+		<text>Photo</text>
+	</string>
+	<string id="item_photo_backpack_s">
+		<text>Photo</text>
+	</string>
+	<string id="enc_item_photo_backpack_descr">
+		<text>Photo</text>
+	</string>
+	<string id="item_photo_monolit">
+		<text>Pseudo-Photo of the Monolith</text>
+	</string>
+	<string id="item_photo_monolit_s">
+		<text>Pseudo-Photo</text>
+	</string>
+	<string id="enc_item_photo_monolit_descr">
+		<text>Photo of the Monolith with erased coded figures...</text>
+	</string>
+	<string id="item_isomorfhic_globe">
+		<text>'Isomorphic' Globe</text>
+	</string>
+	<string id="item_isomorfhic_globe_s">
+		<text>'Isomorphic' Globe</text>
+	</string>
+	<string id="enc_item_isomorfhic_globe_descr">
+		<text>'Isomorphic' Globe .. of a strange, and undetermined origin .. Carrying it inside of a backpack will reduce the radioactive level of any artefacts currently in possession...</text>
+	</string>
+	<string id="item_isomorfhic_camera">
+		<text>'Isomorphic' Camera Part</text>
+	</string>
+	<string id="item_isomorfhic_camera_s">
+		<text>'Isomorphic' Camera Part</text>
+	</string>
+	<string id="enc_item_isomorfhic_camera_descr">
+		<text>The main part of the 'Special' camera...</text>
+	</string>
+	<string id="item_isomorfhic_camera_lens">
+		<text>'Isomorphic' Lens</text>
+	</string>
+	<string id="item_isomorfhic_camera_lens_s">
+		<text>'Isomorphic' Lens</text>
+	</string>
+	<string id="enc_item_isomorfhic_camera_lens_descr">
+		<text>'Isomorphic' Camera Lens. Wearing it on the belt has a negative side-effect of increasing radiation levels due to the unique coating found on the actual lens itself...</text>
+	</string>
+	<string id="item_isomorfhic_shutter_camera">
+		<text>'Isomorphic' Camera Shutter</text>
+	</string>
+	<string id="item_isomorfhic_shutter_camera_s">
+		<text>'Isomorphic' Camera Shutter</text>
+	</string>
+	<string id="enc_item_isomorfhic_shutter_camera_descr">
+		<text>Shutter for the Camera. a specialized 'Unique' Desert Eagle is required in order to make use of it...</text>
+	</string>
+	<string id="item_isomorfhic_7_62x54mm">
+		<text>7.62x54mm 'Isomorphic'</text>
+	</string>
+	<string id="item_isomorfhic_7_62x54mm_s">
+		<text>7.62x54mm 'Isomorphic'</text>
+	</string>
+	<string id="enc_item_isomorfhic_7_62x54mm_descr">
+		<text>7.62x54mm 'Isomorphic' ammunition...</text>
+	</string>
+	<string id="item_wpn_walther_wa_2000">
+		<text>Anomalous Walther WA 2000</text>
+	</string>
+	<string id="item_wpn_walther_wa_2000_s">
+		<text>Anomalous Walther WA 2000</text>
+	</string>
+	<string id="enc_item_wpn_walther_wa_2000_descr">
+		<text>Anomalous Chernomor Sniper Rifle based on the Walther WA 2000 design .. Significantly reduced weight, and wear due to the change itself beginning at the molecular level under the direct influence of an unknown Isomorphic Element. Computerized sight. Used a homemade high-capacity clip. But most importantly - a weapon capable of firing abnormal 7.62x54mm calibre rounds...</text>
+	</string>
+	<string id="item_stalker_1_letters">
+		<text>S.T.A.L.K.E.R. Letters</text>
+	</string>
+	<string id="item_stalker_1_letters_s">
+		<text>S.T.A.L.K.E.R. Letters</text>
+	</string>
+	<string id="enc_item_stalker_1_letters_descr">
+		<text>Pack of letters belonging to the Rookie S.T.A.L.K.E.R. .. Poorly scribbled in pencil, and nothing of great interest. They seem to be covered in foul smelling slime from a Flesh's stomach?!...</text>
+	</string>
+	<string id="item_stalker_plastic1">
+		<text>Plastique</text>
+	</string>
+	<string id="item_stalker_plastic1_s">
+		<text>Plastique</text>
+	</string>
+	<string id="enc_item_stalker_plastic1_descr">
+		<text>Plastic explosive (or plastique) is a specialised form of explosive material. It is soft and hand moldable solid material. Plastic explosives are properly known as putty explosives within the field of explosives engineering. Common plastic explosives include Semtex and C-4. Plastic explosives are especially suited for explosive demolition as they can be easily formed into the best shapes for cutting structural members, and have a high enough velocity of detonation and density for metal cutting work. They are generally not used for ordinary blasting as they tend to be significantly more expensive than other materials that perform just as well in that field. Also, when an explosive is combined with a plasticizer, its power is generally lower than when it is pure.</text>
+	</string>
+	<string id="item_stalker_plastique1">
+		<text>'Isomorphic' Plasticine</text>
+	</string>
+	<string id="item_stalker_plastique1_s">
+		<text>'Isomorphic' Plasticine</text>
+	</string>
+	<string id="enc_item_stalker_plastique1_descr">
+		<text>'Isomorphic' Plastique [or C-4]; Soft explosives which can be molded into convenient shapes. Plastic explosives tend to be safe from accidental detonation caused by fire and impact. The convenience and safety of plastic explosives makes them very well suited for Military application. The higher relative costs of plastic explosives means that they are not commonly utilized for commercial blasting.</text>
+	</string>
+	<string id="item_9x39mm_isomorph1">
+		<text>9x39mm 'Isomorphic'</text>
+	</string>
+	<string id="item_9x39mm_isomorph1_s">
+		<text>9x39mm 'Isomorphic'</text>
+	</string>
+	<string id="enc_item_9x39mm_isomorph1_descr">
+		<text>9x39mm 'Isomorphic' ammunition</text>
+	</string>
+	<string id="item_synthetic_rope1">
+		<text>Rope</text>
+	</string>
+	<string id="item_synthetic_rope1_s">
+		<text>Rope</text>
+	</string>
+	<string id="enc_item_synthetic_rope1_descr">
+		<text>A typical piece of synthetic rope. Could come in useful here in the Zone...</text>
+	</string>
+	<string id="item_teleport_module">
+		<text>Teleportation Module</text>
+	</string>
+	<string id="item_teleport_module_s">
+		<text>Teleportation Module</text>
+	</string>
+	<string id="enc_item_teleport_module_descr">
+		<text>Teleportation Module</text>
+	</string>
+	<string id="item_bomb_casing">
+		<text>Teleportation Module</text>
+	</string>
+	<string id="item_bomb_casing_s">
+		<text>Teleportation Module</text>
+	</string>
+	<string id="enc_item_bomb_casing_descr">
+		<text>Bomb Casing .. both the warhead and detonator are missing...</text>
+	</string>
+	<string id="item_AfMerger">
+		<text>Artefact Merger</text>
+	</string>
+	<string id="item_AfMerger_s">
+		<text>AfMerger</text>
+	</string>
+	<string id="enc_item_AfMerger_descr">
+		<text>-</text>
+	</string>
+	<string id="item_document_viewer">
+		<text>Document Viewer</text>
+	</string>
+	<string id="item_document_viewer_s">
+		<text>Document Viewer</text>
+	</string>
+	<string id="enc_item_AfMerger_descr">
+		<text>Used for viewing Important Documents</text>
+	</string>
+	<string id="item_photograph_monolith">
+		<text>Photograph of the Monolith</text>
+	</string>
+	<string id="item_photograph_monolith_s">
+		<text>Photograph of the Monolith</text>
+	</string>
+	<string id="item_photograph_controller">
+		<text>Photograph of the X-16 Controller</text>
+	</string>
+	<string id="item_photograph_controller_s">
+		<text>Photograph of the X-16 Controller</text>
+	</string>
+	<string id="item_photograph_mutated_controller">
+		<text>Photograph of the Mutated Controller</text>
+	</string>
+	<string id="item_photograph_mutated_controller_s">
+		<text>Photograph of the Mutated Controller</text>
+	</string>
+	<string id="item_photograph_murderer">
+		<text>Photograph of the Murderer</text>
+	</string>
+	<string id="item_photograph_murderer_s">
+		<text>Photograph of the Murderer</text>
+	</string>
+	<string id="item_photograph_stranger">
+		<text>Photograph of the Stranger</text>
+	</string>
+	<string id="item_photograph_stranger_s">
+		<text>Photograph of the Stranger</text>
+	</string>
+	<string id="item_photograph_rookie_village">
+		<text>Photograph of the Rookie Village in the Cordon</text>
+	</string>
+	<string id="item_photograph_rookie_village_s">
+		<text>Photograph of the Rookie Village in the Cordon</text>
+	</string>
+	<string id="item_photograph_old_woman">
+		<text>Photograph of the Old Woman</text>
+	</string>
+	<string id="item_photograph_old_woman_s">
+		<text>Photograph of the Old Woman</text>
+	</string>
+	<string id="item_photograph_hiding_place">
+		<text>Description of a hiding place in the attic</text>
+	</string>
+	<string id="item_photograph_hiding_place_s">
+		<text>Description of a hiding place in the attic</text>
+	</string>
+	<string id="enc_item_photograph_monolith_descr">
+		<text>In order to view this photograph; insert it into it into the sidearm slot...</text>
+	</string>
+	<string id="item_btr_key">
+		<text>btr key</text>
+	</string>
+	<string id="item_btr_key_s">
+		<text>btr key</text>
+	</string>
+	<string id="enc_item_btr_key_descr">
+		<text>Missing description for btr key!??</text>
+	</string>
+</string_table>

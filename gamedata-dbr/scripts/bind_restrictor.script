@@ -1,0 +1,146 @@
+-- TB3D 1.0.9.9.7.0 db calls, use_binder_message
+function my_ver() return "1.0.9.9.7.0" end
+--[[------------------------------------------------------------------------------------------------
+Space restrictor binder
+Chugai Alexander
+
+Notes:
+  - Updates from the restrictor gone, so for those who need an actor is artificially at its renewal
+--------------------------------------------------------------------------------------------------]]
+local string_find = string.find
+
+local updatable_binders = {}    -- binders, which require updates(update)
+
+-- called from bind_stalker:actor_update
+function actor_update(delta)
+	if db.actor then
+		for i, v in pairs(updatable_binders) do
+			if (v) and (v.actor_update) then v:actor_update(delta) end
+		end
+	end
+end
+
+function bind( obj )
+	if obj:name()=="bar_restrictor"
+	   or obj:name()=="gar_vagon_in_restrictor"
+	   or obj:name()=="rostok_sniper_killer_restrictor"
+	   or obj:name()=="agr_u_bloodsucker_rest" then
+		local sobj=alife():object(obj:id())
+		if sobj then
+			if TB3D_Modders.use_binder_message then
+				TB3D_Services.packet_alert("bind restrictor: bind["..utils.to_str(obj:name()).."] section["..obj:section().."] removed!!!!")
+			end
+			alife():release(sobj,true)
+			return
+		end
+	end
+	if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("bind restrictor: bind["..utils.to_str(obj:name()).."] section["..obj:section().."]") end
+	obj:bind_object( restrictor_binder( obj ) )
+end
+
+----------------------------------------------------------------------------------------------------
+class "restrictor_binder" ( object_binder )
+
+function restrictor_binder:__init(obj, char_ini) super(obj)
+	self.initialized = false
+	self.loaded = false
+end
+
+function restrictor_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function restrictor_binder:reinit()
+	object_binder.reinit(self)
+	db.init_my_storage(self.object)
+	self.st = db.storage[self.object:id()]
+end
+
+-- Do not register for updates, if the object in customdata
+-- No section of logic in general.
+function restrictor_binder:net_spawn(data)
+	if not object_binder.net_spawn( self,data ) then return false end
+	db.add_zone( self.object )
+	local char_ini = xr_logic.get_customdata_or_ini_file(self.object, "<customdata>")
+	if char_ini:section_exist("logic") then
+		updatable_binders[self.object:id()] = self
+	end
+	return true
+end
+
+function restrictor_binder:net_destroy()
+	--TB3D_Services.packet_alert("bind restrictor: net destroy")
+	local is_report = false
+	local s_obj = self.object
+	local sname, sect
+	if s_obj then
+		if (s_obj.name) then
+			sname = s_obj:name()
+		else
+			sname = "nil"
+		end
+		if (s_obj.section) then
+			sect = s_obj:section()
+		else
+			sect = "nil"
+		end
+		if TB3D_Modders.use_destroy_message or (TB3D_Modders.use_state_message and string_find(sname, TB3D_Modders.npc_to_log)) then is_report = true end
+		if is_report then TB3D_Services.packet_alert("bind restrictor: net destroy["..sname.."] section["..sect.."]") end
+		if (s_obj.id) then
+			local id = s_obj:id()
+			local st = db.storage[id]
+			if st then
+				if (st.active_scheme) then
+					xr_logic.issue_event(s_obj, st[st.active_scheme], "net_destroy")
+				end
+			else
+				if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind restrictor: net destroy["..sname.."] section["..sect.."] self.object.id[nil] !!!!") end
+			end
+			updatable_binders[id] = nil
+		else
+			if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind restrictor: net destroy["..sname.."] section["..sect.."] self.object.id[nil] !!!!") end
+		end
+		db.del_zone(s_obj)
+		db.destroy_my_storage(s_obj)
+	else
+		if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind restrictor: net destroy self.object[nil] !!!!") end
+	end
+	object_binder.net_destroy(self)
+	if is_report then TB3D_Services.packet_alert("bind restrictor: net destroy["..utils.to_str(sname).."] section["..utils.to_str(sect).."] done") end
+end
+
+-- called locally
+function restrictor_binder:actor_update(delta)
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("restrictor: update["..utils.to_str(self.object:name()).."]")
+	--end
+	if not self.initialized then
+		amk.oau_watchdog=887												-----------------887
+		self.initialized = true
+		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_restrictor)
+	elseif self.st.active_section ~= nil then
+		amk.oau_watchdog=888												-----------------888
+		if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("restrictor: update["..utils.to_str(self.object:name()).."]") end
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
+	end
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("restrictor: update done")
+	--end
+end
+
+function restrictor_binder:net_save_relevant()
+	return true
+end
+
+function restrictor_binder:save(packet)
+	object_binder.save(self, packet)
+	xr_logic.save_obj(self.object, packet)
+end
+
+function restrictor_binder:load(reader)
+	self.loaded = true
+	----printf( "restrictor_binder:load" )
+	object_binder.load(self, reader)
+	xr_logic.load_obj(self.object, reader)
+end
+ 

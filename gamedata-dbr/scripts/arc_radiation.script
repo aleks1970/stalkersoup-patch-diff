@@ -1,0 +1,75 @@
+--TB3D 1.0.9.9.7.5 removed from god mode as 0 in radiation_factor = god mode, minor changes, final delta to actor, tb3d_harsh_environment, added bread
+function my_ver() return "1.0.9.9.7.5" end
+------------------------------------------------------------------------------------------------
+-- actor.radiation also changed by:
+-- soul_cube_binder:slash_target and dmx_medicines.radioprotector_update
+-- >0.3 = alcohal effect, >0.7 = radiation warning, >0.9 = death
+------------------------------------------------------------------------------------------------
+
+local inv_arts_radiation = 0
+
+local time_previous = 0
+local time_step = 287
+local next_hit = 0
+
+-- called by: arc_ and arc_ui_containers, arc_arts
+function change_inv_arts_radiation(delta)
+	inv_arts_radiation = inv_arts_radiation + delta
+	--TB3D_Services.packet_alert("arc rad: arts["..utils.to_str(inv_arts_radiation).."]")
+end
+
+function apply_radiation(time)
+  local time_delta = time - time_previous
+  if time_delta >= time_step then
+	local stepped_delta = math.min(5, time_delta/time_step)
+    local delta_radiation = inv_arts_radiation*stepped_delta
+	--TB3D_Services.packet_alert("arc rad: arts["..utils.to_str(inv_arts_radiation).."]x["..utils.to_str(stepped_delta).."]=["..utils.to_str(delta_radiation).."]")
+    if db.actor:object("lekar_kalmyak") then									--add from lekar_kalmyak
+      delta_radiation =  delta_radiation + 0.008
+		--TB3D_Services.packet_alert("arc rad: delta["..utils.to_str(delta_radiation).."] lekar kalmyak")
+    end
+	if db.actor:object("bread_a") then			--109974
+      delta_radiation =  delta_radiation + 0.0001
+		--TB3D_Services.packet_alert("arc rad: delta["..utils.to_str(delta_radiation).."] rad bread")
+    end
+	if db.actor:object("mushroom") then
+      delta_radiation =  delta_radiation + 0.001
+		--TB3D_Services.packet_alert("arc rad: delta["..utils.to_str(delta_radiation).."] mushroom")
+    end
+	if db.actor:object("case_nebo") then
+      delta_radiation =  delta_radiation + 0.003
+	  spawn_telepatic()
+		--TB3D_Services.packet_alert("arc rad: delta["..utils.to_str(delta_radiation).."] case nebo")
+	end  
+	if hidden_slots.get_item_in_helmet_slot() and not string.find(hidden_slots.get_item_in_helmet_slot(), "psy") then
+        delta_radiation = delta_radiation - 0.015 
+		--TB3D_Services.packet_alert("arc rad: delta["..utils.to_str(delta_radiation).."] helmet")
+    end
+	if has_alife_info("tb3d_harsh_environment") then
+		next_hit = next_hit + stepped_delta
+		if next_hit > math.random(4,12) then
+			delta_radiation =  delta_radiation + 0.0005
+			spawn_telepatic()
+			next_hit = 0
+		end
+	end
+	if delta_radiation~=0 then
+		if dmx_cars.actor_inside_car() == true then
+			--TB3D_Services.packet_alert("arc rad: in car delta["..utils.to_str(delta_radiation).."] blocked")
+		else
+			delta_radiation = delta_radiation * TB3D_Modders.radiation_factor
+			if delta_radiation < 0 then delta_radiation = 0 end
+			db.actor.radiation = delta_radiation
+			--TB3D_Services.packet_alert("arc rad: actor rad["..utils.to_str(db.actor.radiation).."] delta["..utils.to_str(delta_radiation).."]")
+		end
+    end
+    time_previous = time
+  end
+end
+
+function spawn_telepatic()
+	if TB3D_Modders.radiation_hit == true then
+		TB3D_hit_styles.chemical(db.actor, db.actor, "bip01_spine", 0.01, 50, vector():set(0,0,0))
+	end
+    level.add_pp_effector("amk_shoot.ppe", 2011, false)
+end

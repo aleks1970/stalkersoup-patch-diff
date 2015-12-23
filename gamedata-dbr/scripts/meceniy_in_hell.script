@@ -1,0 +1,704 @@
+--TB3D 1.0.9.9.8.0 chgd horror spawns: 50% chance collector, 20% novice to 50% master, spawn check for bad phantoms,
+-- rewrote hellhour, level_info, agro and agro_u, actor and kruglov in ignore list, get_level_up
+function my_ver() return "1.0.9.9.8.0" end
+--------------------------------------------------------------------------------------------------
+--*Module "Time of Terror" .. Spot (Shooter)
+--podrihtovano by sapsan
+--Features
+--1)Reaction Nepesov randomly, but the quest NPCs,
+--2)Issue randomly messages
+--3)The effects of ejection,
+--4)Randomly play a sound,
+--5)Randomly losing effect
+--6)Spawn next to the player (it was necessary to reduce the distance prohibition spawn AMK, see se_monster.script)
+--7)If u sleep, then wake up to
+--8)Probability of failure start the installation 50/50 - sapsan
+----------------------------------------------------------------------------------------------------
+
+local math_random = math.random
+local string_find = string.find
+-- Primary Function
+local remove_horror = true --Removal of Monsters, after an hour of Terror
+
+local tabl_npc_ignore = { -- NPCs that do not panic
+	["Sak"] = true,
+	["mil_stalker0012"] = true,
+	["yantar_ecolog_general"] = true,
+	["mil_freedom_member0021"] = true,
+	["doktor"] = true,
+	["doktor1"] = true,
+ 	["dolgovazyi"] = true,
+	["bar_docent"] = true,
+	["val_bandit_krisyk"] = true,
+	["esc_wolf"] = true,
+	["esc_fanat"] = true,
+	["esc_fox"] = true,
+ 	["esc_ranger"] = true,
+ 	["esc_dan"] = true,
+	["esc_soldier_commander"] = true,
+	["esc_soldier_blockpost_commander"] = true,
+	["esc_lager7"] = true,
+ 	["agr_krot"] = true,
+ 	["agr_nii_commander"] = true,
+	["agr_soldier_sniper_default1"] = true,
+	["bar_bar_osvedomitel"] = true,
+ 	["bar_bar_hunter"] = true,
+ 	["bar_bar_drunk_dolg"] = true,
+ 	["bar_bar_lisiy"] = true,
+	["bar_dolg_leader"] = true,
+ 	["bar_dolg_petrenko"] = true,
+ 	["bar_dolg_ivancov"] = true,
+ 	["bar_dolg_guard_commander"] = true,
+	["bar_stalker_freeman"] = true,
+	["val_bandit_borov"] = true,
+ 	["val_dolg_prisoner"] = true,
+ 	["gar_seriy"] = true,
+	["gar_dolg_blokpost_commander"] = true,
+ 	["gar_stalker_flame_quest"] = true,
+	["yan_scientist_help"] = true,
+	["single_player"] = true						--just to keep from state_mgr.set_state()
+}
+
+local tabl_reaction = {
+"hide_s_left",
+"hide_s_right",
+"hide_no_wpn",
+"psy_pain",
+"psycho_pain"
+}
+
+local tabl_sound_spawn = {
+	[[ambient\random\rnd_scr4]],
+	[[ambient\random\rnd_moan5]],
+	[[ambient\random\rnd_scr10]],
+	[[ambient\random\rnd_fallscream]],
+	[[ambient\random\rnd_ratchant]],
+	[[ambient\random\rnd_respawn]],
+	[[ambient\random\rnd_moan1]]
+}
+
+local tabl_pp_effectors = {
+	--"dead_zone.ppe",
+	"deadcity_wake.ppe",
+	"deadcity_wake1.ppe",
+	"monolith_off.ppe",
+	"radar_psi.ppe",
+	"snd_shock.ppe",
+	"psi.ppe",
+	"vibros.ppe",
+	"vibros_p.ppe"
+}
+
+local tabl_horror_by_level = {
+--[[	l01_escape = {
+		spawn = {
+			exact = { -- monsters with exact coordinates, NO BLOODSUCKERS !!!!TB3D
+				["fracture_weak_horror"] = {-15.43,3.93,56.08},
+				["fracture_weak_horror"] = {-5.05,2.17,251.47},
+				["fracture_weak_horror"] = {28.65,2.90,26.77},
+				["zombie_hell_horror"] = {-5.05,2.17,251.47},
+				["fracture_weak_horror"] = {-9.17,2.17,296.04},
+				["dog_strong_horror"] = {142.01,1.75,337.88}
+			},
+			rand = { -- monsters with random coordinates
+				["zombie_normal_horror"] = {count = 10, d = 150, y = 0},
+				["zombie_hell_horror"] = {count = 1, d = 150, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.0005, shock = 0.00001}
+	},]]--
+	l02_garbage = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+				["bloodsucker_weak_horror"] = {261.18,-8.02,-139.98},
+				["bloodsucker_weak_horror"] = {190.48,-1.02,8.19},
+				["bloodsucker_weak_horror"] = {-54.19,1.73,-45.91},
+				["bloodsucker_weak_horror"] = {-54.19,1.73,-45.91},
+				["dog_normal_horror"] = {81.67,2.59,-228.35},
+				["bloodsucker_weak_horror"] = {-76.42,-1.85,199.83},
+				["dog_normal_horror"] = {190.48,-1.02,8.19},
+				["fracture_normal_horror"] = {81.67,2.59,-228.35},
+				["fracture_normal_horror"] = {-76.42,-1.85,199.83}
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_hell_horror"] = {count = 1, d = 50, y = 0},  
+				["dog_strong_horror"] = {count = 2, d = 50, y = 0},  
+				["zombie_ghost_horror"] = {count = 1, d = 50, y = 0},
+				["zombie_normal_horror"] = {count = 10, d = 50, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.0008, shock = 0.00001}
+	},
+	--l05_bar = {
+		--spawn = {
+			--exact = { -- monsters with exact coordinates
+			--},
+			--rand = { -- monsters with random coordinates
+				--["bloodsucker_hell_horror"] = {count = 1, d = 50, y = 0},  
+				--["dog_strong_horror"] = {count = 2, d = 50, y = 0},  
+				--["zombie_ghost_horror"] = {count = 1, d = 50, y = 0},
+				--["zombie_normal_horror"] = {count = 10, d = 50, y = 0}
+			--}
+		--},
+		--actor_hit_power = {radiation = 0.001, shock = 0.00001}
+	--},
+	l03_agroprom = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+				["bloodsucker_weak_horror"] = {-94.83,13.12,155.43},
+				["bloodsucker_weak_horror"] = {-94.83,13.12,155.43},
+				["bloodsucker_weak_horror"] = {44.38,3.83,94.90},
+				["bloodsucker_weak_horror"] = {44.38,3.83,94.90},
+				["dog_normal_horror"] = {-165.71,1.34,-35.21},
+				["dog_normal_horror"] = {-165.71,1.34,-35.21},
+				["dog_normal_horror"] = {13.19,13.04,-101.63},
+				["fracture_normal_horror"] = {-221.96,7.37,44.36},
+				["fracture_normal_horror"] = {-221.96,7.37,44.36}
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_weak_horror"] = {count = 1, d = 20, y = 0},
+				["zombie_normal_horror"] = {count = 10, d = 50, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.001, shock = 0.00001}
+	},
+	l06_rostok = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+				["bloodsucker_weak_horror"] = {-55.51,-13.99,-178.57},
+				["bloodsucker_weak_horror"] = {-55.51,-13.99,-178.57},
+				["fracture_normal_horror"] = {-55.51,-13.99,-178.57}
+			},
+			rand = { -- monsters with random coordinates
+				["zombie_normal_horror"] = {count = 10, d = 50, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 50, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.002, shock = 0.00001}
+	},
+	l04_darkvalley = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+				["dog_normal_horror"] = {-53.12,-0.29,-132.12},
+				["dog_normal_horror"] = {-53.12,-0.29,-132.12},
+				["bloodsucker_weak_horror"] = {-53.12,-0.29,-132.12},
+				["fracture_strong_horror"] = {-53.12,-0.29,-132.12},
+				["bloodsucker_weak_horror"] = {-39.06,1.67,16.83},
+				["fracture_strong_horror"] = {-39.06,1.67,16.83},
+				["fracture_strong_horror"] = {-97.80,-0.45,-5.99},
+				["fracture_normal_horror"] = {112.56,0.97,72.27},
+				["fracture_normal_horror"] = {112.56,0.97,72.27},
+				["fracture_normal_horror"] = {112.56,0.97,72.27},
+				["bloodsucker_weak_horror"] = {112.56,0.97,72.27},
+				["fracture_strong_horror"] = {112.56,0.97,72.27},
+				["dog_normal_horror"] = {-147.53,0.31,-329.44},
+				["fracture_strong_horror"] = {45.45,1.68,-224.66},
+				["fracture_strong_horror"] = {102.65,1.62,-66.59}
+			},
+			rand = { -- monsters with random coordinates
+				["dog_normal_horror"] = {count = 10, d = 20, y = 0},
+				["zombie_normal_horror"] = {count = 10, d = 50, y = 0},
+				["zombie_immortal_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_hell_horror"] = {count = 5, d = 50, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.0012, shock = 0.00001}
+	},
+	l07_military = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	l08_yantar = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+				["bloodsucker_hell_horror"] = {93.84,2.94,-133.47},
+				["fracture_strong_horror"] = {93.84,2.94,-133.47},
+				["dog_strong_horror"] = {93.84,2.94,-133.47},
+				["dog_normal_horror"] = {93.84,2.94,-133.47}
+			},
+			rand = { -- monsters with random coordinates
+				["zombie_normal_horror"] = {count = 10, d = 50, y = 0},
+				["zombie_immortal_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_hell_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_ghost_horror"] = {count = 5, d = 50, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.0005, shock = 0.00001}
+	},
+--[[	l11_pripyat = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+				["fracture_normal_horror"] = {-15.07,-0.41,34.17},
+				["zombie_normal_horror"] = {-15.07,-0.41,34.17},
+				["zombie_normal_horror"] = {156.33,-0.79,5.64},
+				["dog_strong_horror"] = {70.27,-0.64,-23.60},
+				["dog_strong_horror"] = {70.27,-0.64,-23.60},
+				["bloodsucker_hell_horror"] = {124.79,-0.83,-51.74},
+				["zombie_normal_horror"] = {-67.11, -0.15, 41.19},
+				["dog_strong_horror"] = {-102.09,1.80,12.16},
+				["dog_strong_horror"] = {-102.09,1.80,12.16},
+				["dog_strong_horror"] = {-102.09,1.80,12.16},
+				["dog_strong_horror"] = {-102.09,1.80,12.16},
+				["dog_strong_horror"] = {-102.09,1.80,12.16},
+				["dog_strong_horror"] = {-102.09,1.80,12.16},
+				["fracture_strong_horror"] = {-15.07,-0.41,34.17}
+			},
+			rand = { -- monsters with random coordinates
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_normal_horror"] = {count = 10, d = 50, y = 0},
+				["zombie_immortal_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_hell_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_ghost_horror"] = {count = 5, d = 50, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.01, shock = 0.0007}
+	},]]--
+	pripyat = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_normal_horror"] = {count = 10, d = 50, y = 0},
+				["zombie_immortal_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_hell_horror"] = {count = 5, d = 50, y = 0},
+				["zombie_ghost_horror"] = {count = 5, d = 50, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.01, shock = 0.0007}
+	},
+--[[	dead_city = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},]]--
+	l10_radar = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	k01_darkscape = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	l12_stancia_2 = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	limansk = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	--[[marsh = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},--]]
+	lost_village = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	red_forest = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	generators = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+--[[	zaton = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	jupiter = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},]]--
+	hospital = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	aver = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	},
+	puzir = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	}--[[,
+	atp_for_test22 = {
+		spawn = {
+			exact = { -- monsters with exact coordinates
+			},
+			rand = { -- monsters with random coordinates
+				["bloodsucker_normal_horror"] = {count = 1, d = 100, y = 12},
+				["fracture_normal_horror"] = {count = 2, d = 100, y = 12},
+				["dog_normal_horror"] = {count = 5, d = 20, y = 12},
+				["fracture_strong_horror"] = {count = 5, d = 40, y = 0},
+				["zombie_immortal_horror"] = {count = 10, d = 40, y = 0}
+			}
+		},
+		actor_hit_power = {radiation = 0.005, shock = 0.0002}
+	}]]--
+}
+
+local horror_begin_time = {h = 23, m = 0}
+local horror_time = {h = 23, m = 3}
+local horror_time_2 = {h = 23, m = 6}
+local horror_end_time = {h = 23, m = 14}
+local game_reloaded = true -- during the CHU after restarting the game special effects will continue
+local panic_minute
+local level_info
+local hit_once = false
+
+function horrortime()
+	if not tabl_horror_by_level[level.name()] then return end
+	if level.name() == "l03_agroprom" or level:name() == "l03u_agr_underground"			--109975
+	  and not have_alife_info("agroprom_military_case_done") then
+		return
+	end
+	local timeh =level.get_time_hours()
+	local timem =level.get_time_minutes()
+	local rad, shock
+	if not has_alife_info("horror_time_begin") and not has_alife_info("horror_fail") then		--not in a hell hour now
+		if timeh == horror_begin_time.h and timem < horror_end_time.m then						--time to start a hell hour?
+			--TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."]")
+			level_info = tabl_horror_by_level[level.name()]
+			local diff_range = TB3D_Services.get_level_up() + 1									--109978, insure between 1 and 11
+			diff_range = diff_range + level.get_game_difficulty()								--2 to 5, so novice = 20% chance, master = 50% chance
+			diff_range = math.random(1,diff_range)
+			--TB3D_Services.packet_alert("mec in hell: diff_range["..utils.to_str(diff_range).."]")
+			if level_info and diff_range == 3 or diff_range == 5 or diff_range == 7 or diff_range == 9 or diff_range == 11 then										-- 3 or 5 then start hell hour
+				TB3D_Services.time_resync()		--restore normal speed incase it's excellerated time
+				game_reloaded = false
+				panic_minute = 0
+				TB3D_Services.give_info("horror_time_begin")
+				if sleep_manager.is_sleep_active() then sleep_manager.stopper() end				--wake up and the siren
+				if TB3D_Modders.hell_hour_alarm == true then				
+					local snd_obj = xr_sound.get_safe_sound_object([[meceniy\hell\hellsilent_hill_alarm]])
+					snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 2.5)
+				end
+			else
+				TB3D_Services.give_info("horror_fail")
+			end
+			--TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."] done")
+		end
+	elseif has_alife_info("horror_time_begin") then
+		if not has_alife_info("horror_time_end") and not has_alife_info("horror_fail") then																					--in hell hour
+			if panic_minute ~= timem then	-- NPCs are in a rack with exposed barrel
+				panic_minute = timem
+				local npc, npc_position, position
+				for k, v in pairs (db.storage) do	-- worried NPCs
+					npc = level.object_by_id(k)
+					if npc and npc:alive() and IAmAStalker[npc:clsid()] and tabl_npc_ignore[npc:name()] ~= true then
+						npc_position = npc:position()
+						position = vector():set(npc_position.x + math_random(-5,5), npc_position.y, npc_position.z + math_random(-5,5))
+						state_mgr.set_state(npc, "hide_s_right", nil, nil, {look_position = position})
+					end
+				end
+			end
+			if not has_alife_info("horror") and timem > horror_time.m then
+				TB3D_Services.give_info("horror")
+				--TB3D_Services.packet_alert("mec in hell: start horror["..utils.to_str(timem).."]")
+				local npc, npc_position
+				for k, v in pairs (db.storage) do	-- relaxes NPCs
+					npc = level.object_by_id(k)
+					if npc and npc:alive() and IAmAStalker[npc:clsid()] and tabl_npc_ignore[npc:name()] ~= true then
+						state_mgr.set_state(npc, "idle", nil, nil, nil, {animation = true})
+					end
+				end
+				level.add_cam_effector("camera_effects\\earthquake.anm", 77777775, true, "")
+				level.add_pp_effector("dead_zone.ppe", 77777774, false)
+				level.add_pp_effector("nano.ppe", 77777773, false)
+				level.add_pp_effector("nightvision.ppe", 77777772, false) 
+				level.add_pp_effector("psy_antenna.ppe", 77777771, true, "")
+				effects()
+				if TB3D_Modders.hell_spawn == true then horrorspawn(level.name()) end
+				if TB3D_Modders.phantom_spawn == true then spawn_phantom() end
+				horror_sound()
+				random_reaction()
+				TB3D_Services.check_valid_spawns()
+				--TB3D_Services.packet_alert("mec in hell: start horror["..utils.to_str(timem).."] done")
+			end
+			-- Restart special effects in the case of restarting the game
+			if game_reloaded and has_alife_info("horror") then
+				if timem < horror_end_time.m then
+					level.add_cam_effector("camera_effects\\earthquake.anm", 77777775, true, "")
+					level.add_pp_effector("psy_antenna.ppe", 77777771, true, "")
+					horror_sound()
+				end
+			end
+			game_reloaded = false
+			--end CHU
+			if timem == horror_time_2.m and hit_once == false then
+				hit_once = true
+				if TB3D_Modders.horror_hit == true then
+					level_info = tabl_horror_by_level[level.name()]							--109961
+					if level_info and TB3D_Services.is_indoor(false) == false then
+						rad = level_info["actor_hit_power"]["radiation"]
+						shock = level_info["actor_hit_power"]["shock"]
+						TB3D_hit_styles.horror_hit(rad, shock)
+					end
+				end
+			end
+			if timem > horror_end_time.m then
+				--TB3D_Services.packet_alert("mec in hell: end horror["..utils.to_str(timem).."]")
+				TB3D_Services.give_info("horror_time_end")
+				level.add_pp_effector ("teleport.ppe", 77777777, false)
+				level.remove_pp_effector(77777774)
+				level.remove_pp_effector(77777773)
+				level.remove_pp_effector(77777772)
+				level.remove_pp_effector(77777771)
+				level.remove_pp_effector(77777776)
+				level.remove_cam_effector(77777775)
+				remove_horror_mutant()
+				TB3D_Services.time_resync()
+				--TB3D_Services.packet_alert("mec in hell: end horror["..utils.to_str(timem).."] done")
+			end
+		elseif has_alife_info("horror_time_end") or has_alife_info("horror_fail") then
+			if timem >= horror_end_time.m + 2 then
+				hit_once = false
+				--TB3D_Services.packet_alert("mec in hell: finish horror["..utils.to_str(timem).."]")
+				TB3D_Services.remove_info("horror_time_end")
+				TB3D_Services.remove_info("horror_time_begin")
+				TB3D_Services.remove_info("horror_fail")
+				TB3D_Services.remove_info("horror")
+				--TB3D_Services.packet_alert("mec in hell: finish horror["..utils.to_str(timem).."] done")
+			end
+		end
+	elseif has_alife_info("horror_fail") then
+		TB3D_Services.remove_info("horror_time_end")
+		TB3D_Services.remove_info("horror_time_begin")
+		TB3D_Services.remove_info("horror_fail")
+		TB3D_Services.remove_info("horror")
+	end
+end
+
+-- Choice Reaction NPS
+function random_reaction()
+	local npc
+	for k, v in pairs (db.storage) do
+		npc = level.object_by_id(k)
+		if npc and npc:alive() and IAmAStalker[npc:clsid()] and tabl_npc_ignore[npc:name()] ~= true then
+			state_mgr.set_state(npc, tabl_reaction[math_random(#tabl_reaction)])
+		end
+	end
+end
+
+--[[ Randomly choose a message CHU
+function news()
+	news_manager.send_tip(db.actor, tabl_news[math_random(#tabl_news)], nil, nil, 30000)
+end]]
+
+--[[ Randomly select the report before the hour of terror
+function presoobj()
+	news_manager.send_tip(db.actor, tabl_mess_begin[random_news_number]["normal"], nil, nil, 30000)
+end
+
+-- Randomly select the report before the hour of terror at a bad start
+function presoobjFAIL()
+	news_manager.send_tip(db.actor, tabl_mess_begin[random_news_number]["fail"], nil, nil, 30000)
+end]]
+
+-- Randomly choose a sound
+function horror_sound()
+	local snd_obj = xr_sound.get_safe_sound_object(tabl_sound_spawn[math_random(#tabl_sound_spawn)])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 2.5)
+end
+
+-- The choice of effector
+function effects()
+	level.add_pp_effector(tabl_pp_effectors[math_random(#tabl_pp_effectors)], 77777776, false)
+end
+
+-- The main Spawn Locations in the light
+function horrorspawn(level_name)
+	local ap = db.actor:position()
+	local lv = db.actor:level_vertex_id()
+	local gv = db.actor:game_vertex_id()
+	local pos
+	local level_info = tabl_horror_by_level[level_name]
+	if level_info then
+		for s,p in pairs(level_info["spawn"]["exact"]) do
+			pos = vector():set(p[1],p[2],p[3])
+			alife():create(s, pos, lv, gv)
+		end
+		for s,p in pairs(level_info["spawn"]["rand"]) do
+			for i=1,p["count"] do
+				pos = vector():set(ap.x + math_random(-p["d"],p["d"]), ap.y + p["y"], ap.z + math_random(-p["d"],p["d"]))
+				alife():create(s, pos, lv, gv)
+			end
+		end
+	end
+end
+
+-- Phantoms
+function spawn_phantom()
+	local a_pos = db.actor:position()
+	local pos
+	for i = 1, math_random(5,15) do
+		pos = vector():set(math_random(-30, 30) + a_pos.x, a_pos.y + 2.5, math_random(-30, 30) + a_pos.z)
+		phantom_manager.spawn_phantom(pos)
+	end
+end
+
+-- cleaning of the remaining live monsters
+function remove_horror_mutant()
+	if remove_horror then
+		local sim = alife()
+		local horror_m
+		for i=first_object,last_object do
+			horror_m = sim:object(i)
+			if horror_m and string_find(horror_m:name(), "_horror") and horror_m:alive() then
+				sim:release(horror_m, true)
+			end
+		end
+	end
+end

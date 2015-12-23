@@ -1,0 +1,98 @@
+--TB3D 1.0.9.9.3.2 changed item take/drop inv weight, typo line 24, dmx135 
+function my_ver() return "1.0.9.9.3.2" end
+--[[-----------------------------------------------------------------------------------------------
+ File         : dmx_inv_weight_static.script
+ Description  : Conclusion portable weight indicator
+ Copyright    : DMX MOD
+ Author       : Charsi
+ Date         : 16.03.2011
+--]]-----------------------------------------------------------------------------------------------
+
+local inv_weight, outfit_weight, remaining_weight, last_outfit_id = 0.2, 0, 0, 0
+local inv_max_weight = rx_utils.read_from_ini(nil, "actor_condition", "max_walk_weight", 0)
+--local inv_weight = 0
+--local add_w = 0
+--local last_outfit_id = 0
+
+-- thresholds of color change in the percentage
+local remgreen	 = 10.0
+local remyellow = 5.0 
+local remred	 = 0.05
+
+function add_to_weight(amount)
+	if amount and amount > 0 then inv_weight=inv_weight+amount end
+end
+function sub_from_weight(amount)
+	if amount and amount > 0 then
+		inv_weight=inv_weight-amount
+		if inv_weight < 0 then inv_weight = 0 end
+	end
+end
+
+function update()
+local hud = get_hud()
+--local outfit=db.actor:item_in_slot(6)
+	local outfit = db.actor:get_current_outfit()
+	if outfit then
+		if last_outfit_id~=outfit:id() then
+			--add_w=system_ini():r_float(outfit:section(), "additional_inventory_weight")
+			outfit_weight = rx_utils.read_from_ini(nil, outfit:section(), "additional_inventory_weight", 0)
+			last_outfit_id=outfit:id()
+		end
+		remaining_weight = (inv_max_weight + outfit_weight) - inv_weight
+	else
+		remaining_weight = inv_max_weight - inv_weight
+	end
+	if remaining_weight <= remgreen and remaining_weight > remyellow then
+		add_weight_static("green")
+	elseif remaining_weight <= remyellow and remaining_weight > remred then
+		add_weight_static("yellow")
+	elseif remaining_weight < remred then
+		add_weight_static("red")
+	elseif remaining_weight > remgreen then
+		remove_weight_static()
+	end
+	return outfit
+end
+
+local hud = get_hud()
+function add_weight_static(color)
+	if color == "green" then
+		hud:AddCustomStatic("inv_weight_static", true):wnd():SetColor(GetARGB(255,76,255,0))
+	elseif color == "yellow" then
+		hud:AddCustomStatic("inv_weight_static", true):wnd():SetColor(GetARGB(255,255,216,0))
+	elseif color == "red" then
+		hud:AddCustomStatic("inv_weight_static", true):wnd():SetColor(GetARGB(255,255,0,0))
+	end
+end
+
+function remove_weight_static()
+	if hud:GetCustomStatic("inv_weight_static") then
+		hud:RemoveCustomStatic("inv_weight_static")
+	end
+end
+
+--[[if level.main_input_receiver() or scopeused then
+	if hud:GetCustomStatic("inv_weight_static") then
+		hud:RemoveCustomStatic("inv_weight_static")
+	end
+else
+	cs=hud:GetCustomStatic("inv_weight_static")
+	if cs then
+		local k=inv_weight/(97 + add_w)
+		if k < green then 	    cs:wnd():SetColor(GetARGB(0,255,255,255))  -- Transparent
+		elseif k < yellow then 	cs:wnd():SetColor(GetARGB(255,45,165,65))  -- Green
+		elseif k < red then 	cs:wnd():SetColor(GetARGB(255,233,233,61)) -- yellow
+		else 			        cs:wnd():SetColor(GetARGB(255,233,43,34))  -- red
+		end
+	else
+		hud:AddCustomStatic("inv_weight_static",true)
+		hud:GetCustomStatic("inv_weight_static"):wnd():SetColor(GetARGB(0,255,255,255))
+	end
+end
+end]]
+
+function get_inventory_weight()
+	return inv_weight
+end
+ 

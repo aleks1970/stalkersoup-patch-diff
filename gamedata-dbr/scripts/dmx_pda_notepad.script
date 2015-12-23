@@ -1,0 +1,764 @@
+-- TB3D 1.0.9.9.8.1   dmx135, optimized db.actor, send_tip line 277
+function my_ver() return "1.0.9.9.8.1" end
+--[[---------------------------------------
+ File         : dmx_pda_notepad.script
+ Description  : Notepad, chat, radio, and tagging on the PDA
+ Copyright    : DMX MOD
+ Author       : Charsi
+ Date         : 04.05.2011 
+ Last update  : 09.05.2011 - Shadows
+--]]--------------------------------------------------------------------------
+
+local debug = false -- Run button is enabled if (true - incl. \ false - off)
+local max_string_len, snd_radio = 64
+local win_x, win_y = winx, winy
+local translate = game.translate_string
+
+class "OrganizerWnd" (CUIScriptWnd)
+function OrganizerWnd:__init(owner) super()
+	self.owner = owner
+	self:Init(0,0,win_x,win_y)
+	self.rus_lat = false
+	self.num_rec = 1
+	self.ClickBtn = {}
+	self.records = {}
+	for i = 1, 100 do
+		self.records[i] = amk.load_variable("r"..i, "")
+	end
+	self.back = CUIStatic()
+	self.back:Init("ui\\ui_pda_notepad",0,0,win_x,win_y)
+	self:AttachChild(self.back)
+	local lat = [[qwertyuiop[]asdfghjkl;'zxcvbnm,./QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?!@#$%^&*()-_+=\| 0123456789]]
+	local rus = [[éöóêåíãøùçõúôûâàïðîëäæýÿ÷ñìèòüáþ.ÉÖÓÊÅÍÃØÙÇÕÚÔÛÂÀÏÐÎËÄÆÝß×ÑÌÈÒÜÁÞ,!"¹;%:?*()-_+=\/ 0123456789]]
+	self.translit = {}
+	for i = 1, string.len(rus) do
+		self.translit[string.sub(lat, i, i)] = string.sub(rus, i, i)
+	end
+	self.strings = {}
+	self.text = {}
+	self.pos = 0
+	self.sound_radio_volume = 1
+	self.ClickBtn[1] = function() self:RusLat() end
+	self.ClickBtn[4] = function() if self.pos > 1 then self.pos = self.pos - 1 self:ShowTextPage() end end
+	self.ClickBtn[5] = function() if self.pos > 10 then self.pos = self.pos - 10 self:ShowTextPage() end end
+	self.ClickBtn[6] = function() if self.pos + 10 < #self.text then self.pos = self.pos + 10 self:ShowTextPage() end end
+	self.ClickBtn[7] = function() if self.pos ~= #self.text then self.pos = self.pos + 1 self:ShowTextPage() end end
+	local xml = CScriptXmlInit()
+	xml:ParseFile("dmx_mod.xml")
+	--------------------
+	-- NAVIGATION BAR --
+	--------------------
+	xml:InitAnimStatic("pda_bar_anim_static", self.back)
+	-- reminder
+	self.btn_reminder = xml:InitButton("pda_bar_reminder", self.back)
+	self:Register(self.btn_reminder, "btn_reminder")
+	self:AddCallback("btn_reminder", ui_events.BUTTON_DOWN, self.ClickBtnReminder, self)
+	-- "-10"
+	self.btn_minus10 = xml:InitButton("pda_bar_minus10", self.back)
+	self.btn_minus10:SetText("<<")
+	self:Register(self.btn_minus10, "btn_minus10")
+	self:AddCallback("btn_minus10", ui_events.BUTTON_DOWN, self.ClickBtnMinus10, self)
+	-- "-1"
+	self.btn_minus1 = xml:InitButton("pda_bar_minus1", self.back)
+	self.btn_minus1:SetText("<")
+	self:Register(self.btn_minus1, "btn_minus1")
+	self:AddCallback("btn_minus1", ui_events.BUTTON_DOWN, self.ClickBtnMinus1, self)
+	-- "+1"
+	self.btn_plus1 = xml:InitButton("pda_bar_plus1", self.back)
+	self.btn_plus1:SetText(">")
+	self:Register(self.btn_plus1, "btn_plus1")
+	self:AddCallback("btn_plus1", ui_events.BUTTON_DOWN, self.ClickBtnPlus1, self)
+	-- "+10"
+	self.btn_plus10 = xml:InitButton("pda_bar_plus10", self.back)
+	self.btn_plus10:SetText(">>")
+	self:Register(self.btn_plus10, "btn_plus10")
+	self:AddCallback("btn_plus10", ui_events.BUTTON_DOWN, self.ClickBtnPlus10, self)
+	-- layout
+	self.btn_ruslat = xml:InitButton("pda_bar_ruslat", self.back)
+	self.btn_ruslat:SetText(self:Layout())
+	self:Register(self.btn_ruslat, "btn_ruslat")
+	self:AddCallback("btn_ruslat", ui_events.BUTTON_DOWN, self.RusLat, self)
+	-- decrease the volume
+	self.btn_volume_down = xml:InitButton("pda_bar_volume_down", self.back)
+	self.btn_volume_down:Show(snd_radio)
+	self:Register(self.btn_volume_down, "btn_volume_down")
+	self:AddCallback("btn_volume_down", ui_events.BUTTON_DOWN, self.ClickBtnVolumeDown, self)
+	-- increase volume
+	self.btn_volume_up = xml:InitButton("pda_bar_volume_up", self.back)
+	self.btn_volume_up:Show(snd_radio)
+	self:Register(self.btn_volume_up, "btn_volume_up")
+	self:AddCallback("btn_volume_up", ui_events.BUTTON_DOWN, self.ClickBtnVolumeUp, self)
+	-- the current record
+	self.record_number = xml:InitButton("pda_bar_record_number", self.back)
+	self.record_number:SetText(self.num_rec)
+	self.record_number:Enable(false)
+	------------------
+	-- MAIN BUTTONS --
+	------------------
+	-- start typing
+	self.btn_start_edit = CUIButton()
+	self.btn_start_edit:Init("ui\\ui_pda_notepad",36,115,169,27)
+	self.btn_start_edit:SetText(translate("start_typing_script"))
+	self.btn_start_edit:SetTextAlign(CGameFont.alCenter)
+	self.btn_start_edit:SetTextY(1)
+	self.btn_start_edit:SetFont(GetFontGraffiti22Russian())
+	self.btn_start_edit:SetTextColor(GetARGB(255,255,255,255))
+	self.btn_start_edit:SetOriginalRect(5,775,169,27)
+	self.back:AttachChild(self.btn_start_edit)
+	self.edit_box = CUIEditBox()
+	self.edit_box:Init(-10,111,500,50)
+	self.edit_box:SetTextColor(GetARGB(0,0,0,0))
+	self.back:AttachChild(self.edit_box)
+	-- Save the text
+	self.btn_save = CUIButton()
+	self.btn_save:Init("ui\\ui_pda_notepad",36,175,169,27)
+	self.btn_save:SetText(translate("save_script"))
+	self.btn_save:SetTextAlign(CGameFont.alCenter)
+	self.btn_save:SetTextY(1)
+	self.btn_save:SetFont(GetFontGraffiti22Russian())
+	self.btn_save:SetTextColor(GetARGB(255,255,255,255))
+	self.btn_save:SetOriginalRect(5,775,169,27)
+	self:Register(self.btn_save, "btn_save")
+	self.back:AttachChild(self.btn_save)
+	self:AddCallback("btn_save", ui_events.BUTTON_DOWN, self.ClickBtnSave, self)
+	-- clear the field
+	self.btn_clear = CUIButton()
+	self.btn_clear:Init("ui\\ui_pda_notepad",36,235,169,27)
+	self.btn_clear:SetText(translate("erase_script"))
+	self.btn_clear:SetTextAlign(CGameFont.alCenter)
+	self.btn_clear:SetTextY(1)
+	self.btn_clear:SetFont(GetFontGraffiti22Russian())
+	self.btn_clear:SetTextColor(GetARGB(255,255,255,255))
+	self.btn_clear:SetOriginalRect(5,775,169,27)
+	self:Register(self.btn_clear, "btn_clear")
+	self.back:AttachChild(self.btn_clear)
+	self:AddCallback("btn_clear", ui_events.BUTTON_DOWN, self.ClickBtnClear, self)
+	-- send text
+	self.btn_send = CUIButton()
+	self.btn_send:Init("ui\\ui_pda_notepad",36,295,169,27)
+	self.btn_send:SetText(translate("send_network_script"))
+	self.btn_send:SetTextAlign(CGameFont.alCenter)
+	self.btn_send:SetTextY(1)
+	self.btn_send:SetFont(GetFontGraffiti22Russian())
+	self.btn_send:SetTextColor(GetARGB(255,255,255,255))
+	self.btn_send:SetOriginalRect(5,775,169,27)
+	self:Register(self.btn_send, "btn_send")
+	self.back:AttachChild(self.btn_send)
+	self:AddCallback("btn_send", ui_events.BUTTON_DOWN, self.ClickBtnSend, self)
+	-- complete text as a function
+	self.btn_exe = CUIButton()
+	self.btn_exe:Init("ui\\ui_pda_notepad",36,355,169,27)
+	self.btn_exe:SetText(translate("run_script"))
+	self.btn_exe:SetTextAlign(CGameFont.alCenter)
+	self.btn_exe:SetTextY(1)
+	self.btn_exe:SetFont(GetFontGraffiti22Russian())
+	self.btn_exe:SetTextColor(GetARGB(255,255,255,255))
+	self.btn_exe:SetOriginalRect(5,775,169,27)
+	self:Register(self.btn_exe, "btn_exe")
+	self.back:AttachChild(self.btn_exe)
+	self:AddCallback("btn_exe", ui_events.BUTTON_DOWN, self.ClickBtnExe, self)
+	-- Mark
+	self.btn_add_spot = CUIButton()
+	self.btn_add_spot:Init("ui\\ui_pda_notepad",36,415,169,27)
+	self.btn_add_spot:SetText(translate("mark_script"))
+	self.btn_add_spot:SetTextAlign(CGameFont.alCenter)
+	self.btn_add_spot:SetTextY(1)
+	self.btn_add_spot:SetFont(GetFontGraffiti22Russian())
+	self.btn_add_spot:SetTextColor(GetARGB(255,255,255,255))
+	self.btn_add_spot:SetOriginalRect(5,775,169,27)
+	self:Register(self.btn_add_spot, "btn_add_spot")
+	self.back:AttachChild(self.btn_add_spot)
+	self:AddCallback("btn_add_spot", ui_events.BUTTON_DOWN, self.ClickBtnAddSpot, self)
+	-- activate radio
+	self.btn_radio = CUIButton()
+	self.btn_radio:Init("ui\\ui_pda_notepad",36,475,169,27)
+	self.btn_radio:SetText(translate("zone_radio_script"))
+	self.btn_radio:SetTextAlign(CGameFont.alCenter)
+	self.btn_radio:SetTextY(1)
+	self.btn_radio:SetFont(GetFontGraffiti22Russian())
+	self.btn_radio:SetTextColor(GetARGB(255,255,255,255))
+	self.btn_radio:SetOriginalRect(5,775,169,27)
+	self:Register(self.btn_radio, "btn_radio")
+	self.back:AttachChild(self.btn_radio)
+	self:AddCallback("btn_radio", ui_events.BUTTON_DOWN, self.ClickBtnRadio, self)
+	-- Open the submenu of mini-games
+	--self.btn_minigames = CUIButton()
+	--self.btn_minigames:Init("ui\\ui_pda_notepad",36,535,169,27)
+	--self.btn_minigames:SetText(translate("m_games_script"))
+	--self.btn_minigames:SetTextAlign(CGameFont.alCenter)
+	--self.btn_minigames:SetTextY(1)
+	--self.btn_minigames:SetOriginalRect(5,775,169,27)
+	--self:Register(self.btn_minigames, "btn_minigames")
+	--self.back:AttachChild(self.btn_minigames)
+	--self:AddCallback("btn_minigames", ui_events.BUTTON_DOWN, self.ClickBtnMinigames, self)
+	-- close Notepad
+	self.btn_hide = CUIButton()
+	self.btn_hide:Init(30,34,635,40)
+	self:Register(self.btn_hide, "btn_hide")
+	self.back:AttachChild(self.btn_hide)
+	self:AddCallback("btn_hide", ui_events.BUTTON_DOWN, self.OrganizerQuit, self)
+	-- close all PDAS
+	self.btn_close = CUIButton()
+	self.btn_close:Init(320,0,65,20)
+	self:Register(self.btn_close, "btn_close")
+	self.back:AttachChild(self.btn_close)
+	self:AddCallback("btn_close", ui_events.BUTTON_DOWN, self.PdaQuit, self)
+	self:SetTextPage(self.records[1])
+end
+
+function OrganizerWnd:ClickBtnMinus1()
+	if self.num_rec > 1 then self.num_rec = self.num_rec - 1 end
+	self.record_number:SetText(self.num_rec)
+	self.pos = 0
+	self:SetTextPage(self.records[self.num_rec] or "")
+end
+
+function OrganizerWnd:ClickBtnMinus10()
+	if self.num_rec > 10 then self.num_rec = self.num_rec - 10 end
+	self.record_number:SetText(self.num_rec)
+	self.pos = 0
+	self:SetTextPage(self.records[self.num_rec] or "")
+end
+
+function OrganizerWnd:ClickBtnPlus1()
+	if self.num_rec < 100 then self.num_rec = self.num_rec + 1 end
+	self.record_number:SetText(self.num_rec)
+	self.pos = 0
+	self:SetTextPage(self.records[self.num_rec] or "")
+end
+
+function OrganizerWnd:ClickBtnPlus10()
+	if self.num_rec < 91 then self.num_rec = self.num_rec + 10 end
+	self.record_number:SetText(self.num_rec)
+	self.pos = 0
+	self:SetTextPage(self.records[self.num_rec] or "")
+end
+
+function OrganizerWnd:ClickBtnSave()
+	local text = self:GetTextPage()
+	self.records[self.num_rec] = text
+	amk.save_variable("r"..self.num_rec, text)
+end
+
+function OrganizerWnd:ClickBtnClear()
+	self:SetTextPage("")
+	max_string_len = 64
+end
+
+function OrganizerWnd:ClickBtnSend()
+	local text = self:GetTextPage()
+	if text ~= "" then
+		local cost = 20 + string.len(text)
+		if db.actor:money() >= cost then
+			if not has_alife_info("actor_ban_chat_info") then
+				if not amk_mod.blowout() then
+					db.actor:give_money(-cost)
+					if TB3D_Modders.log_game_stats == true then game_stats.money_quest_update(-cost) end
+					news_manager.amk_send_tip(text, translate("bullseye_script"), nil, 20, "actor_sms")
+					dmx_pda_dialogs.pda_dialogs(dmx_mod.string_lower(text))
+				else
+					news_manager.send_tip(db.actor, translate("during_release_network_not_working_script"), nil, "pda_icon", 15000)
+				end
+			else
+				news_manager.send_tip(db.actor, translate("have_permission_send_messages_script"), nil, "pda_icon", 15000)
+			end
+		else
+			news_manager.send_tip(db.actor, translate("money_send_message_script"), nil, "money_out", 15000)
+		end
+		level.start_stop_menu(self.owner, true)
+		self:OrganizerQuit()
+	end
+end
+
+function OrganizerWnd:ClickBtnExe()
+	if debug then
+		local s = [[]]
+		for k, v in pairs(self.text) do
+			s = s..v:GetCharacter()
+			if v:GetEndString() then
+				s = s..[[ ]]
+			end
+		end
+		local f = loadstring(s)
+		local res, err = pcall(f)
+	else
+		news_manager.send_tip(db.actor, translate("unable_execute_command_script"), nil, "pda_icon", 10000)
+	end
+end
+
+function OrganizerWnd:ClickBtnAddSpot()
+	if db.actor:object("amk_metka") then
+		level.start_stop_menu(MapspotTypeWnd(self:GetTextPage()), true)
+	else 
+		news_manager.send_tip(db.actor, translate("install_need_gps_tracker_script"), nil, "pda_icon", 10000)
+	end
+end
+
+function OrganizerWnd:ClickBtnRadio()
+	if not snd_radio then
+		if not amk_mod.blowout() then
+			snd_radio = sound_object("car_music\\music_"..math.random(25))
+			snd_radio:play_at_pos(db.actor, vector(), 0, sound_object.s2d + sound_object.looped)
+			self.btn_volume_up:Show(true)
+			self.btn_volume_down:Show(true)
+			dmx_cars.car_radio_stop()
+		else
+			news_manager.send_tip(db.actor, translate("emission_radio_doesnt_work_script"), nil, "radio", 10000)
+		end
+	else
+		self.btn_volume_up:Show(false)
+		self.btn_volume_down:Show(false)
+		pda_radio_stop()
+	end
+end
+
+function pda_radio_stop()
+	if snd_radio and snd_radio:playing() then
+		snd_radio:stop() snd_radio = nil
+	end
+end
+
+function OrganizerWnd:ClickBtnVolumeUp()
+	self.sound_radio_volume = self.sound_radio_volume + 0.1
+	if self.sound_radio_volume > 1 then self.sound_radio_volume = 1 end
+	if snd_radio then snd_radio.volume = self.sound_radio_volume end
+end
+
+function OrganizerWnd:ClickBtnVolumeDown()
+	self.sound_radio_volume = self.sound_radio_volume - 0.1
+	if self.sound_radio_volume < 0 then self.sound_radio_volume = 0 end
+	if snd_radio then snd_radio.volume = self.sound_radio_volume end
+end
+
+--function OrganizerWnd:ClickBtnMinigames()
+	--level.start_stop_menu(MinigamesWnd(self), true)
+	--if not has_alife_info("zone_minigames_info") then
+		--TB3D_Services.give_info("zone_minigames_info")
+	--end
+--end
+
+function OrganizerWnd:ClickBtnReminder()
+	local text = self:GetTextPage()
+	if text ~= "" then
+		level.start_stop_menu(ReminderWnd(text), true)
+	else
+		news_manager.send_tip(db.actor, translate("blank_text_box_script"), nil, "pda_icon", 10000)
+	end
+end
+
+function OrganizerWnd:OrganizerQuit()
+	level.start_stop_menu(self, true)
+	dmx_pda_buttons.OrganizerMenu = nil
+end
+
+function OrganizerWnd:PdaQuit()
+	level.start_stop_menu(self.owner, true)
+	self:OrganizerQuit()
+end
+
+function OrganizerWnd:ShowHelp()
+	max_string_len = 115
+	self:SetTextPage("Help, Functions section\\n\\n1. Fast switching keyboard layouts is CTRL + left button.\\n\\n2. Fast sending messages by right-clicking the CTRL.\\n\\n3. To maintain the text you must click 'Save'.\\n\\n4. To view the saved recordings use the navigation buttons:\\n\\n   Buttons '<>' switch record one step backwards and forwards.\\n\\n   '<< >>' Buttons switch recording on ten steps backward and forward.\\n\\n5. If you want to use text as a reminder, you can set a timer. To do this, click 'NOTES'.\\n\\n6. To install tags onto the card, you must have a GPS beacon in the inventory.\\n\\n   The text of the label is set to the active field by clicking 'start'.\\n\\n   After typing, click label, you must select its icon, and then the label is installed.\\n\\n7. The cost of sending a message to the network depends on the length of the message.\\n\\n8. To adjust the volume of the radio, use the buttons 'VOL+' and 'VOL-'.\\n\\n9. To turn off the radio, in the section 'options', click the radio button again or click 'F3'.\\n\\n\\nTo turn off the 'Certificate', click 'F2'.")
+end
+
+-----------------------
+-- Utility functions --
+-----------------------
+
+function OrganizerWnd:GetTextPage()
+	local s = [[]]
+	local c = 0
+	for k, v in pairs(self.text) do
+		s = s..v:GetCharacter()
+		c = c + 1
+		if v:GetEndString() or c == max_string_len then
+			s = s..[[\n]]
+			c = 0
+		end
+	end
+	return s
+end
+
+function OrganizerWnd:SetTextPage(text)
+	local k = 0
+	local s
+	clear_table(self.text)
+	for i = 0, string.len(text) do
+		s = Symbol()
+		s:__init(string.sub(text, i + k, i + k))
+		if (string.sub(text, i + k, i + k + 1) == [[\n]]) then s:SetCharacter("") s:SetEndString(true) k = k + 1
+		elseif (string.sub(text, i + k + 1, i + k + 2) == [[\n]]) then s:SetEndString(true) k = k + 2 end
+		table.insert(self.text, s)
+	end
+	self:ShowTextPage()
+end
+
+function OrganizerWnd:ShowTextPage()
+	for k, v in pairs(self.strings) do
+		self.back:DetachChild(v)
+	end
+	while next(self.strings) do
+		table.remove(self.strings)
+	end
+	local s = ""
+	local c = 0
+	for k, v in pairs(self.text) do
+		s = s..v:GetCharacter()
+		c = c + 1
+		if k == self.pos then s = s.."_" c = c + 1 end
+		if v:GetEndString() or c >= max_string_len then
+			self:AddInStatic(s)
+			s = "" c = 0
+		end
+	end
+	if s ~= "" then self:AddInStatic(s) end
+end
+
+function OrganizerWnd:AddInStatic(text)
+	self.text_area = CUIStatic()
+	self.text_area:Init(230,125+10*table.getn(self.strings),10,10)
+	self.text_area:SetText(text)
+	self.text_area:SetTextColor(255,240,217,182)
+	table.insert(self.strings, self.text_area)
+	self.back:AttachChild(self.text_area)
+end
+
+function OrganizerWnd:AddCharacter(text)
+	text = text and (self.rus_lat and self.translit[text] or text) or ""
+	self.pos = self.pos + 1
+	local s = Symbol()
+	s:__init(text)
+	table.insert(self.text, self.pos, s)
+	self:ShowTextPage()
+end
+
+function OrganizerWnd:NewLine()
+	if self.pos == 0 then self:AddCharacter() end
+	if self.text[self.pos]:GetEndString() then self:AddCharacter() end
+	self.text[self.pos]:SetEndString(true)
+	self:ShowTextPage()
+end
+
+function OrganizerWnd:Backspace()
+	if self.pos > 0 then
+		if self.pos > 1 then
+			local es = self.text[self.pos] and self.text[self.pos]:GetEndString() or false
+			table.remove(self.text, self.pos)
+			self.pos = self.pos - 1
+			if self.text[self.pos] then self.text[self.pos]:SetEndString(es) end
+		elseif self.text[self.pos]:GetCharacter() ~= "" then
+			self.text[self.pos]:SetCharacter("")
+		end
+		self:ShowTextPage()
+	end
+end
+
+function OrganizerWnd:Delete()
+	if self.text[self.pos + 1] then
+		table.remove(self.text, self.pos + 1)
+		self:ShowTextPage()
+	end
+end
+
+function OrganizerWnd:RusLat()
+	self.rus_lat = not self.rus_lat
+	self.btn_ruslat:SetText(self:Layout())
+end
+
+function OrganizerWnd:Layout()
+	return self.rus_lat and translate("russian_1_script") or translate("english_1_script")
+--	return self.rus_lat and "RUSSIAN" or "ENGLISH"
+end
+
+class "Symbol"
+function Symbol:__init(character)
+	self.character = character or ""
+	self.end_string = false
+end
+
+function Symbol:SetCharacter(character)
+	self.character = character
+end
+
+function Symbol:GetCharacter()
+	return self.character
+end
+
+function Symbol:SetEndString(f)
+	self.end_string = f
+end
+
+function Symbol:GetEndString()
+	return self.end_string
+end
+
+--------------
+-- Keyboard --
+--------------
+
+function OrganizerWnd:OnKeyboard(dik, keyboard_action)
+	if dik ~= DIK_keys.DIK_RETURN and dik ~= DIK_keys.DIK_NUMPADENTER then
+		CUIScriptWnd.OnKeyboard(self, dik, keyboard_action)
+	end
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then self:PdaQuit()
+		elseif dik == DIK_keys.DIK_BACK then self:Backspace()
+		elseif dik == DIK_keys.DIK_DELETE then self:Delete()
+		elseif dik == DIK_keys.DIK_RETURN or dik == DIK_keys.DIK_NUMPADENTER then self:NewLine()
+		elseif dik == DIK_keys.DIK_LEFT then self.ClickBtn[4]()
+		elseif dik == DIK_keys.DIK_RIGHT then self.ClickBtn[7]()
+		elseif dik == DIK_keys.DIK_UP then self.ClickBtn[5]()
+		elseif dik == DIK_keys.DIK_DOWN then self.ClickBtn[6]()
+		elseif dik == DIK_keys.DIK_HOME then self.pos = 1 self:ShowTextPage()
+		elseif dik == DIK_keys.DIK_END then self.pos = #self.text self:ShowTextPage()
+		elseif dik == DIK_keys.DIK_NUMPAD0 then self:AddCharacter(0)
+		elseif dik == DIK_keys.DIK_NUMPAD1 then self:AddCharacter(1)
+		elseif dik == DIK_keys.DIK_NUMPAD2 then self:AddCharacter(2)
+		elseif dik == DIK_keys.DIK_NUMPAD3 then self:AddCharacter(3)
+		elseif dik == DIK_keys.DIK_NUMPAD4 then self:AddCharacter(4)
+		elseif dik == DIK_keys.DIK_NUMPAD5 then self:AddCharacter(5)
+		elseif dik == DIK_keys.DIK_NUMPAD6 then self:AddCharacter(6)
+		elseif dik == DIK_keys.DIK_NUMPAD7 then self:AddCharacter(7)
+		elseif dik == DIK_keys.DIK_NUMPAD8 then self:AddCharacter(8)
+		elseif dik == DIK_keys.DIK_NUMPAD9 then self:AddCharacter(9)
+		elseif dik == DIK_keys.DIK_DIVIDE then self:AddCharacter("/")
+		elseif dik == DIK_keys.DIK_MULTIPLY then self:AddCharacter("*")
+		elseif dik == DIK_keys.DIK_ADD then self:AddCharacter("+")
+		elseif dik == DIK_keys.DIK_NUMPADCOMMA then self:AddCharacter(".")
+		elseif dik == DIK_keys.DIK_F1 then self:ShowHelp()
+		elseif dik == DIK_keys.DIK_F2 then self:ClickBtnClear()
+		elseif dik == DIK_keys.DIK_F3 then self:ClickBtnRadio()
+		elseif dik == DIK_keys.DIK_LCONTROL then self.ClickBtn[1]()
+		elseif dik == DIK_keys.DIK_RCONTROL then self:ClickBtnSend()
+		else
+			local text = string.sub(self.edit_box:GetText(), -1)
+			if text and text ~= "" then
+				self:AddCharacter(text)
+				self.edit_box:SetText("")
+			end
+		end
+	end
+	return true
+end
+
+--[[------------------
+-- Minigames menu --
+--------------------
+
+class "MinigamesWnd" (CUIScriptWnd)
+function MinigamesWnd:__init(organizer) super()
+	self:Init(0,0,win_x,win_y)
+	self.ClickBtnExit = function() level.start_stop_menu(self, true) end
+	self.ClickBtnBulldozer = function() level.start_stop_menu(ui_game_bulldozer.puzzle(organizer), true) self:ClickBtnExit() end
+	self.ClickBtnArcanoid = function() level.start_stop_menu(ui_game_arcanoid.arcanoid(organizer), true) self:ClickBtnExit() end
+	self.ClickBtnSaper = function() level.start_stop_menu(ui_game_saper.saper(organizer), true) self:ClickBtnExit() end
+	-- window with shortcuts
+	self.back = CUIStatic()
+	self.back:Init("ui\\ui_pda_notepad",295,270,415,209)
+	self.back:SetStretchTexture(true)
+	self.back:SetOriginalRect(5,809,415,209)
+	self:AttachChild(self.back)
+	-- the close button
+	self.btn_exit = CUIButton()
+	self.btn_exit:Init(346,0,50,17)
+	self:Register(self.btn_exit, "btn_exit")
+	self.back:AttachChild(self.btn_exit)
+	self:AddCallback("btn_exit", ui_events.BUTTON_DOWN, self.ClickBtnExit, self)
+	-- bulldozer tab
+	self.btn_bulldozer = CUIButton()
+	self.btn_bulldozer:Init("ui\\ui_pda_notepad",30,30,44,40)
+	self.btn_bulldozer:SetText("Bulldozer")
+	self.btn_bulldozer:SetTextY(30)
+	self.btn_bulldozer:SetTextAlign(CGameFont.alCenter)
+	self.btn_bulldozer:SetOriginalRect(427,971,44,40)
+	self:Register(self.btn_bulldozer, "btn_bulldozer")
+	self.back:AttachChild(self.btn_bulldozer)
+	self:AddCallback("btn_bulldozer", ui_events.BUTTON_DOWN, self.ClickBtnBulldozer, self)
+	-- shortcut arcanoid
+	self.btn_arcanoid = CUIButton()
+	self.btn_arcanoid:Init("ui\\ui_pda_notepad",115,30,44,40)
+	self.btn_arcanoid:SetText("Arkanoid")
+	self.btn_arcanoid:SetTextY(30)
+	self.btn_arcanoid:SetTextAlign(CGameFont.alCenter)
+	self.btn_arcanoid:SetOriginalRect(427,928,44,40)
+	self:Register(self.btn_arcanoid, "btn_arcanoid")
+	self.back:AttachChild(self.btn_arcanoid)
+	self:AddCallback("btn_arcanoid", ui_events.BUTTON_DOWN, self.ClickBtnArcanoid, self)
+	-- Sapper tab
+	self.btn_saper = CUIButton()
+	self.btn_saper:Init("ui\\ui_pda_notepad",200,30,44,40)
+	self.btn_saper:SetText("Minesweeper")
+	self.btn_saper:SetTextY(30)
+	self.btn_saper:SetTextAlign(CGameFont.alCenter)
+	self.btn_saper:SetOriginalRect(427,883,41,40)
+	self:Register(self.btn_saper, "btn_saper")
+	self.back:AttachChild(self.btn_saper)
+	self:AddCallback("btn_saper", ui_events.BUTTON_DOWN, self.ClickBtnSaper, self)
+end
+]]--
+-----------------------
+-- Mapspot type menu --
+-----------------------
+
+class "MapspotTypeWnd" (CUIScriptWnd)
+function MapspotTypeWnd:__init(text) super()
+	self:Init(0,0,win_x,win_y)
+	local item_mapspot = db.actor:object("amk_metka")
+	self.ClickBtnExit = function() level.start_stop_menu(self, true) end
+	self.ClickBtnHabar = function()
+		db.actor:drop_item(item_mapspot)
+		amk.add_spot_on_map(item_mapspot:id(), "mapspot_pda_habar", text)
+		gps_habar.send_tip(transalate("Have_placemark_map_with_icon_khabar_script"), nil, nil, 15)
+		self:ClickBtnExit()
+	end
+	self.ClickBtnLager = function()
+		db.actor:drop_item(item_mapspot)
+		amk.add_spot_on_map(item_mapspot:id(), "mapspot_pda_lager", text)
+		gps_habar.send_tip(transalate("Have_placemark_map_with_icon_camp_script"), nil, nil, 15)
+		self:ClickBtnExit()
+	end
+	self.ClickBtnAnomal = function()
+		db.actor:drop_item(item_mapspot)
+		amk.add_spot_on_map(item_mapspot:id(), "mapspot_pda_anomal", text)
+		gps_habar.send_tip(transalate("Have_placemark_map_with_icon_anomaly_script"), nil, nil, 15)
+		self:ClickBtnExit()
+	end
+	self.ClickBtnMonsters = function()
+		db.actor:drop_item(item_mapspot)
+		amk.add_spot_on_map(item_mapspot:id(), "mapspot_pda_monsters", text)
+		gps_habar.send_tip(transalate("Have_placemark_map_with_icon_mutants_script"), nil, nil, 15)
+		self:ClickBtnExit()
+	end
+	self.ClickBtnOther = function()
+		db.actor:drop_item(item_mapspot)
+		amk.add_spot_on_map(item_mapspot:id(), "mapspot_pda_other", text)
+		gps_habar.send_tip(transalate("typical_label_the_map_script"), nil, nil, 15)
+		self:ClickBtnExit()
+	end
+	-- open
+	self.back = CUIStatic()
+	self.back:Init("ui\\ui_pda_notepad",295,270,415,209)
+	self.back:SetStretchTexture(true)
+	self.back:SetOriginalRect(5,809,415,209)
+	self:AttachChild(self.back)
+	-- exit
+	self.btn_exit = CUIButton()
+	self.btn_exit:Init(346,0,50,17)
+	self:Register(self.btn_exit, "btn_exit")
+	self.back:AttachChild(self.btn_exit)
+	self:AddCallback("btn_exit", ui_events.BUTTON_DOWN, self.ClickBtnExit, self)
+	-- swag
+	self.btn_habar = CUIButton()
+	self.btn_habar:Init("ui\\ui_common",30,30,100,25)
+	self.btn_habar:SetText(translate("swag_script"))
+	self.btn_habar:SetTextX(3)
+	self.btn_habar:SetOriginalRect(722,795,25,25)
+	self:Register(self.btn_habar, "btn_habar")
+	self.back:AttachChild(self.btn_habar)
+	self:AddCallback("btn_habar", ui_events.BUTTON_DOWN, self.ClickBtnHabar, self)
+	-- camp
+	self.btn_lager = CUIButton()
+	self.btn_lager:Init("ui\\ui_common",30,60,100,25)
+	self.btn_lager:SetText(translate("camp_script"))
+	self.btn_lager:SetTextX(6)
+	self.btn_lager:SetOriginalRect(722,882,25,25)
+	self:Register(self.btn_lager, "btn_lager")
+	self.back:AttachChild(self.btn_lager)
+	self:AddCallback("btn_lager", ui_events.BUTTON_DOWN, self.ClickBtnLager, self)
+	-- anomaly
+	self.btn_anomal = CUIButton()
+	self.btn_anomal:Init("ui\\ui_common",30,90,100,25)
+	self.btn_anomal:SetText(translate("anomaly_script"))
+	self.btn_anomal:SetTextX(15)
+	self.btn_anomal:SetOriginalRect(722,940,25,25)
+	self:Register(self.btn_anomal, "btn_anomal")
+	self.back:AttachChild(self.btn_anomal)
+	self:AddCallback("btn_anomal", ui_events.BUTTON_DOWN, self.ClickBtnAnomal, self)
+	-- the mutants
+	self.btn_monsters = CUIButton()
+	self.btn_monsters:Init("ui\\ui_common",30,120,100,25)
+	self.btn_monsters:SetText(translate("mutants_script"))
+	self.btn_monsters:SetTextX(12)
+	self.btn_monsters:SetOriginalRect(722,998,25,25)
+	self:Register(self.btn_monsters, "btn_monsters")
+	self.back:AttachChild(self.btn_monsters)
+	self:AddCallback("btn_monsters", ui_events.BUTTON_DOWN, self.ClickBtnMonsters, self)
+	-- plain label
+	self.btn_others = CUIButton()
+	self.btn_others:Init("ui\\ui_common",30,150,100,25)
+	self.btn_others:SetText(translate("plain_label_script"))
+	self.btn_others:SetTextX(32)
+	self.btn_others:SetOriginalRect(799,998,25,25)
+	self:Register(self.btn_others, "btn_others")
+	self.back:AttachChild(self.btn_others)
+	self:AddCallback("btn_others", ui_events.BUTTON_DOWN, self.ClickBtnOther, self)
+end
+
+function mapspot_remove(obj)
+	if obj:section() == "amk_metka" then
+		amk.remove_spot_from_map(obj:id(), "mapspot_pda_habar")
+		amk.remove_spot_from_map(obj:id(), "mapspot_pda_lager")
+		amk.remove_spot_from_map(obj:id(), "mapspot_pda_anomal")
+		amk.remove_spot_from_map(obj:id(), "mapspot_pda_monsters")
+		amk.remove_spot_from_map(obj:id(), "mapspot_pda_other")
+	end
+end
+
+-------------------
+-- Reminder menu --
+-------------------
+
+class "ReminderWnd" (CUIScriptWnd)
+function ReminderWnd:__init(text) super()
+	self:Init(0,0,win_x,win_y)
+	self.ClickBtnExit = function() level.start_stop_menu(self, true) end
+	self.ClickBtnCreate = function()
+		local time = self:GetEditBox("edit_box"):GetText()
+		local hour = string.sub(time, 1, 2)
+		local min = string.sub(time, 4, 5)
+		local separator = string.sub(time, 3, 3)
+		if string.len(time) == 5 and type(tonumber(hour)) == "number" and type(tonumber(min)) == "number" and separator == ":" then
+			amk.g_start_timer("pda_reminder_timer", 0, hour, min, text)
+			news_manager.send_tip(db.actor, translate("set_reminder_following_time_script")..time, nil, "pda_icon", 10000)
+			self:ClickBtnExit()
+		else
+			news_manager.send_tip(db.actor, translate("Incor_time_format_script"), nil, "pda_icon", 10000)
+		end
+	end
+	-- popup window
+	self.back = CUIStatic()
+	self.back:Init("ui\\ui_pda_notepad",295,270,415,209)
+	self.back:SetText(translate("enter_a_time_script"))
+	self.back:SetTextX(34)
+	self.back:SetTextY(50)
+	self.back:SetStretchTexture(true)
+	self.back:SetOriginalRect(5,809,415,209)
+	self:AttachChild(self.back)
+	-- text frame
+	self.frame = CUIStatic()
+	self.frame:Init("ui\\ui_common",322,48,45,19)
+	self.frame:SetOriginalRect(114,377,50,21)
+	self.frame:SetStretchTexture(true)
+	self.back:AttachChild(self.frame)
+	-- the input field
+	self.edit_box = CUIEditBox()
+	self.edit_box:Init(324,50,30,17)
+	self:Register(self.edit_box, "edit_box")
+	self.back:AttachChild(self.edit_box)
+	-- Start Timer
+	self.btn_start = CUIButton()
+	self.btn_start:Init("ui\\ui_pda_notepad",120,120,169,27)
+	self.btn_start:SetText(translate("start_the_timer_script"))
+	self.btn_start:SetTextAlign(CGameFont.alCenter)
+	self.btn_start:SetTextY(1)
+	self.btn_start:SetOriginalRect(5,775,169,27)
+	self:Register(self.btn_start, "btn_start")
+	self.back:AttachChild(self.btn_start)
+	self:AddCallback("btn_start", ui_events.BUTTON_DOWN, self.ClickBtnCreate, self)
+	-- exit
+	self.btn_exit = CUIButton()
+	self.btn_exit:Init(346,0,50,17)
+	self:Register(self.btn_exit, "btn_exit")
+	self.back:AttachChild(self.btn_exit)
+	self:AddCallback("btn_exit", ui_events.BUTTON_DOWN, self.ClickBtnExit, self)
+end

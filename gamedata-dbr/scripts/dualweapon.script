@@ -1,0 +1,213 @@
+--TB3D 1.0.9.9.3.1 change item alife to alife()
+function my_ver() return "1.0.9.9.3.1" end
+-- dualweapon.script
+-- v0.5b
+-- Script fire control with two hands
+-- Creator: Sin!
+-- Last modified: 3.08.2010
+
+function main()
+	check()
+	shootmgr()
+end
+
+function check()
+	if (kdm_change_count~=nil) and (kdm_change_count~=0) then		-- We payback: the last time we had something replaced, but the condition is not corrected
+		 synchronize_wpn_data()
+		 kdm_id_table = {}
+		 kdm_inmag_table = {}
+		 kdm_state_table = {}
+		 kdm_change_count = 0
+		 kdm_snwpn = nil
+	end
+	local slot1_wpn = db.actor:item_in_slot(1)
+	local condit = false	
+	if slot1_wpn == nil or slot1_wpn:section()~= "wpn_pmx1" then
+		change_item("wpn_pmx2", "wpn_pmx1", true)
+	else
+		change_item("wpn_pmx1", "wpn_pmx2", false)
+	end	
+end
+
+function change_item(tochange, new, searchslot, patronact)
+	--TB3D_Services.info_alert("dual weapon: main 1")
+	 if db.actor then
+		local in_slot1 = db.actor:item_in_slot(1)
+		--if in_slot1 then TB3D_Services.info_alert("dual weapon: change item["..utils.to_str(in_slot1:name()).."]") end
+		local condit = false
+		kdm_id_table = {}
+		kdm_inmag_table = {}
+		kdm_state_table = {}
+		kdm_change_count = 0
+		kdm_snwpn = nil
+		db.actor:iterate_inventory(function (tmp, item)
+			condit = false
+			if in_slot1==nil then
+				condit=true
+			elseif item and item:id() ~= in_slot1:id() then
+				condit = true
+			end
+			if item and (item:section()== tochange) and (condit or searchslot) then
+		--TB3D_Services.info_alert("dual weapon: change item["..utils.to_str(item:name()).."]")
+				if alife():object(item:id()) then
+					table.insert(kdm_inmag_table, item:get_ammo_in_magazine() or 0)
+					table.insert(kdm_state_table, item:condition() or 0)
+					alife():release(alife():object(item:id()), true)			
+					snwpn = alife():create(new, db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id()) 
+					table.insert(kdm_id_table, snwpn.id)
+					kdm_change_count = kdm_change_count + 1
+				else
+					alife():release(item:id(), true)
+				end
+			end
+		end, db.actor)
+	end
+	--TB3D_Services.info_alert("dual weapon: main done")
+end
+
+function shootmgr()
+	local ini = system_ini()
+	local slot2_wpn = db.actor:item_in_slot(2)
+	local slot1_wpn = db.actor:item_in_slot(1)
+	if (slot1_wpn==nil) or (slot2_wpn == nil) or (string.sub(slot2_wpn:section(), -2)~="x2") or (kdm_dual_mag == nil) or (kdm_single_mag == nil) then
+		kdm_dual_mag = 0
+		if slot1_wpn ~= nil then
+			kdm_single_mag = slot1_wpn:get_ammo_in_magazine()
+		else
+			kdm_single_mag = 0
+		end
+	else	
+		local p_in_mag = slot2_wpn:get_ammo_in_magazine()
+		local p_in_mag_single = slot1_wpn:get_ammo_in_magazine()		
+		-- Synchronizing with the shooting of singles
+		if db.actor:active_slot() == 1 then
+			if kdm_single_mag < p_in_mag_single then								--there was a charge
+				kdm_dual_mag = slot2_wpn:get_ammo_in_magazine()+(p_in_mag_single - kdm_single_mag)
+				if kdm_dual_mag >= 0 then
+					slot2_wpn:set_ammo_elapsed(kdm_dual_mag)
+				else
+					slot2_wpn:set_ammo_elapsed(0)
+				end
+				kdm_single_mag = slot1_wpn:get_ammo_in_magazine()
+				kdm_dual_mag = slot2_wpn:get_ammo_in_magazine()	
+			elseif kdm_single_mag > p_in_mag_single then 							--there were shots
+				local shootscount = kdm_single_mag - p_in_mag_single 					-- How many shots?
+				kdm_dual_mag = (slot2_wpn:get_ammo_in_magazine() - shootscount)				
+				if kdm_dual_mag >= 0 then
+					slot2_wpn:set_ammo_elapsed(kdm_dual_mag)
+				else
+					slot2_wpn:set_ammo_elapsed(0)
+				end
+				kdm_single_mag = slot1_wpn:get_ammo_in_magazine()
+				kdm_dual_mag = slot2_wpn:get_ammo_in_magazine()		
+			end			
+		end
+		-- Synchronization with the active doublet
+		if db.actor:active_slot() == 2 then
+			local activesection = slot2_wpn:section()
+			if kdm_dual_mag < p_in_mag then						--there was a charge
+				local maxdualmag = ini:r_s32(activesection, "ammo_mag_size")
+				if p_in_mag == maxdualmag then
+					kdm_single_mag = p_in_mag * 0.5
+				else
+					kdm_single_mag = math.abs(slot1_wpn:get_ammo_in_magazine()+(p_in_mag-kdm_dual_mag)*0.5) --!!!!!
+					if kdm_single_mag > (maxdualmag*0.5) then
+						kdm_single_mag = maxdualmag*0.5
+					end
+				end
+				slot1_wpn:set_ammo_elapsed(kdm_single_mag)			 -- fills single cartridge								   
+				kdm_single_mag = slot1_wpn:get_ammo_in_magazine()
+				kdm_dual_mag = slot2_wpn:get_ammo_in_magazine()
+			elseif kdm_dual_mag > p_in_mag then 				--there were shots
+				local shootscount = kdm_dual_mag - p_in_mag 			-- How many shots?
+				local now_in_mag2 = slot2_wpn:get_ammo_in_magazine() - shootscount
+				local now_in_mag1 = slot1_wpn:get_ammo_in_magazine() - shootscount			
+				if now_in_mag2 >= 0 then
+					slot2_wpn:set_ammo_elapsed(now_in_mag2)
+				else
+					slot2_wpn:set_ammo_elapsed(0)
+				end
+				if now_in_mag1 > now_in_mag2 then 		--if a single store ammunition more than in-store Douala
+					now_in_mag1 = now_in_mag2		--then forcibly made the call in a single cartridge
+				end
+				local maxdualmag = ini:r_s32(activesection, "ammo_mag_size")
+				if now_in_mag1 > maxdualmag*0.5  then 		
+					now_in_mag1 = maxdualmag*0.5
+				end
+				if now_in_mag1 >= 0 then
+					slot1_wpn:set_ammo_elapsed(now_in_mag1)
+				else
+					slot1_wpn:set_ammo_elapsed(0)
+				end
+				kdm_single_mag = slot1_wpn:get_ammo_in_magazine()
+				kdm_dual_mag = slot2_wpn:get_ammo_in_magazine()
+			end			
+		end
+		if db.actor:active_slot() == nil then
+			local ini=system_ini()
+			local slot2_wpn = db.actor:item_in_slot(2)
+			local slot1_wpn = db.actor:item_in_slot(1)
+			if slot1_wpn~=nil then
+				local maxmag = ini:r_s32(slot1_wpn, "ammo_mag_size")
+				local now_in_mag1 = slot1_wpn:get_ammo_in_magazine()
+			else
+				local maxmag=0
+				local now_in_mag1=0
+			end
+			if now_in_mag1 > maxmag then 		
+				now_in_mag1 = maxmag
+			end
+			if slot1_wpn~=nil then
+				kdm_single_mag = slot1_wpn:get_ammo_in_magazine()
+			else
+				kdm_single_mag=0
+			end
+			if slot2_wpn~=nil then
+				kdm_dual_mag = slot1_wpn:get_ammo_in_magazine()
+			else
+				kdm_dual_mag=0
+			end
+		end
+	end
+end
+
+function synchronize_wpn_data()
+	local ini=system_ini()
+	local slot2_wpn = db.actor:item_in_slot(2)
+	local slot1_wpn = db.actor:item_in_slot(1)
+	local maxsinglemag
+	db.actor:iterate_inventory(function (tmp, item)
+		if kdm_change_count~=0 then
+			for i=1, kdm_change_count, 1 do
+				if item:id()==kdm_id_table[i] then
+					item:set_condition(kdm_state_table[i])
+					if (slot2_wpn~=nil) and (string.sub(slot2_wpn:section(), -2)=="x2") then
+						if slot1_wpn~=nil then
+							item:set_ammo_elapsed(kdm_inmag_table[i]+slot1_wpn:get_ammo_in_magazine())
+						else
+							item:set_ammo_elapsed(kdm_inmag_table[i])
+						end
+					else
+						maxsinglemag = ini:r_s32(item:section(), "ammo_mag_size")
+						if kdm_inmag_table[i]<= maxsinglemag then
+							item:set_ammo_elapsed(kdm_inmag_table[i])
+						else
+							item:set_ammo_elapsed(maxsinglemag)
+						end
+					end
+					if slot1_wpn~=nil then
+						kdm_single_mag = slot1_wpn:get_ammo_in_magazine()
+					else
+						kdm_single_mag=0
+					end
+					if slot2_wpn~=nil then
+						kdm_dual_mag = slot1_wpn:get_ammo_in_magazine()
+					else
+						kdm_dual_mag=0
+					end
+					break
+				end
+			end
+		end
+	end, db.actor)
+end

@@ -1,0 +1,332 @@
+-- TB3D 1.0.9.9.8.1 localized text, added otclik, actor, det_indy, spots, debug, pda_is_blocked
+function my_ver() return "1.0.9.9.8.1" end
+--//----------------------------------------
+--//Author: Singapur22 rewritten Peregrine
+--//Released: 10.01.2010
+--//-----------------------------------------
+
+local list_arts = {
+["af_medusa"] = "af-medusa",
+["af_cristall_flower"] = "af-cristall-flower",
+["af_night_star"] = "af-night-star",
+["af_vyvert"] = "af-vyvert",
+["af_gravi"] = "af-gravi",
+["af_medusa_green"] = "af_medusa",
+["af_vyvert_green"] = "af_vyvert",
+["af_blood_green"] = "af_blood",
+["af_gold_fish"] = "af-gold-fish",
+["af_drops"] = "af-drops",
+["af_fireball"] = "af-fireball",
+["af_cristall"] = "af-cristall",
+["gold_art"] = "gold_art_name",
+["af_blood"] = "af-blood",
+["af_mincer_meat"] = "af-mincer-meat",
+["af_soul"] = "af-soul",
+["af_electra_sparkler"] = "af-electra-sparkler",
+["af_electra_flash"] = "af-electra-flash",
+["af_electra_moonlight"] = "af-electra-moonlight",
+["af_ameba_slime"] = "af-ameba-slime",
+["af_ameba_slug"] = "af-ameba-slug",
+["af_ameba_mica"] = "af-ameba-mica",
+["af_dummy_spring_red"] = "af_dummy_spring",
+["af_dummy_spring"] = "af-dummy-spring",
+["af_dummy_dummy"] = "af-dummy-dummy",
+["af_dummy_battery_red"] = "af_dummy_battery",
+["af_dummy_battery"] = "af-dummy-battery",
+["af_dummy_pellicle_red"] = "af_pellicle",
+["af_dummy_pellicle"] = "af-dummy-pellicle",
+["af_dummy_glassbeads"] = "af-dummy-glassbeads",
+["af_rusty_thorn"] = "af-rusty-thorn",
+["af_rusty_kristall"] = "af-rusty-kristall",
+["af_rusty_sea-urchin"] = "af-rusty-sea-urchin",
+["af_fuzz_kolobok"] = "af-fuzz-kolobok",
+["af_caterpillar"] = "af-caterpillar",
+["artifact_electro_crystal_thorn"] = "af_electro_crystal_thorn",
+["af_arhara_globus"] = "af_arhara_globus",
+["art_acumm"] = "black_power",
+["af_water_flower"] = "af-water-flower",
+["af_water_flower1"] = "af-water-flower1",
+["af_spiral"] = "af-spiral",
+["af_eye_voron"] = "af-eye-voron",
+["af_kamen_udachy"] = "af-kamen-udachy",
+["af_armor_1"] = "af_armor_1",
+["af_armor_2"] = "af_armor_2",
+["af_armor_3"] = "af_armor_3",
+["af_armor_4"] = "af_armor_4",
+["af_babka_1"] = "af_babka_1",
+["af_babka_2"] = "af_babka_2",
+["af_babka_3"] = "af_babka_3",
+["af_babka_4"] = "af-babka_4",
+["af_cry_1"] = "af_cry_1",
+["af_cry_2"] = "af_cry_2",
+["af_cry_3"] = "af_cry_3",
+["af_dik_1"] = "af_dik_1",
+["af_dik_2"] = "af_dik_2",
+["af_dik_3"] = "af_dik_3",
+["af_dik_4"] = "af_dik_4",
+["af_kol_1"] = "af_kol_1",
+["af_kol_2"] = "af_kol_2",
+["af_kol_3"] = "af_kol_3",
+["af_kol_4"] = "af_kol_4",
+["af_pudd_1"] = "af_pudd_1",
+["af_pudd_2"] = "af_pudd_2",
+["af_pudd_3"] = "af_pudd_3",
+["af_pudd_4"] = "af_pudd_4",
+["af_simbion"] = "af_simbion",
+["af_spirit_1"] = "af_spirit_1",
+["af_spirit_2"] = "af_spirit_2",
+["af_spirit_3"] = "af_spirit_3",
+["af_spirit_4"] = "af_spirit_4"
+}
+
+local list_for_super = {
+["5.45x39_izomorf"] = "nm545x39_izomorf",		--10991.1
+["5.45x39_izomorf_1"] = "nm545x39_izomorf1",
+["osnova_fotik"] = "nm_osnova_fotik",
+["linza_fotik"] = "nm_linza_fotik",
+["pushka_fotik"] = "nm_pushka_fotik",
+["rukzak_izomorf"] = "nm_rukzak_izomorf",
+["izom_globus"] = "nm_izom_globus",
+["izomorf_kristal"] = "nm_izomorf_kristal",
+["ammo_zhekan_izomorf"] = "nm_ammo_zhekan_izomorf",
+["kaktus_izomorf"] = "nm_kaktus_izomorf",
+["izomorf_kompas"] = "nm_izomorf_kompas",
+["wa2000_izomorf"] = "nm_wa2000_izomorf",
+["7.62x54_izomorf"] = "nm_7.62x54_izomorf",
+["psevdokristall"] = "nm_psevdokristall",
+["izomorf_plastilin"] = "nm_izomorf_plastilin"	--end 1099.1
+}
+
+function start_update()
+	create_list()
+	update()
+    db.actor:set_fastcall(update, db.actor)
+end
+
+function refresh_list()
+	iteration_del_spot()
+	create_list()
+end
+
+function create_list()
+	local sim = alife()
+	db.artefacts = {}
+	local artefacts = db.artefacts
+    local sobj
+	local cnt = 0
+	local lname = level.name()
+	local is_super = false
+	local sect
+	local n = db.actor:item_in_slot(1)
+	if n and n:section() == "det_artefact_super" then is_super = true end
+    for id = first_object, last_object do
+		sect = nil
+	    sobj = sim:object( id )
+		if sobj then
+			sect = sobj:section_name()
+			if game_graph():valid_vertex_id(sobj.m_game_vertex_id) then						--109976 now per level and unique super items
+				local obj_level = game_graph():vertex(sobj.m_game_vertex_id):level_id()
+				local level_name = alife():level_name(obj_level)	
+				if level_name == lname then
+					if list_arts[sect]
+					  or (is_super and list_for_super[sect]) then
+						artefacts[id] = {spot = false, tim_beep = 0}
+						cnt = cnt + 1
+					end
+				end
+			else
+				alife():release(sobj,true)	
+			end
+		end
+	end
+	db.artefacts_count = cnt
+	if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("bind det arts: total artefacts["..utils.to_str(cnt).."]") end
+end
+
+function update()
+	if db.actor then
+		if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind det arts: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]") end
+		local n = db.actor:item_in_slot(1)
+		if n then
+			local sect = n:section()
+			if sect == "det_artefact_super" then
+				--TB3D_Services.packet_alert("bind det arts: update indy[super]")
+				if TB3D_Services.pda_is_blocked() == false then this.det_super() end
+			elseif sect == "detektor_amorf" then
+				--TB3D_Services.packet_alert("bind det arts: update indy[amorf]")
+				if TB3D_Services.pda_is_blocked() == false then this.det_izomorf() end
+			elseif sect == "det_artefact_indy" then				--veles
+				--TB3D_Services.packet_alert("bind det arts: update indy[veles]")
+				this.det_indy(1600)   --40*40
+			elseif sect == "fake_bolt_detector_otclik" then		--response 'art' !!TB3D
+				--TB3D_Services.packet_alert("bind det arts: update indy[response art]")
+				this.det_indy(900)  --30*30
+			elseif sect == "fake_bolt_detector_veles" then		--response !!TB3D
+				--TB3D_Services.packet_alert("bind det arts: update indy[Response]")
+				this.det_indy(800)  --20*20
+			elseif sect == "fake_bolt_detector_medved" then		--bear !!TB3D
+				--TB3D_Services.packet_alert("bind det arts: update indy[bear]")
+				this.det_indy(100)  --10*10
+			else
+				this.iteration_del_spot()
+			end
+		end
+		if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind det arts: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done") end
+	else
+		TB3D_Services.abort_alert("bind det arts: update no actor!!!!!!!")
+	end
+end
+
+function det_indy(distance)
+	local artefacts = db.artefacts
+	local actorpos = db.actor:position()
+	local snd_obj = xr_sound.get_safe_sound_object("ambient\\da_beep")
+    local obj
+    local dist
+    local level_object_by_id = level.object_by_id
+	local time_g = time_global()
+    for k,v in pairs(artefacts) do
+	    obj = level_object_by_id( k )
+		if obj then
+		    if not obj:parent() then
+				dist = actorpos:distance_to_sqr(obj:position())
+				if artefacts[k].tim_beep then
+					if dist <= distance and artefacts[k].tim_beep <= time_g - dist then
+						if not snd_obj:playing() then
+							artefacts[k].tim_beep = time_g
+							snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+						end
+					end
+				else
+					artefacts[k].tim_beep = time_g
+				end
+			end
+			this.del_spot(k, v)	--turn off all spots as is sound only
+		end
+	end
+end
+
+function det_izomorf()
+	local artefacts = db.artefacts
+	--local actor = db.actor
+	local actorpos = db.actor:position()
+	local snd_obj = xr_sound.get_safe_sound_object("ambient\\da_beep")
+    local level_object_by_id = level.object_by_id
+    local obj
+    local dist
+	local time_g = time_global()
+    for k,v in pairs(artefacts) do
+	    obj = level_object_by_id( k )
+		if obj then
+		    if not obj:parent() then
+			    dist = actorpos:distance_to_sqr(obj:position())
+				if dist < 60*60 then
+					if not v.spot then
+					--name still is not used
+					--[[					local ini = system_ini()
+					    local section = obj:section()
+					    local name = ""
+					    if ini and section and ini:section_exist(section) then
+					        if ini:line_exist(section, "inv_name") then
+						        name = ini:r_string(section, "inv_name")
+						    end
+					    end]]
+						if k and level.map_has_object_spot(k, "artefact_location") == 0 then
+							level.map_add_object_spot(k, "artefact_location", "Local Energy zone")
+							artefacts[k].spot = true
+						end
+			        end
+					if v.tim_beep < time_g and not snd_obj:playing() then
+						artefacts[k].tim_beep = time_g + 2500
+					    snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+					end
+				else
+					this.del_spot(k, v)
+				end
+			else
+			    this.del_spot(k, v)
+			end
+		end
+	end
+end
+
+function det_super()
+	local sim = alife()
+	local artefacts = db.artefacts
+	--local actor = db.actor
+	local ggraph = game_graph()
+    local sobj
+    local level_id = sim:level_id()
+    local section
+    local name
+    for k,v in pairs(artefacts) do
+	    sobj = sim:object( k )
+		if sobj then
+			if ggraph:valid_vertex_id(sobj.m_game_vertex_id) and ggraph:vertex(sobj.m_game_vertex_id):level_id() == level_id
+			  and sobj.parent_id == expendable_object and not sobj.is_day_night then
+				if not v.spot then
+			-- names are stored in the local table - not good in apdeyte inishki kolbasit
+--[[				    local ini = system_ini()
+					local section = sobj:section_name()
+					local name = ""
+					if ini and section and ini:section_exist(section) then
+					    if ini:line_exist(section, "inv_name") then
+						    name = ini:r_string(section, "inv_name")
+						end
+					end]]
+					section = sobj:section_name()
+					name = ""
+					if section and list_arts[section] then
+						name = list_arts[section]
+					end
+					if k and  level.map_has_object_spot(k, "artefact_location") == 0 then
+						level.map_add_object_spot(k, "artefact_location", "artifact: " .. game.translate_string(name))
+						artefacts[k].spot = true
+					end
+			    end
+			else
+				this.del_spot(k, v)
+			end
+		end
+	end
+end
+
+function iteration_del_spot()
+	local artefacts = db.artefacts
+	local sim = alife()
+	local sobj
+    for k,v in pairs(artefacts) do
+		if v.spot then
+	    	sobj = sim:object(k)
+			if sobj then
+				this.del_spot(k, v)
+			end
+		end
+	end
+end
+
+function del_spot(k, v)
+	local artefacts = db.artefacts
+    if v.spot then
+		level.map_remove_object_spot(k, "artefact_location")
+		artefacts[k].spot = false
+	end
+end
+
+function art_count()
+	local artefacts = db.artefacts
+	local sim = alife()
+	local sobj
+	local cnt = 0
+    for k,v in pairs(artefacts) do
+	    sobj = sim:object(k)
+		if sobj then
+			cnt = cnt + 1
+		elseif v.spot then
+			level.map_remove_object_spot(k, "artefact_location")
+			artefacts[k].spot = false
+		end
+	end
+	return cnt
+end
+ 

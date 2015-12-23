@@ -1,0 +1,913 @@
+-- TB3D 1.0.9.9.8.0   fixed conditions for Collector, removed fake_ from item sections, cube dialog, give talk message, debug
+function my_ver() return "1.0.9.9.8.0" end
+---------------------------------------------------------------------
+-- Trader Repair
+-----------------------------------------------------------------------------------
+
+local weapon_profit_margin = 4
+local armor_profit_margin = 1.5
+
+function trader_repair_precond(trader, actor)
+	local item_in_slot_1 = db.actor:item_in_slot(1)
+	local item_in_slot_2 = db.actor:item_in_slot(2)
+	local item_in_slot_6 = db.actor:item_in_slot(6)
+	if item_in_slot_1 ~= nil and 1 > item_in_slot_1:condition() + 0.01 then return true
+	elseif item_in_slot_2 ~= nil and 1 > item_in_slot_2:condition() + 0.01 then return true
+	elseif item_in_slot_6 ~= nil and 1 > item_in_slot_6:condition() + 0.01 then return true
+	else return false
+	end	 
+end
+
+function trader_check_money_s1(trader, actor)
+	local item_in_slot = db.actor:item_in_slot(1)
+	if item_in_slot ~= nil then 
+		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		if item_repair_cost > 0 and db.actor:money() >= item_repair_cost and 1 > item_in_slot:condition() then
+			return true
+		end 
+	end
+	return false
+end
+
+function trader_check_money_s2(trader, actor)
+	local item_in_slot = db.actor:item_in_slot(2)
+	if item_in_slot ~= nil then 
+		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		if item_repair_cost > 0 and db.actor:money() >= item_repair_cost and 1 > item_in_slot:condition() then
+			return true
+		end 
+	end
+	return false
+end
+
+function trader_check_money_s6(trader, actor)
+	local item_in_slot = db.actor:item_in_slot(6)
+	if item_in_slot ~= nil then 
+		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * armor_profit_margin )
+		if item_repair_cost > 0 and db.actor:money() >= item_repair_cost and 1 > item_in_slot:condition() then
+			return true
+		end 
+	end
+	return false
+end
+
+function trader_repiar_weapon_s1(trader, actor)
+	local item_in_slot = db.actor:item_in_slot(1)
+	if item_in_slot ~= nil then
+		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		item_in_slot:set_condition(1)
+		dialogs.relocate_money(actor, item_repair_cost, "out")
+	end
+end
+
+function trader_repiar_weapon_s2(trader, actor)
+	local item_in_slot = db.actor:item_in_slot(2)
+	if item_in_slot ~= nil then
+		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * weapon_profit_margin )
+		item_in_slot:set_condition(1)
+		dialogs.relocate_money(actor, item_repair_cost, "out")
+	end
+end
+
+function trader_repiar_armor_s6(trader, actor)
+	local item_in_slot = db.actor:item_in_slot(6)
+	if item_in_slot ~= nil then
+		local item_repair_cost = math.floor( (1-item_in_slot:condition()) * item_in_slot:cost() * armor_profit_margin )
+		amk_mod.repair_armor(1)
+		dialogs.relocate_money(actor, item_repair_cost, "out")
+	end	
+end
+
+function repair_costs(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local item_repair_cost = 0
+	if db.actor ~= nil then 
+		local item_in_slot_1 = db.actor:item_in_slot(1)
+		local item_in_slot_2 = db.actor:item_in_slot(2)
+		local item_in_slot_6 = db.actor:item_in_slot(6)
+		if item_in_slot_1 ~= nil then 
+			item_repair_cost = math.floor( (1-item_in_slot_1:condition()) * item_in_slot_1:cost() * weapon_profit_margin )
+			if item_repair_cost > 0 then
+				item_name_and_price = game.translate_string("list_trader_repair_0").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
+				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+			end
+		end
+		if item_in_slot_2 ~= nil then
+			item_repair_cost = math.floor( (1-item_in_slot_2:condition()) * item_in_slot_2:cost() * weapon_profit_margin )
+			if item_repair_cost > 0 then
+				item_name_and_price = game.translate_string("list_trader_repair_1").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
+				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+			end
+		end
+		if item_in_slot_6 ~= nil then
+			item_repair_cost = math.floor( (1-item_in_slot_6:condition()) * item_in_slot_6:cost() * armor_profit_margin )
+			if item_repair_cost > 0 then
+				item_name_and_price = game.translate_string("list_trader_repair_2").." %c[255,238,155,23]"..item_repair_cost.." RUB%c[default]"
+				news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+			end
+		end
+	end
+end
+
+function trader_miniquest_precond(trader, actor)
+	local zz = false
+	-- Read customdata
+	local obj = alife():story_object(3)
+	if (obj) then
+		local t = amk.get_trader_data(obj)
+		local cd = amk.parse_custom_data(t.custom)
+		if (cd.microquest and cd.microquest.reward_money and cd.microquest.reward_items and tonumber(cd.microquest.reward_money) > 0 and cd.microquest.reward_items ~= "") then
+			zz = true
+		end
+	end
+	return zz
+end
+
+function trader_check_money_miniquest(trader, actor)
+	local zz = false
+	if (db.actor:money() >= 100) then
+		zz = true
+	end
+	return zz
+end
+
+function trader_miniquest_transfer(trader, actor)
+	dialogs.relocate_money(actor, 100, "out")
+	news_main.on_miniquest_reward(trader)
+end
+
+function trader_miniquest_free_transfer(trader, actor)
+	news_main.on_miniquest_reward(trader)
+end
+
+function trader_check_miniquest_free(trader, actor)
+	if (has_alife_info("esc_trader_miniquest_free")) then
+		return true
+	end
+	return false
+end
+
+function trader_check_miniquest_free_neg(trader, actor)
+	if (has_alife_info("esc_trader_miniquest_free")) then
+		return false
+	end
+	return true
+end
+
+function trader_check_miniquest_free_all_neg(trader, actor)
+	if (has_alife_info("esc_trader_miniquest_free") or has_alife_info("esc_trader_miniquest_notfree")) then
+		return false
+	end
+	return true
+end
+
+
+--------------------------------------------------------------------------------------------------------
+-- Dialog & InfoPortions Function
+--------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------
+-- Trader
+--------------------------------------------------------------------------------------------------------
+
+
+function transfer_deneg(first_speaker, second_speaker)
+    dialogs.relocate_money(second_speaker, 1400, "in")
+    dialogs.relocate_item_section(second_speaker, "detector_simple", "in")
+	dialogs.relocate_item_section(second_speaker, "arc_art_box_8basic", "in")
+	dialogs.relocate_item_section(first_speaker, "arc_art_box_1basic", "out")
+	
+end
+   
+
+function give_weapon_from_trader(trader, actor)
+    --dialogs.relocate_item_section(trader, "wpn_knife", "in")    
+	dialogs.relocate_item_section(trader, "arc_art_box_1basic", "in")
+end
+
+function otday_art (first_speaker, second_speaker)
+    dialogs.relocate_item_section(second_speaker, "amk_af_night_star", "out")
+end
+
+function doc_x8(obj)
+	alife():create("bibliotekar",vector():set(140.922,-0.367,220.575),370139,3769)
+	news_manager.amk_send_tip("I got to the apartment, Shadows and Pavel were, Cube was not. But I found interesting about the notebook night incident in the laboratory... Karoche after all that happened, our friend went back to the lab. Apparently, so did not come out of there...\\nBy the way there yet sink a strange - entry is repeated constantly. To record the conversation sort of military...\\nWhat do you think?", "Labeled: a private channel", 10, 20, "actor_sms")
+	news_manager.amk_send_tip("I think that's what - you have to move. We're in trouble - our last conversation overheard. And maybe someone else knew about the Cube ... Maybe the one who let you tip me...\\nIn general the eastern part of Pripyat is now occupied by a fit squad of mercenaries. They know what you're looking for the Cube in the apartment...\\nWe must make them believe otherwise. You do not want trouble? You can try to merge the disinformation to the stalker network...\\nTry to write in the chat via PDA: 'Cube for Sale, belonged to Shadows. The cordon around the Perimeter, in 8 hours.'\\nWrite exactly as I wrote, then maybe they will think you already took the Cube ... Try.", "Shadows: private channel", 30, 50)
+	TB3D_Triggers.spawn_alife("werewolf",-49.974,-0.507,-71.471,139443,3759, 2)
+	TB3D_Triggers.spawn_alife("werewolf",140.922,-0.367,220.575,370139,3769, 2)
+	dmx_mod.pripyat_base_spawn()
+end
+
+function have_a_art2 (stalker, player)
+    return stalker:object ("amk_af_night_star") ~= nil
+end
+
+function trader_alredy_give_job(trader, actor)
+	--if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D
+	if (has_alife_info("agroprom_military_case") and not has_alife_info("agroprom_military_case_done")) or
+	   (has_alife_info("escape_blockpost_case") and not has_alife_info("escape_blockpost_case_done")) or
+	   (has_alife_info("tutorial_artefact_start") and not has_alife_info("tutorial_artefact_done")) or
+	   (has_alife_info("tutorial_wounded_start") and not has_alife_info("esc_serious_talk"))
+	then
+		return true
+	end
+	return false 
+end
+
+function trader_give_extra_job(trader, actor)
+	if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D
+	--local actor = db.actor
+	if has_alife_info("escape_blockpost_case") and not has_alife_info("escape_blockpost_case_done")
+	then
+		return true
+	end
+	return false
+end
+
+function bandits_die(actor,npc)
+	if has_alife_info("tb3d_collector") then return true end	--!!!!TB3D
+	if has_alife_info("esc_kill_bandits_quest_kill") or has_alife_info("esc_kill_bandits_noquest_kill")
+	then
+		return true
+	end
+	return false
+end
+
+function trader_need_extra_job(trader, actor)
+	--if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D
+	if not has_alife_info("escape_blockpost_case") and 
+	    has_alife_info("esc_return")
+	then
+		return true
+	end
+	return false
+end
+
+function is_tutorial()
+	if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D
+	return not has_alife_info("tutorial_end")
+end
+
+function is_not_tutorial()
+	if has_alife_info("tb3d_collector") then return true end	--!!!!TB3D
+	return has_alife_info("tutorial_end")
+end
+
+function is_not_tutorial_art(actor, trader)
+	if has_alife_info("tb3d_collector") then return true end	--!!!!TB3D
+	local tutorial_artefact = db.actor:object("af_blood_tutorial")
+	if (has_alife_info("tutorial_artefact_start") and not has_alife_info("tutorial_artefact_done")
+		and  tutorial_artefact ~= nil) or has_alife_info("tutorial_artefact_done")
+	then
+		return true
+	end
+	return false
+end
+
+function not_final_job(trader, actor)
+	if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D
+	--local actor = db.actor
+	return not has_alife_info("escape_blockpost_case_done")
+end
+
+function trader_test(actor, npc)	--!!!!TB3D
+ 	--printf ("!!!!!")	
+	return true
+end
+
+function trader_dont_give_job(first_speaker, second_speaker)
+	return not trader_alredy_give_job(first_speaker, second_speaker)
+end
+
+function finalize_quests(first_speaker, second_speaker)
+	if has_alife_info("tb3d_collector") then return true end	--!!!!TB3D
+	if tutorial_artefact_end(first_speaker, second_speaker) == true or
+	   tutorial_wounded_end(first_speaker, second_speaker) == true
+	then
+		return true
+	end
+	return false
+end
+
+function not_finalize_quests(first_speaker, second_speaker)
+	return not this.finalize_quests(first_speaker, second_speaker)	
+end
+
+function tutorial_artefact_end(first_speaker, second_speaker)
+	local actor = db.actor
+	local tutorial_artefact = first_speaker:object("af_blood_tutorial")
+	if has_alife_info("tutorial_artefact_start") and 
+	   not has_alife_info("tutorial_artefact_done") and
+	   tutorial_artefact ~= nil
+	then
+		return true
+	end
+	return false
+end
+
+function tutorial_artefact_have_not(first_speaker, second_speaker)
+	local actor = db.actor
+	local tutorial_artefact = first_speaker:object("af_blood_tutorial")
+	if has_alife_info("tutorial_artefact_start") and 
+	   not has_alife_info("tutorial_artefact_done") and
+	   tutorial_artefact == nil
+	then
+		return true
+	end
+	return false
+end
+
+function tutorial_wounded_end(first_speaker, second_speaker)
+	--if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D
+	local actor = db.actor
+	-- local wounded_flash = first_speaker:object("esc_wounded_flash")
+	if has_alife_info("tutorial_wounded_start")	and 
+		has_alife_info("tutorial_wounded_give_info")	and 	
+	   not has_alife_info("esc_serious_talk")
+ -- and   wounded_flash ~= nil
+	then
+		return true
+	end
+	return false
+end
+
+function trader_dont_has_job(first_speaker, second_speaker)	--!!!!TB3D both return false if collector
+    if trader_need_military_case(first_speaker, second_speaker) == false and
+	   trader_need_blockpost_box(first_speaker, second_speaker) == false
+	then
+		return true
+	end
+	return false
+end
+
+--' Escape tutorial artefact
+function have_tutorial_artefact(first_speaker, second_speaker)
+  	return first_speaker:object("af_blood_tutorial") ~= nil
+end
+function give_medkit(first_speaker, second_speaker)
+	dialogs.relocate_item_section(first_speaker, "medkit", "in")
+end
+function give_tutorial_artefact(first_speaker, second_speaker)
+	dialogs.relocate_item_section(second_speaker, "af_blood_tutorial", "out")
+end
+
+--' Meet fox
+function have_fox_info(first_speaker, second_speaker)
+		if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D
+  	return first_speaker:object("fox_flash") ~= nil
+end
+
+--' fox help
+
+function transfer_medikit_to_fox (player, wounded)
+	wounded:set_relation(game_object.friend, player)
+	TB3D_Services.give_info("escape_fox_heal")
+end
+
+function give_weapon_to_actor (trader, actor)	--!!!!TB3D
+	if has_alife_info("tb3d_collector") then return end	--!!!!TB3D
+	if not has_alife_info("kvest_art_started") then
+		dialogs.relocate_item_section(trader, "wpn_pmx1", "in")
+		dialogs.relocate_item_section(trader, "ammo_9x18_fmj", "in")
+        dialogs.relocate_item_section(trader, "smoking_b", "in") 
+        dialogs.relocate_item_section(trader, "garmoshka_b", "in")
+		dialogs.relocate_item_section(trader, "razgruzka", "in")
+		dialogs.relocate_item_section(trader, "syh_pay_gde_3", "in")
+		dialogs.relocate_item_section(trader, "wpn_fuck", "in")
+		dialogs.relocate_item_section(trader, "bolt", "in")
+		else   
+		dialogs.relocate_item_section(trader, "wpn_pmx1", "in")
+		dialogs.relocate_item_section(trader, "ammo_9x18_fmj", "in")
+        dialogs.relocate_item_section(trader, "smoking_b", "in") 
+        dialogs.relocate_item_section(trader, "garmoshka_b", "in")
+		dialogs.relocate_item_section(trader, "razgruzka", "in")
+		dialogs.relocate_item_section(trader, "syh_pay_gde_3", "in")
+		dialogs.relocate_item_section(trader, "wpn_fuck", "in")
+		dialogs.relocate_item_section(trader, "bolt", "in")
+	end
+end
+
+--' Escape blockpost box
+function have_blockpost_case(first_speaker, second_speaker)
+	if has_alife_info("tb3d_collector") then return true end	--!!!!TB3D return true if collector
+  	return first_speaker:object("quest_case_01") ~= nil
+end
+
+function give_blockpost_case(first_speaker, second_speaker)
+	if has_alife_info("tb3d_collector") then return end	--!!!!TB3D
+	dialogs.relocate_item_section(second_speaker, "quest_case_01", "out")
+end
+
+function give_blockpost_case_reward(first_speaker, second_speaker)
+	if has_alife_info("tb3d_collector") then return end	--!!!!TB3D
+	dialogs.relocate_money(first_speaker, 2000, "in")
+end
+
+--' Agroprom military case
+function trader_need_military_case(first_speaker, second_speaker)
+	if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D return false if collector
+    if has_alife_info("esc_serious_talk") and
+	   not has_alife_info("agroprom_military_case")
+	then
+		return true
+	end
+	return false
+end
+
+--' Escape trader artefact
+function have_artefact_from_fleshes(first_speaker, second_speaker)
+	local actor = db.actor
+	if actor ~= nil and
+	   (actor:object("af_vyvert") ~= nil or
+	   actor:object("af_gravi") ~= nil or
+	   actor:object("af_gold_fish") ~= nil)
+	then
+		return true
+	end
+  	return false
+end
+
+
+--' Box with checkpoint
+function trader_need_blockpost_box(first_speaker, second_speaker)
+		if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D return false if collector
+    if has_alife_info("tutorial_end") and
+	   has_alife_info("esc_trader_speak") and
+	   not has_alife_info("escape_blockpost_case")
+	then
+		return true
+	end
+	return false
+end
+
+--' tutorial wounded in vagon
+function wounded_need_help(first_speaker, second_speaker)
+	local actor = db.actor
+	return actor ~= nil and not has_alife_info( "tutorial_wounded_help" )
+end
+
+--' trader needs military documents
+function trader_need_military_document(first_speaker, second_speaker)
+		if has_alife_info("tb3d_collector") then return false end	--!!!!TB3D return false if collector
+    if has_alife_info("escape_blockpost_case_done") and
+	   not has_alife_info("agroprom_military_case")
+	then
+		return true
+	end
+	return false
+end
+
+--' trader dialog about docs from labx18
+function actor_has_documents (actor, npc)
+	if actor:object("dar_document4") then
+		return true
+	else
+		return false
+	end
+end
+
+--' Escape dynamite for Wolf
+function transfer_wolf_reward(first_speaker, second_speaker)
+	dialogs.relocate_item_section(first_speaker, "af_medusa", "in")
+end
+
+function wolf_additional_reward(first_speaker, second_speaker)
+    dialogs.relocate_item_section(first_speaker, "medkit", "in")
+    dialogs.relocate_item_section(first_speaker, "bandage", "in")
+    dialogs.relocate_item_section(first_speaker, "wpn_fort", "in")
+    dialogs.relocate_item_section(first_speaker, "grenade_f1", "in") 
+    dialogs.relocate_item_section(first_speaker, "ammo_9x18_fmj", "in")        
+end
+
+
+--' Escape Wounded's flash
+function wounded_give_flash(first_speaker, second_speaker)
+	dialogs.relocate_item_section(first_speaker, "esc_wounded_flash", "in")
+end
+
+function have_wounded_flash(first_speaker, second_speaker)
+  	return first_speaker:object("esc_wounded_flash") ~= nil
+end
+function dont_have_wounded_flash(first_speaker, second_speaker)
+  	return not have_wounded_flash(first_speaker, second_speaker)
+end
+
+function give_wounded_flash(first_speaker, second_speaker)
+	dialogs.relocate_item_section(second_speaker, "esc_wounded_flash", "out")
+	dialogs.relocate_money(second_speaker, 1500, "in")
+end
+
+function give_knife_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section(first_speaker, "wpn_knife", "in")
+end
+
+--' Escape bandits factory
+function give_factory_reward_trader(first_speaker, second_speaker)
+	dialogs.relocate_money(first_speaker, 500, "in")
+end
+
+--' Give X-18 documents read
+
+function give_documents_reward (first_speaker, second_speaker)
+	dialogs.relocate_money(first_speaker, 1000, "in")
+end
+
+
+--' Kill killers raid
+function give_reward_killers(first_speaker, second_speaker)
+	dialogs.relocate_money(first_speaker, 2500, "in")
+end
+
+
+--' Soldiers on bridge
+function has_soldiers_bribe(actor, npc)
+	return actor:money() >= 500
+end
+
+function give_soldiers_bribe(actor, npc)
+	dialogs.relocate_money(npc, 500, "out")	
+end
+
+function fox_pay_money(actor, npc)
+	dialogs.relocate_money(npc, 1500, "in")	
+	treasure_manager.get_treasure_manager():give_treasure("esc_secret_truck_goods")
+end
+
+function run_tutorial_pda(first_speaker, second_speaker)	--!!!!TB3D
+	--printf("!-!-!")
+	first_speaker:stop_talk()
+    second_speaker:stop_talk()
+	game.start_tutorial("part_1_pda")
+end
+
+function wolf_precond_univ (actor, npc)
+	if TB3D_Services.is_collector(1100) == true then return true end
+	return has_alife_info("esc_kill_bandits_quest_done") or (has_alife_info("tutorial_wounded_give_info") and not has_alife_info("esc_kill_bandits_quest_have"))
+end
+
+
+--------------------------------------------------------------------------------------------------------
+-- Trader Factions - ABC1 Mod by Speed aka LW. Edit Arkhara
+--------------------------------------------------------------------------------------------------------
+
+function factions_repair_checkduty_r(trader, actor)
+   if relation_registry.community_goodwill ("dolg", db.actor:id ()) < 0 then
+		local chkgoodwill = relation_registry.community_goodwill("dolg",  db.actor:id())
+		if chkgoodwill > -100 and db.actor:money() >= 250000 then return true end
+		if chkgoodwill < -100 and chkgoodwill >= -1000 and db.actor:money() >= 250000 then return true end
+		if chkgoodwill < -1000 and db.actor:money() >= 350000 then return true end
+   end
+return false
+end
+
+function factions_repair_checkduty_j(trader, actor)
+local whatami = db.actor:character_community()
+   if (relation_registry.community_goodwill ("dolg", db.actor:id()) >= 0) and (db.actor:money() >= 250000) and (whatami ~= "actor_dolg") and (whatami == "actor") then return true
+   else return false
+   end
+end
+
+function factions_repair_checkfree_r(trader, actor)
+   if relation_registry.community_goodwill ("freedom", db.actor:id()) < 0 then
+		local chkgoodwill = relation_registry.community_goodwill("freedom",  db.actor:id())
+		if chkgoodwill > -100 and db.actor:money() >= 250000 then return true end
+		if chkgoodwill < -100 and chkgoodwill >= -1000 and  db.actor:money() >= 250000 then return true end
+		if chkgoodwill < -1000 and db.actor:money() >= 350000 then return true end
+   else return false
+   end
+return false
+end
+
+function factions_repair_checkfree_j(trader, actor)
+local whatami = db.actor:character_community()
+   if (relation_registry.community_goodwill ("freedom", db.actor:id()) >= 0) and (db.actor:money() >= 250000) and (whatami ~= "actor_freedom") and (whatami == "actor") then return true
+   else return false
+   end
+end
+
+function factions_repair_checkstalker_r(trader, actor)
+	local whatami = db.actor:character_community()
+    local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
+	-- logf("testing stalker " .. whatami)
+	if (gulag) then
+		if (gulag:npc_is_enemy_to_anybody(db.actor)) and (db.actor:money() >= 250000) and (whatami ~= "monolith") and (whatami ~= "bandit") and (whatami ~= "military") and (whatami ~= "killer") then
+	       return true
+		end
+	end
+    return false
+end
+
+function factions_repair_checkstalker(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 250000
+    local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
+	if (gulag) then
+		if gulag:npc_is_enemy_to_anybody(db.actor) and db.actor:money() >= 250000 then
+			item_name_and_price = game.translate_string("list_factions_repair_4").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+		end
+	end
+end
+
+function factions_repair_setstalker_r(trader, actor)
+	local howmuch = 250000
+    local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
+	if (gulag) then
+		if gulag:npc_is_enemy_to_anybody(db.actor) and db.actor:money() >= 250000 then
+			local chkgoodwill = relation_registry.community_goodwill("stalker",  db.actor:id())
+			xr_gulag.setGulagRelation ("esc_lager", game_object.neutral, db.actor)	
+			relation_registry.set_community_goodwill ("stalker", db.actor:id(), 120)	
+			dialogs.relocate_money(actor, howmuch, "out")
+		end
+	end
+end
+
+function factions_repair_checkduty(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 0
+	if db.actor ~= nil then 
+	  if relation_registry.community_goodwill ("dolg", db.actor:id()) < 0 then
+		local chkgoodwill = relation_registry.community_goodwill("dolg",  db.actor:id())
+		if chkgoodwill > -100 and db.actor:money() >= 250000 then howmuch = 250000 	end
+		if chkgoodwill < -100 and chkgoodwill >= -1000 and db.actor:money() >= 250000 then howmuch = 250000 end
+		if chkgoodwill < -1000 and db.actor:money() >= 350000 then howmuch = 350000 end
+		item_name_and_price = game.translate_string("list_factions_repair_0").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	  elseif (relation_registry.community_goodwill ("dolg", db.actor:id()) >= 0) and (db.actor:money() >= 250000) then
+		howmuch = 250000
+		item_name_and_price = game.translate_string("list_factions_repair_1").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	  end
+    end
+end
+
+function factions_repair_checkfree(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 0
+  if db.actor ~= nil then 
+   if relation_registry.community_goodwill ("freedom", db.actor:id()) < 0 then
+		local chkgoodwill = relation_registry.community_goodwill("freedom",  db.actor:id ())
+		if chkgoodwill > -100 and db.actor:money() >= 250000 then howmuch = 250000 end
+		if chkgoodwill < -100 and chkgoodwill >= -1000 and db.actor:money() >= 350000 then howmuch = 350000 end
+		if chkgoodwill < -1000 and  db.actor:money() >= 350000 then howmuch = 350000 end
+		item_name_and_price = game.translate_string("list_factions_repair_2").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	elseif (relation_registry.community_goodwill ("freedom", db.actor:id()) >= 0) and (db.actor:money() >= 350000) then
+		howmuch = 350000
+		item_name_and_price = game.translate_string("list_factions_repair_3").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+		news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+	end
+  end
+end
+
+function factions_repair_setduty_r(trader, actor)
+	local howmuch = 0
+	if db.actor ~= nil then 
+		local chkgoodwill = relation_registry.community_goodwill("dolg",  db.actor:id())
+		if chkgoodwill > -100 and db.actor:money() >= 250000 then howmuch = 250000 end
+		if chkgoodwill < -100 and chkgoodwill >= -1000 and db.actor:money() >= 250000 then howmuch = 250000 end
+		if chkgoodwill < -1000 and  db.actor:money() >= 350000 then howmuch = 350000 end
+		dialogs.relocate_money(actor, howmuch, "out")
+		relation_registry.set_community_goodwill ("dolg", db.actor:id(), 500)
+	end
+end
+
+function factions_repair_setduty_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 350000, "out")
+		TB3D_Services.set_community(db.actor, "actor_dolg", 0, 0, true)
+		--db.actor:set_character_community("actor_dolg", 0, 0)
+		local chkgoodwill = relation_registry.community_goodwill("dolg",  db.actor:id())
+		if chkgoodwill > 0 then 
+			chkgoodwill = chkgoodwill + 200
+			relation_registry.set_community_goodwill ("dolg", db.actor:id(), chkgoodwill)
+		else
+			relation_registry.set_community_goodwill ("dolg", db.actor:id (), 200)
+		end
+	end
+end
+
+function factions_repair_setfree_r(trader, actor)
+	local howmuch = 0
+	if db.actor ~= nil then 
+		local chkgoodwill = relation_registry.community_goodwill("freedom",  db.actor:id())
+		if chkgoodwill > -100 and db.actor:money() >= 250000 then howmuch = 250000 end
+		if chkgoodwill < -100 and chkgoodwill >= -1000 and db.actor:money() >= 250000 then howmuch = 25000 end
+		if chkgoodwill < -1000 and  db.actor:money() >= 350000 then howmuch = 350000 end
+		dialogs.relocate_money(actor, howmuch, "out")
+		relation_registry.set_community_goodwill ("freedom", db.actor:id(), 1000)
+	end
+end
+
+function factions_repair_setfree_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 350000, "out")
+		TB3D_Services.set_community(db.actor, "actor_freedom", 0, 0, true)
+		--db.actor:set_character_community("actor_freedom", 0, 0)
+		local chkgoodwill = relation_registry.community_goodwill("freedom",  db.actor:id())
+		if chkgoodwill > 0 then 
+			chkgoodwill = chkgoodwill + 250
+			relation_registry.set_community_goodwill ("freedom", db.actor:id(), chkgoodwill)
+		else
+			relation_registry.set_community_goodwill ("freedom", db.actor:id(), 250)
+		end
+	end
+end
+
+function factions_repair_checkmon_j(trader, actor)
+   local whatami = db.actor:character_community()
+   local playhitemb = db.actor:object("h_2")
+   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 250000) and (whatami ~= "monolith") and (whatami == "actor") then return true
+   else return false
+   end
+end
+
+function factions_repair_checkmonolith(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 250000
+		if  db.actor:money() >= 250000 then
+			item_name_and_price = game.translate_string("list_factions_repair_5").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+		end
+end
+
+function factions_repair_setmon_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 250000, "out")
+		TB3D_Services.set_community(db.actor, "monolith", 0, 0, true)
+		--db.actor:set_character_community("monolith", 0, 0)
+		local chkgoodwill = relation_registry.community_goodwill("monolith",  db.actor:id())
+		if chkgoodwill > 0 then 
+			chkgoodwill = chkgoodwill + 200
+			relation_registry.set_community_goodwill ("monolith", db.actor:id(), chkgoodwill)
+		else
+			relation_registry.set_community_goodwill ("monolith", db.actor:id(), 200)
+		end
+	end
+end
+
+function factions_repair_bandit_j(trader, actor)
+   local whatami = db.actor:character_community()
+   local playhitemb = db.actor:object("h_2")
+   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 250000) and (whatami ~= "bandit") and (whatami == "actor") then return true
+   else return false
+   end
+end
+
+function factions_repair_checkbandit(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 250000
+		if  db.actor:money() >= 250000 then
+			item_name_and_price = game.translate_string("list_factions_repair_7").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+		end
+end
+
+function factions_repair_setbandit_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 250000, "out")
+		TB3D_Services.set_community(db.actor, "bandit", 0, 0, true)
+		--db.actor:set_character_community("bandit", 0, 0)
+		local chkgoodwill = relation_registry.community_goodwill("bandit",  db.actor:id())
+		if chkgoodwill > 0 then 
+			chkgoodwill = chkgoodwill + 200
+			relation_registry.set_community_goodwill ("bandit", db.actor:id(), chkgoodwill)
+		else
+			relation_registry.set_community_goodwill ("bandit", db.actor:id(), 200)
+		end
+	end
+end
+
+
+function factions_repair_mil_j(trader, actor)
+   local whatami = db.actor:character_community()
+   local playhitemb = db.actor:object("h_2")
+   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 400000) and (whatami ~= "military") and (whatami == "actor") then return true
+   else return false
+   end
+end
+
+function factions_repair_checkmil(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 400000
+		if  db.actor:money() >= 400000 then
+			item_name_and_price = game.translate_string("list_factions_repair_6").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+		end
+end
+
+function factions_repair_setmil_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 400000, "out")
+		TB3D_Services.set_community(db.actor, "military", 0, 0, true)
+		--db.actor:set_character_community("military", 0, 0)
+		local chkgoodwill = relation_registry.community_goodwill("military",  db.actor:id())
+		if chkgoodwill > 0 then 
+			chkgoodwill = chkgoodwill + 200
+			relation_registry.set_community_goodwill ("military", db.actor:id(), chkgoodwill)
+		else
+			relation_registry.set_community_goodwill ("military", db.actor:id(), 200)
+		end
+	end
+end
+
+function factions_repair_kill_j(trader, actor)
+   local whatami = db.actor:character_community()
+   local playhitemb = db.actor:object("h_2")
+   if (playhitemb ~= nil or db.joinfactions == "yes") and (db.actor:money() >= 300000) and (whatami ~= "killer") and (whatami == "actor") then return true
+   else return false
+   end
+end
+
+function factions_repair_checkkill(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 300000
+		if  db.actor:money() >= 300000 then
+			item_name_and_price = game.translate_string("list_factions_repair_8").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+		end
+end
+
+function factions_repair_setkill_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 300000, "out")
+		TB3D_Services.set_community(db.actor, "killer", 0, 0, true)
+		--db.actor:set_character_community("killer", 0, 0)
+		local chkgoodwill = relation_registry.community_goodwill("military",  db.actor:id())
+		if chkgoodwill > 0 then 
+			chkgoodwill = chkgoodwill + 200
+			relation_registry.set_community_goodwill ("killer", db.actor:id(), chkgoodwill)
+		else
+			relation_registry.set_community_goodwill ("killer", db.actor:id(), 200)
+		end
+	end
+end
+
+
+function factions_repair_eco_j(trader, actor)
+   local whatami = db.actor:character_community()
+   if (db.actor:money() >= 300000) and (whatami ~= "ecolog") and (whatami == "actor") then return true
+   else return false
+   end
+end
+
+function factions_repair_checkeco(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 500000
+		if  db.actor:money() >= 300000 then
+			item_name_and_price = game.translate_string("list_factions_repair_10").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+		end
+end
+
+function factions_repair_seteco_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 300000, "out")
+		TB3D_Services.set_community(db.actor, "ecolog", 0, 0, true)
+		--db.actor:set_character_community("ecolog", 0, 0)
+		local chkgoodwill = relation_registry.community_goodwill("ecolog",  db.actor:id())
+		if chkgoodwill > 0 then 
+			chkgoodwill = chkgoodwill + 200
+			relation_registry.set_community_goodwill ("ecolog", db.actor:id(), chkgoodwill)
+		else
+			relation_registry.set_community_goodwill ("ecolog", db.actor:id(), 200)
+		end
+	end
+end
+
+
+function factions_repair_quit_j(trader, actor)
+   local whatami = db.actor:character_community()
+   if (whatami == "actor_dolg") or (whatami == "actor_freedom") or (whatami == "monolith") or (whatami == "bandit") or (whatami == "military") or (whatami == "killer") or (whatami == "ecolog") then
+	   if (db.actor:money() >= 250000) then return true end
+   end
+   return false
+end
+
+function factions_repair_checkquit(first_speaker, second_speaker)
+	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_money")
+	local item_name_and_price = ""
+	local howmuch = 250000
+		if  db.actor:money() >= 250000 then
+			item_name_and_price = game.translate_string("list_factions_repair_9").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
+			news_manager.give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
+		end
+end
+
+function factions_repair_setquit_j(trader, actor)
+	if db.actor ~= nil then 
+		dialogs.relocate_money(actor, 250000, "out")
+		TB3D_Services.set_community(db.actor, "actor", 0, 0, true)
+		--db.actor:set_character_community("actor", 0, 0)
+	end
+end
+

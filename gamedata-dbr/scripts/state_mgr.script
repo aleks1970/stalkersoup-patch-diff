@@ -1,0 +1,579 @@
+--TB3D 1.0.9.9.8.1 re-write of smart terrain, modders vars, eva_state_mgr_end:__init, cleanup, optimizations and debug,
+-- state_manager:__init, db safe writes
+function my_ver() return "1.0.9.9.8.1" end
+-- file from the mod "People Salsola 2009" by 14.06.
+-- Adapted to the Manager of weapons. Rulix aka Bak on 02/07/2009
+-- Adatiroval: Idler.
+
+----------------------------------------------------------------------------------------------------------------------
+--	Manager changes the status of body
+--	Author: Ruslan Didenko (Stohe)
+--	TODO: 
+----------------------------------------------------------------------------------------------------------------------
+local aim_ratio = TB3D_Modders.sniper_aim_ratio		--1000/50
+local min_ratio = TB3D_Modders.sniper_aim_min		--1500
+
+--' Evaluator, which synchronizes the manager.
+--' We are already in bezralichnom state idle or not
+class "evaluator_state_mgr_idle" (property_evaluator)
+function evaluator_state_mgr_idle:__init(name, state_manager) super (nil, name)
+	self.st = state_manager
+	self.mgr = nil
+end
+
+function evaluator_state_mgr_idle:evaluate()
+	local t = self.st.target_state == "idle"
+	  --and not self.st.planner:evaluator(self.st.properties["locked"]):evaluate()
+	  and self.st.planner:evaluator(self.st.properties["movement"]):evaluate()
+	  and self.st.planner:evaluator(self.st.properties["animstate"]):evaluate()
+	  and self.st.planner:evaluator(self.st.properties["animation"]):evaluate()
+	if t == true then 
+		if self.mgr == nil then
+			self.mgr = self.object:motivation_action_manager()
+		end
+		if self.mgr:initialized() and self.mgr:current_action_id() == xr_actions_id.state_mgr + 1 then
+			self.st.combat = true
+		end
+	end
+	if self.st.combat == true then return true end
+	return false
+end
+
+class "evaluator_state_mgr_idle_off" (property_evaluator)
+function evaluator_state_mgr_idle_off:__init(name, state_manager) super (nil, name)
+	self.st = state_manager
+	self.mgr = nil
+end
+
+function evaluator_state_mgr_idle_off:evaluate()
+	local t = self.st.target_state == "idle" and 
+		   self.st.planner:evaluator(self.st.properties["movement"]):evaluate()	and
+		   self.st.planner:evaluator(self.st.properties["animstate"]):evaluate() and
+		   self.st.planner:evaluator(self.st.properties["animation"]):evaluate() and 
+		   self.st.planner:evaluator(self.st.properties["bodystate"]):evaluate() and 
+			 self.st.planner:evaluator(self.st.properties["weapon"]):evaluate() and
+			 self.st.planner:evaluator(self.st.properties["mental"]):evaluate() -- and
+--			 self.st.planner:evaluator(self.st.properties["direction"]):evaluate()
+	--if TB3D_Modders.use_state_message == true then show_st(self) end
+	return t
+end
+
+--' We are already in bezralichnom state idle or not () checking account with alife
+class "evaluator_state_mgr_idle_alife" (property_evaluator)
+function evaluator_state_mgr_idle_alife:__init(name, state_manager) super (nil, name)
+	self.st = state_manager
+	self.t = nil
+end
+
+function evaluator_state_mgr_idle_alife:evaluate()
+	if self.object:alive() then
+		-- update manager animations
+		-- before he was here, he is now taken out evaluatora
+		--	printf("SECTION %s", utils.to_str(db.storage[self.st.npc:id()].active_section))
+		if mgr == nil then mgr = self.object:motivation_action_manager() end
+		self.t = nil
+		if mgr:initialized() then
+			self.t = mgr:current_action_id()
+			--printf("ACTION %s", utils.to_str(self.t))
+			if self.t ~= xr_actions_id.alife then
+				self.st.alife = false
+			end
+		end
+		if db.storage[self.st.npc:id()].active_section == nil then		
+			if xr_meet.is_meet(self.object) == false then
+				local t = self.st.target_state == "idle"
+				  and not self.st.planner:evaluator(self.st.properties["locked"]):evaluate()
+				  and self.st.planner:evaluator(self.st.properties["movement"]):evaluate()
+				  and self.st.planner:evaluator(self.st.properties["animstate"]):evaluate()
+				  and self.st.planner:evaluator(self.st.properties["animation"]):evaluate()
+				--if TB3D_Modders.use_state_message == true then show_st(self) end
+				if t == true then self.st.alife = true end
+				if not (self.st.alife == true) then	return t end
+			else
+				return false
+			end
+		end
+	end
+	return true
+end
+
+--' Go to idle
+class "act_state_mgr_to_idle" (action_base)
+function act_state_mgr_to_idle:__init(name,state_manager) super (nil, name)	
+	self.st = state_manager
+end
+
+function act_state_mgr_to_idle:initialize()
+	action_base.initialize(self)
+	self.object:movement_enabled(true)
+	if self.object:best_enemy() then
+		self.st:set_state("idle", nil, nil, nil, {animation = true})
+		xr_sound.set_sound(self.object, nil)
+		stop_play_sound(self.object)
+	elseif self.object:best_danger() then
+		self.st:set_state("idle", nil, nil, nil, {animation = true})
+		xr_sound.set_sound(self.object, nil)
+		stop_play_sound(self.object)
+	else
+		self.st:set_state("idle")
+	end
+end
+
+function act_state_mgr_to_idle:execute()
+	action_base.execute(self)
+	if self.object:best_enemy() then
+		self.st:set_state("idle", nil, nil, nil, {animation = true})
+	elseif self.object:best_danger() then
+		self.st:set_state("idle", nil, nil, nil, {animation = true})
+	else
+		self.st:set_state("idle")
+	end
+end
+
+function act_state_mgr_to_idle:finalize()
+	-- Upon completion of the transition need to write -1 in the indicator "for anyone to watch"
+	-- so when you return it clear that it should reset itself.
+	self.st.current_object = -1
+	action_base.finalize(self)
+end
+
+--' Go to idle
+class "act_state_mgr_to_off" (action_base)
+function act_state_mgr_to_off:__init(name,state_manager) super (nil, name)	
+	self.st = state_manager
+end
+
+function act_state_mgr_to_off:initialize()
+	action_base.initialize(self)
+	self.st:set_state("idle", nil, nil, nil, {animation = true})
+	xr_sound.set_sound(self.object, nil)
+	stop_play_sound(self.object)
+--	amk.mylog("stmt for "..self.object:name().." is going off","stmt")
+end
+
+function act_state_mgr_to_off:execute()
+	action_base.execute(self)
+--	self.st:set_state("idle", nil, nil, nil, {animation = true})
+end
+
+function act_state_mgr_to_off:finalize()
+	-- Upon completion of the transition need to write -1 in the indicator "for anyone to watch"
+	-- so when you return it clear that it should reset itself.
+	self.st.current_object = -1
+	self.object:movement_enabled(true)
+--	ui_rad.mylog("stmt for "..self.object:name().." has gone off","stmt")
+	action_base.finalize(self)
+end
+
+--'-------------------------------------------------------------------------------------
+--' Evaluatory & Action Manager
+--'-------------------------------------------------------------------------------------
+--' He graduated from a manager his job
+class "eva_state_mgr_end" (property_evaluator)
+function eva_state_mgr_end:__init(name, st) super (nil, name)
+	if self ~= nil then
+		self.st = st
+		if self.mgr ~= nil then self.mgr = nil end								--TB3D 109932 causes lost self
+	end
+end
+
+function eva_state_mgr_end:evaluate()
+	--TB3D_Services.packet_alert("state mgr: evaluate")
+	if self == nil or self.object == nil then return end --transitioning on death
+	--TB3D_Services.packet_alert("state mgr: evaluate["..utils.to_str(self.object:name()).."]")
+	if self.mgr == nil then
+		self.mgr = self.object:motivation_action_manager()
+	end
+	if self.mgr ~= nil and self.mgr:initialized() then
+		local current_action_id = self.mgr:current_action_id()
+		if current_action_id and current_action_id ~= stalker_ids.action_combat_planner
+		  and current_action_id ~= stalker_ids.action_danger_planner
+		  and current_action_id ~= stalker_ids.action_anomaly_planner then
+			if self.st then
+				self.st.combat = false
+			else
+				TB3D_Services.packet_alert("state manager: evaluate end, st missing!!!!["..utils.to_str(self.object:name()).."]")
+			end
+		else
+			return true
+		end
+	end
+	--TB3D_Services.packet_alert("state mgr: evaluate [false]")
+	return false
+end
+
+--' Is locked a manager
+class "eva_state_mgr_locked" (property_evaluator)
+function eva_state_mgr_locked:__init(name, st) super (nil, name)
+	self.st = st
+end
+
+function eva_state_mgr_locked:evaluate()
+	if self ~= nil and self.st ~= nil then 														--109975
+		if self.st.combat or self.st.alife then --or self.st.override then
+			return true 
+		end
+		return self.st.planner:initialized() and (
+			   self.st.planner:evaluator(self.st.properties["weapon_locked"]):evaluate() or
+			   self.st.planner:evaluator(self.st.properties["animstate_locked"]):evaluate() or
+			   self.st.planner:evaluator(self.st.properties["animation_locked"]):evaluate() or
+			   self.st.planner:evaluator(self.st.properties["direction_turning"]):evaluate())
+	end
+	return false
+end
+
+--' Idlovy Action Manager
+class "act_state_mgr_end" (action_base)
+function act_state_mgr_end:__init(name, st) super (nil, name)
+	self.st = st
+end
+
+function act_state_mgr_end:initialize()
+	action_base.initialize(self)
+end
+
+function act_state_mgr_end:execute()
+	local is_report = false
+	if self ~= nil and self.object ~= nil then
+		if TB3D_Modders.use_state_message and self.object:name() == TB3D_Modders.npc_to_log then is_report = true end
+		if is_report then TB3D_Services.packet_alert("state mgr: execute["..utils.to_str(self.object:name()).."]") end
+	elseif self ~= nil then
+		TB3D_Services.packet_alert("state mgr: execute[no object] !!!!")
+	else
+		--TB3D_Services.packet_alert("state mgr: execute self[nil]")
+		return --transitioning on death
+	end
+	action_base.execute(self)
+	--if not self.st.planner:evaluator(self.st.properties["movement_stand_now"]):evaluate() then		
+		--state_mgr_direction.update_movement_direction(self.object, self.st)
+	--end
+	--TB3D_Services.packet_alert("state mgr: execute 1")
+	local wpn
+	local wm = rx_wmgr.get_wm(self.object)
+	if wm then
+		wpn = wm:get_weapon()
+	else
+		wpn = self.object:best_weapon()
+	end
+	local t = state_lib.states[self.st.target_state].weapon
+	if wpn and t then
+		if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."]") end
+		if t == "fire" or t == "sniper_fire" then
+			local sniper_aim = 3000
+			if self.st.look_object ~= nil then
+				if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] look object") end
+				local look_object = level.object_by_id(self.st.look_object)
+				if look_object == nil then
+					--TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] look object nil")
+					self.st.look_object = nil
+				elseif self.object:see(look_object)
+				  and (not IAmAStalker[look_object:clsid()] or self.object:relation(look_object) == game_object.enemy)
+				  and look_object:alive() == true then
+					if t == "sniper_fire" then
+						sniper_aim = self.object:position():distance_to(look_object:position())*aim_ratio
+						if sniper_aim <= min_ratio then
+							if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(sniper_aim).."] sniper fire aim") end
+							self.object:set_item(object.fire1, wpn, 1, min_ratio)
+						else					
+							if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(sniper_aim).."] sniper aim") end
+							self.object:set_item(object.fire1, wpn, 1, sniper_aim)
+						end
+					else
+						if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] sniper fire") end
+						self.object:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.object, look_object))	--3, 1000
+					end
+				else
+					if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] sniper idle") end
+					self.object:set_item(object.idle, wpn)
+				end
+			elseif self.st.look_position ~= nil and self.st.look_object == nil then
+				if t == "sniper_fire" then
+					if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] look aim") end
+					self.object:set_item(object.fire1, wpn, 1, sniper_aim)
+				else
+					if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] look fire") end
+					self.object:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.object, nil))
+				end
+			else
+				if self.st.target_state == "psy_shoot" then
+					if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] psy shoot") end
+					self.object:set_item(object.fire1, wpn)
+				else
+					if is_report then TB3D_Services.packet_alert("state mgr: execute weapon["..utils.to_str(t).."] idle") end
+					self.object:set_item(object.idle, wpn)
+				end				
+			end
+		elseif t == "unstrapped" then
+			--TB3D_Services.packet_alert("state mgr: execute 4")
+			--printf("[%s] not shooting", self.object:name())
+			self.object:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
+		end
+	else	--no weapon or t state
+		--TB3D_Services.packet_alert("state mgr: [no weapon] or [t state]")
+	end
+	if is_report then TB3D_Services.packet_alert("state mgr: execute done") end
+end
+
+function act_state_mgr_end:finalize()
+	action_base.finalize(self)
+end
+
+--' Lock Manager
+class "act_state_mgr_locked" (action_base)
+function act_state_mgr_locked:__init(name, st) super (nil, name)
+	self.st = st
+end
+
+function act_state_mgr_locked:initialize()
+	action_base.initialize(self)
+end
+
+function act_state_mgr_locked:execute()
+	action_base.execute(self)	
+end
+
+function act_state_mgr_locked:finalize()
+	action_base.finalize(self)
+end
+
+animation_reset_denied = {
+	wounded = true,
+	wounded_heavy = true,
+	wounded_heavy_2 = true,
+	wounded_heavy_3 = true,
+	wounded_zombie = true
+	}
+
+--' Is the manager
+class "state_manager"
+function state_manager:__init(npc)
+	if not npc then npc = self.object end			--TB3D 1099341, prevent crashes in eva-end-init
+	--TB3D_Services.packet_alert("state manager: __init["..npc:name().."]")
+	state_mgr_goap.goap_graph(self, npc)
+	self.target_state = "idle"
+	self.current_direction = nil
+	self.target_position = nil
+	self.current_object = nil
+	self.combat = false
+	self.alife = true
+	self.emerg = {}
+	self.synsound = nil
+	self.yaw_delta = nil
+	self.subanim = 0
+	self.need_reweapon = false
+end
+
+function state_manager:set_state(state_name, callback, timeout, target, emerg, synsound, extrakeys)
+	local is_report = false
+	if TB3D_Modders.use_state_message and self.npc:name() == TB3D_Modders.npc_to_log then is_report = true end
+	if is_report then TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] state["..utils.to_str(state_name).."] start") end
+	local next_state = state_name
+	if next_state == nil then next_state = "idle" end
+	local new_state = state_lib.states[next_state]
+	if new_state then
+		if is_report then
+			 TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] anim["..utils.to_str(new_state.animation).."] anim state["..utils.to_str(new_state.anim_state).."] new state")
+			if target then
+				if target.look_position then
+					TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] look position["..utils.to_str(target.look_position.x)..","..utils.to_str(target.look_position.y)..","..utils.to_str(target.look_position.z).."]")
+				else
+					TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] look position[NIL]")
+				end
+				if target.look_object then
+					TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] look object["..utils.to_str(target.look_object:name()).."]")
+				else
+					TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] look object[NIL]")
+				end
+			else
+				TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] look target[NIL]")
+			end
+		end
+		if target ~= nil then																		--first set goals
+			self.look_position = target.look_position
+			if target.look_object ~= nil then 
+				self.look_object = target.look_object:id()
+			else
+				self.look_object = nil
+			end
+		else
+			self.look_position = nil
+			self.look_object = nil
+		end
+		if extrakeys and extrakeys.yaw_delta ~= nil then											-- changing the angle accuracy.
+			self.yaw_delta = extrakeys.yaw_delta
+		else
+			self.yaw_delta = 5
+		end
+		if extrakeys and extrakeys.subanim ~= nil then												-- change the depth of recursive animation.
+			self.subanim = extrakeys.subanim
+		else
+			self.subanim = 0
+		end
+		local switched = false
+		local last_state = self.target_state
+		if last_state ~= next_state then													--If we switch from shooting to shoot the air condition - must immediately stop firing
+			if is_report then TB3D_Services.packet_alert("state manager: set state npc["..self.npc:name().."] last state["..utils.to_str(last_state).."] next state["..utils.to_str(next_state).."] change state") end
+			if (state_lib.states[self.target_state].weapon == "fire"
+			  or state_lib.states[self.target_state].weapon == "sniper_fire")
+			  and (new_state.weapon ~= "fire"
+			  and new_state.weapon ~= "sniper_fire") then		
+				self.npc:set_item(state_mgr_weapon.get_idle_state(next_state), state_mgr_weapon.get_weapon(self.npc, next_state))
+				--printf("[%s] stop shooting", self.npc:name())
+			end
+			if state_lib.states[self.target_state].movement ~= move.stand					--If we switch from walking to standing position
+			  and state_lib.states[self.target_state].animation ~= nil
+			  and new_state.movement == move.stand then
+				self.npc:movement_enabled(false)
+			end
+			self.target_state = next_state	
+			self.current_object = nil
+			switched = true
+		end
+		if new_state.reset == true then
+			self.reset_state = true
+		else
+			self.reset_state = false
+		end	
+		if switched then
+			switched = false																	--set for update check
+			if emerg ~= nil and animation_reset_denied[last_state] ~= true then
+				self.emerg.animation = emerg.animation
+				self.emerg.animation_nout = emerg.animation_nout
+				switched = true																	--do immediate update
+				if is_report then TB3D_Services.packet_alert("STATE MGR: ["..utils.to_str(self.npc:name()).."] emergency anim CALLED["..utils.to_str(self.emerg.animation).."]["..utils.to_str(self.emerg.animation_nout).."] !!!") end
+			end
+		end
+	else
+		TB3D_Services.packet_alert("STATE MGR: ["..utils.to_str(self.npc:name()).."] ILLEGAL SET STATE CALLED["..utils.to_str(state_name).."] !!!")
+	end
+	self.synsound = synsound
+	self.callback = callback
+	if timeout ~= nil and timeout >= 0 then
+		self.callback.timeout = timeout
+		self.callback.begin = nil
+	elseif self.callback then			
+		self.callback.func = nil
+		self.callback.timeout = nil
+	end
+	--TB3D_Services.packet_alert("state manager: set state end")
+	if switched == true then self:update() end											--emergency update
+	if is_report then show_st(self) end
+end
+
+function state_manager:get_state()
+	return self.target_state
+end
+
+function state_manager:update()
+	if self == nil then
+		TB3D_Services.abort_alert("state manager: update self[nil] !!!! skipped")
+	elseif self.npc == nil then
+		TB3D_Services.abort_alert("state manager: update["..self.npc:name().."] self.npc [nil] !!!! skipped")
+	else
+		local is_report = false
+		if TB3D_Modders.use_state_message and self.npc:name() == TB3D_Modders.npc_to_log then is_report = true end
+		if is_report then TB3D_Services.packet_alert("state manager: update["..self.npc:name().."] start") end
+		--if is_report then show_st(self) end
+		self.animstate:update()	
+			--if is_report then TB3D_Services.packet_alert("state manager: update["..self.npc:name().."] after animstate update") end
+			--if is_report then show_st(self) end
+		self.animation:update(is_report)
+			--if is_report then TB3D_Services.packet_alert("state manager: update["..self.npc:name().."] after animation update") end
+			--if is_report then show_st(self) end
+		self.planner:update()
+			--if is_report then TB3D_Services.packet_alert("state manager: update["..self.npc:name().."] after planner update") end
+		if is_report then
+			show_st(self)
+			TB3D_Services.packet_alert("state manager: update["..self.npc:name().."] done")
+		end
+	end
+end
+
+function show_st(sobj)
+	local sobj_name
+	if sobj.npc then sobj_name = sobj.npc:name() else sobj_name = sobj.object:name() end
+	if sobj_name then --and string.find(sobj_name, TB3D_Modders.npc_to_log) then
+		TB3D_Services.packet_alert("state mgr: set state["..utils.to_str(sobj_name).."]")
+		TB3D_Services.packet_alert("state mgr: target_state["..utils.to_str(sobj.target_state).."]")
+		TB3D_Services.packet_alert("state mgr: current_direction["..utils.to_str(sobj.current_direction).."]")
+		TB3D_Services.packet_alert("state mgr: target_position["..utils.to_str(sobj.target_position).."]")
+		TB3D_Services.packet_alert("state mgr: current_object["..utils.to_str(sobj.current_object).."]")
+		TB3D_Services.packet_alert("state mgr: combat["..utils.to_str(sobj.combat).."]")
+		TB3D_Services.packet_alert("state mgr: alife["..utils.to_str(sobj.alife).."]")
+		TB3D_Services.packet_alert("state mgr: emerg["..utils.to_str(sobj.emerg).."]")
+		TB3D_Services.packet_alert("state mgr: synsound["..utils.to_str(sobj.synsound).."]")
+		TB3D_Services.packet_alert("state mgr: yaw_delta["..utils.to_str(sobj.yaw_delta).."]")
+		TB3D_Services.packet_alert("state mgr: subanim["..utils.to_str(sobj.subanim).."]")
+		TB3D_Services.packet_alert("state mgr: need_reweapon["..utils.to_str(sobj.need_reweapon).."]")
+		if sobj.st then
+			TB3D_Services.packet_alert("state mgr: transition state:")
+			TB3D_Services.packet_alert(">>> target state["..utils.to_str(sobj.st.target_state).."]")
+			TB3D_Services.packet_alert(">>> alife["..utils.to_str(sobj.st.alife).."]")
+			if sobj.st.properties["locked"] then TB3D_Services.packet_alert(">>> locked["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["locked"]):evaluate()).."]") end
+			if sobj.st.properties["movement"] then TB3D_Services.packet_alert(">>> movement["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["movement"]):evaluate()).."]") end
+			if sobj.st.properties["animstate"] then TB3D_Services.packet_alert(">>> animstate["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["animstate"]):evaluate()).."]") end
+			if sobj.st.properties["animation"] then TB3D_Services.packet_alert(">>> animation["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["animation"]):evaluate()).."]") end
+			if sobj.st.properties["bodystate"] then TB3D_Services.packet_alert(">>> bodystate["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["bodystate"]):evaluate()).."]") end 
+			if sobj.st.properties["weapon"] then TB3D_Services.packet_alert(">>> weapon["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["weapon"]):evaluate()).."]") end
+			if sobj.st.properties["mental"] then TB3D_Services.packet_alert(">>> mental["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["mental"]):evaluate()).."]") end
+			if sobj.st.properties["direction"] then TB3D_Services.packet_alert(">>> direction["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["direction"]):evaluate()).."]") end
+			if sobj.st.properties["weapon_locked"] then TB3D_Services.packet_alert(">>> weapon_locked["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["weapon_locked"]):evaluate()).."]") end
+			if sobj.st.properties["direction_turning"] then TB3D_Services.packet_alert(">>> direction_turning["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["direction_turning"]):evaluate()).."]") end
+			if sobj.st.properties["animstate_locked"] then TB3D_Services.packet_alert(">>> animstate_locked["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["animstate_locked"]):evaluate()).."]") end
+			if sobj.st.properties["animation_locked"] then TB3D_Services.packet_alert(">>> animation_locked["..utils.to_str(sobj.st.planner:evaluator(sobj.st.properties["animation_locked"]):evaluate()).."]") end
+		end
+		TB3D_Services.packet_alert("state mgr: set state["..utils.to_str(sobj_name).."] done")
+	end
+end
+
+function set_state(npc, state_name, callback, timeout, target, emerg, synsound, extrakeys)
+	if npc and state_name ~= nil then
+		db.set_state(npc, state_name, callback, timeout, target, emerg, synsound, extrakeys)
+	end
+end
+
+function get_state(npc)
+	return db.get_state(npc)
+end
+
+function bind_manager(object)
+	local manager = object:motivation_action_manager()
+	local properties	= {}
+	properties["state_mgr_idle_combat"] 	= xr_evaluators_id.state_mgr + 1
+	properties["state_mgr_idle_alife"]	 	= xr_evaluators_id.state_mgr + 2
+	properties["state_mgr_idle_off"]	 	= xr_evaluators_id.state_mgr + 3
+	local operators		= {}
+	operators["state_mgr_to_idle_combat"]	= xr_actions_id.state_mgr + 1
+	operators["state_mgr_to_idle_alife"]	= xr_actions_id.state_mgr + 2
+	operators["state_mgr_to_idle_off"]	= xr_actions_id.state_mgr + 3
+	local state_manager = state_mgr.state_manager(object)
+	manager:add_evaluator(properties["state_mgr_idle_combat"], 	evaluator_state_mgr_idle("state_mgr_idle_combat", state_manager))
+	manager:add_evaluator(properties["state_mgr_idle_alife"], 	evaluator_state_mgr_idle_alife("state_mgr_idle_alife", state_manager))
+	manager:add_evaluator(properties["state_mgr_idle_off"], 	evaluator_state_mgr_idle_off("state_mgr_idle_off", state_manager))
+	local action = this.act_state_mgr_to_idle("state_mgr_to_idle_combat", state_manager)
+	action:add_precondition		(world_property(properties["state_mgr_idle_combat"],	false))
+	action:add_effect 			(world_property(properties["state_mgr_idle_combat"],	true))
+	manager:add_action(operators["state_mgr_to_idle_combat"], action)
+	action = this.act_state_mgr_to_off("state_mgr_to_off", state_manager)	-- Add another type of off this disgrace
+	action:add_precondition		(world_property(properties["state_mgr_idle_off"],	false))
+	action:add_effect 			(world_property(properties["state_mgr_idle_off"],	true))
+	manager:add_action(operators["state_mgr_to_idle_off"], action)
+	action = this.act_state_mgr_to_idle("state_mgr_to_idle_alife", state_manager)
+	action:add_precondition		(world_property(stalker_ids.property_enemy,	false))
+	action:add_precondition		(world_property(stalker_ids.property_danger,false))
+	action:add_precondition		(world_property(properties["state_mgr_idle_alife"],	false))
+	action:add_effect 			(world_property(properties["state_mgr_idle_alife"],	true))
+	manager:add_action(operators["state_mgr_to_idle_alife"], action)
+	action = manager:action(xr_actions_id.alife)
+	action:add_precondition(world_property(properties["state_mgr_idle_alife"],true))
+  	action = manager:action(stalker_ids.action_combat_planner)
+  	action:add_precondition(world_property(properties["state_mgr_idle_combat"],true))
+  	action = manager:action(stalker_ids.action_anomaly_planner)
+  	action:add_precondition(world_property(properties["state_mgr_idle_combat"],true))
+  	action = manager:action(stalker_ids.action_danger_planner)
+  	action:add_precondition(world_property(properties["state_mgr_idle_combat"],true))
+	action = manager:action(stalker_ids.action_gather_items)
+	action:add_precondition(world_property(properties["state_mgr_idle_alife"],true))
+	return state_manager
+end
+

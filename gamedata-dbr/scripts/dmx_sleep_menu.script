@@ -1,0 +1,174 @@
+---<!-- TB3D 1.0.9.9.7.6   adj to new time factor, winx, winy 
+function my_ver() return "1.0.9.9.7.6" end
+--[[-----------------------------------------------
+ File         : dmx_sleep_menu.script
+ Description  : Menu sleep
+ Copyright    : DMX MOD
+ Author       : Charsi
+ Date         : 22.04.2011
+--]]-----------------------------------------------------------------------
+
+local w_btn = 25
+class "cheat" (CUIScriptWnd)
+
+function cheat:__init() super()
+	self.sleep_time=8
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function cheat:__finalize() end
+
+function cheat:InitControls()
+	self:Init(0,0,winx,winy)
+	self:SetAutoDelete(true)		--109975
+	local screen_w=600
+	local h=level.get_time_hours()
+	local a=591*(h+1)/24
+	local ws=screen_w*(h+1)/24
+	-- substrate
+	self.bkgr=CUIStatic()
+	self.bkgr:Init("ui\\ui_actor_sleep_screen",(winx-680)/2,(winy-270)/2,680,270)
+	self.bkgr:SetAutoDelete(true)
+	--self.bkgr:InitTexture("ui\\ui_actor_sleep_screen")
+	self.bkgr:SetStretchTexture(true)
+	self.bkgr:SetOriginalRect(0,0,680,270)
+	--self.bkgr:Init((winx-680)/2,(winy-270)/2,680,270)
+	self.bkgr:Show(true)
+	self:AttachChild(self.bkgr)
+	--A.M.
+	self.st=CUIStatic()
+	self.st:SetAutoDelete(true)
+	--self.st:InitTexture("ui\\ui_actor_sleep_screen")
+	self.st:Init("ui\\ui_actor_sleep_screen",38+screen_w-ws-1,30,ws,125)
+	self.st:SetStretchTexture(true)
+	self.st:SetOriginalRect(0,413,a-1,115)
+	self.bkgr:AttachChild(self.st)
+	--self.st:Init(38 + screen_w - ws - 1,30,ws,125)
+	--P.M.
+	self.st=CUIStatic()
+	self.st:SetAutoDelete(true)
+	--self.st:InitTexture("ui\\ui_actor_sleep_screen")
+	self.st:Init("ui\\ui_actor_sleep_screen",38,30,screen_w-ws,125)
+	self.st:SetStretchTexture(true)
+	self.st:SetOriginalRect(a,413,591-a,115)
+	self.bkgr:AttachChild(self.st)
+	--self.st:Init( 38 , 30 ,screen_w-ws,125)
+	--frame
+	self.st=CUIStatic()
+	self.st:SetAutoDelete(true)
+	--self.st:InitTexture("ui\\ui_actor_sleep_screen")
+	self.st:Init("ui\\ui_actor_sleep_screen",38,30,600,125)
+	self.st:SetStretchTexture(true)
+	self.st:SetOriginalRect(0,275,600,125)
+	self.bkgr:AttachChild(self.st)
+	--self.st:Init(38,30,600,125)
+	for i=1,24 do
+		self["upd"..i]=function()
+		local btn=self:GetButton("btn_"..self.sleep_time)
+		btn:DetachChild(self.st)
+		btn:DetachChild(self.st1)
+		self.sleep_time = i
+		btn=self:GetButton("btn_"..i)
+		btn:AttachChild(self.st)
+		btn:AttachChild(self.st1)
+	end
+	self.btn=CUIButton()
+	self.btn:SetAutoDelete(true)
+	self.btn:Init((i-1)*w_btn + 38,38,w_btn,180)
+	self:Register(self.btn, "btn_"..i)
+	--self.btn:SetWindowName("btn_"..i)
+	--self:Register(self.btn)
+	self.bkgr:AttachChild(self.btn)
+	self:AddCallback(self.btn:WindowName(),ui_events.BUTTON_DOWN, self["upd"..i],self)
+	self.st2=CUIStatic()
+	self.st2:SetAutoDelete(true)
+	local txt=h+i
+	if txt>23 then txt=txt-24 end
+	self.st2:SetText(tostring(txt).."H")
+	self.st2:SetTextX(7)
+	self.st2:SetTextY(122)
+	self.st2:Init((i-1)*w_btn + 38,38,w_btn,180)
+	self.bkgr:AttachChild(self.st2)
+	if i==self.sleep_time then
+		-- index
+		self.st=CUIStatic()
+		self.st:Init("ui\\ui_actor_sleep_screen",0,0,w_btn,125)
+		--self.st:InitTexture("ui\\ui_actor_sleep_screen")
+		self.st:SetOriginalRect(620,270,35,125)
+		self.st:SetStretchTexture(true)
+		--self.st:Init(0,0,w_btn,125)
+		self.btn:AttachChild(self.st)
+		--slider
+		self.st1=CUIStatic()
+		self.st1:Init("ui\\ui_actor_sleep_screen",-4,125,w_btn,50)
+		--self.st1:InitTexture("ui\\ui_actor_sleep_screen")
+		self.st1:SetOriginalRect(620,420,35,35)
+		--self.st1:Init(-4,125,w_btn,50)
+		self.btn:AttachChild(self.st1)
+	end
+end
+self.btn=CUI3tButton()
+	self.btn:SetAutoDelete(true)
+	self.btn:Init("ui_button_ordinary",215,217,117,29)
+   self.btn:SetText("Sleep")
+   self.btn:SetTextColor(255,255,255,255)
+   self.btn:SetTextAlign(CGameFont.alCenter)
+	self:Register(self.btn, "sleep_start_btn")
+	self.bkgr:AttachChild(self.btn)
+	self:AddCallback(self.btn:WindowName(),ui_events.BUTTON_CLICKED,self.start_sleep,self)
+--self.btn:InitTexture("ui\\ui_up_ckliked")
+--self.btn:SetOriginalRect(0,0,114,26)
+--self.btn:Init(215,217,114,26)
+   --self.btn:SetTextY(0)
+--self.btn:SetStretchTexture(true)
+--self.btn:Show(true)
+--self.btn:SetWindowName("sleep_start_btn")
+--self:Register(self.btn)
+
+self.btn=CUI3tButton()
+	self.btn:Init("ui_button_ordinary",346,217,117,29)
+   self.btn:SetText("Cancel")
+   self.btn:SetTextColor(255,255,255,255)
+   self.btn:SetTextAlign(CGameFont.alCenter)
+	self:Register(self.btn, "quit_btn")
+	self.btn:SetAutoDelete(true)
+--self.btn:InitTexture("ui\\ui_up_ckliked")
+--self.btn:SetOriginalRect(0,0,114,26)
+--self.btn:Init(346,217,114,26)
+   --self.btn:SetTextY(0)
+--self.btn:SetStretchTexture(true)
+--self.btn:Show(true)
+--self.btn:SetWindowName("quit_btn")
+--self:Register(self.btn)
+self.bkgr:AttachChild(self.btn)
+self:AddCallback(self.btn:WindowName(),ui_events.BUTTON_CLICKED,self.on_quit,self)
+end
+
+function cheat:InitCallBacks()end
+
+function cheat:start_sleep()
+	if sleep_manager then sleep_manager.main(self.sleep_time) end
+	self:on_quit()
+end
+
+function cheat:on_quit()
+		--self.bkgr:DetachChild(self.st)
+		--self.bkgr:DetachChild(self.st1)
+		--self.bkgr:DetachChild(self.st2)
+		--self.bkgr:DetachChild(self.btn)
+	--self:DetachChild(self.bkgr)
+	level.start_stop_menu(self, true)
+	--self:GetHolder():start_stop_menu (self,true)
+end
+
+function cheat:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then self:on_quit()
+		elseif dik == DIK_keys.DIK_F then self:on_quit()
+		elseif dik == DIK_keys.DIK_RETURN then self:start_sleep()
+		end
+	end
+	return true
+end

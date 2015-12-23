@@ -1,0 +1,82 @@
+-- TB3D 1.0.9.9.6.0 new smart terrain services, hit_on_spawn
+function my_ver() return "1.0.9.9.6.0" end
+
+function get_avail_smart_terrains(obj)
+    local smart_section = "smart_terrains"
+    local sp = obj:spawn_ini()
+    if sp and sp:section_exist(smart_section) then
+        local result, field, str
+        local cnt = 0
+        local n = sp:line_count(smart_section)
+        if n > 0 then
+            local avail = {}
+            for i = 0, n - 1 do
+                result, field, str = sp:r_line(smart_section, i, "", "")
+                result = xr_logic.parse_condlist(nil, smart_section, field, str)
+                if field and (field == "none" or alife():object(field) ~= nil) then
+                    if  xr_logic.pick_section_from_condlist(db.actor_proxy, obj, result) ~= nil then
+                        avail[field] = true
+                        cnt = cnt + 1
+                    end
+                end
+            end
+            if cnt > 0 then
+                return avail
+            end
+        end
+    end
+    return nil
+end
+
+
+function check_smart_terrains(is_fix)
+    local sim = alife()
+    local gg = game_graph()
+	local is_bad_smarts = false
+	TB3D_Services.packet_alert("Smart terrain Checker: [started]")
+	if sim and gg then
+		local obj
+		local avail
+		local stname = ""
+		local obj_id
+		for id_ = first_object, last_object, 1 do
+			if id_ then
+				obj = level.object_by_id(id_) --sim:object(id_)
+				if obj then
+					if gg:valid_vertex_id(obj.m_game_vertex_id) and obj.clsid and obj:clsid() == clsid.smart_terrain then
+						stname = obj:name()
+						obj_id = obj:id()
+						for k, v in pairs(obj.npc_info) do
+							if v and v.se_obj then
+								avail = get_avail_smart_terrains(v.se_obj)
+								if avail and avail[stname] == nil then
+									TB3D_Services.packet_alert("tb3d smart check: ["..utils.to_str(v.name).."] wrong smart["..utils.to_str(stname).."] avail:")
+									for st, bool in pairs(avail) do
+										if st then
+											is_bad_smarts = true
+											if is_fix then
+												if obj_id then
+													sim:set_switch_online(obj_id,false)
+													sim:set_switch_offline(obj_id,true)
+													--xr_gulag.clearJob(obj, obj_id)
+													if xr_gulag.resetJob(obj, obj_id) then TB3D_Services.packet_alert("job reset") end
+													sim:set_switch_online(obj_id,true)
+													sim:set_switch_offline(obj_id,false)
+												end
+												break
+											else
+												TB3D_Services.packet_alert("-->["..st.."]")
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+    end
+	if is_bad_smarts then TB3D_Modders.hit_on_spawn = true end
+	TB3D_Services.packet_alert("Smart terrain Checker: [done]")
+end

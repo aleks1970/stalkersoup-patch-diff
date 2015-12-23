@@ -1,0 +1,68 @@
+--TB3D 1.0.9.9.7.0 use_binder_message
+function my_ver() return "1.0.9.9.7.0" end
+--[[------------------------------------------------------------------------------------------------------------------
+Smart terrain binder
+Нужен для того, чтобы серверный объект smart terrain получал обновления.
+Чугай Александр
+--------------------------------------------------------------------------------------------------------------------]]
+
+function bind( obj )
+	local ini = obj:spawn_ini()
+	if ini and (ini:section_exist( "gulag1" ) or ini:section_exist( "smart_terrain" )) then
+		if obj:clsid() == clsid.smart_terrain then
+			if alife() then
+				if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("bind smart terrain: bind["..utils.to_str(obj:name()).."] section["..obj:section().."]") end
+				obj:bind_object( smart_terrain_binder( obj ) )
+			else
+				TB3D_Services.abort_alert("bind smt: No simulation! SMART_TERRAIN["..utils.to_str(obj:name()).."] disabled.")
+			end
+		else
+			TB3D_Services.abort_alert("bind smt: You must use SMART_TERRAIN instead of SCRIPT_ZONE["..utils.to_str(obj:name()).."]")
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+class "smart_terrain_binder" ( object_binder )
+
+function smart_terrain_binder:__init( obj ) super( obj )
+end
+
+function smart_terrain_binder:net_spawn( server_object )
+	if object_binder.net_spawn( self, server_object ) then
+		if  self.object then
+			db.add_zone( self.object )
+			if TB3D_Modders.use_spawn_message then TB3D_Services.packet_alert("BIND smart terrain: net spawn["..self.object:name().."]") end
+		end
+		self.se_smart_terrain = alife():object( server_object.id )
+		if self.se_smart_terrain then
+			db.add_smart_terrain( self.se_smart_terrain )
+			return true
+		end
+	end
+	return false
+end
+
+function smart_terrain_binder:net_destroy()
+	if self.object then
+		if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind smart terrain: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
+		db.del_zone( self.object )
+	end
+	if self.se_smart_terrain then db.del_smart_terrain( self.se_smart_terrain ) end
+	object_binder.net_destroy( self )
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind smart terrain: net destroy["..utils.to_str(self.object:name()).."] done") end
+end
+
+function smart_terrain_binder:net_Relcase( obj )
+	--TB3D_Services.packet_alert("bind smt: net_Relcase["..utils.to_str(self.object:name()).."]["..utils.to_str(obj:name()).."]")
+	if self.se_smart_terrain and self.se_smart_terrain.npc_info[obj:id()] then
+		self.se_smart_terrain.gulag:object_setup_offline( obj:id(), true )
+	end
+end
+
+function smart_terrain_binder:update( delta )
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind smt terr: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta["..utils.to_str(delta).."]") end
+	object_binder.update( self, delta )
+	if self.se_smart_terrain then self.se_smart_terrain:update() end
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind smt terr: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done") end
+end

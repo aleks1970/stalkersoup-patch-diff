@@ -1,0 +1,14 @@
+--TB3D 1.0.9.9.2 new 10/15/12
+function my_ver() return "1.0.9.9.2" end
+
+function main()
+	local actor   	= get_actor()
+
+	wait(1000)
+	action(
+		actor,
+			particle("nature\\fog_stormy","bip01_head",particle_params(vector():set(0,0,0.3),vector():set(0,0,0),vector():set(1,0,0)),false),
+				cond	(cond.time_end, 2000000)
+			)
+
+end

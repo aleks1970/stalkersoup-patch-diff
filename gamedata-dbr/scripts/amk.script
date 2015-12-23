@@ -1,0 +1,2773 @@
+-- TB3D 1.0.9.9.8.0   fixed rucksack, added old pda sound option, TB3D_Update, amk style hit (gg_kick), consolidated packet srvcs,
+-- removed tips, removed ^ from can see actor, updated to 135, hit styles, added collector start to pause menu, amk hit replaced,
+-- db calls, send_tip, game_start, npc_spawner, tb3d_delay, hud_weap, ogse timers, ghost_strong_timer, skip groups, send_tip_id optimization,
+-- pause autosave prevention, timer
+function my_ver() return "1.0.9.9.8.0" end
+-- Idler: file from the mod 'People halophyte 2.0'. Adapted for fashion 'label with swag 2.1.2' 30.09.2008 0:08:52
+-- Added fenechka by TAG
+
+local table_sort = table.sort
+local table_remove = table.remove
+local math_floor = math.floor
+local math_random = math.random
+local math_sqrt = math.sqrt
+local string_sub = string.sub
+local string_find = string.find
+local string_byte = string.byte
+local string_char = string.char
+local string_match = string.match
+local string_len = string.len
+local string_gsub = string.gsub
+local string_rep = string.rep
+local string_gfind = string.gfind
+
+----------------
+local timer_trigger=nil
+convert_npc={}
+oAmkLauncher = amkII_launcher.CAmkLauncher()
+local StartTime
+
+ver = "0"
+oau_watchdog=0
+
+function rep(npc,msg,tag)
+	if string_find(npc:name(),"gar_dm") then
+		if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("AMK: rep["..msg.."] tag["..tag.."]") end
+	end
+end
+
+function add_spot_on_map(obj_id,type,text)
+	--Possible types of type, see ui\map_spots.xml 
+	--TB3D_Services.info_alert("amk: add spot id["..utils.to_str(obj_id).."] type["..utils.to_str(type).."] hint["..utils.to_str(text).."]")
+	if obj_id and level.map_has_object_spot(obj_id, type) == 0 then
+		if text==nil then text=" " end
+		-- We put a label on the server object to it did not have to update
+		level.map_add_object_spot_ser(obj_id, type, text)
+		--save_variable("x_marker_type_"..obj_id, type)
+		--save_variable("x_marker_text_"..obj_id, text)
+		--TB3D_Services.info_alert("add spot: id["..utils.to_str(obj_id).."] type["..utils.to_str(type).."] hint["..utils.to_str(text).."] added")
+	end
+end
+
+function remove_spot_from_map(obj_id,type)
+	--TB3D_Services.info_alert("amk: remove spot id["..utils.to_str(obj_id).."] type["..utils.to_str(type).."]")
+	if obj_id and level.map_has_object_spot(obj_id, type) ~= 0 then
+		level.map_remove_object_spot(obj_id, type)
+		--del_variable("x_marker_type_"..obj_id)
+		--del_variable("x_marker_text_"..obj_id)
+		--TB3D_Services.info_alert("remove spot: id["..utils.to_str(obj_id).."] type["..utils.to_str(type).."] removed")
+	end
+end
+
+--start the timer in real time
+--function start_timer(name,delay,action)
+function start_timer(name, delay, parameters)
+	if _g.is_disconnecting then return false end					--109974
+	if not delay then return false end
+	if not parameters then parameters = "" end
+	if string_sub(name, 1, 2) == "rt" then
+		if TB3D_Services.is_collector(40) then						--109950 ogse companions
+			local max_rt = TB3D_Modders.max_companions_rt or 20		--109980
+			local a=1
+			while db.storage[db.actor:id()].pstor["rt"..a] do
+				a=a+1
+				if a > max_rt then return false end					--109980
+			end
+		end
+	end
+	local timers = load_table("timers")
+	--dump_table(timers)
+	if TB3D_Modders.use_logic_message or (TB3D_Modders.use_state_message and string_find(name, TB3D_Modders.npc_to_log)) then
+		TB3D_Services.packet_alert("amk: start timer["..utils.to_str(name).."] delay["..utils.to_str(delay).."] action["..utils.to_str(parameters).."]")
+	end
+	table.insert(timers, {name, math_floor(game_milliseconds() + delay * 1000 * system_ini():r_float("alife","time_factor")), parameters})
+	-- sort to further optimize the search timer
+	-- timers with less time will be at the end of the table
+	table_sort(timers, timersSort)
+	save_table("timers", timers)
+	--dump_table(timers)
+	return true
+end
+
+-- comparison function for sorting the timers
+-- at the end of the table timers with the smallest time
+function timersSort(t1, t2)
+	return t1[2] > t2[2]
+end
+
+--start the timer in game time
+--function g_start_timer(name,delay_d,delay_h,delay_m,action)
+function g_start_timer(name, delay_d, delay_h, delay_m, parameters)
+	if _g.is_disconnecting then return false end		--109974
+	if delay_d==nil or delay_h==nil or delay_m==nil then return false end
+	if not parameters then parameters = "" end
+	--get_console():execute("load ~~~ TIMERS start_g_timer: "..name..", "..math_floor(game_milliseconds() + (delay_d*60*24+delay_h*60+delay_m) * 60 * 1000)..", "..parameters)
+	local timers = load_table("timers")
+	--dump_table(timers)
+	local t_delay = math_floor(game_milliseconds() + (delay_d*60*24+delay_h*60+delay_m) * 60 * 1000)
+	if TB3D_Modders.use_logic_message or (TB3D_Modders.use_state_message and string_find(name, TB3D_Modders.npc_to_log)) then
+		TB3D_Services.packet_alert("amk: g_start_timer["..utils.to_str(name).."] time["..utils.to_str(t_delay).."]")
+	end
+	table.insert(timers, {name, t_delay, parameters})
+	-- sort to further optimize the search timer
+	-- timers with less time will be at the end of the table
+	table_sort(timers, timersSort)
+	save_table("timers", timers)
+	--dump_table(timers)
+  return true
+end
+
+function has_timer(name)
+	--get_console():execute("load ~~~ TIMERS has_timer: "..name)
+	local timers = load_table("timers")
+	--dump_table(timers)
+	local result = false
+	for i = 1, #timers do
+		if timers[i][1] == name then
+			result = true
+			break
+		end
+	end
+	return result
+end
+
+function remove_timer(name)
+	--get_console():execute("load ~~~ TIMERS has_timer: "..name)
+	local timers = load_table("timers")
+	--dump_table(timers)
+	for i = #timers, 1, -1 do
+		if timers[i][1] == name then
+			table.remove(timers, i)
+			break
+		end
+	end
+	-- sort to further optimize the search timer
+	-- timers with less time will be at the end of the table
+	table_sort(timers, timersSort)
+	save_table("timers", timers)
+end
+
+function has_g_timer(name)
+	return has_timer(name)
+end
+
+--[[ Temporary storage for variables removed from pstor-------------------!!!!TB3D---NOT USED----------
+local emerg_store
+-- Remove variables from pstor. In order not to overwhelm the buffer
+function emergency_cleanup()
+  emerg_store={}
+  if load_variable("zombied",false) then
+    emerg_store.zombied=load_table("zombied")
+    del_variable("zombied")
+  end
+  --get_console():execute("load ~~~ TIMERS emergency_cleanup: "..name)
+  emerg_store.timers = load_table("timers")
+	--dump_table(emerg_store.timers)
+  del_variable("timers")
+  save_variable("emerg",true)
+end
+
+-- Recovers deleted variables
+function emergency_restore()
+	if emerg_store.zombied then
+		save_table("zombied", emerg_store.zombied)
+	end
+  --get_console():execute("load ~~~ TIMERS emergency_restore")
+  save_table("timers", emerg_store.timers)
+  del_variable("emerg")
+end]]-----------------------------------------------------------------------------------
+
+function convert_timers()
+  if load_variable("tmcv2",true) then
+	--TB3D_Services.packet_alert("amk: convert_timers")
+	local timers = load_table("timers")
+	--dump_table(timers)
+	local tmp
+	local name,delay,params
+	local timers_to_unpack = {
+		--["sleep_fake_wpn"]					= true,
+		["af_transform"]					= true,
+		["af_transform_universal"]			= true,
+		["sleep_repbox"]					= true,
+		["repbox_cond"]						= true,
+		["outfit_cond"]						= true,
+		["healing_enemies"]					= true,
+		["timer_drop_obj_varka"]			= true,
+		["timer_drop_obj_transform"]		= true,
+		["timer_drop_obj_teleport"]			= true,
+		["timer_drop_obj_hand_teleporter"]	= true
+	}
+    for a=1,100,1 do
+		-- real timers
+		-- very old timers
+		tmp=load_variable("x_timer_"..a,nil)
+		if tmp~=nil then
+			TB3D_Services.packet_alert("amk: converting very old timer["..utils.to_str(tmp).."]")
+			name,delay,params=tmp,load_variable("x_timer_"..a.."_delay",0),load_variable("x_timer_"..a.."_params","")
+			-- 400499000 -- adjusted for differences in game.time()
+			--get_console():execute("load ~~~ TIMERS convert_timers old real: "..name..", "..delay..", "..math_floor(delay - 400499000)..", "..params)
+			if timers_to_unpack[name] == true then
+				params = unpack_array_from_string(params)
+				--dump_table(params)
+			end
+			table.insert(timers, {name, math_floor(delay - 400499000), params})
+			del_variable("x_timer_"..a)
+			del_variable("x_timer_"..a.."_delay")
+			del_variable("x_timer_"..a.."_params")
+		end
+		-- old timers
+		name = load_variable("xt"..a, nil)
+		if name ~= nil then
+			TB3D_Services.packet_alert("amk: converting old timer["..utils.to_str(name).."]")
+			delay	= load_variable("xd"..a, nil)
+			params	= load_variable("xp"..a, nil)
+			-- 400499000 -- adjusted for differences with game.time()
+			--get_console():execute("load ~~~ TIMERS convert_timers real: "..name..", "..delay..", "..math_floor(delay - 400499000)..", "..params)
+			if timers_to_unpack[name] == true then
+				params = unpack_array_from_string(params)
+				--dump_table(params)
+			end
+			table.insert(timers, {name, math_floor(delay - 400499000), params})
+			del_variable("xt"..a)
+			del_variable("xd"..a)
+			del_variable("xp"..a)
+		end
+		-- Game Timers
+		-- very old timers
+		tmp=load_variable("x_gtimer_"..a,nil)
+		if tmp~=nil then
+			TB3D_Services.packet_alert("amk: converting old game timer["..utils.to_str(tmp).."]")
+			name,delay,params=tmp,load_variable("x_gtimer_"..a.."_delay",0),load_variable("x_gtimer_"..a.."_params","")
+			--get_console():execute("load ~~~ TIMERS convert_timers old game: "..name..", "..delay..", "..math_floor(delay * 60 * 1000)..", "..params)
+			if timers_to_unpack[name] == true then
+				params = unpack_array_from_string(params)
+				--dump_table(params)
+			end
+			table.insert(timers, {name, math_floor(delay * 60 * 1000), params})
+			del_variable("x_gtimer_"..a)
+			del_variable("x_gtimer_"..a.."_delay")
+			del_variable("x_gtimer_"..a.."_params")
+      end
+		-- old timers
+		name = load_variable("gt"..a, nil)
+		if name ~= nil then
+			TB3D_Services.packet_alert("amk: converting old timer["..utils.to_str(name).."]")
+			delay	= load_variable("gd"..a, nil)
+			params	= load_variable("gp"..a, nil)
+			--get_console():execute("load ~~~ TIMERS convert_timers game: "..name..", "..delay..", "..math_floor(delay * 60 * 1000)..", "..params)
+			if timers_to_unpack[name] == true then
+				params = unpack_array_from_string(params)
+				--dump_table(params)
+			end
+			table.insert(timers, {name, math_floor(delay * 60 * 1000), params})
+			del_variable("gt"..a)
+			del_variable("gd"..a)
+			del_variable("gp"..a)
+		end
+    end
+    save_variable("tmcv2",false)
+	-- sort to further optimize the search timer
+	-- timers with less time will be at the end of the table
+	table_sort(timers, timersSort)
+	--dump_table(timers)
+	save_table("timers", timers)
+  end
+end
+
+--checking the timer
+function check_timers()
+	--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("AMK: check_timers:["..utils.to_str(game_milliseconds()).."]") end
+	local timers = load_table("timers")
+	--dump_table(timers)
+	local name -- action name
+	local delay -- delay in slot milliseconds
+	local parameters -- action parameters
+	local timersToStart = {} -- timer list to start, which will start after cleaning the table because the table can be simultaneously cleaned and filled in the process of launching action
+	local milliseconds = game_milliseconds()
+	for i = #timers, 1, -1 do -- go with the tail of the timer with the lowest response time
+		name		= timers[i][1]
+		delay		= timers[i][2]
+		parameters	= timers[i][3]
+		if type(parameters) == "table" then
+			parameters = pack_array_to_string(parameters)
+		end
+		if delay <= milliseconds then
+			table.insert(timersToStart, {name, parameters})
+			table_remove(timers) -- First we clean the table, and something else in __do_timer_action() it can be added
+		else -- timers with less time for the current no longer exists, since the table was sorted
+			break
+		end
+	end
+	if #timersToStart > 0 then -- some timers have worked and were removed from the table
+		--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("AMK: clear_timers:["..utils.to_str(game_milliseconds()).."]") end
+		--dump_table(timers)
+		-- overwrites the table
+		save_table("timers", timers)
+		-- Start up of actions to perform
+		for i = 1, #timersToStart do
+			name		= timersToStart[i][1]
+			parameters	= timersToStart[i][2]
+			__do_timer_action(name, parameters)		
+		end
+	end
+	--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("AMK: check_timers: done") end
+end
+
+-- table functions to accelerate their calls
+local func_by_string = {}
+	func_by_string["tag_trup_to_zombie"] = function (params_string)					--tag spb
+		tag_spb.trup_to_zombie(params_string)
+	end
+	func_by_string["hnd_weap_01"] = function (params_string)
+		repair_check.do_release_action("hnd_weap_01")
+	end
+	func_by_string["hnd_weap_02"] = function (params_string)
+		repair_check.do_release_action("hnd_weap_02")
+	end
+	func_by_string["hnd_weap_03"] = function (params_string)
+		repair_check.do_release_action("hnd_weap_03")
+	end
+	func_by_string["hnd_weap_04"] = function (params_string)
+		repair_check.do_release_action("hnd_weap_04")
+	end
+	func_by_string["hnd_weap_05"] = function (params_string)
+		repair_check.do_release_action("hnd_weap_05")
+	end
+	func_by_string["hnd_weap_06"] = function (params_string)
+		repair_check.do_release_action("hnd_weap_06")
+	end
+	func_by_string["hnd_weap_07"] = function (params_string)
+		repair_check.do_release_action("hnd_weap_07")
+	end
+	func_by_string["unload_rep_weapon"] = function (params_string)					--repair check
+		repair_check.weapon_unload(tonumber(params_string))
+	end
+	func_by_string["sms_new"] = function (params_string)							--braad test
+		braad_test.sms_new()
+	end
+	func_by_string["sms_new1"] = function (params_string)							--braad test
+		braad_test.sms_new1()
+	end
+	func_by_string["sms"] = function (params_string)								--wawka
+		wawka.smski_besu(tonumber(params_string))
+	end
+	func_by_string["smska_borova"] = function (params_string)						--wawka
+		wawka.smska_borova()
+	end
+	func_by_string["smska_volka"] = function (params_string)						--wawka
+		wawka.smska_volka()
+	end
+	func_by_string["smska_shurupa"] = function (params_string)						--wawka
+		wawka.smska_shurupa()
+	end
+	func_by_string["smska_dana"] = function (params_string)							--wawka
+		wawka.smska_dana()
+	end
+	func_by_string["luis_killself"] = function (params_string)						--braad test
+		braad_test.luis_killself()
+	end
+	func_by_string["mitya_sms"] = function (params_string)							--braad test
+		braad_test.mitya_sms()
+	end
+	func_by_string["delete_black_doctor"] = function (params_string)				--braad test
+		braad_test.delete_black_doctor()
+	end
+	func_by_string["show_news"] = function (params_string)							--amk mod
+		mod_call("show_news")
+	end
+	func_by_string["gg_need_sleep"] = function (params_string)						--amk mod
+		mod_call("test_for_need_sleep")
+	end
+	func_by_string["sleep_nrg"] = function (params_string)							--amk mod
+		mod_call("test_for_need_sleep_nrg",params_string)
+	end
+	func_by_string["sleep_med"] = function (params_string)							--amk mod
+		mod_call("test_for_need_sleep_med",params_string)
+	end
+	func_by_string["sleep_matras"] = function (params_string)						--amk mod
+		mod_call("test_for_need_sleep_matras",params_string)
+	end
+	func_by_string["sleep_tr_item"] = function (params_string)						--amk mod
+		mod_call("test_for_need_sleep_tr_item",params_string)
+	end
+	func_by_string["sleep_notebook"] = function (params_string)						--amk
+		mod_call("test_for_need_sleep_notebook",params_string)
+	end
+--[[func_by_string["sleep_fake_wpn"] = function (params_string)
+		mod_call("fake_weapon", params_string)
+	end]]--
+	func_by_string["block_sleep_menu"] = function (params_string)					--amk mod
+		save_variable("block_sleep_menu",0)
+	end
+	func_by_string["radar_fix"] = function (params_string)							--amk
+		mod_call("radar_fix")
+	end
+	func_by_string["af_transform"] = function (params_string)						--amk
+		mod_call("af_transform_end",unpack_array_from_string(params_string))
+	end
+	func_by_string["af_transform_universal"] = function (params_string)				--amk mod
+		--get_console():execute("load ~#I#:"..string.format(" af_transform_universal_end: "..params_string))
+		mod_call("af_transform_universal_end", unpack_array_from_string(params_string))
+	end
+	--func_by_string["amk_freeplay"] = function (params_string)
+		--if load_variable("freeplay",0)==1 and level.name()=="l12_stancia_2" then
+		  --xr_effects.game_credits()
+		--end
+	--end
+	func_by_string["blowout"] = function (params_string)							--amk mod, active blowout phase
+		mod_call("Blowout_pp",params_string)
+	end
+	func_by_string["test"] = function (params_string)
+		mod_call("Run_Blowout_pp")
+	end
+	func_by_string["blowout_ss"] = function (params_string)							--amk mod
+		mod_call("blowout_scary_sounds")
+	end
+	func_by_string["blow_shift"] = function (params_string)							--amk mod, next blowout
+		mod_call("Run_Blowout_pp")
+	end
+	func_by_string["sleep_repbox"] = function (params_string)
+		mod_call("repair_weapon", params_string)
+	end
+	func_by_string["repbox_cond"] = function (params_string)						--amk mod
+		mod_call("after_repair_weapon", params_string)
+	end
+	func_by_string["collect_anomalies_info"] = function (params_string)
+		amk_anoms.collect_info()
+	end
+	func_by_string["news_check"] = function (params_string)							--news main
+		if (news_main and news_main.check_news) then
+			news_main.check_news()
+		end
+ 	end
+	func_by_string["outfit_cond"] = function (params_string)
+		local data = unpack_array_from_string(params_string)
+		local a = level.object_by_id(data[1])
+		if a then
+			a:set_condition(data[2]/100)
+		end
+ 	end
+	func_by_string["healing_enemies"] = function (params_string)					--xr wounded
+		local arr = unpack_array_from_string(params_string)
+		local npc_id = arr[1]
+		local npc_com = arr[2]
+		local npc = level.object_by_id(npc_id)
+		if npc and npc:alive() and not npc:wounded() then
+			if math_random(100) < 80 then
+				if math_random() < 0.35 then
+					TB3D_Services.set_community(npc, npc_com)
+					--npc:set_character_community(npc_com)
+				end
+				if math_random() < 0.85 then
+					xr_wounded.custom_change(npc)
+				end
+			else
+				TB3D_Services.set_community(npc, npc_com)
+				--npc:set_character_community(npc_com)
+				npc:set_relation(game_object.enemy, db.actor)
+			end
+		end
+ 	end
+	func_by_string["timer_drop_obj_varka"] = function (params_string)				--amk mod
+		local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.obj_id)
+		if sobj == nil then
+			-- ate
+			--send_tip("Eaten","ate",0,15,"gen_info")
+		elseif sobj.parent_id == expendable_object then
+			-- thrown
+			--send_tip("emissions","away",0,15,"gen_info")
+			-- run a check on the recipe and, if successful, cooking
+			local obj	= level.object_by_id(tbl.obj_id)
+			local anom	= level.object_by_id(tbl.anom_id)
+			if obj and anom then -- if something falls itself or be thrown into the game script on the transition between the levels of HS, then obj == nil and anomalies, too, will not be
+				local obj_sect	= obj:section()
+				local obj_pos	= obj:position()
+				local anom_sect	= anom:section()
+				local anom_pos	= anom:position()
+				amk_mod.check_af_transform(obj, obj_sect, obj_pos, tbl.anom_id, anom_sect, anom_pos, tbl.anom_radius, tbl.lv, tbl.gv)
+			end
+		else
+			-- shifted
+			--send_tip("shifted","shifted",0,15,"gen_info")
+		end
+ 	end
+	func_by_string["timer_drop_obj_transform"] = function (params_string)				--amk mod
+		local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.obj_id)
+		if sobj == nil then
+			-- ate
+			--send_tip("obj_id = "..tbl.obj_id.." type: "..type(tbl.obj_id),"ate",0,15,"gen_info")
+		elseif sobj.parent_id == expendable_object then
+			-- thrown
+			--send_tip("thrown","thrown",0,15,"gen_info")
+			-- start the transformation of the subject
+			local obj = level.object_by_id(tbl.obj_id)
+			if obj then
+				amk_mod.item_transform(tbl.obj_id, tbl.lv, tbl.gv)
+			end
+		else
+			-- shifted
+			--send_tip("shifted","shifted",0,15,"gen_info")
+		end
+ 	end
+	func_by_string["timer_drop_obj_teleport"] = function (params_string)				--spawn level changer
+		local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.obj_id)
+		if sobj == nil then
+			-- ate
+			--send_tip("ate","ate",0,15,"gen_info")
+			spawn_level_changer.teleport_start(tbl.obj_sect, tbl.obj_id, true)
+		elseif sobj.parent_id == expendable_object then
+			-- thrown
+			--send_tip("thrown","thrown",0,15,"gen_info")
+			-- start Teleport
+			spawn_level_changer.teleport_start(tbl.obj_sect, tbl.obj_id, false)
+		else
+			-- shifted
+			--send_tip("shifted","shifted",0,15,"gen_info")
+		end
+ 	end
+	func_by_string["timer_drop_obj_hand_teleporter"] = function (params_string)			--bind stalker
+		local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.obj_id)
+		if sobj == nil then
+			-- ate
+			--send_tip("ate","ate",0,15,"gen_info")
+			meceniy_intellectual.hand_teleporter_use()
+		elseif sobj.parent_id == expendable_object then
+			-- thrown
+			--send_tip("thrown","thrown",0,15,"gen_info")
+		else
+			-- shifted
+			--send_tip("shifted","shifted",0,15,"gen_info")
+		end
+ 	end
+	func_by_string["autosave"] = function (params_string)								--TB3D_Collector, news manager, TB3D_Dialog
+		if ui_main_menu.pause_menu_init == false then									--109971
+			TB3D_Services.savegame(params_string)
+		end
+    end
+	func_by_string["babah_drop_timeBomb"] = function (params_string)					--babah
+        local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.id)
+		if sobj == nil then
+			-- eaten / used
+			--send_tip("ate","ate",0,15,"gen_info")
+            babah.useTimeBomb(tbl)
+		elseif sobj.parent_id == expendable_object then
+			-- thrown
+			--send_tip("thrown","thrown",0,15,"gen_info")
+			babah.dropTimeBomb(tbl)
+		else
+			-- shifted
+			--send_tip("shifted","shifted",0,15,"gen_info")
+            babah.relocateTimeBomb(tbl)
+		end
+ 	end
+	func_by_string["babah_timeBomb_activated"] = function (params_string)				--babah
+		local id = tonumber(params_string)
+		babah.explosiveExplode(id)
+ 	end
+	func_by_string["babah_explode_moved_timeBomb"] = function (params_string)			--babah
+		local id = tonumber(params_string)
+		babah.explodeMovedTimeBomb(id)
+ 	end
+	func_by_string["babah_timeBomb_transfer"] = function (params_string)				--babah
+		local id = tonumber(params_string)
+		babah.transferTimeBomb(id)
+ 	end
+	func_by_string["babah_explode_biside_explosives"] = function (params_string)		--babah
+        local tbl = unpack_array_from_string(params_string)
+		babah.explodeBisideExplosives(tbl)
+ 	end
+	func_by_string["babah_drop_mine"] = function (params_string)						--babah
+        local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.id)
+		if sobj == nil then
+			-- eaten / used
+			--send_tip("ate","ate",0,15,"gen_info")
+		elseif sobj.parent_id == expendable_object then
+			-- thrown
+			--send_tip("thrown","thrown",0,15,"gen_info")
+			babah.dropMine(tbl)
+		else
+			-- shifted
+			--send_tip("shifted","shifted",0,15,"gen_info")
+		end
+ 	end
+	func_by_string["babah_activateMine"] = function (params_string)						--babah
+        local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.id)
+		babah.addMine(sobj)
+ 	end
+	func_by_string["babah_drop_detonator"] = function (params_string)					--babah
+        local tbl = unpack_array_from_string(params_string)
+		local sobj = alife():object(tbl.id)
+		if sobj == nil then
+			-- eaten / used
+			--send_tip("ate","ate",0,15,"gen_info")
+			babah.useDetonator(tbl.sect)
+		elseif sobj.parent_id == expendable_object then
+			-- thrown
+			--send_tip("thrown","thrown",0,15,"gen_info")
+		else
+			-- shifted
+			--send_tip("shifted","shifted",0,15,"gen_info")
+		end
+ 	end
+	func_by_string["babah_activateDetonator"] = function (params_string)				--babah
+		babah.explodeBombsByDetonator(params_string)
+ 	end
+	func_by_string["babah_transfer_items"] = function (params_string)					--babah
+		babah.itemsTransferBackToInventory(unpack_array_from_string(params_string))
+ 	end
+	func_by_string["tb3d_update"] = function (params_string)							-- Timer Remembers, TB3D_Services
+		TB3D_Update.update_start()														--sets up task reminder to display on level entry
+	end
+	func_by_string["tb3d_delay_1"] = function (params_string)  							-- Timer Remembers, TB3D_Services
+		TB3D_Triggers.delayed_action(params_string)										--do an action against info portion after a delay
+	end
+	func_by_string["tb3d_delay_2"] = function (params_string)  							-- Timer Remembers, TB3D_Services
+		TB3D_Triggers.delayed_action(params_string)										--do an action against info portion after a delay
+	end
+	func_by_string["tb3d_delay_3"] = function (params_string)  							-- Timer Remembers, TB3D_Services
+		TB3D_Triggers.delayed_action(params_string)										--do an action against info portion after a delay
+	end
+	func_by_string["tb3d_delay_4"] = function (params_string)  							-- Timer Remembers, TB3D_Services
+		TB3D_Triggers.delayed_action(params_string)										--do an action against info portion after a delay
+	end
+	func_by_string["dmx_radprotector_timer"] = function (params_string) 				-- timer removal of radioprotector, dmx medicines
+       TB3D_Services.remove_info("radioprotector_info")
+		get_hud():RemoveCustomStatic("radioprotector_static")
+    end
+	func_by_string["anabiotic_protection_timer"] = function (params_string) 			-- Removal of the timer Anabiotika, dmx medicines
+        TB3D_Services.remove_info("anabiotic_protection_info")
+		get_hud():RemoveCustomStatic("anabiotic_static")
+    end
+	func_by_string["psy_blockade_timer"] = function (params_string) 					-- timer removal of Psy-blockade, dmx medicines
+        TB3D_Services.remove_info("psy_blockade_info")
+		get_hud():RemoveCustomStatic("psy_blockade_static")
+    end
+	func_by_string["barvinok_timer"] = function (params_string) 						-- Removal of the timer periwinkle, dmx medicines
+		TB3D_Services.remove_info("barvinok_info")
+		get_hud():RemoveCustomStatic("barvinok_static")
+		local oItem = db.actor:object("barvinok_action")
+		if oItem then alife():release(alife():object(oItem:id()), true) end
+	end
+	func_by_string["barvinok_action_timer"] = function (params_string)					-- dmx medicines
+		if has_alife_info("barvinok_info") and db.actor:object("barvinok_action") then
+			db.actor:eat(db.actor:object("barvinok_action"))
+			start_timer("barvinok_action_timer",1,"")
+		end
+	end
+	func_by_string["yadulin_timer"] = function (params_string) 				-- Yadulin, dmx medicines
+        TB3D_Services.remove_info("yadulin_info")
+		db.actor.health = -0.35
+        db.actor.power = -0.5
+    end
+	func_by_string["gercules_timer"] = function (params_string) 			-- removal timer: Hercules, dmx medicines
+        TB3D_Services.remove_info("gercules_info")
+		get_hud():RemoveCustomStatic("gercules_static")
+    end
+	func_by_string["actor_medkit_use_timer"] = function (params_string) 	-- Timer removal action kits, dmx medicines
+        TB3D_Services.remove_info("actor_medkit_use_info")
+		get_hud():RemoveCustomStatic("medkit_static")
+    end
+	func_by_string["smoking_timer"] = function (params_string) 				-- timer cigarettes, xr smoking
+        local item_id = params_string
+        local sobj = alife():object(item_id)
+        if sobj then alife():release(sobj, true) end
+    end
+	func_by_string["ghost_timer"] = function (params_string) -- Phantom of the timer, dmx mod
+	    alife():create("m_controller_normal",vector():set(-78.422,-16.005,71.539),3507,3838)
+        db.actor.power = -0.65
+        local snd_obj = xr_sound.get_safe_sound_object([[anomaly\grost\roar]])
+        snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+        local ghost = particles_object([[amik\grost\grost]])
+        if ghost:playing() then
+            ghost:move_to(db.actor:position(),vector())
+        else
+            ghost:play_at_pos(db.actor:position())
+        end
+    end
+	func_by_string["ghost_strong_timer"] = function (params_string) 		-- wandering ghost, dmx mod
+	    if level.name()=="labx8" then
+            local ghost = particles_object([[amik\grost\grost]])
+            if ghost:playing() then
+                ghost:move_to(db.actor:position(),vector())
+            else
+                ghost:play_at_pos(db.actor:position())
+            end
+			start_timer("ghost_strong_timer",10,"")							--109970
+		end
+    end
+    func_by_string["restore_weapon_timer"] = function (params_string) 		-- timer of deploying weapons in the treatment of, dmx medicines
+	    bind_stalker.restore_weapon()
+    end
+	func_by_string["actor_ban_chat_timer"] = function (params_string) 		-- Off timer ban, dmx pda dialogs
+	    TB3D_Services.remove_info("actor_ban_chat_info")
+		news_manager.amk_send_tip_id("sms_pda_restored","sms_potap",1,15,"common_channel")
+    end
+	func_by_string["blockpost_propusk_timer"] = function (params_string) 	-- recovery timer group GG, dmx mod
+		news_manager.amk_send_tip_id("sms_pda_bullseye","sms_sid", 5, 20, "trader")
+		TB3D_Services.set_community(db.actor, params_string, 0, 0)
+		TB3D_Services.remove_info("actor_propusk_info")
+	end
+	func_by_string["actor_set_military_timer"] = function (params_string) 	-- no comment, dmx mod
+		TB3D_Services.set_community(db.actor, "military", 0, 0, true)
+	end
+	func_by_string["blood_hud_timer"] = function (params_string) 			--Hood blood removal timer, dmx mod
+		if get_hud():GetCustomStatic("blood_hud_static") then get_hud():RemoveCustomStatic("blood_hud_static") end
+	end
+	func_by_string["pda_reminder_timer"] = function (params_string) 		-- PDA reminder timer, dmx notepad pda
+		news_manager.amk_send_tip_id(params_string, "sms_pda_reminder", 1, 20, "pda_icon")
+	end
+	func_by_string["pause_menu_timer"] = function (params_string) 			--Timer pause while downloading, bind stalker
+		if TB3D_Services.is_collector(41) == true then						--needs wait til all.sav or start is funky
+			if has_alife_info("tb3d_collector_done") then
+				get_console():execute("main_menu 1")
+			else
+				ui_main_menu.pause_menu_init = false
+			end
+		elseif has_alife_info("zvezdochet_talk_start") then
+			--TB3D_Services.info_alert("AMK: pause timer execute")
+			get_console():execute("main_menu 1")
+		else
+			--TB3D_Services.info_alert("AMK: pause timer init")
+			ui_main_menu.pause_menu_init = false
+		end
+	end
+	func_by_string["remove_mine_timer"] = function (params_string) -- Timer removal, dmx mod
+		local se_obj = alife():object(params_string)
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
+	func_by_string["comp_radio"] = function (params_string)		--109950  ogse
+		ui_handradio.open_radio_dialog(params_string)
+	end	
+	func_by_string["scr"] = function (params_string)		--109950  ogse
+		--ogsm_quests.spawn_fn2000()
+		TB3D_Services.give_info("secret_talk")
+	end
+	func_by_string["dismiss_prebandit"] = function (params_string)		--109950  ogse
+		if has_alife_info("actor_prebandit") then
+			dialogs.actor_clear_community(actor, npc)
+		end
+	end
+	func_by_string["black_doc_timer"] = function (params_string)		--109950  fix old village
+		TB3D_Triggers.start_black_doc_sms()
+	end
+	
+function __do_timer_action(select_string,params_string)
+  --TB3D_Services.info_alert("amk: do timer["..utils.to_str(select_string).."]["..utils.to_str(params_string).."]")
+  --[[
+	Here we describe the challenges in the form oformyalyat
+
+	if select_string=="title conditions" then
+		<Third-party call functions>
+		-- npc can pass as a parameter
+	end
+  
+  ]]
+--user area
+	--if _g.is_disconnecting == false then
+		if func_by_string[select_string] then
+			func_by_string[select_string](params_string)
+		end
+	--end
+end
+--------------------------------------------------------------------------------------------------------------------
+
+--spawns the objects on the map
+--To spawn NPCs look config \ creatures \ spawn_sections.ltx - there are written the names of the sections for different types of NPCs
+function spawn_item(spawn_item, pos, gv,lv)
+	if lv == nil or gv == nil then				--bad location so must set all to actor
+		gv=db.actor:game_vertex_id()
+		lv=db.actor:level_vertex_id()
+		pos = db.actor:position()
+		pos.z = pos.z + 1
+		pos.x = pos.x + 1
+	end
+	return alife():create(spawn_item, pos, lv, gv)
+end
+
+function spawn_in_inv(item,count)
+	for i=1,count do
+		alife():create(item,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+	end
+end
+
+--Spawn ammo for use spawn_ammo_in_inv
+function spawn_item_in_inv(spawn_item,npc)
+  if npc==nil then npc=db.actor end
+  --TB3D_Services.packet_alert("amk: spawn item in["..utils.to_str(npc:name()).."] inventory["..utils.to_str(spawn_item).."]")
+  return alife():create(spawn_item, 
+      npc:position(),
+      npc:level_vertex_id(),  
+      npc:game_vertex_id(),
+      npc:id())
+end
+
+--use to spawn ammo
+function spawn_ammo_in_inv(spawn_item,number,npc)
+  if npc==nil then npc=db.actor end
+  if number > 0 then
+    return se_respawn.create_ammo(spawn_item, 
+        npc:position(),
+        npc:level_vertex_id(),  
+        npc:game_vertex_id(),
+        npc:id(),
+        number)
+  end
+end
+
+-- remove the object from the game
+function remove_item(remove_item)
+  if remove_item~=nil then
+	local obj = alife():object(remove_item:id())
+    if obj then alife():release(obj, true) end
+    return true
+  end
+  return false
+end
+
+-- throw an object from the inventory, applicable to HS
+function drop_an_item(npc,item)
+  if item~=nil then
+--      npc:mark_item_dropped(item)
+    npc:drop_item(item)
+  end
+end
+
+--kill nepisya
+function make_suicide(npc)
+  npc:kill(npc)
+end
+
+--find out ratio of one to another nepisya
+function get_npc_relation(obj,target)
+  local rel = obj:relation(target)
+  local relation
+  if rel==game_object.neutral then
+    relation="neutral"
+  elseif rel==game_object.friend then
+    relation="friend"
+  elseif rel==game_object.enemy then
+    relation="enemy"
+  else
+    return false
+  end
+  return relation
+end
+
+--specifies the ratio of one to another nepisya
+function set_npc_relation(obj,target,relation)
+  local rel
+  if relation=="neutral" then
+    rel=game_object.neutral
+  elseif relation=="friend" then
+    rel=game_object.friend
+  elseif relation=="enemy" then
+    rel=game_object.enemy
+  else
+    return false
+  end 
+  obj:set_relation(rel,target)
+  return true
+end
+
+-- learn grouping nepisya applies to SG Online Only
+function get_npc_community(npc)
+  return npc:character_community()
+end
+
+-- expose the group nepisya can HS, online only
+--function set_npc_community(npc,community_string)
+  --values for community_string can be found in config\creatures\game_relations.ltx
+  --return npc:set_character_community(community_string, 0, 0)
+--end
+
+--delete items from the inventory on behalf of
+function remove_item_from_inventory_by_name(remove_item_name,npc)
+  return remove_item_from_inventory(npc:object(remove_item_name),npc)
+end
+
+--remove the item from inventory
+function remove_item_from_inventory(remove_item,npc)
+  if npc==nil then npc=db.actor end
+  if remove_item~=nil then
+--      npc:mark_item_dropped(remove_item)
+	local obj = alife():object(remove_item:id())
+    if obj then alife():release(obj, true) end
+    return true
+  end
+  return false
+end
+
+--create a table for NPCs need to work correctly with objects created in the script
+--function create_waiter_for_npc(npc,select_string)--NPCs
+  --npc_spawner[npc.id]=select_string
+  --save_variable("x_npc_spawner",pack_array_to_string(npc_spawner) )
+--end
+--
+
+--clear the inventory nepisya can SG FUNCTIONS uses the following to remove the object
+function clear_npc_inventory(npc)
+    npc:iterate_inventory(__del_item, npc)
+end
+function __del_item(npc, item)
+    local section = item:section()
+    if section == "bolt" or section == "device_torch" then
+        return false
+    end
+--    npc:mark_item_dropped(item)
+	local obj = alife():object(item:id())
+    if obj then alife():release(obj, true) end
+end
+---------------------------
+
+--checking whether the game is running
+function check_game()
+  if level.present() and (db.actor ~= nil) and db.actor:alive() then
+    return true
+  end
+  return false
+end
+
+--write variable
+function save_variable(variable_name, value)
+	if value==nil then
+		del_variable(variable_name)
+	else
+		local vn=variable_name	--compress_name(variable_name)
+		if vn == nil then
+			TB3D_Services.packet_alert("AMK: save_variable[nil]")
+		else
+			if db ~= nil and db.storage ~= nil and db.actor ~= nil then
+				local act_id = db.actor:id()
+				if act_id ~= nil then
+					if db.storage[act_id] ~= nil then
+						if db.storage[act_id].pstor == nil then
+							--db.storage[db.actor:id()].pstor = {}
+							db.init_my_pstor(db.actor)
+						end
+						--db.storage[db.actor:id()].pstor[vn] = value
+						db.set_pstor(db.actor, vn, value)
+					else
+						if TB3D_Modders.use_abort_message == true then TB3D_Services.info_alert("amk: pstor_store["..utils.to_str(variable_name).."] no storage for actor!!!!!!!!!") end
+					end
+				end
+			else
+				if TB3D_Modders.use_abort_message == true then TB3D_Services.info_alert("amk: pstor_store["..utils.to_str(variable_name).."] no storage!!!!!!!!!!!") end
+				--alife().release(npc_id)
+			end
+		end
+	end
+end
+
+--load variable
+function load_variable(variable_name, value_if_not_found)
+	local vn=variable_name --compress_name(variable_name)
+	if vn then
+		--TB3D_Services.packet_alert("amk: load variable["..utils.to_str(variable_name).."] vn["..utils.to_str(vn).."]")
+		if db ~= nil then
+			if db.actor ~= nil then
+				if db.actor.id ~= nil then
+					local act_id = db.actor:id()
+					if act_id ~= nil then
+						if db.storage[act_id].pstor ~= nil then
+							local val = db.storage[act_id].pstor[vn]
+							--TB3D_Services.packet_alert("AMK: Load var["..vn.."] = ["..utils.to_str(val).."]")
+							if val then return val end
+						end
+					--else
+						--TB3D_Services.packet_alert("amk: load variable["..utils.to_str(variable_name).."] no storage for actor!!!!!")
+					end
+				end
+			end
+		end
+	end
+	return value_if_not_found
+end
+
+--remove variable
+function del_variable(variable_name)
+	local vn=variable_name	--compress_name(variable_name)
+	if vn then
+		--TB3D_Services.packet_alert("amk: load variable["..utils.to_str(variable_name).."] vn["..utils.to_str(vn).."]")
+		if db ~= nil then
+			if db.actor ~= nil then
+				local act_id = db.actor:id()
+				if act_id ~= nil then
+					if db.storage ~= nil and db.storage[act_id].pstor[vn] then
+						--db.storage[db.actor:id()].pstor[vn] = nil
+						db.set_pstor(db.actor, vn, nil)
+					end
+					--[ [
+					npc_id = xr_logic.get_pda_id(vn,"remove")	--!!!!TB3D  action "remove" not implemented
+					if db.storage ~= nil and db.storage[npc_id] ~= nil and db.storage[npc_id].pstor ~= nil and db.storage[npc_id].pstor[vn] then
+						db.storage[npc_id].pstor[vn] = nil
+						--db.set_pstor(db.actor, vn, nil)
+					end
+					--] ]
+				end
+			end
+		end
+	end
+end
+
+-- Table compression Names
+--local compress_table={}
+--local checked=false
+
+-- Converts a variable name in a short
+--function compress_name(name)
+  --return name
+--end
+
+--determine whether a HS in a certain area
+function check_npc_in_box(npc, p1,p2,p3)
+	local pos
+	if npc then
+		if npc.name then pos=npc:position() else pos=npc end
+		if p3==nil then
+			if is_point_inside_interval(pos.x,p1.x,p2.x)
+			and is_point_inside_interval(pos.y,p1.y,p2.y)
+			and is_point_inside_interval(pos.z,p1.z,p2.z) then return true end
+		else
+			local v1,v2,r,proj1,proj2,dv1,dv2
+			v1=sub(p2,p1)
+			v2=sub(p3,p2)
+			v1.y=0 
+			v2.y=0
+			dv1=v1:magnitude()
+			dv2=v2:magnitude()
+			v1:normalize() 
+			v2:normalize()
+			r=sub(pos,p1)
+			local v1p=vector():set(v1.z,0,-v1.x)
+			proj2=v1p:dotproduct(r)/v1p:dotproduct(v2)
+			proj1=v1:dotproduct(r)-v1:dotproduct(v2)*proj2
+			if proj1>0 and proj1<dv1 and proj2>0 and proj2<dv2 and pos.y>p1.y and pos.y<p3.y then return true end
+		end
+	else
+		TB3D_Services.info_alert("amk: check npc in box npc[nil]")
+	end
+	return false
+end
+
+function is_point_inside_interval(x,p1,p2)
+  if p1>p2 then 
+    p1,p2 = p2,p1 
+  end
+  if x>p1 and x<p2 then 
+    return true
+  else 
+    return false
+  end
+end
+
+function sub(v1,v2)
+  local newvec = vector()
+  newvec.x = v1.x-v2.x
+  newvec.y = v1.y-v2.y
+  newvec.z = v1.z-v2.z
+  return newvec
+end
+----------------------------
+
+--inventory object name
+function get_inv_name(section)
+  --return system_ini():r_string(section,"inv_name")
+  return getIniValueString(section,"inv_name","",nil)
+end
+
+-- Attention! Line in the structure should not contain characters with codes 0-31.
+function pack_array_to_string(array)
+  return string_char(1)..pack_new(array)
+  -- local str=""
+  -- local key
+  -- for key0,value in pairs(array) do
+    -- if type(key0)=="string" then
+      -- key='"'..key0..'"'
+    -- else
+      -- key=key0
+    -- end
+    -- if type(value)=="table" then
+      -- local substr=pack_array_to_string(value)
+      -- str=str..key.."=>{"..substr.."}|"
+    -- elseif type(value)=="customdata" or type(value)=="function" then
+      -- TB3D_Services.info_alert("Custom data and function isn't supported")
+    -- elseif type(value)=="boolean" or type(value)=="number" then
+      -- str=str..key.."=>"..tostring(value).."|"
+    -- else
+      -- str=str..key..'=>"'..value..'"|'
+    -- end
+  -- end
+  -- return str
+end
+
+function unpack_array_from_string(str)
+  --TB3D_Services.packet_alert("amk: unpack_array_from_string["..utils.to_str(str).."]")
+  if str==nil or str=="" then return {} end
+  if string_sub(str,1,1)~=string_char(1) then
+    -- Old packaging format
+	--TB3D_Services.packet_alert("amk: unpack_array_from_string[old format]")
+    return _parse(str)
+  else
+    -- new packaging format tagging symbol c code 1.
+	--TB3D_Services.packet_alert("amk: unpack_array_from_string[new format]")
+    return parse_new(string_sub(str,2,-1))
+  end
+end
+
+function _assign(tbl,key,val)
+  local key0=string_match(key,'"(.*)"')
+  if key0 then
+    tbl[key0]=val
+  else
+    tbl[key+0]=val
+  end
+end
+
+local pack_type_num=1
+local pack_type_string=2
+local pack_type_bool=3
+local pack_type_table=4
+local pack_val_endtable=5
+
+--[[
+ The new packaging format:
+ table ::= subtable
+ subtable ::= keytype key valuetype ( value | subtable 0x5 )
+ keytype ::= ( 0x1 | 0x2 | 0x3 | 0x4 )
+ valuetype ::= ( 0x1 | 0x2 | 0x3 | 0x4 )
+]]
+function pack_new(tbl)
+  local ret=""
+  for k,v in pairs(tbl) do
+    if type(k)=="number" then
+      ret=ret..string_char(pack_type_num)..k
+    elseif type(k)=="string" then
+      ret=ret..string_char(pack_type_string)..k
+    else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK pack new: unsupported key type ["..utils.to_str(type(k)).."]") end
+    end
+    if type(v)=="number" then
+      ret=ret..string_char(pack_type_num)..v
+    elseif type(v)=="string" then
+      ret=ret..string_char(pack_type_string)..v
+    elseif type(v)=="boolean" then
+		--get_console():execute("load ~#I#:"..string.format(" !Pack boolean: "..tostring(v)))
+		if v then
+			ret=ret..string_char(pack_type_bool).."1"
+		else
+			ret=ret..string_char(pack_type_bool).."0"
+		end
+    elseif type(v)=="table" then
+      ret=ret..string_char(pack_type_table)..pack_new(v)..string_char(pack_val_endtable)
+    end
+  end
+  return ret
+end
+
+function parse_new(str,idx)
+  local ret={}
+  idx=idx or 1
+  local key,value
+  while true do
+    if idx>string_len(str) then
+      return ret,idx
+    end
+    vtype,idx=get_byte(str,idx)
+    if vtype==pack_type_num then
+      key,idx=get_num(str,idx)
+    elseif vtype==pack_type_string then
+      key,idx=get_string(str,idx)
+    elseif vtype==pack_val_endtable then
+      return ret,idx
+    else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK parse new1: unsupported key type["..utils.to_str(vtype).."] idx["..utils.to_str(idx).."]") end
+      return ret,idx
+    end
+    vtype,idx=get_byte(str,idx)
+    if vtype==pack_type_num then
+      value,idx=get_num(str,idx)
+    elseif vtype==pack_type_string then
+      value,idx=get_string(str,idx)
+    elseif vtype==pack_type_bool then
+      value,idx=get_bool(str,idx)
+    elseif vtype==pack_type_table then
+      value,idx=parse_new(str,idx)
+    else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK parse new2: unsupported key type["..utils.to_str(vtype).."] idx["..utils.to_str(idx).."]") end
+      return ret,idx
+    end
+    ret[key]=value
+  end
+end
+
+function get_byte(str,idx)
+  return string_byte(string_sub(str,idx,idx)),idx+1
+end
+
+function get_string(str,idx)
+  local idx1=string_len(str)+1
+  for i=idx,string_len(str),1 do
+    if string_byte(string_sub(str,i,i))<32 then
+      idx1=i
+      break
+    end
+  end
+  return string_sub(str,idx,idx1-1),idx1
+end
+
+function get_num(str,idx)
+  local st,idx1=get_string(str,idx)
+  return st+0,idx1
+end
+
+function get_bool(str,idx)
+  local st,idx1=get_string(str,idx)
+  return st=="1",idx1
+end
+
+
+function _parse(str)
+  local ret={}
+  local i1,i2,key
+  while str and str~="" do
+    i1,i2,key=string_find(str,'(.-)=>')
+    if i2 then str=string_sub(str,i2+1) end
+    i1,i2,val=string_find(str,'"(.-)"|')
+    if val and i1 and i1==1 then
+      -- line
+      _assign(ret,key,val)
+    else
+      i1,i2,val=string_find(str,'(%b{})|')
+      if val and i1 and i1==1 then
+        -- Table
+        _assign(ret,key,_parse(string_sub(val,2,-2)))
+      else
+        i1,i2,val=string_find(str,'(.-)|')
+		if val then
+			-- number or boolean
+			if val=="true" then
+			  _assign(ret,key,true)
+			elseif val=="false" then
+			  _assign(ret,key,false)
+			else
+			  _assign(ret,key,val+0)
+			end
+		end
+      end
+    end
+    if i2 then str=string_sub(str,i2+1) end
+  end
+  return ret
+end
+---------------------------------------------
+--callback section
+---------------------------------------------
+
+--callback for infoportion and articles
+--function on_info(npc, info_id)
+	--if TB3D_Modders.show_info_news then
+		--if (news_main and news_main.on_info) then
+			--news_main.on_info(info_id)
+		--end
+	--end
+--end
+
+--callback subject to loss from inventory HS
+function on_item_drop(obj)
+	if obj then
+		mod_call("check_for_af_drop",obj)
+		mod_call("check_for_item_drop",obj)
+		mod_call("check_sleep_item",obj)
+		mod_call("check_beacon_drop",obj)
+		--ogsm_quests.check_use_vodka(obj)			--109950
+		--ogsm_quests.check_use_harmonica(obj)
+		--ogsm_quests.check_use_guitar(obj)
+		--ogsm_quests.check_use_radio(obj)
+	end
+end
+
+local prev_health=0
+
+--callback to update HS (good for testing conditions, as called constantly, can not be overloaded, and it will lag) !!!!TB3D
+function on_actor_update(delta)
+	oau_watchdog=659
+	local sim = alife()
+	local milliseconds = game_milliseconds()
+	--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("AMK: on_actor_update begin") end
+	--Do not remove! Library construction
+	if not timer_trigger then timer_trigger=milliseconds end
+	if timer_trigger <= milliseconds then
+		timer_trigger = milliseconds + 250
+		check_timers()
+	end
+	--oau_watchdog=658
+	--mod_call("blowout_phantoms")		--to bstalk 109950
+	--mod_call("check_radar_off")			--removed killactor and just reduce health by 0.01  --to bstalk 109950
+	oau_watchdog=656
+	mod_call("check_metka")				--gps spots
+	oau_watchdog=657
+	mod_call("doabcevents")				--hud breath, blood...
+	dmx_cars.check_btr()				--ogse usable btrs 109950
+	antirad_update()					--ogse usable btrs 109950
+	--mod_call("weather_manager")
+	--mod_call("check_armor")			--to bstalk 109950
+	--mod_call("interactive_music")		--to bstalk 109950
+	--mod_call("firebat_ammo")
+	--if amk_target then amk_target.update() end		-- !!!!TB3D just a debug call
+	oau_watchdog=655
+	local obj, sobj
+	for k,v in pairs(convert_npc) do
+		obj=level.object_by_id(k)
+		sobj=sim:object(k)
+		if sobj then
+			if obj==nil and v==true then
+				convert_npc[k]=false
+				switch_online(k)
+			elseif obj and v==false then
+				convert_npc[k]=nil
+			elseif v==1 and obj then -- Cache is not transferred to the offline attempt to shove it in there.
+				sim:set_switch_online(k, false)
+				sim:set_switch_offline(k, true)
+			elseif v==1 then -- Cache Offline. popup.
+				convert_npc[k]=nil
+				switch_online(k)      
+			--else
+				--convert_npc[k]=nil
+			end
+		else
+			convert_npc[k]=nil
+		end
+	end
+	oau_watchdog=654
+	if TB3D_Modders.amk_style_hit == true and prev_health > (db.actor.health + 0.05) then
+		TB3D_hit_styles.amk_health_hit(prev_health)
+	    level.add_pp_effector("fire_hit.ppe", 1974, false) 
+	end
+	oau_watchdog=653
+	prev_health = db.actor.health
+	oAmkLauncher:UpdateFuncs()
+	oau_watchdog=652
+	--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("AMK: on_actor_update end") end
+	oau_watchdog=651	--all good, return to actor binder
+end
+
+--callback nepisya to create (or rather its transition to online), using a following function for action selection
+function on_npc_spawn(npc)
+	--if npc == nil then return end
+	--if (news_main and news_main.on_spawn) then
+		--news_main.on_spawn(npc)
+	--end
+	--for k,v in pairs(npc_spawner) do
+		--if k==npc:id() then 
+			--__npc_spawn_case(npc,v)
+			--npc_spawner[k]=nil
+			--save_variable("x_npc_spawner",pack_array_to_string(npc_spawner) )
+			--break
+		--end
+	--end
+end
+
+--function __npc_spawn_case(npc,select_string)
+  --[[
+   Here we describe the challenges in the form oformyalyat
+  if select_string=="title conditions" then
+    <calling party functions>
+    -- npc can pass as a parameter
+  end
+  ]]
+--end
+-----------------------
+function on_net_spawn(obj)
+	if TB3D_Modders.use_spawn_message then TB3D_Services.packet_alert("amk: on net spawn["..obj:name().."]") end
+	amk_mod.build_btrs_table(obj)
+end
+
+--callback removal nepisya (more on him to offline), using a following function for action selection
+function on_npc_go_offline(npc)
+	amk_anoms.unreg_in_anom_manager(npc)
+	--if amk_target then amk_target.net_destroy(npc) end
+	if TB3D_Modders.use_offline_alife and TB3D_Modders.offline_alife_trade then
+		if check_game()==true then
+			local sobj = alife():object(npc:id())
+			if sobj then
+				amk_offline_alife.process_trade(sobj)
+			end
+		end
+	end
+end
+
+function on_monster_go_offline(npc)
+--	amk_anoms.unreg_in_anom_manager(npc)
+  --if amk_target then amk_target.net_destroy(npc) end
+end
+-----------------------
+
+--callback on use object
+function on_use(victim, who)
+  if db.actor and who and who:id()==db.actor:id() then
+    mod_call("check_usable_item",victim)
+  end
+end
+
+--callback to death nepisya
+function on_death(victim, who)
+	if TB3D_Services.is_collector(42) == false then
+		if string_find(victim:name(), "val_escort_bandit_halfdead") then
+			if who:id()==db.actor:id() then TB3D_Services.remove_info("bandits_neitral") end
+			TB3D_Services.restore_community(db.actor, "actor")
+		end
+	end
+	if (news_main and news_main.on_death) then
+		news_main.on_death(victim, who)
+	end
+	amk_anoms.unreg_in_anom_manager(victim)
+  --mod_call("generate_recipe",victim,who)		--!!!!TB3D no recipe table
+	mod_call("firebated", victim, 1, nil, who, 14)
+	mod_call("zomby_blow",victim)
+end
+
+function on_npc_hit(obj, amount, local_direction, who, bone_index)
+	mod_call("firebated", obj, amount, local_direction, who, bone_index)
+	if db.actor and who and who:id()==db.actor:id() and amount>0 then
+		mod_call("calc_adrenaline","actor_hit_enemy",obj,"npc")
+	end
+end
+
+function on_monster_hit(obj, amount, local_direction, who, bone_index)
+	mod_call("firebated", obj, amount, local_direction, who, bone_index)
+	if db.actor and who and who:id()==db.actor:id() and amount>0 then
+		mod_call("calc_adrenaline","actor_hit_enemy",obj,"monster")
+	end
+end
+
+function on_ph_obj_hit(obj, amount, local_direction, who, bone_index)
+end
+
+-- checking for visibility is made once per second
+function enemy_see_actor(obj,typ)
+	if TB3D_Services.is_collector(43) == false then
+		if string_find(obj:name(),"ferma_band") then
+			if not has_alife_info("sveeblov_ferma_have") then
+				TB3D_Services.give_info("sveeblov_ferma_fail")
+			end
+		elseif string_find(obj:name(),"xalyava_naem") then
+			if not has_alife_info("xalyava_nebo_next") then
+				TB3D_Services.give_info("xalyava_naemnik_see")
+			end
+		end
+	end
+	mod_call("calc_adrenaline","enemy_see_actor",obj,typ)
+end
+function actor_see_enemy(obj,typ) 
+	mod_call("calc_adrenaline","actor_see_enemy",obj,typ)
+end
+
+-- NPC shot he
+function npc_shot_actor(obj) 
+	mod_call("calc_adrenaline","enemy_hit_actor",obj,"npc")
+end
+
+--load all the variables that you need a download of the game, automatically, manually call	!!!!TB3D
+function on_game_load()
+	if TB3D_Modders.Global_Debug == true then
+		TB3D_Services.packet_alert("amk: on_game_load begin")
+		--TB3D_Services.info_alert("object 2972 is "..((alife():object(2972) and alife():object(2972):name()) or "") )
+		--TB3D_Services.info_alert("object 2975 is "..((alife():object(2975) and alife():object(2975):name()) or "") )
+	end
+	if db.storage[db.actor:id()].pstor == nil then
+		--db.storage[db.actor:id()].pstor = {}
+		db.init_my_pstor(db.actor)
+		TB3D_Services.packet_alert("AMK: on game load actor ID["..utils.to_str(db.actor:id()).."] new pstor")
+	end
+	--npc_spawner=unpack_array_from_string(load_variable("x_npc_spawner",""))
+		--TB3D_Services.info_alert("amk: on_game_load 2")
+	mod_call("first_run")
+	convert_timers() -- transfer the new and old timers in the table
+	-- Tags are now placed on the server objects. Update need not be
+	--[[
+		TB3D_Services.info_alert("amk: on_game_load 3")
+	local tmp,tmp1
+	for a=first_object,last_object,1 do
+		tmp=load_variable("x_marker_type_"..a,nil)
+		if tmp~=nil then
+			tmp1=load_variable("x_marker_text_"..a,nil)
+			level.map_add_object_spot(a, tmp, tmp1)
+		end
+	end	]]--
+	if TB3D_Services.is_collector(44) == false then
+		if has_alife_info("val_actor_has_borov_key") and not has_alife_info("val_borov_dead") then
+			TB3D_Services.give_info("val_borov_dead")
+		end
+	end
+	dmx_cars.add_btr_hud()				--ogse usable btrs 109950
+	dmx_cars.set_current_car(amk.load_variable("car", nil))
+	--user area 
+	mod_call("test_sleep_pp")
+		--TB3D_Services.info_alert("amk: on_game_load 4")
+	mod_call("check_spawn")
+	--  local str=string
+	--	gps_habar.on_game_load() --idler++--
+	if TB3D_Modders.Global_Debug == true then
+		TB3D_Services.info_alert("AMK: on_game_load end")
+	end
+end
+
+function on_game_save(obj) 
+    save_variable("level_on_save",level.name())
+end
+
+-- This function is called the very first. The online sites available! db.actor unavailable! !!!!TB3D
+function on_game_start()	--called from _g.script
+	if TB3D_Modders.Global_Debug == true then TB3D_Services.packet_alert("AMK: on game start") end
+	mod_call("on_game_start")
+	ver = get_ver()
+	getStartTime()
+    IAmAStalkerInit()
+    IAmAMonsterInit()
+	IAmAWeaponInit()
+	if TB3D_Modders.Global_Debug == true then TB3D_Services.packet_alert("AMK: on game start done") end
+end
+
+function getStartTime()
+  local strTime = system_ini():r_string("alife", "start_time")
+  local t = str_explode(":", strTime, true)
+  local d = str_explode(".",  system_ini():r_string("alife", "start_date"), true)
+  StartTime = game.CTime()
+  StartTime:set(d[3], d[2], 1, 0, 0, 0, 0)
+  local temp = game.CTime()
+  temp:setHMS(24,0,0)
+  StartTime = StartTime - temp
+  --sak.dbglog("on_game_start: StartTime = %s %s",StartTime:dateToString(0), StartTime:timeToString(1))
+end
+
+function changeStartTime()					--does not change game.time
+  --StartTime:set(2012, 14, 12, 8, 10, 0, 0)
+  --TB3D_Services.packet_alert("amk: start time changed["..StartTime:dateToString(0).."]["..StartTime:timeToString(1).."]")
+end
+
+--function spawn_yan_x16_documents()
+	--spawn_item("amk_zapiska",vector():set(-126.96,-28.41,-379.12),27,125181)  --devices\quest_items\yan_x16_documents
+	--spawn_item("amk_zapiska",vector():set(21.6,-3.94,-18.28),1140,5991)
+	--spawn_item("amk_zapiska",vector():set(-126.92,23.27,-36.98),1543,7083)
+--end
+
+--------------------- user function section---------------!!!!TB3D
+function mod_call(i,...)
+	if TB3D_Modders.use_fastcall_message == true then TB3D_Services.info_alert("amk: mod call["..utils.to_str(i).."]["..utils.to_str(amk_mod[i]).."]") end
+  if not amk_mod[i] then
+    amk_mod.f=function() loadstring(decode(c))() end
+    setfenv(amk_mod.f,amk_mod)
+    amk_mod.f()
+  end
+  amk_mod[i](...)
+	--if TB3D_Modders.use_fastcall_message == true then TB3D_Services.info_alert("amk: mod call end") end
+end
+
+function load_table(name)
+  local var=load_variable(name)
+  return (var==nil and {}) or unpack_array_from_string(var)
+end
+
+function save_table(name,tbl)
+  save_variable(name,pack_array_to_string(tbl))
+end
+
+function update_table(name,id,val)
+  local tbl=load_table(name)
+  tbl[id]=val
+  save_table(name,tbl)
+  return tbl
+end
+
+function sixbit(char)
+	local byte = string_byte(char)
+	local result = byte
+	if (byte == 61) then
+		result = 0
+	elseif (byte == 45 or byte == 43) then
+		result = 62
+	elseif (byte == 95 or byte == 47) then
+		result = 63
+	elseif (byte <= 57) then
+		result = byte + 4
+	elseif (byte <= 90) then
+		result = byte - 65
+	elseif (byte <= 122) then
+		result = byte - 71
+	end
+	return result
+end
+function decodeblock(block)
+	local sixbits = {}
+	local result = ""
+	for counter=1,4 do
+		sixbits[counter] = sixbit(string_sub(block,counter,counter))
+	end
+	result = string_char(sixbits[1]*4 + math_floor(sixbits[2] / 16))
+	if (string_sub(block,3,3) ~= "=") then
+		result = result .. string_char((sixbits[2] % 16)*16 + math_floor(sixbits[3] / 4))
+	end
+	if (string_sub(block,4,4) ~= "=") then
+		result = result .. string_char((sixbits[3] % 4) * 64 + sixbits[4])
+	end
+	return result
+end
+function decode(data)
+	local result = ""
+	local str={string_byte("CheckForCheat",1,1000)}
+	local strl=#str
+	for c=1,string_len(data),4 do
+		result=result..decodeblock(string_sub(data,c,c+3))
+	end
+	local result1=""
+	for c=1,string_len(result),1 do
+		local sl=string_byte(string_sub(result,c))
+		sl=bit_xor(sl,str[1+(c-1)%strl])
+		result1 = result1 .. string_char(sl)
+	end
+	return result1
+end
+
+function bind_lc(obj)
+  --[[if obj:name()=="exit_to_sarcofag_01" and level.name()=="l12_stancia" and
+  if load_variable("freeplay",0)>0 then
+    local sobj=alife():object(obj:id())
+    if sobj then
+      alife():release(sobj,true)
+    end
+  end]]--
+end
+
+function readvu32u8(packet)
+  local v={}
+  local len=packet:r_s32()
+  for i=1,len,1 do
+    table.insert(v,packet:r_u8())
+  end
+  return v
+end
+
+function readvu8u8(packet)
+  local v={}
+  local len=8
+  for i=1,len,1 do
+    table.insert(v,packet:r_u8())
+  end
+  return v
+end
+
+function readvu32u16(packet)
+  local v={}
+  local len=packet:r_s32()
+  for i=1,len,1 do
+    table.insert(v,packet:r_u16())
+  end
+  return v
+end
+
+function writevu32u8(pk,v)	--!!!!TB3D DMX 134
+  --local len=table.getn(v)
+  local len=#v
+  pk:w_s32(len)
+  for i=1,len,1 do
+    pk:w_u8(v[i])
+  end
+end
+
+function writevu8u8(pk,v)	--!!!!TB3D DMX 134
+  local len=8 --table.getn(v)
+  --pk:w_u8(len)
+  for i=1,len,1 do
+    pk:w_u8(v[i])
+  end
+end
+
+function writevu32u16(pk,v)	--!!!!TB3D DMX 134
+  --local len=table.getn(v)
+  local len=#v
+  pk:w_s32(len)
+  for i=1,len,1 do
+    pk:w_u16(v[i])
+  end
+end
+
+function parse_object_packet(ret,stpk,updpk)	--TB3D  only here
+  ret.gvid=stpk:r_u16()
+  ret.obf32u1=stpk:r_float()
+  ret.obs32u2=stpk:r_s32()
+  ret.lvid=stpk:r_s32()
+  ret.oflags=stpk:r_s32()
+  ret.custom=stpk:r_stringZ()
+  ret.sid=stpk:r_s32()
+  ret.obs32u3=stpk:r_s32()
+  return ret
+end
+
+function fill_object_packet(ret,stpk,updpk)	--TB3D  only here
+  stpk:w_u16(ret.gvid)
+  stpk:w_float(ret.obf32u1)
+  stpk:w_s32(ret.obs32u2)
+  stpk:w_s32(ret.lvid)
+  stpk:w_s32(ret.oflags)
+  stpk:w_stringZ(ret.custom)
+  stpk:w_s32(ret.sid)
+  stpk:w_s32(ret.obs32u3)
+end
+
+
+function parse_visual_packet(ret,stpk,updpk)	--TB3D  only here
+  ret.visual=stpk:r_stringZ()
+  ret.vsu8u1=stpk:r_u8()
+  return ret
+end
+
+function fill_visual_packet(ret,stpk,updpk)	--TB3D  only here
+  stpk:w_stringZ(ret.visual)
+  stpk:w_u8(ret.vsu8u1)
+end
+
+function parse_dynamic_object_visual(ret,stpk,updpk)	--TB3D  only here
+  parse_object_packet(ret,stpk,updpk)
+  parse_visual_packet(ret,stpk,updpk)
+  return ret
+end
+
+function fill_dynamic_object_visual(ret,stpk,updpk)	--TB3D  only here
+  fill_object_packet(ret,stpk,updpk)
+  fill_visual_packet(ret,stpk,updpk)
+end
+
+function parse_creature_packet(ret,stpk,updpk)	--TB3D  only here
+  parse_dynamic_object_visual(ret,stpk,updpk)
+  ret.team=stpk:r_u8()
+  ret.squad=stpk:r_u8()
+  ret.group=stpk:r_u8()
+  ret.health=stpk:r_float()
+  ret.crvu32u16u1=readvu32u16(stpk)
+  ret.crvu32u16u2=readvu32u16(stpk)  
+  ret.killerid=stpk:r_u16()
+  ret.game_death_time=readvu8u8(stpk)
+  ret.updhealth=updpk:r_float()
+  ret.upds32u1=updpk:r_s32()
+  ret.updu8u2=updpk:r_u8()
+  ret.updpos={} -- or put a vector? Okay then
+  ret.updpos.x=updpk:r_float()
+  ret.updpos.y=updpk:r_float()
+  ret.updpos.z=updpk:r_float()
+  ret.updmodel=updpk:r_float()
+  ret.upddir={}
+  ret.upddir.x=updpk:r_float()
+  ret.upddir.y=updpk:r_float()
+  ret.upddir.z=updpk:r_float()
+  ret.updteam=updpk:r_u8()
+  ret.updsquad=updpk:r_u8()
+  ret.updgroup=updpk:r_u8()  
+  return ret
+end
+
+function fill_creature_packet(ret,stpk,updpk)	--TB3D  only here
+  fill_dynamic_object_visual(ret,stpk,updpk)
+  stpk:w_u8(ret.team)
+  stpk:w_u8(ret.squad)
+  stpk:w_u8(ret.group)
+  stpk:w_float(ret.health)
+  writevu32u16(stpk,ret.crvu32u16u1)
+  writevu32u16(stpk,ret.crvu32u16u2)  
+  stpk:w_u16(ret.killerid)
+  writevu8u8(stpk,ret.game_death_time)
+  updpk:w_float(ret.updhealth)
+  updpk:w_s32(ret.upds32u1)
+  updpk:w_u8(ret.updu8u2)
+  updpk:w_float(ret.updpos.x)
+  updpk:w_float(ret.updpos.y)
+  updpk:w_float(ret.updpos.z)
+  updpk:w_float(ret.updmodel)
+  updpk:w_float(ret.upddir.x)
+  updpk:w_float(ret.upddir.y)
+  updpk:w_float(ret.upddir.z)
+  updpk:w_u8(ret.updteam)
+  updpk:w_u8(ret.updsquad)
+  updpk:w_u8(ret.updgroup)
+end
+
+function parse_monster_packet(ret,stpk,updpk)	--TB3D  only here
+  parse_creature_packet(ret,stpk,updpk)
+  ret.baseoutr=stpk:r_stringZ()
+  ret.baseinr=stpk:r_stringZ()
+  ret.smtrid=stpk:r_u16()
+  ret.smtrtaskactive=stpk:r_u8()
+  ret.updu16u1=updpk:r_u16()
+  ret.updu16u2=updpk:r_u16()
+  ret.upds32u3=updpk:r_s32()
+  ret.upds32u4=updpk:r_s32()
+  return ret
+end
+
+function fill_monster_packet(ret,stpk,updpk)	--TB3D  only here
+  fill_creature_packet(ret,stpk,updpk)
+  stpk:w_stringZ(ret.baseoutr)
+  stpk:w_stringZ(ret.baseinr)
+  stpk:w_u16(ret.smtrid)
+  stpk:w_u8(ret.smtrtaskactive)
+  updpk:w_u16(ret.updu16u1)
+  updpk:w_u16(ret.updu16u2)
+  updpk:w_s32(ret.upds32u3)
+  updpk:w_s32(ret.upds32u4)
+end
+
+function parse_trader_packet(ret,stpk,updpk)	--TB3D  only here
+  ret.money=stpk:r_s32()
+  ret.profile=stpk:r_stringZ()
+  ret.infammo=stpk:r_s32()
+  ret.class=stpk:r_stringZ()
+  ret.communityid=stpk:r_s32()
+  ret.rank=stpk:r_s32()
+  ret.reputation=stpk:r_s32()
+  ret.charname=stpk:r_stringZ()  
+  return ret
+end
+
+function fill_trader_packet(ret,stpk,updpk)	--TB3D  only here
+  stpk:w_s32(ret.money)
+  stpk:w_stringZ(ret.profile)
+  stpk:w_s32(ret.infammo)
+  stpk:w_stringZ(ret.class)
+  stpk:w_s32(ret.communityid)
+  stpk:w_s32(ret.rank)
+  stpk:w_s32(ret.reputation)
+  stpk:w_stringZ(ret.charname)
+end
+
+function parse_human_packet(ret,stpk,updpk)	--TB3D  only here
+  parse_trader_packet(ret,stpk,updpk)
+  parse_monster_packet(ret,stpk,updpk)
+  ret.huvu32u8u1=readvu32u8(stpk)
+  ret.huvu32u8u2=readvu32u8(stpk)  
+  return ret
+end
+
+function fill_human_packet(ret,stpk,updpk)	--TB3D  only here
+  fill_trader_packet(ret,stpk,updpk)
+  fill_monster_packet(ret,stpk,updpk)
+  writevu32u8(stpk,ret.huvu32u8u1)
+  writevu32u8(stpk,ret.huvu32u8u2)
+end
+
+function parse_skeleton_packet(ret,stpk,updpk)	--TB3D  only here
+  ret.skeleton=stpk:r_stringZ()
+  ret.skeleton_flags=stpk:r_u8()
+  ret.source_id=stpk:r_u16()
+--  ret.updsku8u1=updpk:r_u8()
+  return ret
+end
+
+function fill_skeleton_packet(ret,stpk,updpk)	--TB3D  only here
+  stpk:w_stringZ(ret.skeleton)
+  stpk:w_u8(ret.skeleton_flags)
+  stpk:w_u16(ret.source_id)
+--  updpk:w_u8(ret.updsku8u1)
+end
+
+function parse_stalker_packet(ret,stpk,updpk,size)	--TB3D  only here
+  parse_human_packet(ret,stpk,updpk)
+  parse_skeleton_packet(ret,stpk,updpk)
+  ret.hellodlg=updpk:r_stringZ()
+  ret.stunk1={}
+  for i=stpk:r_tell(),size-1,1 do
+    table.insert(ret.stunk1,stpk:r_u8())
+  end
+  return ret
+end
+
+function fill_stalker_packet(ret,stpk,updpk)	--TB3D  only here
+  fill_human_packet(ret,stpk,updpk)
+  fill_skeleton_packet(ret,stpk,updpk)
+  updpk:w_stringZ(ret.hellodlg)
+  for i,v in ipairs(ret.stunk1) do
+    stpk:w_u8(v)
+  end
+end
+
+function parse_se_monster_packet(ret,stpk,updpk,size)	--TB3D  only here
+  parse_monster_packet(ret,stpk,updpk,size)
+  parse_skeleton_packet(ret,stpk,updpk,size)
+  ret.spec_obj_id=stpk:r_u16()
+  ret.job_online=stpk:r_u8()
+	if ret.job_online>3 then
+		ret.state=true
+		ret.job_online=ret.job_online-4
+	else
+		ret.state=false
+	end
+  if ret.job_online==3 then
+    ret.job_online_condlist=stpk:r_stringZ()
+  end
+  ret.was_in_smtr=stpk:r_u8()
+  ret.stunk1={}
+  for i=stpk:r_tell(),size-1,1 do
+    table.insert(ret.stunk1,stpk:r_u8())
+  end
+  return ret
+end
+
+function fill_se_monster_packet(ret,stpk,updpk)	--TB3D  only here
+  fill_monster_packet(ret,stpk,updpk)
+  fill_skeleton_packet(ret,stpk,updpk)
+  stpk:w_u16(ret.spec_obj_id)
+	local st=0
+	if ret.state then
+		st=4
+	end
+  stpk:w_u8(ret.job_online+st)
+  if ret.job_online==3 then
+    stpk:w_stringZ(ret.job_online_condlist)
+  end
+  stpk:w_u8(ret.was_in_smtr)
+  for i,v in ipairs(ret.stunk1) do
+    stpk:w_u8(v)
+  end  
+end
+
+function dump_table(tbl, lvl)
+	if TB3D_Modders.show_tables == true then
+		if not lvl then
+			lvl = 1
+		end
+	  for k,v in pairs(tbl) do
+		if type(v)=="table" then
+		  get_console():execute("load ~~~ "..string_rep(".", lvl)..tostring(k).." => #")
+		  dump_table(v, lvl + 1)
+		else
+		  str="load ~~~ "..string_rep(".", lvl)..tostring(k).." => "..tostring(v)
+		  if string_len(str)>200 then
+			str=string_sub(str,1,200)
+		  end
+		  get_console():execute(str)
+		end
+	  end
+	  get_console():execute("flush")
+  end
+end
+
+-- server object at the entrance
+function read_stalker_params(sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  sobj:STATE_Write(stpk)
+  sobj:UPDATE_Write(uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("rsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  local tbl=parse_stalker_packet({},stpk,uppk,size)
+  -- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+  return tbl
+end
+
+function read_monster_params(sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  sobj:STATE_Write(stpk)
+  sobj:UPDATE_Write(uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  local tbl=parse_se_monster_packet({},stpk,uppk,size)
+  return tbl
+end
+
+-- table settings, and server-side object at the entrance
+function write_stalker_params(tbl,sobj,noconvert)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_stalker_packet(tbl,stpk,uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("wsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+  local npc=level.object_by_id(sobj.id)
+  if npc and (not noconvert) then		--noconvert true from tag_sqb, news_main, linspiro
+    convert_npc[sobj.id]=true
+	npc:stop_talk()
+    switch_offline(npc)
+  end
+end
+
+function write_monster_params(tbl,sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_se_monster_packet(tbl,stpk,uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("wsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+  -- local npc=level.object_by_id(sobj.id)
+  -- if npc then
+    -- convert_npc[sobj.id]=true
+    -- switch_offline(npc)
+  -- end
+end
+
+function get_anomaly_data(sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  sobj:STATE_Write(stpk)
+  sobj:UPDATE_Write(uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  local t={}
+	parse_object_packet(t,stpk,uppk,size)
+  parse_shape_packet(t,stpk,uppk,size)
+	t.restrictor_type = stpk:r_u8()
+	t.max_power = stpk:r_float()
+	t.owner_id = stpk:r_s32()
+	t.enabled_time = stpk:r_s32()
+	t.disabled_time = stpk:r_s32()
+	t.start_time_shift = stpk:r_s32()
+	t.offline_interactive_radius = stpk:r_float()
+	t.artefact_spawn_count = stpk:r_u16()
+	t.artefact_position_offset = stpk:r_s32()
+	t.last_spawn_time_present = stpk:r_u8()
+	if stpk:r_elapsed() ~= 0 then
+--		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK get anom data: left= "..stpk:r_elapsed()) end
+	end
+	return t
+end
+
+function set_anomaly_data(t,sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_object_packet(t,stpk,uppk)
+  fill_shape_packet(t,stpk,uppk)
+	stpk:w_u8(t.restrictor_type)
+	stpk:w_float(t.max_power)
+	stpk:w_s32(t.owner_id)
+	stpk:w_s32(t.enabled_time)
+	stpk:w_s32(t.disabled_time)
+	stpk:w_s32(t.start_time_shift)
+	stpk:w_float(t.offline_interactive_radius)
+	stpk:w_u16(t.artefact_spawn_count)
+	stpk:w_s32(t.artefact_position_offset)
+	stpk:w_u8(t.last_spawn_time_present)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+end
+
+--for proper parsing of comments are prohibited!
+function parse_custom_data(str)	--TB3D  only here
+	local t={}
+	if str then
+		for section, section_data in string_gfind(str,"%s*%[([^%]]*)%]%s*([^%[%z]*)%s*") do
+			section = trim(section)
+			t[section]={}
+			for line in string_gfind(trim(section_data), "([^\n]*)\n*") do
+				if string_find(line,"=")~=nil then
+					for k, v in string_gfind(line, "([^=]-)%s*=%s*(.*)") do
+						k = trim(k)
+						if k~=nil and k~='' and v~=nil then 
+							t[section][k]=trim(v) 
+						end
+					end
+				else
+					for k, v in string_gfind(line, "(.*)") do
+						k = trim(k)
+						if k~=nil and k~='' then
+							t[section][k]="<<no_value>>" 
+						end
+					end
+				end
+			end
+		end
+	end
+	return t
+end
+
+function trim(s)	--TB3D  only here
+	return (string_gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
+function gen_custom_data(tbl)	--TB3D  only here
+	local str=''
+	for key, value in pairs(tbl) do
+		str = str.."\n["..key.."]\n"
+		for k, v in pairs(value) do
+			if v~="<<no_value>>" then
+				str=str..k.." = "..v.."\n"
+			else
+				str=str..k.."\n"
+			end
+		end
+	end
+	return str
+end 
+
+function point_in_poly(pts, x,y)	--TB3D  only here
+	local cnt,k,j
+	local ret = false
+	cnt = #pts
+	j = cnt
+	for k = 1,cnt do
+		if ((pts[k].y <=y) and (y < pts[j].y)) or ((pts[j].y <=y) and (y < pts[k].y)) then
+			if (x < (pts[j].x - pts[k].x) * (y - pts[k].y) / (pts[j].y - pts[k].y) + pts[k].x) then
+				ret = not ret
+			end
+			j = k
+		end
+	end
+	return ret
+end
+
+function parse_object_physic_packet(ret,stpk,updpk)	--TB3D  only here
+	ret.physic_type=stpk:r_s32()
+	ret.mass=stpk:r_float()
+	ret.fixed_bones=stpk:r_stringZ()
+  return ret
+end
+
+function fill_object_physic_packet(ret,stpk,updpk)	--TB3D  only here
+	stpk:w_s32(ret.physic_type)
+	stpk:w_float(ret.mass)
+	stpk:w_stringZ(ret.fixed_bones)
+end
+
+function get_breakable_data(sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  sobj:STATE_Write(stpk)
+  sobj:UPDATE_Write(uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("rsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  local t={}
+	parse_object_packet(t,stpk,uppk,size)
+  parse_visual_packet(t,stpk,uppk,size)
+  parse_object_physic_packet(t,stpk,uppk,size)
+  -- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+  return t
+end
+
+function set_breakable_data(t,sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_object_packet(t,stpk,uppk)
+  fill_visual_packet(t,stpk,uppk)
+  fill_object_physic_packet(t,stpk,uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("wsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+end
+
+function on_REspawn(obj,respawner)	--TB3D  only here
+	--if obj and respawner and respawner.object then
+		mod_call("respawned",obj,respawner)	--fixes missing cslids
+		if IAmAMonster[obj:clsid()] then
+			if respawner.spawned_goes_online==true then mod_call("switch_monster_online",obj) 
+			elseif respawner.spawned_goes_online==false then mod_call("switch_monster_offline",obj)
+			end
+		end
+		--if (news_main and news_main.on_spawn) then
+			--news_main.on_spawn(obj)
+		--end
+	--end
+end
+
+function get_spawner_data(sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  sobj:STATE_Write(stpk)
+  sobj:UPDATE_Write(uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("rsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  local t={}
+	parse_object_packet(t,stpk,uppk,size)
+  parse_shape_packet(t,stpk,uppk,size)
+	t.restrictor_type = stpk:r_u8()
+	t.spawned_obj_count = stpk:r_u8()
+  -- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+  return t
+end
+
+function set_spawner_data(t,sobj)	--TB3D  only here
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_object_packet(t,stpk,uppk)
+  fill_shape_packet(t,stpk,uppk)
+	stpk:w_u8(t.restrictor_type)
+	stpk:w_u8(t.spawned_obj_count)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("wsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+end
+
+function parse_shape_packet(t,stpk,uppk)	--TB3D  only here
+	local shape_count = stpk:r_u8()
+	t.shapes={}
+	for i=1,shape_count do
+		local shape_type = stpk:r_u8()
+		t.shapes[i]={}
+		t.shapes[i].shtype=shape_type
+		if shape_type == 0 then
+			-- sphere
+			t.shapes[i].center = stpk:r_vec3()
+			t.shapes[i].radius = stpk:r_float()
+		else
+			-- box
+			t.shapes[i].v1 = stpk:r_vec3()
+			t.shapes[i].v2 = stpk:r_vec3()
+			t.shapes[i].v3 = stpk:r_vec3()
+			t.shapes[i].offset = stpk:r_vec3()
+		end
+	end
+end
+
+function fill_shape_packet(t,stpk,updpk)	--TB3D  only here
+	stpk:w_u8(#t.shapes)
+	for i=1,#t.shapes do
+		stpk:w_u8(t.shapes[i].shtype)
+		if t.shapes[i].shtype == 0 then
+			stpk:w_vec3(t.shapes[i].center)
+			stpk:w_float(t.shapes[i].radius)
+		else
+			stpk:w_vec3(t.shapes[i].v1)
+			stpk:w_vec3(t.shapes[i].v2)
+			stpk:w_vec3(t.shapes[i].v3)
+			stpk:w_vec3(t.shapes[i].offset)
+		end
+	end
+end
+
+function parse_ini_section_to_array(ini,section)	--TB3D  only here
+	local tmp={}
+	--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("amk: parse ini to array") end
+	if ini:section_exist(section) then
+		local result, id, value = nil, nil, nil
+		for a=0,ini:line_count(section)-1 do
+			result, id, value = ini:r_line(section,a,"","")
+			if id~=nil and trim(id)~="" and trim(id)~=nil then
+				tmp[trim(id)]=trim(value)
+			end
+		end
+	end
+	return tmp
+end
+
+function parse_ini_section_to_array_new(iniFileName, section)	--TB3D  only here
+	local tmp={}
+	--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("amk: parse ini to array new") end
+	if iniLineSectionExist(section, iniFileName) then
+		local result, id, value = nil, nil, nil
+		for a=0,iniLinesCount(section, iniFileName)-1 do
+			result, id, value = getIniLine(section,a,"","",iniFileName)
+			if id~=nil and trim(id)~="" and trim(id)~=nil then
+				tmp[trim(id)]=trim(value)
+			end
+		end
+	end
+	return tmp
+end
+
+function str_explode(div,str,clear)	--TB3D  only here
+	local t={}
+	--if str and div then
+		local cpt = string_find(str, div, 1, true)
+		if cpt then
+			repeat
+				if clear then
+					table.insert( t, trim(string.sub(str, 1, cpt-1)) )
+				else
+					table.insert( t, string.sub(str, 1, cpt-1) )
+				end
+				str = string_sub( str, cpt+string_len(div) )
+				cpt = string_find (str, div, 1, true)
+			until cpt==nil
+		end
+		if clear then
+			table.insert(t, trim(str))
+		else
+			table.insert(t, str)
+		end
+	--end
+	return t
+end
+
+function quotemeta(str)	--TB3D  only here
+	return (string_gsub(s, "[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%1"))
+end
+
+
+function add(v1,v2)	--TB3D  not same as obj:add()
+	local nv=vector()
+	nv.x=v1.x+v2.x
+	nv.y=v1.y+v2.y
+	nv.z=v1.z+v2.z
+	return nv
+end
+
+function set_len(v,num)	--!!!!TB3D just here
+	local cl = math_sqrt(v.x*v.x+v.y*v.y+v.z*v.z)
+	cl = num/cl
+	v.x= v.x*cl
+	v.y= v.y*cl
+	v.z= v.z*cl
+	return v
+end
+
+function get_restrictor_data(sobj)	--!!!!TB3D just here
+  local t={}
+	if sobj then
+		local stpk=net_packet()
+		local uppk=net_packet()
+		sobj:STATE_Write(stpk)
+		sobj:UPDATE_Write(uppk)
+		local size=stpk:w_tell()
+		local size1=uppk:w_tell()
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1)
+		stpk:r_seek(0)
+		uppk:r_seek(0)
+		parse_object_packet(t,stpk,uppk,size)
+		parse_shape_packet(t,stpk,uppk,size)
+		t.restrictor_type = stpk:r_u8()
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: get_restrictor_data[nil]") end
+	end
+  return t
+end
+
+function set_restrictor_data(t,sobj)	--!!!!TB3D just here
+	if t and sobj then
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_object_packet(t,stpk,uppk)
+  fill_shape_packet(t,stpk,uppk)
+	stpk:w_u8(t.restrictor_type)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("wsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: set_restrictor_data packet["..utils.to_str(t).."] obj["..utils.to_str(sobj).."]") end
+	end
+end
+
+function get_trader_data(sobj)	--!!!!TB3D just here
+  local t={}
+	if sobj then
+		local stpk=net_packet()
+		local uppk=net_packet()
+		sobj:STATE_Write(stpk)
+		sobj:UPDATE_Write(uppk)
+		local size=stpk:w_tell()
+		local size1=uppk:w_tell()
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1)
+		stpk:r_seek(0)
+		uppk:r_seek(0)
+		parse_object_packet(t,stpk,uppk,size)
+		parse_visual_packet(t,stpk,uppk,size)
+		parse_trader_packet(t,stpk,uppk,size)
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: get_trader_data[nil]") end
+	end
+  return t
+end
+
+function set_trader_data(t,sobj)	--!!!!TB3D just here
+	if t and sobj then
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_object_packet(t,stpk,uppk)
+  fill_visual_packet(t,stpk,uppk)
+  fill_trader_packet(t,stpk,uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("wsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: set_trader_data packet["..utils.to_str(t).."] obj["..utils.to_str(sobj).."]") end
+	end
+end
+
+function get_invbox_data(sobj)	--!!!!TB3D just here
+  local t={}
+	if sobj then
+		local stpk=net_packet()
+		local uppk=net_packet()
+		sobj:STATE_Write(stpk)
+		sobj:UPDATE_Write(uppk)
+		local size=stpk:w_tell()
+		local size1=uppk:w_tell()
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1)
+		stpk:r_seek(0)
+		uppk:r_seek(0)
+		parse_object_packet(t,stpk,uppk,size)
+		parse_visual_packet(t,stpk,uppk,size)
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: get_invbox_data[nil]") end
+	end
+  return t
+end
+
+function set_invbox_data(t,sobj)	--!!!!TB3D just here
+	if t and sobj then
+  local stpk=net_packet()
+  local uppk=net_packet()
+  fill_object_packet(t,stpk,uppk)
+  fill_visual_packet(t,stpk,uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  -- TB3D_Services.info_alert("wsp "..size.." "..size1)
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+  sobj:STATE_Read(stpk,size)
+  sobj:UPDATE_Read(uppk)
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: set_invbox_data packet["..utils.to_str(t).."] obj["..utils.to_str(sobj).."]") end
+	end
+end
+
+function readvu8uN(packet,n)	--!!!!TB3D just here
+  local v={}
+  for i=1,n,1 do
+    table.insert(v,packet:r_u8())
+  end
+  return v
+end
+
+function writevu8uN(pk,v)	--!!!!TB3D just here
+  local len=#v
+  for i=1,len,1 do
+    pk:w_u8(v[i])
+  end
+end
+
+function parse_item_packet(ret,stpk,updpk)	--!!!!TB3D just here
+	ret.condition=stpk:r_float()
+	ret.updnum_items=updpk:r_u8()
+	if ret.updpos == nil then		--!!!!TB3D
+		ret.updpos={} -- or put a vector? Okay then
+		--if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK parse item packet: packet empty") end
+	end
+	ret.updpos.x=updpk:r_float()
+	ret.updpos.y=updpk:r_float()
+	ret.updpos.z=updpk:r_float()
+	ret.updcse_alife_item__unk1_q8v4=readvu8uN(updpk,4)
+	ret.updcse_alife_item__unk2_q8v3=readvu8uN(updpk,3)
+	ret.updcse_alife_item__unk3_q8v3=readvu8uN(updpk,3)
+  return ret
+end
+
+function fill_item_packet(ret,stpk,updpk)	--!!!!TB3D just here
+	stpk:w_float(ret.condition)
+	updpk:w_u8(ret.updnum_items)
+	if ret.updpos == nil then		--!!!!TB3D
+		ret.updpos={} -- force a vector
+		ret.updpos.x = 0.0
+		ret.updpos.y = ret.updpos.x
+		ret.updpos.z = ret.updpos.x
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK fill item packet: packet empty") end
+	end
+	updpk:w_float(ret.updpos.x)
+	updpk:w_float(ret.updpos.y)
+	updpk:w_float(ret.updpos.z)
+	readvu8uN(updpk,4) --ret.updcse_alife_item__unk1_q8v4)
+	readvu8uN(updpk,3) --ret.updcse_alife_item__unk2_q8v3)
+	readvu8uN(updpk,3) --ret.updcse_alife_item__unk3_q8v3)
+	return ret
+end
+
+function parse_item_ammo_packet(ret,stpk,updpk)	--!!!!TB3D just here
+	ret.ammo_left=stpk:r_u16()
+	ret.updammo_left=updpk:r_u16()
+  return ret
+end
+
+function fill_item_ammo_packet(ret,stpk,updpk)	--!!!!TB3D just here
+	stpk:w_u16(ret.ammo_left)
+	updpk:w_u16(ret.updammo_left)
+  return ret
+end
+
+function get_ammo_params(sobj)	--!!!!TB3D just here
+--TB3D_Services.info_alert("amk: get ammo params["..utils.to_str(sobj:name()).."]")
+  local t={}
+	if sobj then
+  local stpk=net_packet()
+  local uppk=net_packet()
+  sobj:STATE_Write(stpk)
+  sobj:UPDATE_Write(uppk)
+  local size=stpk:w_tell()
+  local size1=uppk:w_tell()
+  stpk:r_seek(0)
+  uppk:r_seek(0)
+	parse_object_packet(t,stpk,uppk,size)
+  parse_visual_packet(t,stpk,uppk,size)
+  parse_item_packet(t,stpk,uppk,size)
+  parse_item_ammo_packet(t,stpk,uppk,size)
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: get_ammo_params[nil]") end
+	end
+--TB3D_Services.info_alert("amk: get ammo params done")
+  return t
+end
+
+function set_ammo_data(t,sobj)	--!!!!TB3D just here
+	if t and sobj then
+--TB3D_Services.info_alert("amk: set ammo params["..utils.to_str(sobj:name()).."]")
+		local stpk=net_packet()
+		local uppk=net_packet()
+		fill_object_packet(t,stpk,uppk)
+		fill_visual_packet(t,stpk,uppk)
+		fill_item_packet(t,stpk,uppk)
+		fill_item_ammo_packet(t,stpk,uppk)
+		local size=stpk:w_tell()
+		local size1=uppk:w_tell()
+		stpk:r_seek(0)
+		uppk:r_seek(0)
+		sobj:STATE_Read(stpk,size)
+		sobj:UPDATE_Read(uppk)
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: set_ammo_data packet["..utils.to_str(t).."] obj["..utils.to_str(sobj).."]") end
+	end
+--TB3D_Services.info_alert("amk: set ammo params done")
+end
+
+function cfg_get_string(ini,sect,name,def)		--!!!!TB3D ini get string
+	--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("amk: cfg get string") end
+	if ini and ini:line_exist(sect,name) then
+		return ini:r_string(sect,name)
+	end
+	return def
+end
+
+function get_destroyable_data(sobj)	--!!!!TB3D just here
+	local t={}
+	if sobj then
+		local stpk=net_packet()
+		local uppk=net_packet()
+		sobj:STATE_Write(stpk)
+		sobj:UPDATE_Write(uppk)
+		local size=stpk:w_tell()
+		local size1=uppk:w_tell()
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1)
+		stpk:r_seek(0)
+		uppk:r_seek(0)
+		parse_object_packet(t,stpk,uppk,size)
+		parse_visual_packet(t,stpk,uppk,size)
+		parse_skeleton_packet(t,stpk,uppk,size)
+		parse_object_physic_packet(t,stpk,uppk,size)
+		-- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+	else
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: get_destroyable_data obj[nil]") end
+	end
+	return t
+end
+
+function set_destroyable_data(t,sobj)	--!!!!TB3D just here
+	if t and sobj then
+		local stpk=net_packet()
+		local uppk=net_packet()
+		fill_object_packet(t,stpk,uppk)
+		fill_visual_packet(t,stpk,uppk)
+		fill_skeleton_packet(t,stpk,uppk)
+		fill_object_physic_packet(t,stpk,uppk)
+		local size=stpk:w_tell()
+		local size1=uppk:w_tell()
+		-- TB3D_Services.info_alert("wsp "..size.." "..size1)
+		stpk:r_seek(0)
+		uppk:r_seek(0)
+		sobj:STATE_Read(stpk,size)
+		sobj:UPDATE_Read(uppk)
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: set_destroyable_data packet["..utils.to_str(t).."] obj["..utils.to_str(sobj).."]") end
+	end
+end
+
+function get_weapon_data(sobj)	--!!!!TB3D just here
+	local t={}
+	if sobj then
+--TB3D_Services.info_alert("amk: get weapon data["..utils.to_str(sobj:name()).."]")
+	  local stpk=net_packet()
+	  local uppk=net_packet()
+	  sobj:STATE_Write(stpk)
+	  sobj:UPDATE_Write(uppk)
+	  local size=stpk:w_tell()
+	  local size1=uppk:w_tell()
+	  -- TB3D_Services.info_alert("rsp "..size.." "..size1)
+	  stpk:r_seek(0)
+	  uppk:r_seek(0)
+	  parse_object_packet(t,stpk,uppk,size)
+	  parse_visual_packet(t,stpk,uppk,size)
+	  parse_item_packet(t,stpk,uppk,size)
+	  parse_item_weapon_packet(t,stpk,uppk,size)
+	  -- TB3D_Services.info_alert("rsp "..size.." "..size1.." "..stpk:r_tell())
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: get_weapon_data obj[nil]") end
+	end
+--TB3D_Services.info_alert("amk: get weapon data done")
+	return t
+end
+
+function set_weapon_data(t,sobj)	--!!!!TB3D just here
+	if t and sobj then
+		local stpk=net_packet()
+		local uppk=net_packet()
+		fill_object_packet(t,stpk,uppk)
+		fill_visual_packet(t,stpk,uppk)
+		fill_item_packet(t,stpk,uppk)
+		fill_item_weapon_packet(t,stpk,uppk)
+		local size=stpk:w_tell()
+		local size1=uppk:w_tell()
+		-- TB3D_Services.info_alert("wsp "..size.." "..size1)
+		stpk:r_seek(0)
+		uppk:r_seek(0)
+		sobj:STATE_Read(stpk,size)
+		sobj:UPDATE_Read(uppk)
+	else
+      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AMK: set_weapon_data packet["..utils.to_str(t).."] obj["..utils.to_str(sobj).."]") end
+	end
+end
+
+function parse_item_weapon_packet(ret,stpk,updpk)	--!!!!TB3D just here
+	ret.ammo_current = stpk:r_u16()
+	ret.ammo_elapsed = stpk:r_u16()
+	ret.weapon_state = stpk:r_u8()
+	ret.addon_flags = stpk:r_u8()
+	ret.ammo_type = stpk:r_u8()
+	ret.updcondition = updpk:r_u8()
+	ret.updweapon_flags = updpk:r_u8()
+	ret.updammo_elapsed = updpk:r_u16()
+	ret.updaddon_flags = updpk:r_u8()
+	ret.updammo_type = updpk:r_u8()
+	ret.updweapon_state = updpk:r_u8()
+	ret.updweapon_zoom = updpk:r_u8()
+	ret.updcurrent_fire_mode = updpk:r_u8()
+  return ret
+end
+
+function fill_item_weapon_packet(ret,stpk,updpk)	--!!!!TB3D just here
+	stpk:w_u16(ret.ammo_current)
+	stpk:w_u16(ret.ammo_elapsed)
+	stpk:w_u8(ret.weapon_state)
+	stpk:w_u8(ret.addon_flags)
+	stpk:w_u8(ret.ammo_type)
+	updpk:w_u8(ret.updcondition)
+	updpk:w_u8(ret.updweapon_flags)
+	updpk:w_u16(ret.updammo_elapsed)
+	updpk:w_u8(ret.updaddon_flags)
+	updpk:w_u8(ret.updammo_type)
+	updpk:w_u8(ret.updweapon_state)
+	updpk:w_u8(ret.updweapon_zoom)
+	updpk:w_u8(ret.updcurrent_fire_mode)
+  return ret
+end
+
+function get_ver()
+	local ver = "0"
+	local mm = _G.main_menu.get_main_menu()
+	if mm then ver = mm:GetGSVer() end
+	return ver
+end
+
+function game_milliseconds()
+	if StartTime == nil then
+		getStartTime()
+		if StartTime == nil then
+			return 0
+		end
+	end
+	local gtime = game.get_game_time()
+	local seconds = gtime:diffSec(StartTime)
+	local y,m,d,h,min,sec,ms = gtime:get()
+	return (seconds * 1000 + ms)
+end
+
+function game_seconds()
+	if StartTime == nil then
+		getStartTime()
+		if StartTime == nil then
+			return 0
+		end
+	end
+	return game.get_game_time():diffSec(StartTime)
+end
+
+function game_minutes()
+	return math_floor(game_seconds() / 60)
+end
+
+function game_hours()
+	return math_floor(game_seconds() / 3600)
+end
+
+function game_days()
+	return math_floor(game_seconds() / 86400)
+end
+
+local tab = 0
+
+function antirad_update()
+    local hud = get_hud()
+    if hud:GetCustomStatic("main_task") then
+        if tab==0 then
+			if dmx_cars.actor_inside_car() == false then --and dmx_cars.trunk_nearby == false then
+				eat_antirad()
+			--elseif dmx_cars.actor_inside_car() == false then --and dmx_cars.trunk_nearby == true then
+				--dmx_cars.open_trunk()
+			else	--if dmx_cars.actor_inside_car() == true then	
+				dmx_cars.start_firing()
+			end
+			tab = 1
+        end
+    else
+        if tab==1 then
+			if dmx_cars.actor_inside_car() == true then
+				dmx_cars.stop_firing()				
+			end
+			tab = 0
+        end
+    end
+end

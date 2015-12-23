@@ -1,0 +1,46 @@
+--TB3D 1.0.9.9.3.4 moved news message, check for object and section
+function my_ver() return "1.0.9.9.3.4" end
+--\\* Module Effector Monster ".. Spot (Shooter)..
+
+class"MonsterEffector" 
+function MonsterEffector:__init() end
+function MonsterEffector:update(param)
+	self.object = param
+	if self.object and self.object.section and string.find(self.object:section(),"bloodsucker_effector") and self.object:alive() then
+		if self.object:best_enemy() and self.object:position():distance_to(self.object:best_enemy():position()) < 1.5 and self.object:see(self.object:best_enemy())  then
+			bloodsucker_effector(self.object)
+		end
+	end
+end
+
+function MonsterEffector:on_death(param)
+	self.object = param
+	if self.object and self.object.section and string.find(self.object:section(),"bloodsucker_effector") then
+		bloodsucker_effector(self.object)
+		if self.object:who_hit_name()=="single_player" then
+			if db.actor:dont_has_info("bloodsucker_effector") then
+				news_manager.mmm_on_death("Scientist:\\nMecheny, you're alive?? hmm .. first time see a man should have survived after a meeting with this kind of bloodsucking .. It is called the Swamp Creature.. It is very dangerous type of bloodsucking, moreover, that he is strong, may be invisible to the human eye, so he is still after his death gives the discharge of electricity, but retains its body intact. It is unclear how you could survive after this.. But I am glad that you are alive.. Good luck")
+				db.actor:give_info_portion("bloodsucker_effector")
+			end
+		end
+	end
+end
+
+local particles = particles_object("anomaly2\\electra2_blast")
+local particles_2 = particles_object("static\\zharka_static")
+local sound = sound_object([[anomaly\electra_blast1]])
+function bloodsucker_effector(section)
+	if section then
+		if not particles:playing() then particles:play_at_pos(section:position()) end
+		if not particles_2:playing() then particles_2:play_at_pos(section:position()) end
+		particles_2:play_at_pos(section:position())
+		particles:play_at_pos(section:position())
+		sound:play_at_pos(section, section:position(), 0)
+		if section:best_enemy() and  section:position():distance_to(section:best_enemy():position()) < 5 then 
+			TB3D_hit_styles.shock(section:best_enemy(), section:best_enemy(), 0, 0, section:position():sub(section:best_enemy():position()))
+		end
+		if not section:best_enemy() and section:position():distance_to(db.actor:position()) < 20 then
+			TB3D_hit_styles.shock(db.actor, db.actor, 0, 0, section:position():sub(db.actor:position()))
+		end
+	end
+end

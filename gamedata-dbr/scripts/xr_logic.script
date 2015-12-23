@@ -1,0 +1,1695 @@
+--TB3D 1.0.9.9.7.7 fixed wounded, optimized, func check, pstor item count reporting, added checks,
+-- debug, state control, obj level, localized string funcs, determine_section_to_activate
+function my_ver() return "1.0.9.9.7.7" end
+prefetch("xr_conditions")
+local string_find = string.find
+local string_sub = string.sub
+local string_len = string.len
+local string_match = string.match
+local string_gfind = string.gfind
+
+local tabl_netpda_varnames={
+["m_teleport_6"] = true,
+["m_teleport_26"] = true,
+["m_teleport_35"] = true,
+["m_teleport_36"] = true,
+["m_teleport_37"] = true,
+["m_teleport_38"] = true,
+["m_teleport_39"] = true,
+["m_teleport_40"] = true,
+["m_teleport_41"] = true,
+["m_teleport_42"] = true,
+["m_teleport_43"] = true,
+["m_teleport_44"] = true,
+["m_teleport_45"] = true,
+["m_teleport_46"] = true,
+["m_teleport_47"] = true,
+["m_teleport_48"] = true,
+["m_teleport_49"] = true,
+["m_teleport_50"] = true,
+["m_teleport_51"] = true,
+["m_teleport_52"] = true,
+["m_teleport_53"] = true,
+["m_teleport_54"] = true,
+["gps_labels"] = true,
+["lim_zone_teleport1"] = true,
+["lim_zone_teleport2"] = true,
+["zone_teleport_new"] = true,
+["zone_teleport_new_out"] = true,
+["flame_start"] = true,
+["flame_reload"] = true,
+["flame_reload_count"] = true,
+["sak_teleport"] = true,
+["glushitel_reload"] = true,
+["repair_box"] = true,
+["repair_item_outfit"] = true,
+["repair_item_weapon"] = true
+--[[
+["af_simbion_activation"] = true,
+["artmod_activation_info_artmod_electra_flash_zharka"] = true,
+["artmod_activation_info_artmod_ameba_slime_zharka"] = true,
+["artmod_activation_info_artmod_gravi_zharka"] = true,
+["artmod_activation_info_artmod_night_star_zharka"] = true,
+["artmod_activation_info_artmod_electra_moonlight_zharka"] = true,
+["artmod_activation_info_artmod_dummy_battery_zharka"] = true,
+["artmod_activation_info_artmod_fireball_galant"] = true,
+["artmod_activation_info_artmod_cristall_flower_galant"] = true,
+["artmod_activation_info_artmod_ameba_mica_galant"] = true,
+["artmod_activation_info_artmod_electra_moonlight_galant"] = true,
+["artmod_activation_info_artmod_gold_fish_galant"] = true,
+["artmod_activation_info_artmod_dummy_spring_galant"] = true,
+["artmod_activation_info_artmod_medusa_galant"] = true,
+["artmod_activation_info_artmod_rusty_kristall_buzz"] = true,
+["artmod_activation_info_artmod_rusty_thorn_buzz"] = true,
+["artmod_activation_info_artmod_fireball_buzz"] = true,
+["artmod_activation_info_artmod_cristall_buzz"] = true,
+["artmod_activation_info_artmod_night_star_buzz"] = true,
+["artmod_activation_info_artmod_fuzz_kolobok_buzz"] = true,
+["artmod_activation_info_artmod_vyvert_buzz"] = true,
+["artmod_activation_info_artmod_cristall_flower_mincer"] = true,
+["artmod_activation_info_artmod_drops_mincer"] = true,
+["artmod_activation_info_artmod_rusty_kristall_mincer"] = true,
+["artmod_activation_info_artmod_electra_moonlight_mincer"] = true,
+["artmod_activation_info_artmod_ameba_slug_mincer"] = true,
+["artmod_activation_info_artmod_dummy_glassbeads_mincer"] = true,
+["artmod_activation_info_artmod_mincer_meat_mosquito_bald"] = true,
+["artmod_activation_info_artmod_electra_sparkler_mosquito_bald"] = true,
+["artmod_activation_info_artmod_ameba_slug_mosquito_bald"] = true,
+["artmod_activation_info_artmod_cristall_mosquito_bald"] = true,
+["artmod_activation_info_artmod_rusty_sea-urchin_mosquito_bald"] = true,
+["artmod_activation_info_artmod_dummy_dummy_mosquito_bald"] = true,
+["artmod_activation_info_artmod_ameba_slug_gravi_zone"] = true,
+["artmod_activation_info_artmod_ameba_slime_gravi_zone"] = true,
+["artmod_activation_info_artmod_electra_flash_gravi_zone"] = true,
+["artmod_activation_info_artmod_night_star_gravi_zone"] = true,
+["artmod_activation_info_artmod_soul_gravi_zone"] = true,
+["artmod_activation_info_artmod_dummy_pellicle_gravi_zone"] = true,
+["artmod_activation_life_heart_final"] = true
+]]--
+}
+function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_name)
+	local is_report = false
+	if TB3D_Modders.use_logic_message or (TB3D_Modders.use_state_message and string_find(npc:name(), TB3D_Modders.npc_to_log)) then is_report = true end
+	local npc_id = npc:id()
+	local st = db.storage[npc_id]
+	if is_report then TB3D_Services.packet_alert("xr logic: configure schemes for ["..utils.to_str(npc:name()).."]["..utils.to_str(npc_id).."]") end
+	-- if a scheme was previously active, deactivate it
+	if st.active_section then
+		issue_event(npc, st[st.active_scheme], "deactivate", npc)
+	end
+	local actual_ini
+	local actual_ini_filename
+	if ini ~= nil then		--109975
+		if ini:section_exist(section_logic) == nil then
+			if gulag_name == nil then
+				-- General scheme should work without logic:
+				actual_ini_filename = ini_filename
+				actual_ini = ini -- character does not necessarily have to have a section logic
+			else
+				-- Otherwise this character is a Gulag-and he did not ask for work:
+				if is_report then TB3D_Services.packet_alert("xr logic: ERROR: object ["..utils.to_str(npc:name()).."] gulag["..utils.to_str(gulag_name).."] not looking for work") end
+			end
+		else
+			local filename = utils.cfg_get_string(ini, section_logic, "cfg", npc, false, "")
+			if filename ~= nil then
+				if is_report then TB3D_Services.packet_alert("xr logic: enable_scripts: object ["..utils.to_str(npc:name()).."] has external configuration file ["..utils.to_str(filename).."]") end
+				-- Recursively to process the configuration file referenced by the field cfg
+				actual_ini_filename = filename
+				actual_ini = ini_file(filename)
+				--return configure_schemes(npc, actual_ini, actual_ini_filename, stype, section_logic, gulag_name)		--109975
+				--[[
+				if actual_ini:line_count(section_logic) == 0 then
+					if is_report then TB3D_Services.packet_alert("xr logic: file "..filename.." does not exist or is empty, or has no section ["..section_logic.."]") end
+				end
+				--]]
+			else
+				if is_report then TB3D_Services.packet_alert("xr logic: enable_scripts: object ["..utils.to_str(npc:name()).."] has NO external configuration file, using ["..utils.to_str(ini_filename).."]") end
+				actual_ini_filename = ini_filename
+				actual_ini = ini
+			end
+		end
+	else
+		TB3D_Services.packet_alert("xr logic: enable_scripts: object["..utils.to_str(npc:name()).."] has NO ini file !!!!")		--109975
+	end
+	-- Since the time of activation schemes could work previously established general scheme, it is necessary to disable all of them:
+	disable_generic_schemes(npc, stype)
+	if is_report then TB3D_Services.packet_alert("xr logic: configure schemes init ["..utils.to_str(npc:name()).."]") end
+	-- Includes all general schemes (wounded, callback to hit, etc.):
+	enable_generic_schemes(actual_ini, npc, stype, section_logic)
+	-- Initialization of trade
+	--TB3D_Services.packet_alert("xr logic: configure schemes2")
+	if stype == modules.stype_stalker or npc:clsid() == clsid.script_trader then
+		local trade_ini = utils.cfg_get_string(actual_ini, section_logic, "trade", npc, false, "", "misc\\trade_generic.ltx")
+		trade_manager.trade_init(npc, trade_ini)
+	end
+	--TB3D_Services.packet_alert("xr logic: configure schemes3")
+	st.active_section = nil
+	st.active_scheme = nil
+	if gulag_name then
+		st.gulag_name = gulag_name
+	else
+		st.gulag_name = ""
+	end
+	st.stype = stype
+	st.ini = actual_ini
+	st.ini_filename = actual_ini_filename
+	st.section_logic = section_logic
+	if is_report then TB3D_Services.packet_alert("xr logic: configure schemes done ["..utils.to_str(npc:name()).."]") end
+	return st.ini
+end
+
+-- Called Binder in order to determine the first active circuit
+function determine_section_to_activate(npc, ini, section_logic, actor)
+	if ini:section_exist(section_logic) then
+		-- Parse the string section of an active choice based commands enclosed in%%
+		local active_section_cond = cfg_get_condlist(ini, section_logic, "active", npc)
+		if active_section_cond == nil then
+			if TB3D_Modders.use_abort_message then
+				TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] section["..utils.to_str(section_logic).."] unable to find field["..utils.to_str(active).."]")
+			end
+		else
+			local active_section = pick_section_from_condlist(actor, npc, active_section_cond.condlist)
+			if active_section ~= nil then
+				if db.storage[npc:id()].stype then
+					local stype = db.storage[npc:id()].stype
+					if stype <= 1 then																	--  0=stalker, 1=monster
+						local schm_type = db.stypes[utils.get_scheme_by_section(active_section)]
+						--TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] stype["..utils.to_str(stype).."] schm_type["..utils.to_str(schm_type).."]")
+						if schm_type ~= nil then
+							if stype ~= schm_type then					--109977, if scheme type does not match
+								if TB3D_Modders.use_abort_message then
+									TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] stype["..utils.to_str(stype).."] schm_type["..utils.to_str(schm_type).."] wrong scheme type!!!!!")
+								end
+								return "nil"			--removes schemes for npc
+							end
+						elseif TB3D_Modders.use_info_message then
+							TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] sect["..utils.to_str(npc:section()).."] stype["..utils.to_str(stype).."] schm_type[nil] no scheme type exists!!!!!")
+						end
+					--else																				-- not a stalker or monster
+						--TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] stype["..utils.to_str(stype).."] is not a stalker or monster.")
+					end
+				end
+				return active_section
+			elseif TB3D_Modders.use_logic_message then
+				TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] section["..utils.to_str(section_logic).."] active["..utils.to_str(active).."] has no conditionless else clause.")
+			end
+		end
+	end
+	return "nil"
+end
+
+------------------------------------------------------------------------------------------------------------
+-- Modifies this function, not forget to add the corresponding line and in enable_generic_schemes
+------------------------------------------------------------------------------------------------------------
+function disable_generic_schemes(npc, stype)
+	if stype == modules.stype_stalker then
+		if blowout_scheme then blowout_scheme.disable_scheme(npc, "blowout_scheme") end
+		xr_danger.disable_scheme(npc, "danger")
+		xr_combat.disable_scheme(npc, "combat")
+		xr_use.disable_scheme(npc, "use")
+		--stalker_generic
+		xr_hit.disable_scheme(npc, "hit")
+		--xr_wounded
+		--xr_abuse
+		xr_meet.disable_scheme(npc, "actor_dialogs")
+		--xr_death
+		xr_heli_hunter.disable_scheme(npc, "heli_hunter")
+		if xr_combat_ignore then xr_combat_ignore.disable_scheme(npc, "combat_ignore") end
+		m_bar.disable_scheme(npc,"bar_facer") -- DMX MOD
+		--watcher_act
+		if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.disable_schemes(npc, stype) end
+		rx_ai.disable_schemes(npc, stype)
+	elseif stype == modules.stype_mobile then
+		mob_combat.disable_scheme(npc, "mob_combat")
+		--mob_death
+		mob_trade.disable_scheme(npc, "mob_trade")
+		xr_hit.disable_scheme(npc, "hit")
+	elseif stype == modules.stype_item then
+		if ph_on_hit then ph_on_hit.disable_scheme(npc, "ph_on_hit") end
+	elseif stype == modules.stype_heli then
+		xr_hit.disable_scheme(npc, "hit")
+	end
+end
+
+------------------------------------------------------------------------------------------------------------
+-- Modifies this function, not forget to add the corresponding line and in disable_generic_schemes
+------------------------------------------------------------------------------------------------------------
+function enable_generic_schemes(ini, npc, stype, section)
+	if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: enable gen scheme start") end
+	local sch_section
+	if stype == modules.stype_stalker then	--===================================================
+		if blowout_scheme then
+			blowout_scheme.set_hide(npc,ini,"blowout_scheme",section)
+		else
+			if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: error [blowout_scheme] not loaded for["..utils.to_str(npc.name()).."]") end
+		end
+		xr_danger.set_danger(npc, ini, "danger", "danger")
+		local combat_section = utils.cfg_get_string(ini, section, "on_combat", npc, false, "")
+		xr_combat.set_combat_checker(npc, ini, "combat", combat_section)
+		sch_section = utils.cfg_get_string(ini, section, "on_use", npc, false, "")
+		if sch_section then
+			xr_use.set_use_checker(npc, ini, "use", sch_section)
+		end
+		sch_section = utils.cfg_get_string(ini, section, "info", npc, false, "")
+		if sch_section then
+			stalker_generic.set_npc_info(npc, ini, "info", sch_section)
+		end
+		sch_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
+		if sch_section then
+			xr_hit.set_hit_checker(npc, ini, "hit", sch_section)
+		end
+		sch_section = utils.cfg_get_string (ini, section, "actor_dialogs", npc, false, "")
+		if sch_section then
+			xr_meet.set_actor_dialogs(npc, ini, "actor_dialogs", sch_section)
+		end
+		sch_section = utils.cfg_get_string (ini, section, "wounded", npc, false, "")
+		xr_wounded.set_wounded (npc, ini, "wounded", sch_section)
+		xr_abuse.set_abuse(npc, ini, "abuse", section)
+		sch_section = utils.cfg_get_string (ini, section, "meet", npc, false, "")
+		xr_meet.set_meet(npc, ini, "meet", sch_section)
+		sch_section = utils.cfg_get_string (ini, section, "on_death", npc, false, "")
+		xr_death.set_death (npc, ini, "death", sch_section)
+		sch_section = utils.cfg_get_string(ini, section, "heli_hunter", npc, false, "")
+		xr_heli_hunter.set_scheme(npc, ini, "heli_hunter", sch_section)
+		sch_section = utils.cfg_get_string(ini, section, "combat_ignore", npc, false, "")
+		if sch_section then
+			if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: stalker set ignore scheme") end
+			xr_combat_ignore.set_combat_ignore_checker(npc, ini, "combat_ignore", sch_section)
+		end
+		m_bar.set_scheme(npc,ini,"bar_facer","bar_facer") -- DMX MOD
+		if watcher_act then
+			if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: stalker set watcher scheme") end
+			watcher_act.set_scheme(npc,ini,"watcher_act","watcher_act")
+		else
+			if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: error [watcher_act] not loaded for["..utils.to_str(npc.name()).."]") end
+		end
+		if TB3D_Modders.use_xtrm_ai then
+			if xrs_ai then
+				xrs_ai.enable_schemes(ini, npc, stype, section)
+			else
+				if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: error [xrs_ai] not loaded for["..utils.to_str(npc.name()).."]") end
+			end
+		end
+		rx_ai.enable_schemes(ini,npc)
+	elseif stype == modules.stype_mobile then	--=========================================================================
+		sch_section = utils.cfg_get_string(ini, section, "on_combat", npc, false, "")
+		if combat_section then
+			mob_combat.set_scheme(npc, ini, "mob_combat", sch_section)
+		end
+		sch_section = utils.cfg_get_string(ini, section, "on_death", npc, false, "")
+		mob_death.set_scheme(npc, ini, "mob_death", sch_section)
+		sch_section = utils.cfg_get_string(ini, section, "on_trade", npc, false, "")
+		if sch_section then
+		  mob_trade.set_scheme(npc, ini, "mob_trade", sch_section)
+		end
+		sch_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
+		if sch_section then
+		  xr_hit.set_hit_checker(npc, ini, "hit", sch_section)
+		end
+		mob_panic.set_scheme(npc, ini, "mob_panic")
+  elseif stype == modules.stype_item then	--====================================================
+		sch_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
+		if sch_section then
+		  ph_on_hit.set_scheme(npc, ini, "ph_on_hit", sch_section)
+		end
+  elseif stype == modules.stype_heli then	--======================================================
+		sch_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
+		if sch_section then
+		  xr_hit.set_hit_checker(npc, ini, "hit", sch_section)
+		end
+  end
+	if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: enable gen scheme done") end
+end
+
+function activate_by_section(npc, ini, section, loading)
+	if loading == nil then
+		TB3D_Services.packet_alert("xr logic: activate_by_section: loading field is nil, true or false expected")
+		return
+	end
+	local npc_id = npc:id()
+	if db.storage[npc_id].active_section then
+		TB3D_Services.packet_alert("xr logic: activate_by_section: while processing section") -- ["..utils.to_str(section).."] character ["..utils.to_str(npc:name()).."] trying to activate more than one scheme at once (section ["..utils.to_str(db.storage[npc_id].active_section).."] is active)")
+		return
+	end
+	if loading == false then
+		db.set_activation_time(npc, time_global())
+		db.set_activation_game_time(npc, game.get_game_time())	-- GAMETIME added by Stohe.
+	end
+	if section == "nil" then
+		db.set_overrides(npc, nil)
+		reset_generic_schemes_on_scheme_switch(npc, "nil", "nil")
+		db.set_my_section(npc, nil)
+		db.set_my_scheme(npc, nil)
+		return
+	end
+	if ini:section_exist(section) then
+		local scheme = utils.get_scheme_by_section(section)
+		if scheme == nil then
+			if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: object ["..utils.to_str(npc:name()).."] unable to determine scheme name from section name ["..utils.to_str(section).."]") end
+		end
+		db.set_overrides(npc, cfg_get_overrides(ini, section, npc))	-- Download overrides:
+		reset_generic_schemes_on_scheme_switch(npc, scheme, section)	-- Reset the general scheme:
+		local filename = db.schemes[scheme]	-- db.schemes[scheme] will give the name of the file (module), which implemented a scheme
+		if filename == nil then
+		  if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: scheme ["..scheme.."] is not registered in modules.script") end
+		  return
+		end
+		--printf("_bp: calling module('%s')", filename)
+		if not _G[filename] then	-- _G[] will give a pointer to namespaces (table) of this module
+			if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: can't call ["..utils.to_str(filename).."].set_scheme() - a nil value") end
+			return
+		end
+		if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: calling ["..utils.to_str(filename).."] for ["..utils.to_str(npc_id).."]") end
+		_G[filename].set_scheme(npc, ini, scheme, section, db.storage[npc_id]["gulag_name"])
+		--printf("DEBUG: activate_by_section: scheme '%s' activated from section '%s'", scheme, section)
+		db.set_my_section(npc, section)
+		db.set_my_scheme(npc, scheme)
+	--'   if not loading then
+	--'     db.storage[npc_id].pstor = nil
+	--'   end
+		if db.storage[npc_id].stype == modules.stype_stalker then  -- to avoid further movement along the path when you install a restrictor
+			utils.send_to_nearest_accessible_vertex(npc, npc:level_vertex_id())
+			issue_event(npc, db.storage[npc_id][scheme], "activate_scheme", loading, npc)
+		else
+			issue_event(npc, db.storage[npc_id][scheme], "reset_scheme", loading, npc)
+		end
+	else
+		if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: object ["..utils.to_str(npc:name()).."] activate_by_section: section ["..utils.to_str(section).."] does not exist") end
+	end
+end
+
+--[[
+-- Destination:
+--  Resets the state of the object (removes the callback, off the conversation) immediately before switching
+--  the new scheme.
+--]]
+function reset_generic_schemes_on_scheme_switch(npc, scheme, section)
+  --printf("_bp: reset_generic_schemes_on_scheme_switch: npc:name()='%s'", npc:name())
+  local st = db.storage[npc:id()]
+  if not st.stype then
+    return
+  end
+	if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: rst gen schm on switch: stype ["..utils.to_str(st.stype).."] for ["..utils.to_str(npc:name()).."]") end
+  if st.stype == modules.stype_stalker then
+    --xr_reactions.reset_reactions(npc, scheme, st, section)
+    xr_meet.dialog_manager_reset(npc, st.stype)
+    xr_meet.reset_meet(npc, scheme, st, section)
+    xr_abuse.reset_abuse(npc, scheme, st, section)
+    xr_wounded.reset_wounded(npc, scheme, st, section)
+    xr_death.reset_death(npc, scheme, st, section)
+    xr_danger.reset_danger(npc, scheme, st, section)
+    stalker_generic.reset_threshold(npc, scheme, st, section)
+    stalker_generic.reset_show_spot(npc, scheme, st, section)
+  elseif st.stype == modules.stype_mobile then
+    --if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: disabling talk") end
+    --npc:disable_talk() -- now done in dialog_manager_reset
+    xr_meet.dialog_manager_reset(npc, st.stype)
+    mob_release(npc)
+    if npc:clsid() == clsid.bloodsucker_s then
+      if scheme == "nil" then
+		--TB3D_Services.packet_alert("xr logic: rst gen schm on switch: man_inv[false] for["..utils.to_str(npc:name()).."]")
+        npc:set_manual_invisibility(false)
+      else
+		--TB3D_Services.packet_alert("xr logic: rst gen schm on switch: man_inv[true] for["..utils.to_str(npc:name()).."]")
+        npc:set_manual_invisibility(true)
+        -- Visible or not determines the scheme, which will take it under control:
+        if TB3D_Modders.invisible == false then npc:set_invisible(false) end
+      end
+    end
+    mob_panic.reset_panic(npc, scheme, st, section)
+  elseif st.stype == modules.stype_item then
+    npc:set_callback(callback.use_object, nil)
+    npc:set_nonscript_usable(true)
+    if npc:clsid() == clsid.car then
+      -- Other facilities under the script is not taken, so they do not need to dump
+      npc:destroy_car()
+      mob_release(npc)
+    end
+  end
+end
+
+function assign_storage_and_bind(npc, ini, scheme, section)
+	if npc == nil or scheme == nil then
+		if TB3D_Modders.use_abort_message then TB3D_Services.packet_alert("xr_logic: assign and bind[npc or scheme = nil]!!!!") end
+		return nil
+	end
+	local npc_id = npc:id()
+	local st
+	if db.storage[npc_id] ~= nil and db.storage[npc_id][scheme] ~= nil then
+		st = db.storage[npc_id][scheme]
+	else
+		db.init_my_scheme(npc, scheme)
+		st = db.storage[npc_id][scheme]
+		st["npc"] = npc
+		if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: assign_storage_and_bind: ["..utils.to_str(npc:name()).."]") end
+		_G[db.schemes[scheme]].add_to_binder(npc, ini, scheme, section, st)  -- The scheme will start for the first time - pribindit
+	end
+	st["scheme"] = scheme
+	st["section"] = section
+	st["ini"] = ini
+	return st
+end
+
+function subscribe_action_for_events(npc, storage, new_action)
+  --printf("DEBUG: registering new action for reset event (npc:name() = '%s')", npc:name())
+  if not storage.actions then
+    storage.actions = {}
+  end
+  storage.actions[new_action] = true
+end
+
+function unsubscribe_action_from_events(npc, storage, new_action)
+  if not storage.actions then
+    storage.actions = {}
+  end
+  storage.actions[new_action] = nil
+end
+
+-- st - storage active circuits
+function issue_event(npc, st, event_fn, ...)
+  if not st or not st.actions then
+    return
+  end
+  local activation_count = 0
+  local action_ptr, is_active = 0, 0
+  for action_ptr, is_active in pairs(st.actions) do
+    if is_active and action_ptr[event_fn] then
+      action_ptr[event_fn](action_ptr, ...)
+      activation_count = activation_count + 1
+    end
+  end
+--  if activation_count == 0 and
+--    event_fn == "activate_scheme"
+--  then
+--    TB3D_Services.abort_alert("xr logic: issue_event: activate_scheme handler not found, active_scheme is "..db.storage[npc:id()].active_scheme)
+--  end
+end
+
+function pick_section_from_condlist(actor, npc, condlist)
+	local is_report = false
+	local actor_id, npc_id = actor, npc
+	if actor_id == nil then						--creatures will call this with actor == nil
+		actor_id = db.actor
+		--TB3D_Services.packet_alert("xr logic: pick_section_from_condlist: actor[nil]") 
+	end
+	if npc_id == nil then
+		npc_id = actor_id
+		--TB3D_Services.packet_alert("xr logic: pick_section_from_condlist: npc[nil]") 
+	end
+	if actor_id == nil and npc_id == nil then
+		TB3D_Services.packet_alert("xr logic: pick_section_from_condlist actor[nil] and npc[nil]")
+		return nil
+	end
+	local actor_name
+	local npc_name
+	if actor_id and actor_id.name then
+		actor_name = actor_id:name()
+	end
+	if actor_name == nil then actor_name = "nil" end
+	if npc_id and npc_id.name then
+		npc_name = npc_id:name()
+	end
+	if npc_name == nil then npc_name = "nil" end
+	if TB3D_Modders.use_state_message and string_find(npc_name, TB3D_Modders.npc_to_log) then is_report = true end
+	if condlist == nil then
+		if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist [nil] no condition list!!!!")  end
+		return "true" -- math.random(80, 100)
+	else
+		--TB3D_Services.packet_alert("xr logic: pick_section_from_condlist") 
+		local rval = nil
+		local newsect = nil
+		local infop_conditions_met = true
+		local func=nil
+		local module=nil
+		local fname=""
+		--TB3D_Services.packet_alert("xr logic: pick_section_from_condlist 2") 
+		for n, cond in pairs(condlist) do
+			infop_conditions_met = true -- initially assume that all switching conditions are satisfied
+			--TB3D_Services.packet_alert("xr logic: pick_section_from_condlist 2a") 
+			for inum, infop in pairs(cond.infop_check) do
+				if infop.prob then
+					if not rval then rval = math.random(100) end
+					if is_report then TB3D_Services.packet_alert("xr logic: actor["..actor_name.."] npc["..npc_name.."] prob["..utils.to_str(infop.prob).."] rand["..utils.to_str(rval).."]") end
+					if infop.prob < rval then
+						infop_conditions_met = false -- not met
+						break
+					end
+				elseif infop.func then
+					--TB3D_Services.packet_alert("xr logic: func") --["..utils.to_str(infop.func).."]")
+					if not xr_conditions or not xr_conditions[infop.func] then
+						if is_report or TB3D_Modders.use_abort_message then 
+							if xr_conditions then
+								TB3D_Services.packet_alert("xr logic: pick_section_from_condlist: npc["..npc_name.."] for actor["..actor_name.."] function["..utils.to_str(infop.func).."] is not defined in xr_conditions.script!!!!") 
+							else
+								TB3D_Services.packet_alert("xr logic: pick_section_from_condlist: npc["..npc_name.."] for actor["..actor_name.."] function["..utils.to_str(infop.func).."] xr_conditions = nil!!!!") 
+							end
+						end
+						infop_conditions_met = false 				--ERROR! bail out
+						break
+					end
+					if infop.params then
+						if is_report then TB3D_Services.packet_alert("xr logic: npc["..npc_name.."] pick_section_from_condlist: function["..utils.to_str(infop.func).."] p1["..utils.to_str(infop.params[1]).."] p2["..utils.to_str(infop.params[2]).."]") end
+						if xr_conditions[infop.func](actor_id, npc_id, infop.params) then
+							if not infop.expected then
+								infop_conditions_met = false -- not met
+								break
+							end
+						else
+							if infop.expected then
+								infop_conditions_met = false -- not met
+								break
+							end
+						end
+					else
+						if is_report then TB3D_Services.packet_alert("xr logic: actor["..actor_name.."] npc["..npc_name.."] pick_section_from_condlist: function["..utils.to_str(infop.func).."] no parameters exist") end
+						if xr_conditions[infop.func] and xr_conditions[infop.func](actor_id, npc_id) then
+							if not infop.expected then
+								infop_conditions_met = false -- not met
+								break
+							end
+						else
+							if infop.expected then
+								infop_conditions_met = false -- not met
+								break
+							end
+						end
+					end
+				elseif has_alife_info(infop.name) then
+					if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] expected["..utils.to_str(infop.expected).."] info["..utils.to_str(infop.name).."] req["..utils.to_str(infop.required).."]") end
+					if not infop.required then
+						if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] FAILED: actor has infop["..infop.name.."]["..utils.to_str(has_alife_info(infop.name)).."] which is NOT needed") end
+						infop_conditions_met = false -- not met
+						break
+					else
+						if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] PASSED: actor has infop["..infop.name.."]["..utils.to_str(has_alife_info(infop.name)).."] which is needed") end
+					end
+				else
+					if infop.required then
+						if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] FAILED: actor has NO infop["..infop.name.."]["..utils.to_str(has_alife_info(infop.name)).."] which is needed") end
+						infop_conditions_met = false -- not met
+						break
+					else
+						if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] PASSED: actor has NO infop["..infop.name.."]["..utils.to_str(has_alife_info(infop.name)).."] which is not needed") end
+					end
+				end
+			end		--infop loop
+			if infop_conditions_met then			--no actor during initial loading when register target is called
+				--TB3D_Services.packet_alert("xr logic: pick_section_from_condlist 3") 
+				-- Conditions are satisfied. Regardless of whether the given section, you need to put down the required infoportions:
+				for inum, infop in pairs(cond.infop_set) do
+					if infop.func then
+						func=nil
+						module,fname=string_match(infop.func,"(.+)[.](.+)")
+						if fname and _G[module] and _G[module][fname] then
+							func=_G[module][fname]
+						else
+							if xr_effects and xr_effects[infop.func] then
+								if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: function ["..infop.func.."] executed") end
+								func=xr_effects[infop.func]
+							else
+								if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: function ["..utils.to_str(infop.func).."] is not defined in xr_effects.script") end
+								return nil
+							end
+						end
+						if infop.params then
+							if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: calling func: with params") end
+							func(actor_id, npc_id, infop.params)
+						else
+							if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: calling func: no params") end
+							func(actor_id, npc_id)
+						end
+					elseif infop.required then
+						if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: give info["..infop.name.."]") end
+						TB3D_Services.give_info(infop.name)
+					else
+						if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: remove info["..infop.name.."]") end
+						TB3D_Services.remove_info(infop.name)
+					end
+				end
+				if cond.section and cond.section == "never" then					--can be probability, boolean, info, "" or nil
+					if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: returning cond[never]") end
+					return nil
+				else
+					if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: returning cond["..utils.to_str(cond.section).."]") end
+					return cond.section
+				end
+			--else
+				--TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: [not met]")
+				--return nil
+			end
+		end	--end conditions loop
+		if is_report then TB3D_Services.packet_alert("xr logic: object["..npc_name.."] pick_section_from_condlist: returning [nil]") end
+	end
+	return nil
+end
+
+-- Switches to the specified section if defined.
+-- Anee section == nil, still work the old section.
+function switch_to_section(npc, st, section)
+  if section == nil or section == "" then
+    return false
+  end
+  if (section == "sr_aes_deadzone") then
+	if (has_alife_info("strelok_pda_have")) then
+	return false
+	end
+  end
+  local active_section = db.storage[npc:id()].active_section
+  if active_section == section then
+    return false
+  end
+  -- call scheme::finalize()
+  if active_section then
+    issue_event(npc, db.storage[npc:id()][db.storage[npc:id()].active_scheme], "deactivate", npc)
+  end
+  db.storage[npc:id()].active_section = nil
+  db.storage[npc:id()].active_scheme = nil
+  activate_by_section(npc, st.ini, section, false)
+  return true
+end
+
+function see_actor(npc)
+  return npc:alive() and npc:see(db.actor)
+end
+
+function cond_name(cond, etalon)
+  return string_find( cond, "^"..etalon.."%d*$" ) ~= nil
+end
+
+function try_switch_to_another_section(npc, st, actor)
+  local lgc = st.logic
+  local npc_id = npc:id()
+  if not npc or not actor then
+    --if TB3D_Modders.use_logic_message then
+		TB3D_Services.packet_alert("xr logic: try_switch_to_another_section(): error in implementation of scheme ["..utils.to_str(st.scheme).."] npc or actor is nil!!!!")
+	--end
+    return
+  end
+  local npc_name = npc:name()
+  if not npc_name then npc_name = "" end
+  local is_report = false
+	if TB3D_Modders.use_logic_message or (TB3D_Modders.use_state_message and string_find(npc_name, TB3D_Modders.npc_to_log)) then is_report = true end
+  if lgc then
+	  local switched = false
+	  for n, c in pairs(lgc) do
+		if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] logic index["..utils.to_str(n).."] cond["..utils.to_str(c.name).."]") end
+		if cond_name(c.name, "on_actor_dist_le") then
+		  if is_report then TB3D_Services.packet_alert("xr logic: dist["..utils.to_str(distance_between(actor, npc)).."] need <= ["..utils.to_str(c.v1).."] see_actor["..utils.to_str(see_actor(npc)).."]") end
+		  if see_actor(npc) and distance_between(actor, npc) <= c.v1 then
+			if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_dist_le conditions met") end
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_actor_dist_le_nvis") then
+		  if distance_between(actor, npc) <= c.v1 then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_actor_dist_ge") then
+		  if is_report then TB3D_Services.packet_alert("xr logic: dist["..utils.to_str(distance_between(actor, npc)).."] need <= ["..utils.to_str(c.v1).."] see_actor["..utils.to_str(see_actor(npc)).."]") end
+		  -- HERE DELIBERATELY> and not&gt; =, because it is paired with on_actor_dist_le, where q =
+		  if see_actor(npc) and distance_between(actor, npc) > c.v1 then
+			if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_dist_ge conditions met") end
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_actor_dist_ge_nvis") then
+		  -- HERE DELIBERATELY> and not&gt; =, because it is paired with on_actor_dist_le_nvis, where q =
+		  if distance_between(actor, npc) > c.v1 then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_signal") then
+			if is_report then TB3D_Services.packet_alert("xr logic: on_signal["..utils.to_str(c.v1).."] for["..npc_name.."] actor["..actor:name().."]") end
+		  if st.signals and st.signals[c.v1] then
+			if is_report then
+				TB3D_Services.packet_alert("xr logic: on_signal["..utils.to_str(c.v1).."] signalled["..npc_name.."]")
+			end
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		 -- FIXME: not duplicate here the names, leave one on_info, but add a few copies of it to the list
+		elseif cond_name(c.name, "on_info") then
+		  switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		elseif cond_name(c.name, "on_timer") then
+		  if is_report then
+			TB3D_Services.packet_alert("xr logic: on_timer["..utils.to_str(npc_name).."] ["..utils.to_str(time_global()).."] >= act time["..utils.to_str(db.storage[npc_id].activation_time + c.v1).."]")
+		  end
+		  if time_global() >= db.storage[npc_id].activation_time + c.v1 then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		-- GAMETIME added by Stohe.
+		elseif cond_name(c.name, "on_game_timer") then
+			local t_time = c.v1
+			if string_find(npc_name, "esc_bridge_kill_zone") then						--109974, values in all.spawn are x10 and too long
+				t_time = 300
+			elseif string_find(npc_name, "agr_space_restrictor_tower") then
+				t_time = 120
+			elseif string_find(npc_name, "esc_blockpost_patrol_restrictor") then
+				t_time = 720
+			end
+			if is_report then
+				TB3D_Services.packet_alert("xr logic: on_game_timer time["..utils.to_str(game.get_game_time():diffSec(db.storage[npc_id].activation_game_time)).."] >= v1["..utils.to_str(t_time).."]")
+			end
+			if game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= t_time then
+				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+			end
+		elseif cond_name(c.name, "on_actor_in_zone") then
+		  if utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_actor_not_in_zone") then
+		  if not utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_npc_in_zone") then
+		  if utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_npc_not_in_zone") then
+		  if not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_actor_inside") then
+		  if utils.npc_in_zone(actor, npc) then
+			if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_inside [true]") end
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		elseif cond_name(c.name, "on_actor_outside") then
+		  if not utils.npc_in_zone(actor, npc) then
+			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+		  end
+		else
+		  if is_report then TB3D_Services.packet_alert("xr logic: WARNING: object ["..utils.to_str(npc_name).."] try_switch_to_another_section: unknown condition ["..utils.to_str(c.name).."] encountered") end
+		end
+		if switched then
+		  if is_report then
+			TB3D_Services.packet_alert("xr logic: ["..utils.to_str(npc_name).."] SWITCHED[true]")
+		  end
+		  break
+		end
+	  end
+		return switched
+	else
+		if is_report then
+			TB3D_Services.packet_alert("xr logic: Can't find script switching information in storage, scheme  ["..utils.to_str(st.active_scheme).."]")
+		end
+	end
+end
+
+function is_active(npc, st)
+  if st.section == nil then
+    if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: npc ["..utils.to_str(npc:name()).."] st.section is nil, active section is ["..utils.to_str(db.storage[npc:id()].active_section).."]") end
+  end
+  local is_act = (st.section == db.storage[npc:id()].active_section)
+  -- The current section is active and has not worked, none of the conditions for switching to other sections
+  return is_act
+end
+
+function abort_syntax_error_in_cond(npc, section, field)
+	TB3D_Services.abort_alert("xr logic: abort_syntax_error_in_cond object["..utils.to_str(npc:name()).."] section["..utils.to_str(section).."] field["..utils.to_str(field).."] from["..utils.to_str(from).."] syntax error in switch condition")
+end
+
+-- At the entrance, we have an empty array and a string of the form "  +infop1  -infop2 +infop3 ... "
+-- Fill the array:
+-- { "infop_name" = true/false }.
+function parse_infop1(rslt, str)
+  --printf("_bp: parse_infop: %s", utils.to_str(str))
+  if str then
+    local infop_name, sign
+    local infop_n = 1
+    for s in string_gfind(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
+      --printf("_bp: parse_infop: s=%s", utils.to_str(s))
+      sign = string_sub(s, 1, 1)
+      infop_name = string_sub(s, 2)
+      if sign == "+" then
+        rslt[infop_n] = { name = infop_name, required = true }
+      elseif sign == "-" then
+        rslt[infop_n] = { name = infop_name, required = false }
+      elseif sign == "~" then
+        rslt[infop_n] = { prob = tonumber(infop_name) }
+      elseif sign == "=" then
+        rslt[infop_n] = { func = infop_name, expected = true }
+      elseif sign == "!" then
+        rslt[infop_n] = { func = infop_name, expected = false }
+      else
+        abort_syntax_error_in_cond(npc, section, field)
+      end
+      infop_n = infop_n + 1
+    end
+  end
+end
+
+function parse_func_params(str)
+  local lst = {}
+  local n
+  for par in string_gfind(str, "%s*([^:]+)%s*") do
+    n = tonumber(par)
+    if n then table.insert(lst, n)
+    else table.insert(lst, par) end
+  end
+  return lst
+end
+
+function parse_infop(rslt, str)
+  --printf("_bp: parse_infop1: %s", utils.to_str(str))
+  if str then
+    local infop_name, sign
+    local infop_n = 1
+    local at, params
+    for s in string_gfind(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
+      --printf("_bp: parse_infop: s=%s", utils.to_str(s))
+      sign = string_sub(s, 1, 1)
+      infop_name = string_sub(s, 2)
+      params = nil
+      -- parses the parameters of the functions
+      at = string_find(infop_name, "%(")
+      if at then
+        if string_sub(infop_name, -1) ~= ")" then
+          if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr logic: wrong condlist  ["..str.."]") end
+        end
+        if at < string_len(infop_name) - 1 then
+          params = parse_func_params(string_sub(infop_name, at + 1, -2))
+        else
+          params = {}
+        end
+        infop_name = string_sub(infop_name, 1, at - 1)
+      end
+      if sign == "+" then
+        rslt[infop_n] = { name = infop_name, required = true }
+      elseif sign == "-" then
+        rslt[infop_n] = { name = infop_name, required = false }
+      elseif sign == "~" then
+        rslt[infop_n] = { prob = tonumber(infop_name) }
+      elseif sign == "=" then
+        --printf("_bp: n = %s; r = %s", infop_name, utils.to_str(params))
+        rslt[infop_n] = { func = infop_name, expected = true, params = params }
+      elseif sign == "!" then
+        --printf("_bp: n = %s; r = %s", infop_name, utils.to_str(params))
+        rslt[infop_n] = { func = infop_name, expected = false, params = params }
+      else
+        abort_syntax_error_in_cond(npc, section, field)
+      end
+      infop_n = infop_n + 1
+    end
+  end
+end
+
+-- Rasparsivaet string src form:
+-- {+infop1} section1 %-infop2%, {+infop3 -infop4} section2 ...
+-- in table:
+-- {
+--   1 = { infop_check = { 1 = {"infop1" = true} }, infop_set = { 1 = {"infop2" = false } }, section = "section1" },
+--   2 = { infop_check = { 1 = {"infop3" = true}, 2 = {"infop4" = false} }, infop_set = {}, section = "section2" },
+-- }
+function parse_condlist(npc, section, field, src)
+	--[[		----------list to log------------------
+	local src_str = src or "nil"
+	local field_str = field or "nil"
+	local sect_str = section or "nil"
+	local npc_str = "nil"
+	if npc and npc.name then npc_str = npc:name() end
+	TB3D_Services.packet_alert("xr logic: npc["..npc_str.."] section["..sect_str.."] field["..field_str.."] src["..src_str.."]")
+	--]]		----------------------------------------
+	local lst = {}
+	local at, to, infop_check_lst, remainings, infop_set_lst, newsect	-- 1) Is divided into parts separated by commas
+	local n = 1
+	if src then
+		for fld in string_gfind(src, "%s*([^,]+)%s*") do
+			-- Here is a set fld infoportions in {} and the name of the section to which the switch.
+			lst[n] = {}
+			--TB3D_Services.packet_alert("xr logic: iter["..utils.to_str(n).."] fld["..utils.to_str(fld).."]")
+			at, to, infop_check_lst = string_find(fld, "{%s*(.*)%s*}")		-- Select a list infoportions to check
+			if infop_check_lst then
+			  --TB3D_Services.packet_alert("xr logic: infop_check_lst["..utils.to_str(infop_check_lst).."]")
+			  -- Select the rest of the field, ie section name plus a list of infoportions to install:
+			  remainings = string_sub(fld, 1, at - 1) .. string_sub(fld, to + 1)
+			else
+			  -- List infoportions to test was not given, therefore, do not remove:
+			  remainings = fld
+			end
+			--TB3D_Services.packet_alert("xr logic: remainings["..utils.to_str(remainings).."]")
+			-- Select a list infoportions for installation of remainings:
+			at, to, infop_set_lst = string_find(remainings, "%%%s*(.*)%s*%%")
+			if infop_set_lst then
+			  -- Select the rest of the field, ie section name:
+			  newsect = string_sub(remainings, 1, at - 1) .. string_sub(remainings, to + 1)
+			else
+			  -- List infoportions to install has not been set, therefore, remainings is the name of the section.
+			  newsect = remainings
+			end
+			--TB3D_Services.packet_alert("xr logic: newsect["..utils.to_str(newsect).."]")
+			-- And once trim section name:
+			at, to, newsect = string_find(newsect, "%s*(.*)%s*")
+			if newsect then
+				-- Section name can now be saved:
+				lst[n].section = newsect
+				-- Now you need to parse a string infoportions infop_check_lst ?
+				-- fill the array infop_check: { "infop_name" = true/false }.
+				-- At the entrance we have a string like "  +infop1  -infop2 +infop3 ... "
+				lst[n].infop_check = {}
+				parse_infop(lst[n].infop_check, infop_check_lst)
+				-- The same is true for established infoportions:
+				lst[n].infop_set = {}
+				parse_infop(lst[n].infop_set, infop_set_lst)
+			else
+			  abort_syntax_error_in_cond(npc, section, field)
+			end
+			n = n + 1
+		end
+	end
+	return lst
+end
+
+function cfg_get_number_and_condlist(ini, section, field, npc)
+  local str = utils.cfg_get_string(ini, section, field, npc, false, "")
+  if not str then
+    return nil
+  end
+  local par = utils.parse_params(str)
+  if not par[1] or not par[2] then
+    abort_syntax_error_in_cond(npc, section, field)
+  end
+  local t = {}
+  t.name = field
+  t.v1 = tonumber(par[1])
+  t.condlist = parse_condlist(npc, section, field, par[2])
+  return t
+end
+
+function cfg_get_string_and_condlist(ini, section, field, npc)
+  local str = utils.cfg_get_string(ini, section, field, npc, false, "")
+  if not str then
+    return nil
+  end
+  local par = utils.parse_params(str)
+  if not par[1] or not par[2] then
+    abort_syntax_error_in_cond(npc, section, field)
+  end
+  local t = {}
+  t.name = field
+  t.v1 = par[1]
+  t.condlist = parse_condlist(npc, section, field, par[2])
+  return t
+end
+
+function cfg_get_two_strings_and_condlist(ini, section, field, npc)
+  local str = utils.cfg_get_string(ini, section, field, npc, false, "")
+  if not str then
+    return nil
+  end
+  local par = utils.parse_params(str)
+  if not par[1] or not par[2] or not par[3] then
+    abort_syntax_error_in_cond(npc, section, field)
+  end
+  local t = {}
+  t.name = field
+  t.v1 = par[1]
+  t.v2 = par[2]
+  t.condlist = parse_condlist(npc, section, field, par[3])
+  return t
+end
+
+function cfg_get_condlist(ini, section, field, npc)
+  local str = utils.cfg_get_string(ini, section, field, npc, false, "")
+  if not str then
+    return nil
+  end
+  local par = utils.parse_params(str)
+  if not par[1] then
+    abort_syntax_error_in_cond(npc, section, field)
+  end
+  local t = {}
+  t.name = field
+  t.condlist = parse_condlist(npc, section, field, par[1])
+  return t
+end
+
+function add_condition(lst, at, cond)
+  if cond then
+    lst[at] = cond
+    return at + 1
+  end
+  return at
+end
+
+function cfg_get_switch_conditions(ini, section, npc)
+  local l = {}
+  local t
+  local n = 1
+  local function add_conditions(func, cond)
+    local i = 1
+    local c = func(ini, section, cond, npc)
+    while c ~= nil do
+      n = add_condition(l, n, c, npc)
+      i = i + 1
+      c = func(ini, section, cond..i, npc)
+    end
+  end
+  add_conditions( cfg_get_number_and_condlist, "on_actor_dist_le"      )
+  add_conditions( cfg_get_number_and_condlist, "on_actor_dist_le_nvis" )
+  add_conditions( cfg_get_number_and_condlist, "on_actor_dist_ge"      )
+  add_conditions( cfg_get_number_and_condlist, "on_actor_dist_ge_nvis" )
+  add_conditions( cfg_get_string_and_condlist, "on_signal"             )
+  add_conditions( cfg_get_condlist           , "on_info"               )
+  add_conditions( cfg_get_number_and_condlist, "on_timer"              )
+  add_conditions( cfg_get_number_and_condlist, "on_game_timer"         )
+  add_conditions( cfg_get_string_and_condlist, "on_actor_in_zone"      )
+  add_conditions( cfg_get_string_and_condlist, "on_actor_not_in_zone"  )
+  add_conditions( cfg_get_condlist           , "on_actor_inside"       )
+  add_conditions( cfg_get_condlist           , "on_actor_outside"      )
+  add_conditions( cfg_get_npc_and_zone       , "on_npc_in_zone"        )
+  add_conditions( cfg_get_npc_and_zone       , "on_npc_not_in_zone"    )
+  return l
+end
+
+function cfg_get_overrides(ini, section, npc)
+  local l = {}
+--  l.meet_enabled      = utils.cfg_get_bool(ini, section, "meet_enabled", npc, false)
+--  l.meet_talk_enabled = utils.cfg_get_bool(ini, section, "meet_talk_enabled", npc, false)
+--  l.meet_dialog       = utils.cfg_get_string(ini, section, "meet_dialog", npc, false, "")
+--  l.meet_state        = utils.cfg_get_string(ini, section, "meet_state", npc, false, "")
+--  l.reactions         = parse_names(utils.cfg_get_string(ini, section, "reactions", npc, false, "", ""))
+  local tmp     = utils.cfg_get_string(ini, section, "heli_hunter", npc, false, "")
+  if tmp then
+    l.heli_hunter = xr_logic.parse_condlist(npc, section, "heli_hunter", tmp)
+  end
+--  l.wounded_enabled   = utils.cfg_get_bool(ini, section, "wounded_enabled", npc, false)
+  l.combat_ignore     = cfg_get_condlist(ini, section, "combat_ignore_cond", npc)
+  l.combat_ignore_keep_when_attacked = utils.cfg_get_bool(ini, section, "combat_ignore_keep_when_attacked", npc, false)
+  l.combat_type       = cfg_get_condlist(ini, section, "combat_type", npc)
+  l.on_combat         = cfg_get_condlist(ini, section, "on_combat", npc)
+  l.companion_enabled = utils.cfg_get_bool(ini, section, "companion_enabled", npc, false)
+  if string_find(section, "kamp") ~= nil then
+    l.soundgroup    = utils.cfg_get_string(ini, section, "center_point", npc, false, "")
+  else
+    l.soundgroup    = utils.cfg_get_string(ini, section, "soundgroup", npc, false, "")
+  end
+  return l
+end
+
+function cfg_get_npc_and_zone(ini, section, field, npc)
+  local t = cfg_get_two_strings_and_condlist(ini, section, field, npc)
+  if t then
+    local sim = alife()
+    if sim then
+      local se_obj = sim:story_object(tonumber(t.v1))
+      if se_obj then
+        t.npc_id = se_obj.id
+      else
+        t.npc_id = -1
+        if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: object ["..utils.to_str(npc:name()).."] section ["..utils.to_str(section).."] field ["..utils.to_str(field).."] there is no object with story_id ["..utils.to_str(t.v1).."]") end
+      end
+    else
+      t.npc_id = -1
+      --printf("xr logic: WARNING: object "..npc:name()..": section "..section..": field "..field..": can't use story_id without simulation!")
+    end
+  end
+  return t
+end
+
+-- Returns a reference to overraydy registered in the currently active section,
+-- either nil, if none of the sections is not active, or overrides if not.
+function generic_scheme_overrides(npc)
+  return db.storage[npc:id()].overrides
+end
+
+function mob_release(mob)
+  if mob:get_script() then
+    mob:script(false, script_name())
+  end
+end
+
+function mob_capture(mob, reset_actions)
+  if reset_actions == nil then
+    if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: mob_capture: reset_actions parameter's value is not specified") end
+  end
+  if reset_actions then
+    reset_action(mob, script_name())
+  else
+    if not mob:get_script() then
+      mob:script(true, script_name())
+    end
+  end
+end
+
+function mob_captured(mob)
+  return mob:get_script()
+end
+
+function save_logic(obj, packet)
+  local npc_id = obj:id()
+  local cur_tm = time_global()
+  local activation_time = db.storage[npc_id].activation_time
+  if not activation_time then
+    activation_time = 0
+  end
+  packet:w_s32(activation_time - cur_tm)
+  -- GAMETIME added by Stohe.
+  utils.w_CTime(packet, db.storage[npc_id].activation_game_time)
+end
+
+function load_logic(obj, reader)
+  local npc_id = obj:id()
+  local cur_tm = time_global()
+  db.set_activation_time(obj, reader:r_s32() + cur_tm)
+  -- GAMETIME added by Stohe.
+  db.set_activation_game_time(obj, utils.r_CTime(reader))
+end
+
+local pstor_number = 0
+local pstor_string = 1
+local pstor_boolean = 2
+local pstor_custom = 3
+
+function pstor_is_registered_type(tv)
+  if tv ~= "boolean" and tv ~= "string" and tv ~= "number" and tv ~= "userdata" then
+    return false
+  end
+  return true
+end
+
+--[[function pstor_store(obj, varname, val)
+if (obj == nil) then return end
+  local npc_id = obj:id()
+  if db.storage[npc_id].pstor == nil then
+    db.storage[npc_id].pstor = {}
+  end
+  local tv = type(val)
+  if not pstor_is_registered_type(tv) then
+    if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr_logic: pstor_store: not registered type ["..tv.."] encountered") end
+  end
+  db.storage[npc_id].pstor[varname] = val
+end]]
+--------------------
+-- Returns the id actor, if the variable is not present in table tabl_netpda_varnames
+-- faster (not to iterate through a table) - just identify the entry specific variable on PDA
+-- !!!!TB3D: this makes no sense at all, as net packet create only returns actor and action does not exist
+function get_pda_id(var_name,action)
+	local pda_id
+	if tabl_netpda_varnames[var_name] == true then
+		pda_id = netpacket_pda_create.create_pda()
+	else
+		pda_id = db.actor:id()
+	end
+	return pda_id
+end
+--------------------
+function pstor_store(obj, varname, val)
+	local tv = type(val)
+	if obj and pstor_is_registered_type(tv) then
+		local npc_id = obj:id()  
+		--if tabl_netpda_varnames[varname] == true then
+			-- npc_id = get_pda_id(varname,"store")
+			--npc_id = netpacket_pda_create.create_pda()
+			--TB3D_Services.packet_alert("xr logic: pstor_store: ["..utils.to_str(varname).."] registered to npcid["..utils.to_str(npc_id).."]")
+		--else
+			--npc_id = obj:id()
+		--end
+		if npc_id == nil then
+			if db.actor then npc_id = db.actor:id() else npc_id = 0 end	--!!!!TB3D    for startup
+		end
+		if db.storage then
+			if db.storage[npc_id] then
+				if db.storage[npc_id].pstor == nil then
+					--db.storage[npc_id].pstor = {}
+					db.init_my_pstor(obj)
+				end
+				if npc_id == db.actor:id() then
+					if TB3D_Modders.use_abort_messgae then TB3D_Services.packet_alert("XR LOGIC: Storing["..utils.to_str(varname).."] = ["..utils.to_str(val).."] to actor!!!!!!!!!!!!!!!") end
+				end
+				--db.storage[npc_id].pstor[varname] = val
+				db.set_pstor(obj, varname, val)
+			else
+				if TB3D_Modders.use_abort_message == true then TB3D_Services.packet_alert("xr logic: pstor_store["..utils.to_str(varname).."] no storage for npcid["..utils.to_str(npc_id).."]") end
+			end
+		else
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.packet_alert("xr logic: pstor_store["..utils.to_str(varname).."] no storage!!!!!!!!!!!") end
+			--alife().release(npc_id)
+		end
+	else
+		if obj and TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr logic: pstor_store var["..utils.to_str(varname).."] val["..utils.to_str(val).."] not registered type["..utils.to_str(tv).."] for["..utils.to_str(obj:name()).."]") end
+	end
+end
+------------------------------
+
+function pstor_retrieve(obj, varname, defval)
+	if obj then
+		local npc_id -- = db.actor:id()
+		--if tabl_netpda_varnames[varname] == true then
+			-- npc_id = get_pda_id(varname,"get")
+			--npc_id = netpacket_pda_create.create_pda()
+			--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_retrieve:["..utils.to_str(npc_id).."] created new netpacket") end
+		--else
+			npc_id = obj:id()
+		--end
+		--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_retrieve:["..utils.to_str(npc_id).."] ["..utils.to_str(varname).."] default ["..utils.to_str(defval).."]") end
+		if npc_id == nil then
+			if db.actor then npc_id = db.actor:id() else npc_id = 0 end	--!!!!TB3D    for startup
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.packet_alert("xr logic: pstor_retrieve: ["..utils.to_str(varname).."] npcid["..utils.to_str(npc_id).."]") end
+		end
+		if db.storage and db.storage[npc_id] then
+			if db.storage[npc_id].pstor ~= nil then
+				local val = db.storage[npc_id].pstor[varname]
+				if val then return val end
+			end
+		else
+			--TB3D_Services.packet_alert("xr logic: pstor_retrieve:["..utils.to_str(varname).."] no storgae for npcid["..utils.to_str(npc_id).."]")
+		end
+			--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_retrieve: variable ["..utils.to_str(varname).."] does not exist") end
+	end
+	return defval
+end
+
+function pstor_get_custom(obj, classname, varname)
+	if obj then
+		local npc_id = obj:id()
+		if npc_id then
+			if db.storage and db.storage[npc_id] then
+				if db.storage[npc_id].pstor == nil then
+					--db.storage[npc_id].pstor = {}
+					db.init_my_pstor(obj)
+				end
+				local val = db.storage[npc_id].pstor[varname]
+				if val == nil then
+					--db.storage[npc_id].pstor[varname] = pstor_custom_impl[classname]()
+					db.set_pstor(obj, varname, pstor_custom_impl[classname]())
+					val = db.storage[npc_id].pstor[varname]
+				end
+				if val ~= nil then
+					return val.st
+				end
+				--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_get_custom: variable ["..utils.to_str(varname).."] does not exist") end
+			else
+				--TB3D_Services.packet_alert("xr logic: pstor_get_custom:["..utils.to_str(varname).."] no storgae for npcid["..utils.to_str(npc_id).."]")
+			end
+		else
+			--TB3D_Services.packet_alert("xr logic: pstor_get_custom:["..utils.to_str(varname).."] no npcid for obj["..utils.to_str(obj).."]")
+		end
+	else
+		--TB3D_Services.packet_alert("xr logic: pstor_get_custom:["..utils.to_str(varname).."] obj[nil]")
+	end
+	return nil
+end
+
+function pstor_save_all(obj, packet)
+  --local i, np_varname
+  local npc_id = obj:id()
+  local pstor = db.storage[npc_id].pstor
+  if not pstor then
+    --pstor = {}
+    --db.storage[npc_id].pstor = pstor
+	db.init_my_pstor(obj)
+	pstor = db.storage[npc_id].pstor
+  end
+  local ctr = 0
+  for k, v in pairs(pstor) do
+    ctr = ctr + 1
+  end
+  packet:w_u32(ctr)
+  if ctr > 0 then
+	--TB3D_Services.packet_alert("XR LOGIC: pstor saving["..utils.to_str(ctr).."] items for["..utils.to_str(obj:name()).."]")
+	  local tv
+	  for k, v in pairs(pstor) do
+		packet:w_stringZ(k)
+		tv = type(v)
+		if tv == "number" then
+		  packet:w_u8(pstor_number)
+		  packet:w_float(v)
+		elseif tv == "string" then
+			packet:w_u8(pstor_string)
+			if v then
+				--if string_len(v)>208 then
+					--v = string_sub(v,1,208)
+				--end
+				--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."]") end -- string = ["..utils.to_str(v).."]") end
+				packet:w_stringZ(v)
+			else
+				--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] string = [nil]") end
+				packet:w_stringZ("")
+			end
+		elseif tv == "boolean" then
+		  packet:w_u8(pstor_boolean)
+		  packet:w_bool(v)
+		elseif tv == "userdata" then
+		  packet:w_u8(pstor_custom)
+		  if v.classname == k then
+			 packet:w_stringZ("")
+		  else
+			packet:w_stringZ(v.classname)
+		  end
+		  v:save(packet)
+		else
+		  if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr logic: pstor_save_all: not registered type ["..utils.to_str(tv).."] encountered") end
+		end
+	  end
+	 end
+end
+
+function pstor_save_all_report(obj, packet)
+	--local i, np_varname
+	TB3D_Services.packet_alert("XR LOGIC: pstor save all for ["..utils.to_str(obj:name()).."]")
+	local npc_id = obj:id()
+	local pstor = db.storage[npc_id].pstor
+	if not pstor then
+		--pstor = {}
+		--db.storage[npc_id].pstor = pstor
+		db.init_my_pstor(obj)
+		pstor = db.storage[npc_id].pstor
+		TB3D_Services.packet_alert("XR LOGIC: pstor save all new packet created")
+	end
+	local ctr = 0
+	for k, v in pairs(pstor) do
+		ctr = ctr + 1
+	end
+	packet:w_u32(ctr)
+	TB3D_Services.packet_alert("XR LOGIC: pstor saving ["..utils.to_str(ctr).."] items")
+	ctr = 0
+	local tv
+	for k, v in pairs(pstor) do
+		ctr = ctr + 1
+		packet:w_stringZ(k)
+		tv = type(v)
+		if tv == "number" then
+			TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] number = ["..utils.to_str(v).."]")
+			packet:w_u8(pstor_number)
+			packet:w_float(v)
+		elseif tv == "string" then
+			if v == nil then
+				v = ""
+			end
+			TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] len["..utils.to_str(string_len(v)).."]") -- string = ["..utils.to_str(v).."]")
+			packet:w_u8(pstor_string)
+			--if string_len(v)>208 then
+				--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(ctr).."]["..utils.to_str(k).."] len["..utils.to_str(string_len(v)).."] removed")
+				--v = ""
+			--end
+			packet:w_stringZ(v)
+		elseif tv == "boolean" then
+			TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] bool = ["..utils.to_str(v).."]")
+			packet:w_u8(pstor_boolean)
+			packet:w_bool(v)
+		elseif tv == "userdata" then
+			packet:w_u8(pstor_custom)
+			if v.classname == k then
+				TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] no user data string = ["..utils.to_str(v.classname).."]")
+				packet:w_stringZ("")
+			else
+				TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] user data string = ["..utils.to_str(v.classname).."]")
+				packet:w_stringZ(v.classname)
+			end
+			v:save(packet)
+		else
+			TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] not registered type ["..utils.to_str(tv).."]")
+		end
+	end
+	TB3D_Services.packet_alert("XR LOGIC: pstor saved for ["..utils.to_str(obj:name()).."]")
+end
+
+function pstor_load_all(obj, reader)
+	local npc_id = obj:id()
+	local pstor = db.storage[npc_id].pstor
+	if not pstor then
+		--pstor = {}
+		--db.storage[npc_id].pstor = pstor
+		db.init_my_pstor(obj)
+		pstor = db.storage[npc_id].pstor
+	end
+	local ctr = reader:r_u32()
+	if tonumber(ctr) > 10 and tostring(obj:name()) ~= "single_player" and npc_id ~= db.actor:id() and npc_id~=netpacket_pda_create.create_pda() then
+		TB3D_Services.packet_alert("xr logic: pstor_load_all too many items["..utils.to_str(ctr).."] for["..utils.to_str(obj:name()).."] !!!!")
+		-- maximum of 10 iterations - in NPCs written 5 variables, the technique - 7, even 10 would be
+		-- If you have pstor something of their own written, guided by their values
+		-- and be sure to remove the check from actor - he has a very thick pstor, and also
+		-- if so will it hurt pstor, then there just is no help
+		remove_zavis.remove_obj(obj)
+		ctr = 0
+	end
+	local varname
+	local tn
+	local classname
+	local strng
+	local bad_varname
+	for i = 1, ctr do
+		bad_varname = false
+		varname = nil
+		tn = nil
+		classname = nil
+		varname = reader:r_stringZ()
+		if varname == "" then
+			varname = "no_var_name:"..utils.to_str(i)
+			bad_varname = true
+		end
+		tn = reader:r_u8()
+		if tn == pstor_number then
+			pstor[varname] = reader:r_float()
+		elseif tn == pstor_string then
+			strng = reader:r_stringZ()
+			if strng == nil then
+				strng = ""
+			end
+			--if string_len(strng)>200 then
+				--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."] removed")
+			--end
+			pstor[varname] = strng
+		elseif tn == pstor_boolean then
+			pstor[varname] = reader:r_bool()
+		elseif tn == pstor_custom then
+			classname = reader:r_stringZ()
+			if classname == nil or classname == "" then
+				classname = varname
+				--pstor[varname] = nil
+			end
+			if pstor ~= nil then
+				if classname ~= "" and pstor_custom_impl[classname] then
+					pstor[varname] = pstor_custom_impl[classname]()	--!!!!TB3D
+					pstor[varname]:load(reader)
+				else
+					TB3D_Services.packet_alert("XR LOGIC: load all [classname or implementation invalid] !!!!")
+					pstor[varname] = nil
+				end
+			else
+				TB3D_Services.packet_alert("XR LOGIC: load all pstor = nil["..utils.to_str(obj:name()).."] ctr["..utils.to_str(ctr).."] idx["..utils.to_str(i).."]!!!!")
+			end
+		else
+			-- should not try to take off - just do not write the corrupted data
+			-- thus necessarily remove the variable itself - as a result of record
+			-- debris pstor alone her name can hang download
+			TB3D_Services.packet_alert("XR LOGIC: load all [type invalid]!!!!")
+			pstor[varname] = nil
+		end 
+		if bad_varname == true then
+			TB3D_Services.packet_alert("XR LOGIC: pstor varname["..utils.to_str(i).."]=["..utils.to_str(varname).."] tn["..utils.to_str(tn).."] removed!!!!")
+			pstor[varname] = nil
+		end
+	end
+end
+
+function pstor_load_all_report(obj, reader)
+	local npc_id = obj:id()
+	local pstor = db.storage[npc_id].pstor
+	TB3D_Services.packet_alert("XR LOGIC: pstor load all for["..utils.to_str(obj:name()).."]")
+	if not pstor then
+		--pstor = {}
+		--db.storage[npc_id].pstor = pstor
+		db.init_my_pstor(obj)
+		pstor = db.storage[npc_id].pstor
+		TB3D_Services.packet_alert("XR LOGIC: pstor load all[created new pstor]")
+	end
+	local ctr = reader:r_u32()
+	if tonumber(ctr) > 10 and tostring(obj:name()) ~= "single_player" and npc_id ~= db.actor:id() and npc_id~=netpacket_pda_create.create_pda() then
+		TB3D_Services.packet_alert("xr logic: pstor_load_all too many items["..utils.to_str(ctr).."] for["..utils.to_str(obj:name()).."] !!!!")
+		-- maximum of 10 iterations - in NPCs written 5 variables, the technique - 7, even 10 would be
+		-- If you have pstor something of their own written, guided by their values
+		-- and be sure to remove the check from actor - he has a very thick pstor, and also
+		-- if so will it hurt pstor, then there just is no help
+		remove_zavis.remove_obj(obj)
+		ctr = 0
+	end
+	TB3D_Services.packet_alert("XR LOGIC: pstor loading ["..utils.to_str(ctr).."] items")
+	local varname
+	local tn
+	local classname
+	local strng
+	local bad_varname
+	for i = 1, ctr do
+		bad_varname = false
+		varname = nil
+		tn = nil
+		classname = nil
+		varname = reader:r_stringZ()
+		if varname == "" then
+			varname = "no_var_name:"..utils.to_str(i)
+			bad_varname = true
+		end
+		tn = reader:r_u8()
+		TB3D_Services.packet_alert("XR LOGIC: pstor varname["..utils.to_str(i).."]=["..utils.to_str(varname).."] tn["..utils.to_str(tn).."]")
+		if tn == pstor_number then
+			pstor[varname] = reader:r_float()
+			TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] = float["..utils.to_str(pstor[varname]).."]")
+		elseif tn == pstor_string then
+			strng = reader:r_stringZ()
+			if strng == nil then
+				strng = ""
+			end
+			TB3D_Services.packet_alert("XR LOGIC: pstor loading item ["..utils.to_str(i).."] ["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."]") -- string = ["..utils.to_str(v).."]")
+			--if string_len(strng)>200 then
+				--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."] removed")
+			--end
+			pstor[varname] = strng
+			--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."] = stringz["..strng.."]")
+		elseif tn == pstor_boolean then
+			pstor[varname] = reader:r_bool()
+			TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] = bool["..utils.to_str(pstor[varname]).."]")
+		elseif tn == pstor_custom then
+			classname = reader:r_stringZ()
+			if classname == nil or classname == "" then
+				classname = varname
+				--pstor[varname] = nil
+			end
+			if pstor ~= nil then
+				if classname ~= "" and pstor_custom_impl[classname] then
+					pstor[varname] = pstor_custom_impl[classname]()	--!!!!TB3D
+					TB3D_Services.packet_alert("XR LOGIC: pstor custom["..utils.to_str(i).."]["..utils.to_str(varname).."] loading reader")
+					pstor[varname]:load(reader)
+				else
+					TB3D_Services.packet_alert("XR LOGIC: load all [classname or implementation invalid]")
+					pstor[varname] = nil
+				end
+			else
+				TB3D_Services.packet_alert("XR LOGIC: load all pstor = nil["..utils.to_str(obj:name()).."] ctr["..utils.to_str(ctr).."] idx["..utils.to_str(i).."]")
+			end
+		else
+			-- should not try to take off - just do not write the corrupted data
+			-- thus necessarily remove the variable itself - as a result of record
+			-- debris pstor alone her name can hang download
+			TB3D_Services.packet_alert("XR LOGIC: load all [type invalid]!!!!")
+			pstor[varname] = nil
+		end 
+		if bad_varname == true then
+			TB3D_Services.packet_alert("XR LOGIC: pstor varname["..utils.to_str(i).."]=["..utils.to_str(varname).."] tn["..utils.to_str(tn).."] removed")
+			pstor[varname] = nil
+		end
+	end
+	TB3D_Services.packet_alert("XR LOGIC: pstor loaded for ["..utils.to_str(obj:name()).."]")
+end
+
+function save_obj(obj, packet)
+	--TB3D_Services.packet_alert("BSTALK: save_obj["..Utils.to_str(obj:name()).."]")
+	local npc_id = obj:id()
+	local st = db.storage[npc_id]
+	--if TB3D_Modders.use_packet_message then
+		--TB3D_Services.packet_alert("XR LOGIC: Save Obj ["..utils.to_str(obj:name()).."]["..utils.to_str(st.loaded_ini_filename).."]["..utils.to_str(st.loaded_section_logic).."]["..utils.to_str(st.loaded_active_section).."]["..utils.to_str(st.loaded_active_scheme).."]["..utils.to_str(st.loaded_gulag_name).."]")
+	--end
+	if st.ini_filename then
+		packet:w_stringZ(st.ini_filename)
+	else
+		packet:w_stringZ("")
+	end
+	if st.section_logic then
+		packet:w_stringZ(st.section_logic)
+	else
+		packet:w_stringZ("")
+	end
+	if st.active_section then
+		packet:w_stringZ(st.active_section)
+	else
+		packet:w_stringZ("")
+	end
+	--if st.active_scheme then
+		--  packet:w_stringZ(st.active_scheme)
+	--else
+		--  packet:w_stringZ("")
+	--end
+	if st.gulag_name then
+		packet:w_stringZ(st.gulag_name)
+	else
+		packet:w_stringZ("")
+	end
+	--packet:w_s32(st.stype)
+	save_logic(obj, packet)
+	if st.active_scheme then
+		issue_event(obj, db.storage[npc_id][st.active_scheme], "save")
+	end
+	pstor_save_all(obj, packet)
+end
+
+function load_obj(obj, reader)
+	--TB3D_Services.packet_alert("BSTALK: load_obj["..Utils.to_str(obj:name()).."]")
+	local npc_id = obj:id()
+	local st = db.storage[npc_id]
+	local ini_filename = reader:r_stringZ()
+	if ini_filename == "" then
+		ini_filename = nil
+	end
+	local section_logic = reader:r_stringZ()
+	if section_logic == "" then
+		section_logic = nil
+	end
+	local active_section = reader:r_stringZ()
+	if active_section == "" then
+		-- In activate_by_section need to pass the string "nil", but not nil, so as not to activate any of the schemes.
+		-- The real active_section becomes equal nil.
+		active_section = "nil"
+	end
+	--local active_scheme = reader:r_stringZ()
+	--if active_scheme == "" then
+	--  active_scheme = nil
+	--end
+	local gulag_name = reader:r_stringZ()
+	if gulag_name == "" then
+		gulag_name = nil
+	end
+	--local stype = reader:r_s32()
+	st.loaded_ini_filename = ini_filename
+	st.loaded_section_logic = section_logic
+	st.loaded_active_section = active_section
+	--st.loaded_active_scheme = active_scheme
+	st.loaded_gulag_name = gulag_name
+	--st.loaded_stype = stype
+	--if TB3D_Modders.use_packet_message then
+		--local text = "XR LOGIC: Load Obj ["..utils.to_str(npc_id).."]["..utils.to_str(st.loaded_ini_filename).."]["..utils.to_str(st.loaded_section_logic).."]["..utils.to_str(st.loaded_active_section).."]["..utils.to_str(st.loaded_active_scheme).."]["..utils.to_str(st.loaded_gulag_name).."]"
+		--TB3D_Services.packet_alert(text)
+	--end
+	load_logic(obj, reader)
+	pstor_load_all(obj, reader)
+end
+
+function get_customdata_or_ini_file(npc, filename)
+	--  printf( "get_customdata_or_ini_file: filename=%s", filename )
+	if filename == "<customdata>" then
+		local ini = npc:spawn_ini()
+		if ini then
+			return ini
+		else
+			return ini_file([[scripts\dummy.ltx]])
+		end
+	elseif string_find( filename, "*" ) == 1 then
+		-- dynamic ltx
+		local p = string_find( filename, "*", 2 )
+		return gulag_tasks.loadLtx( string_sub(filename, 2, p-1), string_sub(filename, p+1) )
+	else
+		return ini_file(filename)
+	end
+end
+
+function initialize_obj(obj, st, loaded, actor, stype, inifile)
+	local is_report = false
+	if TB3D_Modders.use_logic_message or (TB3D_Modders.use_state_message and string_find(obj:name(), TB3D_Modders.npc_to_log)) then is_report = true end
+	if not loaded then
+		local ini_filename = inifile or "<customdata>"
+		if is_report then TB3D_Services.packet_alert("xrlogic: init obj, loading custom data["..utils.to_str(ini_filename).."]") end
+		local ini = get_customdata_or_ini_file(obj, ini_filename)
+		ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, "logic", nil)
+		local sect = xr_logic.determine_section_to_activate(obj, ini, "logic", actor)
+		xr_logic.activate_by_section(obj, ini, sect, false)
+	else
+		local ini_filename = st.loaded_ini_filename
+		if is_report then TB3D_Services.packet_alert("xrlogic: init obj, get custom data loaded["..utils.to_str(ini_filename).."]") end
+		if ini_filename then
+			local ini = get_customdata_or_ini_file(obj, ini_filename)
+			ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, st.loaded_section_logic, st.loaded_gulag_name)
+			--printf( "initialize_obj: loaded" )
+			xr_logic.activate_by_section(obj, ini, st.loaded_active_section, true)
+		end
+		--if st.active_scheme then
+			--issue_event(obj, db.storage[obj:id()][st.active_scheme], "load")
+		--end
+	end
+	if is_report then TB3D_Services.packet_alert("xrlogic  get custom data done") end
+end

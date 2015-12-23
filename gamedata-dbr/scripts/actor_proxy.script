@@ -1,0 +1,63 @@
+--TB3D 1.0.9.9.7.0 new 10/15/12, cleanup, debug
+function my_ver() return "1.0.9.9.7.0" end
+
+class "actor_proxy"
+
+function actor_proxy:__init()
+	self.initialized = false
+end
+
+function actor_proxy:init()
+	if not self.initialized then
+		self.online = false
+		self.actor = nil
+		self.alife = alife()
+		if self.alife then
+			self.actor_id = self.alife:actor().id
+			self.initialized = true
+		else
+			self.initialized = false
+		end
+	end
+end
+
+function actor_proxy:deinit()
+	if self.initialized then
+		self.alife = nil
+		self.actor = nil
+		self.initialized = false
+	end
+end
+
+function actor_proxy:id()
+	self:init()
+	return self.actor_id
+end
+
+function actor_proxy:has_info( name )
+	self:init()
+	has_alife_info(name)
+end
+
+function actor_proxy:dont_has_info( name )
+	self:init()
+	if self.online then
+		return not has_alife_info( name )
+	else
+		return not has_alife_info( self.actor_id, name )
+	end
+end
+
+function actor_proxy:net_spawn( obj )
+	self:init()
+	self.online = true
+	self.actor  = obj
+end
+
+function actor_proxy:net_destroy()
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("actor proxy: net destroy") end
+	self:deinit()
+	self.online = false
+	--self.actor  = nil
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("actor proxy: net destroy done") end
+end

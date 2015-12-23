@@ -1,0 +1,1942 @@
+;<!-- TB3D 1.0.9.9.7.7 added exit teleports, added wish granter and finish teleports, chgd mon_over,
+; added missing ";" aleks1970, red forest2, chgd wharehouses, dead_city, new levels, skip groups,silent lcs for monolit_send, skip to prip, skip_to_yan -->
+[simple]
+;x = x point to the level where Teleport
+;y = y point to the level where Teleport
+;z = z point to the level where Teleport
+;lv = levelVertexId at a level where Teleport
+;gv = GameVertexId at a level where Teleport
+;lname_for_LC = name of the game ex. 'l01_escape'
+;question = 1 = moves without the issue of "desire" to move to another location 0 = ask 
+;id = story_id Object number
+
+[finish]
+x=-259.61
+y=-13.98
+z=-187.48
+lv=6306
+gv=41
+lname_for_LC =l01_escape
+question=1
+id=1999995
+
+[escape] ;--triggers skip cave --948564
+x=-241.715
+y=-16.901
+z=-155.921
+lv=18736
+gv=47
+lname_for_LC =l01_escape
+question =0
+id =1999998
+
+[skip_to_mil] ;--triggers skip cave if not already done --948564 and completes to start of warehouses 109960
+x=-333.670
+y=-25.534
+z=45.360
+lv=16731
+gv=1546
+lname_for_LC =l07_military
+question =1
+id =1999991
+
+[skip_monolith] ; --completes monolith question 109960
+x=-45.249
+y=-4.016
+z=-30.234
+lv=4409
+gv=718
+lname_for_LC =l03u_agr_underground
+question =1
+id =1999990
+
+[skip_oso] ; --completes oso question 109960
+x=-26.143
+y=17.708
+z=266.950
+lv = 128979
+gv = 3411
+lname_for_LC = marsh
+question =1
+id =1999989
+
+[skip_to_sar] ; --completes through aes
+x=-28.598
+y=0.231
+z=46.638
+lv = 85
+gv = 2403
+lname_for_LC = l12u_sarcofag
+question =1
+id =1999988
+
+[skip_to_prip] ; --completes through radar
+x=34.865
+y=-2.266
+z=-290.554
+lv = 145458
+gv = 2269
+lname_for_LC = l11_pripyat
+question =1
+id =1999987
+
+[jupuncars]
+x=0.1635
+y=3.133
+z=-46.5
+lv=13277
+gv=3797
+lname_for_LC = jupiter_underground 
+question =1
+id =1999986
+
+[skip_to_yan] ;--triggers skip cave if not already done --948564 and completes to start of yanter 109977
+x=195.412
+y=5.878
+z=-245.030
+lv=136760
+gv=1459
+lname_for_LC =l08_yantar
+question =1
+id =1999985
+
+;-----------following use 1999999 to NOT trigger quest and to auto-remove on spawn
+[cordon]
+x=-259.61
+y=-13.98
+z=-187.48
+lv=6306
+gv=41
+lname_for_LC =l01_escape
+question =1
+id =1999999
+
+[agroprom]
+x=46.831
+y=2.498
+z=-10.833
+lv=284177
+gv=663
+lname_for_LC =l03_agroprom
+question =1
+id =1999999 ;--948567
+
+[agrounder]
+x=-38.525
+y=-4.053
+z=34.677
+lv=4809
+gv=714
+lname_for_LC =l03u_agr_underground
+question =0
+id =1999999 ;--948580
+
+[swamp]
+x=-174.2788848877
+y=1.8328202962875
+z=-272.23278808594
+lv=54747
+gv=3367
+lname_for_LC =marsh
+question =1
+id =1999999 ;--948568
+
+[radar]
+x=303.425
+y=-39.451
+z=-19.238
+lv=67298
+gv=1930
+lname_for_LC =l10_radar
+question =0
+id =1999999 ;--948569
+
+[radar2]
+x=33.110
+y=-3.379
+z=-38.401
+lv=21245
+gv=1997
+lname_for_LC =l10_radar
+question =0
+id =1999999 ;--948569
+
+[yantar]
+x=35.860
+y=-5.943
+z=-271.664
+lv=56791
+gv=1480
+lname_for_LC =l08_yantar
+question =0
+id =1999999 ;--948570
+
+[warehouses]
+x=-72.921
+y=-17.784
+z=250.499
+lv=239765
+gv=1735
+lname_for_LC =l07_military
+question =1
+id =1999999 ;--948571
+
+[bar]
+x=154.141
+y=4.945
+z=71.167
+lv=40793
+gv=1180
+lname_for_LC =l05_bar
+question =1
+id =1999999 ;--948572
+
+[village]
+x=18.268
+y=13.997
+z=24.360
+lv=18864
+gv=3330
+lname_for_LC =lost_village
+question =0
+id =1999999 ;--948573
+
+[warentrance]
+x=2.434
+y=9.262
+z=22.468
+lv=4832
+gv=3210
+lname_for_LC =warlab
+question =0
+id =1999999 ;--948574
+
+[warbrain]
+x=19.128
+y=-3.151
+z=1.289
+lv=7162
+gv=3217
+lname_for_LC =warlab
+question =0
+id =1999999 ;--948578
+
+[redforest]
+x=-10.439
+y=0.337
+z=-408.054
+lv=58916
+gv=3280
+lname_for_LC =red_forest
+question =0
+id =1999999 ;--948575
+
+[redforest_2]
+x=-178.320
+y=2.270
+z=-30.378
+lv=3403
+gv=3240
+lname_for_LC =red_forest
+question =0
+id =1999999 ;--948575
+
+[limeast]
+x=8.732
+y=-0.010
+z=-379.519
+lv=59505
+gv=3006
+lname_for_LC =limansk
+question =0
+id =1999999 ;--948576
+
+[limcentral]
+x=12.097
+y=10.899
+z=152.836
+lv=32314
+gv=3010
+lname_for_LC =limansk
+question =0
+id =1999999 ;--948577
+
+[garbage]
+x=-59.719
+y=2.061
+z=-26.087
+lv=133973
+gv=322
+lname_for_LC =l02_Garbage
+question =1
+id =1999999 ;--948579
+
+[atp]
+x=-169.230
+y=4.267
+z=226.008
+lv=131823
+gv=2799
+lname_for_LC =atp_for_test22
+question =0
+id =1999999 ;--948581
+
+[dvalley]
+x=29.130
+y=3.593
+z=-5.468
+lv=210376
+gv=1029
+lname_for_LC =l04_darkvalley
+question =1
+id =1999999 ;--948582
+
+[x18]
+x=-7.547
+y=9.318
+z=-8.604
+lv=1818
+gv=1110
+lname_for_LC =l04u_LabX18
+question =0
+id =1999999 ;--948583
+
+[rostok]
+x=-88.691
+y=4.078
+z=144.180
+lv=46736
+gv=1421
+lname_for_LC =l06_rostok
+question =0
+id =1999999 ;--948584
+
+[x16]
+x=-44.226
+y=19.179
+z=4.407
+lv=2440
+gv=1530
+lname_for_LC =l08u_brainlab
+question =0
+id =1999999 ;--948585
+
+[caveminers]
+x=-185.998
+y=-2.388
+z=-60.586
+lv=731
+gv=2863
+lname_for_LC =peshera
+question =0
+id =1999999 ;--948586
+
+[recon]
+x=-371.762
+y=3.808
+z=62.485
+lv=229499
+gv=2889
+lname_for_LC =aver
+question =0
+id =1999999 ;--948588
+
+[x10]
+x=0.056
+y=-7.456
+z=-79.291
+lv=5829
+gv=2661
+lname_for_LC = l10u_bunker 
+question =0
+id =1999999 ;--948589
+
+[pripchurch]
+x=-3.064
+y=-4.263
+z=191.348
+lv=96166
+gv=2195
+lname_for_LC = l11_pripyat 
+question =0
+id =1999999 ;--948590
+
+[hosp]
+x=-84.544
+y=32.017
+z=747.682
+lv=4253
+gv=3052
+lname_for_LC = hospital   
+question =0
+id =1999999 ;--948591
+
+[ffent]
+x=-199.250
+y=-3.313
+z=207.123
+lv=29984
+gv=2881
+lname_for_LC = puzir   
+question =0
+id =1999999 ;--948592
+
+[ffcross]
+x=-39.109
+y=-0.042
+z=-142.570
+lv=155990
+gv=2882
+lname_for_LC = puzir   
+question =0
+id =1999999 ;--948593
+
+[gennorth]
+x=178.914
+y=25.751
+z=-99.129
+lv=543882
+gv=3144
+lname_for_LC = generators   
+question =0
+id =1999999 ;--948594
+
+[gencamp]
+x=-134.807
+y=44.783
+z=-490.975
+lv=180039
+gv=3152
+lname_for_LC = generators  
+question =0
+id =1999999 ;--948595
+
+[genstronghold]
+x=172.668
+y=35.335
+z=-491.567
+lv=536236
+gv=3138
+lname_for_LC = generators  
+question =1
+id =1999999 ;--948596
+
+[labry1]
+x=-354.456
+y=96.030
+z=142.236
+lv=16621
+gv=2915
+lname_for_LC = av_peshera  
+question =0
+id =1999999 ;--948597
+
+[labry2]
+x=-293.358
+y=61.688
+z=117.874
+lv=54086
+gv=2938
+lname_for_LC = av_peshera  
+question =0
+id =1999999 ;--948598
+
+[npp1bridge]
+x=919.090
+y=-0.001
+z=-292.599
+lv=404957
+gv=2401
+lname_for_LC = l12_stancia
+question =0
+id =1999999 ;--948599
+
+[npp1control]
+x=395.808
+y=-0.004
+z=1.887
+lv=172744
+gv=2383
+lname_for_LC = l12_stancia
+question =0
+id =1999999 ;--948600
+
+[npp2exit]
+x=1.410
+y=5.144
+z=68.756
+lv=24841
+gv=2659
+lname_for_LC = l12_stancia_2
+question =0
+id =1999999 ;--948605
+
+[npp2roof]
+x=875.972
+y=15.095
+z=109.854
+lv=228107
+gv=2635
+lname_for_LC = l12_stancia_2
+question =0
+id =1999999 ;--948606
+
+[npp2monolith]
+x=30.098
+y=55.187
+z=32.100
+lv=6282
+gv=2417
+lname_for_LC = l12u_sarcofag
+question =0
+id =1999999 ;--948602
+
+[npp2x8]
+x=54.218
+y=16.832
+z=30.841
+lv=9177
+gv=2462
+lname_for_LC = l12u_sarcofag
+question =0
+id =1999999 ;--948603
+
+[npp2control]
+x=-10.326
+y=-34.411
+z=33.167
+lv=1484
+gv=2482
+lname_for_LC = l12u_control_monolith
+question =0
+id =1999999 ;--948604
+
+[dcity]
+x=131.811
+y=1.228
+z=-122.618
+lv=472299
+gv=3654
+lname_for_LC = dead_city
+question =0
+id = 1999999 ;--948607
+
+[dcity2]		;--by lima lc
+x=-219.105
+y=-4.913
+z=305.173
+lv=118500
+gv=3593
+lname_for_LC = dead_city
+question =0
+id = 1999999 ;--948607
+
+[zaton]		;--below radar complex
+x=-295.967
+y=2.667
+z=2.658
+lv=548685
+gv=3693
+lname_for_LC = zaton
+question =0
+id = 1999999 ;--948607
+
+[zatcave]
+x=-152.790
+y=-16.191
+z=-176.779
+lv=641423
+gv=3673
+lname_for_LC = zaton
+question =0
+id = 1999999 ;--948608
+
+[zatbridge]		
+x=430.440
+y=33.253
+z=-139.953
+lv=1672089
+gv=3693
+lname_for_LC = zaton
+question =0
+id = 1999999 ;--948609
+
+[zatship]		
+x=138.896		;-- 126.021
+y=-7.341		;-- -7.272
+z=182.635		;-- 175.431
+lv=1203776		;-- 1182876
+gv=3686			;-- 3686
+lname_for_LC = zaton
+question =0
+id = 1999999 ;--948610
+
+[zatgun]
+x=-421.399
+y=35.801
+z=-345.854
+lv=152039
+gv=3664
+lname_for_LC = zaton
+question =0
+id = 1999999 ;--948611
+
+[jupstation]
+x=-49.357
+y=-0.620
+z=198.186
+lv=636193
+gv=3717
+lname_for_LC = jupiter
+question =0
+id = 1999999 ;--948612
+
+[jupcomplex]	
+x=-365.061
+y=2.638
+z=-4.796
+lv=97932
+gv=3708
+lname_for_LC = jupiter
+question =0
+id = 1999999 ;--948613
+
+[jupsump]	
+x=234.011
+y=16.368
+z=-280.807
+lv=1115258
+gv=3735
+lname_for_LC = jupiter
+question =0
+id = 1999999 ;--948614
+
+[jupshop]
+x=360.582
+y=37.949
+z=334.637
+lv=1289173
+gv=3746
+lname_for_LC = jupiter
+question =0
+id = 1999999 ;--948615
+
+[pripshop]
+x=-185.699
+y=3.794
+z=-358.879
+lv=31142
+gv=3753
+lname_for_LC = pripyat
+question =0
+id = 1999999 ;--948616
+
+[pripstation]
+x=143.940
+y=2.367
+z=-194.718
+lv=375710
+gv=3765
+lname_for_LC = pripyat
+question =0
+id = 1999999 ;--948617
+
+[priproof]
+x=-68.218
+y=25.100
+z=105.396
+lv=121776
+gv=3755
+lname_for_LC = pripyat
+question =0
+id = 1999999 ;--948618
+
+[pripdock]
+x=275.026
+y=18.781
+z=311.023
+lv=468653
+gv=3769
+lname_for_LC = pripyat
+question =0
+id = 1999999 ;--948619
+
+[jupunelevator]
+x=-41.791
+y=8.036
+z=444.053
+lv=1920
+gv=3772
+lname_for_LC = jupiter_underground
+question =0
+id = 1999999 ;--948620
+
+[jupunbooth]
+x=27.136
+y=11.472
+z=-0.093
+lv=39736
+gv=3808
+lname_for_LC = jupiter_underground
+question =0
+id = 1999999 ;--948621
+
+[jupunladder]
+x=82.611
+y=4.520
+z=-233.867
+lv=40798
+gv=3828
+lname_for_LC = jupiter_underground
+question =0
+id = 1999999 ;--948622
+
+;------------  New levels by dAVROs 13 Aug 2011
+[priphosp]
+x=129.6533
+y=-2.9379
+z=75.3183
+lv=351892
+gv=3762
+lname_for_LC = pripyat 
+question =1
+id =1999999
+
+[zatlost]
+x=599.786683
+y=18.9171582
+z=-330.438507
+lv=1846608
+gv=3699
+lname_for_LC = zaton
+question =1
+id =1999997
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EXIT OBJECTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[exit_as]
+x=-317.23675537109
+y=-26.327833175659
+z=55.278633117676
+lv=28719
+gv=1758
+lname_for_LC = l07_military
+id = 1999999 ;--9803
+question=1
+;view = {0.0,0.0,0.0}
+
+[exit_as2]
+x=-274.62121582031
+y=-27.297189712524
+z=239.00979614258
+lv = 66343
+gv = 1786
+id = 1999999 ;--9814
+lname_for_LC = l07_military
+question=1
+;view = {0.0,0.0,0.0}
+
+[exit_as3]
+x=-33.368682861328
+y=-20.897382736206
+z=379.58074951172
+id = 1999999 ;--9815
+lv = 273147
+gv = 1821
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l07_military
+
+[exit_as4]
+x=-243.89454650879
+y=-0.28634393215179
+z=435.28894042969
+id = 1999999 ;--9816
+lv = 83694
+gv = 1852
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l07_military
+
+[exit_bunker]
+x=8.3457946777344
+y=-23.525426864624
+z=19.003190994263
+id = 1999999 ;--9801
+lv = 7807
+gv = 2773
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l10u_bunker
+
+[exit_svalka]
+x=-77.325019836426
+y=-3.660080909729
+z=195.34251403809
+id = 1999999 ;--9802
+lv = 127101
+gv = 351
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka2]
+x=-289.04534912109
+y=-6.6783475875854
+z=-178.82406616211
+id = 1999999 ;--9822
+lv = 1201
+gv = 260
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka3]
+x=200.77691650391
+y=-0.638019323349
+z=-145.20561218262
+id = 1999999 ;--9823
+lv = 344517
+gv = 401
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka4]
+x=122.61166381836
+y=-4.2376079559326
+z=153.47959899902
+id = 1999999 ;--9861
+lv = 284570
+gv = 374
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka5]
+x=173.82795715332
+y=-0.30577194690704
+z=51.149074554443
+id = 1999999 ;--9862
+lv = 324917
+gv = 384
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka6]
+x=97.819366455078
+y=15.575645446777
+z=31.107891082764
+id = 1999999 ;--9863
+lv = 311456
+gv = 385
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka7]
+x=-49.738338470459
+y=20.034204483032
+z=115.88290405273
+id = 1999999 ;--9864
+lv = 166216
+gv = 332
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka8]
+x=-277.18438720703
+y=0.42264106869698
+z=26.608871459961
+id = 1999999 ;--9865
+lv = 2848
+gv = 314
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka9]
+x=-204.31503295898
+y=0.77477610111237
+z=-14.08620929718
+id = 1999999 ;--9866
+lv = 27161
+gv = 308
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka10]
+x=-43.285057067871
+y=22.38338470459
+z=-109.06379699707
+id = 1999999 ;--9867
+lv = 117566
+gv = 299
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka11]
+x=-82.571281433105
+y=-2.6017231941223
+z=-208.38046264648
+id = 1999999 ;--9868
+lv = 123627
+gv = 268
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_svalka12]
+x=108.47253417969
+y=-2.2334003448486
+z=-264.66119384766
+id = 1999999 ;--9869
+lv = 272734
+gv = 263
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l02_garbage
+
+[exit_pripyat]
+x=190.84159851074
+y=2.8052725791931
+z=212.05661010742
+id = 1999999 ;--9804
+lv = 260478
+gv = 2219
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l11_pripyat
+
+[exit_pripyat2]
+x=-112.93630981445
+y=2.8031325340271
+z=97.108512878418
+id = 1999999 ;--9820
+lv = 7817
+gv = 2216
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l11_pripyat
+
+[exit_x18]
+x=5.0796270370483
+y=-12.429841995239
+z=15.65408706665
+id = 1999999 ;--9805
+lv = 4086
+gv = 1155
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l04u_labx18
+
+[exit_td]
+x=31.025503158569
+y=-2.9186296463013
+z=-18.474792480469
+id = 1999999 ;--9824
+lv = 212105
+gv = 1025
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l04_darkvalley
+
+[exit_td2]
+x=177.20614624023
+y=6.6501698493958
+z=-368.2509765625
+id = 1999999 ;--9825
+lv = 377579
+gv = 938
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l04_darkvalley
+
+[exit_kordon]
+x=288.75579833984
+y=6.6381821632385
+z=334.9274597168
+id = 1999999 ;--9826
+lv = 557888
+gv = 245
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon2]
+x=-56.72008895874
+y=-29.649417877197
+z=-352.75286865234
+id = 1999999 ;--9827
+lv = 220208
+gv = 16
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon3]
+x=33.526428222656
+y=4.8442959785461
+z=406.35510253906
+id = 1999999 ;--9848
+lv = 314641
+gv = 198
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon4]
+x=43.707790374756
+y=1.604367017746
+z=157.83784484863
+id = 1999999 ;--9849
+lv = 326234
+gv = 97
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon5]
+x=59.635650634766
+y=19.672622680664
+z=156.50126647949
+id = 1999999 ;--9850
+lv = 346954
+gv = 97
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon6]
+x=176.90881347656
+y=6.2265067100525
+z=274.12582397461
+id = 1999999 ;--9851
+lv = 479316
+gv = 242
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon7]
+x=116.21976470947
+y=-7.5939545631409
+z=-16.879535675049
+id = 1999999 ;--9852
+lv = 418761
+gv = 115
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon8]
+x=-178.17098999023
+y=-29.790063858032
+z=-355.4208984375
+id = 1999999 ;--9853
+lv = 71846
+gv = 30
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon9]
+x=-138.1682434082
+y=-25.440311431885
+z=-356.09561157227
+id = 1999999 ;--9854
+lv = 116591
+gv = 19
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon10]
+x=-206.31811523438
+y=-36.486312866211
+z=-275.36505126953
+id = 1999999 ;--9855
+lv = 46406
+gv = 38
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon11]
+x=-218.33445739746
+y=-19.930738449097
+z=-167.60050964355
+id = 1999999 ;--9856
+lv = 34087
+gv = 47
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon12]
+x=-207.27334594727
+y=-22.535316467285
+z=-128.54507446289
+id = 1999999 ;--9857
+lv = 45951
+gv = 58
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon13]
+x=-246.82745361328
+y=-14.313711166382
+z=-17.025833129883
+id = 1999999 ;--9858
+lv = 11502
+gv = 67
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon14]
+x=-112.90689849854
+y=-8.191520690918
+z=7.4986095428467
+id = 1999999 ;--9859
+lv = 143574
+gv = 73
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_kordon15]
+x=-1.5780007839203
+y=-17.687986373901
+z=-152.26568603516
+id = 1999999 ;--9860
+lv = 274973
+gv = 108
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_radar]
+x=351.03564453125
+y=-45.688995361328
+z=-201.36804199219
+id = 1999999 ;--9806
+lv = 93230
+gv = 2081
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l10_radar
+
+[exit_radar2]
+x=304.68270874023
+y=-39.390411376953
+z=-25.789834976196
+id = 1999999 ;--9811
+lv = 67978
+gv = 1930
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l10_radar
+
+[exit_radar3]
+x=14.053562164307
+y=-1.2424700260162
+z=41.381050109863
+id = 1999999 ;--9812
+lv = 14611
+gv = 2013
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l10_radar
+
+[exit_radar4]
+x=-12.000325202942
+y=0.37741497159004
+z=-67.812171936035
+id = 1999999 ;--9813
+lv = 6439
+gv = 1960
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l10_radar
+
+[exit_undergraund]
+x=-84.987205505371
+y=-16.462963104248
+z=-60.738975524902
+id = 1999999 ;--9810
+lv = 2505
+gv = 745
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l03_agr_underground
+
+[exit_bar]
+x=193.61143493652
+y=0.097166806459427
+z=71.526657104492
+id = 1999999 ;--9821
+lv = 45474
+gv = 1188
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l05_bar
+
+[exit_bar2]
+x=175.31533813477
+y=-0.0002819299697876
+z=145.91943359375
+id = 1999999 ;--9842
+lv = 39883
+gv = 1204
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l05_bar
+
+[exit_bar3]
+x=198.24176025391
+y=3.271665096283
+z=-77.252685546875
+id = 1999999 ;--9843
+lv = 47206
+gv = 1270
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l05_bar
+
+[exit_bar4]
+x=232.64491271973
+y=5.1447978019714
+z=-113.61502838135
+id = 1999999 ;--9844
+lv = 59366
+gv = 1277
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l05_bar
+
+[exit_bar5]
+x=276.64755249023
+y=0.055086404085159
+z=-66.742523193359
+id = 1999999 ;--9845
+lv = 68763
+gv = 1274
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l05_bar
+
+[exit_bar6]
+x=128.80438232422
+y=-4.8249382972717
+z=16.76756477356
+id = 1999999 ;--9846
+lv = 35860
+gv = 1238
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l05_bar
+
+[exit_bar7]
+x=116.09830474854
+y=-5.3052234649658
+z=12.649393081665
+id = 1999999 ;--9847
+lv = 33903
+gv = 1239
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l05_bar
+
+[exit_agroprom]
+x=253.95002746582
+y=-0.20055566728115
+z=76.619018554688
+id = 1999999 ;--9828
+lv = 428448
+gv = 498
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l03_agroprom
+
+[exit_agroprom2]
+x=-122.60626983643
+y=10.350003242493
+z=164.23361206055
+id = 1999999 ;--9829
+lv = 117939
+gv = 523
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l03_agroprom
+
+[exit_agroprom3]
+x=-135.0357208252
+y=4.9933753013611
+z=-196.9232635498
+id = 1999999 ;--9830
+lv = 103987
+gv = 621
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l03_agroprom
+
+[exit_yantar1]
+x=-98.555587768555
+y=-12.03422164917
+z=-263.20428466797
+id = 1999999 ;--9831
+lv = 6635
+gv = 1486
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar2]
+x=-49.516319274902
+y=-12.687213897705
+z=-263.55654907227
+id = 1999999 ;--9832
+lv = 22009
+gv = 1454
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar3]
+x=87.165092468262
+y=1.5326626300812
+z=-137.15473937988
+id = 1999999 ;--9833
+lv = 85543
+gv = 1440
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar4]
+x=110.79859924316
+y=0.51710104942322
+z=67.085777282715
+id = 1999999 ;--9834
+lv = 98895
+gv = 1520
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar5]
+x=102.05886077881
+y=-0.055661827325821
+z=-38.264953613281
+id = 1999999 ;--9835
+lv = 93237
+gv = 1515
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar6]
+x=23.551870346069
+y=-3.417268037796
+z=-50.092147827148
+id = 1999999 ;--9836
+lv = 50739
+gv = 1505
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar7]
+x=35.566432952881
+y=0.036594957113266
+z=19.930288314819
+id = 1999999 ;--9837
+lv = 57034
+gv = 1445
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar8]
+x=90.726051330566
+y=0.028770864009857
+z=-2.0428421497345
+id = 1999999 ;--9838
+lv = 87168
+gv = 1514
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar9]
+x=-2.272828578949
+y=0.31553617119789
+z=-12.611492156982
+id = 1999999 ;--9839
+lv = 38250
+gv = 1525
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar10]
+x=0.41521853208542
+y=20.732145309448
+z=-11.2778673172
+id = 1999999 ;--9840
+lv = 39736
+gv = 1525
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_yantar11]
+x=28.687835693359
+y=-5.943422794342
+z=-272.9033203125
+id = 1999999 ;--9841
+lv = 53157
+gv = 1480
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l08_yantar
+
+[exit_dt1]
+x=-236.99816894531
+y=9.3585262298584
+z=56.257476806641
+id = 1999999 ;--9870
+lv = 15216
+gv = 1391
+question=1
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt2]
+x=-254.47462463379
+y=-5.8917918205261
+z=88.748420715332
+id = 1999999 ;--9871
+lv = 8119
+gv = 1382
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt3]
+x=-268.44509887695
+y=-6.0012273788452
+z=106.45835113525
+id = 1999999 ;--9872
+lv = 4658
+gv = 1379
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt4]
+x=-282.68493652344
+y=-0.0055593848228455
+z=203.75721740723
+id = 1999999 ;--9873
+lv = 7269
+gv = 1338
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt5]
+x=-173.43870544434
+y=-0.0011672079563141
+z=192.25354003906
+id = 1999999 ;--9874
+lv = 32043
+gv = 1329
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt6]
+x=-149.55770874023
+y=0.096051603555679
+z=179.93653869629
+id = 1999999 ;--9875
+lv = 38957
+gv = 1328
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt7]
+x=-217.82315063477
+y=1.935809969902
+z=88.06103515625
+id = 1999999 ;--9876
+lv = 22437
+gv = 1370
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt8]
+x=-169.39688110352
+y=-0.0033434927463531
+z=82.040466308594
+id = 1999999 ;--9877
+lv = 32382
+gv = 1322
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt9]
+x=-159.36485290527
+y=-0.0026704967021942
+z=99.839752197266
+id = 1999999 ;--9878
+lv = 36070
+gv = 1321
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt10]
+x=-192.9693145752
+y=-0.0026823878288269
+z=119.04988098145
+id = 1999999 ;--9879
+lv = 27318
+gv = 1326
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_dt11]
+x=-89.581573486328
+y=3.1074571609497
+z=148.33610534668
+id = 1999999 ;--9880
+lv = 46578
+gv = 1421
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l06_rostok
+
+[exit_peshera]
+x=-0.06784837692976
+y=-2.0694215297699
+z=-12.294366836548
+id = 1999999	;--17005
+lv = 32280
+gv = 2880
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = peshera
+
+[exit_peshera1]
+x=-241.71829223633
+y=-16.903062820435
+z=-155.92127990723
+id = 1999999	;--17006
+lv = 18736
+gv = 47
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l01_escape
+
+[exit_to_stancia21]
+x=210.38436889648
+y=79.390335083008
+z=120.03535461426
+id = 1999999 ;--8955
+lv = 76262
+gv = 2573
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l12_stancia_2
+
+[exit_as21]
+x=-274.62121582031
+y=-27.297189712524
+z=239.00979614258
+id = 1999999 ;--17007
+lv = 66343
+gv = 1786
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l07_military
+
+[Limbasement]	;added by Collector 12/05/11
+x=-45.692
+y=-6.353
+z=-153.468
+id = 1999999 ;--17007
+lv = 4340
+gv = 2993
+question=0 
+;view = {0.0,0.0,0.0}
+lname_for_LC = limansk
+
+
+
+
+[exit_redf_htd]
+x=-156.08173
+y=6.331574
+z=-234.7
+id = 1999999 ;--17007
+lv = 2502
+gv = 3233
+question=0 
+;view = {0.0,0.0,0.0}
+lname_for_LC = red_forest
+
+[exit_nppt_htd]
+x=472.54
+y=41.73
+z=401.208
+id = 1999999 ;--17007
+lv = 155967
+gv = 2616
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = l12_stancia_2
+
+[exit_limk_htd]
+x=-72.276
+y=-4.9785
+z=-160.271
+id = 1999999 ;--17007
+lv = 3242
+gv = 2993
+question=0 
+;view = {0.0,0.0,0.0}
+lname_for_LC = limansk
+
+;;;;; added 10991, chgd 10992
+[mon_over]
+x=-45.249
+y=-4.016
+z=-30.234
+lv=4409
+gv=718
+lname_for_LC =l03u_agr_underground
+question =1
+id =1999996 ;--948580
+
+[joined]
+x=-259.61
+y=-13.98
+z=-187.48
+lv=6306
+gv=41
+lname_for_LC =l01_escape
+question =1
+id =1999994 ;--948600
+
+[refused]
+x=1.410
+y=5.144
+z=68.756
+lv=24841
+gv=2659
+lname_for_LC = l12_stancia_2
+question =1
+id =1999993 ;--948573
+
+[npp_final]
+x=932.447
+y=5.998
+z=163.809
+lv=240846
+gv=2637
+lname_for_LC =l12_stancia_2
+question =1
+id =1999999
+
+[npp_chaes_exit]
+x=-26.143
+y=17.708
+z=266.950
+lv = 128979
+gv = 3411
+question=1 
+;view = {0.0,0.0,0.0}
+lname_for_LC = marsh
+id = 1999992 ;--17007
+
+;;;;;;;;;;;;;;;;;;new 109940
+[x10_2]  ;;; room with the antenna switch ; aleks1970
+x=-6.644 ;1.418 ;5.523
+y=-34.255 ;-19.454 ;-19.457
+z=28.049 ;25.276 ;36.482
+lv=4257 ;6409 ;7373
+gv=2777 ;2768 ;2764
+lname_for_LC = l10u_bunker 
+question =0
+id =1999999 ;--948589
+
+[techniques]
+x=26
+y=6
+z=-627
+lv=247089
+gv=4865
+lname_for_LC =promzone
+question =1
+id =1999999
+
+[waitingroom1]
+x=-574.550
+y=18.690
+z=423.143
+lv=68699
+gv=3877
+lname_for_LC =predbannik
+question =1
+id =1999999
+
+[waitingroom2]							;;;east tunnel, may use as lc to southern tunnels
+x=164.267
+y=8.560
+z=-24.652
+lv=1200802
+gv=4028
+lname_for_LC =predbannik
+question =1
+id =1999999
+
+[darkscape1]					;nw corner (from dark valley)
+x=-405
+y=1.20000004768372
+z=623
+lv=47616
+gv=4600
+lname_for_LC =k01_darkscape
+question =1
+id =1999999
+
+[darkscape2]				;se tunnels (from waiting room)
+x=514.621
+y=-1.558
+z=-418.053
+lv=986197
+gv=4647
+lname_for_LC =k01_darkscape
+question =1
+id =1999999
+
+[deadmarsh]
+x=281
+y=6.90000009536743
+z=67
+lv=1758463
+gv=4398
+lname_for_LC =swamp_old
+question =1
+id =1999999
+
+[brokenroad]
+x=26
+y=3
+z=305
+lv=506136
+gv=4487
+lname_for_LC =hiding_road
+question =1
+id =1999999
+
+[wasted1]
+x=-113
+y=-1.10000002384186
+z=414
+lv=267438
+gv=4658
+lname_for_LC =dark_forest
+question =1
+id =1999999
+
+[wasted2]					;east lc location
+x=435.389
+y=7.830
+z=-432.056
+lv=1568340
+gv=4666
+lname_for_LC =dark_forest
+question =1
+id =1999999
+
+[f1]
+x=266.748
+y=29.763
+z=48.759
+lv=577182
+gv=4679
+lname_for_LC =level_f-1
+question =1
+id =1999999
+
+[research1]
+x=276
+y=5.5
+z=-264
+lv=592876
+gv=4384
+lname_for_LC =yantar_old
+question =1
+id =1999999
+
+[research2]							;location for rsrch to jup and jup to rsrch
+x=-236.279
+y=18.617
+z=114.468
+lv=30617
+gv=4345
+lname_for_LC =yantar_old
+question =1
+id =1999999
+
+[tunnels]							;southern underground
+x=80.621
+y=-20.402
+z=-181.018
+lv=1537
+gv=3868
+lname_for_LC =cs_agroprom_underground
+question =1
+id =1999999
+
+[secretlab]							;northern underground
+x=-2
+y=-34.5
+z=-8
+lv=1783
+gv=5374
+lname_for_LC =lab_x14
+question =1
+id =1999999
+
+[diggerstash]						;hole in the ground  (small place to hide)
+x=-22
+y=-1.5
+z=5
+lv=23
+gv=5345
+lname_for_LC =digger_stash
+question =1
+id =1999999
+
+[distribution]
+x=22
+y=1.5
+z=-69
+lv=39983
+gv=5246
+lname_for_LC =l01_krasivay
+question =1
+id =1999999
+
+[courtyards]
+x=156
+y=5
+z=46
+lv=37661
+gv=5283
+lname_for_LC =l02_dd
+question =1
+id =1999999
+
+[blackmarket]
+x=-20
+y=0.899999976158142
+z=37
+lv=8356
+gv=5308
+lname_for_LC =l03_rinok
+question =1
+id =1999999
+
+[cemetery]
+x=1.39999997615814
+y=0.00999999977648258
+z=-133
+lv=21173
+gv=5334
+lname_for_LC =l04_pogost
+question =1
+id =1999999
+
+[endstation]
+x=113.401
+y=-6.249
+z=64.353
+lv=20783
+gv=5340
+lname_for_LC =l05_vokzal
+question =1
+id =1999999
+
+[firingrange]
+x=-125.465
+y=-9.138
+z=89.590
+lv=78564
+gv=5390
+lname_for_LC =l01_poligon
+question =1
+id =1999999
+
+;[hiddenlab]							;central underground
+;x=24
+;y=-34.4000015258789
+;z=13
+;lv=2932
+;gv=5381
+;lname_for_LC =collector22
+;question =1
+;id =1999999
+
+;[deadcity]
+;x=-61
+;y=1.10000002384186
+;z=-235
+;lv=245795
+;gv=5159
+;lname_for_LC =deadcity
+;question =1
+;id =1999999
+
+[labx8]
+x=-73.839
+y=-23.856
+z=64.036
+lv=4568
+gv=3845
+lname_for_LC =labx8
+question =1
+id =1999999
+
+[f1_floating_island]	--f1 floating island from wr
+x=-148.854
+y=22.100
+z=179.106
+lv=130405
+gv=4680
+lname_for_LC =level_f-1
+question =1
+id =1999999
+
+[tunnels2]				--empty room down hole
+x=101.578
+y=-19.461
+z=11.304
+lv=2530
+gv=3867
+lname_for_LC =cs_agroprom_underground
+question =1
+id =1999999

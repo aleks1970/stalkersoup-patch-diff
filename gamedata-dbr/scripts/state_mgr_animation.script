@@ -1,0 +1,693 @@
+--TB3D 1.0.9.9.7.0 hit styles, callback hit, bones, state_mgr_animation_list.animations
+function my_ver() return "1.0.9.9.7.0" end
+
+local anima=0
+local tmp_table = {}
+--local k,v = 0,0
+
+--' Character animation
+--' we are in need of state?
+class "eva_state_mgr_animation" (property_evaluator)
+function eva_state_mgr_animation:__init(name, st) super (nil, name)
+	self.st = st
+end
+function eva_state_mgr_animation:evaluate()
+	if self.st.callback ~= nil and
+		self.st.callback.func ~= nil and
+		state_lib.states[self.st.target_state].animation == nil and
+		self.st.callback.begin == nil
+	then
+		--printf("animation false")
+		return false
+	end
+
+	return state_lib.states[self.st.target_state].animation == self.st.animation:state()
+end
+--' Do we really need to win back twisted animation
+class "eva_state_mgr_animation_play" (property_evaluator)
+function eva_state_mgr_animation_play:__init(name, st) super (nil, name)
+	self.st = st
+end
+function eva_state_mgr_animation_play:evaluate()
+	return state_lib.states[self.st.target_state].animation ~= nil
+end
+--' Wins back if we are perverted animations
+class "eva_state_mgr_animation_play_now" (property_evaluator)
+function eva_state_mgr_animation_play_now:__init(name, st) super (nil, name)
+	self.st = st
+end
+function eva_state_mgr_animation_play_now:evaluate()
+	return self.st.animation:state() ~= "_wait" and self.st.animation:state() ~= nil
+end
+--' Do we really need do not win back the animation
+class "eva_state_mgr_animation_none" (property_evaluator)
+function eva_state_mgr_animation_none:__init(name, st) super (nil, name)
+	self.st = st
+end
+function eva_state_mgr_animation_none:evaluate()
+	return state_lib.states[self.st.target_state].animation == nil
+end
+--' we are no longer wins back any perverted animations
+class "eva_state_mgr_animation_none_now" (property_evaluator)
+function eva_state_mgr_animation_none_now:__init(name, st) super (nil, name)
+	self.st = st
+end
+function eva_state_mgr_animation_none_now:evaluate()
+	return self.st.animation:state() == nil
+end
+--' Do I need an extra circuit reset
+class "eva_state_mgr_animation_reset" (property_evaluator)
+function eva_state_mgr_animation_reset:__init(name, st) super (nil, name)
+	self.st = st
+end
+function eva_state_mgr_animation_reset:evaluate()
+	--printf("reset state [%s]", utils.to_str(self.st.reset_state))
+	--printf("state [%s]", utils.to_str(state_lib.states[target_state]))
+--//	if state_lib.states[target_state] ~= nil then
+--//		--printf("state reset [%s]", utils.to_str(state_lib.states[target_state].reset))
+--//	end
+
+	if self.st.callback ~= nil and
+		self.st.callback.func ~= nil and
+		state_lib.states[self.st.target_state].animation == nil and
+		self.st.callback.begin == nil
+	then
+		return true
+	end
+	
+	return self.st.reset_state == true and
+		   state_lib.states[self.st.target_state] ~= nil and
+		   self.st.current_state == self.st.target_state and
+		   state_lib.states[self.st.target_state].reset == true	
+end
+--' locked if the scheme
+class "eva_state_mgr_animation_locked" (property_evaluator)
+function eva_state_mgr_animation_locked:__init(name, st) super (nil, name)
+	self.st = st
+end
+function eva_state_mgr_animation_locked:evaluate()
+--	printf("animstate %s", utils.to_str(self.st.animation:state()))
+	return self.st.animation:state() == "_wait" or
+		   self.st.animation:state() == "_new"
+end
+
+
+--' Playing the input animation
+class "act_state_mgr_animation_start" (action_base)
+function act_state_mgr_animation_start:__init(name, st) super (nil, name)
+	self.st = st
+end
+function act_state_mgr_animation_start:initialize()
+	action_base.initialize(self)
+	self.st.animation:set_state(state_lib.states[self.st.target_state].animation)
+end
+function act_state_mgr_animation_start:execute()
+	action_base.execute(self)
+end
+function act_state_mgr_animation_start:finalize()
+	action_base.finalize(self)
+end
+--' reset animation
+class "act_state_mgr_animation_reset" (action_base)
+function act_state_mgr_animation_reset:__init(name, st) super (nil, name)
+	self.st = st
+end
+function act_state_mgr_animation_reset:initialize()
+	action_base.initialize(self)
+	--printf("RESET")
+	self.st.animation:set_state(state_lib.states[self.st.target_state].animation, true)
+	self.st.reset_state = false
+end
+function act_state_mgr_animation_reset:execute()
+	action_base.execute(self)
+end
+function act_state_mgr_animation_reset:finalize()
+	action_base.finalize(self)
+end
+--' Play animation output
+class "act_state_mgr_animation_stop" (action_base)
+function act_state_mgr_animation_stop:__init(name, st) super (nil, name)
+	self.st = st
+end
+function act_state_mgr_animation_stop:initialize()
+	action_base.initialize(self)
+	self.st.animation:set_state(nil)
+end
+function act_state_mgr_animation_stop:execute()
+	action_base.execute(self)
+end
+function act_state_mgr_animation_stop:finalize()
+	action_base.finalize(self)
+end
+
+
+class "animation"
+function animation:__init(npc, mgr)
+	local is_report = false
+	if TB3D_Modders.use_state_message and npc:name() == TB3D_Modders.npc_to_log then is_report = true end
+	if is_report then TB3D_Services.packet_alert("state mgr anim: __init["..utils.to_str(npc:name()).."]") end -- mgr["..utils.to_str(mgr).."]") end
+	self.mgr = mgr
+	self.npc = npc
+	self.states = {
+		last_id = nil,
+		current_state = nil,
+		target_state = nil,
+		begin = nil,
+		idle = nil,
+		anim_level = 0,
+		attach_items = {hand_radio		= {mode = "detach", done = true},
+						bread			= {mode = "detach", done = true},
+						vodka			= {mode = "detach", done = true},
+						energy_drink    = {mode = "detach", done = true},
+						kolbasa			= {mode = "detach", done = true},
+						sandwich   		= {mode = "detach", done = true},
+						cigara   		= {mode = "detach", done = true},
+						flaska			= {mode = "detach", done = true},
+						beer_a          = {mode = "detach", done = true},
+						sweetness		= {mode = "detach", done = true},
+						guitar_a		= {mode = "detach", done = true},
+                        balalaika_a		= {mode = "detach", done = true},
+						harmonica_a		= {mode = "detach", done = true},
+						wpn_binoc		= {mode = "detach", done = true},
+						device_pda		= {mode = "detach", done = true},
+						wpn_sigaret		= {mode = "detach", done = true},
+						sigareta		= {mode = "detach", done = true},
+						sigaret			= {mode = "detach", done = true},
+						kruglov_flash	= {mode = "detach", done = true}}
+	}
+	
+	self.clb_settings = {}
+	self.clb_cnt = 0
+end
+
+--' Installation of a new state
+function animation:set_state(id, reset)
+	local is_report = false
+	if TB3D_Modders.use_state_message and self.npc:name() == TB3D_Modders.npc_to_log then is_report = true end
+	if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] new animation id["..utils.to_str(id).."] current_state["..utils.to_str(self.states.target_state).."]") end
+	local nn = 0
+	local wpn_slot = self:weapon_slot()
+	self.npc:clear_animations()	--' Output from the old state
+	self:clear_anim_callback()
+	if state_mgr_animation_list.animations and state_mgr_animation_list.animations[self.states.target_state] ~= nil then
+		if self.mgr.emerg.animation_nout == true
+		  or self.mgr.emerg.animation == true then
+			if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] emerg[true]") end
+			--' reset the voice acting (unless it is specified in the animation)
+			if self.npc:active_sound_count() > 0 then
+				if self.mgr.subanim > 0 then
+					for key = self.mgr.subanim, 0 do
+						local a = state_mgr_animation_list.animations[self.states.target_state].subanim[key]
+						if a and a.into_music then
+							stop_play_sound(self.npc)
+							if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] stop sound") end
+							break
+						end
+					end
+				end
+			end
+			--' (2) emergency exit, must dropnut priatachennye items
+			if state_mgr_animation_list.animations[self.states.target_state].out ~= nil then
+				anima = self:anim_for_slot(wpn_slot,state_mgr_animation_list.animations[self.states.target_state].out)
+				if anima then
+					if type(anima) == "table" then
+						for k,v in pairs(anima) do
+							if type(v) == "table" and v.d ~= nil then
+								local obj = self.npc:object(v.d)
+								if obj then
+									if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] detached["..obj:name().."]") end
+									obj:enable_attachable_item(false)
+								end
+								self.states.attach_items[v.d].mode = "detach"
+								self.states.attach_items[v.d].done = true
+							end
+						end
+					end
+				end	
+			end		
+		else
+			--' exit podanimatsy	
+			if self.mgr.subanim > 0 then
+				for key = self.mgr.subanim, 0 do
+					local a = state_mgr_animation_list.animations[self.states.target_state].subanim[key]
+					if a then 
+						if a.out then
+							anima = self:anim_for_slot(wpn_slot,a.out)
+							if anima then
+								if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] add anime["..anima.."]") end
+								add_anim(self.npc, anima, true)							
+							end
+						end
+						if a.into_music then
+							stop_play_sound(self.npc)
+						end
+					end
+				end
+			end			
+			if state_mgr_animation_list.animations[self.states.target_state].out ~= nil then
+				anima = self:anim_for_slot(wpn_slot,state_mgr_animation_list.animations[self.states.target_state].out)
+				if anima then
+					if type(anima) == "table" then
+						if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] add anime table") end
+						for k,v in pairs(anima) do
+							if type(v) == "table" then
+								self:set_anim_callback(v)
+							else
+								add_anim(self.npc, v, true)
+							end
+						end
+					else
+						if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] add anime["..anima.."]") end
+						add_anim(self.npc, anima, true)
+					end
+					nn = nn +1
+				end			
+			end
+		end
+	end
+	--' Emergency detach detachable items if the new animation pointed at detach.
+	if self.states.current_state == "_new" then
+--'		printf("[%s]", self.npc:name())
+--'		if TB3D_Modders.show_tables then show_tables(self.states.attach_items, nil, "state mgr anim") end
+		for k,v in pairs(self.states.attach_items) do
+			local t = self.npc:object(k)
+			if t then
+				if v.mode == "attach" then
+					t:enable_attachable_item(false)
+				end
+			end
+			v.mode = "detach"
+			v.done = true				
+		end
+	end
+	--' entrance into a new state	
+	if state_mgr_animation_list.animations and state_mgr_animation_list.animations[id] ~= nil then
+		if state_mgr_animation_list.animations[id].into ~= nil then
+			anima = self:anim_for_slot(wpn_slot,state_mgr_animation_list.animations[id].into)
+			if type(anima) == "table" then
+				for k,v in pairs(anima) do
+					if type(v) == "table" then
+						self:set_anim_callback(v)
+					else
+						add_anim(self.npc, v, true)
+					end
+				end
+				nn = nn +1
+			else
+				if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] add anime["..anima.."]") end
+				add_anim(self.npc, anima, true)
+				nn = nn +1
+			end
+		end
+		if reset == true then
+			if self.mgr.callback ~= nil then
+				self.mgr.callback.begin = nil
+			end
+			self:play_rnd(id, 100)			
+		end
+		if state_mgr_animation_list.animations[id].idle ~= nil then
+			anima = self:anim_for_slot(wpn_slot,state_mgr_animation_list.animations[id].idle)
+			if anima then
+				if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] add anime["..anima.."]") end
+				add_anim(self.npc, anima, true)
+				nn = nn + 1
+			end
+		else
+			-- For political correctness, ask animstate play their idle animation
+			self.mgr.animstate:add_idle_animation()
+		end
+	else
+		-- For political correctness, ask animstate play their idle animation
+		self.mgr.animstate:add_idle_animation()
+	end
+	self.states.current_state = "_new"
+	self.states.target_state = id
+	self.states.begin = nil
+	self.states.anim_level = 0
+	self.mgr.emerg.animation = nil
+	if is_report then TB3D_Services.packet_alert("state mgr anim: set state["..utils.to_str(self.npc:name()).."] new animation id["..utils.to_str(id).."] current_state["..utils.to_str(self.states.target_state).."] done") end
+end
+
+--callled from state_mgr:update()
+function animation:update(is_report)
+	if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] time["..time_global().."] current state["..utils.to_str(self.states.current_state).."] target state["..utils.to_str(self.states.target_state).."] anims["..self.npc:animation_count().."]") end
+	self.is_called = false
+	if self.sound_played then	-- !!! checking that finished playing our sound
+		if self.npc:active_sound_count() == 0 then
+			self.sound_played = false
+		end
+	end	
+	for k,v in pairs(self.states.attach_items) do	-- Attach DETACH OBJECTS
+		--printf("Trying to attach [%s]", tostring(k))
+		if v.done == false then
+			--printf("proceed [%s]", tostring(k))
+			local t = self.npc:object(k)
+			if t then
+				--printf("item [%s] exist", tostring(k))
+				if v.mode == "attach" then
+					if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] item["..utils.to_str(k).."] is attached") end
+					t:enable_attachable_item(true)
+				elseif v.mode == "detach" then
+					if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] item["..utils.to_str(k).."] is detached") end
+					t:enable_attachable_item(false)
+				end
+			end
+			v.done = true
+		end
+	end
+	if self.states.current_state == nil then
+		self:callback_process()
+		if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] current state[nil]") end
+		return
+	end
+	if self.mgr.emerg ~= nil and  	-- chop off the animation and urgently to start immediately
+	   self.mgr.emerg.animation == true then
+		self.npc:clear_animations()
+		self:set_state(nil)
+		self.states.current_state = nil
+		self.mgr.emerg.animation = nil
+		if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] emergency start") end
+		return
+	end
+	if self.states.current_state == "_new" then	-- check over whether the transition to the
+		local nnum = 0
+		if  state_mgr_animation_list.animations and ((state_mgr_animation_list.animations[self.states.target_state] ~= nil and
+		   state_mgr_animation_list.animations[self.states.target_state].idle ~= nil) or
+		   self.mgr.animstate:idle_animation_present()) then
+			nnum = 1
+		end
+		if self.npc:animation_count() <= nnum then
+			self.states.current_state = self.states.target_state
+			self:callback_init()
+		end
+		if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] current state[_new]") end
+		return
+	end
+	if self.states.current_state == "_wait" then	--' expect to complete the transition.		
+		local nnum = 0
+		if (state_mgr_animation_list.animations[self.states.target_state] ~= nil and
+		   state_mgr_animation_list.animations[self.states.target_state].idle ~= nil) or
+		   self.mgr.animstate:idle_animation_present()
+		then
+			nnum = 1
+		end
+		if self.npc:animation_count() <= nnum then
+			self.states.current_state = self.states.target_state
+		end
+		if self.states.target_state == state_lib.states[self.mgr.target_state].animation and		-- initialization callback called again at the same steyt
+		   self.mgr.callback and self.mgr.callback.func and self.mgr.callback.timeout and
+		   self.mgr.callback.begin == nil
+		then
+			self:callback_init(true)
+		end
+		self:callback_process()
+		if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] current state[_wait]") end
+		return
+	end
+	if 	self.states.current_state == self.states.target_state then	-- Roleplaying a randomly animashek if they have
+		if self.mgr.callback and self.mgr.callback.func and self.mgr.callback.timeout and		-- Initialization callbacks
+		   self.mgr.callback.begin == nil then
+			self:callback_init(true)
+		end
+		if self:callback_process() == true then		--' check for emergency reset circuit
+			if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] emergency reset") end
+			return
+		end
+		local wpn_slot = self:weapon_slot()
+		if  state_mgr_animation_list.animations and state_mgr_animation_list.animations[self.states.current_state].subanim == nil then		-- Checking the level of recursiveness.
+			self.states.anim_level = 0											-- If the current animation does not allow recursion, set the current level of zero.
+			self.mgr.subanim = 0
+		end
+		if self.states.anim_level < self.mgr.subanim then		-- if the desired level of recursion achieved - playing randomly looped and Idle out of it.
+			self.npc:clear_animations()							-- if not - played the entire set of input animations to it.
+			for key = self.states.anim_level+1, self.mgr.subanim do
+				local a = state_mgr_animation_list.animations[self.states.current_state].subanim[key]
+				if a and a.into then
+					anima = self:anim_for_slot(wpn_slot,a.into)
+					if anima then
+						add_anim(self.npc, anima, true)
+					end
+				end
+				if a.into_music then										--' establish music
+					xr_sound.set_sound_play(self.npc, a.into_music)
+				end				
+			end
+			self.states.anim_level = self.mgr.subanim
+			anima = self:anim_for_slot(wpn_slot,state_mgr_animation_list.animations[self.states.current_state].subanim[self.states.anim_level].idle)
+			if anima then													-- add Idle current level
+				add_anim(self.npc, anima, true)
+			end		
+			self.states.current_state = "_wait"			
+			if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] < subanim") end
+			return
+		end
+		if self.states.anim_level > self.mgr.subanim then		-- if the current recursion level is higher than necessary - play set off animations out of it.
+			self.npc:clear_animations()
+			local a
+			for key = self.states.anim_level, self.mgr.subanim+1 do
+				a = state_mgr_animation_list.animations[self.states.current_state].subanim[key]
+				if a and a.out then
+					anima = self:anim_for_slot(wpn_slot,a.out)
+					if anima then
+						add_anim(self.npc, anima, true)
+					end
+				end
+			end
+			self.states.anim_level = self.mgr.subanim
+			local anima
+			if self.states.anim_level == 0 then			-- add Idle current level
+				anima = self:anim_for_slot(wpn_slot,state_mgr_animation_list.animations[self.states.current_state].idle)
+			else
+				anima = self:anim_for_slot(wpn_slot,state_mgr_animation_list.animations[self.states.current_state].subanim[self.states.anim_level].idle)
+			end
+			if anima then
+				add_anim(self.npc, anima, true)
+			end		
+			self.states.current_state = "_wait"
+			if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] > subanim") end
+			return
+		end
+		if state_mgr_animation_list.animations and state_mgr_animation_list.animations[self.states.current_state] ~= nil then		--' Determine whether you want to add animation or wait
+			local state			
+			if self.states.anim_level == 0 then
+				state = state_mgr_animation_list.animations[self.states.current_state]
+			else
+				state = state_mgr_animation_list.animations[self.states.current_state].subanim[self.states.anim_level]
+			end
+			if state.rnd ~= nil then
+				if self.states.begin == nil then				
+					if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] begin state["..utils.to_str(state).."]") end
+					self:play_rnd(state, true)
+				elseif time_global() - self.states.begin > self.states.idle then
+					if is_report then TB3D_Services.packet_alert("state mgr animation:update npc["..utils.to_str(self.npc:name()).."] timed state["..utils.to_str(state).."]") end
+					self:play_rnd(state)
+				end
+			end
+		end		
+	end
+end
+
+-- Roleplaying randomly animation
+function animation:play_rnd(state, must_play)
+	--printf("try to add rnd animation [%s] for [%s]", utils.to_str(state), utils.to_str(rnd))
+	-- You can not add rand during the localization scheme.
+	if not (self.mgr.planner:evaluator(self.mgr.properties["animation"]):evaluate() and
+	    self.mgr.planner:evaluator(self.mgr.properties["weapon"]):evaluate()) then
+		return
+	end
+	-- !!! checking that the finished playing our sound
+	if self.sound_played then
+		if self.npc:active_sound_count() == 0 then
+			self.sound_played = false
+		end
+		return
+	end
+	--' Definition of time intervals between animations
+	self.states.begin = time_global()
+	self.states.idle = (math.random(state.prop.maxidle) + state.prop.sumidle) * 1000
+	if math.random(100) < state.prop.rnd or must_play then	
+		local wpn_slot = self:weapon_slot()
+		local anima = self:anim_for_slot(wpn_slot,state.rnd)
+		if anima == nil then			
+			return
+		end
+		local r
+		if table.getn(anima) > 1 then			
+			if self.states.last_id == nil then
+				r = math.random(table.getn(anima))
+			else
+				r = math.random(table.getn(anima)-1)
+				if r >= self.states.last_id then
+					r = r + 1
+				end
+			end
+			self.states.last_id = r
+		else
+			r = 1
+		end		
+		self.npc:clear_animations()
+		if anima[r] ~= nil then
+			add_anim(self.npc, anima[r], true)
+			-- add sound randomly
+			if self.mgr.synsound and self.npc:active_sound_count() == 0 then
+				xr_sound.set_sound_play(self.npc, self.mgr.synsound)
+				self.sound_played = true		   
+			end
+		end
+		if state.idle ~= nil then
+			anima = self:anim_for_slot(wpn_slot,state.idle)
+			if anima then
+				add_anim(self.npc, anima, true)
+			end
+		else
+			-- For political correctness, ask animsteyt play their aydlovuyu animation
+			self.mgr.animstate:add_idle_animation()
+		end				
+		self.states.current_state = "_wait"				
+	end
+end
+
+-- Initialization callback
+function animation:callback_init(recall)
+--'		printf("callback init anim[%s]", tostring(self.states.current_state))
+--'		printf("state_lib.states[self.mgr.target_state].animation == self.states.current_state [%s]", tostring(state_lib.states[self.mgr.target_state].animation == self.states.current_state))
+		if self.mgr.callback ~= nil and
+		   self.mgr.callback.func ~= nil and
+		   (state_lib.states[self.mgr.target_state].animation == self.states.current_state or
+		    recall == true) and
+		   self.mgr.callback.begin == nil then
+				self.mgr.callback.begin = time_global()
+--'				printf("		Callback initialized %s", time_global())				
+		end
+end
+
+--' Processing callbacks on time
+function animation:callback_process()
+		local ret = false
+		if self.mgr.callback ~= nil and
+		   self.mgr.callback.func ~= nil and
+		   self.mgr.callback.begin ~= nil
+		then
+--'			printf("callback process")
+--'			printf("	%s - %s ? %s", time_global(), utils.to_str(self.mgr.callback.begin), utils.to_str(self.mgr.callback.timeout))
+			if time_global() - self.mgr.callback.begin >= self.mgr.callback.timeout then
+--'				printf("		Callback called %s", time_global())
+				local a = self.mgr.callback.func
+				local b = self.mgr.callback.obj
+				self.mgr.callback.begin = nil
+				self.mgr.callback.func = nil
+				a(b)
+				ret = true
+			end
+		end
+		return ret
+end
+
+-- Zeroing callback when switching animated blocks
+function animation:clear_anim_callback()
+	self.clb_settings = {}
+end
+
+--' setting callbacks for specific actions
+function animation:set_anim_callback(value)
+	--printf("SET ANIM callback [%s]", self.npc:animation_count())
+	-- Needed to determine the difference between the number of active animations and table size
+	-- add tables nilami to size
+	-- the last position to record the settings.
+	local table_size = table.getn(self.clb_settings)
+	local anim_count = self.npc:animation_count()
+	--printf("for debug [%s] [%s]", table_size, anim_count)
+	for key = table_size+1, anim_count do
+		table.insert(self.clb_settings, "nil")
+	end
+	self.clb_settings[table.getn(self.clb_settings)] = {
+		a = value.a,
+		d = value.d,
+		s = value.s,
+		sh = value.sh,
+		f = value.f
+	}
+	--if TB3D_Modders.show_tables then show_tables(self.clb_settings, nil, "state mgr anim") end
+end
+
+--' callback to the specific actions
+function animation:anim_callback()
+--'	if TB3D_Modders.show_tables then printf("anim callback [%s]", self.npc:animation_count()) end
+	--show_tables(self.clb_settings, nil, "state mgr anim")
+	-- We pass on the table from a position proofreads action. Others simply shift
+	v = self.clb_settings[1]
+	if v == nil then
+		return true
+	end	
+	if v == "nil" then
+		table.remove(self.clb_settings, 1)
+		return true
+	end
+	-- Produce actions are at 1 position
+	if v.a ~= nil and
+		self.states.attach_items[v.a] ~= nil 
+	then
+--'		printf("item [%s] attach", utils.to_str(v.a))
+		self.states.attach_items[v.a].mode = "attach"
+		self.states.attach_items[v.a].done = false
+	end
+	if v.d ~= nil and
+		self.states.attach_items[v.d] ~= nil 
+	then
+--'		printf("item [%s] detach", utils.to_str(v.d))	
+		self.states.attach_items[v.d].mode = "detach"
+		self.states.attach_items[v.d].done = false
+	end
+	if v.s ~= nil then
+		xr_sound.set_sound_play(self.npc, v.s)
+	end
+	if v.sh ~= nil and TB3D_Modders.animation_hit == true then
+			-- plot the hit itself.
+			TB3D_hit_styles.wound(self.npc, self.npc, nil, v.sh, 200, vector_rotate_y(self.npc:direction(),45))
+	end
+	if v.f ~= nil then
+		-- Running function
+--'		printf("called function [%s]", tostring(v.f))
+		v.f(self.npc)
+	end
+	table.remove(self.clb_settings, 1)
+	return true 
+end
+
+--' in what condition we are
+function animation:state()
+	return self.states.current_state
+end
+
+--' in what condition we are
+function animation:target_state()
+	return self.states.target_state
+end
+
+--' Weapon Slot
+function animation:weapon_slot()
+	local weapon = self.npc:active_item()
+	if weapon == nil or self.npc:weapon_strapped() == true then
+		return 0
+	end
+--	printf("SLOT [%s]", utils.to_str(weapon:animation_slot()))
+	return weapon:animation_slot()
+end
+
+--' Weapon Slot
+function animation:anim_for_slot(slot, t)
+--	printf("ANIM for SLOT [%s]", slot)
+	if t[slot] ~= nil then
+		return t[slot]
+	else
+		return t[0]
+	end			
+end
+
+function add_anim(npc, anim, bb)
+--'	printf("ANIMATION [%s] added [%s]", npc:name(), anim)
+	npc:add_animation(anim, bb, false)
+end
+
+function clear_anim(npc)
+end

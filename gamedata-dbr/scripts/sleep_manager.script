@@ -1,0 +1,91 @@
+--TB3D 1.0.9.9.7.7 added my_ver, fixed times,removed amk corpses 
+function my_ver() return "1.0.9.9.7.7" end
+-- -----------------------------
+--  DreamMod v0.2 by Ab@dDon ---
+-- -----------------------------
+
+function sleep_one_hour()
+	sleep_manager.main (1)
+end
+function sleep_three_hours()
+	sleep_manager.main (3)
+end
+function sleep_nine_hours()
+	sleep_manager.main (9)
+end
+function sleep_unlim(scale)
+	local sleep_time = (1 - db.actor.health)*6
+      	sleep_manager.main (sleep_time)
+end
+
+function main(scale)
+	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: main start scale["..utils.to_str(scale).."]") end
+	--level.set_snd_volume(0.001)
+	amk.mod_call("reduce_need_sleep",scale)
+	local sleep_ltx = ini_file("scripts\\actorsleep.ltx")
+	db.schemes["ar_sleep"] = "ar_sleep"
+	ar_sleep.set_scheme(db.actor, sleep_ltx, "ar_sleep", logic)
+	db.actor:stop_talk()
+	--bind_stalker.hide_weapon()
+	level.disable_input()
+	sleep_manager.hp_corrector(scale)
+	sleep_manager.starter(scale)
+	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: main done") end
+end
+
+function starter(scale)		--button index 1-24
+	local factor = scale * 2400
+	game.start_tutorial("time_scaling")
+	level.add_pp_effector("teleport.ppe", 2006, false)
+	level.set_time_factor(factor)
+	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: starter factor["..utils.to_str(factor).."]") end
+end
+
+function dreamer()
+	--TB3D_Services.time_resync()	--resync time of day
+	if sleep_manager.is_sleep_active() then
+		sleep_manager.hp_corrector(0)
+		local dream = dream.sleep_video_name_callback()
+	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: dreamer start") end
+		if dream ~= "" then game.start_tutorial(dream)
+		else game.start_tutorial("without_dream") end
+	end
+end
+
+function stopper()
+  if not is_sleep_active() then
+    return
+  end
+	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: stopper called") end
+	ar_sleep.disable_scheme()
+	if db.actor:alive() then
+		level.add_cam_effector("camera_effects\\prison_1.anm", 25, false, "")
+		level.add_pp_effector("yantar_underground_psi.ppe", 2007, false)
+		level.add_pp_effector("total_recall.ppe", 2008, false)
+		--bind_stalker.restore_weapon()
+		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_01\stalker\states\breath\breath_2]])
+		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 15.0)
+	    level.add_cam_effector("camera_effects\\hit_back_left.anm", 26, false, "")
+	end
+	level.enable_input()	
+	TB3D_Services.time_resync()	--resync time of day
+	--level.set_snd_volume(1.0)
+	if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("SLEEP MGR: stopper done") end
+end
+
+function hp_corrector(fr)
+	if fr ~= 0 then
+		hp = fr/6 + db.actor.health
+		if hp > 1 then hp = 1 end
+		return
+	elseif db.actor.health > hp then 
+		db.actor.health = hp - db.actor.health
+	end
+end
+
+function is_sleep_active()
+	if db.storage[db.actor:id()].active_scheme == "ar_sleep" then 
+		return true 
+	end
+	return false
+end

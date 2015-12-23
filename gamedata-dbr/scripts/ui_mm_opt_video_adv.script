@@ -1,0 +1,176 @@
+--TB3D 1.0.9.9.8.1 mblur added, more adv ctrls added, hdr adapt
+function my_ver() return "1.0.9.9.8.1" end
+class "opt_video_adv" (CUIWindow)
+
+function opt_video_adv:__init() super()
+end
+
+function opt_video_adv:__finalize()
+end
+
+function only_2_mode(ctrl, _id)
+	local bEnabled	= _id==2
+	ctrl:Enable		(bEnabled)
+end
+
+function only_12_mode(ctrl, _id)
+	local bEnabled	= _id==1 or _id==2
+	ctrl:Enable		(bEnabled)
+end
+
+function opt_video_adv:InitControls(x, y, xml, handler)
+	local ctl
+	self:Init									(x,y, 738, 416)
+	self:SetAutoDelete							(true)
+	
+	self.bk			= xml:InitFrame				("frame_videoadv", self)
+	self.scroll_v	= xml:InitScrollView		("video_adv:scroll_v", self)
+
+	local _st		= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_vis_dist",				_st)
+	xml:InitTrackBar							("video_adv:track_vis_dist",			_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_geometry_lod",			_st)
+	xml:InitTrackBar							("video_adv:track_geometry_lod",		_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_detail_density",		_st)
+	xml:InitTrackBar							("video_adv:track_detail_density",		_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_texture_lod",			_st)
+	xml:InitTrackBar							("video_adv:track_texture_lod",			_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_aniso",					_st)
+	xml:InitTrackBar							("video_adv:track_aniso",				_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_ssample",				_st)
+	xml:InitTrackBar							("video_adv:track_ssample",				_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_light_distance",		_st)
+	ctl				= xml:InitTrackBar			("video_adv:track_light_distance",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	------------------- GLOSS and PARALLAX HEIGHT --------------------------------------------------------
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_gloss_factor",			_st)
+	xml:InitTrackBar							("video_adv:track_r2_gloss_factor",			_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_parallax_h",				_st)
+	xml:InitTrackBar							("video_adv:track_r2_parallax_h",			_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	------------------- SUN and SHADOW ------------------------------------------------------------------
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_sun",				_st)
+	ctl			= xml:InitCheck					("video_adv:check_r2_sun",				_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_sun_details",		_st)
+	ctl			= xml:InitCheck					("video_adv:check_r2_sun_details",		_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_sun_lumscale",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_sun_lumscale",		_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_sun_lumscale_amb",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_sun_lumscale_amb",		_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_particles_distance",	_st)
+	ctl				= xml:InitTrackBar			("video_adv:track_particles_distance",	_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	------------------------------ HDR ----------------------------------------------------------------
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_tonemap",		_st)
+	ctl			= xml:InitCheck					("video_adv:check_r2_tonemap",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_tonemap_middlegray",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_tonemap_middlegray",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_tonemap_lowlum",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_tonemap_lowlum",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_tonemap_amount",		_st)
+	ctl			= xml:InitTrackBar				("video_adv:track_r2_tonemap_amount",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_tonemap_adaptation",		_st)
+	ctl			= xml:InitTrackBar				("video_adv:track_r2_tonemap_adaptation",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_ls_bloom_fast",					_st)
+	xml:InitCheck								("video_adv:check_r2_ls_bloom_fast",				_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_ls_bloom_kernel_scale",		_st)
+	ctl				= xml:InitTrackBar			("video_adv:track_r2_ls_bloom_kernel_scale",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_ls_bloom_threshold",		_st)
+	ctl				= xml:InitTrackBar			("video_adv:track_r2_ls_bloom_threshold",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_ls_bloom_speed",		_st)
+	ctl				= xml:InitTrackBar			("video_adv:track_r2_ls_bloom_speed",		_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+if TB3D_Modders.use_soft_effects then	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_soft_particles",				_st)
+	xml:InitCheck								("video_adv:check_r2_soft_particles",			_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_soft_water",				_st)
+	xml:InitCheck								("video_adv:check_r2_soft_water",			_st)
+	handler.m_preconditions[ctl]		= only_12_mode
+end
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_npc_torch",				_st)
+	xml:InitCheck								("video_adv:check_npc_torch",			_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_motion_blur",		_st)
+	ctl				= xml:InitTrackBar			("video_adv:track_motion_blur",		_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_vsync",					_st)
+	xml:InitCheck								("video_adv:check_vsync",				_st)
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_60hz",					_st)
+	xml:InitCheck								("video_adv:check_60hz",				_st)
+
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_rs_stats",					_st)
+	xml:InitCheck								("video_adv:check_rs_stats",				_st)
+
+	btn		= xml:Init3tButton					("video_adv:btn_to_simply",	self)	
+	handler:Register							(btn, "btn_simply_graphic")	
+	
+end

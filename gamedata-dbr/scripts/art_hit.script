@@ -1,0 +1,304 @@
+---<!-- TB3D 1.0.9.9.8.0 added default_hit option in modders script, drop_perchi = drop_item, chgd art hit,
+-- art_hit_multiplier, apply_protection, get_level_up
+function my_ver() return "1.0.9.9.8.0" end
+-- sapsan , Monnoroch
+-- Charsi
+
+local art_cnt=0
+
+-- hit.burn, hit.chemical_burn, hit.dummy, hit.explosion,
+-- hit.fire_wound, hit.radiation, hit.shock, hit.strike, hit.telepatic, hit.wound
+	local art_hit = {
+		["af_medusa_green"]					= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_medusa"]						= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_cristall_flower"]				= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_night_star"]					= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_vyvert_green"]					= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_vyvert"]						= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_gravi"]						= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_gold_fish"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_drops"]						= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_fireball"]						= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_cristall"]						= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_blood_green"]					= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_blood"]						= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_mincer_meat"]					= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["gold_art"]						= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_soul"]							= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_electra_sparkler"]				= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_electra_flash"]				= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_electra_moonlight"]			= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_ameba_slime"]					= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_ameba_slug"]					= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_ameba_mica"]					= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_dummy_spring_red"]				= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.explosion},
+		["af_dummy_spring"]					= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.explosion},
+		["af_dummy_dummy"]					= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.explosion},
+		["af_dummy_battery_red"]			= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_dummy_battery"]				= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_dummy_pellicle_red"]			= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_dummy_pellicle"]				= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_dummy_glassbeads"]				= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_rusty_thorn"]					= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_rusty_kristall"]				= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_rusty_sea-urchin"]				= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_fuzz_kolobok"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_caterpillar"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["artifact_electro_crystal_thorn"]	= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_arhara_globus"]				= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.strike},
+		
+		["art_acumm"]						= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_water_flower"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_water_flower1"]				= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_spiral"]						= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.explosion},
+		["af_eye_voron"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_babka_4"]						= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.radiation},
+	
+		["af_armor_1"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_armor_2"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_armor_3"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_armor_4"]						= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_babka_1"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_babka_2"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_babka_3"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_cry_1"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_cry_2"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_cry_3"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_dik_1"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_dik_2"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_dik_3"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_dik_4"]						= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_kol_1"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.fire_wound},
+		["af_kol_2"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.explosion},
+		["af_kol_3"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_kol_4"]						= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_pudd_1"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_pudd_2"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_pudd_3"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_pudd_4"]						= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.fire_wound},
+		["af_simbion"]						= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_spirit_1"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_spirit_2"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_spirit_3"]						= {["power"] = 0.6, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_spirit_4"]						= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.wound},
+	
+		["af_kristal_zp"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_kristal_blue"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_repei"] 						= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_dummy_indilian"]				= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_dummy_djoker"]					= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_dummy_coal"]					= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_dummy_seashell"]				= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_dummy_mushroom"]				= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.radiation},
+		["af_dummy_dumbbell"]				= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_dummy_vertyshka"]				= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_dummy_star_monolith"]			= {["power"] = 0.7, ["impulse"] = 0.3, ["type"] = hit.telepatic},
+		["af_dummy_quill"]					= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.wound},
+		["af_dummy_wool"]					= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_dummy_bonanza"]				= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_dummy_mercury_ball"]			= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.shock},
+		["af_dummy_bezi"]					= {["power"] = 0.2, ["impulse"] = 0.3, ["type"] = hit.chemical_burn},
+		["af_dummy_glow"]					= {["power"] = 0.3, ["impulse"] = 0.3, ["type"] = hit.burn},
+		["af_dummy_node"]					= {["power"] = 0.4, ["impulse"] = 0.3, ["type"] = hit.strike},
+		["af_kosi"] 						= {["power"] = 0.5, ["impulse"] = 0.3, ["type"] = hit.telepatic}
+	}
+
+-- glove protection, 0 = full protection
+local perchatki_propusk =
+{
+		["wpn_fuck"]		= 0.9,
+		["wpn_fist_c1"]		= 0.7,
+		["wpn_fist_c2"]		= 0.5,
+		["wpn_fist_c3"]		= 0.3,
+		["wpn_fist_c4"]		= 0.0
+}
+
+-- suit protection, 0 = full protection
+    local scient={
+	["merc_scientific_outfit"]						= 0.5,
+		["merc_scientific_outfit_bad"]				= 0.5,
+		["merc_scientific_outfit_goodp"]			= 0.5,
+		["merc_scientific_outfit_default"]			= 0.5,
+		["merc_scientific_outfit_static"]			= 0.5,
+		["merc_scientific_outfit_kat_eye"]			= 0.5,
+		["merc_scientific_outfit_psy"]				= 0.5,
+		["merc_scientific_outfit_blackwhite"]		= 0.5,
+		["merc_scientific_outfit_bast"]				= 0.5,
+		["merc_scientific_outfit_plus"]				= 0.3,
+		["merc_scientific_outfit_badplus"]			= 0.3,
+		["merc_scientific_outfit_goodplus"]			= 0.3,
+		["merc_scientific_outfit_defaultplus"]		= 0.3,
+		["merc_scientific_outfit_staticplus"]		= 0.3,
+		["merc_scientific_outfit_kat_eyeplus"]		= 0.3,
+		["merc_scientific_outfit_psyplus"]			= 0.3,
+		["merc_scientific_outfit_blackwhiteplus"]	= 0.3,
+		["merc_scientific_outfit_bastplus"]			= 0.3,
+	["scientific_outfit"]							= 0.5,
+		["scientific_outfit_bad"]					= 0.5,
+		["scientific_outfit_goodp"]					= 0.5,
+		["scientific_outfit_default"]				= 0.5,
+		["scientific_outfit_static"]				= 0.5,
+		["scientific_outfit_kat_eye"]				= 0.5,
+		["scientific_outfit_psy"]					= 0.5,
+		["scientific_outfit_blackwhite"]			= 0.5,
+		["scientific_outfit_bast"]					= 0.5,
+		["scientific_outfit_plus"]					= 0.3,
+		["scientific_outfit_badplus"]				= 0.3,
+		["scientific_outfit_goodplus"]				= 0.3,
+		["scientific_outfit_defaultplus"]			= 0.3,
+		["scientific_outfit_staticplus"]			= 0.3,
+		["scientific_outfit_kat_eyeplus"]			= 0.3,
+		["scientific_outfit_psyplus"]				= 0.3,
+		["scientific_outfit_blackwhiteplus"]		= 0.3,
+		["scientific_outfit_bastplus"]				= 0.3,
+	["dolg_scientific_outfit"]						= 0.3,
+		["dolg_scientific_outfit_bad"]				= 0.3,
+		["dolg_scientific_outfit_goodp"]			= 0.3,
+		["dolg_scientific_outfit_default"]			= 0.3,
+		["dolg_scientific_outfit_static"]			= 0.3,
+		["dolg_scientific_outfit_kat_eye"]			= 0.3,
+		["dolg_scientific_outfit_psy"]				= 0.3,
+		["dolg_scientific_outfit_blackwhite"]		= 0.3,
+		["dolg_scientific_outfit_bast"]				= 0.3,
+		["dolg_scientific_outfit_plus"]				= 0.0,
+		["dolg_scientific_outfit_badplus"]			= 0.0,
+		["dolg_scientific_outfit_goodplus"]			= 0.0,
+		["dolg_scientific_outfit_defaultplus"]		= 0.0,
+		["dolg_scientific_outfit_staticplus"]		= 0.0,
+		["dolg_scientific_outfit_kat_eyeplus"]		= 0.0,
+		["dolg_scientific_outfit_psyplus"]			= 0.0,
+		["dolg_scientific_outfit_blackwhiteplus"]	= 0.0,
+		["dolg_scientific_outfit_bastplus"]			= 0.0,
+	["freedom_scientific_outfit"]					= 0.2,
+		["freedom_scientific_outfit_bad"]			= 0.2,
+		["freedom_scientific_outfit_goodp"]			= 0.2,
+		["freedom_scientific_outfit_default"]		= 0.2,
+		["freedom_scientific_outfit_static"]		= 0.2,
+		["freedom_scientific_outfit_kat_eye"]		= 0.2,
+		["freedom_scientific_outfit_psy"]			= 0.2,
+		["freedom_scientific_outfit_blackwhite"]	= 0.2,
+		["freedom_scientific_outfit_bast"]			= 0.2,
+		["freedom_scientific_outfit_plus"]			= 0.0,
+		["freedom_scientific_outfit_badplus"]		= 0.0,
+		["freedom_scientific_outfit_goodplus"]		= 0.0,
+		["freedom_scientific_outfit_defaultplus"]	= 0.0,
+		["freedom_scientific_outfit_staticplus"]	= 0.0,
+		["freedom_scientific_outfit_kat_eyeplus"]	= 0.0,
+		["freedom_scientific_outfit_psyplus"]		= 0.0,
+		["freedom_scientific_outfit_blackwhiteplus"]= 0.0,
+		["freedom_scientific_outfit_bastplus"]		= 0.0,
+	["monolit_scientific_outfit"]					= 0.2,
+		["monolit_scientific_outfit_bad"]			= 0.2,
+		["monolit_scientific_outfit_goodp"]			= 0.2,
+		["monolit_scientific_outfit_default"]		= 0.2,
+		["monolit_scientific_outfit_static"]		= 0.2,
+		["monolit_scientific_outfit_kat_eye"]		= 0.2,
+		["monolit_scientific_outfit_psy"]			= 0.2,
+		["monolit_scientific_outfit_blackwhite"]	= 0.2,
+		["monolit_scientific_outfit_bast"]			= 0.2,
+		["monolit_scientific_outfit_plus"]			= 0.0,
+		["monolit_scientific_outfit_badplus"]		= 0.0,
+		["monolit_scientific_outfit_goodplus"]		= 0.0,
+		["monolit_scientific_outfit_defaultplus"]	= 0.0,
+		["monolit_scientific_outfit_staticplus"]	= 0.0,
+		["monolit_scientific_outfit_kat_eyeplus"]	= 0.0,
+		["monolit_scientific_outfit_psyplus"]		= 0.0,
+		["monolit_scientific_outfit_blackwhiteplus"]= 0.0,
+		["monolit_scientific_outfit_bastplus"]		= 0.0,
+	["nebo_scientific_outfit"]						= 0.0,
+		["nebo_scientific_outfit_bad"]				= 0.0,
+		["nebo_scientific_outfit_goodp"]			= 0.0,
+		["nebo_scientific_outfit_default"]			= 0.0,
+		["nebo_scientific_outfit_static"]			= 0.0,
+		["nebo_scientific_outfit_kat_eye"]			= 0.0,
+		["nebo_scientific_outfit_psy"]				= 0.0,
+		["nebo_scientific_outfit_blackwhite"]		= 0.0,
+		["nebo_scientific_outfit_bast"]				= 0.0,
+	["protection_outfit"]							= 0.0,
+		["protection_outfit_bad"]					= 0.0,
+		["protection_outfit_goodp"]					= 0.0,
+		["protection_outfit_default"]				= 0.0,
+		["protection_outfit_static"]				= 0.0,
+		["protection_outfit_kat_eye"]				= 0.0,
+		["protection_outfit_psy"]					= 0.0,
+		["protection_outfit_blackwhite"]			= 0.0,
+		["protection_outfit_bast"]					= 0.0,
+		["protection_outfit_plus"]					= 0.0,
+		["protection_outfit_badplus"]				= 0.0,
+		["protection_outfit_goodplus"]				= 0.0,
+		["protection_outfit_defaultplus"]			= 0.0,
+		["protection_outfit_staticplus"]			= 0.0,
+		["protection_outfit_kat_eyeplus"]			= 0.0,
+		["protection_outfit_psyplus"]				= 0.0,
+		["protection_outfit_blackwhiteplus"]		= 0.0,
+		["protection_outfit_bastplus"]				= 0.0,
+	["ecolog_outfit"]								= 0.0,
+		["ecolog_outfit_bad"]						= 0.0,
+		["ecolog_outfit_goodp"]						= 0.0,
+		["ecolog_outfit_default"]					= 0.0,
+		["ecolog_outfit_static"]					= 0.0,
+		["ecolog_outfit_kat_eye"]					= 0.0,
+		["ecolog_outfit_psy"]						= 0.0,
+		["ecolog_outfit_blackwhite"]				= 0.0,
+		["ecolog_outfit_bast"]						= 0.0,
+		["ecolog_outfit_plus"]						= 0.0,
+		["ecolog_outfit_badplus"]					= 0.0,
+		["ecolog_outfit_goodplus"]					= 0.0,
+		["ecolog_outfit_defaultplus"]				= 0.0,
+		["ecolog_outfit_staticplus"]				= 0.0,
+		["ecolog_outfit_kat_eyeplus"]				= 0.0,
+		["ecolog_outfit_psyplus"]					= 0.0,
+		["ecolog_outfit_blackwhiteplus"]			= 0.0,
+		["ecolog_outfit_bastplus"]					= 0.0
+	}
+
+function net_spawn()
+	if art_cnt == 0 then
+		local sim=alife()
+		local sobj
+		for i=first_object,last_object do
+			sobj=sim:object(i)
+			if sobj and art_hit[sobj:section_name()] and sobj.parent_id == 0 then
+				art_cnt=art_cnt+1
+			end
+		end
+	end
+end
+
+function hit_by_art(obj)
+	if TB3D_Modders.artefact_hit == true then
+		local hs =  art_hit[obj:section()]
+		if hs~=nil and level.main_input_receiver()==nil then
+			if art_cnt > 0 then
+				art_cnt = art_cnt - 1
+			else
+				local protection=1
+				local gloves = db.actor:item_in_slot(0)
+				if gloves then protection = perchatki_propusk[gloves:section()] or 1 end
+				local outfit=db.actor:item_in_slot(6)
+				if outfit then protection = protection * (scient[outfit:section()] or 1) end
+				local flevel = TB3D_Services.get_level_up()
+				local koef = TB3D_Services.global_koef(flevel)	* (0.00001 * TB3D_Modders.art_hit_multiplier)	--make it stronger as rank/level increases
+				local type = hs["type"]
+				local power = (hs["power"] * koef) * protection			--first adjust then apply protection
+				local impulse = (hs["impulse"] * koef) * protection
+				--TB3D_Services.packet_alert("art hit: koef["..utils.to_str(koef).."] power["..utils.to_str(power).."] impulse["..utils.to_str(impulse).."]")
+				if power > 0 and tb3d_hit_styles then tb3d_hit_styles.artifact_hit(type, power, impulse) end
+			end
+		end
+	end
+end
+
+function update()
+	local gloves=db.actor:item_in_slot(0)
+	if gloves and perchatki_propusk[gloves:section()]~=nil then
+		local outfit=db.actor:item_in_slot(6)
+		if outfit and scient[outfit:section()]~=nil then
+			db.actor:drop_item(gloves)
+		end
+	end
+end
+
+function apply_protection(outfit, power)
+	return power * (scient[outfit:section()] or 1)
+end

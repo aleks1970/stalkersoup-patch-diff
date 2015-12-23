@@ -1,0 +1,2778 @@
+---TB3D 1.0.9.9.8.1 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+--added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
+--population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
+-- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
+-- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
+-- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
+-- removed lastrepreward
+function my_ver() return "1.0.9.9.8.1" end	--modders append with initials and rev.
+
+--title version will display network info in future
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.1}" end
+
+major_version = 109981							--used in saves
+--default string type flag, must match current_server_entity_version in script_engine.ltx
+dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
+gulag_cnt = 0									--counts the number of gulags with states loaded
+--local lastrepreward = 0							--used to determine direction the next reputation reward should swing
+local isnight									--flag is set based on day_start and day_end in modders script
+local ismidnight, isnoon						--major day cycle event points, true for 5 game minutes after 0 or 12 hour change 
+local string_find = string.find					--create a local pointer for faster lookups
+local math_random = math.random
+local medkit,antirad,bandage,vodka = 0,0,0,0         -- counters items
+local medkit_wnd,antirad_wnd,bandage_wnd,vodka_wnd   -- static window
+local is_skipping = false
+local level_up, blow_phase, blow_type								--109980
+
+function inc_meds(val)
+	medkit = medkit+val
+	if medkit < 0 then medkit = 0 end
+end
+function inc_rads(val)
+	antirad = antirad+val
+	if antirad < 0 then antirad = 0 end
+end
+function inc_bandage(val)
+	bandage = bandage+val
+	if bandage < 0 then bandage = 0 end
+end
+function inc_vodka(val)
+	vodka = vodka+val
+	if vodka < 0 then vodka = 0 end
+end
+
+function update()
+	if is_collector(0) then		--future use
+		if level.name() == "zaton" then
+			if has_alife_info("tb3d_agr_knockdown") then
+				--TB3D_Triggers.zaton_lost()
+				--TB3D_Services.remove_info("tb3d_agr_knockdown")
+			end
+		end
+	else
+		amk.start_timer("tb3d_update",20)
+	end
+end
+
+function delayed_action(num, info_id, delay)					-- 1 thru 4
+	amk.start_timer("tb3d_delay_"..num,delay,info_id)
+end
+
+--idx: 0=update, 1=save, 2=rank, 10-13=amk_mod, 20-33=bind_stalker, 40-44=amk, 50=bind_monster,
+-- 60=death_manager, 70=se_stalker, 80-81=tb3d pop control, 90=tb3d_fixer, 100-101=tb3d_triggers,
+-- 200=treasure_manager, 300=xr_sound, 310=sr_sound2d, 400-407=xr_motivator, 500=xr_conditions, 600=ui_handradio,
+-- 700-704=tb3d_dyn_spawn, 800-802=news_manager, 900-921=dmx_mod, 950-957=bar_rostok_tasks,
+-- 1000=gulag_pripyat, 1100=escape_dialog, 1200-1201=dialogs_yantar, 1300-1301=bar_dialogs,
+-- 2000=xr_effects, 3000=braad_test, 4000=arhara_dialog, 5000=new_spawn
+function is_collector(idx)
+	local is_freeplay = get_level_up()			--109980
+	 if is_freeplay == -1 then
+		packet_alert("tb3d services: is collector freeplay[nil] for["..utils.to_str(idx).."]")
+		if get_console():get_string("mm_net_srv_name") == game.translate_string("gd_collector") then
+			is_freeplay = 1
+		else
+			is_freeplay = 0
+		end
+	end
+	--packet_alert("is collector["..utils.to_str(is_freeplay).."]")
+	--if is_skipping == true then return true end
+	if is_freeplay > 0 then return true else return false end
+end
+function init_level_up()						--109980
+	level_up = amk.load_variable("freeplay", nil)
+	return level_up or -1
+end
+function get_level_up()							--109980
+	if level_up == nil then level_up = amk.load_variable("freeplay", -1) end
+	return level_up
+end
+function set_new_levelup(levelup)				--109980
+	level_up = levelup
+	amk.save_variable("freeplay",levelup)
+	if level_up > 0 then news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."STALKERSOUP:  %c[default]LEVEL "..utils.to_str(level_up).." Achieved!", 1, "tb3d_master", 40) end
+end
+
+function fell_through_level(pos)
+	if level.name() == "peshera" or level.name() == "av_peshera" then return false end				--109974
+	return pos.y <= level.get_bounding_volume().min.y
+end
+
+function killed_by_actor(idx)		--109976
+	local was_actor = false
+	local idx0, idx1, idx2, idx3, idx4, idx5
+	local result = amk.load_variable("killed_by_actor", 0)
+	if result > 10000 then idx5 = true result = result - 100000 end			--first decompose flags
+	if result > 1000 then idx4 = true result = result - 10000 end
+	if result > 100 then idx3 = true result = result - 1000 end
+	if result > 10 then idx2 = true result = result - 100 end
+	if result > 1 then idx1 = true result = result - 10 end
+	if result > 0 then idx0 = true result = result - 1 end
+	if idx == 0 then														--next see who is being checked
+		if idx0 then was_actor = true end						--atp_bandit_shnura
+	elseif idx == 1 then
+		if idx1 then was_actor = true end						--atp_ataker_bandit23
+	elseif idx == 2 then
+		if idx2 then was_actor = true end						--bar_killer_attackers_15 humpback
+	elseif idx == 3 then
+		if idx3 then was_actor = true end						--atp_ataker_bandit24
+	elseif idx == 4 then
+		if idx4 then was_actor = true end						--dsity_rasstrel2
+	elseif idx == 5 then
+		if idx5 then was_actor = true end						--dsity_rasstrel1
+	end
+	return was_actor
+end
+
+function clear_killed_by_actor(idx)		--109976
+	local idx0, idx1, idx2, idx3, idx4, idx5
+	local result = amk.load_variable("killed_by_actor", 0)
+	if result > 10000 then idx5 = true result = result - 100000 end			--first decompose flags
+	if result > 1000 then idx4 = true result = result - 10000 end
+	if result > 100 then idx3 = true result = result - 1000 end
+	if result > 10 then idx2 = true result = result - 100 end
+	if result > 1 then idx1 = true result = result - 10 end
+	if result > 0 then idx0 = true result = result - 1 end
+	if idx == 0 then														--next see who is being cleared
+		idx0 = false						--atp_bandit_shnura
+	elseif idx == 1 then
+		idx1 = false						--atp_ataker_bandit23
+	elseif idx == 2 then
+		idx2 = false						--bar_killer_attackers_15 humpback
+	elseif idx == 3 then
+		idx3 = false						--atp_ataker_bandit24
+	elseif idx == 4 then
+		idx4 = false						--dsity_rasstrel2
+	elseif idx == 5 then
+		idx5 = false						--dsity_rasstrel1
+	end
+	result = 0																--clear result and repack flags
+	if idx0 then result = result + 1 end
+	if idx1 then result = result + 10 end
+	if idx2 then result = result + 100 end
+	if idx3 then result = result + 1000 end
+	if idx4 then result = result + 10000 end
+	if idx5 then result = result + 100000 end
+	if result > 0 then														--still has true flags left so save
+		amk.save_variable("killed_by_actor", result)
+	else
+		amk.del_variable("killed_by_actor")									--no flags left so remove the var
+	end
+	return was_actor
+end
+
+function crash_alert()	--amk watchdog
+	if TB3D_Modders.use_abort_message == true then
+		local msg = "!!!WATCHDOG ALERT!!! reason["..amk.oau_watchdog.."]>>> MAY CORRUPT NEW SAVES. <<< Look in the log. It is recommended to reload the last game save!"
+		if db and db.actor then
+			if not device():is_paused() then
+				local snd_obj = xr_sound.get_safe_sound_object("detectors\\da-2_beep1")
+				snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 2.5)
+			end
+			news_manager.give_game_news(msg, "ui\\ui_iconsTotal", Frect():set(83,47,83,47), 0, 15000)
+		end
+		get_console():execute("load ~~~ "..msg)
+	end
+	amk.oau_watchdog = 0	--reset watchdog
+end
+
+function abort_alert(strg)	--_g abort
+	local con = get_console()
+	con:execute("load ~~~ "..strg)
+	con:execute("flush")
+end
+
+function exit_alert(strg)	--save file corrupt so try to exit gracefully, not used
+	local con = get_console()
+	con:execute("load ~~~ "..strg)
+	con:execute("flush")
+	con:execute("disconnect")
+end
+
+function packet_alert(strg)
+	local con = get_console()
+  if con and strg then
+	con:execute("load ~~~ "..strg)
+	error_log("test")
+  end
+end
+
+function info_alert(strg, flush)							--direct messages
+	local con = get_console()
+  if con and strg then
+	con:execute("load ~~~ "..strg)
+	if flush then con:execute("flush") end
+  end
+end
+
+function show_mem_usage()
+	local con = get_console()
+  if con then
+	con:execute("load ~~~ TB3D services: Memory check")
+	con:execute("stat_memory")
+	con:execute("flush")
+  end
+end
+
+function show_belt_items()			--109975
+	for i = 0, 12 do
+		local oitem = db.actor:item_in_slot(i)
+		if oitem then
+			TB3D_Services.packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] ["..oitem:name().."]")
+		else
+			TB3D_Services.packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] [empty]")
+		end
+	end
+end
+
+function isGameOn()
+	if level.present() and db.actor ~= nil and db.actor:alive() then
+		return true
+	end
+	return false
+end
+
+function inc_gulags(cnt)
+	if cnt == 1 then
+		gulag_cnt = gulag_cnt + 1
+	else
+		gulag_cnt = gulag_cnt - 1
+	end
+end
+function report_gulags()
+	packet_alert("TB3D: Gulags loaded["..utils.to_str(gulag_cnt).."]")
+end
+
+function report_plug_ins()
+	packet_alert("tb3d services: reporting plug ins...")
+	get_language_pack()							--in localization.ltx
+	get_texture_pack()							--in TB3D_Texture_pack.ltx
+	get_weapons_pack()							--in weapons.ltx
+	get_weather_pack()							--in environment.ltx
+	get_inventory_pack()						--in inventory_items.ltx
+	get_scopes_pack()							--in TB3D_Scopes_Pack.ltx
+	get_outfit_pack()							--in TB3D_Outfit_Pack.ltx
+	get_music_pack()							--in TB3D_Music_Pack.ltx
+	get_mp_pack()								--in TB3D_Livelink.ltx
+	get_ui_pack()								--in TB3D_Ui_Pack.ltx
+	packet_alert("tb3d services: reporting plug ins done")
+	local gmode = system_ini():r_string("game_mode", "mode")
+	local act_id = db.actor:id()
+	packet_alert("tb3d_services: actor reputation["..utils.to_str(db.actor:character_reputation()).."] rank["..utils.to_str(db.actor:character_rank()).."] koef["..utils.to_str(global_koef(level_up)).."] comm["..utils.to_str(db.actor:character_community()).."] level up["..utils.to_str(level_up).."] gmode["..utils.to_str(gmode).."]")
+	packet_alert("tb3d_services: actor goodwill stalker["..utils.to_str(relation_registry.community_goodwill("stalker",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill ecolog["..utils.to_str(relation_registry.community_goodwill("ecolog",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill green["..utils.to_str(relation_registry.community_goodwill("green",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill nebo["..utils.to_str(relation_registry.community_goodwill("nebo",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill Military["..utils.to_str(relation_registry.community_goodwill("military",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill dolg["..utils.to_str(relation_registry.community_goodwill("dolg",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill freedom["..utils.to_str(relation_registry.community_goodwill("freedom",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill bandit["..utils.to_str(relation_registry.community_goodwill("bandit",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill killer["..utils.to_str(relation_registry.community_goodwill("killer",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill monolith["..utils.to_str(relation_registry.community_goodwill("monolith",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill zombied["..utils.to_str(relation_registry.community_goodwill("zombied",  act_id)).."]")
+end
+function get_language_pack()
+    local ltx = system_ini()
+	local lang, author, version
+	if ltx:section_exist("language_pack") then
+		if ltx:line_exist("language_pack", "language") then
+			lang = ltx:r_string("language_pack", "language")
+		end
+		if ltx:line_exist("language_pack", "author") then
+			author = ltx:r_string("language_pack", "author")
+		end
+		if ltx:line_exist("language_pack", "version") then
+			version = ltx:r_string("language_pack", "version")
+		end
+	end
+	if lang == nil then lang = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: language pack["..utils.to_str(lang).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_texture_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("texture_pack") then
+		if ltx:line_exist("texture_pack", "style") then
+			style = ltx:r_string("texture_pack", "style")
+		end
+		if ltx:line_exist("texture_pack", "author") then
+			author = ltx:r_string("texture_pack", "author")
+		end
+		if ltx:line_exist("texture_pack", "version") then
+			version = ltx:r_string("texture_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: texture pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_weapons_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("weapons_pack") then
+		if ltx:line_exist("weapons_pack", "style") then
+			style = ltx:r_string("weapons_pack", "style")
+		end
+		if ltx:line_exist("weapons_pack", "author") then
+			author = ltx:r_string("weapons_pack", "author")
+		end
+		if ltx:line_exist("weapons_pack", "version") then
+			version = ltx:r_string("weapons_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: weapons pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_weather_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("weather_pack") then
+		if ltx:line_exist("weather_pack", "style") then
+			style = ltx:r_string("weather_pack", "style")
+		end
+		if ltx:line_exist("weather_pack", "author") then
+			author = ltx:r_string("weather_pack", "author")
+		end
+		if ltx:line_exist("weather_pack", "version") then
+			version = ltx:r_string("weather_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: weather pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_inventory_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("inventory_pack") then
+		if ltx:line_exist("inventory_pack", "style") then
+			style = ltx:r_string("inventory_pack", "style")
+		end
+		if ltx:line_exist("inventory_pack", "author") then
+			author = ltx:r_string("inventory_pack", "author")
+		end
+		if ltx:line_exist("inventory_pack", "version") then
+			version = ltx:r_string("inventory_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: inventory pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_mp_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("mp_pack") then
+		if ltx:line_exist("mp_pack", "style") then
+			style = ltx:r_string("mp_pack", "style")
+		end
+		if ltx:line_exist("mp_pack", "author") then
+			author = ltx:r_string("mp_pack", "author")
+		end
+		if ltx:line_exist("mp_pack", "version") then
+			version = ltx:r_string("mp_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: multiplayer pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_music_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("music_pack") then
+		if ltx:line_exist("music_pack", "style") then
+			style = ltx:r_string("music_pack", "style")
+		end
+		if ltx:line_exist("music_pack", "author") then
+			author = ltx:r_string("music_pack", "author")
+		end
+		if ltx:line_exist("music_pack", "version") then
+			version = ltx:r_string("music_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: music pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+-- New Plug-ins addon start aleks1970
+function get_ui_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("ui_pack") then
+		if ltx:line_exist("ui_pack", "style") then
+			style = ltx:r_string("ui_pack", "style")
+		end
+		if ltx:line_exist("ui_pack", "author") then
+			author = ltx:r_string("ui_pack", "author")
+		end
+		if ltx:line_exist("ui_pack", "version") then
+			version = ltx:r_string("ui_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: ui pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_scopes_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("scopes_pack") then
+		if ltx:line_exist("scopes_pack", "style") then
+			style = ltx:r_string("scopes_pack", "style")
+		end
+		if ltx:line_exist("scopes_pack", "author") then
+			author = ltx:r_string("scopes_pack", "author")
+		end
+		if ltx:line_exist("scopes_pack", "version") then
+			version = ltx:r_string("scopes_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: scopes pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+function get_outfit_pack()
+    local ltx = system_ini()
+	local style, author, version
+	if ltx:section_exist("outfit_pack") then
+		if ltx:line_exist("outfit_pack", "style") then
+			style = ltx:r_string("outfit_pack", "style")
+		end
+		if ltx:line_exist("outfit_pack", "author") then
+			author = ltx:r_string("outfit_pack", "author")
+		end
+		if ltx:line_exist("outfit_pack", "version") then
+			version = ltx:r_string("outfit_pack", "version")
+		end
+	end
+	if style == nil then style = "Unknown" end
+	if author == nil then author = "Unknown" end
+	if version == nil then version = "Unknown" end
+	packet_alert("tb3d services: outfit pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+end
+-- New Plug-ins addon start aleks1970
+
+function get_obj_level(gvid)
+	--local gvid = sobj.m_game_vertex_id
+    if gvid and game_graph():valid_vertex_id(gvid) then
+		local level_id = game_graph():vertex(gvid):level_id()
+		--packet_alert("tb3d services: get obj level["..utils.to_str(level_id).."]")
+		return alife():level_name(level_id)
+	end
+	packet_alert("tb3d services: get obj level - gvid["..utils.to_str(gvid).."]  invalid !!!!")
+	return ""
+end
+
+function savegame(save_name)
+	if isGameOn() and save_name ~= nil then
+		--packet_alert("tb3d services: save name["..utils.to_str(save_name).."]")
+		local save_param
+		if is_collector(1) == true then
+			save_param = user_name().." -FP LVL"..utils.to_str(get_level_up()).."- "..save_name
+		else
+			save_param = user_name().." -stalker- "..save_name
+		end
+		--packet_alert("tb3d services: save param["..utils.to_str(save_param).."]")
+		get_console():execute("save "..save_param)
+		save_param = nil
+    end
+	get_console():execute("flush")
+end
+
+function start_disconnect()
+	_g.is_disconnecting = true
+	if alife() and db.actor then
+		packet_alert("tb3d services: start disconnect")
+		if TB3D_Modders.use_info_message then
+			show_belt_items()		--109975
+			--remove_dyn_objects()
+			db.show_counts()
+		end
+	end
+end
+
+function set_daytime()												--needed to set isnight without triggering campfires
+	time_resync()
+	local m_h = level.get_time_hours()								-- set initial state
+	local m_m = level.get_time_minutes()
+	if m_h < TB3D_Modders.day_start or m_h > TB3D_Modders.day_end then					-- night
+		isnight = true
+	else
+		isnight = false
+	end
+end
+
+------monitor transfers and insure item parent is not item
+------cause 'can't detach' errors: parent == item , parent == npc or item == npc
+function transfer_item(parent, item, npc, caller)
+	local result = true
+	--packet_alert("tb3d: transfer item")
+	if parent and item and npc then
+		if parent:name() == item:name() or item:name() == npc:name() then
+			result = false
+		end
+		packet_alert("tb3d: transfer item["..item:name().."] parent["..parent:name().."] npc["..npc:name().."] func["..caller.."] result["..utils.to_str(result).."]")
+		if result == true then parent:transfer_item(item,npc) end
+	else
+		packet_alert("tb3d: transfer item nil passed by ["..caller.."]")
+	end
+end
+
+function skip_cave()
+	if give_info("tb3d_cave_done") == false then
+		--packet_alert("tb3d: skip cave [already done]")
+		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]ESCAPE Teleport Released, cave was already done")
+	else
+		if give_info("zvezdochet_talk_start") == true then		--didn't talk to stargazer
+			--packet_alert("tb3d: skip cave [zvezdochet_talk_start]")
+			arhara_dialog.del_dolbannay_doska() 
+			arhara_dialog.spawn_teleport_vhod_otsek()	--teleporter entrance at 3 compartment
+			arhara_dialog.spawn_teleport_blok_ruchag()  --lever in lima         
+			amk.spawn_in_inv("bolt", 1)
+			--if use_ammo_belt then amk.spawn_in_inv("razgruzka",1) end
+			if not is_skipping then
+				amk.spawn_in_inv("novice_outfit_rain_1", 1)
+				amk.spawn_in_inv("fake_wpn_binoc",1)
+				amk.spawn_in_inv("wpn_pm",1)
+			end
+			amk.spawn_in_inv("fake_wpn_knife",1)
+			amk.spawn_in_inv("medkit",2)
+		end
+		give_info("kordon_doctor_dialog_start") 			--gives anom info
+		give_info("helping_fox")						--didn't talk to doctor
+		if give_info("arhara_shaxter_start") == true then	--didn't talk to minor
+			--packet_alert("tb3d: skip cave [arhara_shaxter_start]")
+			--arhara_dialog.arhara_shaxter_done()	--removes items and gives teleport
+			if arhara_dialog.arhara_shaxter_have() == true then	
+				sak.out_item_namber("wpn_m_134",1)
+				sak.out_item_namber("ammo_minigun",7)
+				sak.out_item_namber("exo_bandit_outfit",1)
+				sak.out_item_namber("af_dik_1",5)
+				sak.out_item_namber("af_part_monolit",1)
+				sak.out_item_namber("af_vyvert_green",1)
+				sak.out_item_namber("mutant_poltergeist_glas",1)
+				sak.out_item_namber("mutant_psevdogigant_hand",2)
+				sak.out_item_namber("mutant_dog_tail",2)
+				sak.out_item_namber("mutant_krovosos_jaw",1)
+				sak.out_item_namber("mutant_burer_hand",1)
+				sak.out_item_namber("art_acumm",2)
+				sak.out_item_namber("medkit_scientic",3)
+			end
+			arhara_dialog.spawn_teleport_aver_baza_vxod()	--entrance to the base
+			arhara_dialog.spawn_teleport_land_baza_vuxod()	--exit from the base
+			arhara_dialog.spawn_teleport_aver_taynik()		--entrance to the cave in 3 NC
+		end
+		if new_dialog.item_much("snotvornoe_tele",1) ~= false then
+			--packet_alert("tb3d: skip cave [snotvornoe_tele]")
+			sak.out_item_namber("snotvornoe_tele",1)
+		end
+		if new_dialog.item_much("shaxter_tele",1) ~= false then
+			--packet_alert("tb3d: skip cave [shaxter_tele]")
+			sak.out_item_namber("shaxter_tele",1)
+		end
+		give_info("esc_trader_can_leave")
+		if not is_skipping then news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]ESCAPE Teleport Released, cave skipped") end
+	end
+end
+function skip_esc()
+	get_info_portions("end_misc")			--military case done/learn
+	get_info_portions("esc_fox_done")		--gives storyline_seryi_info
+	get_info_portions("esc_skip")
+	get_info_portions("esc_articles")	
+end
+function skip_gar()
+	get_info_portions("gar_done")
+end
+function skip_agro()
+	get_info_portions("agr_skip")
+end
+function skip_val()
+	get_info_portions("val_done")
+	get_info_portions("val_misc")
+	get_info_portions("dar_done")
+	get_info_portions("dar_misc")
+end
+function skip_bar()
+	get_info_portions("bar_skip")
+end
+function skip_ros()
+	get_info_portions("ros_skip")
+end
+function skip_yan()
+	get_info_portions("yan_skip")
+end
+function skip_rad()
+	get_info_portions("rad_done")
+	get_info_portions("rad_ambush")
+end
+function skip_mil()
+	get_info_portions("mil_skip")
+end
+function skip_prip()
+	get_info_portions("pri_skip")
+	get_info_portions("pri_allspawn")
+	get_info_portions("pri_tasks")
+	get_info_portions("pri_misc")
+end
+function skip_aes()
+	get_info_portions("aes_skip")
+end
+function skip_sar()
+	get_info_portions("sar_skip")
+end
+function skip_sar2()
+	get_info_portions("sar2_skip")			--deaths
+end
+function skip_aes2()
+	get_info_portions("aes2_skip")
+end
+function skip_group0()
+	if give_info("tb3d_skip_group0") then
+		is_skipping = true
+		skip_esc()
+		skip_gar()
+		skip_agro()
+		skip_val()
+		skip_ros()
+		is_skipping = false
+		get_collector_items("skip_items1",1)
+		amk.spawn_in_inv("fake_wpn_arm_binoc",1)
+		local obj = alife():story_object(6002)
+		if not obj then alife():create(3565) end      							--109953, [3565] index in all.spawn
+		--sak.add_new_yantar_108()
+		bar_dialogs.give_agroprom_reward()
+		TB3D_Triggers.spawn_sak_trader()
+		delayed_action(1, "tb3d_complete_group0", 10)
+	end
+end
+function skip_group1()
+	if give_info("tb3d_skip_group1") then
+		is_skipping = true
+		skip_esc()
+		skip_gar()
+		skip_agro()
+		skip_val()
+		skip_bar()
+		skip_ros()
+		skip_yan()
+		is_skipping = false
+		get_collector_items("skip_items1",1)
+		amk.spawn_in_inv("fake_wpn_arm_binoc",1)
+		local obj = alife():story_object(6002)
+		if not obj then alife():create(3565) end      							--109953, [3565] index in all.spawn
+		sak.add_new_military()													--Kruglov Flash
+		sak.add_new_yantar_108()
+		bar_dialogs.give_darklab_reward()
+		spawn_teleport.spawn_teleport12()
+		spawn_teleport.spawn_teleport13()
+		spawn_teleport.spawn_teleport14()
+		spawn_teleport.spawn_teleport15()
+		spawn_teleport.spawn_teleport20()
+		spawn_teleport.spawn_teleport21()
+		spawn_teleport.spawn_teleport22()
+		spawn_teleport.spawn_teleport23()
+		bar_dialogs.give_agroprom_reward()
+		TB3D_Triggers.spawn_sak_trader()
+		delayed_action(1, "tb3d_complete_group1", 10)
+	end
+end
+function skip_group1a()
+	if give_info("tb3d_skip_group1a") then
+		is_skipping = true
+		skip_rad()
+		skip_mil()
+		get_collector_items("skip_items1a",1)
+		is_skipping = false
+		delayed_action(2, "tb3d_complete_group1a", 15)
+	end
+end
+function skip_group1b()
+	if give_info("tb3d_skip_group1b") then
+		skip_prip()
+		skip_aes()
+		is_skipping = false
+		delayed_action(3, "tb3d_complete_group1b", 15)
+	end
+end
+function skip_group2()
+	if give_info("tb3d_skip_group2") then
+		is_skipping = true
+		skip_sar()
+		is_skipping = false
+		get_collector_items("skip_items2",1)
+		--delayed_action(3, "tb3d_complete_group2", 20)
+	end
+end
+function skip_group3()
+	if give_info("tb3d_skip_group3") then
+		is_skipping = true
+		skip_sar2()
+		skip_aes2()
+		is_skipping = false
+		get_collector_items("skip_items3",1)
+		--delayed_action(4, "tb3d_complete_group3", 25)
+		TB3D_Triggers.npp_chaes_exit()
+	end
+end
+
+function complete_group(idx)						--109977
+	if idx == 0 then								--group0
+		get_info_portions("esc_skip_tasks")
+		get_info_portions("esc_fox_task")
+		get_info_portions("esc_fox_start")
+		get_info_portions("gar_skip_tasks")
+		get_info_portions("agr_skip_tasks")
+		get_info_portions("val_skip_tasks")
+		get_info_portions("ros_skip_tasks")
+	elseif idx == 1 then							--group1
+		get_info_portions("esc_skip_tasks")
+		get_info_portions("esc_fox_task")
+		get_info_portions("esc_fox_start")
+		get_info_portions("gar_skip_tasks")
+		get_info_portions("agr_skip_tasks")
+		get_info_portions("val_skip_tasks")
+		get_info_portions("yan_skip_tasks")
+		get_info_portions("bar_skip_tasks")
+		get_info_portions("bar_misc")
+	elseif idx == 2 then							--group1a
+		get_info_portions("mil_skip_tasks")
+		get_info_portions("rad_skip_tasks")
+	elseif idx == 3 then							--group1b
+		get_info_portions("prip_skip_tasks")
+		get_info_portions("aes_skip_tasks")
+	elseif idx == 4 then							--group2
+		--TODO
+	elseif idx == 5 then							--group3
+		--TODO
+	end
+end
+
+function check_teleportation()
+	----DO NOT CHANGE---------------first check if used teleporter
+	local sim = alife()
+	local sname = ""
+	local t_obj = sim:story_object(1999999) --all normal locations get same id in TB3D_Teleports.ltx
+	if t_obj then
+		sim:release(t_obj, true)
+		news_manager.amk_send_tip_id("sms_teleport_released","sms_tb3d",0,20,"gen_info")
+	else
+		t_obj = sim:story_object(1999998) --948564 'escape' teleport used, game info completion reqr'd
+		if t_obj then
+			skip_cave()
+			sname = "peshera"
+			sim:release(t_obj, true)
+			give_info("tb3d_cave_done")
+			--packet_alert("tb3d: skip cave [skip cave done]")
+		else
+			t_obj = sim:story_object(1999997) -- 'zatlost' teleport used, game info completion reqr'd
+			if t_obj then
+				sim:release(t_obj, true)
+				sname = "zaton"
+			else
+				t_obj = sim:story_object(1999996) -- talked to momolith
+				if t_obj then
+					sim:release(t_obj, true)
+					sname = "l12u_sarcofag"
+				else
+					t_obj = sim:story_object(1999995) -- start collector
+					if t_obj then
+						sim:release(t_obj, true)
+						db.actor.health = 2			--full health, to survive Collector start
+					else
+						t_obj = sim:story_object(1999994) -- joined osozn
+						if t_obj then
+							sim:release(t_obj, true)
+							sname = "l12u_sarcofag"
+							--change community reps, ecolg should not trust actor
+							--relation_registry.set_community_goodwill ("military", db.actor:id(), 0)
+							--relation_registry.set_community_goodwill ("freedom", db.actor:id(), 0)
+							--relation_registry.set_community_goodwill ("dolg", db.actor:id(), 0)
+							--relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
+							--relation_registry.set_community_goodwill ("bandit", db.actor:id(), 0)
+							relation_registry.set_community_goodwill ("monolith", db.actor:id(), 400)
+							relation_registry.set_community_goodwill ("ecolog", db.actor:id(), 0)
+							local oldrep = db.actor:character_reputation()
+							db.actor:change_character_reputation(-oldrep)	--zero out rep, controls runaways
+							db.actor:change_character_reputation(900)
+							db.actor.health = 2			--full health
+							give_info("tb3d_joined_oc")
+						else
+							t_obj = sim:story_object(1999993) -- refused osozn
+							if t_obj then
+								sim:release(t_obj, true)
+								sname = "l12u_sarcofag"
+								--change community reps, ecolg should like actor
+								--relation_registry.set_community_goodwill ("military", db.actor:id(), 0)
+								--relation_registry.set_community_goodwill ("freedom", db.actor:id(), 0)
+								--relation_registry.set_community_goodwill ("dolg", db.actor:id(), 0)
+								--relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
+								--relation_registry.set_community_goodwill ("bandit", db.actor:id(), 0)
+								relation_registry.set_community_goodwill ("monolith", db.actor:id(), -500)
+								relation_registry.set_community_goodwill ("ecolog", db.actor:id(), 400)
+								--sorry, health stay as is, what did you expect?
+							else
+								t_obj = sim:story_object(1999992) -- chaes tower
+								if t_obj then
+									sim:release(t_obj, true)
+									sname = "l12_stancia_2"
+									db.actor.health = 2			--full health, for a fresh start
+									TB3D_Triggers.npp_chaes_exit()
+								else
+									t_obj = sim:story_object(1999991) -- skip_to_mil
+									if t_obj then
+										sim:release(t_obj, true)
+										sname = "l05_bar"
+										skip_cave()
+										skip_group1()
+									else
+										t_obj = sim:story_object(1999990) -- skip_to_mono1
+										if t_obj then
+											sim:release(t_obj, true)
+											sname = "l12u_sarcofag"
+											skip_cave()
+											skip_group1()
+											skip_group1a()
+											skip_group1b()
+											skip_group2()
+										else
+											t_obj = sim:story_object(1999989) -- skip_to_mono2
+											if t_obj then
+												sim:release(t_obj, true)
+												sname = "l12_stancia_2"
+												skip_cave()
+												skip_group1()
+												skip_group1a()
+												skip_group1b()
+												skip_group2()
+												skip_group3()
+												dmx_mod.create_level_changer_marsh_yantar()
+												if not has_alife_info("treasure_ecolog_start") then
+													news_manager.amk_send_tip_id("sms_water_tower", "shadows_private", 30, 20)
+												end
+											else
+												t_obj = sim:story_object(1999988) -- skip_to_sar
+												if t_obj then
+													sim:release(t_obj, true)
+													sname = "l12_stancia"
+													skip_cave()
+													skip_group1()
+													skip_group1a()
+													skip_group1b()
+												else
+													t_obj = sim:story_object(1999987) -- skip_to_prip
+													if t_obj then
+														sim:release(t_obj, true)
+														sname = "l10_radar"
+														skip_cave()
+														skip_group1()
+														skip_group1a()
+													else
+														t_obj = sim:story_object(1999986) -- end of lab x14
+														if t_obj then
+															sim:release(t_obj, true)
+															sname = "lab_x14"
+															arhara_dialog.enabl_karta()
+														else
+															t_obj = sim:story_object(1999985) -- skip_to_yan
+															if t_obj then
+																sim:release(t_obj, true)
+																sname = "l06_rostok"
+																skip_cave()
+																skip_group0()
+															end
+														end
+													end
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	change_reputation(db.actor, 0)	--make sure is in range
+	return sname
+end
+
+function set_community(npc, comm, gw, rep)				--109981
+	if TB3D_Modders.use_info_message then packet_alert("tb3d services: set community["..npc:name().."] comm["..utils.to_str(comm).."] gw["..utils.to_str(gw).."] rep["..utils.to_str(rep).."]") end
+	if comm then
+		if gw and rep then
+			npc:set_character_community(comm,gw,rep)			--change all three
+		elseif gw then
+			npc:set_character_community(comm,gw)				--change just comm and goodwill
+		elseif rep then
+			npc:set_character_community(comm,0,rep)				--must reset goodwill when change reputation
+		else
+			npc:set_character_community(comm)					--just community, leave goodwill and reputation alone
+		end
+	end
+end
+
+function check_active_community(lname)										--109981, actor only on spawn
+	local comm = "actor"
+	if is_collector() then
+		--future use
+	else
+		if amk_utils.inventory_search("amul_naemn", 1) then
+			comm = "killer"
+		elseif amk_utils.inventory_search("amulet", 1) then
+			comm = "monolith"
+		elseif amk_utils.inventory_search("bullion_gild", 1) then
+			comm = "freedom"
+		elseif amk_utils.inventory_search("streyndzher", 1) then
+			comm = "stranger"
+		elseif lname == "l04_darkvalley" then	
+			if has_alife_info("bandits_neitral") then
+				comm = "stranger"
+			end
+		end
+	end
+	if db.actor:character_community() ~= comm then
+		if TB3D_Modders.use_info_message then packet_alert("tb3d services: set community actor community["..utils.to_str(comm).."]") end
+		if comm == "actor" then
+			db.actor:set_character_community(comm)				--if actor then leave goodwill and reputation as it was
+		else
+			db.actor:set_character_community(comm,0,0)			--insures that you are always nuetral to start
+		end
+	end
+end
+
+--game_relations.personal_goodwill_limits	= -9000, 9000
+function change_reputation(npc, rval)
+	local oldrep = npc:character_reputation()
+	local newrep = oldrep + rval
+	npc:change_character_reputation(-oldrep)					--zero out rep, controls runaways
+	if newrep < -9000 then										--bottom out
+		newrep = -9000											--zombified, need info portion to really control
+	elseif newrep > 9000 then
+		newrep = 9000											--top out, keep in tables
+	end
+	npc:change_character_reputation(newrep)
+	if rval == 0 then rval = 1 end								--startup, prevent 'bad guy' on first reward
+	--if npc:id() == db.actor:id() then lastrepreward = rval end	--update for change_rank
+	if TB3D_Modders.use_info_message then
+		packet_alert("CHG REP: npc["..utils.to_str(npc:name()).."] from["..utils.to_str(oldrep).."] to["..utils.to_str(newrep).."] now["..utils.to_str(npc:character_reputation()).."]")
+	end
+end
+
+function change_rank(npc, rval)
+	--if lastrepreward > 0 and npc:character_reputation() > 0 then	--not being a bad guy or zombied, give rank increase 
+		local newrank = npc:character_rank()	-- + rval
+		if TB3D_Modders.use_alife_message then packet_alert("CHG RANK: npc["..utils.to_str(npc:name()).."] was["..utils.to_str(newrank).."] reward["..utils.to_str(rval).."] last reward["..utils.to_str(lastrepreward).."]") end
+		if is_collector(2) == true then	--level up and reset rank/rep
+			newrank = newrank + (rval/2)
+			if newrank > 25000 then newrank = 25000 end
+		else
+			newrank = newrank + rval
+			if newrank > 2500 then
+				newrank = 2500	--max for stalker
+			end
+		end	--divisor used in probabilities, also 300 and 600 used for arena and hand tele
+		npc:set_character_rank(newrank)
+		if TB3D_Modders.use_alife_message then packet_alert("CHG RANK: npc["..utils.to_str(npc:name()).."] now["..utils.to_str(newrank).."] rep["..utils.to_str(npc:character_reputation()).."]") end
+	--else
+		--if TB3D_Modders.use_alife_message then packet_alert("CHG RANK: npc["..utils.to_str(npc:name()).."] bad guy!!! last rep reward["..utils.to_str(lastrepreward).."] rep["..utils.to_str(npc:character_reputation()).."]") end
+	--end
+end
+
+--based on rank * difficulty koef
+--default: 2500:1 ratio against ((game difficulty+1) * rank)
+--diff_level > 0 = 2500:1 ratio against ((freeplay level*0.1) * rank) (max 10 levels)
+--------------------------------------------------------------------------
+function global_koef(diff_level, force_rank)
+	local rank = db.actor:character_rank()
+	if force_rank ~= nil then rank = force_rank end
+	local diff = level.get_game_difficulty() + 1				--1 thru 4
+	if diff_level and diff_level > 0 then						--109981, levelup 1 thru 10
+		diff = diff + (diff_level * 0.1)						--shift into levelup difficulties (4.1 thru 5.0)
+	end
+	local result = (diff * (1/2500)) * rank						--109981
+	--packet_alert("tb3d services: global koef["..utils.to_str(result).."] rank["..utils.to_str(rank).."] level["..utils.to_str(diff_level).."] diff["..utils.to_str(diff).."]")
+	return result
+end
+
+function get_info_portions(sect)
+	--local actor = db.actor
+	local cnt = 1
+	local str = ""
+	local ini = ini_file("misc\\TB3D_collector_info.ltx") 
+	if ini:section_exist(sect) then	
+		while cnt > 0 do
+			if ini:line_exist(sect,tostring(cnt)) then
+				str = tostring(ini:r_string(sect,tostring(cnt)))
+				if str == nil or str == "" then
+					cnt = 0
+				else
+					give_info(str)
+					cnt = cnt+1
+				end
+			else
+				cnt = 0
+			end
+		end
+	end
+	str = ""
+	ini = nil
+end
+function remove_info_portions(sect)
+	--local actor = db.actor
+	local cnt = 1
+	local str = ""
+	local ini =ini_file("misc\\TB3D_collector_info.ltx") 
+	if ini:section_exist(sect) then	
+		while cnt > 0 do
+			if ini:line_exist(sect,tostring(cnt)) then
+				str = tostring(ini:r_string(sect,tostring(cnt)))
+				if str == nil or str == "" then
+					cnt = 0
+				else
+					remove_info(str)
+					cnt = cnt+1
+				end
+			else
+				cnt = 0
+			end
+		end
+	end
+	str = ""
+	ini = nil
+end
+
+function get_sar2_ghosts()
+	get_info_portions("sar2")
+end
+
+function get_escape_quests()
+	get_info_portions("end_misc")	--military case done/learn
+	get_info_portions("esc_tasks")
+	get_info_portions("esc_articles")
+	get_info_portions("esc_allspawn")
+	--get_info_portions("esc_spawns")
+	--get_info_portions("esc_disables")
+	get_info_portions("esc_misc")
+	get_info_portions("esc_done")
+	get_info_portions("esc_fox_start")		--spawns dogs
+	get_info_portions("esc_fox_task")		--triggers help fox task, gives sl_usefull_info
+	get_info_portions("esc_fox_done")		--gives storyline_seryi_info
+	get_info_portions("esc_fox_meds")
+	--get_info_portions("esc_fox_fail")
+	get_info_portions("esc_lager")			--merc attack on village
+	get_info_portions("esc_kostya_done")		--	
+	--get_info_portions("esc_kostya_start")		--	
+	get_info_portions("esc_tolik")
+	get_info_portions("esc_shustry")
+	get_info_portions("esc_fanat")
+	get_info_portions("esc_dynamite")
+	--get_info_portions("esc_snip")		--deaths
+end
+function get_garbage_quests()
+	get_info_portions("gar_done")
+	get_info_portions("gar_tasks")
+	get_info_portions("gar_misc")
+end
+function get_agro_quests()
+	get_info_portions("agr_done")
+	get_info_portions("agr_tasks")
+	get_info_portions("agr_misc")
+end
+function get_bar_quests()
+	get_info_portions("bar_done")
+	get_info_portions("bar_tasks")
+	get_info_portions("bar_misc")
+	get_info_portions("bar_dolg")
+end
+function get_val_quests()
+	get_info_portions("val_done")
+	get_info_portions("val_tasks")
+	get_info_portions("val_misc")
+end
+function get_dar_quests()
+	get_info_portions("dar_done")
+	get_info_portions("dar_tasks")
+	get_info_portions("dar_misc")
+end
+function get_ros_quests()
+	get_info_portions("rostok_done")	--109940
+end
+function get_yan_quests()
+	get_info_portions("yan_done")
+	get_info_portions("yan_tasks")
+	get_info_portions("yan_misc")
+end
+function get_rad_quests()
+	get_info_portions("rad_done")
+	get_info_portions("rad_tasks")
+	get_info_portions("rad_ambush")
+end
+function get_mil_quests()
+	get_info_portions("mil_done")
+	get_info_portions("mil_tasks")
+	get_info_portions("mil_misc")
+end
+function get_prip_quests()
+	get_info_portions("pri_done")
+	get_info_portions("pri_allspawn")
+	--get_info_portions("pri_dead")		--deaths
+	get_info_portions("pri_tasks")
+	get_info_portions("pri_misc")
+end
+function get_aes_quests()
+	get_info_portions("aes_skip")
+	get_info_portions("sar_done")
+	get_info_portions("aes2_skip")
+	--get_info_portions("sar_misc")
+	--get_info_portions("sar2")			--deaths
+end
+function get_all_quests()
+	get_info_portions("tb3d_start")	--set collector startup
+	get_info_portions("tb3d_doors")	--unlock all doors
+	get_info_portions("enc")		--give general information
+	get_info_portions("esp_done")  	--doctor and cave quests
+	get_escape_quests()
+	get_garbage_quests()
+	get_agro_quests()
+	get_bar_quests()
+	get_val_quests()
+	get_dar_quests()
+	get_ros_quests()
+	get_yan_quests()
+	get_rad_quests()
+	get_mil_quests()
+	get_prip_quests()
+	get_aes_quests()
+	--get_info_portions("sniper_begins")	--109940-----------------
+	--get_info_portions("shadowman_zver")	--deaths
+	get_info_portions("redf_done")
+	--get_info_portions("redf_misc")
+	get_info_portions("redf_start")
+	--get_info_portions("naem_zahar")		--deaths
+	--get_info_portions("marsh_dead")
+	get_info_portions("marsh_done")
+	get_info_portions("marsh_misc")
+	get_info_portions("marsh_start")
+	get_info_portions("aver_done")
+	get_info_portions("aver_tasks")
+	--get_info_portions("warlab_spawns")
+	get_info_portions("warlab_done")
+	get_info_portions("warlab_tasks")
+	get_info_portions("dehn_misc")
+	get_info_portions("raz_tasks")
+	get_info_portions("village_spawns")
+	get_info_portions("village_done")
+	get_info_portions("village_tasks")
+	get_info_portions("larvae_misc")
+	get_info_portions("gen_spawn")
+	get_info_portions("gen_done")
+	get_info_portions("gen_tasks")
+	get_info_portions("death_gopnik")
+	get_info_portions("gen_misc")
+	get_info_portions("black_doc")
+	get_info_portions("finish_misc")
+	get_info_portions("finish_tasks")
+	get_info_portions("finish_spawns")
+	get_info_portions("lightning_tasks")
+	get_info_portions("lightning_spawns")
+	get_info_portions("lightning_misc")
+	get_info_portions("chernomor_misc")
+	get_info_portions("father_misc")
+	get_info_portions("mg_spawns")
+	get_info_portions("mg_tasks")
+	get_info_portions("krysyk")
+	get_info_portions("borov")
+	get_info_portions("sak")
+	get_info_portions("prapor")
+	get_info_portions("docent")
+	get_info_portions("lifeheart")
+	get_info_portions("doctor")
+	get_info_portions("limansk_done")
+	get_info_portions("limansk_start")
+	get_info_portions("dc_done")
+	get_info_portions("dc_tasks")
+	get_info_portions("zaton_misc")			--109940---------------------
+	get_info_portions("end")
+	get_info_portions("quests_done")
+	--get_info_portions("quests_misc")
+	get_info_portions("quests_start")
+	get_info_portions("cocoons")
+	get_info_portions("det_spots")
+	get_info_portions("encyclopedia")
+	get_info_portions("stories")
+	get_info_portions("amk_info")
+	--get_info_portions("flamethrower")
+	get_info_portions("diaries")
+	get_info_portions("prices")
+	get_info_portions("info_artmod")
+	get_info_portions("level_objects")
+	get_info_portions("vehicles")
+	--get_info_portions("ui_pda")
+	get_collector_items("items",1)
+	get_collector_items("detectors",1)
+	get_collector_items("pairs",2)
+	get_collector_items("meds",4)
+	get_collector_items("ammo",6)
+	get_collector_items("player",1)
+	--db.actor:activate_slot(2)
+end
+
+-- communities ------------------------------------------------------------------
+-- stalker, monolith, military, killer, ecolog, dolg, freedom, bandit, zombied,
+-- trader, stranger, arena_enemy, sniper, green, nebo, lastday, fotoman
+---------------------------------------------------------------------------------
+function set_player_relations(standings)
+	-- normal game_relations.ltx values: -400 = enemy, 0 = neutral, 500 = friend
+	local mil, freedom, dolg, stalker, bandit, mono, ecolog, killer, lastday
+	if standings == 1 then					--good standings all
+		mil = 500
+		freedom = 500
+		dolg = 500
+		stalker = 500
+		bandit = 500
+		mono = 500
+		ecolog = 500
+		killer = 500
+		lastday = 500
+	elseif standings == 2 then				--fair standings
+		mil = 100
+		freedom = 100
+		dolg = 100
+		stalker = 100
+		bandit = 100
+		mono = 100
+		ecolog = 100
+		killer = -400
+		lastday = -400
+	elseif standings == 3 then				--normal good standings
+		mil = 200
+		freedom = 200
+		dolg = 200
+		stalker = 300
+		bandit = 0
+		mono = -400
+		ecolog = 200
+		killer = -400
+		lastday = -400
+	elseif standings == 4 then				--normal game standings
+		mil = 0
+		freedom = 0
+		dolg = 0
+		stalker = 200
+		bandit = -400
+		mono = -400
+		ecolog = 0
+		killer = -500
+		lastday = -500
+	elseif standings == 5 then				--collector start
+		mil = 0
+		freedom = 0
+		dolg = 0
+		stalker = 0
+		bandit = -500
+		mono = -500
+		ecolog = 0
+		killer = -500
+		lastday = -500
+	else									--all neutral
+		mil = 0
+		freedom = 0
+		dolg = 0
+		stalker = 0
+		bandit = 0
+		mono = 0
+		ecolog = 0
+		killer = 0
+		lastday = 0
+	end
+	relation_registry.set_community_goodwill ("military", db.actor:id(), mil)
+	relation_registry.set_community_goodwill ("freedom", db.actor:id(), freedom)
+	relation_registry.set_community_goodwill ("dolg", db.actor:id(), dolg)
+	relation_registry.set_community_goodwill ("stalker", db.actor:id(), stalker)
+	relation_registry.set_community_goodwill ("ecolog", db.actor:id(), ecolog)
+	relation_registry.set_community_goodwill ("bandit", db.actor:id(), bandit)
+	relation_registry.set_community_goodwill ("monolith", db.actor:id(), mono)
+	relation_registry.set_community_goodwill ("killer", db.actor:id(), killer)
+	relation_registry.set_community_goodwill ("lastday", db.actor:id(), lastday)
+
+end
+
+function get_collector_items(sect, num)
+	local cnt = 1
+	local numb = num
+	local str = ""
+	local ini =ini_file("misc\\TB3D_collector_items.ltx") 
+	if ini:section_exist(sect) then	
+		while cnt > 0 do
+			if ini:line_exist(sect,tostring(cnt)) then
+				str = tostring(ini:r_string(sect,tostring(cnt)))
+				if str == nil or str == "" then
+					cnt = 0
+				else
+					for i = 1, numb do
+						alife():create(str,	
+							db.actor:position(),
+							db.actor:level_vertex_id(),	
+							db.actor:game_vertex_id(), 
+							db.actor:id())
+					end
+					cnt = cnt+1
+				end
+			else
+				cnt = 0
+			end
+		end
+	end
+	str = ""
+	ini = nil
+end
+
+function teleportate(str)
+	local x=0
+	local y=0
+	local z=0
+	local lname=""
+	local gv=0
+	local lv=0
+	--local dir=vector():set(0,0,0)
+	local question=1
+	local id=0
+	local teleporting=true
+	ini =ini_file("misc\\TB3D_Teleports.ltx") 
+	if ini:section_exist(str) then	
+		if ini:line_exist(str,"x") then
+			 x=ini:r_float(str,"x")
+		else
+			news_manager.send_tip_txt(db.actor,"Attention:\\n parameter X does not exist, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if ini:line_exist(str,"y") then
+			 y=ini:r_float(str,"y")
+		else
+			news_manager.send_tip_txt(db.actor,"Attention:\\n parameter Y does not exist, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if ini:line_exist(str,"z") then
+			 z=ini:r_float(str,"z")
+		else
+			news_manager.send_tip_txt(db.actor,"Please note:\\n the parameter Z does not exist, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if ini:line_exist(str,"lname_for_LC") then
+			 lname=tostring(ini:r_string(str,"lname_for_LC"))
+		else
+			news_manager.send_tip_txt(db.actor,"Warning:\\n There is no option lname_for_LC, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if ini:line_exist(str,"gv") then
+			 gv=ini:r_float(str,"gv")
+		else
+			news_manager.send_tip_txt(db.actor,"Warning:\\n GV parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if ini:line_exist(str,"lv") then
+			 lv=ini:r_float(str,"lv")
+		else
+			news_manager.send_tip_txt(db.actor,"Warning:\\n LV parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if ini:line_exist(str,"question") then
+			 question=ini:r_s32(str,"question")
+		else
+			news_manager.send_tip_txt(db.actor,"Please note:\\n Question of the parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if ini:line_exist(str,"id") then
+			 id=ini:r_s32(str,"id")
+		else
+			news_manager.send_tip_txt(db.actor,"Warning:\\n Id parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			 teleporting=false
+		end
+		if teleporting == true then
+			dmx_mod.create_level_changer(id,
+			db.actor:position(),
+			db.actor:level_vertex_id(),
+			db.actor:game_vertex_id(),
+			lv,
+			gv,
+			vector():set( x, y, z),
+			vector():set(0,0,0),
+			lname,
+			question,
+			1)
+			start_disconnect()
+		else
+			news_manager.send_tip_txt(db.actor,"ERROR:\\n Not all options exist in the section: ".. str ..". Check the integrity of the File TB3D_teleports.ltx")
+		end
+	else
+		news_manager.send_tip_txt(db.actor,"Section:\\n "..str..", does not exist!")
+		teleporting=false
+	end
+	lname = ""
+	ini = nil
+end
+
+function check_valid_spawns()
+	for a=first_object,last_object,1 do
+		obj = alife():object(a)
+		if obj then
+			if game_graph():valid_vertex_id(obj.m_game_vertex_id) then
+				obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
+				if obj_level == 39 or obj_level == 55 or obj_level > 56 then
+					TB3D_Services.abort_alert("fixer: invalid spawn for["..utils.to_str(obj:name()).."] level["..utils.to_str(obj_level).."] gv["..utils.to_str(obj.m_game_vertex_id).."] !!!!")
+					alife():release(obj, true)
+				end
+			end
+		end
+	end		
+end
+
+function x18_dor_open_spawn()	--ref'd in info_l05dark_valley.xml
+	amk_spawn.x_spawn("x18_1")
+	amk_spawn.x_spawn("x18_2")
+	amk_spawn.x_spawn("x18_3")
+end
+
+function get_treasure()
+	--if TB3D_Modders.use_task_message then info_alert("TB3D: get treasure") end
+	local ini = ini_file("misc\\TB3D_atreasures.ltx") 
+	if ini:section_exist("list") then	
+		local cnt = math_random(245)
+		if ini:line_exist("list",tostring(cnt)) then
+			local str = tostring(ini:r_string("list",tostring(cnt)))
+			if str ~= nil and str ~= "" then
+				if TB3D_Modders.use_task_message then info_alert("TB3D: get treasure ["..str.."]") end
+				treasure_manager.get_treasure_manager():give_treasure(str)
+				str = ""
+			end
+		end
+	end
+	ini = nil
+	--if TB3D_Modders.use_task_message then info_alert("TB3D: get treasure done") end
+end
+
+function get_names()
+	local name = ""
+	local sname = ""
+	local ini =ini_file("misc\\TB3D_uniq_news.ltx") 
+	if ini:section_exist("names") then
+		name = ini:r_string("names",tostring(math_random(300)))
+		sname = ini:r_string("names",tostring(math_random(300)))
+	end
+	ini = nil
+	return name, sname
+end
+
+function get_death_reason()
+	local reason = ""
+	local ini =ini_file("misc\\TB3D_death_list.ltx") 
+	if ini:section_exist("dead_reason") then
+		reason = ini:r_string_wq("dead_reason",tostring(math_random(65)))
+	end
+	ini = nil
+	return reason
+end
+
+function get_death_place()
+	local place = ""
+	local ini =ini_file("misc\\TB3D_death_list.ltx") 
+	if ini:section_exist("where_dead") then
+		place = ini:r_string_wq("where_dead",tostring(math_random(108)))
+	end
+	ini = nil
+	return place
+end
+
+function give_info(info)
+	if db.actor and not has_alife_info(info) then
+		db.actor:give_info_portion(info)
+		return true
+	end
+	return false
+end
+
+function remove_info(info)
+	if db.actor and has_alife_info(info) then
+		db.actor:disable_info_portion(info)
+		return true
+	end
+	return false
+end
+
+function get_text_color(text_type)
+	if text_type == "alert" then
+		return "%c[255,240,10,10]" -- red
+	elseif text_type == "tip" then
+		return "%c[255,220,220,10]" -- yellow
+	elseif text_type == "task" then
+		return "%c[255,240,240,60]" -- yellow
+	elseif text_type == "treasure" then
+		return "%c[255,210,20,10]" -- gold green
+	elseif text_type == "money" then
+		return "%c[255,0,220,10]" -- green
+	elseif text_type == "aem" then
+		return "%c[255,10,10,220]" --  blue
+	elseif text_type == "name" then
+		return "%c[255,240,200,140]" -- khaki
+	elseif text_type == "system" then
+		return "%c[255,220,220,100]" -- orange
+	elseif text_type == "news" then
+		return "%c[255,240,240,240]" -- white
+	elseif text_type == "chat" then
+		return "%c[255,160,160,160]"
+	elseif text_type == "text" then
+		return "%c[255,255,128,128]"
+	elseif text_type == "gps" then
+		return "%c[255,255,128,128]"
+	elseif text_type == "enc" then
+		return "%c[255,210,60,10]" -- gold green
+	end
+	return "%c[default]"
+end
+
+function time_resync()
+	--packet_alert("TB3D Services: time resync")
+	level.set_time_factor(system_ini():r_float("alife","time_factor"))	--resync time of day
+end
+
+local spawned = false
+local wasnight
+local smoke_on
+local frogs_snd_soft
+local frogs_snd
+local cooling_snd
+function env_update()
+	local m_h = level:get_time_hours()
+	local m_m = level.get_time_minutes()
+	if m_h < TB3D_Modders.day_start or m_h > TB3D_Modders.day_end then						-- night
+		if ismidnight then
+			if m_m > 5 then ismidnight = false end
+		elseif m_h == 0 and m_m < 4 then
+			ismidnight = true
+			math.randomseed(level.get_time_minutes()+1133)										--start a new random seed
+			if has_alife_info("sar_monolith_go") then meceniy_art.art_respawn() end				--spawn an art_accumm on active level
+		end
+		isnight = true
+	else
+		if smoke_on and m_m > 1 then														-- wait a moment then remove smoke
+			--if TB3D_Modders.fires_always_on == false and is_indoor(false) == false then
+				remove_smoke()
+				update_smoke(false)
+			--end
+			smoke_on = false
+		end
+		if isnoon then
+			if m_m > 5 then isnoon = false end
+		elseif m_h == 12 and m_m < 4 then
+			isnoon = true
+			remove_info("art_mec_spawn")
+		end
+		isnight = false
+	end
+	if wasnight == nil then																	--for startup
+		wasnight = not isnight
+	end
+	amk.oau_watchdog=761																	-----------------761
+	if wasnight ~= isnight then
+		remove_info("actor_ban_chat_info")									--remove ban if exists
+		amk.del_variable("has_fines")														--clear any fines
+		campfire_update(isnight)
+		update_smoke(isnight)
+		if isnight then																		--night events
+			amk.oau_watchdog=762															-----------------762
+			if TB3D_Modders.use_environment_message then packet_alert("tb3d: nightfall["..utils.to_str(m_h)..":"..utils.to_str(m_m).."]") end
+			if TB3D_Modders.night_creatures == true and has_alife_info("bar_deactivate_radar_done") then
+				if spawned == false then
+					spawned = TB3D_Triggers.creatures_of_the_night()
+				end
+			end
+		else																				--day events
+			amk.oau_watchdog=763															-----------------763
+			if TB3D_Modders.use_environment_message then packet_alert("tb3d: daybreak["..utils.to_str(m_h)..":"..utils.to_str(m_m).."]") end
+			spawned = false																	--reset for next night
+		end
+		wasnight = isnight
+	end
+	if not has_alife_info("tb3d_harsh_environment") then
+		----------dynamic ambient sound zones-------------------------------------------------------------------------------
+		amk.oau_watchdog=764																	-----------------764
+		if has_alife_info("tb3d_marsh_zones") and TB3D_Modders.swamp_sounds then				--frogs when in swampy areas
+			local is_inzone = in_zone(level.name()) 
+			local dy = "2"
+			if is_night(false) then dy = "1" end
+			if is_inzone == 1 then
+				if frogs_snd then
+					if frogs_snd:playing() then frogs_snd:stop() end
+				end
+				if not frogs_snd_soft then
+					frogs_snd_soft = sound_object("ambient\\outdoors\\frogs_choir_3")				--start soft
+				end
+				if frogs_snd_soft and not frogs_snd_soft:playing() then
+					frogs_snd_soft:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d + sound_object.looped)
+				end
+			elseif is_inzone == 2 then
+				if frogs_snd_soft then
+					if frogs_snd_soft:playing() then frogs_snd_soft:stop() end
+				end
+				if not frogs_snd then
+					frogs_snd = sound_object("ambient\\outdoors\\frogs_choir_"..dy)						--day or night
+				end
+				if frogs_snd and not frogs_snd:playing() then
+					frogs_snd:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d + sound_object.looped)
+				end
+			else
+				if frogs_snd_soft and frogs_snd_soft:playing() then
+					frogs_snd_soft:stop()
+					frogs_snd_soft = nil
+				end
+				if frogs_snd and frogs_snd:playing() then
+					frogs_snd:stop()
+					frogs_snd = nil
+				end
+			end
+		else
+			if frogs_snd_soft then
+				if frogs_snd_soft:playing() then frogs_snd_soft:stop() end
+				frogs_snd_soft = nil
+			end
+			if frogs_snd then
+				if frogs_snd:playing() then frogs_snd:stop() end
+				frogs_snd = nil
+			end
+		end
+		amk.oau_watchdog=765																	-----------------765
+		if has_alife_info("tb3d_cooling_zones") and TB3D_Modders.cooling_sounds then			--indoor zones with ventillation
+			if not (cooling_snd and cooling_snd:playing()) then
+				if level.name() == "jupiter_underground" then
+					cooling_snd = sound_object("ambient\\cooling_run_jup")
+				else
+					cooling_snd = sound_object("ambient\\cooling_run")
+				end
+				cooling_snd:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d + sound_object.looped)
+			end
+		elseif cooling_snd then
+			cooling_snd:stop()
+			cooling_snd = nil
+		end
+		-------------------------------------------------------------------------------------------------------------------------
+	end
+end
+
+function in_zone(level_name)
+	local inzone = 2																	--0 = not, 1 = outer and 2 = inner
+	local alt = db.actor:position().y													--marsh water level at 0
+	local posx = db.actor:position().x
+	local posz = db.actor:position().z
+	if level_name == "zaton" then														--water level at -7
+		if posx < -332																	--swirls far left
+		  or (posz < -100 and posx < -23)												--under gas station
+		  or (posz < -200 and posx < 23)
+		  or (posx > 360.5 and posz > 417)												--crack in upper corner
+		  then
+			inzone = 0
+		elseif posx < -336
+		  or (posz < -110 and posx < -25)
+		  or (posz < -210 and posx < 25)
+		  or (posx > 362.5 and posz > 420)
+		  then
+			inzone = 1
+		end
+		alt = alt + 7
+	elseif level_name == "marsh" then													--water level at 0
+		if posx < -300
+		  then
+			inzone = 0
+		elseif posx < -290
+		  then
+			inzone = 1
+		end
+	elseif level_name == "l03_agroprom" then											--water level at 0
+		if posx > -138
+		  or posz < -9
+		  then
+			inzone = 0
+		elseif posx > -140
+		  or posz < -7
+		  then
+			inzone = 1
+		end
+	elseif level_name == "l04_darkvalley" then										--water level at -7
+		alt = alt + 7
+	elseif level_name == "l02_garbage" then											--water level at -5
+		if posx > 133 and posx < 169
+		  and posz > 90 and posz < 136 then
+			inzone = 1
+		elseif posx > 135 and posx < 167
+		  and posz > 92 and posz < 134 then
+			inzone = 2
+		else
+			inzone = 0
+		end
+		alt = alt + 5
+	elseif level_name == "l08_yantar" then											--water level at -13
+		if posx < -80
+		  and posz > -217
+		  then
+			inzone = 0
+		elseif posx > 14
+		  or posx < -90
+		  or posz > -200
+		  or posz < -315
+		  then
+			inzone = 0
+		elseif posx > 12
+		  or posx < -86
+		  or posz > -198
+		  or posz < -313
+		  then
+			inzone = 1
+		end
+		alt = alt + 13
+	elseif level_name == "aver" then												--water level at -43
+		--big lake at -7 and swamp at -54, so need to make seperate
+		alt = alt + 43
+	else
+		inzone = 0
+	end
+	if inzone > 0 then
+		if alt > 4 or alt < -4 then	inzone = 0								--not close to water or in deep so stop
+		elseif alt > 2 or alt < -2 then inzone = 1
+		end
+	end
+	return inzone
+end
+
+function is_indoor(include_night)											--check if indoors or night(optional)
+	local level_name = level.name()
+	if level_name == "l12_stancia"
+	  or level_name == "l12_stancia_2"							--used for vehicle and building fires
+	  or level_name == "l08_yantar" then							--for the tunnels and trucks
+		return true
+	elseif level_weathers.is_indoor(level_name) == true then
+		return true
+	elseif include_night then return isnight end
+	return false
+end
+function is_night()
+	if isnight == nil then set_daytime() end
+	return isnight
+end
+
+function is_instorm(level_name)											--109978, check if outdoors in the storm area
+	if level_name == "l12_stancia"
+	  or level_name == "l12_stancia_2"
+	  or level_name == "l10_radar"
+	  or level_name == "l04_pogost"					--cemetery
+	  or level_name == "l03_rinok"					--black market
+	  or level_name == "l07_military"
+	  or level_name == "aver"						--recon
+	  or level_name == "pripyat"
+	  or level_name == "dead_city"
+	  or level_name == "generators" then
+		return true
+	end
+	return false
+end
+
+local harsh_snd
+function set_harsh_environment(type)											--109980
+	if type == 1 then																--F1 and level_up 2 outdoors
+		level.add_pp_effector("psy_antenna.ppe", 77777771, true, "")
+		harsh_snd = sound_object("ambient\\radarsparks_1")
+		give_info("tb3d_bad_torch")													--flashlight will break if equiped
+		give_info("tb3d_harsh_environment")											--gear starts to deteriorate from environment, also starts storm effect
+	elseif type == 2 then															--jupu after x14
+		level.add_pp_effector("dead_zone.ppe", 77777771, false)
+		level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
+	elseif type == 3 then
+		level.add_pp_effector("nightvision.ppe", 77777771, true) 
+		harsh_snd = sound_object("ambient\\radarsparks_1")
+	else  --if type == 4 then
+		level.add_pp_effector("nano.ppe", 77777771, true)
+		harsh_snd = sound_object("ambient\\radar_2")
+	end
+	if harsh_snd then harsh_snd:play_no_feedback(db.actor, sound_object.s2d + sound_object.looped, 0, vector(), 2.5) end
+end
+
+function clear_harsh_environment()											--109980
+	if harsh_snd then harsh_snd:stop() harsh_snd = nil end
+	level.remove_pp_effector(77777771)
+	remove_info("tb3d_bad_torch")													--ok to use flashlight again
+	remove_info("tb3d_harsh_environment")											--gear stops degrading, also stops storm effect
+end
+
+function set_blow(phase)											--109980
+	blow_phase = phase
+	amk.save_variable("blowout", phase)
+end
+function stop_blow()
+	blow_phase = nil
+	blow_type = nil
+	amk.del_variable("blowout")
+end
+
+function blow()											--109980
+	return blow_phase
+end
+function blowout_type()
+	if blow_type == nil then blow_type = amk_hideouts.blowout_types[level.name()] or 5 end
+	return blow_type
+end
+function is_harsh_blowout()
+	if has_alife_info("tb3d_harsh_environment")
+	  or ((blow_type == 0 or blow_type == 3) and blow_phase ~= nil and blow_phase > run_hide and blow_phase < can_leave) then
+		return true
+	end
+	return false
+end
+function pda_is_blocked()
+	if has_alife_info("tb3d_harsh_environment")
+	  or (blowout_type() < 4 and blow_phase ~= nil and blow_phase > run_hide and blow_phase < can_leave) then
+		return true
+	end
+	return false
+end
+
+--fires checked---------------------------
+--cordon, hosp, 
+--no fires on level-----------------------
+--zaton
+------------------------------------------
+function campfire_update(night)
+	local name = ""
+	local obj
+	local pos
+	for id=first_object, last_object do
+		obj = level.object_by_id(id)
+		if obj then
+			name = obj:name()
+			section = obj:section()
+			--if TB3D_Modders.use_environment_message then
+				--packet_alert("tb3d: campfire update["..utils.to_str(name).."] sect["..utils.to_str(section).."]")
+			--end
+			if section == "lights_hanging_lamp" then
+				--packet_alert("tb3d: campfire update lamp["..utils.to_str(name).."]")
+				if string_find(name, "r1_r2")
+				  or string_find(name, "lights_camp")
+				  or string_find(name, "koster") 		--"koster_lights")
+				  or string_find(name, "hosp_3otsek_svet3")
+				  or string_find(name, "hosp_3otsek_ogon1_svet1") then
+					if TB3D_Modders.fires_always_on == true or night or is_indoor(false) == true then
+						if TB3D_Modders.use_environment_message then packet_alert("tb3d: campfire lamp update["..utils.to_str(name).."] [on]") end
+						obj:get_hanging_lamp():turn_on()
+					else
+						if TB3D_Modders.use_environment_message then packet_alert("tb3d: campfire lamp update["..utils.to_str(name).."] [off]") end
+						obj:get_hanging_lamp():turn_off()
+					end
+				end
+			elseif section == "zone_flame_small" then
+				if TB3D_Modders.fires_always_on == true or night == true or is_indoor(false) == true then
+					if TB3D_Modders.use_environment_message then packet_alert("tb3d: flame["..utils.to_str(name).."] [on]") end
+					obj:enable_anomaly()
+				else
+					if TB3D_Modders.use_environment_message then packet_alert("tb3d: flame["..utils.to_str(name).."] [off]") end
+					obj:disable_anomaly()
+				end
+			end
+		end
+	end
+end
+function update_smoke(night)
+	local name = ""
+	local obj
+	local pos
+	for id=first_object, last_object do
+		obj = level.object_by_id(id)
+		if obj then
+			name = obj:name()
+			section = obj:section()
+			if section == "zone_flame_small" then
+				if TB3D_Modders.use_campfire_smoke then
+					if TB3D_Modders.fires_always_on == true or night == true or is_indoor(false) == true then
+						pos = obj:position()
+						if pos then
+							pos.y = pos.y-0.33
+							if TB3D_Modders.use_environment_message then
+								packet_alert("tb3d: campfire smoke posx["..utils.to_str(pos.x).."] posy["..utils.to_str(pos.y).."] posz["..utils.to_str(pos.z).."] lv["..utils.to_str(obj:level_vertex_id()).."] gv["..utils.to_str(obj:game_vertex_id()).."]")
+							end
+							alife():create("zone_campfire_tb3d",vector():set(pos.x,pos.y,pos.z),obj:level_vertex_id(),obj:game_vertex_id())
+							smoke_on = true
+						end
+					end
+				end
+			end
+		end
+	end
+end
+function remove_smoke()
+	local name = ""
+	local obj
+	for id=first_object, last_object do
+		obj = alife():object(id) --level.object_by_id(id)
+		if obj then
+			name = obj:name()
+			if string_find(name, "zone_campfire_tb3d") then
+				alife():release(alife():object(id), true)
+			end
+		end
+	end
+end
+
+--Characters with invunerable immunities, invuln to all but actor
+local invuln_npc = {
+    --["mil_stalker0012"] = true, 				--Mad Dog at AU
+    ["yantar_ecolog_general"] = true, 			--Sakharov
+    ["dead_mono_labirint"] = true, 				--undead
+    --["bar_bar_guard"] = true, 				--Garik at the bar
+    ["bar_bar_osvedomitel"] = true, 			--The informant in the bar
+    --["bar_bar_guard_2"]  = true,  			--Zhorik in the bar
+	["actor"] = true,							--Hero, for multiplayer			
+	--["actor_zombi"] = true,					--Hero, for multiplayer	
+	["mp_actor"] = true,						--Hero, for multiplayer	
+	["mp_actor_zombi"] = true,					--Hero, for multiplayer	
+	["esc_zvezdochet"] = true,					--Astrologer
+	["land_arhara_zvezdochet"] = true,			--Astrologer
+	["zvezd_after_warl"] = true,				--Astrologer
+	["generators_zvezdochet"] = true,			--Astrologer
+	["aver_zvezdochet2"] = true,				--Astrologer
+	["esc_bridge_soldier5"] = true,				--Kuznet
+	["esc_wolf"] = true,						--Wolf
+	--["esc_wolf_zombi"] = true,				--Wolf
+	["esc_vagon_wounded"] = true,				--Tolik
+	--["esc_vagon_wounded_zombi"] = true,		--Tolik
+	["esc_akim"] = true,						--Akim
+	--["esc_novice_attacker1"] = true,			--Petruha
+	--["esc_novice_attacker_zombi"] = true,		--Petruha
+	["esc_shustryi"] = true,					--Nimble
+	--["esc_shustryi_zombi"] = true,			--Nimble
+	["esc_kostya"] = true,						--Kostya
+	--["esc_kostya_zombi"] = true,				--Kostya
+	["esc_fox"] = true,							--Fox
+	--["esc_fox_zombi"] = true,					--Fox
+	["gar_hellcar"] = true,						--Bes
+	["aes_Monolit_master"] = true,				--Bes
+	["cit_bandit_veteran_best"] = true,			--Bes
+	["cit_bandit_veteran_best_zombi"] = true,	--Bes
+	["aem_arny"] = true,						--Arnie
+	["bar_arena_manager"] = true,				--Arnie
+	["yan_ecolog_help"] = true,					--Kruglov - Rostok
+	["yan_scientist_help"] = true,				--Kruglov - Yantar
+	["piyan_kapitan"] = true,					--drunk Captain Sralamazalynsky in agro
+	["trezv_kapitan"] = true,					--sober Captain Sralamazalynsky in agro
+	["amk_artem_kulinar"] = true,				--mil cook
+	["ds_cook"] = true,							--Darckscape cook
+	--["ds_cook_zombi"] = true,					--Darckscape cook
+	["esc_fanat"] = true,						--Fanatic
+	--["esc_fanat_zombi"] = true,				--Fanatic
+	["esc_provodnik"] = true,					--Guide
+	--["esc_provodnik_zombi"] = true,			--Guide
+	["boloto_provodnik"] = true,				--Guide
+	["esc_soldier_commander"] = true,			--Kuznetsov
+	["bar_dolg_ivancov"] = true,				--Ivancov
+	--["bar_dolg_ivancov_zombi"] = true,		--Ivancov
+	["mil_dolg_stalker0000"] = true,			--Skull
+	["mil_bolt"] = true,						--Bolt
+	["mil_bolt_zombi"] = true,					--Bolt
+    ["mil_freedom_member0009"]  = true, 		--Guard Lucas
+    ["mil_freedom_member0012"]  = true, 		--Lukas
+	["mil_Svoboda_leader"] = true,				--Lukash
+	--["svoboda_leader_zombi"] = true,			--Lukash
+	["final_lukash"] = true,					--Lukash
+    ["mil_freedom_member0019"]  = true, 		--Guard Lucas
+	["mil_freedom_member0002"] = true,
+	["mil_freedom_member0026"] = true,
+	["mil_freedom_stalker0010"] = true,
+    ["mil_freedom_member0021"]  = true, 		--Miser
+	["mil_Svoboda_cook"] = true,				--svaboda cook
+	--["mil_Svoboda_cook_zombi"] = true,		--svaboda cook
+	--["svoboda_cook_zombi"] = true,			--svaboda cook
+	["mil_Svoboda_master_Max"] = true,			--Max
+	["mil_freedom_member0018"] = true,			--Max
+	["Sak"] = true,								--Max
+	["doktor1"] = true,							--Cordon Doctor
+	["doktor"] = true,							--Marsh Doctor
+	["agro_adrenalin"] = true,					--Adrenalin
+	["agro_mobil_torgash"] = true,				--Mobile Trader
+	["agr_krot"] = true,						--Mole
+	["final_krot"] = true,						--Mole
+	["bar_dolg_petrenko"] = true,				--Patrenko
+	--["bar_dolg_petrenko_zombi"] = true,		--Patrenko
+	["final_petrenko"] = true,					--Patrenko
+	["mil_Svoboda_engineer"] = true,			--Screw
+	--["mil_Svoboda_engineer_zombi"] = true,	--Screw
+	["gar_seriy"] = true,						--Seriy
+	--["gar_seriy_zombi"] = true,				--Seriy
+	["mil_Svoboda_trader"] = true,				--Skinflint
+	["bar_dolg_leader"] = true,					--Voronin
+	--["bar_dolg_leader_zombi"] = true,			--Voronin
+	["final_voronin"] = true,					--Voronin
+	["clear_scy_leader"] = true,				--Sviblov
+	["gar_dram_novice"] = true,					--Yurik
+	["gar_dolg_blokpost_commander"] = true,		--Warrent Officer
+	["sim_dolg_veteran_prapor"] = true,			--Prapor
+	["gar_dolg_blokpost_4"] = true,				--prapor
+	["atp_kalinin"] = true,						--Kalinin
+	["yakut_agro2"] = true,						--Yakut
+	["aver_filin"] = true,						--Fillin
+	["puzir_crest"] = true,						--Crest in Forgotten Forest
+	["gar_vitek_voron_spawn"] = true,			--Vitek Voron
+	["land_lazaret_stalker1"] = true,			--Lazaret
+	["land_lazaret_stalker2"] = true,			--Lazaret
+	["land_lazaret_stalker3"] = true,			--Lazaret
+	["piligrim"] = true,						--Pilgrim
+	["piligrim_1"] = true,						--Pilgrim
+	["piligrim_2"] = true,						--Pilgrim
+	["piligrim_bar"] = true,					--Pilgrim
+	["piligrim_sklad"] = true,					--Pilgrim
+	["village_piligrim"] = true,				--Pilgrim
+	["kluk_sklad"] = true,						--Kluk
+	["stalk_kluk"] = true,						--Kluk
+	["bunker_kluk"] = true,						--Kluk
+	["kluk_bar"] = true,						--Kluk
+	["new_kluk_nz"] = true,						--Kluk
+	["pantera"] = true,							--Pantera
+	["bodi_pantera1"] = true,					--Pantera
+	["bodi_pantera2"] = true,					--Pantera
+	["pantera_new"] = true,						--Pantera
+	["body1_pantera_new"] = true,				--Pantera
+	["body2_pantera_new"] = true,				--Pantera
+	["village_pantera"] = true,					--Pantera
+	["marsh_pantera"] = true,					--Pantera
+	["warlab_vitamin"] = true,					--Vitamin
+	["radar_vitamin"] = true,					--Vitamin
+	["vitamin"] = true,							--Vitamin
+	["warlab_stalker_oso"] = true,				--Oso
+	["tehnik_golograma"] = true,				--Golograma
+	["warlab_golograma"] = true,				--Golograma
+	["kolmogor"] = true,						--Kolmogor
+	["frits"] = true,							--Frits
+	["gener_frits2"] = true,					--Frits
+	["solvador"] = true,						--Solvador
+	["generators_prizrak"] = true,				--Prizrak
+	["chaes1_prizrak"] = true,					--Prizrak
+	["generators_udav"] = true,					--Udav
+	["stalk_semetskiy"] = true,					--Semetskiy
+	["semetskiy"] = true,						--Semetskiy
+	["forest_lesnik"] = true,					--Lesnik
+	["lesnik"] = true,							--Lesnik
+	["syslov"] = true,							--Syslov
+	["kombat"] = true,							--Kombat
+	["shadows"] = true,							--Shadows
+	["mudri"] = true,							--Mudri
+	["grozn"] = true,							--Grozn
+	["alex"] = true,							--Alex
+	["klenov"] = true,							--Klenov
+	["botsman"] = true,							--Botsman
+	["pavel_sergeevich"] = true,				--Pavel Sergeevich
+	["peshera_shaxter"] = true,					--Shaxter
+	["borman"] = true,							--borman
+	["labirint_monolit_shahter"] = true			--fema coal
+	--["borm_lima_freedom4"] = true				--borman
+}
+
+function is_invulnerable(npc)
+	local npc_name = protected_items.get_obj_name(npc)		--strips off the id
+	if npc_name then
+		if invuln_npc[npc_name] then
+			--packet_alert("tb3d services: is_invulnerable["..npc_name.."][true]")
+			return true
+		end
+		--packet_alert("tb3d services: is_invulnerable["..npc_name.."][false]")
+	end
+	return false
+end
+
+function check_invuln_can_die(npc)
+	local result = false											--default stay invulnerable
+	local npc_name = protected_items.get_obj_name(npc)				--strips off the id
+	if npc_name then
+		if npc_name == "esc_bridge_soldier5" then						--Kuznet
+			result = has_alife_info("kuzy_artmodifikator_done")
+		elseif npc_name == "mil_Svoboda_cook"							--cook
+		  or npc_name == "mil_Svoboda_cook_zombi"
+		  or npc_name == "svoboda_cook_zombi" then
+			result = has_alife_info("mil_headquarter_attack")
+		elseif  npc_name == "mil_Svoboda_master_Max"				--Max
+		  or npc_name == "Sak"
+		  or npc_name == "mil_freedom_member0018" then
+			result = has_alife_info("mil_headquarter_attack")
+			  or has_alife_info("mil_lukash_get_job")
+			  or has_alife_info("mil_lukash_dolg_task")
+		elseif  npc_name == "mil_dolg_stalker0000" then				--Skull
+			result = has_alife_info("mil_headquarter_attack")
+			  or has_alife_info("mil_lukash_get_job")
+			  or has_alife_info("mil_lukash_dolg_task")
+		elseif  npc_name == "sim_stalker_prut" then
+			result = has_alife_info("mil_headquarter_attack")
+		elseif npc_name == "gar_dolg_blokpost_commander"			--warrant officer
+		  or npc_name == "bunker_kluk"								--corn
+		  or npc_name == "sim_dolg_veteran_prapor" then				--Prapor
+			result = true
+		elseif npc_name == "mil_Svoboda_leader"						--Lukash
+		  or npc_name == "svoboda_leader_zombi"
+		  or npc_name == "final_lukash"
+		  or npc_name == "mil_freedom_member0012" then
+			result = has_alife_info("mil_dolg_final_task")
+			  or has_alife_info("mil_headquarter_attack")
+		elseif string_find(npc_name, "mil_freedom_member") then		--lukash guards(0009,0019), Miser(0021)
+			result = has_alife_info("mil_headquarter_attack")		--attack freedom base
+		end
+ 	end
+	packet_alert("tb3d services: can die?["..npc_name.."] ["..utils.to_str(result).."]")
+	return result
+end
+
+local immortals = {
+	["labirint_shade_monolit"] = true,						--shadow of the monolith			
+	["land_sniper_chimaera"] = true,						--Chimaera
+	["final_shade_mono"] = true								--shadow of the monolith		
+}
+function is_immortal(npc)
+	--local npc_name = npc:name()
+	local npc_name = protected_items.get_obj_name(npc)		--strips off the id
+	if npc_name then
+		if immortals[npc_name] then
+			--packet_alert("tb3d services: is_immortal["..npc_name.."][true]")
+			return true
+		end
+		--packet_alert("tb3d services: immortal["..npc_name.."][false]")
+	end
+	return false
+end
+
+--[[function skip_task(id)
+	if id == "pri_stadium_help"				--16725
+	  or id == "pri_corner"					--16749
+	  or id == "pri_followers"				--16774
+	  or id == "pri_depot"					--16827
+	  or id == "pri_stadium"				--16917
+	  or id == "pri_monolith"				--16973
+	  or id == "pri_wave1"					--17114
+	  or id == "pri_wave2"					--17118
+	  or id == "pri_wave4"					--17146
+	  or id == "pri_wave5"					--17173
+	  or id == "pri_wave6"					--17191
+	  or id == "pri_wave7"					--17219
+	  or id == "sar_monolith_guard"			--19329
+	  or id == "sar_monolith_general"		--19438
+	  or id == "sar_monolith_sklad"			--19524
+	  or id == "rad_get_to_aes"
+	  then return true end
+	 return false
+end]]--
+	
+function remove_stalker_infos()		--remove unnec info from collector db
+	remove_info_portions("pri_misc")
+	remove_info_portions("pri_tasks")
+	remove_info_portions("pri_dead")
+	--remove_info_portions("esc_fox_fail")
+	--remove_info_portions("esc_lager")		--merc attack on village
+	--remove_info_portions("esc_spawns")
+	--remove_info_portions("esc_disables")
+	remove_info_portions("sar_misc")
+	remove_info_portions("sniper_begins")
+end
+
+function remove_dynrad_info()
+	remove_info("my1")
+	remove_info("my2")
+	remove_info("my3")
+	remove_info("my4")
+	remove_info("my5")
+	remove_info("my6")
+	remove_info("my7")
+	remove_info("my8")
+	remove_info("my9")
+	remove_info("my10")
+	remove_info("my11")
+end
+
+function shadowman_cleanup()
+	remove_info_portions("shadowman_zver")
+	TB3D_Services.give_info("shadowman_zver_have")
+end
+
+function clear_snip_infos()
+	remove_info_portions("esc_snip")
+end
+
+function clear_naem_zahar_infos()
+	remove_info_portions("naem_zahar")
+end
+
+function move_actor(x,y,z,is_hit)
+	if x and y and z then
+		db.actor:set_actor_position(vector():set(x, y, z))
+		if is_hit then
+			--level.add_pp_effector("deadcity_wake.ppe", 4467, false)
+			level.add_pp_effector("alcohol.ppe", 3000, false)
+		end
+	end
+end
+
+function rotate_actor(degs)
+	local pos = db.actor:position()
+	local angle = degs
+	if angle == nil then
+		angle = 180
+	end
+	--db.actor:set_actor_direction(vector_rotate_y(device().cam_dir, angle))
+	db.actor:set_actor_direction(vector_rotate_y(db.actor:direction(), angle))
+	--packet_alert("tb3d services: actor rotated["..utils.to_str(angle).."]")
+	--db.actor:set_actor_position(vector():set(pos.x, pos.y, pos.z+0.001))
+end
+
+function check_box_closed()
+	local bx_wnd=level.main_input_receiver()
+	if bx_wnd then
+		bx_wnd:GetHolder():start_stop_menu(bx_wnd,true)
+	end
+end
+
+function test_spawns()
+	--get_info_portions("enc")		--give general information
+	--get_info_portions("esp_done")  	--doctor and cave quests
+	--get_info_portions("esc_articles")
+	--get_info_portions("esc_allspawn")
+	--get_info_portions("esc_misc")
+	--get_info_portions("esc_fox_start")		--spawns dogs
+	--get_info_portions("esc_fox_task")		--triggers help fox task, gives sl_usefull_info
+	--get_info_portions("esc_fox_done")		--gives storyline_seryi_info
+	--get_info_portions("esc_fox_meds")
+	--get_info_portions("esc_kostya")			--allows him to roam	
+	--get_info_portions("esc_done")
+	--get_info_portions("esc_tasks")
+	--get_info_portions("gar_done")
+	--get_info_portions("gar_tasks")
+	--get_info_portions("gar_misc")
+	--get_info_portions("agr_done")
+	--get_info_portions("agr_tasks")
+	--get_info_portions("agr_misc")
+	get_info_portions("end_misc")	--military case done/learn
+	--get_info_portions("bar_done")
+	--get_info_portions("bar_tasks")
+	--get_info_portions("bar_misc")
+end
+
+function jump_to_npc(npc)
+	local pos = npc:position(npc:id())
+	if pos then
+		move_actor(pos.x,pos.y,pos.z)
+	end
+end
+
+function can_remove_dead(lname)
+	local result = false
+	if lname == "l01_escape" then
+		if has_alife_info("bar_darklab_document_done") then result = true end
+	elseif lname == "l02_garbage" then
+		if has_alife_info("bar_darklab_document_done") then result = true end
+	elseif lname == "marsh" then
+		if has_alife_info("brat_luis_have") then result = true end
+	elseif lname == "l05_bar" then
+		if has_alife_info("bar_deactivate_radar_done") then result = true end
+	elseif lname == "l04_darkvalley" then
+		if has_alife_info("bar_darklab_document_done") then result = true end
+	elseif lname == "l07_military" then
+		if has_alife_info("rad_after_antenna_turned_off") then result = true end
+	elseif lname == "l03_agroprom" then
+		if has_alife_info("agroprom_military_case_done") then result = true end
+	elseif lname == "atp_for_test22" then
+		if has_alife_info("kalinin_zadan_done") then result = true end
+	elseif lname == "l06_rostok" then
+		if has_alife_info("yan_kill_brain_done") then result = true end
+	elseif lname == "l08_yantar" then
+		if has_alife_info("bar_x16_documents_done") then result = true end
+	elseif lname == "l10_radar" then
+		if has_alife_info("rad_after_antenna_turned_off") then result = true end
+	elseif lname == "l11_pripyat" then
+		if has_alife_info("pri_wave7_end") or has_alife_info("pri_followers_all_dead") then result = true end
+	elseif lname == "l12_stancia" then
+		if has_alife_info("aes_found_sarcofag") then result = true end
+	elseif lname == "l12_stancia_2" then
+		if has_alife_info("aes2_monolit_ambush11") or has_alife_info("m9_ready") then result = true	end
+	elseif lname == "k01_darkscape" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "l23_final_battle" then
+		if has_alife_info("final_muzon") then result = true end
+	elseif lname == "pripyat" then				--east
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "limansk" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "lost_village" then
+		if has_alife_info("village_after_razborka") then result = true end
+	elseif lname == "generators" then
+		if has_alife_info("gener_desant_black_spawn") then result = true end
+	elseif lname == "red_forest" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "aver" then				--recon
+		--result = true
+	elseif lname == "puzir" then			--forgotten forest
+		--result = true
+	elseif lname == "hospital" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "jupiter" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "zaton" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "dead_city" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "l04u_labX18" then														--------underground/indoor levels------------
+		if has_alife_info("bar_darklab_document_done") then result = true end
+	elseif lname == "l03u_agr_underground" then
+		if has_alife_info("agr_find_gunslinger_cache_done") then result = true end
+	elseif lname == "l10u_bunker" then
+		if has_alife_info("bar_deactivate_radar_done") then result = true end
+    elseif lname == "warlab" then
+		if has_alife_info("zep24_have") then result = true end
+    elseif lname == "l08u_brainlab" then												--x16 Yantar
+		if has_alife_info("yan_x16_documents_gain") then result = true end
+    elseif lname == "l12u_sarcofag" then
+		if has_alife_info("aes_found_sarcofag") then result = true end
+	elseif lname == "jupiter_underground" then
+		if has_alife_info("zep24_have") then result = true end
+    elseif lname == "l12u_control_monolith" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "peshera" then
+		--result = false
+    elseif lname == "av_peshera" then
+		--result = false
+	elseif lname == "predbannik" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "promzone" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "hiding_road" then
+		if has_alife_info("zep24_have") then result = true end
+	elseif lname == "level_f-1" then
+		if has_alife_info("zep24_have") then result = true end
+	end
+	return result
+end
+
+function stalker_set_portals()								--hides portal if called, normal start
+	if TB3D_Modders.default_portal_spawn then
+		 sak.out_new_lc(9100,"info_way100a")
+		 sak.out_new_lc(9101,"info_way101a")
+		 sak.out_new_lc(9102,"info_way102a")
+		 sak.out_new_lc(9103,"info_way103a")
+		 sak.out_new_lc(9104,"info_way104a")
+		 sak.out_new_lc(9105,"info_way105a")
+		 sak.out_new_lc(9106,"info_way106a")
+		 sak.out_new_lc(9107,"info_way107a")
+		 sak.out_new_lc(9108,"info_way108a")
+		 sak.out_new_lc(9109,"info_way109a")
+		 sak.out_new_lc(9110,"info_way110a")
+		 sak.out_new_lc(9111,"info_way111a")
+		 sak.out_new_lc(1008,"info_way112a")
+		 sak.out_new_lc(592,"info_way113a")
+		 sak.out_new_lc(97101,"info_way114a")
+		 sak.out_new_lc(11504,"info_way_arhara_peshera_cvalka")
+		 sak.out_new_lc(11505,"info_way_arhara_peshera_agro")
+		 sak.out_new_lc(11502,"info_way_arhara_cvalka_peshera")
+		 sak.out_new_lc(11503,"info_way_arhara_agro_peshera")
+		 sak.out_new_lc(97071,"info_way_arhara_td_les")
+		 sak.out_new_lc(97081,"info_way_arhara_labirint_peshera")
+		 sak.out_new_lc(97021,"info_way_arhara_peshera_labirint")
+		 sak.out_new_lc(11512,"info_way_arhara_labirint_yantar")
+		 sak.out_new_lc(11515,"info_way_arhara_yantar_labirint")
+		 sak.out_new_lc(11511,"info_way_arhara_labirint_earth")
+		 sak.out_new_lc(97041,"info_way_arhara_atp_pripyat")
+		 sak.out_new_lc(97091,"info_way_arhara_atp_military")
+		 sak.out_new_lc(97092,"info_way_arhara_atp_kordon")
+		 sak.out_new_lc(97093,"info_way_arhara_atp_svalka")
+		 sak.out_new_lc(97100,"info_way_arhara_pripyt_village") 
+		 sak.out_new_lc(11514,"info_way_arhara_military_earth")
+		 sak.out_new_lc(11513,"info_way_arhara_td_earth")
+		 sak.out_new_lc(12506,"info_way_arhara_svalka_earth")
+		 sak.out_new_lc(11510,"info_way_arhara_earth_labirint")
+		 sak.out_new_lc(97094,"info_way_arhara_radar_warlab")
+		 sak.out_new_lc(97095,"info_way_arhara_warlab_brainlab")
+		 sak.out_new_lc(97097,"info_way_arhara_warlab_skladu")
+		 sak.out_new_lc(97098,"info_way_arhara_x18_warlab")
+		 sak.out_new_lc(14002,"info_way_arhara_kordon_boloto")
+		 sak.out_new_lc(14091,"info_way_arhara_radar_forest")
+		 sak.out_new_lc(97099,"info_way_arhara_chaes2_atp")
+		 sak.out_new_lc(11529,"info_way_arhara_village_limansk")
+		 sak.out_new_lc(11531,"info_way_arhara_village_hospital")
+		 sak.out_new_lc(97103,"info_way_arhara_chaes_generator")
+		 sak.out_new_lc(97104,"info_way_arhara_hospital_agroprom")
+		 sak.out_new_lc(97105,"info_way_arhara_agroprom_marsh1")
+		 sak.out_new_lc(97001,"info_way_arhara_bar_atp")
+		 sak.out_new_lc(97106,"info_way_arhara_gener_pripyat")
+		 sak.out_new_lc(97102,"info_way_arhara_chaes2_chaes")
+		 sak.out_new_lc(11521,"info_way_arhara_gener_hospital")
+		 sak.out_new_lc(97096,"info_way_arhara_warlab_generators")
+		 sak.out_new_lc(97107,"info_way_arhara_limansk_generators")
+		 sak.out_new_lc(97108,"info_way_arhara_forest_warlab")
+		 sak.out_new_lc(97109,"info_way_arhara_dcity_limansk")
+		 sak.out_new_lc(97110,"info_way_arhara_dead_city_atp")
+		 sak.out_new_lc(97111,"info_way_arhara_dcity_rostok")
+		 sak.out_new_lc(97112,"info_way_arhara_atp_dead_city")
+		 sak.out_new_lc(97113,"info_way_arhara_dcity_zaton")
+		 sak.out_new_lc(97114,"info_way_arhara_lima_dcity")
+	 else
+		 if TB3D_Modders.Global_Debug then packet_alert("TB3D: Open All Portals") end
+		 sak.add_new_dcity()
+		 --sak.add_new_dcity_to_zaton()
+		 sak.add_new_lima_to_dead_city()
+	 end
+end
+
+function show_game_graph()
+	local cnt = 0
+	local gg = game_graph()
+	for gvid=0,5400 do
+		if gg:valid_vertex_id(gvid) then
+			local vertex = gg:vertex(gvid)
+			local level_name = alife():level_name(vertex:level_id())
+			if level_name ~= "collector22" and level_name ~= "garbage_old" and level_name ~= "deadcity" then
+				local lvid = vertex:level_vertex_id()
+				local pos = vertex:level_point()
+				local obj = alife():create("tb3d_gspot", pos, lvid, gvid)
+				level.map_add_object_spot_ser(obj.id, "alife_presentation_monstr", level_name..":"..gvid)
+				--packet_alert("graph point: level["..level_name.."] gvid["..utils.to_str(gvid).."] lvid["..utils.to_str(lvid).."] pos["..utils.to_str(pos.x)..","..utils.to_str(pos.y)..","..utils.to_str(pos.z).."]")
+				cnt = cnt + 1
+			end
+		end
+	end
+	packet_alert("tb3d services: total gvids["..utils.to_str(cnt).."]")
+end
+
+local time_wait
+function actor_update(obj, delta, time)
+	local ald_opt = amk.load_variable("tb3d_ald_weapons", 0)
+	if ald_opt == 3 then				--tunnel rat 1
+		if not time_wait then
+			time_wait = time + 50000	--if start or reload
+		elseif time_wait < time then
+			TB3D_Triggers.tunnel_rat3()
+			time_wait = time + 50000
+			amk.save_variable("tb3d_ald_weapons", 4)
+		end
+	elseif ald_opt == 4 then				--tunnel rat 2
+		if not time_wait then
+			time_wait = time + 50000		--if reload
+		elseif time_wait < time then
+			TB3D_Triggers.tunnel_rat4()
+			amk.save_variable("tb3d_ald_weapons", 5)
+			time_wait = nil
+		end
+	end
+end
+
+-- Quick-Use Slots
+-- Shadows - Additional Subject Matter
+function show_medkits(scopeused)
+	if TB3D_Modders.CopKeys == true then 
+		local hud = get_hud()
+		local cs = hud: GetCustomStatic("caption_button")
+		if not scopeused then -- hide slots of sight
+			if cs == nil then
+				hud: AddCustomStatic("caption_medkit", true)
+				hud: AddCustomStatic("caption_antirad", true)
+				hud: AddCustomStatic("caption_bandage", true)
+				hud: AddCustomStatic("caption_vodka", true)
+				hud: AddCustomStatic("caption_button", true)
+				hud: AddCustomStatic("caption_value_1", true)
+				hud: AddCustomStatic("caption_value_2", true)
+				hud: AddCustomStatic("caption_value_3", true)
+				hud: AddCustomStatic("caption_value_4", true)
+				cs = hud: GetCustomStatic("caption_button")
+				medkit_wnd = hud: GetCustomStatic("caption_value_1"):wnd()
+				medkit_wnd:SetTextY(1)
+				medkit_wnd:SetTextAlign(CGameFont.alCenter)
+				antirad_wnd = hud: GetCustomStatic("caption_value_2"):wnd()
+				antirad_wnd:SetTextY(1)
+				antirad_wnd:SetTextAlign(CGameFont.alCenter)
+				bandage_wnd = hud: GetCustomStatic("caption_value_3"):wnd()
+				bandage_wnd:SetTextY(1)
+				bandage_wnd:SetTextAlign(CGameFont.alCenter)
+				vodka_wnd = hud: GetCustomStatic("caption_value_4"):wnd()
+				vodka_wnd:SetTextY(1)
+				vodka_wnd:SetTextAlign(CGameFont.alCenter)
+			end
+			if cs ~= nil then
+				medkit_wnd:SetText("x"..medkit)
+				antirad_wnd:SetText("x"..antirad)
+				bandage_wnd:SetText("x"..bandage)
+				vodka_wnd:SetText("x"..vodka)
+			end
+		else
+			if cs then
+			   hud:RemoveCustomStatic("caption_medkit")
+			   hud:RemoveCustomStatic("caption_antirad")
+			   hud:RemoveCustomStatic("caption_bandage")
+			   hud:RemoveCustomStatic("caption_vodka")
+			   hud:RemoveCustomStatic("caption_button")
+				hud:RemoveCustomStatic("caption_value_1")
+				hud:RemoveCustomStatic("caption_value_2")
+				hud:RemoveCustomStatic("caption_value_3")
+				hud:RemoveCustomStatic("caption_value_4")
+			end
+		end
+	end
+end
+
+function jump_to_safe_spot()
+	local lname = level.name()
+	local x,y,z
+	if lname == "l01_escape" then
+		x=368.64785766602 y=14.986410140991 z=-39.82799911499
+	elseif lname == "l02_garbage" then
+		x=34.987949371338 y=0.39999961853027 z=-321.69677734375
+	elseif lname == "l03_agroprom" then
+		x=246.31381225586 y=0.31188201904297 z=-6.2722949981689
+	elseif lname == "l03u_agr_underground" then
+		x=-116.9373626709 y=-3.9851088523865 z=-142.53953552246
+	elseif lname == "l04_darkvalley" then
+		x=119.97664642334 y=-2.8698844909668 z=-255.84725952148
+	elseif lname == "l04u_labx18" then
+		x=0.70830935239792 y=9.3158388137817 z=-6.9960765838623
+	elseif lname == "l05_bar" then
+		x=352.52301025391 y=8.4092178344727 z=-488.80322265625
+	elseif lname == "l06_rostok" then
+		x=38.994853973389 y=-0.29142463207245 z=135.1131439209
+	elseif lname == "l08_yantar" then
+		x=169.37275695801 y=4.1396331787109 z=-243.70597839355
+	elseif lname == "l08u_brainlab" then
+		x=-105.99773406982 y=21.565196990967 z=-30.402231216431
+	elseif lname == "l07_military" then
+		x=-410.09213256836 y=-20.84464263916 z=7.3378114700317
+	elseif lname == "l10_radar" then
+		x=565.05798339844 y=-53.391662597656 z=-410.84588623047
+	elseif lname == "l11_pripyat" then
+		x=-25.191442489624 y=12.136672019958 z=-172.90087890625
+	elseif lname == "l12_stancia" then
+		x=919.42755126953 y=0.00026702880859375 z=-239.1022644043
+	elseif lname == "l12u_sarcofag" then
+		x=60.308162689209 y=16.659175872803 z=28.04531288147
+	elseif lname == "l12u_control_monolith" then
+		x=36.417289733887 y=-34.998241424561 z=19.186647415161
+	elseif lname == "l12_stancia_2" then
+		x=-57.491508483887 y=0.010772705078125 z=71.515472412109
+	elseif lname == "l10u_bunker" then
+		x=-0.081940174102783 y=-7.4505681991577 z=-76.284446716309
+	elseif lname == "atp_for_test22" then
+		x=-258.02090454102 y=4.9093523025513 z=-14.117897033691
+	elseif lname == "peshera" then
+		x=-198.72961425781 y=-9.617130279541 z=14.827494621277
+	elseif lname == "puzir" then
+		x=-216.73342895508 y=-1.4458351135254 z=203.62590026855
+	elseif lname == "aver" then
+		x=-403.00442504883 y=52.34253692627 z=-143.81695556641
+	elseif lname == "av_peshera" then
+		x=-398.79754638672 y=86.888648986816 z=177.20317077637
+	elseif lname == "limansk" then
+		x=-69.205352783203 y=-6.9999918937683 z=45.089172363281
+	elseif lname == "hospital" then
+		x=-104.30426025391 y=27.388628005981 z=624.37896728516
+	elseif lname == "generators" then
+		x=-256.55212402344 y=30.532493591309 z=-97.026573181152
+	elseif lname == "warlab" then
+		x=-37.256866455078 y=-12.045679092407 z=-62.555488586426
+	elseif lname == "red_forest" then
+		x=-201.97389221191 y=7.8662247657776 z=-277.51422119141
+	elseif lname == "lost_village" then
+		x=-82.914672851563 y=10.248264312744 z=-82.935363769531
+	elseif lname == "marsh" then
+		x=-305.54000854492 y=0.80841100215912 z=-103.64685821533
+	elseif lname == "dead_city" then
+		x=-384.27618408203 y=1.2913208007813 z=91.870826721191
+	elseif lname == "zaton" then
+		x=-503.95874023438 y=-0.521240234375 z=143.5478515625
+	elseif lname == "jupiter" then
+		x=-395.79711914063 y=5.12060546875 z=-124.95478820801
+	elseif lname == "pripyat" then
+		x=-180.36508178711 y=-0.46511840820313 z=-233.65742492676
+	elseif lname == "jupiter_underground" then
+		x=-48.331108093262 y=8.0676784515381 z=422.59338378906
+	elseif lname == "labx8" then
+		x=-104.13023376465 y=-32.101341247559 z=77.855361938477
+	elseif lname == "cs_agroprom_underground" then
+		x=-3.1008706092834 y=-3.2347826957703 z=68.550582885742
+	elseif lname == "predbannik" then
+		x=-261.848 y=19.943 z=264.030
+		--x=-665.00506591797 y=27.097995758057 z=26.621646881104
+	elseif lname == "yantar_old" then
+		x=-266.35855102539 y=4.2769775390625 z=158.32368469238
+	elseif lname == "swamp_old" then
+		x=-109.02476501465 y=4.2637786865234 z=170.3108215332
+	elseif lname == "hiding_road" then
+		x=-407.99221801758 y=1.3803825378418 z=-373.58477783203
+	elseif lname == "k01_darkscape" then
+		x=-551.49627685547 y=-0.5 z=-423.13821411133
+	elseif lname == "dark_forest" then
+		x=-109.59384155273 y=-0.89407277107239 z=417.29489135742
+	elseif lname == "level_f-1" then
+		x=275.02563476563 y=29.539932250977 z=49.102138519287
+	elseif lname == "promzone" then
+		x=-228.66265869141 y=21.958457946777 z=67.607696533203
+	elseif lname == "l01_krasivay" then
+		x=20.742607116699 y=1.4549117088318 z=-33.006042480469
+	elseif lname == "l02_dd" then
+		x=156.99856567383 y=5.2203235626221 z=55.699630737305
+	elseif lname == "l03_rinok" then
+		x=77.635589599609 y=-3.1874027252197 z=34.986255645752
+	elseif lname == "l04_pogost" then
+		x=0.81084787845612 y=0.0023756043519825 z=-102.14660644531
+	elseif lname == "l05_vokzal" then
+		x=128.37115478516 y=-7.072114944458 z=53.50887298584
+	elseif lname == "digger_stash" then
+		x=-25.183917999268 y=-6.9300665855408 z=5.603449344635
+	elseif lname == "lab_x14" then
+		x=-36.763496398926 y=-34.48157119751 z=-36.932453155518
+	elseif lname == "l01_poligon" then
+		x=-45.778461456299 y=-9.2169141769409 z=56.468769073486
+	end
+	move_actor(x,y,z,true)
+end
+
+function adjust_for_level(lname)
+	local dist_val = 1.5										-- most levels use max settings
+	local lighting_val = 1.5									-- vision and lighting best when equal
+	local lod_a = 96											-- 16 - 96
+	local lod_b = 64											-- 32 - 64
+	local shadow_qlty = 1.0										-- 0.5 - 1.0
+	if TB3D_Modders.level_set_max < 50 then						--fixed at 30%
+		dist_val = 1.0
+		lighting_val = dist_val
+		lod_a = 48
+		lod_b = 32
+		shadow_qlty = 0.5
+	else
+		if lname == "marsh" or lname == "swamp_old" then			--30%
+			dist_val = 1.1
+			lighting_val = dist_val
+			lod_a = 48
+			lod_b = 32
+			shadow_qlty = 0.5
+		elseif lname == "pripyat" or lname == "l11_Pripyat" then	--50%
+			dist_val = 1.2
+			lighting_val = dist_val
+			lod_a = 64
+			lod_b = 48
+			shadow_qlty = 0.7
+		elseif lname == "aver" then									--30%
+			dist_val = 1.0
+			lighting_val = dist_val
+			lod_a = 48
+			lod_b = 32
+			shadow_qlty = 0.5
+		elseif lname == "peshera" or lname == "av_peshera" then		--50%
+			dist_val = 1.0
+			lighting_val = dist_val
+			lod_a = 64
+			lod_b = 48
+			shadow_qlty = 0.7
+		elseif lname == "red_forest" or lname == "yantar_old" then	--30%
+			dist_val = 1.0
+			lighting_val = dist_val
+			lod_a = 48
+			lod_b = 32
+			shadow_qlty = 0.5
+		elseif TB3D_Modders.level_set_max < 70 then					--50%
+			dist_val = 1.0
+			lighting_val = dist_val
+			lod_a = 64
+			lod_b = 48
+			shadow_qlty = 0.7
+		elseif TB3D_Modders.level_set_max < 100 then				--70%
+			dist_val = 1.2
+			lighting_val = dist_val
+		elseif TB3D_Modders.level_set_max > 100 then				--120%
+			lighting_val = 2.0
+		end
+	end		--set here before renderer starts to build scene
+	get_console():execute("r2_slight_fade "..utils.to_str(lighting_val))			--lighting distance (2.0 = max), but
+	get_console():execute("rs_vis_distance "..utils.to_str(dist_val))				--matching vis dist gives best performance
+	get_console():execute("r2_ssa_lod_a "..utils.to_str(lod_a))						--ssa
+	get_console():execute("r2_ssa_lod_b "..utils.to_str(lod_b))						--ssa
+	get_console():execute("r2_ls_squality "..utils.to_str(shadow_qlty))				--shadows
+end
+
+function check_prior_version(lname, sname)												--109972
+	local obj
+	local stage = amk.load_variable("tb3d_fixer_stage", 0)		--returns 0 if not created yet
+	--local tb3d_ver = amk.load_variable("tb3d_version",0)
+	local started = amk.load_variable("first_started", 0)
+	if started > 109980 then						--109981, skip stages 1-5
+		if stage < 5 then stage = 5 end
+	elseif started > 109979 then					--109981, skip stage 1
+		if stage < 1 then stage = 1 end
+	end
+	if stage < 1 then
+		obj = alife():story_object(14091)																		--radar to red forest (wrong target point)
+		if obj then alife():release(obj) end
+		if has_alife_info("info_way_arhara_radar_forest") then dmx_mod.create_level_changer_rad_red() end		--14091 - fixes target location
+		obj = alife():story_object(99200)																		--old ds lc, actually in wasted wood
+		if obj then alife():release(obj) end
+		obj = alife():story_object(99201)																		--old ds lc, actually in wasted wood
+		if obj then alife():release(obj) end
+		dmx_mod.create_level_changer_ww_vill()
+		--obj = alife():story_object(97001)
+		--if not obj then sak.add_new_bar_to_atp() end
+		obj = alife():story_object(97104)																		--missing reject way in all.spawn
+		if obj then alife():release(obj) end
+		if has_alife_info("info_way_arhara_hospital_agroprom") and not has_alife_info("tb3d_final_start") then	--respawn if active
+			dmx_mod.create_level_changer_hospital_agroprom()													--hospital to agro final
+		end
+		stage = 1
+	end
+	if stage < 2 then								--remove runaway rad zones
+		if lname == sname then						--if not same level then will be done by fixer
+			--local cnt = 0
+			for a=first_object,last_object,1 do		--skip actor (0)
+				obj = alife():object(a)
+				if obj then
+					if obj.name then obj_name = obj:name() else obj_name = "NIL" end
+					if obj.section_name then sect = obj:section_name() else sect = "NIL" end
+					if string_find(obj_name, "zone_radioactive_tb3d") and sect == "zone_radioactive_tb3d" then
+						alife():release(obj, true)
+						--cnt = cnt + 1
+					end
+				end
+			end
+			--packet_alert("tb3d services: old version fixer removed["..utils.to_str(cnt).."] rad zones!!!!")
+		end
+		stage = 2
+	end
+	if stage < 3 then
+		if not has_alife_info("tb3d_x14_done") then
+			local obj = alife():story_object(284)
+			if obj then alife():release(obj) end
+			obj = alife():story_object(6018)
+			if obj then alife():release(obj) end
+			obj = alife():story_object(6017)
+			if obj then alife():release(obj) end
+		end
+		stage = 3
+	end
+	if stage < 4 then
+		if has_alife_info("zep05_have") then
+			local obj = alife():story_object(4500)
+			if not obj then
+				dmx_mod.create_eprip_to_prip()
+			end
+		end
+		stage = 4			--109981
+	end
+	if stage < 5 then
+		if is_collector() then TB3D_Services.set_player_relations(5) end	--109981, fixed relations: killer, lastday and mono -500, all others 0
+		stage = 5
+	end
+	amk.save_variable("tb3d_fixer_stage", stage)
+end
+

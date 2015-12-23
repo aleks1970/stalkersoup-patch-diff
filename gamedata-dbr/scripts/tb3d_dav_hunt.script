@@ -1,0 +1,395 @@
+--TB3D 1.0.9.9.8.1 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+-- dav update 16Apr14, item 17, send_tip_id optimization, fixed send_tip_id to amk_send_tip_id, debug, save now
+function my_ver() return "1.0.9.9.8.1" end
+-- randomly caches Collector treasures and provides base for bind_stalker services
+
+local string_sub = string.sub
+local string_find = string.find
+
+----------------------------------------------- Collector Treasure Hunt last added to by dAVROs Oct 2013 ----------------------------------------------------
+----------------------------------------------------- collector hunt by dAVROs -------------------------------------------------------------------
+-- randomly caches Collector treasures and provides base for bind_stalker services
+local treasure = {	"treasure_2_","treasure_3_","treasure_4_","treasure_5_","treasure_6_","treasure_7_","treasure_8_","treasure_9_","treasure_10_",
+					"treasure_11_","treasure_12_","treasure_13_","treasure_14_","treasure_15_","treasure_16_","treasure_17_","treasure_18_","treasure_19_",
+					"treasure_20_","treasure_21_","treasure_22_","treasure_23_","treasure_24_","treasure_25_","treasure_26_","treasure_27_","treasure_28_",
+					"treasure_29_","treasure_30_","treasure_31_"}
+					
+local ini = ""
+function spawn_next(n)
+	if n <= 31 then
+		amk.remove_item(db.actor:object("val_zapis_"..tostring(n-1)))	-- delete the old note
+		if amk.load_variable("option_autosave",1)~=0 then
+			--TB3D_Services.packet_alert("Collector Hunt found stash ["..utils.to_str(n-1).."]")
+			news_manager.save_collector("Hunt Stash "..tostring(n-1), true)									--109981, save now
+		end
+		if n == 17 then					--finish radar and if done with zep then continue otherwise wait
+			TB3D_Services.give_info("tb3d_radar_done")					--109981, gives article
+			if not has_alife_info("zep24_have") then return end			--109981, wait for zep ending
+			if not has_alife_info("tb3d_hunt2_start") then TB3D_Services.delayed_action(1, "tb3d_hunt2_start", 30) end
+		end
+		ini =ini_file("misc\\TB3D_collector.ltx") 
+		local x=0
+		local y=0
+		local z=0
+		local gv=0
+		local lv=0
+		local reslt = true
+		local a = ""
+		local desc=""
+		if n < 2 or n == 15 or n == 16 or n == 17 or n == 18 or n == 31 then
+			a = ("treasure_"..tostring(n))
+		elseif n == 22 or n == 25 or n == 27 or n == 28 or n == 29 or n == 30 then
+            a = (treasure[n-1]..tostring(math.random(4)))
+		elseif n == 26 then
+            a = (treasure[n-1]..tostring(math.random(5)))    	
+		else
+			a = (treasure[n-1]..tostring(math.random(3)))
+		end
+		if ini:section_exist(a) then
+			if ini:line_exist(a,"x") then
+				 x=ini:r_float(a,"x")
+			else
+				 reslt=false
+			end
+			if ini:line_exist(a,"y") then
+				 y=ini:r_float(a,"y")
+			else
+				reslt=false
+			end
+			if ini:line_exist(a,"z") then
+				 z=ini:r_float(a,"z")
+			else
+				reslt=false
+			end
+			if ini:line_exist(a,"gv") then
+				 gv=ini:r_float(a,"gv")
+			else
+				reslt=false
+			end
+			if ini:line_exist(a,"lv") then
+				 lv=ini:r_float(a,"lv")
+			else
+				reslt=false
+			end
+			if ini:line_exist(a,"description") then
+				 desc=ini:r_string(a,"description")
+			else
+				reslt=false
+			end
+			if reslt == true then
+				amk.save_variable("val_descr",desc)
+				local nobj = alife():create("val_taynik_"..tostring(n), vector():set(x,y,z),lv,gv)
+				if nobj and TB3D_Modders.coll_spots then level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", "val_taynik_"..tostring(n)) end
+				--TB3D_Services.packet_alert("Collector: found stash ["..desc.."]")
+				if TB3D_Modders.use_spawn_message then 
+					news_manager.send_tip(db.actor,"Collector Hunt Spawned: ["..desc.."]") 
+				end
+			else
+				if TB3D_Modders.use_abort_message then TB3D_Services.packet_alert("Collector Hunt Spawn Failed: ["..a.."]") end
+			end
+			desc=""
+		end
+		a = ""
+		spawn_shrooms(n)
+		--TB3D_Services.packet_alert("Collector Hunt spawned shroom ["..tostring(n).."]")
+		ini = ""
+	end
+end
+
+function spawn_shrooms(n)
+	if n == 1 then
+		get_item("cordon_m1")
+	elseif n == 2 then
+		get_item("cordon_m2")
+		get_item("cordon_m3")
+	elseif n == 3 then
+		get_item("dump_m1")
+		get_item("dump_m2")
+	elseif n == 4 then
+		get_item("agro_m1")
+	elseif n == 5 then
+		get_item("dump_m4")
+		get_item("dump_m5")
+	elseif n == 6 then
+		get_item("dval_m1")
+	elseif n == 7 then
+		get_item("bar_m1")
+		get_item("bar_m2")
+		get_item("bar_m3")
+		get_item("bar_m4")
+	elseif n == 8 then
+		get_item("wild_m1")
+		get_item("wild_m6")
+	elseif n == 10 then
+		get_item("wild_m2")
+		get_item("wild_m3")
+		get_item("wild_m4")
+		get_item("wild_m5")
+	elseif n == 11 then
+		get_item("mil_m1")
+	elseif n == 12 then
+		get_item("radar_m1")
+		get_item("radar_m2")
+	elseif n == 13 then
+		get_item("prip_m1")
+		get_item("prip_m2")
+	elseif n == 14 then	
+		alife():create("vehicle_tb3d_plow", vector():set(835.862,-0.002,8.458),363036,2296)			--help get over wall
+	elseif n == 15 then
+		get_item("radar_m3")
+		get_item("stepup1")
+	elseif n == 16 then
+		get_item("radar_t1")
+		get_item("radar_t2")
+		get_item("radar_t3")
+		get_item("radar_t4")
+		get_item("radar_t5")
+		get_item("radar_t6")
+		get_item("radar_t7")
+		get_item("radar_t8")
+		get_item("radar_t9")
+		get_item("radar_t10")
+		get_item("radar_t11")
+		get_item("radar_t12")
+		get_item("radar_t13")
+		get_item("radar_t14")
+		get_item("radar_t15")
+		get_item("radar_t16")
+		get_item("radar_t17")
+		get_item("radar_t18")
+		get_item("radar_t19")
+		get_item("radar_t20")
+		get_item("radar_t21")
+		get_item("radar_t22")
+		get_item("radar_t23")
+		get_item("radar_t24")
+	elseif n == 17 then
+		get_item("bomba_dav")
+	elseif n == 21 then
+		get_item("oldvil_bomb1")
+		get_item("oldvil_bomb2")
+		get_item("oldvil_bomb3")
+	elseif n == 22 then
+		get_item("hos_mkr1")
+		get_item("hos_mkr2")
+		get_item("hos_mkr3")
+		get_item("hos_tel1")
+		get_item("stepup2")
+	elseif n == 23 then
+		get_item("lim_eb1")
+		get_item("lim_eb2")
+		get_item("lim_telemkr")
+		get_item("lim_tun")
+	elseif n == 24 then
+		get_item("stepup3")
+	elseif n == 25 then	
+		arhara_dialog.del_baza_doza_timer(story_id)
+		arhara_dialog.del_podstanziy_doza_timer(story_id)
+	elseif n == 26 then	
+		TB3D_Services.give_info("collector_ready_for_redf")	
+	elseif n == 27 then
+		TB3D_Services.give_info("collector_done_with_redf")
+		TB3D_Services.give_info("collector_ready_for_dcity")
+	elseif n == 28 then
+		TB3D_Services.give_info("collector_done_with_dcity")
+		TB3D_Services.give_info("collector_ready_for_zaton")
+	elseif n == 29 then
+		news_manager.amk_send_tip_id("backwater_activated","sms_tb3d", 0, 60, "gen_info")
+		get_item("bwtr_sa")
+		get_item("bwtr_tp1")
+		get_item("bwtr_tp2")
+		get_item("bwtr_tp3")
+		get_item("bwtr_mkr1")
+		get_item("bwtr_mkr2")
+		get_item("bwtr_mkr3")
+		get_item("bwtr_bonus1")
+		get_item("bwtr_bonus2")
+		get_item("bwtr_bonus3")
+		get_item("bwtr_bonus4")
+		get_item("bwtr_bonus5")
+		get_item("bwtr_bonus6")
+		get_item("bwtr_bonus7")
+		get_item("bwtr_bonus8")
+		get_item("jup_tp1")
+		get_item("jup_mkr1")
+		get_item("jup_tp1b")
+		get_item("jup_mkr1b")
+		alife():create("vehicle_tb3d_atv",vector():set(177.557,29.962,-520.618),1344174,3743) 	--outside caesier's tp
+		get_item("jup_tp2")
+		get_item("jup_tp3")
+		get_item("jup_mkr2")
+		get_item("jup_mkr3")
+		get_item("jup_mine1")
+		get_item("jup_mine2")
+		get_item("jup_mine3")
+		get_item("jup_mine4")
+		TB3D_Services.give_info("collector_done_with_zaton")
+		TB3D_Services.give_info("collector_ready_for_jupiter")
+	elseif n == 30 then
+		get_item("eprip_tp1")
+		get_item("eprip_tp2")
+		get_item("eprip_tp3")
+		get_item("eprip_tp4")
+		get_item("eprip_tp5")
+		get_item("eprip_tpX")	--109911
+		get_item("eprip_mkr2")
+		get_item("eprip_mkrx")
+		get_item("eprip_mkr1")
+		get_item("eprip_mkrcs1")
+		get_item("stepup4")
+		TB3D_Services.give_info("collector_done_with_jupiter")
+		TB3D_Services.give_info("collector_ready_for_eastprip")
+	elseif n == 31 then
+		news_manager.amk_send_tip_id("caesiers_activated","sms_tb3d",0,60,"gen_info")
+		get_item("stepup5")
+		get_item("ju_tp0")
+		get_item("ju_mkr0")
+		get_item("ju_mush1")
+		get_item("ju_mush2")
+		get_item("ju_mush3")
+		get_item("ju_mush4")
+		get_item("ju_sr1")
+		get_item("ju_sr2")
+		get_item("ju_sr3")
+		get_item("ju_sr4")
+		get_item("ju_sr5")
+		get_item("ju_sr6")
+		get_item("ju_sr7")
+		get_item("ju_sr8")
+		get_item("ju_sr9")
+		get_item("ju_sr10")
+		get_item("ju_sr11")
+		get_item("ju_sr12")
+		get_item("ju_sr13")
+		get_item("ju_sr14")
+		get_item("ju_sr15")
+		get_item("ju_sr16")
+		get_item("ju_sr17")
+		get_item("ju_sr18")
+		get_item("ju_sr19")
+		get_item("ju_sr20")
+		get_item("ju_sr21")
+		get_item("ju_sr22")
+		get_item("ju_sr23")
+		get_item("ju_sr24")
+		get_item("ju_sr25")
+		get_item("ju_sr26")
+		get_item("ju_sr27")
+		get_item("ju_sr28")
+		get_item("ju_sr29")
+		get_item("ju_sr30")
+		--get_item("ju_sr31")
+		--get_item("ju_sr32")
+		get_item("ju_sr33")
+		get_item("ju_tp1")
+		get_item("ju_mkr1")
+		get_item("ju_tp2")
+		get_item("ju_mkr2")
+		get_item("ju_tp2b")
+		get_item("ju_mkr2b")
+		get_item("ju_tp3")
+		get_item("ju_mkr3")
+		get_item("ju_tp4")
+		get_item("ju_mkr4")
+		get_item("ju_tp5")
+		get_item("ju_mkr5")
+		get_item("ju_tp6")
+		get_item("ju_mkr6")
+		get_item("ju_trap1")
+		get_item("ju_trap2")
+		get_item("ju_trap3")
+		get_item("ju_trap4")
+		get_item("ju_trap5")
+		get_item("ju_trap6")
+		get_item("ju_trap7")
+		get_item("ju_trap8")
+		get_item("ju_trap9")
+		get_item("ju_trap10")
+		get_item("ju_trap11")
+		get_item("ju_trap12")
+		alife():create("hunt_doc_jupu", vector():set(70.093,3.089,3.824),15090,3797)
+		TB3D_Services.give_info("collector_done_with_eastprip")
+		TB3D_Services.give_info("collector_ready_for_jupund")
+	end
+end
+
+function get_item(str)		
+	local x=0
+	local y=0
+	local z=0
+	local gv=0
+	local lv=0
+	local reslt = true
+	local desc=""
+	if ini:section_exist(str) then
+		if ini:line_exist(str,"x") then
+			 x=ini:r_float(str,"x")
+		else
+			 reslt=false
+		end
+		if ini:line_exist(str,"y") then
+			 y=ini:r_float(str,"y")
+		else
+			reslt=false
+		end
+		if ini:line_exist(str,"z") then
+			 z=ini:r_float(str,"z")
+		else
+			reslt=false
+		end
+		if ini:line_exist(str,"gv") then
+			 gv=ini:r_float(str,"gv")
+		else
+			reslt=false
+		end
+		if ini:line_exist(str,"lv") then
+			 lv=ini:r_float(str,"lv")
+		else
+			reslt=false
+		end
+		if ini:line_exist(str,"desc") then
+			 desc=ini:r_string(str,"desc")
+		else
+			reslt=false
+		end
+		if reslt == true then
+			alife():create(desc, vector():set(x,y,z),lv,gv)
+			if TB3D_Modders.use_spawn_message then
+				news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:  %c[default]Collector Hunt Spawned["..desc.."]")
+			end
+		else
+			if TB3D_Modders.use_abort_message then TB3D_Services.packet_alert("Collector Item Failed: ["..desc.."]") end
+		end
+		desc=""
+	else
+		if TB3D_Modders.use_abort_message then TB3D_Services.packet_alert("Collector Not Exist: ["..str.."]") end
+	end
+end
+
+local st_coll
+function show_st()
+	local sect="fake_"..tostring( db.actor:item_in_slot(0):section())
+	st_coll=CUIStatic()
+	st_coll:SetAutoDelete(true)
+	local ini=system_ini()
+	local grid	= ini:r_u32("tb3d", "inv_grid_size")
+	local x=ini:r_u32(sect, "inv_grid_x")*grid --50
+ 	local y=ini:r_u32(sect, "inv_grid_y")*grid --50
+	local width=ini:r_u32(sect, "inv_grid_width")*grid --50
+ 	local height=ini:r_u32(sect, "inv_grid_height")*grid --50
+	st_coll:InitTexture("ui\\ui_icon_equipment")
+	st_coll:SetOriginalRect(x,y,width,height)
+	st_coll:SetStretchTexture(true)
+	local h=grid --50
+	local w=h*width/height
+	st_coll:Init(winx-85-0.5*w,winy-45-0.5*h,w,h)
+	get_hud():AddDialogToRender(st_coll)
+end
+
+function remove_st()
+	if st_coll then get_hud():RemoveDialogToRender(st_coll) st_coll=nil end
+end
+
+function net_destroy()
+	remove_st()
+end

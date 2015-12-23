@@ -1,0 +1,77 @@
+---TB3D 1.0.9.9.7.5  now removes automatically   added ports 8/23/11, centralized create_level_changer, cleanup, new BETA Teleports(109960) aleks1970 -->
+function my_ver() return "1.0.9.9.7.5" end
+class "ui_TB3D_Teleport" (CUIScriptWnd)
+
+function ui_TB3D_Teleport:__init(owner) super()
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function ui_TB3D_Teleport:__finalize() 
+end
+
+function ui_TB3D_Teleport:InitControls()
+	self:Init(50,50,550,490)
+	self:SetAutoDelete(true)		--109975
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_TB3D_Teleport.xml")
+	xml:InitStatic("back_video", self)
+	xml:InitStatic("background", self)
+	self:Register(xml:Init3tButton("title", self),"title")
+	self:Register(xml:Init3tButton("caption", self),"caption")
+	self:Register(xml:Init3tButton("captionL1", self),"captionL1")
+	self:Register(xml:Init3tButton("captionL2", self),"captionL2")
+	self:Register(xml:Init3tButton("captionL3", self),"captionL3")
+	self:Register(xml:Init3tButton("captionL4", self),"captionL4")
+	self:Register(xml:Init3tButton("captionL5", self),"captionL5")
+	self:Register(xml:Init3tButton("captionL6", self),"captionL6")
+	self:Register(xml:Init3tButton("captionL7", self),"captionL7")
+	self:Register(xml:Init3tButton("captionL8", self),"captionL8")
+	self:Register(xml:Init3tButton("captionL9", self),"captionL9")
+	self:Register(xml:Init3tButton("captionL10", self),"captionL10")
+	self:Register(xml:Init3tButton("captionL11", self),"captionL11")
+	self:Register(xml:Init3tButton("captionL12", self),"captionL12")
+	self:Register(xml:Init3tButton("captionL13", self),"captionL13")
+	self:Register(xml:Init3tButton("captionL14", self),"captionL14")
+	self:Register(xml:Init3tButton("caption2", self),"caption2")
+	self:Register(xml:Init3tButton("caption3", self),"caption3")
+	self:Register(xml:Init3tButton("caption4", self),"caption4")
+	self:Register(xml:Init3tButton("caption5", self),"caption5")
+	self:Register(xml:Init3tButton("caption6", self),"caption6")
+	self:Register(xml:Init3tButton("caption7", self),"caption7")
+	self:Register(xml:Init3tButton("caption8", self),"caption8")
+	self:Register(xml:Init3tButton("caption9", self),"caption9")
+	self:Register(xml:Init3tButton("caption10", self),"caption10")
+	self:Register(xml:Init3tButton("caption11", self),"caption11")
+	self:Register(xml:Init3tButton("btn_1", self),"btn_1")
+	self:Register(xml:Init3tButton("btn_quit", self),"btn_quit")
+	self:Register(xml:InitEditBox("edit_box", self), "edit_box")
+end
+
+function ui_TB3D_Teleport:InitCallBacks()
+	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.set, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_close, self)
+end
+
+function ui_TB3D_Teleport:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_close()
+		end		
+	end
+	return true
+end
+
+function ui_TB3D_Teleport:set()
+	local text = self:GetEditBox("edit_box"):GetText()
+	if text~="" then
+		TB3D_Services.teleportate(text)
+		self:on_close()	
+	end
+end
+
+function ui_TB3D_Teleport:on_close()
+	self:GetHolder():start_stop_menu (self,true)
+end

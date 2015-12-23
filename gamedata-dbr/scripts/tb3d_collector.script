@@ -1,0 +1,1169 @@
+--TB3D 1.0.9.9.8.1 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
+--zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content
+function my_ver() return "1.0.9.9.8.1" end
+local string_sub = string.sub
+local string_find = string.find
+local translate = game.translate_string
+local math_random = math.random
+
+function on_net_spawn()
+	--insures alloc in same namespace
+end
+
+local spawned_1, spawned_2, spawned_3, spawned_4, spwaned_5, spawned_6				--109981, spawn triggers
+local tower_pos = vector():set(-278.763,15.172,23.567)		--109976
+local deadm_dogs = vector():set(75.784,4.777,79.351)		--109980, dogs
+local upd_timeLDK
+local upd_timeTB3D
+function update(time_now, slice_base)															--only called if is_collector() = true
+	if has_alife_info("tb3d_collector_done") then												--setup complete, let's rock
+		local ln = level.name()
+		local level_up = TB3D_Services.get_level_up()											--109955 for actions past the Collector levelup
+		------------------------------------------------------------------------------------------main loop
+		if level_up < 4 then
+			amk.oau_watchdog=679
+			if not has_alife_info("tb3d_teleport_zaton") then									--check if hideout done yet
+				if has_alife_info("agr_knockdown") then											--entered strelok hideout
+					if has_alife_info("tb3d_agr_knockdown") then								--send player to backwater
+						TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
+						TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
+					else
+						TB3D_Services.give_info("tb3d_agr_knockdown")							--delay one cycle
+					end
+				end
+			end
+			local pos = db.actor:position()
+			if upd_timeTB3D == nil then
+				upd_timeTB3D = slice_base
+				upd_timeLDK = time_now
+			end
+			if upd_timeLDK < time_now and not has_alife_info("tb3d_harsh_environment") then
+				amk.oau_watchdog=678
+				upd_timeLDK = time_now + (1100 * slice_base) 								--*(<3) LDK spawns, avg 1.1gs
+				if slice_base < 3 then
+					if level_up == 1 then
+						if has_alife_info("tb3d_collector_hunt") then
+							if TB3D_Modders.use_slice_message then
+								TB3D_Services.packet_alert("tb3d collector: actor_update - LDK["..utils.to_str(time_now).."]")
+							end
+							dav_ldk.spawn_ldk1(ln, pos)										--treasure hunt
+						end
+					elseif has_alife_info("tb3d_dm_deserters") then
+						--TB3D_Mob.spawn_ldk(ln, pos)										--reuse ldk spawns in level_up 2 and on
+					end
+				end
+			elseif upd_timeTB3D < time_now and not has_alife_info("tb3d_harsh_environment") then
+				amk.oau_watchdog=677
+				upd_timeTB3D = time_now + (110 * slice_base) 								--*(<3) TB3D spawns, avg 0.11gs
+				if slice_base < 4 then
+					if TB3D_Modders.use_slice_message then
+						TB3D_Services.packet_alert("tb3d collector: actor_update - TB3D["..utils.to_str(time_now).."]")
+					end
+					if ln == "l01_escape" then		--109981
+						if spawned_1 == 0 then
+							if actor_in_range(vector():set(115.079,-7.688,-15.837), 10000) then
+								TB3D_Mobs.spawn_npcs(115.079,-7.688,-15.837,417165,115,0,math_random(3,8))						--bandits, center of carpark
+								spawned_1=1
+								amk.save_variable("has_spawned1", spawned_1)
+							end
+						end
+						if spawned_2 == 0 then
+							if actor_in_range(vector():set(312.281,3.274,119.891), 6000) then
+								TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",312.281,3.274,119.891,571300,143, math_random(1,3))		--petruha campfire
+								spawned_2=1
+								amk.save_variable("has_spawned2", spawned_2)
+							end
+						end
+						if spawned_3 == 0 then
+							if actor_in_range(vector():set(246.138,5.194,40.829), 6000) then
+								TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",246.138,5.194,40.829,530041,138, math_random(1,3))			--trees below tunnel
+								spawned_3=1
+								amk.save_variable("has_spawned3", spawned_3)
+							end
+						end
+					elseif ln == "l11_pripyat" then		--109976
+						amk.oau_watchdog=676
+						if actor_in_range(vector():set(68.234,0.988,341.640), 2) then			--right end of trailer in stadium
+							TB3D_Services.move_actor(169.125,-5.537,70.595, true)				--e end of main ave in underpass
+						elseif actor_in_range(vector():set(74.482,0.987,335.851), 2) then		--left end of trailer in stadium
+							TB3D_Services.move_actor(-167.298,-2.273,83.898, true)				--w end of main ave
+						end
+					elseif ln == "l12_stancia" then
+						amk.oau_watchdog=675
+						if spawned_1 == 0 then
+							if actor_in_range(vector():set(363.191,-0.101,-360.855), 6000) then		--hot spot s. of viaduct on tracks at fence exit
+								TB3D_Triggers.spawn_aes_stampede2()
+								spawned_1=1
+								amk.save_variable("has_spawned1", spawned_1)
+							end
+						end
+						if has_alife_info("tb3d_goldbar_10") and not has_alife_info("tb3d_goldbar_15") then
+							if not has_alife_info("tb3d_npp1_signal_1") then
+								if actor_in_range(vector():set(55.859,-0.001,-306.080), 800) then		--hot spot pipes (80m)
+									TB3D_Triggers.signal_green(154.902,1.000,-231.807,386473,2400)					--smoke at pipes
+									TB3D_Services.give_info("tb3d_npp1_signal_1")
+								end
+							end
+							if not has_alife_info("tb3d_npp1_signal_2") then
+								if actor_in_range(vector():set(138.420,-7.920,-266.784), 4000) then		--hot spot sump (400m)
+									TB3D_Triggers.spawn_aes_stampede()
+									if TB3D_Services.give_info("tb3d_npp1_signal_1") then				--missed it on entry
+										TB3D_Triggers.signal_green(154.902,1.000,-231.807,386473,2400)				--smoke near portal
+									end
+									TB3D_Services.give_info("tb3d_npp1_signal_2")
+								end
+							end
+							if not has_alife_info("tb3d_npp1_signal_3") then
+								if actor_in_range(vector():set(387.713,0.145,29.061), 4000) then						--hot spot traincar (400m)
+									--TB3D_Triggers.spawn_alife_rand("ldk1_troop",387.713,0.145,29.061,168951,2384,1)	-- behind traincar, bad culling
+									TB3D_Triggers.spawn_alife_rand("ldk1_troop",362.037,0.093,27.203,154927,2384,1)		-- behind sarc entrance
+									TB3D_Triggers.spawn_alife_rand("ldk1_troop",394.560,-0.004,2.543,172423,2383,2)		-- entrance in corner
+									TB3D_Services.give_info("tb3d_npp1_signal_3")
+								end
+							end
+						end
+					elseif ln == "l12_stancia_2" then											--purple fog blocking bad culling
+						amk.oau_watchdog=674
+						if pos.x>756 and pos.x<782 and pos.z>179 and pos.z<194 then
+							TB3D_Services.move_actor(520.281,18.204,268.394,true)				--rooftop near generators
+							if has_alife_info("tb3d_note_04") then
+								TB3D_Dialog.spawn_snorks_on_roof()
+							else
+								TB3D_Triggers.signal_green(520.281,18.204,268.394,162080,2617)
+							end
+						end
+						if has_alife_info("tb3d_start_x14") then								--picked up black energy in firing range
+							local spawns = amk.load_variable("npp2_spawns", 0)
+							if spawns == 0 then
+								if actor_in_range(vector():set(206.838,-0.100,377.046), 20000) then					--2km
+									TB3D_Mobs.spawn_killer_squad(236.658,-0.001,397.985,84605,2580,6,4,false)		--ground troops
+									TB3D_Mobs.spawn_killer_squad(158.386,-2.296,299.455,54580,2538,6,1,false)		--chopper pit
+									TB3D_Mobs.spawn_killer_squad(158.009,3.688,212.125,68776,2549,6,2,false)		--up by sarc entrance
+									TB3D_Mobs.spawn_killer_squad(195.901,-0.003,267.721,76970,2546,6,2,false)		--by sheds
+									TB3D_Mobs.spawn_killer_squad(235.068,4.498,304.663,84190,2582,6,4,true)			--overhead troop and signal
+									amk.save_variable("npp2_spawns", 1)
+								end
+							end
+						end
+					elseif ln == "l12u_sarcofag" then
+						amk.oau_watchdog=673
+						if has_alife_info("tb3d_goldbar_15") then
+							if not has_alife_info("tb3d_sarc_signal_1") then
+								if actor_in_range(vector():set(93.123,60.421,6.582), 40) then		--hot spot1 lower campfire
+									TB3D_Mobs.spawn_snorks(97.277,59.406,-38.838,6403,2417,3)		--far corner left
+									TB3D_Mobs.spawn_snorks(97.477,59.902,50.947,10451,2465,5)		--behind actor
+									--TB3D_Mobs.spawn_snorks(68.365,67.411,20.899,6406,2417,3)		--ledge over hot spot1
+									TB3D_Services.give_info("tb3d_sarc_signal_1")
+								end
+							end
+							if not has_alife_info("tb3d_sarc_signal_2") then
+								if actor_in_range(vector():set(61.461,67.819,27.032), 20) then		--hot spot2 large hole above granter
+									TB3D_Mobs.spawn_snorks(55.685,52.175,44.940,6406,2417,5)		--campfire under hot spot2
+									--TB3D_Mobs.spawn_snorks(47.885,53.197,9.427,8331,2417,3)		--near reactor rim
+									TB3D_Mobs.spawn_snorks(9.689,56.286,47.738,5205,2417,3)			--next to granter
+									TB3D_Services.give_info("tb3d_sarc_signal_2")
+								end
+							end
+						end
+					elseif ln == "marsh" then
+						amk.oau_watchdog=672
+						if amk.load_variable("swamp_spawns", 0) == 0 then
+							if actor_in_range(tower_pos, 40000) then 								--10:1 = 4000m	(10k = campfire N. accross water)
+								alife():create("nebo_heavy_outfit", tower_pos, 7283, 3351)			--far west tower smoke signal and armor	
+								TB3D_Triggers.signal_green(-278.763,17.172,23.567,7283,3351)
+								amk.save_variable("swamp_spawns", 1)
+								--TODO: add note in trailer (-290.241,1.309,29.753),5490,3348)
+							end
+						end
+					elseif ln == "swamp_old" then	
+						if spawned_1 == 0 then
+							if actor_in_range(deadm_dogs, 10000) then
+									TB3D_Services.packet_alert("in range")
+								if TB3D_Services.is_night() then
+									TB3D_Triggers.spawn_alife_rand("tb3dm_chimera_x_ray",deadm_dogs.x,deadm_dogs.y,deadm_dogs.z,1311752,4388,3)
+								else
+									TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",deadm_dogs.x,deadm_dogs.y,deadm_dogs.z,1311752,4388,4)
+								end
+								spawned_1=1
+								amk.save_variable("has_spawned1", spawned_1)
+							end
+						end
+					elseif ln == "hospital" then
+						amk.oau_watchdog=671
+						hospital_fog_maze()
+					elseif ln == "hiding_road" then
+						local spawns = amk.load_variable("hr_spawns", 0)
+						if actor_in_range(vector():set(-323.544,15.767,-152.990), 10) then			--hot spot central to small hut
+							TB3D_Services.move_actor(-245.593,30.712,-201.925,true)					--roof of tall hut
+						elseif actor_in_range(vector():set(-323.544,15.767,-152.990), 1500) then	--hot spot rocks
+							if spawns == 2 then
+								TB3D_Triggers.signal_green(-343.482,10.232,-167.246,21706,4404)
+								amk.save_variable("hr_spawns",3)
+							elseif spawns == 3 then
+								TB3D_Mobs.check_hr_hut_spawns()
+								amk.save_variable("hr_spawns",4)
+							end
+						end
+					elseif ln == "cs_agroprom_underground" then
+						amk.oau_watchdog=670
+						if spawned_1 == 0 then
+							if actor_in_range(vector():set(110.616,-2.236,-25.753), 100) then		--hot spot central
+								local spawns = amk.load_variable("cs_agro_spawns", 0)
+								if spawns == 0 or spawns == 10 then
+									TB3D_Mobs.spawn_snorks(108.668,-7.732,37.993,3159,3865,3)
+									TB3D_Mobs.spawn_snorks(99.830,-7.731,12.355,2454,3867,3)
+									TB3D_Mobs.spawn_snorks(113.939,-7.726,-62.645,3765,3868,3)
+									amk.save_variable("cs_agro_spawns", spawns + 1)
+									spawned_1=1
+									amk.save_variable("has_spawned1", spawned_1)
+								end
+							end
+						end
+						if spawned_2 == 0 then
+							if actor_in_range(vector():set(107.733,-7.817,52.732), 10) then		--hot spot spiral stairs
+								local spawns = amk.load_variable("cs_agro_spawns", 0)
+								if spawns < 10 then 
+									TB3D_Mobs.spawn_snorks(72.605,-16.118,103.204,1323,3858,3)			--snorks far end gate
+									TB3D_Mobs.spawn_snorks(121.272,-16.126,61.107,4459,3869,3)			--snorks near end gate
+									amk.save_variable("cs_agro_spawns", spawns + 10)
+									spawned_2=1
+									amk.save_variable("has_spawned2", spawned_2)
+								end
+							end
+						end
+					elseif ln == "l01_krasivay" then						--construcion site top level ambush
+						amk.oau_watchdog=669
+						local spawns = amk.load_variable("dist_spawns", 0)
+						if spawns == 0 then
+							if pos.y > 17 then
+								if pos.x < -6 and pos.x > -44
+								  and pos.z < 174 and pos.z > 134 then
+									TB3D_Triggers.dist_center_ambush()
+									amk.save_variable("dist_spawns", 1)
+								end
+							end
+						elseif spawns == 1 then
+							--future use
+						end
+					elseif ln == "jupiter" then
+						if has_alife_info("zep05_have") then
+							if spawned_1 == 0 then
+								if actor_in_range(vector():set(41.825,23.973,-185.348), 10000) then
+									TB3D_Mobs.spawn_killer_squad(41.825,23.973,-185.348,785806,3727,6,4,true)			--motorpool with roundhouse
+									spawned_1=1
+									amk.save_variable("has_spawned1", spawned_1)
+								end
+							end
+							if amk.load_variable("level_on_save",ln) ~= "l11_pripyat" and spawned_2 == 0 then
+								if actor_in_range(vector():set(436.370,27.675,-157.039), 10000) then
+									TB3D_Mobs.spawn_killer_squad(436.370,27.675,-157.039,1406616,3741,6,4,true)			--exit to pripyat
+									spawned_2=1
+									amk.save_variable("has_spawned2", spawned_2)
+								end
+							end
+						end
+					elseif ln == "zaton" then								--109976
+						amk.oau_watchdog=668
+						local spawns = amk.load_variable("zat_spawns", 0)
+						if spawned_1 == 0 then
+							if actor_in_range(vector():set(557.005,-7.415,-189.347), 1000) then					--exit to eprip
+								if spawns == 1 or spawns == 3 then
+									TB3D_Mobs.spawn_killer_squad(544.057,-6.068,-223.529,1823654,3696,6,1,false)
+									TB3D_Mobs.spawn_killer_squad(570.633,-6.671,-208.310,1839422,3696,6,1,false)
+									TB3D_Mobs.spawn_killer_squad(554.135,-1.266,-235.641,1831362,3699,6,1,false)
+									TB3D_Mobs.spawn_killer_squad(529.351,-7.528,-170.819,1810057,3696,6,1,false)
+								else
+									TB3D_Mobs.spawn_snorks(544.057,-6.068,-223.529,1823654,3696,2)					--behind reeds
+									TB3D_Mobs.spawn_snorks(570.633,-6.671,-208.310,1839422,3696,3)					--behind reeds
+									TB3D_Mobs.spawn_snorks(554.135,-1.266,-235.641,1831362,3699,2)					--on hill
+									TB3D_Mobs.spawn_snorks(529.351,-7.528,-170.819,1810057,3696,2)					--behind reeds
+									TB3D_Mobs.spawn_snorks(531.893,-7.522,-171.145,1814233,3696,1)					--behind reeds
+								end
+								spawned_1=1
+								amk.save_variable("has_spawned1", spawned_1)
+							elseif actor_in_range(vector():set(-333.718,9.476,397.311), 10000) then				--mill area hot spot
+								if spawns == 1 or spawns == 3 then
+									TB3D_Mobs.spawn_killer_squad(-333.718,9.476,397.311,284411,3665,6,1,true)	--center of mil
+									TB3D_Mobs.spawn_killer_squad(-230.079,10.371,485.935,483743,3665,6,1,true)	--hill to left of road
+								end
+								spawned_1=1
+								amk.save_variable("has_spawned1", spawned_1)
+							end
+						end
+						if spawned_2 == 0 then
+							if actor_in_range(vector():set(-77.170,7.610,253.737), 20) then					--cave area hot spot
+								if spawns == 1 or spawns == 3 then
+									TB3D_Mobs.spawn_fire_cave(1)											--tunnels around hot spot
+								elseif spawns == 2 or spawns == 4 then
+									TB3D_Mobs.spawn_fire_cave(0)											--tunnels around hot spot
+								end
+								spawned_2=1
+								amk.save_variable("has_spawned2", spawned_2)
+							end
+						end
+						if spawned_3 == 0 and spawns == 1 then
+							if actor_in_range(vector():set(155.453,20.015,-138.648), 11000) then								--crows nest hot spot
+								alife():create("ammo_9x39_izomorf", vector():set(150.074,-5.908,-138.724),1224672,3688)			--ammo on table
+								alife():create("ammo_9x39_izomorf", vector():set(150.074,-5.908,-138.724),1224672,3688)			--ammo on table
+								alife():create("wpn_fn2000_paratrooper", vector():set(150.074,-5.908,-138.724),1224672,3688)	--sniper rifle on table
+								TB3D_Triggers.signal_green(154.777,25.015,-138.116,1230702,3688)												--in crows nest
+								spawned_3=1
+								amk.save_variable("has_spawned3", spawned_3)
+							end
+						end
+						if spawned_4 == 0 then
+							if actor_in_range(vector():set(155.453,20.015,-138.648), 10) then					--crows nest hot spot
+								if spawns == 1 or spawns == 3 then
+									TB3D_Mobs.spawn_killer_squad(162.406,4.821,-194.288,1243956,3688,6,1,true)		--site next to boat
+									TB3D_Mobs.spawn_killer_squad(170.868,10.786,-260.843,1258149,3683,6,1,true)
+									TB3D_Mobs.spawn_killer_squad(272.605,18.883,-257.742,1431826,3688,6,1,true)
+									TB3D_Mobs.spawn_killer_squad(315.418,9.193,-77.785,1498606,3688,6,2,true)
+									TB3D_Mobs.spawn_killer_squad(41.830,8.339,-239.381,1014781,3681,6,1,true)
+								elseif spawns == 2 or spawns == 4 then
+									TB3D_Mobs.spawn_killer_squad(162.406,4.821,-194.288,1243956,3688,6,2,true)
+									TB3D_Mobs.spawn_killer_squad(170.868,10.786,-260.843,1258149,3683,6,1,true)
+									TB3D_Mobs.spawn_killer_squad(272.605,18.883,-257.742,1431826,3688,6,1,true)
+									TB3D_Mobs.spawn_killer_squad(315.418,9.193,-77.785,1498606,3688,6,2,true)
+									TB3D_Mobs.spawn_killer_squad(41.830,8.339,-239.381,1014781,3681,6,1,true)
+								end
+								spawned_4=1
+								amk.save_variable("has_spawned4", spawned_4)
+							end
+						end
+						if spawned_5 == 0 then
+							if actor_in_range(vector():set(322.044,33.323,-428.168), 10000) then					--crows nest hot spot
+								if spawns == 1 or spawns == 3 then
+									TB3D_Mobs.spawn_killer_squad(324.381,41.749,-394.286,1509432,3690,6,1,false)		--site next to boat
+								elseif spawns == 2 or spawns == 4 then
+									TB3D_Mobs.spawn_killer_squad(324.381,41.749,-394.286,1509432,3690,6,3,false)
+								end
+								spawned_5=1
+								amk.save_variable("has_spawned5", spawned_5)
+							end
+						end
+						if spawned_6 == 0 and (spawns == 1 or spawns == 3) then
+							if actor_in_range(vector():set(400.675,-0.618,431.371), 1000) then					--toxic dome hot spot
+								TB3D_Mobs.spawn_killer_squad(477.965,-1.216,428.090,1744703,3698,6,1,false)		--around the dome
+								TB3D_Mobs.spawn_killer_squad(460.826,-6.686,395.611,1719312,3697,6,1,false)
+								TB3D_Mobs.spawn_killer_squad(396.637,-7.000,380.644,1619812,3689,6,1,false)
+								TB3D_Mobs.spawn_killer_squad(302.873,2.444,468.231,1476758,3689,6,1,false)
+								spawned_6=1
+								amk.save_variable("has_spawned6", spawned_6)
+							end
+						end
+					end
+				end
+			end
+		elseif level_up == 4 then
+			if TB3D_DLC_001 then is_remove_item = TB3D_DLC_001.update(time_now, slice_base, ln) end								--109978, optional dlc content				
+		elseif level_up == 5 then
+			if TB3D_DLC_002 then is_remove_item = TB3D_DLC_002.update(time_now, slice_base, ln) end								--109978, optional dlc content				
+		elseif level_up == 6 then
+			if TB3D_DLC_003 then is_remove_item = TB3D_DLC_003.update(time_now, slice_base, ln) end								--109978, optional dlc content				
+		elseif level_up == 7 then
+			if TB3D_DLC_004 then is_remove_item = TB3D_DLC_004.update(time_now, slice_base, ln) end								--109978, optional dlc content				
+		elseif level_up == 8 then
+			if TB3D_DLC_005 then is_remove_item = TB3D_DLC_005.update(time_now, slice_base, ln) end								--109978, optional dlc content				
+		elseif level_up == 9 then
+			if TB3D_DLC_006 then is_remove_item = TB3D_DLC_006.update(time_now, slice_base, ln) end								--109978, optional dlc content				
+		else
+			if TB3D_DLC_007 then is_remove_item = TB3D_DLC_007.update(time_now, slice_base, ln) end								--109978, optional dlc content				
+		end
+	----------------------------------------------------------------------------------------------end main loop
+	elseif has_alife_info("tb3d_collector_start") then
+		TB3D_Services.give_info("tb3d_collector_done")
+		db.actor.health = 2
+	else
+		TB3D_Services.get_all_quests()															-- gives tb3d_collector_start
+	end
+end
+
+--109940: now supports all collector levels (1-10) --------------------------------------------------------------------------------
+--this allows expansion without changing bind_stalker.script
+-----------------------------------------------------------------------------------------------------------------------------------
+function on_item_take(obj)
+	local is_remove_item = false
+	local sect = obj:section()
+	local ln = level.name()
+	local level_up = TB3D_Services.get_level_up()										--109955 for actions past the Collector levelup
+	--TB3D_Services.info_alert("Collector: item take["..sect.."]")
+	if level_up < 4 then
+		if sect=="val_zapis_1" and amk.load_variable("val_descr","")=="" then							-- Upon receipt of the note in inventory spawns stash
+			if TB3D_Modders.use_spawn_message then
+				TB3D_Services.info_alert("Collector Spawning: ["..obj:section().."]")
+			end
+			TB3D_dav_hunt.spawn_next(1)																				--Randomly spawns caches
+			TB3D_Triggers.spawn_alife_rand("rat_normal",-208.098,-20.370,-171.540,45243,50,8)
+			TB3D_Triggers.spawn_alife_rand("rat_weak",-208.098,-20.370,-171.540,45243,50,8)
+		elseif string_sub(sect,1,8)=="zep_doc_" then
+			TB3D_Dialog.found_zep_document(tonumber(string_sub(sect,9)))
+		elseif string_sub(sect,1,9)=="zep_note_" then
+			TB3D_Dialog.found_zep_note(string_sub(sect,10))
+		elseif string_sub(sect,1,9)=="zep_gold_" then
+			TB3D_Dialog.found_zep_gold(tonumber(string_sub(sect,13)))
+		elseif sect == "wpn_soulcube" then
+			if has_alife_info("tb3d_cube_spawned") then
+				local cube_cnt = amk.load_variable("soul_cube", 0)
+				if cube_cnt == 0 then
+					TB3D_Dialog.found_soul_cube_f1()
+					is_remove_item = true
+					amk.save_variable("soul_cube", 1)
+				elseif cube_cnt == 1 then
+					TB3D_Dialog.has_soul_cube_f1()
+					amk.save_variable("soul_cube", 2)
+				end
+			end
+		elseif sect == "bandranen_pda" then
+			TB3D_Triggers.bandranen_pda()
+			is_remove_item = true
+		elseif sect == "tweed_book" then
+			if TB3D_Services.give_info("tweed_book_have") then
+				TB3D_Dialog.tweed_book_found()
+			end
+		elseif sect == "swamp_samopisez" and ln == "swamp_old" then
+			if TB3D_Services.give_info("tb3d_dm_samp_has") then
+				if amk.load_variable("option_autosave",1) ~= 0 then
+					amk.start_timer("autosave",10,"take recorder to Rostok")
+				end
+			end
+		elseif sect == "hunt_doc_jupu" then
+			if TB3D_Services.give_info("tb3d_jupu_doc_has") then
+				amk.remove_item(db.actor:object("val_zapis_31"))										-- delete the last note
+				dmx_mod.create_level_changer_jupunder_to_jup()
+				dmx_mod.create_level_changer_jupunder_to_limansk()
+				dmx_mod.create_level_changer_jup_to_yantar()
+				if amk.load_variable("option_autosave",1) ~= 0 then
+					amk.start_timer("autosave",10,"caesier final stash")
+				end
+			end
+		elseif sect == "art_acumm" then
+			if ln == "l01_poligon" and not has_alife_info("tb3d_start_x14") then
+				TB3D_Services.delayed_action(1,"tb3d_start_x14", 10)
+				TB3D_Mobs.spawn_mob(-123.160,-9.191,8.683,79761,5390,5,1)
+				TB3D_Mobs.spawn_mob(-81.884,-9.318,-0.186,106498,5390,5,2)
+			end
+		elseif sect == "wpn_eagle" then
+			if ln == "l03_rinok" then
+				TB3D_Mobs.spawn_npcs(-20.985,0.007,-20.771,7980,5312,0,6)				--bandits at dist exit side of big hall
+				TB3D_Mobs.spawn_npcs(-20.926,1.248,19.393,8035,5309,0,6)				--bandits other side of big hall
+			end
+		end
+		--if sect == "tb3d_pri_document" then
+			--if ln == "l11_pripyat" and amk.load_variable("tb3d_suits", 0) < 3 then
+				--TB3D_Triggers.spawn_suit(10,99.434,4.336,131.041,215847,2185)
+				--amk.save_variable("tb3d_suits", 3)
+			--end
+		--end
+	elseif level_up == 4 then
+		if TB3D_DLC_001 then is_remove_item = TB3D_DLC_001.on_item_take(obj) end								--109978, optional dlc content				
+	elseif level_up == 5 then
+		if TB3D_DLC_002 then is_remove_item = TB3D_DLC_002.on_item_take(obj) end								--109978, optional dlc content				
+	elseif level_up == 6 then
+		if TB3D_DLC_003 then is_remove_item = TB3D_DLC_003.on_item_take(obj) end								--109978, optional dlc content				
+	elseif level_up == 7 then
+		if TB3D_DLC_004 then is_remove_item = TB3D_DLC_004.on_item_take(obj) end								--109978, optional dlc content				
+	elseif level_up == 8 then
+		if TB3D_DLC_005 then is_remove_item = TB3D_DLC_005.on_item_take(obj) end								--109978, optional dlc content				
+	elseif level_up == 9 then
+		if TB3D_DLC_006 then is_remove_item = TB3D_DLC_006.on_item_take(obj) end								--109978, optional dlc content				
+	else
+		if TB3D_DLC_007 then is_remove_item = TB3D_DLC_007.on_item_take(obj) end								--109978, optional dlc content				
+	end
+	return is_remove_item
+end
+
+function on_info(info_id)
+	local level_up = TB3D_Services.get_level_up()									--109978
+	if info_id == "tb3d_esc_prison" then
+		--if has_alife_info("esc_prison") then								--all.spawn toggle around carpark
+			TB3D_Services.remove_info("esc_prison")							--future use, just insure esc_prison is not active
+		--else
+			--TB3D_Services.give_info("esc_prison")
+		--end
+	elseif info_id == "tb3d_harsh_environment" then
+		news_manager.amk_send_tip_id("harsh_environment_msg","harsh_environment_title",10,40,"pda_icon")
+	elseif info_id == "mil_fblockpost_actor_outside" then					--going in and out of the warehouse compound
+		--TODO: random spawns, also mil_fblockpost_alarm
+	elseif level_up < 4 then
+		if info_id == "tb3d_blowout_done" then
+			amk.start_timer("autosave",10,"Collector Start")					--initial save for the collector
+			news_manager.amk_send_tip_id("collector_welcome_msg","collector_welcome_title",10,40,"trader")
+		elseif info_id == "falling_car" then
+			--handled elsewhere
+		elseif info_id == "dd_inform_zep2_start" then							--talked to informer in courtyards after wr barman
+			TB3D_Services.give_info("kras_kill_detmir")							--military ambush
+		elseif info_id == "tajic_sdoh" then										--spawn zombies and dogs when trader dies
+			TB3D_Services.give_info("kras_ngfind")
+		elseif info_id == "dd_informant_dead" then								--spawn zombies when informant dies		
+			TB3D_Services.give_info("kras_el_razvnavokz_return")
+		elseif info_id == "tractorist_zep3_done" then
+			if math_random(100) > 30 then
+				alife():create("zep_note_broke1", vector():set(-11.938,0.72,-6.379),443322,4481)		--first orange roof near tank
+			elseif math_random(100) > 60 then
+				alife():create("zep_note_broke1", vector():set(-57.899,0.979,-102.901),368164,4460)		--house w/shed has cellar 
+			else
+				alife():create("zep_note_broke1", vector():set(-89.002,0.98,-24.559),322686,4456)		--house on sw corner 
+			end
+		elseif info_id == "collector_ready_for_jupund" then
+			dmx_mod.create_level_changer_eprip_to_jup()
+			dmx_mod.create_level_changer_jup_to_jupunder()
+		elseif info_id == "collector_ready_for_eastprip" then
+			dmx_mod.create_level_changer_jup_to_eprip()
+		elseif info_id == "collector_ready_for_jupiter" then
+			dmx_mod.create_level_changer_zat_to_jup()
+		elseif info_id == "collector_ready_for_dcity" then
+			dmx_mod.create_level_changer_redforest_to_dcity()
+		elseif info_id == "collector_done_with_jupund" then
+			TB3D_Triggers.treasure_hunt_ending()
+			TB3D_Services.remove_info("tb3d_collector_hunt")
+		elseif info_id == "dd_inform_zep2_start" then				--109972 spawn trader, zombies and more mercs
+			TB3D_Services.give_info("svd_kill")
+		elseif info_id == "tb3d_cube_garbled_msg" then
+			news_manager.amk_send_tip_id("sms_sak_cube","sms_max",10,40,"common_channel")
+		elseif info_id == "tb3d_start_x14" then
+			news_manager.amk_send_tip_id("tb3d_x14_distress","sms_incomming",10,40,"common_channel")		--send sms from glavny
+			amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(196.735,0.024,365.252),50137,2538) ,"vehicle_btr","jupu") --nw gate
+			amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(216.960,-0.002,387.783),50137,2538) ,"vehicle_btr","jupu") --nw gate
+			TB3D_Services.give_info("tb3d_desant_wave2")			--spawns monolith in x14
+			TB3D_Services.delayed_action(1,"zat_kalter_bye_start", 10)			--sets restrictor that spawns glavny
+		elseif info_id == "zat_kalter_bye_start" then
+			dmx_mod.create_level_changer_npp2_x14()
+		elseif info_id == "glavny_spawn" then
+			TB3D_Services.give_info("x14_glavny_spawn")
+		elseif info_id == "tb3d_x14_done" then
+			--TB3D_Services.packet_alert("tb3d collector: dropped black energy")
+			TB3D_Services.give_info("tb3d_game_end")
+			TB3D_Services.teleportate("jupuncars")					--teleport to jup under
+		elseif info_id =="tb3d_portals_x10" then
+			dmx_mod.create_level_changer_jup_to_jupunder(true)		--98003, also given in dav_hunt
+			dmx_mod.create_level_changer_jupunder_to_jup(true)		--97115
+		elseif info_id == "tb3d_pred_trader" then
+			TB3D_Services.packet_alert("tb3d collector: spawn pred trader")
+			--alife():create("predbannik_m_trader", vector():set(78.980,-0.922,92.742),1067710,4005,97129)		--sid = 4001
+		elseif info_id == "zep_sms_from_cemetery" then				--109978
+			news_manager.amk_send_tip_id("tb3d_cem_distress","sms_incomming",10,40,"common_channel")		--send sms from stalkers
+		elseif info_id == "tb3d_sms_storm" then
+			news_manager.amk_send_tip_id("tb3d_sms_about_storm","sms_incomming",10,40,"common_channel")		--send sms from stalkers
+			TB3D_Services.delayed_action(1, "tb3d_sms_storm_areas", 10)
+		elseif info_id == "tb3d_sms_storm_areas" then
+			news_manager.amk_send_tip_id("tb3d_sms_storm_areas","sms_incomming",10,40,"common_channel")		--send sms from stalkers
+			TB3D_Services.delayed_action(1, "tb3d_give_storm_info", 10)
+		elseif info_id == "barman_zep4_start" then
+			if not has_alife_info("zep14_have") then
+				if has_alife_info("zep13_have") then
+					TB3D_Services.give_info("tb3d_zep4_article2")
+				else
+					TB3D_Services.give_info("tb3d_zep4_article1")
+				end
+			end
+		elseif info_id == "tb3d_sak_cube_done" then
+			dmx_mod.create_level_changer_radar_ros()
+		elseif info_id == "tb3d_hunt2_start" then
+			news_manager.amk_send_tip_id("hunt_part2_message","sms_sid",10,40,"trader")						--109981, moved from dav_hunt
+		end
+		if amk.load_variable("option_autosave",1) ~= 0 then		--automatic saves for collector levels (1-10)
+			local save_str = ""
+			if level_up < 4 then
+				if info_id == "tb3d_start_zep" then						--talking to sid about the north
+					save_str = "start_zep_search"
+				elseif info_id == "sid_zep2_start" then					--after talking to sid about f1
+					save_str = "have_tweed_weapon"
+				elseif info_id == "tweed_zep1_start" then				--first meeting
+					save_str = "find_book_tweed"
+				elseif info_id == "tweed_zep1_done" then				--found book in old bar
+					save_str = "found_book_tweed"
+				elseif info_id == "tweed_zep2_start" then				--after giving weapon to tweed
+					save_str = "gave_tweed_weapon"
+				elseif info_id == "tweed_zep3_start" then				--Tweed after firing range
+					save_str = "give_tweed_help"
+				elseif info_id == "barman_zep2_start" then				--after gathering info at the bar
+					save_str = "wasted_awaits"
+				elseif info_id == "tb3d_note_06" then					--note in house in techniques
+					save_str = "pipes_end"
+				elseif info_id == "tweed_book_have" then				--found book in the old bar
+					save_str = "touch_tweed"
+				elseif info_id == "tb3d_gb1_done" then					--first set of portals done in tunnels
+					save_str = "gbars1_done"
+				elseif info_id =="tb3d_sak_cube_done" then
+					save_str = "sak_cube_info"
+				elseif info_id =="tb3d_start_x14" then					--109980, found accum in firing range
+					save_str = "start_x14"
+				end
+			end
+			if save_str ~= "" then
+				local send_delay = TB3D_Modders.autosave_wait_time or 6
+				amk.start_timer("autosave",send_delay,translate(save_str))
+			end
+		elseif level_up == 4 then
+			if TB3D_DLC_001 then TB3D_DLC_001.on_info(info_id) end								--109978, optional dlc content				
+		elseif level_up == 5 then
+			if TB3D_DLC_002 then TB3D_DLC_002.on_info(info_id) end								--109978, optional dlc content				
+		elseif level_up == 6 then
+			if TB3D_DLC_003 then TB3D_DLC_003.on_info(info_id) end								--109978, optional dlc content				
+		elseif level_up == 7 then
+			if TB3D_DLC_004 then TB3D_DLC_004.on_info(info_id) end								--109978, optional dlc content				
+		elseif level_up == 8 then
+			if TB3D_DLC_005 then TB3D_DLC_005.on_info(info_id) end								--109978, optional dlc content				
+		elseif level_up == 9 then
+			if TB3D_DLC_006 then TB3D_DLC_006.on_info(info_id) end								--109978, optional dlc content				
+		else
+			if TB3D_DLC_007 then TB3D_DLC_007.on_info(info_id) end								--109978, optional dlc content	
+		end
+	end
+end
+
+function from_box(box, item)
+	local sect = item:section()
+	local bsect = box:section()
+	local do_transfer = false
+	local level_up = TB3D_Services.get_level_up()									--109955 for actions past the Collector levelup
+	if box:is_inv_box_empty() then
+		if bsect == "m_inventory_box" or string.sub(bsect,1,11) == "val_taynik_" then 	--- DMX MOD
+			level.start_stop_menu(level.main_input_receiver(), true)
+			alife():create("treasure_item",box:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+			alife():release(alife():object(box:id()))
+		elseif bsect == "dmx_box_nevedimka" then  -- DMX MOD
+			alife():release(alife():object(box:id())) 
+			do_transfer = true
+		end
+	end
+	if level_up < 4 then
+		if string.sub(sect,1,10) == "val_zapis_" then
+			local num = tonumber(string.sub(sect,11,-1))
+			if num == 2 then
+				TB3D_Services.give_info("tb3d_hunt_note2")													--109980, gives article in journal
+			end
+			TB3D_dav_hunt.spawn_next(num)
+		end
+	elseif level_up == 4 then
+		if TB3D_DLC_001 then do_transfer = TB3D_DLC_001.from_box(box, item) end								--109978, optional dlc content				
+	elseif level_up == 5 then
+		if TB3D_DLC_002 then do_transfer = TB3D_DLC_002.from_box(box, item) end								--109978, optional dlc content				
+	elseif level_up == 6 then
+		if TB3D_DLC_003 then do_transfer = TB3D_DLC_003.from_box(box, item) end								--109978, optional dlc content				
+	elseif level_up == 7 then
+		if TB3D_DLC_004 then do_transfer = TB3D_DLC_004.from_box(box, item) end								--109978, optional dlc content				
+	elseif level_up == 8 then
+		if TB3D_DLC_005 then do_transfer = TB3D_DLC_005.from_box(box, item) end								--109978, optional dlc content				
+	elseif level_up == 9 then
+		if TB3D_DLC_006 then do_transfer = TB3D_DLC_006.from_box(box, item) end								--109978, optional dlc content				
+	else
+		if TB3D_DLC_007 then do_transfer = TB3D_DLC_007.from_box(box, item) end								--109978, optional dlc content
+	end
+	return do_transfer
+end
+
+function item_drop(obj)
+	if obj then
+		local level_up = TB3D_Services.get_level_up()									--109955 for actions past the Collector levelup
+		local sect = obj:section()
+		if sect == "hand_radio_f" then														--companion radio
+			if amk.check_game() then amk.start_timer("comp_radio", 0.1, obj:id()) end
+		--elseif sect == "device_torch" then
+			--to be used in the future
+		elseif sect == "art_acumm" then														--109978, will use on other level ups
+			if level_up == 1 then
+				if level.name() == "lab_x14" and not has_alife_info("tb3d_x14_done") then
+					--TB3D_Services.packet_alert("tb3d collector: dropped black energy")
+					if actor_in_range(vector():set(-16.274,-31.364,27.377), 20) then
+						arhara_dialog.disabl_karta()
+						xr_effects.aes_earthshake(db.actor)													--start earth shock then fade
+						level.add_cam_effector("camera_effects\\surge_02.anm", 2532, false, "")
+						level.add_pp_effector("surge_fade.ppe", 2011, false)
+						dmx_mod.create_level_changer_jupu_to_x14()
+						TB3D_Services.delayed_action(1, "tb3d_x14_done", 2)			--event_horizont will be removed by fixer on next load
+						amk.remove_item(obj)
+					end
+				end
+			end
+		elseif level_up < 4 and string_find(sect, "zep_gold_") then					--109978, can continue until level up 4
+			local barnum = tonumber(string_sub(sect, 13))
+			local pos
+			if barnum == 2 then
+				pos = vector():set(67.120,-19.292,-178.588)		--ws6
+			elseif barnum == 3 then
+				pos = vector():set(76.894,-19.292,-166.629)		--wn5
+			elseif barnum == 4 then
+				pos = vector():set(101.765,-19.291,-165.089)	--ws3
+			elseif barnum == 5 then
+				pos = vector():set(102.913,-19.291,-149.440)	--wn2
+			elseif barnum == 6 then
+				pos = vector():set(113.766,-19.292,-132.074)	--n0
+			elseif barnum == 7 then
+				pos = vector():set(123.730,-19.293,-135.378)	--s0
+			elseif barnum == 10 then
+				pos = vector():set(126.965,-19.290,-110.782)	--es2
+			elseif barnum == 11 then
+				pos = vector():set(115.868,-19.290,-98.444)		--en3
+			elseif barnum == 12 then
+				pos = vector():set(127.091,-19.291,-86.656)		--es4
+			elseif barnum == 13 then
+				pos = vector():set(127.083,-19.291,-62.401)		--es6
+			elseif barnum == 15 then
+				pos = vector():set(118.672,-19.496,-133.629)	--NS-00
+			end
+			if pos then
+				if actor_in_range(pos, 40) then 									--10:1
+					if TB3D_Triggers.check_bar_drop(barnum) == true then			--check if right sequence
+						amk.remove_item(obj)
+						return
+					end
+				end
+				if barnum == 15 then
+					TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",127.083,-19.291,-62.401,4673,3868,2)		--west end
+					TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",67.120,-19.292,-178.588,1190,3868,2)		--east end
+				elseif barnum < 4 then
+					TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",113.766,-19.292,-132.074,3760,3868,2)		--middle
+				elseif barnum < 11 then
+					TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",127.083,-19.291,-62.401,4673,3868,2)		--west end
+				else
+					TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",67.120,-19.292,-178.588,1190,3868,2)		--east end
+				end
+			end
+		elseif level_up == 4 then
+			if TB3D_DLC_001 then TB3D_DLC_001.item_drop(obj) end								--109978, optional dlc content				
+		elseif level_up == 5 then
+			if TB3D_DLC_002 then TB3D_DLC_002.item_drop(obj) end								--109978, optional dlc content				
+		elseif level_up == 6 then
+			if TB3D_DLC_003 then TB3D_DLC_003.item_drop(obj) end								--109978, optional dlc content				
+		elseif level_up == 7 then
+			if TB3D_DLC_004 then TB3D_DLC_004.item_drop(obj) end								--109978, optional dlc content				
+		elseif level_up == 8 then
+			if TB3D_DLC_005 then TB3D_DLC_005.item_drop(obj) end								--109978, optional dlc content				
+		elseif level_up == 9 then
+			if TB3D_DLC_006 then TB3D_DLC_006.item_drop(obj) end								--109978, optional dlc content				
+		else
+			if TB3D_DLC_007 then TB3D_DLC_007.item_drop(obj) end								--109978, optional dlc content				
+		end
+	end
+end
+
+function on_use_object(obj)
+	meceniy_outfit.on_item_drop(obj)
+	dmx_mod.dmx_use(obj)
+	bolt_ending.on_actor_use(obj)
+	hidden_slots.on_eat(obj:section())
+	dmx_medicines.use(obj)
+	dmx_cars.car_repair(obj) 
+	local level_up = TB3D_Services.get_level_up()									--109978, for DLC content
+	if level_up == 4 then
+		if TB3D_DLC_001 then TB3D_DLC_001.on_use_object(obj) end								--109978, optional dlc content				
+	elseif level_up == 5 then
+		if TB3D_DLC_002 then TB3D_DLC_002.on_use_object(obj) end								--109978, optional dlc content				
+	elseif level_up == 6 then
+		if TB3D_DLC_003 then TB3D_DLC_003.on_use_object(obj) end								--109978, optional dlc content				
+	elseif level_up == 7 then
+		if TB3D_DLC_004 then TB3D_DLC_004.on_use_object(obj) end								--109978, optional dlc content				
+	elseif level_up == 8 then
+		if TB3D_DLC_005 then TB3D_DLC_005.on_use_object(obj) end								--109978, optional dlc content				
+	elseif level_up == 9 then
+		if TB3D_DLC_006 then TB3D_DLC_006.on_use_object(obj) end								--109978, optional dlc content				
+	else
+		if TB3D_DLC_007 then TB3D_DLC_007.on_use_object(obj) end								--109978, optional dlc content				
+	end
+end
+
+function check_usable_item(obj)		--VICTIM ONLY, actor checks these directly in binder, called by amk_mod.script
+	--TB3D_Services.packet_alert("tb3d collector: check usable item["..obj:name().."]")
+	local level_up = TB3D_Services.get_level_up()									--109978, for DLC content
+	if level_up == 4 then
+		if TB3D_DLC_001 then TB3D_DLC_001.check_usable_item(obj) end								--109978, optional dlc content				
+	elseif level_up == 5 then
+		if TB3D_DLC_002 then TB3D_DLC_002.check_usable_item(obj) end								--109978, optional dlc content				
+	elseif level_up == 6 then
+		if TB3D_DLC_003 then TB3D_DLC_003.check_usable_item(obj) end								--109978, optional dlc content				
+	elseif level_up == 7 then
+		if TB3D_DLC_004 then TB3D_DLC_004.check_usable_item(obj) end								--109978, optional dlc content				
+	elseif level_up == 8 then
+		if TB3D_DLC_005 then TB3D_DLC_005.check_usable_item(obj) end								--109978, optional dlc content				
+	elseif level_up == 9 then
+		if TB3D_DLC_006 then TB3D_DLC_006.check_usable_item(obj) end								--109978, optional dlc content				
+	else
+		if TB3D_DLC_007 then TB3D_DLC_007.check_usable_item(obj) end								--109978, optional dlc content				
+	end
+end
+
+function process_levels(lname, sname)
+	if lname ~= sname then
+		local level_up = TB3D_Services.get_level_up()									--109955 for actions past the Collector levelup
+		--TB3D_Services.packet_alert("tb3d collector: process levels lname["..lname.."] sname["..sname.."] levelup["..utils.to_str(level_up).."]")
+		reset_spawn_triggers()												--109981, save in vars for reloads
+		if lname == "l01_escape" then
+			local spawns = amk.load_variable("tb3d_esc_spawns", 0)
+			if spawns == 0 then
+				amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(-179.130,-22.624,-469.112),71030,13) ,"vehicle_btr","jupu") --south gate
+				--TB3D_Triggers.spawn_suit(6,64.986,4.131,-0.547,39059,3808)
+				amk.save_variable("tb3d_esc_spawns", 1)
+			--elseif spawns == 1 then
+			end
+			if TB3D_Modders.use_random_tanks then
+				if has_alife_info("barman_zep4_start") then turret_spawn.kordon_spawn_turret() end		--southern outpost
+			end
+		elseif lname == "l02_garbage" then
+			--future
+		elseif lname == "l05_bar" then
+			--future
+		elseif lname == "l06_rostok" then
+			--local spawns = amk.load_variable("sarc_spawns", 0)
+			--TB3D_Triggers.ros_spawns(spawns)															--109978
+			if TB3D_Services.give_info("tb3d_portal_wt1") then											--treasure hunt way back out
+				local se_obj = alife():create("m_teleport_tb3d1",vector():set(-113.797,-0.001,103.625),43996,1315)
+				local t = amk.get_anomaly_data(se_obj) 
+				t.sid = 1999901
+				amk.set_anomaly_data(t, se_obj)
+			end
+		elseif lname == "l04_darkvalley" then
+			TB3D_Mobs.check_dv_spawns()
+		elseif lname == "l03_agroprom" then
+			--future
+		elseif lname == "l08_yantar" then
+			--future
+		elseif lname == "l12u_sarcofag" then
+			local spawns = amk.load_variable("sarc_spawns", 0)
+			TB3D_Triggers.sarc_spawns(spawns)															--109978
+		elseif lname == "l12u_control_monolith" then
+			--future
+		elseif lname == "marsh" then
+			--future
+		elseif lname == "l10u_bunker" then
+			local spawns = amk.load_variable("bunker_spawns", 0)
+			TB3D_Triggers.bunker_spawns(spawns)															--109978
+		elseif lname == "l10_radar" then
+			if sname == "l10u_bunker" then
+				if amk.load_variable("tb3d_suits", 0) < 2 then
+					TB3D_Triggers.spawn_suit(3,107.167,-6.097,-21.919,45466,1973)
+					amk.save_variable("tb3d_suits", 2)
+				end
+			end
+		elseif lname == "jupiter" then
+			--if has_alife_info("collector_done_with_jupiter") or not has_alife_info("collector_ready_for_jupiter") then
+				local spawns = amk.load_variable("tb3d_jup_spawns", 0)
+				if spawns == 0 then
+					TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -59.286,4.354,214.718,622759,3719,8)			--shack in barrel
+					TB3D_Triggers.spawn_suit(6,-59.286,4.354,214.718,622759,3719)									--trader's back room
+					amk.save_variable("tb3d_jup_spawns", 1)
+				elseif spawns == 1 then
+					--TB3D_Triggers.spawn_suit(8,9.980,9.556,275.074,18758,3799)
+					--amk.save_variable("tb3d_jup_spawns", 2)
+				elseif spawns == 2 then
+					--TB3D_Triggers.spawn_suit(11,19.211,9.570,194.655,25281,3804)
+					--amk.save_variable("tb3d_jup_spawns", 3)
+				end
+			--end
+			TB3D_Mobs.check_jupiter_spawns()
+			if level_up == 1 then
+				if has_alife_info("tb3d_note_00") then TB3D_Services.give_info("yan_bunker_door_1_open") end
+			elseif level_up == 2 then												--109978
+				local rand2 = 10
+				if sname == "jupiter_underground" then rand2 = 7 end				--skip elevator spawns
+				dav_ldk.spawn_rand_jup_ldk(math_random(1,rand2))
+			elseif level_up > 2 then												--109978
+				dav_ldk.spawn_rand_jup_ldk(math_random(1,5))
+				dav_ldk.spawn_rand_jup_ldk(math_random(6,10))
+			end
+		elseif lname == "jupiter_underground" then
+			if not has_alife_info("collector_ready_for_jupund") or has_alife_info("collector_done_with_jupund") then
+				TB3D_Mobs.check_jupu_spawns()
+			end
+			if level_up == 1 then
+				if has_alife_info("collector_done_with_jupund") or not has_alife_info("collector_ready_for_jupund") then
+					local spawns = amk.load_variable("tb3d_jupu_spawns", 0)
+					if spawns == 0 then		--tech packs are NOT dynamic and should only spawn once
+						if not has_alife_info("tb3d_x14_done") then
+							TB3D_Triggers.spawn_x14_guard()
+						end
+						amk.save_variable("tb3d_jupu_spawns", 1)
+					elseif spawns == 1 then																				--second pass
+						TB3D_Triggers.spawn_suit(8,9.980,9.556,275.074,18758,3799)										--truck
+						amk.save_variable("tb3d_jupu_spawns", 2)
+					elseif spawns == 2 then																				--3rd pass
+						TB3D_Triggers.spawn_suit(11,19.211,9.570,194.655,25281,3804)									--cannister
+						amk.save_variable("tb3d_jupu_spawns", 3)
+					end
+				end
+			elseif level_up == 2 then													--109978
+				TB3D_Mobs.spawn_snorks(-46.644,8.036,441.673,1219,3772,10)			--elevator
+				TB3D_Mobs.spawn_snorks(-53.615,3.208,-0.186,395,3775,6)				--main room behind cannisters
+				TB3D_Mobs.spawn_snorks(-2.122,0.077,60.598,12021,3784,6)			--main room dead end tunnel
+				TB3D_Mobs.spawn_snorks(71.413,5.032,-227.727,40106,3827,10)			--eprip exit
+			elseif level_up > 2 then												--109978
+				dav_ldk.spawn_rand_jupu_ldk(0, math_random(1,6))
+				dav_ldk.spawn_rand_jupu_ldk(1, math_random(1,6))
+			end
+		elseif lname == "zaton" then
+			--if not has_alife_info("collector_ready_for_zaton") or has_alife_info("collector_done_with_zaton") then
+				local spawns = amk.load_variable("zat_spawns", 0)
+				TB3D_Triggers.zat_spawns(spawns)														--109978, consolidated to triggers
+			--end
+			if sname == "lost_village" then TB3D_Services.rotate_actor() end		--109976
+		elseif lname == "l11_pripyat" then
+			TB3D_Mobs.check_pripyat_spawns()
+			if sname == "zaton" then TB3D_Services.rotate_actor() end				--109976
+		elseif lname == "pripyat" then
+			--if not has_alife_info("collector_ready_for_eastprip") or has_alife_info("collector_done_with_eastprip") then
+				TB3D_Mobs.check_eprip_spawns()
+			--end
+			local spawns = amk.load_variable("eprip_spawns", 0)
+			TB3D_Triggers.eprip_spawns(spawns)														--109978, consolidated to triggers
+			if level_up == 1 then																	--Collector = ZEP, Gold Bars and treasure hunt
+				if sname == "jupiter_underground" then
+					TB3D_Mobs.eprip_exit_jupu()
+				end
+			end
+		elseif lname == "dead_city" then
+			local spawns = amk.load_variable("tb3d_dcity_spawns", 0)
+			if has_alife_info("collector_done_with_dcity") or not has_alife_info("collector_ready_for_dcity") then
+				if spawns == 0 then
+					--TB3D_Triggers.spawn_suit(6,64.986,4.131,-0.547,39059,3808)
+					--amk.save_variable("tb3d_dcity_spawns", 1)
+				elseif spawns == 1 then
+					--TB3D_Triggers.spawn_suit(8,9.980,9.556,275.074,18758,3799)
+					--amk.save_variable("tb3d_dcity_spawns", 2)
+				elseif spawns == 2 then
+					--TB3D_Triggers.spawn_suit(11,19.211,9.570,194.655,25281,3804)
+					--amk.save_variable("tb3d_dcity_spawns", 3)
+				end
+			end
+			if not has_alife_info("collector_ready_for_dcity") or has_alife_info("collector_done_with_dcity") then
+				--TB3D_Mobs.check_dcity_spawns()
+			end
+		elseif lname == "l07_military" then
+			if sname == "l06_rostok" then
+				TB3D_Dialog.killers_in_camp()
+			end
+		elseif lname == "l12_stancia_2" then
+			if sname == "l12_stancia" then
+				TB3D_Dialog.npp2_killers_npp1()
+			end
+		elseif lname == "l12_stancia" then
+			if level_up == 1 then																				--Collector = ZEP, Gold Bars and treasure hunt
+				if sname == "yantar_old" then
+					TB3D_Dialog.npp2_killers_rs()
+				end
+				if has_alife_info("tb3d_goldbar_10") and not has_alife_info("tb3d_goldbar_15") then
+					if sname == "pripyat" then
+						TB3D_Triggers.signal_green(55.859,-0.001,-306.080,386473,2400)
+						alife():create("tb3dm_gigant_strong", vector():set(55.859,-0.001,-306.080),386473,2400,expendable_object)	--pipe bend
+					end
+				end
+			end
+			local spawns = amk.load_variable("npp1_spawns", 0)
+			TB3D_Triggers.npp_spawns(spawns)												--109978, need add more
+		elseif lname == "l01_poligon" then
+			--TB3D_Services.give_info("tb3d_poli_btrs")
+			TB3D_Services.give_info("tb3d_poli_apcs")
+			if has_alife_info("zep24_have") then
+				if TB3D_Services.give_info("tb3d_poli_towers") then
+					alife():create("art_acumm", vector():set(-56.779,-8.091,53.222),122891,5390)	--acumm in firing range
+				end
+			end
+			--TB3D_Services.give_info("tb3d_poli_sleepers")
+		elseif lname == "k01_darkscape" then
+			TB3D_Mobs.check_ds_spawns()
+			local spawns = amk.load_variable("ds_spawns", 0)
+			TB3D_Triggers.ds_spawns(spawns)												--109978, need add more
+		elseif lname == "l04_pogost" then
+			if level_up < 3 then
+				if TB3D_Services.give_info("pogost_militlager_kill") then
+					--spawns large group of enemy and small group of dead stalkers from sms
+				elseif TB3D_Services.remove_info("pogost_militlager_kill_done") then
+					TB3D_Services.give_info("pogost_help")
+				elseif has_alife_info("tb3d_goldbar_02") then
+					TB3D_Mobs.check_cemetery_spawns()
+				end
+			elseif level_up == 3 then
+				if TB3D_Services.give_info("pogost_haker_find") then
+					TB3D_Services.give_info("pogost_militlager_kill_return")
+				elseif TB3D_Services.give_info("pogost_oxranik_helpmutant") then
+					--TODO
+				else
+					TB3D_Mobs.check_cemetery_spawns()
+				end
+			else
+				TB3D_Mobs.check_cemetery_spawns()
+			end
+		elseif lname == "dark_forest" then
+			TB3D_Mobs.check_wasted_spawns()
+			if level_up == 1 then
+				if sname == "marsh" and has_alife_info("tb3d_goldbar_09") then
+					TB3D_Triggers.spawn_df_killers()
+				end
+			elseif level_up == 3 then
+				if sname == "marsh" then
+					TB3D_Triggers.spawn_df_killers()
+				end
+			end
+		elseif lname == "l01_krasivay" then
+			TB3D_Mobs.check_kras_spawns()
+			--TB3D_Services.give_info("kras_ng_attak")
+		elseif lname == "l02_dd" then
+			--future use
+		elseif lname == "hiding_road" then
+			local spawns = amk.load_variable("hr_spawns", 0)
+			TB3D_Triggers.hr_spawns(spawns)														--109978, consolidated to triggers
+			if spawns == 2 or spawns == 3 then													--2 is acted upon in update and set to 3 then 4
+				--do nothing
+			else
+				TB3D_Mobs.check_hr_spawns()
+			end
+		elseif lname == "predbannik" then
+			TB3D_Services.give_info("tb3d_pred_trader")
+		elseif lname == "level_f-1" then
+			if not has_alife_info("zep22_have") then
+				TB3D_Services.give_info("tb3d_harsh_environment")
+			else
+				TB3D_Mobs.check_f1_spawns()
+			end
+		elseif lname == "generators" then
+			if sname == "l04_pogost" then
+				TB3D_Mobs.spawn_gen_skelets()
+			elseif sname == "warlab" then
+				TB3D_Triggers.warlab_spawns(0)														--109978, need add more
+			end
+		elseif lname == "swamp_old" then
+			TB3D_Mobs.spawn_deadm_mobs()																--dogs, dogs, dogs
+			TB3D_Services.rotate_actor(180)
+		end
+		--============ allways do ==========================================
+		if sname == "jupiter" then
+			TB3D_Services.remove_info("yan_bunker_door_1_open")											--reset bunker doors
+		end
+		if has_alife_info("tb3d_collector_hunt") then													--can end up on more than one level/level_up
+			if has_alife_info("tb3d_jupu_doc_has") then
+				TB3D_Services.delayed_action(1, "collector_done_with_jupund", 30)
+				TB3D_Services.remove_info("tb3d_collector_hunt")										--done with treasure hunt
+			elseif has_alife_info("zep24_have") then
+				dav_ldk.check_spawn(lname)																	--start hunt part 2
+			end
+		end
+		--TB3D_Services.packet_alert("tb3d collector: level up["..utils.to_str(level_up).."]")
+		if level_up == 1 then																				--collector
+			if sname == "level_f-1" then
+				TB3D_Services.remove_info("tb3d_harsh_environment")											--visits prior to BR
+			end
+		elseif level_up == 2 then																			--Desolation = above ground is harsh in some levels and breaks gear
+			if TB3D_Services.is_instorm(lname) == true then													--109978, levels close to npp
+				TB3D_Services.give_info("tb3d_harsh_environment")
+				TB3D_Services.set_harsh_environment(1)														--109978
+			else
+				TB3D_Services.remove_info("tb3d_harsh_environment")
+				TB3D_Services.clear_harsh_environment()														--109978
+			end
+		elseif level_up == 3 then																			--LIVE LINK
+			if TB3D_Services.remove_info("tb3d_harsh_environment") then
+				TB3D_Services.clear_harsh_environment()														--109981, storm is over
+			end
+			TB3D_Services.give_info("tb3d_spawn_oman")														--oman occupies waiting room helipad
+		elseif level_up == 4 then
+			if TB3D_Services.remove_info("tb3d_collector_hunt") then										--109981, never completed the treasure hunt
+				dmx_mod.create_level_changer_jup_to_yantar()
+			end
+			if TB3D_DLC_001 then TB3D_DLC_001.process_levels(lname, sname) end								--109978, optional dlc content				
+		elseif level_up == 5 then
+			if TB3D_DLC_002 then TB3D_DLC_002.process_levels(lname, sname) end								--109978, optional dlc content				
+		elseif level_up == 6 then
+			if TB3D_DLC_003 then TB3D_DLC_003.process_levels(lname, sname) end								--109978, optional dlc content				
+		elseif level_up == 7 then
+			if TB3D_DLC_004 then TB3D_DLC_004.process_levels(lname, sname) end								--109978, optional dlc content				
+		elseif level_up == 8 then
+			if TB3D_DLC_005 then TB3D_DLC_005.process_levels(lname, sname) end								--109978, optional dlc content				
+		elseif level_up == 9 then
+			if TB3D_DLC_006 then TB3D_DLC_006.process_levels(lname, sname) end								--109978, optional dlc content				
+		else
+			if TB3D_DLC_007 then TB3D_DLC_007.process_levels(lname, sname) end								--109978, optional dlc content				
+		end
+		--===================================================================
+	else
+		spawned_1=amk.load_variable("has_spawned1", 0)			--109981, reload them
+		spawned_2=amk.load_variable("has_spawned2", 0)
+		spawned_3=amk.load_variable("has_spawned3", 0)
+		spawned_4=amk.load_variable("has_spawned4", 0)
+		spawned_5=amk.load_variable("has_spawned5", 0)
+		spawned_6=amk.load_variable("has_spawned6", 0)
+	end	--lname ~= sname
+end
+function reset_spawn_triggers()
+	spawned_1=0
+	amk.save_variable("has_spawned1", spawned_1)
+	spawned_2=spawned_1
+	amk.save_variable("has_spawned2", spawned_2)
+	spawned_3=spawned_1
+	amk.save_variable("has_spawned3", spawned_3)
+	spawned_4=spawned_1
+	amk.save_variable("has_spawned4", spawned_4)
+	spawned_5=spawned_1
+	amk.save_variable("has_spawned5", spawned_5)
+	spawned_6=spawned_1
+	amk.save_variable("has_spawned6", spawned_6)
+end
+
+function actor_in_range(pos, dist)
+	return (db.actor:position():distance_to_sqr(pos) < dist)
+end
+
+function hospital_fog_maze()
+	local pos = db.actor:position()
+	local x, z
+	if pos.y > 37 then									--above halls 
+		if pos.z > 893 then								--north edge
+			x = -84.657									--half buried entrance under ledge
+			pos.y = 25.561
+			z = 620.833
+		elseif pos.z < 609 then							--south edge
+			x = -78.798									--back to ledge
+			z = 624.070
+			pos.y = 36.957
+		elseif pos.x > -60 then							--east edge
+			if pos.z > 770 then							--entrance region
+				x = -74.770								--back to start
+				pos.y = 28.699
+				z = 861.722
+			else										--cave entrance south to ledge
+				x = -78.798								--back to ledge
+				z = 624.070
+				pos.y = 36.957
+			end
+		elseif pos.x < -112 then						--west edge
+			x = -84.657									--half buried entrance under ledge
+			pos.y = 25.561
+			z = 620.833
+		elseif pos.z >= 775 then						--north region above cave
+			--west edge done
+		elseif pos.z >= 760 then						--pit behind cave with tree
+			if pos.x > -90 then							--entering smoke in pit
+				x = -78.798								--back to ledge
+				z = 624.070
+				pos.y = 36.957
+			end
+		elseif pos.z >= 750 then						--hill behind cave
+			--west edge done
+		elseif pos.z >= 736 then						--end of second hall to the west
+			if pos.x < -87 then							--to room below cave in water
+				x = -94.812
+				z = 750.694
+				pos.y = 23.786
+			end
+		elseif pos.x < -87 then							--to room below cave in water
+			x = -94.812
+			z = 750.694
+			pos.y = 23.786
+		end
+	elseif pos.z > 613.354 and pos.z < 616.086 then		--room with teleport -93.650,32.225,613.354   -93.418,32.442,616.086
+		if pos.y > 32.2 and pos.x < -93 then			--to tractor
+			x = -71.462
+			pos.y = 36.688
+			z = 875.731
+		end
+	elseif pos.z > 900 and pos.x < -110 then			---NE corner to far end in upper hall
+		x = -92.612
+		z = 558.599
+		pos.y = 27.405
+	end
+	if x or z then
+		if x then pos.x = x end
+		if z then pos.z = z end
+		TB3D_Services.move_actor(pos.x,pos.y,pos.z,true)
+	end
+end
+

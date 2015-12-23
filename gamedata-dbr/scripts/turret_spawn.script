@@ -1,0 +1,119 @@
+-- TB3D 1.0.9.9.7.5   added fire distance to spawner, removed bar turret
+function my_ver() return "1.0.9.9.7.5" end
+--[[ Random turrets for fashion OGSE.
+	Author: Mixser
+the old turret on the block as the cordon
+temp[3]
+(-132.28,-24.59,-355.00)
+temp[6]
+(-121.61,-23.67,-371.1)
+PTP spavnit? in excess of the turret 1.25
+NATO spavnit? in excess of the turret 0.9
+--]]
+
+function kordon_spawn_turret()
+	local j = 3 --  the number of turrets at the level
+	local x = 0 -- turret room
+	local temp = {0,0,0,0,0,0,0} -- flags that indicate what turret zaspavneny.
+	local is_skipped = false
+	local y = 0
+	local v = vector()
+	while y < j do
+		x = math.random(1,6) -- random select turret
+		y=y+1
+		if x == 1 and temp[1] == 0 then
+			temp[1] = 1 
+			v = vector():set(-172.85,-24.19,-350.07)
+		elseif x == 2 and temp[2] == 0 then
+			temp[2] = 1
+			v = vector():set(-163.60,-24.19,-350.42)
+		elseif x == 3 and temp[3] == 0 then
+			temp[3] = 1
+			v = vector():set(-132.49,-28.89,-387.39)
+		elseif x == 4 and temp[4] == 0 then
+			temp[4] = 1
+			v = vector():set(-147.79,-25.19,-353.13)
+		elseif x == 5 and temp[5] == 0 then
+			temp[5] = 1
+			v = vector():set(-172.60,-24.19,-359.43)
+		elseif x == 6 and temp[6] == 0 then
+			temp[6] = 1
+			v = vector():set(-125.39,-28.9,-370.79)
+		else 
+			is_skipped = true 
+		end
+		if is_skipped then 
+			y=y-1 
+			is_skipped = false
+		else
+			turret_mgun.create_turret("turret_tb3d_pkm", "l01_escape", v, "military", "esc_blokpost", 100, 100)
+		end
+	end
+	for i=1,6 do temp[i]=0 end -- clearing check boxes
+end
+
+function agroprom_spawn_turret()
+	local j = 3 --  the number of turrets at the level
+	local x = 0 -- turret room
+	local temp = {0,0,0,0,0,0,0,0,0,0,0} -- flags needed to spavnilis? not for turret one and the same place--check boxes that indicate what turret zaspavneny.
+	local is_skipped = false
+	local v = vector()
+	local y = 0
+	while y < j do
+		x = math.random(1,10) -- random select turret
+		y=y+1
+		if x == 1 and temp[1] == 0 then
+			temp[1] = 1
+			v = vector():set(-175.96,6.46,-210.55)
+		elseif x == 2 and temp[2] == 0 then
+			temp[2] = 1
+			v = vector():set(-115.63,9.32,-220.57)
+		 elseif x == 3 and temp[3] == 0 then
+			 temp[3] = 1
+			 v = vector():set(-119.91,16.64,-190.84)
+		 elseif x == 4 and temp[4] == 0 then
+			 temp[4] = 1
+			 v = vector():set(-157.50,16.63,-190.90)
+		 elseif x == 5 and temp[5] == 0 then
+			 temp[5] = 1
+			 v = vector():set(-129.14,16.64,-205.67)
+		 elseif x == 6 and temp[6] == 0 then
+			 temp[6] = 1
+			 v = vector():set(-192.96,5.74,-208.17)
+		 elseif x == 7 and temp[7] == 0 then
+			 temp[7] = 1
+			 v = vector():set(-117.58,6.51,-173.71)
+		 elseif x == 8 and temp[8] == 0 then
+			 temp[8] = 1
+			 v = vector():set(-132.49,6.48,-173.29)
+		 elseif x == 9 and temp[9] == 0 then
+			 temp[9] = 1
+			 v = vector():set(-138.76,5.82,-185.84)
+		 elseif x == 10 and temp[10] == 0 then
+			 temp[10] = 1
+			 v = vector():set(-175.64,8.75,-155.02)
+		else 
+			is_skipped = true 
+		end
+		if is_skipped then 
+			y=y-1 
+			is_skipped = false
+		else
+			 turret_mgun.create_turret("turret_tb3d_pkm", "l03_agroprom", v, "military", "agr_nii", 45, 90)
+		end
+	end
+	for i=1,14 do temp[i]=0 end -- clearing check boxes
+end
+
+--function bar_turret() -- Dolgovska turret
+	--if has_alife_info("bar_svoboda_rg6_done") then
+		--turret_mgun.create_turret("turret_tb3d_pkm", "l05_bar", vector():set(184.2,1.3,102.38), "dolg", "", 60, 60)
+	--end
+--end
+
+function ros_turrets() -- Najmitovskie turret
+	turret_mgun.create_turret("turret_tb3d_pkm", "l06_rostok", vector():set(-84.12,0.9,140.35), "killer", "", 60, 60)
+	turret_mgun.create_turret("turret_tb3d_pkm", "l06_rostok", vector():set(-84.12,0.9,131.72), "killer", "", 60, 60)
+	turret_mgun.create_turret("turret_tb3d_pkm", "l06_rostok", vector():set(-47.37,0.9,113.67), "killer", "", 60, 60)
+end
+ 

@@ -1,0 +1,48 @@
+--TB3D 1.0.9.9.7.0 use_binder_message
+function my_ver() return "1.0.9.9.7.0" end
+--[[------------------------------------------------------------------------------------------------------------------
+Respawn binder
+--------------------------------------------------------------------------------------------------------------------]]
+
+function bind(obj)
+	local obj_name = obj:name()
+	local amk_name = obj.amk_name or "NIL"
+	if amk_name ~= "NIL" then obj_name = amk_name end
+	local ini = obj:spawn_ini()
+	if ini then
+		obj:bind_object(respawn_binder(obj))
+		if TB3D_Modders.use_binder_message then
+			TB3D_Services.packet_alert("bind RESPAWN: bind["..utils.to_str(obj_name).."] section["..obj:section().."]")
+		end
+		return
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+class "respawn_binder" ( object_binder )
+
+function respawn_binder:__init( obj ) super( obj )
+	--if TB3D_Modders.use_alife_message == true then TB3D_Services.packet_alert("bind RESPAWN: ["..utils.to_str(obj:name()).."] binded") end
+end
+
+function respawn_binder:net_spawn( server_object )
+		if object_binder.net_spawn( self, server_object ) then
+			self.se_respawn = alife():object( server_object.id )
+			if TB3D_Modders.use_respawn_message == true then TB3D_Services.packet_alert("bind RESPAWN: ["..utils.to_str(self.object:name()).."] spawned") end
+			return true
+		end
+	return false
+end
+
+function respawn_binder:net_destroy()
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind respawn: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
+	object_binder.net_destroy( self )
+	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind respawn: net destroy["..utils.to_str(self.object:name()).."] done") end
+end
+
+function respawn_binder:update( delta )
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind    respawn: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta["..utils.to_str(delta).."]") end
+	object_binder.update( self, delta )
+	self.se_respawn:update_online()
+	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("bind    respawn: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done") end
+end

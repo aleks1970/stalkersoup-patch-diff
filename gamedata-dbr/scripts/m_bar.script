@@ -1,0 +1,703 @@
+function my_ver() return "1.0.9.9.4.0" end
+--[[ <!-- TB3D 1.0.9.9.4.0 --------------------------------------------------------------
+ File           : m_bar.script
+ Description    : tin in the bar (do not touch someone else, and you shall receive :-))
+ Copyright      : 2011 © Erlik 
+ Author         : Erlik (aka Garry_Galler)
+ Last edit      : 6.03.2011 
+--]] -----------------------------------------------------------------------------
+
+--**//Debagovye function//********************************************
+--function Console(fmt, ...)
+	--if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("M BAR: "..msg)
+		--local msg = string.format(fmt, ...)
+		--TB3D_Services.info_alert("M BAR: "..msg)
+	--end
+--end 
+
+function ToString(v)
+if type(v)=="string" then return v end 
+local str = (type(v)=="number" or  type(v)=="boolean") and tostring(v) or  type(v)
+return str
+end
+--********************************************************************
+
+--**//External variables and auxiliary functions//***************
+local sPattern          = true and "bar_bar_"                 --// If changed to false, you will be taken of any NPC, but not from the bar tolklo
+local sZoneName         = true and "bar_no_weapon_zone"       --// area of ??the scheme, if true change to false, then any area
+local iDistPunch        = 1.5    --// Distance to strike
+local iDistThrow        = 10     --// distance for a throw
+local iDistStartAction  = 2      --// distance between the NPC and the subject for the start of the scheme
+local bStart            = false  --// start circuit condition
+local iLevelVerexId     = nil    --// source vertex NPC 
+local sCurrentState     = nil    --// reset NPC 
+local vLookPosition     = nil    --// position where the NPC you need to look
+local fTimeShift        = nil    --// to delay action games
+local gNpc              = nil    --// NPC object under the scheme
+local gItemDrop         = nil    --// object taken things for the PC drops
+local iIdEat            = nil    --// Aidi subject to spawn
+local sStateNpc         = nil    --// current Sawston ekshena
+local bOpenTradeWnd     = false  --// open a trade window
+local iCountPunch       = 0      --// number inflicted blows
+local iPauseSounds      = 0      --// Pause for a replica
+local iRealTimeFactor   = system_ini():r_u32("alife", "time_factor")
+local tItemsForDrop     = {"bread", "conserva", "kolbasa", "energy_drink", "vodka"}
+local tItemsForEvaluate = {["bread"]=true,["conserva"]=true, ["kolbasa"]=true, ["energy_drink"]=true,["vodka"]=true }	
+local sBoneName         = "bip01_r_finger0"  --"bip01_r_hand"  --// bone to the position of the object spawn	!!!!TB3D
+local tItemId           ={}                                    --// a temporary array to store objects thrown HS
+
+
+
+function IsNpc(npc)
+return npc and (npc:clsid()==clsid.script_stalker or npc:clsid()==clsid.script_trader) and npc:alive()
+end
+
+function GetNpcForAction(npc, oItem)
+ if  not IsNpc(npc) then  return false end
+    if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("M BAR: GetNpcForAction["..npc:name().."]") end
+    if  sPattern then
+    return string.match(npc:name(), sPattern) and distance_between(npc, oItem)<iDistStartAction  and npc
+    end
+    return distance_between(npc, oItem)<iDistStartAction  and npc
+end
+ 
+
+function GetDistance(oItem)
+local if_true = false
+  for k, v in pairs(db.storage) do 
+   if_true = GetNpcForAction(level.object_by_id(k),oItem)
+      if if_true then
+      gNpc  = if_true
+      break
+     end
+  end
+ return if_true  
+end
+
+
+function GetActorInZone()
+    if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("M BAR: GetActorInZone["..sZoneName.."]") end
+	if sZoneName then
+		return utils.npc_in_zone(db.actor, db.zone_by_name[sZoneName])
+	end
+	return true
+end
+
+function PlaySound(path, volume)
+local snd =  xr_sound.get_safe_sound_object(path)
+   if not snd:playing() then 
+   snd:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), volume or 1.0)
+   end
+end 
+
+function SoundPunch()
+local tSoundsPath={
+[1]=[[affects\hit_fist]]	--!!!!TB3D
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)])
+end 
+
+function ActorPostReplics()
+local tSoundsPath={
+[1]=[[script_replics\stalker_1\newbie\robbered_replic_1_1]],
+[2]=[[script_replics\stalker_1\newbie\robbered_replic_1_2]],
+[3]=[[script_replics\stalker_1\newbie\robbered_replic_1_3]],
+[4]=[[script_replics\stalker_1\newbie\robbered_replic_3_1]]
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)])
+end
+
+function StalkerBackoffReplics()
+local tSoundsPath={
+[1]="characters_voice\\human_03\\stalker\\threat\\back_off\\backoff_"..math.random(6),
+[2]="script_replics\\stalker_1\\talk\\stalker_talk_"..math.random(19,24),
+[3]="script_sound\\talk\\abuse\\soldier\\soldier_abuse_"..math.random(11)	--!!!!TB3D
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)])
+end
+
+function StalkerStopReplics()
+local tSoundsPath={
+[1]="script_sound\\threat\\stop\\soldier\\soldier_stop_"..math.random(3)
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)])
+end
+
+function ReplicsOthersStalkers()
+local tSoundsPath={
+[1]="script_sound\\reactions\\enemy\\soldier\\soldier_enemy_8",
+[2]="script_sound\\reactions\\enemy\\soldier\\soldier_enemy_4",
+[3]="script_sound\\reactions\\enemy\\soldier\\soldier_enemy_3",
+[4]="script_sound\\reactions\\enemy\\soldier\\soldier_enemy_5",
+[5]="script_sound\\reactions\\enemy\\soldier\\soldier_enemy_2"
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)])
+end 
+
+function StalkerThrowReplics()
+local tSoundsPath={
+[1]="characters_voice\\human_01\\stalker\\fight\\fire\\fire_"..math.random(6),
+[2]="characters_voice\\human_01\\stalker\\fight\\attack\\attack_one_1"	--!!!!TB3D
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)])
+end
+
+function ActorHitReplics()
+local tSoundsPath={
+[1]="actor\\hit_"..math.random(5,7),
+[2]="actor\\pain_"..math.random(2,8),
+[3]="actor\\bullet_hit_pain_2"
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)],10)
+end
+
+
+function AddEffect(sEffect, sid, loop)
+level.add_cam_effector(sEffect, sid or 1000, loop or false, "")
+end 
+
+function RemoveEffect(sid)
+    if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("M BAR: remove effect") end
+level.remove_cam_effector(sid)
+end 
+
+function PostEffect()
+level.add_cam_effector("camera_effects\\prison_1.anm", 2001, false, "")
+level.add_pp_effector("yantar_underground_psi.ppe", 2002, false)
+level.add_pp_effector("total_recall.ppe", 2003, false)
+		
+local tSoundsPath={
+[1]="characters_voice\\human_01\\stalker\\states\\idle\\idle_26",
+[2]="characters_voice\\human_01\\stalker\\states\\idle\\idle_28",
+[3]="characters_voice\\human_01\\stalker\\states\\idle\\idle_29",
+[4]="characters_voice\\human_01\\stalker\\states\\idle\\idle_33",
+[5]="characters_voice\\human_01\\stalker\\states\\breath\\breath_1",
+[6]="characters_voice\\human_01\\stalker\\states\\breath\\breath_2"	--!!!!TB3D
+}
+PlaySound(tSoundsPath[math.random(#tSoundsPath)], 10)
+level.add_cam_effector("camera_effects\\hit_back_left.anm", 2004, false, "")
+level.add_cam_effector("camera_effects\\fatigue.anm", 2005, false, "")
+end
+
+function ClearAnim(gNpc)
+if gNpc:animation_count() > 0 then
+	  gNpc:clear_animations()
+	end 
+end 
+
+function SetValueNil()
+gNpc          = nil
+gItemDrop     = nil
+sItemActive   = nil
+sStateNpc     = nil
+iLevelVerexId = nil
+sCurrentState = nil
+vLookPosition = nil
+fTimeShift    = nil
+iCountPunch   = 0
+iPauseSounds  = 0
+end
+
+function TimerActions()
+return fTimeShift and fTimeShift<time_global()
+end
+
+function TimerSounds()
+return iPauseSounds and iPauseSounds<time_global()
+end
+
+function TimerEffects()
+return fPauseEffects and fPauseEffects<time_global()
+end
+
+function Throw(arg, iId, gObj)
+    if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("M BAR: throw["..utils.to_str(gObj:name()).."]") end
+local pshell = gObj:get_physics_shell()
+if  pshell then 
+   --news_manager.send_tip(db.actor, "Physics is", 0, "trader", 10000)
+   --gObj:set_const_force(db.actor:direction(), 150000, 5000) 
+   --pshell:apply_force(math.random(10)*5000, 1000, math.random(10)*5000) 
+    --// xStream'a borrowed, and then other options for crooked work, and even so it is nothing, though the height and length of the shot, I corrected the
+    local dir=utils.vector_copy_by_val(db.actor:position()):sub(gObj:position())
+	dir:mul(math.random(2000,5000))
+    dir:add(vector():set(math.random(1000,3000),math.random(10000,15000),math.random(3000)))
+    pshell:apply_force(dir.x,dir.y,dir.z) 
+   end 
+end
+
+
+function SpawnForActiveItem()
+ --//NPC spawn an object to pick up the
+    if not gNpc then return end
+	local oItem=alife():create(tItemsForDrop[math.random(#tItemsForDrop)], vector():set(gNpc:position() ), gNpc:level_vertex_id(), gNpc:game_vertex_id(),gNpc:id())
+	iIdEat =oItem.id
+end 
+
+function SpawnForThrow(sItemActive)
+ --//NPC spawn object to simulate a throw
+    if not gNpc then return end
+	local oItem=alife():create(sItemActive, vector():set(gNpc:bone_position(sBoneName)), gNpc:level_vertex_id(), gNpc:game_vertex_id())
+  level.client_spawn_manager():add(oItem.id,  0, this.Throw,  0)
+end 
+
+
+--// remove from the NPC to take up the subject of
+function DeleteItem(iId)
+local seObj = iId and alife():object(iId)
+    if seObj  then 
+    alife():release(seObj,true)
+	end	
+end
+
+
+function DropActiveItem()
+local actor = db.actor
+ local oActiveItem  = actor:active_item()
+	if oActiveItem then
+	 actor:drop_item(oActiveItem)
+	end
+end 
+
+
+function DeactivateWeapon()
+local oActiveItem = gNpc and gNpc:active_item()
+if isWeapon(oActiveItem) then
+  --// barrel with a belt - remove the shoulder ... well as human wave to them when you have to hit in the face?
+    if state_mgr_weapon.strappable_weapon(oActiveItem) then
+		gNpc:set_item(object.strap, oActiveItem)
+	--// differently - we remove the trunk out of sight
+	else
+		gNpc:set_item(object.idle, nil)
+	end
+  --gNpc:set_item(object.deactivate, oActiveItem)
+   end 
+end 
+
+function StopMoveStalker()
+   if gNpc and gNpc:movement_type()~= move.stand then
+    gNpc:movement_enabled(false)
+	gNpc:set_movement_type(move.stand)
+	end 
+end 
+
+function DownActorHealth()
+local actor = db.actor
+actor.health=-0.05
+end 
+
+
+
+--*****//Terms of activation schemes//********************************************************
+
+class "evaluator_bar_facer" (property_evaluator)
+--// получает объекты сразу при загрузке схемы - один раз
+function evaluator_bar_facer:__init(npc, action_name, storage) super(nil, action_name)
+  	self.st  = storage
+    --if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("M BAR: evaluator") end
+	--Console("Init evaluator_bar_facer:__init %s", npc and  npc:name() or "nil")
+end
+
+--// get objects continuously right after the method init - because the condition is tested constantly, until the scheme is loaded
+function evaluator_bar_facer:evaluate()
+--Console("evaluator_bar_facer:evaluate =%s", self.object and self.object:name() or "nil")
+    --if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("M BAR: evaluate") end
+   if bStart and gItemDrop  and sStateNpc==nil then
+        sStateNpc  = "backoff"
+	    bStart     = false
+       --Console("evaluator_bar_facer:evaluate =%s", ToString(sStateNpc))
+        end
+    --if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("M BAR: evaluate end") end
+	return sStateNpc~=nil
+end 
+
+----//Callbeck---------------------------------------------------------------------------
+
+function take_item(gObj)
+--Console(gObj:section())
+    if TB3D_Modders.use_inventory_message then TB3D_Services.info_alert("M BAR: take item") end
+   if gObj and tItemsForEvaluate[gObj:section()] then
+   --if gObj and get_clsid(gObj) ==clsid.obj_food then
+   if not gItemDrop and not tItemId[gObj:id()] and not bOpenTradeWnd and GetActorInZone() and GetDistance(gObj) then 
+   gItemDrop=gObj
+   bStart  = true
+   --Console("take_item %s=",ToString(bStart))
+       end
+   end 
+    if TB3D_Modders.use_inventory_message then TB3D_Services.info_alert("M BAR: take item done") end
+end
+
+function drop_g_item(gObj)
+	tItemId[gObj:id()]=true
+end 
+
+function info_callback(info_id)
+ bOpenTradeWnd = info_id =="ui_trade" 
+ --Console("info_callback %s", ToString(bOpenTradeWnd))
+end
+------------------------------------------------------------------------------
+--*******//Action Scheme//****************************************************************
+--// get objects when loading scheme - once
+class "action_bar_facer" (action_base)
+function action_bar_facer:__init (npc, action_name, storage) super(nil, action_name)
+	self.st = storage
+	if not self.st.npc then
+	self.st.npc={}
+	   if self.st.npc[npc:id()] then
+	   self.st.npc[npc:id()]=npc
+	   end
+	end
+--Console("action_bar_facer:__init Transferred user data:[ %s]",npc and npc:name() or "nil")
+end
+
+--// get objects immediately after the condition - once
+function action_bar_facer:initialize()
+action_base.initialize(self)
+--Console("action_bar_facer:initialize() Transferred user data:[ %s]",self.object and self.object:name() or "nil")
+end
+--// get objects continuously until the condition of the operator
+function action_bar_facer:execute()
+--Console("action_bar_facer:execute() Transferred user data:[ %s]",self.object and self.object:name() or "nil")
+action_base.execute(self)
+       --=====================Start spektalya=========================================
+    if sStateNpc==nil then return end 
+	  TimerSounds()
+	  TimerActions()
+      if sStateNpc=="backoff" then 
+	    DeactivateWeapon()
+	    --//We write the initial sostoyanie gNpc 
+        sCurrentState     = db.storage[gNpc:id()].state_mgr.target_state
+	    --// Where to watch
+	    LookPosition     = db.storage[gNpc:id()].state_mgr.look_position 
+        --// vertex finding
+	    iLevelVerexId    = gNpc:level_vertex_id()
+	    --Console("action_bar_facer:execute: backoff, %s",ToString(sCurrentState))
+	    --//NPC spawns item in inventory to pick up the
+        SpawnForActiveItem()
+	    --// rotate the NPC, to smorel in HS
+		gNpc:set_desired_direction(db.actor:position())
+		--gNpc:set_desired_position()
+		
+	     --// HS show facts
+	    state_mgr.set_state(gNpc, "backoff2",   nil, nil, {look_object = db.actor},      {animation = true})
+		--// swearing
+		StalkerBackoffReplics()
+		fTimeShift=time_global()+2000
+		gNpc:disable_talk()
+		sStateNpc="punch"
+		
+		
+	  --=======================Hit, run or throw for the PC=================================
+	
+	  elseif TimerActions() and sStateNpc=="punch" then 
+	  --Console("action_bar_facer:execute: punch")
+	    
+		--// if a suitable distance - bem immediately - gently but firmly :-)
+	    if  distance_between(gNpc, db.actor)<=iDistPunch then
+	    --set_inactivate_input_time(0.5*iRealTimeFactor) --//detain SG for half a second, so not too briskly to get away from the NPC
+		ClearAnim(gNpc)
+		--// remove from the hands of arms - (removes bad)
+		DeactivateWeapon()
+		--gNpc:set_item(object.idle,nil) -- and so, too crooked
+	    --//stop motion - if the NPC running
+		StopMoveStalker()
+		--// rotate the NPC, to smorel in HS
+		gNpc:set_desired_direction(db.actor:position())
+		--// Replica Observer
+		ReplicsOthersStalkers()
+	   --// include the state of shock
+	    state_mgr.set_state(gNpc, "punch",   nil, nil, {look_object = db.actor},      {animation = true})
+	    gNpc:add_animation("udar_0", true, false)
+		--// Replica NPC, such as, "those in the soup", etc.
+		StalkerThrowReplics()
+	    --Console("action_bar_facer:execute: strike")
+	    --gNpc:set_item(object.deactivate, gNpc:best_weapon())
+	    --gNpc:set_item(object.hide, gNpc:active_item() or gNpc:best_weapon())
+	    fTimeShift=time_global()+500
+	    sStateNpc="effects"
+	   --=======================================================
+	   --// makes gNpc run up, if the distance strike more than 1.5 meters, but less than the specified
+	    elseif distance_between(gNpc, db.actor)>iDistPunch and distance_between(gNpc, db.actor)<iDistThrow then
+	    --Console("action_bar_facer:execute: run up, start, %s", ToString(state_mgr.get_state(gNpc)))
+	    ClearAnim(gNpc)
+		
+		--// shout after fleeing HS
+		if TimerSounds()  then
+		StalkerStopReplics()
+		iPauseSounds=time_global()+2000
+		end 
+		--RemoveRestrictions(gNpc)
+		--gNpc:remove_all_restrictions()  -- strange method - NPC immediately dumps out of the bar
+		--// catching up
+		gNpc:set_desired_direction(db.actor:position())
+	    gNpc:set_desired_position()
+	    gNpc:set_body_state(move.standing)
+	    gNpc:set_mental_state(anim.panic)
+	    gNpc:set_movement_type(move.run)
+		gNpc:movement_enabled(true)
+	    gNpc:set_path_type(game_object.level_path)
+	    gNpc:set_detail_path_type(move.line)
+	    --// We write the state in State Manager
+	    state_mgr.set_state(gNpc, "run", nil, nil, {look_object = db.actor}) 
+	    --Console("action_bar_facer:execute: run up, the end, %s", ToString(state_mgr.get_state(gNpc)))
+	    utils.send_to_nearest_accessible_vertex(gNpc, db.actor:level_vertex_id() )
+	    fTimeShift=time_global()+1000
+	   --// go back to the stage whipping the face - if the PC is not knocked out of the restrictor allowed for NPC
+	    local out_restr = gNpc:out_restrictions()
+		--Console("[%s]=out_restr %s", gNpc:name(), gNpc:out_restrictions())
+		if out_restr~="" then
+		out_restr = string.sub(out_restr,1,string.find(out_restr,",",1,true) or 0-1) --// in the event that the restrictor in the line of more than one
+		end 
+		--// if no-no restrictor at Npc - is a new range
+		if out_restr== "" then
+		sStateNpc="punch"
+		--// if the restrictor has (should be no more than one) - go to the next round
+		elseif out_restr~= "" and utils.npc_in_zone(db.actor, db.zone_by_name[out_restr]) then
+		sStateNpc="punch"
+		--// but what if there restriktorr HS knocked out - we prove facts and bring down back
+		else
+		ClearAnim(gNpc)
+		StopMoveStalker()
+		state_mgr.set_state(gNpc, "backoff2",   nil, nil, {look_object = db.actor},      {animation = true})
+		sStateNpc="go_home"
+		fTimeShift=time_global()+2000
+		end 
+	    
+		--=======================================================
+		--// if HS ran far not bem into the air and just throw in the PC with anything ... precisely the fact that the hand spawn
+		else 
+	    ClearAnim(gNpc)
+		--Console("action_bar_facer:execute: throw")
+	    --// just in case another person to rotate the NPC HS
+		gNpc:set_desired_direction(db.actor:position())
+		gNpc:set_desired_position()
+		--// remove from the hands of weapons - though crooked turns
+		DeactivateWeapon()
+		--// if not overtake the PC - after swearing
+		StalkerThrowReplics()
+		state_mgr.set_state(gNpc, "punch",   nil, nil, {look_object = db.actor},      {animation = true})
+		--Console("Аттач=%s", ToString(obj:attachable_item_enabled()))
+		--// obtain a client object for the object activation in the hands of
+		local obj = level.object_by_id(iIdEat)
+		if not obj then 
+		obj=gNpc:best_weapon()
+		end
+	    --// do something priattachivaemoy
+		obj:enable_attachable_item(true)
+		--Console("Аттач2=%s", ToString(obj:attachable_item_enabled()))
+		--// activate object - NPC to take it in hand
+		gNpc:set_item(object.activate, obj)
+		--// extra spawns on the right hand position of an object and wait for its release online, then 
+		SpawnForThrow(obj:section() or "conserva")
+		--// do swing
+		gNpc:add_animation("norm_all_6_attack_2")
+		fTimeShift=time_global()+500
+	    sStateNpc="throw_end"
+		--//...cheers, got straight in the eye YY!!!
+	    end 
+	 --===============Remove the thing after a throw========================================
+	 elseif TimerActions() and sStateNpc=="throw_end" then
+	 --Console("action_bar_facer:execute: throw")
+	 --// remove the object, which we stuck a hand in NPC
+	    if level.object_by_id(iIdEat) then
+	    DeleteItem(iIdEat)
+	    end
+	    fTimeShift=time_global()+1000
+	    sStateNpc="action_end"
+		
+	 --==================Play fighting the effects of=====================================
+	
+    elseif TimerActions() and sStateNpc=="effects" then
+	DropActiveItem()
+	set_inactivate_input_time(1*iRealTimeFactor) --//detain SG for a second, should not depart from the impact
+	--// losing the effects of
+	 --Console("action_bar_facer:execute: effects")
+	--// throw (type punt) taken subject
+     db.actor:mark_item_dropped(gItemDrop)
+	 
+	if iCountPunch<=2 then
+	AddEffect("camera_effects\\fusker.anm")
+	elseif iCountPunch>2 and iCountPunch<5 then
+    AddEffect("camera_effects\\prison_1.anm")
+	else
+	AddEffect("camera_effects\\dream.anm",2000, true)
+	end
+	
+	SoundPunch()      --//whack
+	ActorHitReplics() --// SG replica with bumps
+	DownActorHealth() --//will reduce a bit the health of the PC ... hmm, and yet can score and to death
+	iCountPunch       = iCountPunch +1 --//count the number of strikes
+	--// will be adding a second, third, etc. strikes
+	if math.random()>0.3 and iCountPunch<math.random(10,12) then
+	  if iCountPunch<5 then 
+	  fTimeShift=time_global()+1000
+	  else
+	  fTimeShift=time_global()+2000
+	  end 
+	  sStateNpc="punch"
+	  return 
+	end 
+	
+	--// when no longer needed to beat - complete action, but first check whether you need to send an NPC in the point standing
+	--// if the NPC has left the place - sending back
+	if gNpc:level_vertex_id()~= iLevelVerexId then
+	--// NPC to be dumped from the PC, otherwise free from the control of our operator
+	--//would be stupid to stand next to the PC, having fallen under the control of the operator "talk c YY".  
+	fTimeShift=time_global()+1000 
+	sStateNpc="go_home"
+	set_inactivate_input_time(2*iRealTimeFactor)
+	else
+	fTimeShift=time_global()+2000
+	sStateNpc="action_end"
+	set_inactivate_input_time(2*iRealTimeFactor)
+	end 
+	
+	--============================Let's go home=========================
+    elseif TimerActions() and sStateNpc=="go_home" then 
+    --Console("Are we at the operator 'to speak' =%s", ToString(xr_meet.is_meet(gNpc)))
+	--Console("Vertices: %s, %s", ToString(iLevelVerexId), ToString(gNpc:level_vertex_id()))
+    --// NPC send back
+     ClearAnim(gNpc)
+	 
+	--gNpc:remove_all_restrictions() --deregulation results in care of the zone stalker bar after all the actions in this case under the scheme for some reason it slows down the threshold bar
+	  --gNpc:set_desired_direction()
+	  gNpc:set_desired_direction(level.vertex_position(iLevelVerexId)) -- so still turns his head back
+      gNpc:set_desired_position()
+	  gNpc:movement_enabled(true)
+  	  gNpc:set_movement_type(move.walk)
+	  gNpc:set_body_state(move.standing)
+	  gNpc:set_path_type(game_object.level_path)
+	  gNpc:set_mental_state(anim.free)
+	  gNpc:set_detail_path_type(move.line)
+	
+	--gNpc:set_dest_level_vertex_id(iLevelVerexId)
+	gNpc:disable_talk()
+	utils.send_to_nearest_accessible_vertex(gNpc, iLevelVerexId)
+	state_mgr.set_state(gNpc, "walk", nil, nil, {look_object = nil})
+	--state_mgr.set_state(gNpc, "walk")
+	DeactivateWeapon()
+	fTimeShift=time_global()+2000
+	sStateNpc="action_end"
+    --============================End ekshena=====================================
+	--// pause after that restore the original state so that does not depend gNpc
+    elseif TimerActions() and sStateNpc=="action_end" then 
+	
+	if iCountPunch>=5 then 
+	PostEffect()
+	set_inactivate_input_time(6*iRealTimeFactor)
+	end 
+	RemoveEffect(2000)
+	
+    --// NPC return its original state, if it is the starting point - if not to help him alayf
+	--Console("action_bar_facer:execute: action_end, %s",ToString(sCurrentState))
+	--StopMoveStalker()
+	if gNpc:level_vertex_id()== iLevelVerexId then
+	ClearAnim(gNpc)
+	state_mgr.set_state(gNpc, sCurrentState, nil, nil, {look_position = vLookPosition}, {animation = true} )
+	end 
+	--// if a throw was not - remove the object zaspavnenny
+	if level.object_by_id(iIdEat) then
+	DeleteItem(iIdEat)
+	end
+	 --// if broke - too derision on stalkers
+	if iCountPunch>0 then
+	ActorPostReplics()
+	end 
+	fTimeShift=time_global()+1000
+	sStateNpc="pause"
+	--// pause ... just pause :-) 
+	elseif TimerActions() and sStateNpc=="pause" then 
+	gNpc:enable_talk()
+	SetValueNil()
+	end 
+end
+
+function action_bar_facer:finalize()
+	action_base.finalize(self)
+end
+
+--*****// Bindi scheme//***************************
+
+evid_bar_facer=50001
+actid_bar_facer=evid_bar_facer
+
+function add_to_binder(object, ini, scheme, section, storage)
+
+	local operators	= {}
+	local properties  = {}
+
+	local manager = object:motivation_action_manager()
+    --local id = manager:current_action_id() -- get the current action
+	
+	operators["bar_facer"]	= actid_bar_facer
+
+	properties["bar_facer"] = evid_bar_facer
+
+	
+	if false--[[here what a condition under which evalyuator not add]] then
+		manager:add_evaluator (properties["bar_facer"], property_evaluator_const(false))
+	else
+		manager:add_evaluator (properties["bar_facer"], evaluator_bar_facer(object, "bar_facer", storage))
+	end
+	
+	--// obtain the object of our operator 
+	local action = action_bar_facer (object,"bar_facer", storage)
+	--// add to it a precondition of 
+	action:add_precondition(world_property(stalker_ids.property_alive, true))            --// npc live
+	action:add_precondition(world_property(stalker_ids.property_enemy, false))           --// no enemies near
+	action:add_precondition	(world_property(stalker_ids.property_danger,false))          --// no danger
+	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base, false))  --// npc not injured
+	action:add_precondition(world_property(stalker_ids.property_anomaly,false))          --// no anomalies near 
+	
+	xr_motivator.addCommonPrecondition(action)
+	--// which makes this line? without it, the scheme operators do not run when in evalyuator true 
+	action:remove_precondition(properties["bar_facer"])
+	--// our evalyuator must be true
+	action:add_precondition	(world_property(properties["bar_facer"], true))
+	--// if evalyuator was false - to stop the execution of actions ???
+	action:add_effect (world_property(properties["bar_facer"], false))
+	--// add a statement to the scheduler
+	manager:add_action (operators["bar_facer"], action)
+
+	--// obtain some standard operators and add to their preconditions, 
+	--//that our evalyuator must be false, thus forbidding them to work, when our true evalyuator
+	
+	--// do not allow the operator to work while running alayfa our operator
+	action = manager:action (xr_actions_id.alife)
+	action:add_precondition	(world_property(properties["bar_facer"], false))
+    
+	--action = manager:action (xr_evaluators_id.abuse_base)
+	--action = manager:action (xr_actions_id.abuse_base)
+	--action:add_precondition	(world_property(properties["bar_facer"], false))
+	
+	
+	--// add to our condition in the operators' GG wants to talk to me "
+	action = manager:action (xr_actions_id.stohe_meet_base)
+	action:add_precondition	(world_property(properties["bar_facer"], false))
+
+	action = manager:action (xr_actions_id.stohe_meet_base+1)
+	action:add_precondition	(world_property(properties["bar_facer"], false))
+	--PS: Those guys do not disable the operator has to send home forcibly NPC
+	
+	--//  it is unclear what this statement - State Manager disables like
+	--action = manager:action (xr_actions_id.state_mgr)
+	--action:add_precondition	(world_property(properties["bar_facer"], false))
+	
+end
+
+
+--*****// Enable \ disabling schemes//***************************
+
+function set_scheme(npc,ini,scheme,section)
+   local st = xr_logic.assign_storage_and_bind(npc,ini,scheme,section)
+   --Console(type(db.storage[npc:id()][scheme]))
+end
+
+function disable_scheme(npc, scheme)
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		st.enabled = false
+	end
+end
+
+
+

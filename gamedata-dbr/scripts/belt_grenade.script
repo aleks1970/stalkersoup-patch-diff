@@ -1,0 +1,77 @@
+--<!-- TB3D 1.0.9.9.1 -->--------!!!!TB3D make optional- 
+function my_ver() return "1.0.9.9.1" end
+--[[--------------------------------------
+ File              : belt_grenade.script
+ Description       : Granatometanie with belt
+ Created           : 10.11.2010
+ Lasd edit         : 15.03.2011
+ Copyright         : Charsi
+ Adaptation to DMX : Shadows v134
+--]]----------------------------------------------------------------------------
+
+local grenades = {["grenade_f1"]=true,["grenade_rgd5"]=true,["grenade_gd-05"]=true,["grenade_7643b"]=true,["grenade_an_m14"]=true,["grenade_m61"]=true,["grenade_m67"]=true,["w_dynamite"]=true}
+local grenades_on_belt = {}
+local f = false
+local grenades_1 = {}
+for k,v in pairs(grenades) do grenades_1[k.."_1"]=true end
+local fake_grenades = {}
+for k,v in pairs(grenades) do fake_grenades["fake_"..k]=true end
+
+function on_item_take(obj)
+    local sec=obj:section()
+    if grenades[sec] then
+	    del_item(obj:id()) amk.spawn_item_in_inv("fake_"..sec)
+    elseif grenades_1[sec] and not grenades_on_belt[obj:id()] then
+	    del_item(obj:id()) inventory.start() f=true
+    end
+end
+
+function on_item_drop(obj)
+local id=grenades_on_belt[obj:id()]
+if id and has_alife_info("ui_inventory_hide") and not has_alife_info("ui_car_body") and not db.actor:is_talking() then
+	grenades_on_belt[obj:id()]=nil
+	del_item(id)
+end
+end
+
+function on_info(info_id)
+	if info_id=="ui_inventory" or info_id=="ui_car_body" or info_id=="ui_trade" then
+		db.actor:iterate_inventory(function(dummy,item) if grenades_1[item:section()] then del_item(item:id()) end end,nil)
+		grenades_on_belt={}
+	elseif info_id=="ui_inventory_hide" or info_id=="ui_car_body_hide" or info_id=="ui_trade_hide" then 
+		inventory.start() f=true
+	end
+end
+
+function update_tbl()
+  if f then
+	--grenades_on_belt={}
+	local sect
+	for id,v in pairs (inventory.belt_id) do
+		if v then
+			sect=level.object_by_id(id):section()
+		    if string.sub(sect,1,5)=="fake_" then
+			    for fake_sect,_ in pairs(fake_grenades) do
+				    if sect==fake_sect then
+						grenades_on_belt[spawn_in_inv(string.sub(sect,6,-1).."_1")]=id
+						break
+					end
+				end
+			end
+		end
+	end
+	f=false
+  end
+end
+
+function spawn_in_inv(sec)
+	local obj = alife():create(sec,db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(),0)
+	return obj.id
+end
+
+function del_item(id)
+	local sobj=alife():object(id)
+	if sobj then
+		alife():release(sobj,true)
+	end
+end
