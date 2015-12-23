@@ -1,12 +1,12 @@
--- TB3D 1.0.9.9.9.1 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.0.9.9.9.2 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
 -- atp_brigada1, dead removal, travka, val bloodsucker, rad_curve, val_sniper3, turret, labx18 bad ameba,
 -- redone for new 'can go on line', sak_book4, f1 to dyn content, hog, dark_btr2_restrictor, af_ameba_slug to af_ameba_,
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
--- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count
-function my_ver() return "1.0.9.9.9.1" end
+-- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count, dyn spawns
+function my_ver() return "1.0.9.9.9.2" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -19,6 +19,8 @@ function my_ver() return "1.0.9.9.9.1" end
 --[wpn_abakan_m1:wpn_abakan_m158374] id_entity [55064][wpn_fake_missile:] [7526]
 
 local string_find = string.find
+local string_sub = string.sub			--109992
+
 local snil_count = 0
 local nil_count = 0
 local junk_count = 0
@@ -50,20 +52,20 @@ function force_fixes()
 			if obj.name then obj_name = obj:name() else obj_name = "NIL" end
 			if obj.section_name then sect = obj:section_name() else sect = "NIL" end
 			local has_parent = TB3D_Services.check_has_parent(obj)
-			if has_parent then
-				if TB3D_Modders.use_child_message then
-					TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] name["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] has parent ID["..utils.to_str(has_parent).."]")
-				end
-				child_count = child_count + 1
-				skip_count = skip_count - 1							--remove self from skip count
-				is_skip = true
-			elseif game_graph():valid_vertex_id(obj.m_game_vertex_id) then
+			if game_graph():valid_vertex_id(obj.m_game_vertex_id) then
+				obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
+				level_name = alife():level_name(obj_level)	
 				--TB3D_Services.packet_alert("tb3d fixer: object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] has parent["..utils.to_str(has_parent).."]")
-				is_skip, is_fixed = check_object(obj, obj_name, sect, is_collector)				--first check if object is specific
+				is_skip, is_fixed = check_object(obj, obj_name, sect, is_collector, obj_level)				--109992, first check if object is specific
 				if not is_skip and not is_fixed then
-					obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
-					level_name = alife():level_name(obj_level)	
-					if sect == "art_acumm" then									--109991, suit/minigun energy source, black energy
+					if has_parent then
+						if TB3D_Modders.use_child_message then
+							TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] name["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] has parent ID["..utils.to_str(has_parent).."]")
+						end
+						child_count = child_count + 1
+						skip_count = skip_count - 1							--remove self from skip count
+						is_skip = true
+					elseif sect == "art_acumm" then									--109991, suit/minigun energy source, black energy
 						accum_count = accum_count + 1
 						skip_count = skip_count - 1							--remove self from skip count
 						is_skip = true
@@ -71,7 +73,7 @@ function force_fixes()
 						mushroom_count = mushroom_count + 1
 						skip_count = skip_count - 1							--remove self from skip count
 						is_skip = true
-					elseif string.sub(sect, 1, 3) == "af_" or string.sub(sect, 1, 7) == "amk_af_" then			--109976 remove all dynamic arts from level for respawning
+					elseif string_sub(sect, 1, 3) == "af_" or string_sub(sect, 1, 7) == "amk_af_" then			--109976 remove all dynamic arts from level for respawning
 						if string_find(obj_name, "_shield_") then												--109991, ldk shields
 							is_skip = true
 						elseif amk_anoms.dynamic_art(obj_name, level_name, sect) == false then					--109991
@@ -83,20 +85,23 @@ function force_fixes()
 						is_fixed = true
 					elseif string_find(obj_name, "_horror") then
 						is_fixed = true										--109984, hell hour spawns always remove
-					elseif string.sub(obj_name, 1, 6) == "tb3dm_" then			--109989
+					else													--109992
 						--TB3D_Services.packet_alert("tb3d fixer: level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."]["..utils.to_str(level.game_id()).."] checking dyn spawn")
 						is_skip, is_fixed = check_dyn_spawns(obj, obj_name, sect, obj_level)
-					else
+					end
+					if not is_fixed and not is_skip then
 						--TB3D_Services.packet_alert("tb3d fixer: level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."]["..utils.to_str(level.game_id()).."] checking restrictor")
 						is_skip, is_fixed = check_restrictors(obj_name, sect, is_collector)
 					end
 					if not is_fixed and not is_skip then
 						is_skip, is_fixed = check_level(obj, obj_name, sect, obj_level, is_collector)
 					end
-					if TB3D_Modders.population_controller and level_name == level.name() then			--109989, active level only
-						if not is_fixed and not is_skip and obj.alive and obj:alive() then				--only creatures now
-							if protected_items.obj_has_protected_item(obj) == false then
-								is_fixed = TB3D_population_control.population_control(obj, sect)		--see if over populated
+					if not is_fixed and not is_skip then
+						if TB3D_Modders.population_controller and level_name == level.name() then			--109989, active level only
+							if obj.alive and obj:alive() then				--only creatures now
+								if protected_items.obj_has_protected_item(obj) == false then
+									is_fixed = TB3D_population_control.population_control(obj, sect)		--see if over populated
+								end
 							end
 						end
 					end
@@ -142,15 +147,15 @@ function force_fixes()
 		end --no obj
 	end --loop
 	TB3D_Services.packet_alert("tb3d fixer: fixed objects["..utils.to_str(fixed_count).."]")
-	TB3D_Services.packet_alert("tb3d fixer: skipped objects["..utils.to_str(skip_count).."]")
-	TB3D_Services.packet_alert("tb3d fixer: skipped child objects["..utils.to_str(child_count).."]")		--109991
-	TB3D_Services.packet_alert("tb3d fixer: skipped accumulators["..utils.to_str(accum_count).."]")			--109991
-	TB3D_Services.packet_alert("tb3d fixer: skipped mushrooms["..utils.to_str(mushroom_count).."]")			--109991
+	TB3D_Services.packet_alert("tb3d fixer: world objects["..utils.to_str(skip_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: child objects["..utils.to_str(child_count).."]")		--109991
+	TB3D_Services.packet_alert("tb3d fixer: accumulators["..utils.to_str(accum_count).."]")			--109991
+	TB3D_Services.packet_alert("tb3d fixer: mushrooms["..utils.to_str(mushroom_count).."]")			--109991
 	TB3D_Services.packet_alert("tb3d fixer: respawn objects["..utils.to_str(respawn_count).."]")
 	TB3D_Services.packet_alert("tb3d fixer: dynamic objects["..utils.to_str(dyn_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: dynamic artefacts["..utils.to_str(arts_count).."]")
 	TB3D_Services.packet_alert("tb3d fixer: empty story objs["..utils.to_str(snil_count).."]")
-	TB3D_Services.packet_alert("tb3d fixer: removed artefacts["..utils.to_str(arts_count).."]")
-	TB3D_Services.packet_alert("tb3d fixer: done - empty object slots["..utils.to_str(nil_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: empty object slots["..utils.to_str(nil_count).."]")
 	TB3D_Services.packet_alert("tb3d cleaner: removed junk["..utils.to_str(junk_count).."]")
 	TB3D_Services.packet_alert("tb3d cleaner: removed weapons["..utils.to_str(wpn_count).."]")
 	TB3D_population_control.population_report()
@@ -182,7 +187,7 @@ function check_story_object(a)
 	end
 end
 
-function check_object(obj, obj_name, sect, is_collector)
+function check_object(obj, obj_name, sect, is_collector, lnum)
 	local is_skip, is_fixed = false, false
 	if obj_name == "NIL" then
 		TB3D_Services.packet_alert("tb3d fixer: obj name[nil] !!!!!!!!!")
@@ -289,6 +294,8 @@ function check_object(obj, obj_name, sect, is_collector)
 		else
 			is_skip = true
 		end
+	elseif string_find(obj_name, "outfit_specnaz_m1") then					--F1 stash interferes with Yantar quest
+		if lnum == 45 then is_fixed = true end
 	--elseif string_find(obj_name, "m_teleport_radar_derevo")
 	  --or string_find(obj_name, "^zone_teleport")
 	  --or string_find(obj_name, "m_teleport_holm2")
@@ -609,7 +616,7 @@ end
 
 function check_dyn_spawns(obj, obj_name, sect, obj_level)
 	local is_skip, is_fixed = false, false
-	if string.sub(obj_name, 1, 6) == "tb3dm_" then				-- TB3D Dynamic Mobs
+	if string_sub(obj_name, 1, 6) == "tb3dm_" then				-- TB3D Dynamic Mobs
 		if level_name == level.name() then						--remove all but same level
 			if string_find(obj_name, "zombied_") then			--keep count of those on this level
 				TB3D_Mobs.increment(8)
@@ -1337,9 +1344,6 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 		--end
 	elseif obj_level == 44 then												--dark forest
 	elseif obj_level == 45 then												--f-1
-		--if string_find(obj_name, "af_") then								--mass spawning
-			--is_fixed = true
-		--end
 	elseif obj_level == 46 then												--promzone
 	--elseif obj_level == 47 then											--deadcity			--109940 dead_city used instead
 	elseif obj_level == 48 then												--krasivay

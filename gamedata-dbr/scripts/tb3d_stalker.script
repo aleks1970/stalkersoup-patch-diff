@@ -1,7 +1,7 @@
---<!-- TB3D 1.0.9.9.9.1 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.2 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
---cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends()
-function my_ver() return "1.0.9.9.9.1" end
+--cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start
+function my_ver() return "1.0.9.9.9.2" end
 
 local upd_pos = 0
 local fix_done = false
@@ -456,6 +456,11 @@ function on_item_take(obj)
 			TB3D_Services.give_info("have_doc_tvar_check")					--109991
 		end
 	end
+	if has_alife_info("petr_sidor_vzyt_start") and not has_alife_info("petr_sidor_vzyt_have") then
+		if arhara_dialog.petr_sidor_vzyt_have() == true then
+			TB3D_Services.give_info("petr_sidor_vzyt_have")					--109992
+		end
+	end
 	return is_remove_obj
 end
 
@@ -631,7 +636,11 @@ function process_levels(lname, sname)
 				end
 			end
 		elseif lname == "l07_military" then
-			--future use
+			if has_alife_info("petr_sidor_vzyt_start") and not has_alife_info("petr_sidor_vzyt_have") then		--109992
+				if TB3D_Services.give_info("tb3d_wrenches_spawned") == true then
+					TB3D_Triggers.spawn_item("kluch",-55.443,-6.437,-21.472,255385,1605,2)
+				end
+			end
 		elseif lname=="l12u_sarcofag" then													--show the spots
 			if sname == "l12_stancia" then
 				TB3D_Services.give_info("aes_found_sarcofag")
@@ -643,6 +652,9 @@ function process_levels(lname, sname)
 			if has_alife_info("kot_need_doc_start") and (not has_alife_info("kot_need_doc_have")
 			  or not has_alife_info("kot_need_doc_done")) then
 				braad_test.spawn_blizn_krug_dead()
+			end
+			if has_alife_info("brat_luis_spawn") then										--109992, Brother Luis
+				TB3D_Services.give_info("brat_luis_start")
 			end
 		elseif lname=="l10_radar" then
 			if sname == "l10u_bunker" then
@@ -671,6 +683,12 @@ function process_levels(lname, sname)
 		elseif lname == "l12_stancia" then
 			if has_alife_info("tb3d_wish_granted") then			--109989, empty after chaes
 				TB3D_Mobs.check_npp1_spawns()
+			end
+		elseif lname == "atp_for_test22" then					--109992, make sure they are there
+			if has_alife_info("petr_sidor_vzyt_start") and not has_alife_info("petr_sidor_vzyt_have") then
+				if TB3D_Services.give_info("tb3d_tools_spawned") == true then
+					arhara_dialog.remkomplekt_spawn()
+				end
 			end
 		end
 		if lname ~= "labx8" then

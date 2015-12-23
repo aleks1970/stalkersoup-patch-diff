@@ -1518,7 +1518,7 @@
 			<phrase id="6">
 				<text>petr_sidor_vzyt_6</text>
 				<give_info>petr_sidor_vzyt_start</give_info>
-				<action>arhara_dialog.remkomplekt_spawn</action>
+				<!--action>arhara_dialog.remkomplekt_spawn</action   109992, given on spawn-->
 			</phrase>
 			<phrase id="7">
 				<text>petr_sidor_vzyt_7</text>
@@ -1529,7 +1529,7 @@
 	<dialog id="petr_sidor_zabrat">
 		<precondition>arhara_dialog.petr_sidor_vzyt_have</precondition>
 		<dont_has_info>petr_sidor_vzyt_done</dont_has_info>
-		<has_info>petr_sidor_vzyt_have</has_info>
+		<!--has_info>petr_sidor_vzyt_have</has_info-->
 		<phrase_list>
 			<phrase id="0">
 				<text>petr_sidor_zabrat_0</text>

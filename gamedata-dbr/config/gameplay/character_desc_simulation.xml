@@ -1753,7 +1753,24 @@
 #include "dialogs\sim_Soldier_master_dialogs.xml"
 	</specific_character>
 	<!-- ***************Stalkers Quest Profiles************** -->
-	<!-- ***************Oleg Gusarov*************** -->
+	<!-- ***************Oleg Gusarov*************** 109992, this is in all.spawn-->
+	<specific_character id="sim_stalker_gusarov" team_default="1">
+		<name>sim_stalker_veteran_gusarov_name</name>
+		<icon>ui_npc_u_stalker_2_gas</icon>
+		<map_icon x="1" y="0"/>
+		<bio>sim_stalker_veteran_gusarov_bio</bio>
+		<class>sim_stalker_veteran_gusarov</class>
+		<community>stalker</community>
+		<terrain_sect>stalker_terrain</terrain_sect>
+		<rank>789</rank>
+		<reputation>78</reputation>
+		<visual>actors\neytral\stalker_2_gas</visual>
+		<snd_config>characters_voice\human_03\stalker\</snd_config>
+		<crouch_type>-1</crouch_type>
+#include "inventory\stalker_master_items.xml"
+#include "gameplay\character_criticals_4.xml"
+#include "dialogs\generic_dialogs.xml"
+	</specific_character>
 	<specific_character id="sim_stalker_veteran_gusarov" team_default="1">
 		<name>sim_stalker_veteran_gusarov_name</name>
 		<icon>ui_npc_u_stalker_2_gas</icon>

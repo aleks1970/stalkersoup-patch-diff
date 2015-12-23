@@ -579,10 +579,10 @@ end
 --' spawns repair kits
 function remkomplekt_spawn()
 	if TB3D_Services.is_collector(4006) == false then
-		alife():create("kuvalda",vector():set(138.305,-6.021,13.806),576283,2832)
-		alife():create("kuvalda",vector():set(156.332,-7.041,-65.593),600827,2833)
-		TB3D_Triggers.spawn_item("kluch",-55.443,-6.437,-21.472,255385,1605,2)
-		alife():create("otvertka",vector():set(113.399,-1.398,3.550),540952,2826)
+		alife():create("kuvalda",vector():set(138.305,-6.021,13.806),576283,2832)		--sledge on workbench
+		alife():create("kuvalda",vector():set(156.332,-7.041,-65.593),600827,2833)		--sledge far end of barn
+		--TB3D_Triggers.spawn_item("kluch",-55.443,-6.437,-21.472,255385,1605,2)		--109992, done in tb3d_stalker
+		alife():create("otvertka",vector():set(113.399,-1.398,3.550),540952,2826)		--two screwdrivers on upstairs workbench
 		alife():create("otvertka",vector():set(113.173,-1.398,3.539),540952,2826)
 		alife():create("af_ameba_slime",vector():set(-143.967,-2.800,-11.277),168374,2798)
 		alife():create("zombie_babka_weak",vector():set(-78.585,-5.721,-96.389),264461,2808)

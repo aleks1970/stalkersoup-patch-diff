@@ -1,9 +1,9 @@
--- TB3D 1.0.9.9.9.1 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.0.9.9.9.2 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized,
--- pri_monolith_10, vampire
-function my_ver() return "1.0.9.9.9.1" end
+-- pri_monolith_10, vampire, specnaz_dead
+function my_ver() return "1.0.9.9.9.2" end
 					
 -----over population control----
 local string_find = string.find
@@ -1332,6 +1332,10 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						else
 							result = true
 						end
+					elseif string_find(obj_name, "specnaz_dead") then				--109992, wait for task from mil
+						if has_alife_info("mil_lukash_dolg_task") then
+							result = true
+						end
 					elseif string_find(obj_name, "home_snork_") then				--clear the snorks mini quest
 						result = true
 --[[					elseif string_find(obj_name, "jump_snork_0")				--109972 reset in amk_mod, on info = yan_zombied_respawn_05
@@ -2206,7 +2210,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 				  or hdr3 == "kot"
 				  or hdr4 == "pre_"										--lager_stalker_ukastrika, guard
 				  or hdr4 == "gar_"										--seriywff
-				  or hdr5 == "brat_"
+				  or hdr5 == "brat_"									--brat_luis and freinds
 				  or hdr6 == "blizn_"									--_krug1,2
 				  or hdr6 == "ferma_" then								--_band1,2,3,4,5,6,7
 					if extended_levels then

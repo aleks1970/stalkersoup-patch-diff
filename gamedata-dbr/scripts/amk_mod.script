@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.0 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.9.2 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -8,8 +8,8 @@
 -- sak_book4, tb3d_collector, corrected lighting_val, changed fixer to only be called on level change, sak_book4, news, blowout types, get_obj_level,
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
--- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms
-function my_ver() return "1.0.9.9.9.0" end
+-- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp
+function my_ver() return "1.0.9.9.9.2" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -2020,7 +2020,7 @@ end
 
 function Run_Blowout_pp()
 	local bt=blowout_type()		--returns 5 if no blowout or type
-	if TB3D_Modders.run_blowout_pp == true and not has_alife_info("tb3d_harsh_environment") then		--109982
+	if TB3D_Modders.run_blowout_pp == true and has_alife_info("tutorial_end") and not has_alife_info("tb3d_harsh_environment") then		--109992
 		if level.name() == "l04_darkvalley" and not has_alife_info("bandit_krisyk_done") then
 			TB3D_Services.stop_blow()			--skip it to not have bes and demon attack bandit base
 			bt = 5								--not 0 so no news given
