@@ -1,8 +1,8 @@
----TB3D 1.0.9.9.9.8 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
+---TB3D 1.0.9.9.9.9 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
 -- removed din_rad and added use_rad_fields, TB3D_net_manager, added items, tb3d_dav_hunt, debug, gulag_deadcity,
 -- gulag_generators, gulag_aver, new vars and reorg, loadout_min_cond, loadout_ammo_count, loadout_ammo_loot, hdr,
--- hardcore_mobs_mult, repair
-local vers = "1.0.9.9.9.8"
+-- hardcore_mobs_mult, repair, bind_mashalat
+local vers = "1.0.9.9.9.9"
 -- following removed from the mod ------------------------------------------------------------------------------------------------------------------------
 	--if valerich_dialog then TB3D_Services.packet_alert("valerich_dialog ok") else TB3D_Services.packet_alert("valerich_dialog failed!!!!") is_failed = true end
 	--if valerich_treasures then TB3D_Services.packet_alert("valerich_treasures ok") else TB3D_Services.packet_alert("valerich_treasures failed!!!!") is_failed = true end
@@ -95,6 +95,7 @@ function verify_files()
 	if bind_det_arts then TB3D_Services.packet_alert("bind_det_arts: "..bind_det_arts.my_ver()) else TB3D_Services.packet_alert("bind_det_arts failed!!!!") is_failed = true end
 	if bind_ggun then TB3D_Services.packet_alert("bind_ggun: "..bind_ggun.my_ver()) else TB3D_Services.packet_alert("bind_ggun failed!!!!") is_failed = true end
 	if bind_heli then TB3D_Services.packet_alert("bind_heli: "..bind_heli.my_ver()) else TB3D_Services.packet_alert("bind_heli failed!!!!") is_failed = true end
+	if bind_mashalat then TB3D_Services.packet_alert("bind_mashalat: "..bind_mashalat.my_ver()) else TB3D_Services.packet_alert("bind_mashalat failed!!!!") is_failed = true end
 	if bind_monster then TB3D_Services.packet_alert("bind_monster: "..bind_monster.my_ver()) else TB3D_Services.packet_alert("bind_monster failed!!!!") is_failed = true end
 	if bind_mteleport then TB3D_Services.packet_alert("bind_mteleport: "..bind_mteleport.my_ver()) else TB3D_Services.packet_alert("bind_mteleport failed!!!!") is_failed = true end
 	if bind_physic_object then TB3D_Services.packet_alert("bind_physic_object: "..bind_physic_object.my_ver()) else TB3D_Services.packet_alert("bind_physic_object failed!!!!") is_failed = true end

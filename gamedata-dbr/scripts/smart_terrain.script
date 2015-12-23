@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.8 chgd abort service, added obj checks to release npc, added protection at unregister_npc, debug, print,
+--TB3D 1.0.9.9.9.9 chgd abort service, added obj checks to release npc, added protection at unregister_npc, debug, print,
 -- original unreg, db, get_obj_level, exclusives, show_smart_packets, promz/pred excepts, preserve_exclusives
-function my_ver() return "1.0.9.9.9.8" end
+function my_ver() return "1.0.9.9.9.9" end
 
 --[[------------------------------------------------------------------------------------------------------------------
 Smart Terrain (machinery, organized all the stalkers and monsters at some stage)
@@ -215,9 +215,9 @@ function se_smart_terrain:get_se_objs()
   for id, v in pairs( self.npc_info ) do
     obj = sim:object( id )
     if obj == nil then	--!!!!TB3D after blowout save ctd
-		--if TB3D_Modders.pop_spawn_message then
+		if TB3D_Modders.pop_spawn_message then
 			TB3D_Services.packet_alert("Smart Terrain: get se objs npc["..utils.to_str(self:name()).."] unregistering se_obj id["..utils.to_str(self.id).."]")
-		--end
+		end
 		self:unregister_npc_id( id )
 	else
 		self:fill_npc_info( obj, v )
@@ -989,7 +989,9 @@ function se_smart_terrain:fill_monster_classes()
       [clsid.gigant_s      ] = "pseudo_gigant",
       [clsid.snork_s       ] = "snork",
       [clsid.tushkano_s    ] = "tushkano",
-      [clsid.zombie_s      ] = "zombie"
+      [clsid.zombie_s      ] = "zombie",
+	  --[clsid.werewolf_s		] = "werewolf"--,
+	  --[clsid.bibliotekar_s ] = "bibliotekar"
     }
   end
 end

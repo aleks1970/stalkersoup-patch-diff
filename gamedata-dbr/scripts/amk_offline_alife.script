@@ -246,7 +246,7 @@ function build_tables()
 	end
 	if TB3D_Modders.offline_alife_trade == true then
 		sell_table = {}
-		local iniFileName = "misc\\trade_generic.ltx"
+		local iniFileName = "trade\\trade_generic.ltx"
 		local sini = ini_file(iniFileName)
 		-- local cfg_sell = utils.cfg_get_string(sini, "trader", "sell_condition", npc, false, false, "")
 		local cfg_sell = getIniValueString("trader", "sell_condition", "", iniFileName)
@@ -350,9 +350,9 @@ end
 function update()				--called by bind stalker
 	if _g.is_disconnecting then return end
 	local now = game.get_game_time()
-	--if TB3D_Modders.Global_Debug then
+	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("amk_off_line: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
-	--end
+	end
 	local lname = TB3D_Population_Control.get_rnd_level()
 	local st = 0
 	if off_npcs[lname] then st = #off_npcs[lname].stalkers end
@@ -414,9 +414,9 @@ function update()				--called by bind stalker
 			end
 		end
 	end
-	--if TB3D_Modders.Global_Debug then
+	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("amk_off_line: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
-	--end
+	end
 end
 
 --Old collect about NPCs

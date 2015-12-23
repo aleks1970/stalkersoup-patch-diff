@@ -1,4 +1,5 @@
-;<!-- TB3D 1.0.9.9.3.1 excluded empty "discovery_dependency" aleks1970 -->
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons
+;<!-- excluded empty "discovery_dependency" aleks1970 -->
 [wpn_ump45_m1]:wpn_ump45
 GroupControlSection		= spawn_group
 ; discovery_dependency = ; aleks1970
@@ -10,7 +11,7 @@ cform                   = skeleton
 class                   = WP_LR300
 min_radius              = 0
 max_radius              = 200
-description				= enc_weapons1_wpn_ump45-Taktikal
+description				= enc_weapons1_wpn_ump45_Taktikal
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -34,14 +35,14 @@ fire_modes				= 1, 2, 3, -1
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name				= wpn_ump45-Taktik
-inv_name_short			= wpn_ump45-Taktik
+inv_name				= wpn_ump45_Taktik
+inv_name_short			= wpn_ump45_Taktik_s
 inv_weight				= 2.5
 
 inv_grid_width			= 4
 inv_grid_height			= 2
-inv_grid_x				= 6
-inv_grid_y				= 59
+inv_grid_x				= 78
+inv_grid_y				= 31
 
 
 slot 					= 1		; // secondary
@@ -72,7 +73,7 @@ hit_power        	= 2.12
 hit_impulse		 	= 140
 hit_type 			= fire_wound
 
-fire_distance          	= 1000
+fire_distance          	= 100					;;;109974 10:1
 bullet_speed		= 390 
 rpm                     = 720
 ; end ttc
@@ -82,7 +83,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 1.65	
 silencer_hit_impulse	 	= 140
-silencer_fire_distance   	= 350
+silencer_fire_distance   	= 85					;;;109974 10:1
 silencer_bullet_speed	 	= 340
 
 

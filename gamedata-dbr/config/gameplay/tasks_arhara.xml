@@ -1060,14 +1060,14 @@ miser to skinflint, muha_kukl, minor edits, boatswain, reduced func calls, optim
 	</objective>
 	<objective>
 		<text>information_about_Varlab_Fang_gameplay_descriptions</text>
-		<map_location_type hint="Canin_name_gameplay">blue_location</map_location_type>
+		<map_location_type hint="Canine_name_gameplay">blue_location</map_location_type>
 		<object_story_id>stalk_kluk</object_story_id>
 		<infoportion_complete>kluk_vstrecha_done</infoportion_complete>
 	</objective>
 </game_task>
 <!-- ***************<Signet Lukas>*************** -->
 <game_task id="lukash_pechatka">
-	<title>Return_eal_Lukas_gameplay_titles</title>
+	<title>Return_seal_Lukas_gameplay_titles</title>
 	<objective>
 		<text>Find_the_seal_Lukas_gameplay_descriptions</text>
 		<icon>ui_iconsTotal_found_thing</icon>
@@ -1909,7 +1909,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain, reduced func calls, optim
 		<infoportion_complete>dovel_chernomora_done</infoportion_complete>
 	</objective>
 </game_task>
-<!-- ***************<flesh at the dump>*************** 109998, need change item-->
+<!-- ***************<flesh at the dump>*************** 109999, changed items - aleks1970 -->
 <game_task id="plot_dialog">
 	<title>Return_goods_and_chattels_gameplay_titles</title>
 	<objective>
@@ -1922,7 +1922,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain, reduced func calls, optim
 	<objective>
 		<text>Find_the_flesh_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.plot_dialog_say_have</function_complete>
+		<function_complete>arhara_dialog.plot_dialog_say_have_itm</function_complete>	<!-- aleks1970 -->
 		<infoportion_set_complete>plot_dialog_say_have</infoportion_set_complete>
 	</objective>
 	<objective>

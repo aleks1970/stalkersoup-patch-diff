@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.8 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
--- bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom, tb3d_gbars_chp2
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.0.9.9.9.9 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+--bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom, tb3d_gbars_chp2, deathclaw
+function my_ver() return "1.0.9.9.9.9" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -455,6 +455,12 @@ function zaton_spawns()
 	TB3D_Mobs.spawn_mob(393.687,32.744,33.772,1613853,3691,1,4)
 	TB3D_Mobs.spawn_mob(232.978,8.178,97.569,1363021,3684,0,4)										--type normal
 	TB3D_Mobs.spawn_mob(104.316,6.304,369.607,1146239,3682,0,4)
+	TB3D_Mobs.spawn_dogs(-333.830,12.415,-186.011,283692,3664,8)									--109999, dogs under twisted tree
+	TB3D_Mobs.spawn_dogs(-282.669,12.559,-179.326,378892,3672,8)
+	alife():create("antirad", vector():set(-162.519,26.764,-195.518),616464,3673)					--109999, roof of gas station
+	alife():create("medkit_scientic", vector():set(-162.519,26.764,-195.518),616464,3673)			--109999, roof of gas station
+	alife():create("bandage_dmx", vector():set(-162.519,26.764,-195.518),616464,3673)				--roof of gas station
+	TB3D_Mobs.spawn_npcs(13.977,9.857,-386.316,971861,3678,2,8)										--109999, zombies in pit near hill w/chopper
 	alife():create("zep_doc_4", vector():set(-2.818,-4.087,193.281),97951,2195)						--drawer near doc's book
 	TB3D_Triggers.spawn_suit(10,-8.428,-3.287,203.374,90744,2195)									--mono exo on lockers
 end
@@ -844,6 +850,7 @@ function spawn_deadm_found()											--bar11
 	TB3D_Mobs.spawn_mob(-101.553,5.587,-105.600,924337,4387,1,3)		--s. side of hut
 	TB3D_Mobs.spawn_mob(-41.852,2.696,-79.273,1053006,4387,5,3)			--island straight accross
 	TB3D_Mobs.spawn_mob(-26.289,3.126,-17.154,1086554,4391,1,3)			--island with boardwalk
+	TB3D_Mobs.spawn_deathclaws(-26.289,3.126,-17.154,1086554,4391,2,0)	--island with boardwalk, weak
 	TB3D_Mobs.spawn_mob(-42.038,1.994,5.523,1053125,4386,3,3)			--island near road
 end
 

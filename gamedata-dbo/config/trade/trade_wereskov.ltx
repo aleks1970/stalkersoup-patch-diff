@@ -1,0 +1,118 @@
+[trader]
+;какие товары торговец будет покупать
+buy_condition = wereskov_generic_buy
+
+;какие товары у торговца будут вначале
+sell_condition = wereskov_start_sell
+
+;за какую цену торговец будет продавать
+buy_supplies = supplies_start
+
+
+[wereskov_generic_buy]
+;"Стоимость покупки" - описываются цены по которым покупаются товары и покупаются ли.
+
+;Название предмета 			= минимальная цена покупки, максимальная цена покупки
+
+;Артефакты
+af_medusa				= 1.5,	0.5
+af_cristall_flower		= 1.5,	0.5
+af_night_star			= 1.5,	0.5
+af_vyvert				= 1.5,	0.5
+af_gravi				= 1.5,	0.5
+af_gold_fish			= 1.5,	0.5
+af_blood				= 1.5,	0.5
+af_mincer_meat			= 1.5,	0.5
+af_soul					= 1.5,	0.5
+af_electra_sparkler		= 1.5,	0.5
+af_electra_flash		= 1.5,	0.5
+af_electra_moonlight	= 1.5,	0.5
+af_rusty_thorn			= 1.5,	0.5
+af_rusty_kristall		= 1.5,	0.5
+af_rusty_sea_urchin		= 1.5,	0.5
+af_ameba_slime			= 1.5,	0.5
+af_ameba_slug			= 1.5,	0.5
+af_ameba_mica			= 1.5,	0.5
+af_drops				= 1.5,	0.5
+af_fireball				= 1.5,	0.5
+af_cristall				= 1.5,	0.5
+af_dummy_glassbeads		= 1.5,	0.5
+af_dummy_pellicle		= 1.5,	0.5
+af_dummy_battery		= 1.5,	0.5
+af_dummy_dummy			= 1.5,	0.5
+af_dummy_spring			= 1.5,	0.5
+af_fuzz_kolobok			= 1.5,	0.5
+af_part_monolit1        = 1.5,	0.5
+af_part_monolit2        = 1.5,	0.5
+af_water_flower         = 1.5,	0.5
+af_spiral               = 1.5,	0.5
+af_eye_voron            = 1.5,	0.5
+af_kamen_udachy         = 1.5,	0.5
+af_arhara_globus        = 1.5,	0.5
+af_caterpillar          = 1.5,	0.5
+af_simbion              = 1.5,	0.5
+af_babka_1              = 1.5,	0.5
+af_babka_2              = 1.5,	0.5
+af_babka_3              = 1.5,	0.5
+af_dik_1                = 1.5,	0.5
+af_dik_2                = 1.5,	0.5
+af_dik_3                = 1.5,	0.5
+af_dik_4                = 1.5,	0.5
+af_cry_1                = 1.5,	0.5
+af_cry_2                = 1.5,	0.5
+af_cry_3                = 1.5,	0.5
+af_armor_1              = 1.5,	0.5
+af_armor_2              = 1.5,	0.5
+af_armor_3              = 1.5,	0.5
+af_armor_4              = 1.5,	0.5
+
+;Детали монстров
+mutant_flesh_eye		= 1.5,	1
+mutant_boar_leg			= 1.5,	1
+mutant_dog_tail			= 1.5,	1
+mutant_psevdodog_tail	        = 1.5,	1
+mutant_krovosos_jaw		= 1.5,	1
+mutant_burer_hand		= 1.5,	1
+mutant_zombie_hand		= 1.5,	1
+mutant_snork_leg		= 1.5,	1
+mutant_face_tushkano            = 1.5,	1
+mutant_hand_kontroler           = 1.5,	1
+mutant_poltergeist_glas         = 1.5,	1
+mutant_psevdogigant_hand        = 1.5,	1
+mutant_tail_cat                 = 1.5,	1
+mutant_chimera_kogot            = 1.5,	1
+mutant_spleen_rat                 = 1.5,	1
+mutant_fracture_hand               = 1.5,	1
+part_tarakan                    = 1.5,	1
+part_tarakan_strong             = 1.5,	1
+part_digitis_biblio             = 1.5,	1
+;mutant_deathclaw_antler         = 1.5,	1
+
+
+[wereskov_start_sell]
+;"Поставка" - описывается что продается после квеста
+
+;Название предмета 			= количество, вероятность появления
+
+;Еда
+medkit_scientic		    = 2,	0.7
+antirad				    = 2,	0.7
+ecolog_outfit			= 2,	0.7
+scientific_outfit		= 2,	0.7
+energy_drink		    = 2,	0.7
+wpn_flame_modern        = 3,	0.4
+ammo_flame              = 15,	0.5
+
+[supplies_start]
+;за какую цену торговец будет продавать после квеста
+
+;Название предмета 			= минимальная цена продажи, максимальная цена продажи
+
+;Еда
+medkit_scientic		    = 2,	4
+antirad				    = 2,	4
+ecolog_outfit			= 2,	1
+scientific_outfit		= 2,	1
+energy_drink		    = 2,	5
+wpn_flame_modern        = 1,	2
+ammo_flame              = 2,	4

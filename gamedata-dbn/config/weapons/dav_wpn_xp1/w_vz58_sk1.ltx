@@ -1,7 +1,8 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [wpn_vz58_sk1]:identity_immunities
 GroupControlSection					= spawn_group
-discovery_dependency				= 
+;;discovery_dependency				= 
 $spawn              				= "weapons\vz58_sk1"	; name and section in level editor
 $npc								= on				
 $prefetch 							= 8
@@ -39,8 +40,8 @@ single_handed						= 0
 slot 								= 2					; number of slot in inventory we put weapon in (1 - knife slot, 2 - pistol, 3 - rifle, 4 - grenade, 5 - apparatus)
 animation_slot						= 2					; type of the animation that will be used
 
-inv_name	        				= VZ58			; name in inventory	
-inv_name_short						= ars-vz58
+inv_name	        				= desc_vz58_sk1_dav			; name in inventory	
+inv_name_short						= desc_vz58_sk1_dav_s ;ars-vz58
 inv_weight							= 2.91				; weight in inventory
 
 inv_grid_width						= 4
@@ -106,7 +107,7 @@ PDM_crouch_no_acc 					= 1.0
 hit_power        					= 0.46
 hit_impulse		 					= 40
 hit_type 							= fire_wound
-fire_distance            			= 800		; maximum fire distance that bullet can fly
+fire_distance            			= 80					;;;109974 10:1
 bullet_speed						= 705		; starting bullet speed
 rpm                      			= 800		; max round per minute
 
@@ -118,7 +119,7 @@ time_to_aim							= 1.0
 
 silencer_hit_power       			= 0.46
 silencer_hit_impulse	 			= 30
-silencer_fire_distance   			= 800
+silencer_fire_distance   			= 80					;;;109974 10:1
 silencer_bullet_speed	 			= 685
 
 hud                      			= wpn_vz58_sk1_hud				; name of the section of the hud

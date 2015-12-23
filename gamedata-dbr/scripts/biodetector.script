@@ -1,6 +1,6 @@
---<!-- TB3D 1.0.9.9.8.1 added non pulse option, pass scopeused, chgd scopeUsed, added werewolf (still need to add unique part),
+--<!-- TB3D 1.0.9.9.9.9 added non pulse option, pass scopeused, chgd scopeUsed, added werewolf (still need to add unique part),
 -- chgd update(), remove(), colors, winx, winy, corpse checked, harsh environment, pda_is_blocked
-function my_ver() return "1.0.9.9.8.1" end
+function my_ver() return "1.0.9.9.9.9" end
 
 local need_update = true
 
@@ -194,11 +194,11 @@ local colors = {
 		},
 		["werewolf"]	= {
 			["color"]	= GetARGB(alpha, mqtr_color+10, no_color, no_color),
-			["parts"]	= {"mutant_chimera_kogot"}
+			["parts"]	= {"mutant_werewolf_kogot"}
 		},
 		["tb3dm_wolf"]	= {
 			["color"]	= GetARGB(alpha, mqtr_color+10, no_color, no_color),
-			["parts"]	= {"mutant_chimera_kogot"}
+			["parts"]	= {"mutant_werewolf_kogot"}
 		},
 		["zombie"]		= {
 			["color"]	= GetARGB(alpha, mid_color, mid_color, max_color),

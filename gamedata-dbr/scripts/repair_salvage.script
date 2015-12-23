@@ -6,7 +6,7 @@ function my_ver() return "1.0.9.9.9.8" end
  Copyright    : barak1001, StalkerSoup
  Author       : barak1001 (Moddb)
  Rewritten	  : for StalkerSoup by aleks1970 08/22/2015
- LastUpdate   : 06.09.2015 by aleks1970
+ LastUpdate   : 29.10.2015 by aleks1970
 --]]--------------------------------------------------------------------------------------------------------------------------------
 local base_script = nil
 local current_script = nil
@@ -777,8 +777,15 @@ end
 
 function salvage_item(container,weapon)
 	local found = nil
+	local max_s = TB3D_Modders.max_small_parts	--aleks1970
+	local max_l = TB3D_Modders.max_large_parts
+	local max_a = TB3D_Modders.max_armor_parts
+	local pistol_part = amk.load_variable("spare_pistol", 0)
+	local rifle_part = amk.load_variable("spare_rifle", 0)
+	local armor_part = amk.load_variable("spare_armor", 0)	--aleks1970
 	if container == "pistol" then
 		local item_table = base_script.slot1.items
+		if pistol_part >= max_s then return end	--aleks1970
 		for k,v in ipairs(item_table) do
 			if not found then
 				if k == weapon then
@@ -786,7 +793,8 @@ function salvage_item(container,weapon)
 					local undamaged,parts = nil,nil
 					undamaged,parts = repair.calculate_parts(item)
 					--repair.copy_addons(item)
-					if parts > TB3D_Modders.max_small_parts then parts = TB3D_Modders.max_small_parts end
+					local parts = parts + pistol_part	--aleks1970
+					if parts > max_s then parts = max_s + 1 end	--aleks1970
 					amk.save_variable("spare_pistol", parts)
 					repair.set_counter()
 					table.remove(base_script.slot1.items,k)
@@ -798,6 +806,7 @@ function salvage_item(container,weapon)
 	end
 	if container == "rifle" then
 		local item_table = base_script.slot2.items
+		if rifle_part >= max_l then return end	--aleks1970
 		for k,v in ipairs(item_table) do
 			if not found then
 				if k == weapon then
@@ -805,7 +814,8 @@ function salvage_item(container,weapon)
 					local undamaged,parts = nil,nil
 					undamaged,parts = repair.calculate_parts(item)
 					--repair.copy_addons(item)
-					if parts > TB3D_Modders.max_large_parts then parts = TB3D_Modders.max_large_parts end
+					local parts = parts + rifle_part	--aleks1970
+					if parts > max_l then parts = max_l + 1 end	--aleks1970
 					amk.save_variable("spare_rifle", parts)
 					repair.set_counter()
 					table.remove(base_script.slot2.items,k)
@@ -817,13 +827,15 @@ function salvage_item(container,weapon)
 	end
 	if container == "armor" then
 		local item_table = base_script.slot3.items
+		if armor_part >= max_a then return end	--aleks1970
 		for k,v in ipairs(item_table) do
 			if not found then
 				if k == weapon then
 					local item = level.object_by_id(v)
 					local undamaged,parts = nil,nil
 					undamaged,parts = repair.calculate_parts(item)
-					if parts > TB3D_Modders.max_armor_parts then parts = TB3D_Modders.max_armor_parts end
+					local parts = parts + armor_part	--aleks1970
+					if parts > max_a then parts = max_a + 1 end	--aleks1970
 					amk.save_variable("spare_armor", parts)
 					repair.set_counter()
 					table.remove(base_script.slot3.items,k)

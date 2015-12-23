@@ -152,9 +152,46 @@ belt				= true
 cost				= 1000
 
 [mutant_werewolf_kogot]:mutant_chimera_kogot
+$spawn 				= "devices\monster_items\werewolf_paws"
+visual				= monster_items\werewolf_paws.ogf	;missing model, need to edit object - aleks1970
 inv_name			= mutant_werewolf_kogot
 inv_name_short		= mutant_werewolf_kogot
 description			= mutant_werewolf_kogot_description
+
+inv_weight			= 1.2
+can_trade			= on
+
+inv_grid_width		= 2	;new icon - aleks1970
+inv_grid_height		= 1
+inv_grid_x			= 70
+inv_grid_y			= 22
+belt				= true
+cost				= 35000
+
+;;; Venom Claw(Raptor)
+[mutant_raptor_kogot]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\monster_items\chimera_kogott"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\chimera_kogot.ogf
+radius				= 1
+
+inv_name			= mutant_raptor_kogot
+inv_name_short		= mutant_raptor_kogot
+description			= enc_mutant_raptor_kogot_description
+
+inv_weight			= 0.1
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 20
+inv_grid_y			= 66
+belt				= true
+cost				= 12000
 
 ;<!-- IZLOM'S HAND -->
 [mutant_fracture_hand]:identity_immunities
@@ -320,13 +357,35 @@ radius				= 1
 inv_name			     = part_digitis_biblio
 inv_name_short		     = part_digitis_biblio
 description			= enc_part_digitis_biblio
-inv_weight			= 0.80
+inv_weight			= 2.80
 can_trade			= on
-inv_grid_width     = 1
+inv_grid_width     = 3
 inv_grid_height    = 1
-inv_grid_x         = 37	;45 - aleks1970
-inv_grid_y         = 19	;48
+inv_grid_x         = 79	;37 new icon - aleks1970
+inv_grid_y         = 14	;19
 cost				= 40000
 belt				= true
 
+[mutant_deathclaw_antler]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\monster_items\mutant_deathclaw_antler"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\deathclaw_antler.ogf
+radius				= 1
 
+inv_name			= mutant_deathclaw_antler
+inv_name_short		= mutant_deathclaw_antler
+description			= enc_mutant_deathclaw_antler_description
+
+inv_weight			= 0.6
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 57
+belt				= true
+cost				= 18000

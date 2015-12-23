@@ -1,4 +1,5 @@
-;<!-- TB3D 1.0.9.9.3.1 excluded empty "discovery_dependency" aleks1970 -->
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons
+;<!-- excluded empty "discovery_dependency" aleks1970 -->
 ; Shotgun ( shotgun ) Boar -12 
 ;--------------------------------------
 [wpn_vepr12]:identity_immunities
@@ -12,7 +13,7 @@ cform                   = skeleton
 class                   = WP_LR300
 min_radius              = 1
 max_radius              = 40
-description				= enc_arsenal_vepr12  
+description				= enc_arsenal_vepr12_descr
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -38,14 +39,14 @@ launch_speed			= 0
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name				= "Boar -12"
-inv_name_short			= "Boar -12"
+inv_name				= enc_arsenal_vepr12
+inv_name_short			= enc_arsenal_vepr12_s
 inv_weight				= 3.6
 
 inv_grid_width     = 5
 inv_grid_height    = 2
-inv_grid_x         = 18
-inv_grid_y         = 55
+inv_grid_x         = 10
+inv_grid_y         = 57
 
 kill_msg_x			= 72
 kill_msg_y			= 82
@@ -98,7 +99,7 @@ PDM_crouch_no_acc 		= 1.0
 hit_power                	= 2.77		; size of damage by bullet
 hit_impulse		 			= 85		; size of physic impulse by bullet	
 hit_type 					= fire_wound 	; [] type of the wound
-fire_distance            	= 180		; maximum fire distance that bullet can fly
+fire_distance            	= 180					;;;109974 10:1
 bullet_speed				= 500		; starting bullet speed
 rpm                      	= 450		; max round per minute
 
@@ -107,7 +108,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 1.72
 silencer_hit_impulse	 	= 80
-silencer_fire_distance   	= 90
+silencer_fire_distance   	= 9					;;;109974 10:1
 silencer_bullet_speed	 	= 280
 
 hud                     = wpn_vepr12_hud

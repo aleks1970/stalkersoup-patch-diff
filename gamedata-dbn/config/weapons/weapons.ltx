@@ -1,6 +1,8 @@
-;<!-- TB3D 1.0.9.9.3.4  fixed missing includes for wep, 12x70 k_hit = 0.25 vice 0.07, disp adj(TB3D10983) -->
-;<!-- "Empty" desc for vog(no_ammo), 9x18_pbp names, added some short desc, icons by aleks1970, ald weapons, hit_probability_max_dist -->
-;<!-- excluded empty "discovery_dependency" aleks1970 and add fake_grenade_name = wpn_fake_drob aleks1970, buck_shot, tweaks, 7.62x25 -->
+;;;; TB3D 1.0.9.9.9.9 - TB3D style weapons
+;; fixed missing includes for wep, 12x70 k_hit = 0.25 vice 0.07, disp adj(TB3D10983),
+;; "Empty" desc for vog(no_ammo), 9x18_pbp names, added some short desc, icons by aleks1970, ald weapons, hit_probability_max_dist,
+;; excluded empty "discovery_dependency" aleks1970 and add fake_grenade_name = wpn_fake_drob aleks1970, buck_shot, tweaks, 7.62x25,
+;; foto ammo, fuelcan descriptions, fn2000_comp, ammo_12.7x54, bullet manager
 
 ;;;sounds: (name of the sound, volume (0.0 - 1.0), delay (sec))
 
@@ -74,6 +76,7 @@
 #include "w_ognemet.ltx"				;;!!!!TB3D wep
 #include "w_gungauss.ltx"
 #include "w_fn2000_sniper.ltx"
+#include "fn2000_comp.ltx"				;;;109981
 ;;;;;;;;;;;;;;;;;;;      dual         ;;;;;;;;;;;;;;;;;;;;
 #include "w_pkm.ltx"
 #include "w_m_134.ltx"
@@ -119,33 +122,30 @@
 #include "holodnoe\w_elf.ltx"
 #include "holodnoe\w_knif3.ltx"
 #include "holodnoe\w_knif2.ltx"
+#include "holodnoe\w_knif4.ltx" ; aleks1970
 #include "holodnoe\w_fist_0.ltx"
 #include "holodnoe\w_fist_1.ltx"
 #include "holodnoe\w_fist_2.ltx"
 #include "holodnoe\w_fist_3.ltx"
 #include "holodnoe\w_axe.ltx"
 #include "holodnoe\w_sledgehammer.ltx"
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; dAVROs weapons for LDK ;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;   dAVROs weapons for LDK  ;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include "dav_wpn_xp1.ltx"
-
-
 
 [bullet_manager]
 tracer_width					= 0.06
-tracer_length_max				= 8.0	;24.0 ;14.0	
-tracer_length_min				= 2		;0.2
+tracer_length_max				= 8.0
+tracer_length_min				= 2.0
 
-hit_probability_max_dist		= 10 ;100 ;;;10
+hit_probability_max_dist		= 10						;;;reduces collision calcs beyond this distance
 
 gravity_const					= 9.81
-air_resistance_k				= 1.3 ;1.0 ;;;0.3 ;1.82		;;;TB3D 109933
+air_resistance_k				= 1.3						;;;TB3D 109933, creates a much better drop
 
 time_step						= 33
-min_bullet_speed				= 3.0 ;0.73 ;0.3
-collision_energy_min			= 0.8 ;;;0.9 ;0.6 ;0.80 ;0.75; 0.90
-collision_energy_max			= 0.5 ;;;0.8 ;0.5 ;0.7;0.50
+min_bullet_speed				= 3.0 						;;;TB3D, this applied to air resistance creates a better drop
+collision_energy_min			= 0.3 						;;;TB3D 109989, impact at farthest distance (k_dist*fire_distance)
+collision_energy_max			= 1.0 						;;;TB3D 109989, impact up to hit_probability_max_dist
 
 whine_sounds					= weapons\whine_1, weapons\whine_2, weapons\whine_3, weapons\whine_4, weapons\whine_5,
                                                    weapons\whine_6, weapons\whine_7, weapons\whine_8, weapons\whine_9, weapons\whine_10, 
@@ -153,24 +153,26 @@ whine_sounds					= weapons\whine_1, weapons\whine_2, weapons\whine_3, weapons\wh
 explode_particles				= amk\flame ;explosions\expl_bullet,explosions\expl_bullet_00,explosions\expl_bullet_01
 
 
-[tracers_color_table]	;color_table
+[tracers_color_table]
 color_0 = 1.0, 0.54, 0.0	; redish yellow
-color_1 = 1.0, 1.0, 1.0	; white
-color_2 = 1.0, 0.1, 0.0	; red
-color_3 = 0.3, 1.0, 0.3	; green
-color_4 = 0.7, 0.5, 1.0 ; red violet
+color_1 = 1.0, 1.0, 1.0		; white
+color_2 = 1.0, 0.1, 0.0		; yellow
+color_3 = 0.3, 1.0, 0.3		; green
+color_4 = 0.7, 0.5, 1.0 	; red violet
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AMUNITION
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [ammo_base]:identity_immunities
-;belt				= false
-buck_shot		= 1				;;;;TB3D 109933  most ammo is single, not pellets
-tracer			= off			;;;;TB3D 109933  start off, only certain ammo has tracer coating, on = all tracers on
+;belt				= false			;;;;TB3D 109989, ammo belt does not support all ammo at the present time
+buck_shot			= 1				;;;;TB3D 109933  most ammo is single, not pellets
+tracer				= off			;;;;TB3D 109933  start off, only certain ammo has tracer coating, on = all tracers on
 tracer_color_ID		= 0
-explosive		= off
-k_pierce		= 0.0			;;;;TB3D 109933  non armor piercing is default, needs to be 0 to skip piercing calculation
+explosive			= off
+k_pierce			= 0.0			;;;;TB3D 109933  non armor piercing is default, NEEDS TO BE 0 TO SKIP PIERCING CALCULATION
+can_be_unlimited	= false			;;;;109989, AI uses 'out of ammo' to change weapons during combat
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;   Боеприпасы для пистолетов, револьверов и пистолетов-пулеметов  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -444,8 +446,9 @@ impair			= 1
 ;buck_shot		= 1
 tracer			= on
 wm_size         	= 0.05
-explosive		= off 
+;explosive		= off 
 ;tracer_color_ID		= 1
+;can_be_unlimited = on
 
 
 [ammo_5.45x39_izomorf]:ammo_5.45x39_ap
@@ -463,17 +466,17 @@ inv_name_short	     = ammo_5.45x39_izomorf_s
 inv_weight		= .37
 
 inv_grid_width		= 2
-inv_grid_height	= 1
-inv_grid_x		= 30
-inv_grid_y		= 46
+inv_grid_height		= 1
+inv_grid_x			= 30
+inv_grid_y			= 46
 
-k_dist			= 3.2
-k_disp		     	= 1
-k_hit		     	= 3
-k_pierce		= 2.6
-k_impulse		= 12.8
-explosive		= on
-tracer			= on
+k_dist				= 1	;3.2	109989
+k_disp		    	= 1
+k_hit		   		= 6	;3	109989
+k_pierce			= 1	;2.6	109989
+k_impulse			= 12.8
+explosive			= on
+tracer				= on
 tracer_color_ID		= 4		;;;;TB3D 109933
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -511,16 +514,18 @@ inv_grid_x			= 16
 inv_grid_y			= 11
 
 k_dist			= 1
-k_disp		        = 1
-k_hit		        = 1
+k_disp		    = 1
+k_hit		    = 1.2	;1		109989
 k_impulse		= 1
 k_pierce		= 0.45 ;;;2.2
 impair			= 1
 ;buck_shot		= 1
 tracer			= on
-wm_size         	= 0.05
-explosive		= off 
+wm_size         = 0.05
+;explosive		= off 
 ;tracer_color_ID		= 3
+;can_be_unlimited = on
+
 ;;;;;;;;;;;;;;;;;;;;;;;  Боеприпасы для семейства (АР)М-16, Сиг-550, Г-36, Л85А2, Famas, Galil, AUG, XM8 ;;;;;;;;;;;;;;;;;;;;;;;
 ;-------------------------------------------
 ;   патрон 5,56х45мм M995 (.223 Ремингтон)
@@ -556,15 +561,15 @@ inv_grid_x			= 10
 inv_grid_y			= 11
 
 k_dist			= 1 ;;;.3 ;1.2		;tB3D 10983
-k_disp		    	= 1 ;;;.45 ;1	;tB3D 10983
-k_hit		   	= 1 ;0.9	;tB3D 10983
+k_disp		    = 1 ;;;.45 ;1	;tB3D 10983
+k_hit		   	= 1.2	;1 ;0.9	;tB3D 109889
 k_impulse		= 1 ;;;0.8
-k_pierce		= 0.25 ;;;2 ;2.3	;tB3D 10983
+k_pierce		= 0.5	;0.25 ;;;2 ;2.3	;tB3D 109889
 impair			= 1
 ;buck_shot		= 1
 ;tracer			= on
 wm_size         = 0.05
-explosive		= off 
+;explosive		= off 
 ;tracer_color_ID		= 2
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;-------------------------------------------
@@ -601,15 +606,15 @@ inv_grid_x			= 14
 inv_grid_y			= 11
 
 k_dist				= 1
-k_disp		        	= 1 ;;;.6 ;1	;tB3D 10983
-k_hit		        	= 1 ;1.1	;tB3D 10983
+k_disp		        = 1 ;;;.6 ;1	;tB3D 10983
+k_hit		        = 1.4	;1 ;1.1	;tB3D 109889
 k_impulse			= 1
 k_pierce			= 0.55 ;;;1.75 ;2.1	;tB3D 10983
 impair				= 1
 ;buck_shot			= 1
 tracer				= on
 wm_size         	= 0.05
-explosive		= off
+;explosive		= off
 ;tracer_color_ID		= 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [ammo_5.7x28_fmj]:ammo_base
@@ -769,6 +774,64 @@ impair			= 1
 wm_size         = 0.05
 ;tracer_color_ID		= 1
 ;tracer				= on
+
+[ammo_pkm_box_1]:ammo_7.62x54r
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970 = 
+$spawn			= "weapons\ammo\ammo_7.62x54r" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\pkm\ammo_762x54r_box.ogf
+description				= enc_weapons1_ammo_ammo-7.62x54r_box
+$prefetch 		= 64
+
+cost			= 900
+
+box_size		= 100
+
+inv_name		= ammo-7.62x54r_100_s
+inv_name_short	= ammo-7.62x54r_100_s
+inv_weight		= 2.6
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 26
+inv_grid_y		= 14
+
+k_dist			= 1
+k_disp			= 1.5 ;1	;tB3D 10983
+k_hit			= 1
+k_impulse		= 1
+k_pierce		= 0.38
+impair			= 1
+;buck_shot		= 1
+wm_size         = 0.05
+;tracer_color_ID		= 1
+;tracer				= on
+
+[ammo_pkm_box_2]:ammo_pkm_box_1
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970 = 
+$spawn			= "weapons\ammo\ammo_7.62x54r" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\pkm\ammo_762x54r_box.ogf
+description				= enc_weapons1_ammo_ammo-7.62x54r_box
+$prefetch 		= 64
+
+cost			= 1600
+
+box_size		= 250
+
+inv_name		= ammo-7.62x54r_250_s
+inv_name_short	= ammo-7.62x54r_250_s
+inv_weight		= 5.6
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 28
+inv_grid_y		= 14
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  Боеприпасы для снайперских винтовок  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -815,7 +878,7 @@ impair			= 1.05
 ;buck_shot		= 1
 ;tracer			= on
 wm_size         = 0.04
-explosive		= off
+;explosive		= off
 ;tracer_color_ID		= 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;-------------------------------------------
@@ -860,7 +923,7 @@ impair			= 1
 ;buck_shot		= 1
 tracer			= on
 wm_size         = 0.04
-explosive		= off ;on
+;explosive		= off ;on
 ;tracer_color_ID		= 0
 
 
@@ -889,13 +952,13 @@ inv_grid_y			= 48
 k_dist			= 1.2
 k_disp			= 0.6 
 k_hit			= 2
-k_impulse		     = 3.8
-k_pierce		     = 1.78
+k_impulse		= 3.8
+k_pierce		= 0.8	;1.78		109989
 impair			= 1
-;buck_shot		     = 1
+;buck_shot		= 1
 tracer			= on
-wm_size            = 0.04
-explosive		     = on
+wm_size         = 0.04
+explosive		= on
 tracer_color_ID	= 4
 
 [ammo_7.62x54_foto]:ammo_7.62x54_ap 		
@@ -926,7 +989,7 @@ impair			= 1
 ;buck_shot		= 1
 ;tracer			= off
 wm_size         = 0.04
-explosive		= off
+;explosive		= off
 ;tracer_color_ID		= 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -972,7 +1035,7 @@ impair			= 1
 ;buck_shot		= 1
 tracer			= on
 wm_size         = 0.05
-explosive		= off
+;explosive		= off
 ;tracer_color_ID		= 2
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;  Боеприпасы для спец.оружия ВСС "Винторез", АС "Вал", ОЦ-14 "Гроза"  ;;;;;;;;;;;;;;;;;;;;;
@@ -1086,11 +1149,11 @@ inv_grid_x		= 36
 inv_grid_y		= 50
 
 k_dist			= 3.2
-k_disp		     = 1
-k_hit		     = 2
+k_disp		    = 1
+k_hit		    = 2
 k_pierce		= 1.78
-k_impulse			= 12.8
-explosive		     = on
+k_impulse		= 12.8
+explosive		= on
 tracer			= on
 tracer_color_ID		= 4
 
@@ -1137,7 +1200,7 @@ impair			= 2
 ;buck_shot		= 1
 tracer			= on
 wm_size         = 0.05
-explosive		= off
+;explosive		= off
 ;tracer_color_ID		= 4
 
 [ammo_knife]:ammo_9x39_pab9
@@ -1178,7 +1241,7 @@ impair			= 0.3
 buck_shot		= 1
 ;tracer			= off
 wm_size         = 0.02
-explosive		= off
+;explosive		= off
 ;tracer_color_ID		= 3
 ;;;;;;;;;;;;;;;;;;;; Боеприпасы для Гаусс-пистолета ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [ammo_super_gauss]:ammo_gauss
@@ -1347,7 +1410,7 @@ impair			= 1.2
 ;buck_shot		= 1
 ;tracer			= off ;on
 wm_size         = 0.05
-explosive		= off
+;explosive		= off
 ;tracer_color_ID		= 3
 
 fake_grenade_name = wpn_fake_drob
@@ -1391,17 +1454,17 @@ k_hit			= 2
 k_impulse		= 1.5
 k_pierce		= 0.16
 impair			= 1.15
+wm_size         = 0.05
+fake_grenade_name = wpn_fake_drob
 ;buck_shot		= 1
 ;tracer			= off ;on
-wm_size         = 0.05
-explosive		= off 
+;explosive		= off 
 ;tracer_color_ID		= 2
 
-fake_grenade_name = wpn_fake_drob
 
 [ammo_12x76_zhekan_heli]:ammo_12x76_zhekan
 $spawn			= "weapons\ammo\ammo_12x76_zhekan_heli" ; option for Level Editor
-explosive		= off
+;explosive		= off
 k_pierce		= 0.75
 
 [ammo_zhekan_izomorf]:ammo_12x76_zhekan
@@ -1473,18 +1536,17 @@ inv_grid_y			= 9
 
 k_dist			= 0.6
 k_disp			= 10
-k_hit			= 0.85
-k_impulse		= 0.7
+k_hit			= 0.7		;0.85		109989
+k_impulse		= 0.5		;0.7		109989
 ;k_pierce		= 0.15
 impair			= 1
 buck_shot		= 8	;;;;TB3D 109930 buck has 8 pellets
-;tracer			= off ;on
 wm_size         = 0.02
+fake_grenade_name = wpn_fake_drob	; -missing- Aleks1970
+;tracer			= off ;on
 ;tracer_color_ID		= 3
 
-fake_grenade_name = wpn_fake_drob	; -missing- Aleks1970
 ;12x70 "Grapeshot"  TB3D 109930 - this is tungsten alloy shot, not Grapeshot!!!!
-
 [ammo_12x70_kart]:ammo_base
 GroupControlSection	= spawn_group
 ; discovery_dependency = ; aleks1970	= 
@@ -1510,16 +1572,16 @@ inv_grid_y         	= 13
 
 k_dist			= 0.75
 k_disp			= 8		;;;;TB3D 10991
-k_hit			= 1.25		;;;;TB3D 10991
-k_impulse		= 0.7
-k_pierce		= 0.05
+k_hit			= 0.85	;1.25		;;;;TB3D 109989
+k_impulse		= 0.5	;0.7		;;;;TB3D 109989
+k_pierce		= 0.05		;;;;has slight armor piercing quality
 impair			= 1.2
 buck_shot		= 8		;;;;TB3D 109930  8 pellets tungsten alloy
-;tracer			= off ;on
 wm_size			= 0.09
-explosive		= off
-
 fake_grenade_name = wpn_fake_drob
+;tracer			= off ;on
+;explosive		= off
+
 ;;;;;;;;;;;;;;;;;;;;;;;  Боеприпасы для семейства АК серий 47 ;;;;;;;;;;;;;;;;;;;;;;;
 ;-------------------------------------------
 ;   патрон 7.62х39мм обр.1943г (8ПО)
@@ -1560,10 +1622,11 @@ k_hit			= 1
 k_impulse		= 0.8
 k_pierce		= 0.35
 impair			= 1
+wm_size         = 0.04
 ;buck_shot		= 1
 ;tracer			= on
-wm_size         = 0.04
 ;tracer_color_ID		= 1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;-------------------------------------------
 ;   патрон 7.62х39мм ПС обр.1943г (57-Н-231С)
@@ -1604,49 +1667,42 @@ k_hit			= 1.3 ;0.9	;tB3D 10983
 k_impulse		= 0.8 
 k_pierce		= 0.56
 impair			= 1
+wm_size         = 0.04
 ;buck_shot		= 1
 ;tracer			= on
-wm_size         = 0.04
 ;tracer_color_ID		= 0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [ammo_og-7b]:ammo_base
 GroupControlSection	= spawn_group
 ; discovery_dependency = ; aleks1970 = 
 $spawn			= "weapons\ammo\ammo_og-7b" ; option for Level Editor
 class			= A_OG7B
-cform                   = skeleton
-visual                  = weapons\ammo\ammo_og-7b.ogf
-description				= enc_weapons1_ammo_ammo-og-7b
+cform           = skeleton
+visual          = weapons\ammo\ammo_og-7b.ogf
+description		= enc_weapons1_ammo_ammo-og-7b
 $prefetch 		= 64
-
-cost					 = 1000
-
+cost			= 1000
 box_size		= 1
-
 inv_name		= ammo-og-7b
 inv_name_short	= ammo-og-7b
-inv_weight		= 4.5
-
+inv_weight		= 2			;;;109989
 inv_grid_width		= 3
 inv_grid_height		= 1
 inv_grid_x			= 15
 inv_grid_y			= 19
-
-
 k_dist			= 1
 k_disp			= 1
-k_hit			= 1.2
-k_impulse		= 1
-k_pierce		= 1.25
-impair			= 1.15
-buck_shot		= 0
-;tracer_color_ID		= 4
+k_hit			= 12	;;;109989, tanks take 2 to 3 hits, npcs in blast radius
+k_impulse		= 1		;;;109989
+k_pierce		= 1		;;;109989, full armor piercing
+impair			= 1
 wm_size         = 0.1
-
-fake_grenade_name = wpn_fake_missile1
-
+fake_grenade_name = wpn_fake_missile		;;;109989
+;buck_shot		= 0
+;tracer_color_ID		= 4
 ;can the ammunition be unlimited : 1 - can, 0 - cannot
-can_be_unlimited = true ;false
+;can_be_unlimited = false			;;;109989
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grenades for Attachable grenade launcher
@@ -1694,7 +1750,7 @@ jump_height = 1.5
 fake_grenade_name = wpn_fake_missile1
 
 ;могут ли боеприпасы быть неограниченными : 1 - могут, 0 - не могут
-can_be_unlimited = true ;false
+;can_be_unlimited = true ;false
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [ammo_vog-25]:ammo_base
@@ -1740,7 +1796,7 @@ wm_size         = 0.05
 fake_grenade_name = wpn_fake_missile
 
 ;могут ли боеприпасы быть неограниченными : 1 - могут, 0 - не могут
-can_be_unlimited = true ;false
+;can_be_unlimited = true ;false
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [ammo_m209]:ammo_base
@@ -1785,7 +1841,7 @@ wm_size         = 0.05
 fake_grenade_name = wpn_fake_missile2
 
 ;могут ли боеприпасы быть неограниченными : 1 - могут, 0 - не могут
-can_be_unlimited = true ;false
+;can_be_unlimited = true ;false
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; For Mauser
@@ -2022,7 +2078,7 @@ snd_explode = weapons\explo\grenade_m406_boom
 
 ;свойства которые читаются, но не используются
 inv_name		= ammo-m209
-inv_name_short	= "M209"
+inv_name_short	= enc_wpn_M_209_tmp_s
 inv_weight		= .2
 
 inv_grid_width		= 1
@@ -2057,14 +2113,15 @@ $prefetch			= 16
 class				= II_EXPLO
 cform				= skeleton
 visual		 		= physics\balon\balon_01.ogf
-inv_name			= Fuelcan
-inv_name_short		= Fuelcan
+description			= enc_fuelcan_acitelen_item_desc
+inv_name			= fuelcan_acitelen_item
+inv_name_short		= fuelcan_acitelen_item_s
 inv_weight			= .1
 
-inv_grid_width		= 1;1 ;;;aleks1970
-inv_grid_height		= 3;1
-inv_grid_x			= 65;9
-inv_grid_y			= 62;9
+inv_grid_width		= 1	;1 ;;;aleks1970
+inv_grid_height		= 3	;1
+inv_grid_x			= 65 ;9
+inv_grid_y			= 62 ;9
 
 ;вещь невозможно подобрать
 can_take			= false
@@ -2131,14 +2188,15 @@ $prefetch			= 16
 class				= II_EXPLO
 cform				= skeleton
 visual				= physics\balon\bomb_01.ogf
-inv_name			= Fuelcan
-inv_name_short		= Fuelcan
+description			= enc_can_liquid_nitrogen_tmp_descr
+inv_name			= enc_can_liquid_nitrogen_tmp
+inv_name_short		= enc_can_liquid_nitrogen_tmp_s
 inv_weight			= .1
 
-inv_grid_width		= 1
-inv_grid_height		= 1
-inv_grid_x			= 9
-inv_grid_y			= 9
+inv_grid_width		= 2 ;1	; aleks1970
+inv_grid_height		= 2 ;1	; aleks1970
+inv_grid_x			= 68 ;9	; aleks1970
+inv_grid_y			= 62 ;9	; aleks1970
 ;вещь невозможно подобрать
 can_take			= false
 
@@ -2204,16 +2262,17 @@ $prefetch			= 16
 class				= II_EXPLO
 cform				= skeleton
 visual				= physics\balon\bochka_fuel.ogf
-inv_name			= Barrel
-inv_name_short		= Barrel
-inv_weight			= .1
+inv_name			= bochka
+inv_name_short		= bochka_s
+description			= enc_bochka_barrel_descr
+inv_weight			= 15.0	;.1 ; aleks1970
 
-inv_grid_width		= 1
-inv_grid_height		= 1
-inv_grid_x			= 9
-inv_grid_y			= 9
+inv_grid_width		= 2	;1
+inv_grid_height		= 3	;1
+inv_grid_x			= 66 ;9
+inv_grid_y			= 62 ;9
 ;вещь невозможно подобрать
-can_take			= false
+;can_take			= false ; aleks1970
 
 cost				= 500
 ;-----------------------------------------------------------------------------------
@@ -2280,14 +2339,15 @@ $prefetch			= 16
 class				= II_EXPLO
 cform				= skeleton
 visual				= physics\balon\bochka_fuel.ogf
-inv_name			= Barrel
-inv_name_short		= 
+inv_name			= bochka2
+inv_name_short		= bochka2_s
+description			= enc_bochka_barrel_descr
 inv_weight			= .1
 
-inv_grid_width		= 1
-inv_grid_height		= 1
-inv_grid_x			= 9
-inv_grid_y			= 9
+inv_grid_width		= 2	;1
+inv_grid_height		= 3	;1
+inv_grid_x			= 66 ;9
+inv_grid_y			= 62 ;9
 ;вещь невозможно подобрать
 can_take			= false
 
@@ -2353,14 +2413,15 @@ $prefetch			= 16
 class				= II_EXPLO
 cform				= skeleton
 visual				= physics\balon\kanistra.ogf
-inv_name			= Barrel
-inv_name_short		= Barrel
+inv_name			= kanistra
+inv_name_short		= kanistra_s
+description			= enc_kanistra_can_descr
 inv_weight			= .1
 
-inv_grid_width		= 1
-inv_grid_height		= 1
-inv_grid_x			= 9
-inv_grid_y			= 9
+inv_grid_width		= 2	;1 aleks1970
+inv_grid_height		= 2	;1
+inv_grid_x			= 8	;9
+inv_grid_y			= 36 ;9
 ;вещь невозможно подобрать
 can_take			= false
 
@@ -2426,8 +2487,8 @@ $prefetch			= 16
 class				= II_EXPLO
 cform				= skeleton
 visual		 		= physics\box\expl_dinamit.ogf
-inv_name			= Dimanit
-inv_name_short		= Dimanit
+inv_name			= enc_wpn_Dimanit_tmp
+inv_name_short		= enc_wpn_Dimanit_tmp_s
 inv_weight			= 10.0
 
 inv_grid_width		= 1
@@ -2505,15 +2566,15 @@ $prefetch				= 16
 class				= II_EXPLO
 cform				= skeleton
 visual				= weapons\grenade\yadrena_bomba.ogf
-inv_name				= Fuelcan
-inv_name_short			= Fuelcan
-inv_weight			= .1
-description			= enc_weapons1_grenade-f1
+inv_name				= enc_bomba_item
+inv_name_short			= enc_bomba_item
+inv_weight			= 15.0
+description			= enc_bomba_item_descr
 
-inv_grid_width			= 1
-inv_grid_height		= 1
-inv_grid_x			= 9
-inv_grid_y			= 9
+inv_grid_width		= 3	;1 ;aleks1970
+inv_grid_height		= 2	;1
+inv_grid_x			= 34 ;9
+inv_grid_y			= 45 ;9
 
 ;вещь невозможно подобрать
 can_take			    = true
@@ -2773,7 +2834,7 @@ inv_weight		= .54
 
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 31
+inv_grid_x			= 32	;31 - aleks1970
 inv_grid_y			= 17
 
 k_dist			= 1
@@ -2835,7 +2896,7 @@ visual          = weapons\strela.ogf
 description		= enc_weapons1_ammo_ammo-arbolt
 $prefetch 		= 64
 cost			= 250
-box_size		= 5
+box_size		= 3								;;;109974 as in description
 inv_name		= ammo-arbolt
 inv_name_short	= ammo-arbolt
 inv_weight		= 0.1125
@@ -2843,16 +2904,16 @@ inv_grid_width		= 3
 inv_grid_height		= 1
 inv_grid_x			= 0
 inv_grid_y			= 64
-k_dist			= 1.7
+k_dist			= 2.0			;;109974
 k_disp			= 1
-k_hit			= 1
+k_hit			= 2				;;109974		improve agro red giant hit from distance
 k_impulse		= 1
 k_pierce		= 0.76
 impair			= 1
 ;buck_shot		= 1
-tracer			= on
+;tracer			= off		;;;109974
 wm_size         = 0.08
-explosive		= off
+;explosive		= off
 
 ; Бумажный патрон для "Самопала"
 [ammo_samopal]:ammo_base
@@ -2864,7 +2925,7 @@ cform                   = skeleton
 visual                  = paket.ogf
 description		= enc_weapons1_ammo_ammo-samopal
 $prefetch 		= 64
-
+can_trade		= off	;; - new disabled - aleks1970
 cost			= 50
 
 box_size		= 50
@@ -3017,7 +3078,7 @@ k_pierce		= 0.76
 impair			= 2.1
 ;buck_shot		= 1 ;3
 wm_size         = 0.05
-can_be_unlimited = on
+;can_be_unlimited = on
 
 ;------------------------------chuck fotik Habarych------------------------------------------
 [ammo_foto]:ammo_base 		
@@ -3045,15 +3106,15 @@ inv_grid_y             = 50
 
 k_dist			= 1.2
 k_disp			= 1.02 ;1	;tB3D 10983
-k_hit			= 5.5
+k_hit			= 1.0 ;5.5
 k_impulse		     = 0.01
-k_pierce		     = 3.5
+k_pierce		     = 0.1 ;3.5
 impair			= 1
 ;buck_shot		     = 1
-tracer			= off
+;tracer			= off
 wm_size                 = 0.04
-explosive		          = off
-tracer_color_ID		= 0
+;explosive		          = off
+;tracer_color_ID		= 0
 
 
 ;------------------------------для Терроризм-мода от 4ufak------------------------------------------
@@ -3079,10 +3140,10 @@ hud = wpn_vodka_hud
 
 [bomba]:explosive_barrel
 visual             = weapons\trotil.ogf
-inv_name			= bomba
-inv_name_short		= bomba
-description		= enc_bomba-trotil
-inv_weight		= 0.5
+inv_name			= bomba_trotil
+inv_name_short		= bomba_trotil
+description			= enc_bomba-trotil
+inv_weight			= 0.5
 inv_grid_width     = 3
 inv_grid_height    = 1
 inv_grid_x         = 18
@@ -3201,9 +3262,8 @@ inv_grid_y         = 51
 cost				= 2700
 time_to_explode			= 0.1f
 
+;;;;;;The explosives with a timer in the inventory
 [bomba_timer_n_10]:bomba_timer_n_10_base
-;inv_name			= "The explosives with a timer in the inventory"
-;inv_name_short		= "Explosives with a timer"
 GroupControlSection = spawn_group
 ; discovery_dependency = ; aleks1970 =
 $spawn    = "food and drugs\antirad"
@@ -3326,26 +3386,26 @@ quest_item			= false
 ;;;;gas cannister
 [ammo_balon]:ammo_base
 GroupControlSection	= spawn_group
-; discovery_dependency = ; aleks1970 = 
+; discovery_dependency = ; aleks1970 
 $spawn			= "weapons\ammo\ammo_balon" ; option for Level Editor
 class			= A_OG7B
 cform                   = skeleton
-visual                  = physics\balon\kanistra.ogf
+visual                  = amk\amk_ballon.ogf	;physics\balon\kanistra.ogf
 $prefetch 		= 64
 
-box_size		= 50
+box_size		= 150
 
 inv_name		= ars-balon
-inv_name_short		= ars-balon
+inv_name_short	= ars-balon_s
 description		= enc_arsenal_ammo_balon
 
-cost			= 1300
+cost			= 2300
 inv_weight		= 5
 
 inv_grid_width		= 2
-inv_grid_height		= 2
-inv_grid_x			= 10
-inv_grid_y			= 36
+inv_grid_height		= 1	;2
+inv_grid_x			= 8	;10
+inv_grid_y			= 40 ;36
 
 
 k_dist			= 1
@@ -3355,12 +3415,12 @@ k_impulse		= 3 ;3.3
 k_pierce		= 10
 impair			= 1
 buck_shot		= 0 ;9 ;20
-tracer			= off
+;tracer			= off
 wm_size         	= 0.55
 explosive		= on
 
 ;могут ли боеприпасы быть неограниченными : 1 - могут, 0 - не могут
-can_be_unlimited = true ;false
+;can_be_unlimited = true ;false
 
 ;Короб для М249
 [ammo_5.56x45r]:ammo_base
@@ -3369,22 +3429,22 @@ discovery_dependency =
 $spawn			= "weapons\ammo\ammo_5.56x45_ap" ; option for Level Editor
 class			= AMMO
 cform                   = skeleton
-visual                  = weapons\pkm\ammo_762x54r_box.ogf
-description				= "Короб с лентой под патрон 5.56х45 NATO."
+visual                  = dav\ammo_m249_box.ogf
+description				= enc_wpn_5_56x45_tmp_descr
 $prefetch 		= 64
 
 cost					 = 800
 
 box_size		= 100
 
-inv_name		= "Короб на 100 патронов для М249"
-inv_name_short	= "Короб на 100 патронов для М249"
+inv_name		= enc_wpn_5_56x45_tmp
+inv_name_short	= enc_wpn_5_56x45_tmp_s
 inv_weight		= 4.8
 
-inv_grid_width		= 2
-inv_grid_height		= 1
-inv_grid_x			= 36
-inv_grid_y			= 40
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 36
+inv_grid_y		= 11
 
 k_dist			= 1
 k_disp			= 1.5;3
@@ -3392,7 +3452,7 @@ k_hit			= 1.3
 k_impulse		= 1
 k_pierce		= 2.2
 impair			= 1.05
-buck_shot		= 1
+;buck_shot		= 1
 tracer			= on
 wm_size         = 0.05
 
@@ -3401,20 +3461,20 @@ GroupControlSection   	  = spawn_group
 $spawn			= "weapons\ammo\ammo_12.7x54" ; option for Level Editor
 class			= AMMO
 visual          = weapons\ammo_12.ogf
-description		= "Патрон 12,7х54мм специальный СЦ-130"
+description		= enc_wpn_SP_130_tmp_descr
 
 cost			= 900
 
 box_size		= 5
 
-inv_name		= "12,7х54мм СЦ-130"
-inv_name_short	= "СЦ-130"
+inv_name		= enc_wpn_SP_130_tmp
+inv_name_short	= enc_wpn_SP_130_tmp_s
 inv_weight		= 0.3
 
 inv_grid_width     = 2
 inv_grid_height    = 1
 inv_grid_x         = 20
-inv_grid_y         = 40
+inv_grid_y         = 23
 
 k_dist			= 2
 k_disp			= 1
@@ -3423,10 +3483,19 @@ k_impulse		= 1
 k_pierce		= 2.5
 tracer			= on
 wm_size         = 0.1
-explosive		= off
+;explosive		= off
 impair			      = 1
-buck_shot		           = 1
+;buck_shot		           = 1
 
+
+#include "Arsenal.ltx"								;;aem mod	109974
+#include "dmx_mod\dmx_weapons.ltx"					;;dmx mod	109974
+
+#include "ald_mod\ald_weapons_pack.ltx"				;;109974
+#include "ald_mod\unique_ald_weapons.ltx"			;;109974
+
+#include "grenadier.ltx"			;;;;	DMX	109974
+#include "gl.ltx"					;;;;	109974
 
 ;------------------------------end------------------------------------------
 

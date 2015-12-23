@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.8.8 - TB3D style weapons
 [wpn_m14_ebr]:identity_immunities
 GroupControlSection		= spawn_group
-discovery_dependency 	= 
+;;discovery_dependency 	= 
 $spawn                  = "weapons\w_m14"
 $npc			 		= on				
 $prefetch 		 		= 8
@@ -10,7 +11,7 @@ class                   = WP_LR300
 min_radius              = 0
 max_radius              = 100
 
-description				= "Калибр	7.62x51мм Винтовка для снайперов уровня отделения Корпуса Морской Пехоты США M14 Designated Marksman Rifle (DMR)."
+description				= enc_wpn_M14_tmp_descr
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -38,14 +39,14 @@ f_mode				= 2
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name				=  "M-14 DMR"
-inv_name_short		=  "M-14 DMR"
+inv_name				=  enc_wpn_M14_tmp
+inv_name_short			=  enc_wpn_M14_tmp
 inv_weight				= 5.1
 
 inv_grid_width     = 6
 inv_grid_height    = 2
-inv_grid_x         = 25
-inv_grid_y         = 32
+inv_grid_x         = 43
+inv_grid_y         = 23
 
 kill_msg_x			= 72
 kill_msg_y			= 82
@@ -99,7 +100,7 @@ hit_impulse		 	= 10
 hit_type 			= fire_wound
 hit_rate	= 1.85
 
-fire_distance          	= 800
+fire_distance          	= 80					;;;109974 10:1
 bullet_speed			= 845 ;начальная скорость пули
 rpm                     = 750
 ; end ttc
@@ -109,7 +110,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.45
 silencer_hit_impulse	 	= 150
-silencer_fire_distance   	= 130
+silencer_fire_distance   	= 60					;;;109974 10:1
 silencer_bullet_speed	 	= 450
 
 hud                     = wpn_m14ebr_hud

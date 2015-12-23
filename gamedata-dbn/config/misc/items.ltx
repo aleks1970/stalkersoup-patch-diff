@@ -1,6 +1,7 @@
-;<!-- TB3D 1.0.9.9.5.0 edits by glowworm, adjusted torch position, argali to arhara, device_pda -->    
+;<!-- TB3D 1.0.9.9.9.9 edits by glowworm, adjusted torch position, argali to arhara, device_pda -->    
 ;<!-- aleks1970; excluded duplicates section and commented out "discovery_dependency" aleks1970 --> 
-;added testsak_l12_stancia_2, car_key_2
+;added testsak_l12_stancia_2, car_key_2, bread_a and vodka_a consumable, added Repair Kit Revamped - aleks1970,
+;detector simple
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;	FOOD		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -16,9 +17,9 @@ visual				= equipments\mushroom_5.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 
-inv_name			        = mushroom
-inv_name_short		        = mushroom
-description			= enc_equipment_mushroom
+inv_name			        = amanita_mushroom
+inv_name_short		        = amanita_mushroom_s
+description			= enc_equipment_amanita_mushroom
 inv_weight			= 0.1
 can_trade			= on
 inv_grid_width     = 2
@@ -52,33 +53,6 @@ bone_name				= bip01_r_hand
 position_offset			 = 0.0,0.0,0.0
 angle_offset			 = 1.570790,1.570790,3.92699
 
-[bread_a]:identity_immunities
-GroupControlSection		= spawn_group
-; discovery_dependency = ; aleks1970  
-$spawn					= "food and drugs\bread_a"
-cform                   = skeleton
-class					= II_ATTCH
-visual                  = weapons\bred\bre1.ogf
-cost					= 20
-inv_name				= food_bread_rad
-inv_name_short			= food_bread_rad
-description				= enc_food_bread_rad
-inv_weight				= .3
-inv_grid_width			= 1
-inv_grid_height			= 1
-inv_grid_x				= 20
-inv_grid_y				= 37
-
-attach_angle_offset		= -0.287979, 1.560923, 1.544060
-attach_position_offset	= 0.096910, -0.013594, 0.107925
-attach_bone_name		= bip01_r_hand
-auto_attach				= false
-
-;// should be deleted after update
-bone_name				= bip01_r_hand
-position_offset			 = 0.0,0.0,0.0
-angle_offset			 = 1.570790,1.570790,3.92699
-
 [bread]:identity_immunities
 GroupControlSection	= spawn_group
 ; discovery_dependency = ; aleks1970  
@@ -90,7 +64,7 @@ visual				= weapons\bred\bred.ogf
 description			= enc_equipment_food_bread1
 
 inv_name			= Bread
-inv_name_short		= Bread
+inv_name_short		= Bread_s
 inv_weight			= 0.1	;0.1
 
 inv_grid_width		= 1
@@ -124,6 +98,22 @@ animation_slot		= 4
 ;hud item
 hud = wpn_vodka_hud
 
+[bread_a]:bread
+GroupControlSection		= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn					= "food and drugs\bread_a"
+visual                  = weapons\bred\bre1.ogf
+cost					= 0
+inv_name				= food_bread_rad
+inv_name_short			= food_bread_rad_s
+description				= enc_food_bread_rad
+;inv_weight				= .3
+inv_grid_width			= 1
+inv_grid_height			= 1
+inv_grid_x				= 20
+inv_grid_y				= 37
+
+eat_radiation = 0.7
 
 [kolbasa]:identity_immunities
 GroupControlSection	= spawn_group
@@ -135,8 +125,8 @@ cform				= skeleton
 visual				= weapons\kolbasa\kolbasa.ogf
 description			= enc_equipment_food_kolbasa1
 
-inv_name			= Kolbasa
-inv_name_short		= Kolbasa
+inv_name			= item_Kolbasa3
+inv_name_short		= item_Kolbasa3_s
 inv_weight			= 0.2
 
 inv_grid_width		= 1
@@ -178,8 +168,8 @@ cform                   = skeleton
 class					= II_ATTCH
 visual                  = weapons\kolbasa\kolbasa.ogf
 cost					= 50
-inv_name				= "kolbasa"
-inv_name_short			= "kolbasa"
+inv_name				= item_Kolbasa4
+inv_name_short			= item_Kolbasa4_s
 inv_weight				= .45
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -207,7 +197,7 @@ visual				= food\conserv1.ogf
 description			= enc_equipment_food_conserva1
 
 inv_name			= Conserva
-inv_name_short		= Conserva
+inv_name_short		= Conserva_s
 inv_weight			= 0.2
 
 inv_grid_width		= 1
@@ -241,33 +231,6 @@ bone_name				= bip01_r_hand
 position_offset			 = 0.0,0.0,0.0
 angle_offset			 = 1.570790,1.570790,3.92699
 
-[vodka_a]:identity_immunities
-GroupControlSection		= spawn_group
-; discovery_dependency = ; aleks1970  
-$spawn					= "food and drugs\vodka_a"
-cform                   = skeleton
-class					= II_ATTCH
-visual                  = weapons\vodka\vodka
-cost					= 100
-inv_name				= vodka_rad
-inv_name_short			= vodka_rad
-description				= vodka_rad_descr
-inv_weight				= .5
-inv_grid_width			= 1
-inv_grid_height			= 2
-inv_grid_x				= 5
-inv_grid_y				= 2
-
-attach_angle_offset		= 0.000000, 0.000000, 0.000000
-attach_position_offset	= 0.087266, -0.078540, 0.052360
-attach_bone_name		= bip01_r_hand
-auto_attach				= false
-
-;// should be deleted after update
-bone_name				= bip01_r_hand
-position_offset			 = 0.0,0.0,0.0
-angle_offset			 = 1.570790,1.570790,3.92699
-
 [vodka]:identity_immunities
 GroupControlSection	= spawn_group
 ; discovery_dependency = ; aleks1970  
@@ -280,8 +243,8 @@ description			= enc_equipment_food_vodka1
 
 ef_weapon_type		= 0
 
-inv_name			= Vodka
-inv_name_short		= Vodka
+inv_name			= Vodka5
+inv_name_short		= Vodka5_s
 inv_weight			= 0.2	;0.2
 
 inv_grid_width		= 1
@@ -321,6 +284,22 @@ hud = wpn_vodka_hud
 break_particles		= explosions\explosion_bottle
 break_sound			= material\bottle\collide\bottle_break_1
 
+[vodka_a]:vodka
+GroupControlSection		= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn					= "food and drugs\vodka_a"
+visual                  = weapons\vodka\vodka
+cost					= 0
+inv_name				= vodka_rad
+inv_name_short			= vodka_rad_s
+description				= vodka_rad_descr
+;inv_weight				= .5
+inv_grid_width			= 1
+inv_grid_height			= 2
+inv_grid_x				= 50
+inv_grid_y				= 6
+
+eat_radiation = 1.0
 
 [guitar_a]:identity_immunities
 GroupControlSection		= spawn_group
@@ -332,7 +311,7 @@ visual                  = Equipments\item_guitar.ogf
 description			    = enc_guitar_descr
 cost					= 1200
 inv_name				= enc_guitar_name
-inv_name_short			= enc_guitar_descr
+inv_name_short			= enc_guitar_name_s
 inv_weight				= 1.5
 inv_grid_width			= 4
 inv_grid_height			= 2
@@ -351,8 +330,9 @@ cform                   = skeleton
 class					= II_ATTCH
 visual                  = Equipments\item_harmonica.ogf
 cost					= 35
+description				= enc_harmonica_descr
 inv_name				= enc_harmonica_name
-inv_name_short			= enc_harmonica_descr
+inv_name_short			= enc_harmonica_name_s
 inv_weight				= 0.35
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -378,7 +358,7 @@ visual          = equipments\item_antirad.ogf
 description		= enc_equipment_medi_antirad1
 
 inv_name			= Antirad
-inv_name_short		= Antirad
+inv_name_short		= Antirad_s
 inv_weight			= 0.01
 
 inv_grid_width		= 1
@@ -413,7 +393,7 @@ cform				= skeleton
 visual				= equipments\item_aptechka.ogf
 description			= enc_equipment_medi_medkit1
 inv_name			= Medkit
-inv_name_short		= Medkit
+inv_name_short		= Medkit_s
 inv_weight			= 0.1
 
 inv_grid_width		= 2
@@ -447,8 +427,8 @@ class			= II_MEDKI
 cform				= skeleton
 visual				= equipments\item_aptechka3.ogf
 description			= enc_equipment_medi_medkit2
-inv_name			= Medkit_army
-inv_name_short		= Medkit_army
+inv_name			= Medkit_army4
+inv_name_short		= Medkit_army4_s
 inv_weight			= 0.1
 
 inv_grid_width		= 2
@@ -483,7 +463,7 @@ cform				= skeleton
 visual				= equipments\item_aptechka2.ogf
 description			= enc_equipment_medi_medkit3
 inv_name			= Medkit_scientific
-inv_name_short		= Medkit_scientific
+inv_name_short		= Medkit_scientific_s
 inv_weight			= 0.1
 
 inv_grid_width		= 2
@@ -549,7 +529,7 @@ visual				= equipments\item_bandage.ogf
 description			= enc_equipment_medi_bandage1
 
 inv_name			= bandage
-inv_name_short		= bandage
+inv_name_short		= bandage_s
 inv_weight			= 0.01	
 
 inv_grid_width		= 1
@@ -584,13 +564,13 @@ cform                   = skeleton
 class					= II_ATTCH
 visual                  = weapons\binoculars\wpn_binoculars.ogf
 cost					= 0
-inv_name				= "binocular"
-inv_name_short			= "binocular"
+inv_name				= item_binocular
+inv_name_short			= item_binocular
 inv_weight				= .5
 inv_grid_width			= 2
 inv_grid_height			= 1
 inv_grid_x				= 16
-inv_grid_y				= 12
+inv_grid_y				= 8
 attach_angle_offset		= 3.080506,-1.493053,-1.202040   ;is set to radians Angle*PI/180
 attach_position_offset	= 0.080000,0.021273,0.100000
 attach_bone_name		= bip01_r_hand
@@ -610,7 +590,7 @@ slot				= 7
 script_binding      = game_totalizator.init		;;;;TB3D!!!!    marsh lottery system
 
 inv_name			= device_pda1
-inv_name_short		= device_pda1
+inv_name_short		= device_pda1_s
 inv_weight			= 0.0	;0.2
 
 inv_grid_width		= 2
@@ -640,7 +620,7 @@ visual				= equipments\light_night.ogf
 description			= enc_equipment_devic_device-torch1
 cost				= 500
 inv_name			= device-torch
-inv_name_short		= device-torch
+inv_name_short		= device-torch_s
 inv_weight			= 0.0
 inv_grid_width		= 2
 inv_grid_height		= 1
@@ -683,7 +663,7 @@ $prefetch 			= 32
 class				= D_SIMDET
 cform				= skeleton
 visual				= equipments\item_datchik1.ogf
-description			= enc_equipment_devic_detect1
+description			= st_detector_descr1	;enc_equipment_devic_detect1
 radius				= 10	;15
 buzzer_radius		= 1.5
 noise				= zone_mosquito_bald       ;detectors\geiger_noise_loop
@@ -692,7 +672,7 @@ buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
 ef_detector_type	= 1
 
 inv_name			= st_detector
-inv_name_short		= st_detector
+inv_name_short		= st_detector_s
 inv_weight			= 0.1
 
 inv_grid_width		= 1
@@ -758,7 +738,7 @@ buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
 ef_detector_type	= 1
 
 inv_name			= st_detector2
-inv_name_short		= st_detector2
+inv_name_short		= st_detector2_s
 inv_weight			= 0.15
 
 inv_grid_width		= 1
@@ -808,7 +788,6 @@ $prefetch 			= 32
 class				= D_SIMDET
 cform				= skeleton
 visual				= equipments\item_datchik3.ogf
-description			= enc_equipment_devic_detect3
 radius				= 10	;15
 buzzer_radius		= 1.5
 noise				= zone_mosquito_bald       ;detectors\geiger_noise_loop
@@ -817,8 +796,8 @@ buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
 ef_detector_type	= 1
 
 inv_name			= st_detector3
-inv_name_short		= st_detector3
-;description			= st_detector_descr3
+inv_name_short		= st_detector3_s
+description			= enc_equipment_devic_detect3 ;st_detector_descr3 ;aleks1970
 inv_weight			= 0.25
 
 inv_grid_width		= 1
@@ -877,7 +856,6 @@ $prefetch 			= 32
 class				= D_SIMDET
 cform				= skeleton
 visual				= equipments\item_datchik3.ogf
-description			= enc_equipment_devic_detect_sak
 radius				= 10	;15
 buzzer_radius		= 1.5
 noise				= zone_mosquito_bald       ;detectors\geiger_noise_loop
@@ -885,8 +863,8 @@ buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
 slot				= 9
 ef_detector_type	= 1
 inv_name			= st_detector_sak
-inv_name_short		= st_detector_sak
-;description		= st_detector_descr3
+inv_name_short		= st_detector_sak_s
+description			= enc_equipment_devic_detect_sak	;st_detector_descr3 ;aleks1970
 inv_weight			= 0.3
 inv_grid_width		= 1
 inv_grid_height		= 1
@@ -963,15 +941,15 @@ $prefetch 			= 32
 class				= D_SIMDET
 cform				= skeleton
 visual				= equipments\item_datchik3.ogf
-description			= detect_john
 radius				= 10
 buzzer_radius		= 1.5
 noise				= detectors\geiger_noise_loop
 buzzer				= detectors\DA-2_alarm_loop
 slot				= 9
 ef_detector_type	= 1
+description			= detect_john
 inv_name			= detector_elite_john
-inv_name_short		= detector_elite_john
+inv_name_short		= detector_elite_john_s
 inv_weight			= 0.35
 inv_grid_width		= 1
 inv_grid_height		= 1
@@ -1084,9 +1062,9 @@ $prefetch		= 64
 cform			= skeleton
 class			= ARTEFACT
 visual			= equipments\item_datchik3.ogf
-description			= det_art_ultra_info
-inv_name			= det_artefact_super
-inv_name_short		= det_artefact_super
+description			= enc_det_art_ultra_info	;det_art_ultra_info	; aleks1970
+inv_name			= det_art_ultra_super	;det_artefact_super
+inv_name_short		= det_art_ultra_super_s	;det_artefact_super_s
 inv_weight			= 0.25
 inv_grid_width		= 1
 inv_grid_height		= 1
@@ -1140,7 +1118,7 @@ class			= ARTEFACT
 visual			= equipments\iphone.ogf
 description			= detektor_amorf_info
 inv_name			= detektor_amorf
-inv_name_short		= detektor_amorf
+inv_name_short		= detektor_amorf_s
 inv_weight			= 0.35
 inv_grid_width		= 1
 inv_grid_height		= 1
@@ -1321,7 +1299,7 @@ visual                  = new_item\cigara.ogf
 description				= enc_cigara
 cost					= 100
 inv_name				= cigara
-inv_name_short			= cigara
+inv_name_short			= cigara_s
 
 inv_weight				= 0.1
 inv_grid_width			     = 1
@@ -1371,7 +1349,7 @@ anim_eat			= kurit_3
 $spawn 				= "food and drugs\sandwich"
 visual				= new_item\sandwich.ogf
 inv_name			= sandwich
-inv_name_short		= sandwich
+inv_name_short		= sandwich_s
 description		    = enc_sandwich
 inv_weight			= 0.1	
 inv_grid_x          = 53
@@ -1386,7 +1364,7 @@ eat_satiety         = 0.2
 [beer_a]:vodka
 $spawn 				= "food and drugs\beer_a"
 inv_name			= beer_a
-inv_name_short		= beer_a
+inv_name_short		= beer_a_s
 visual				= new_item\drink_beer.ogf
 description			= enc_beer_a
 cost				= 75
@@ -1412,7 +1390,7 @@ $spawn 				= "food and drugs\flaska"
 visual				= new_item\flaska
 description			= enc_flaska
 inv_name			= flaska
-inv_name_short		= flaska
+inv_name_short		= flaska_s
 inv_grid_height     = 1
 inv_grid_x          = 55
 inv_grid_y          = 2
@@ -1433,7 +1411,7 @@ $spawn 				= "food and drugs\sweetness"
 visual			    = new_item\sweetness.ogf
 description		    = enc_sweetness
 inv_name			= sweetness
-inv_name_short		= sweetness
+inv_name_short		= sweetness_s
 inv_weight			= 0.2
 inv_grid_x          = 54
 inv_grid_y          = 2
@@ -1453,7 +1431,7 @@ visual                  = new_item\box_cigara.ogf
 cost					= 1250
 description			    = enc_box_cigara
 inv_name				= box_cigara
-inv_name_short			= box_cigara
+inv_name_short			= box_cigara_s
 inv_weight				= 0.4
 inv_grid_width			     = 2
 inv_grid_height			= 1
@@ -1474,7 +1452,7 @@ visual                  = new_item\box_cigara.ogf
 cost					= 1250
 description			    = enc_box_cigara
 inv_name				= box_cigara
-inv_name_short			= box_cigara
+inv_name_short			= box_cigara_s
 inv_weight				= 0.4
 inv_grid_width			     = 2
 inv_grid_height			= 1
@@ -1498,7 +1476,7 @@ visual                  = new_item\item_balalaika.ogf
 cost					= 185
 description			    = enc_balalaika_a
 inv_name				= balalaika_a
-inv_name_short			= balalaika_a
+inv_name_short			= balalaika_a_s
 inv_weight				= 1.5
 inv_grid_width			= 4
 inv_grid_height			= 2
@@ -1520,7 +1498,7 @@ radius				= 1
 quest_item			= true
 description			= enc_car_key_2
 inv_name			= car_key_2
-inv_name_short		= car_key_2
+inv_name_short		= car_key_2_s
 inv_weight			= 0.01
 inv_grid_width		= 1
 inv_grid_height		= 1
@@ -1529,6 +1507,41 @@ inv_grid_y			= 65 ;66
 cost				= 1000
 
 [btr_key]:car_key_2
-description			= enc_btr_key
-inv_name			= btr_key
-inv_name_short		= btr_key
+description			= enc_item_btr_key_descr
+inv_name			= item_btr_key
+inv_name_short		= item_btr_key_s
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;109998							 - Repair Kit Revamped Start - 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[repair_kit]:identity_immunities
+GroupControlSection	= spawn_group
+;discovery_dependency	=
+$spawn				= "devices\quest_items\repair_kit"
+$prefetch			= 32
+class				= II_ANTIR
+cform				= skeleton
+visual				= equipments\revamped_repair_box.ogf
+radius				= 1
+description			= enc_equipment_repair_kit
+inv_name			= revamped_repair_kit
+inv_name_short		= revamped_repair_kit
+inv_weight			= 2.50
+quest_item			= false	;true	;aleks1970
+inv_grid_width		= 2
+inv_grid_height		= 2
+inv_grid_x			= 57
+inv_grid_y			= 17
+cost				= 12500
+eat_health			= 0
+eat_satiety			= 0
+eat_power			= 0
+eat_radiation		= 0
+eat_alcohol			= 0
+wounds_heal_perc	= 0
+eat_portions_num	= 1
+animation_slot		= 4
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;							 - Repair Kit Revamped End - 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

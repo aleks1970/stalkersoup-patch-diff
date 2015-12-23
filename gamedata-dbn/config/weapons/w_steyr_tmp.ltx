@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons, icon
 [wpn_steyr_tmp]:identity_immunities
 GroupControlSection		= spawn_group
-discovery_dependency	= 
+;;discovery_dependency	= 
 $spawn              	= "weapons\steyr_tmp"	; name and section in level editor
 $npc					= on
 $prefetch 				= 8
@@ -9,7 +10,7 @@ cform               	= skeleton
 class               	= WP_LR300			; class of the weapon that corresponding to CPP class
 min_radius          	= 30				; [] for AI
 max_radius          	= 100				; [] for AI
-description				= "TMP (англ. Tactical Machine Pistol Ч тактический автоматический пистолет) Ч автоматический пистолет под патрон 9х19 мм ѕарабеллум, производства австрийской компании Steyr Mannlicher."
+description				= enc_wpn_steyr_tmp_descr
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -36,14 +37,14 @@ single_handed			= 0
 slot 					= 2									; number of slot in inventory we put weapon in (1 - knife slot, 2 - pistol, 3 - rifle, 4 - grenade, 5 - apparatus)
 animation_slot			= 1									; type of the animation that will be used
 
-inv_name	        	= "TMP"							; name in inventory	
-inv_name_short			= "TMP"
+inv_name	        	= enc_wpn_steyr_tmp							; name in inventory	
+inv_name_short			= enc_wpn_steyr_tmp
 inv_weight				= 1.3								; weight in inventory
 
-inv_grid_width     = 3
-inv_grid_height    = 2
-inv_grid_x         = 9
-inv_grid_y         = 32
+inv_grid_width			= 2
+inv_grid_height			= 2
+inv_grid_x			= 40
+inv_grid_y			= 75
 
 kill_msg_x			= 161
 kill_msg_y			= 153
@@ -86,7 +87,7 @@ PDM_crouch_no_acc 		= 1.0
 hit_power           = 0.39
 hit_impulse	        = 3
 hit_type 	        = fire_wound
-fire_distance       = 150
+fire_distance       = 150					;;;109974 10:1
 bullet_speed		= 330
 rpm                 = 650
 
@@ -98,7 +99,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.45
 silencer_hit_impulse	 	= 12
-silencer_fire_distance   	= 180
+silencer_fire_distance   	= 110					;;;109974 10:1
 silencer_bullet_speed	 	= 450
 
 hud                      	= wpn_steyr_tmp_hud				; name of the section of the hud
@@ -133,8 +134,8 @@ zoom_enabled				= true						; (on,off)zoom mode (right mouse button)
 scope_zoom_factor	    	= 90						; fov for zoom mode
 
 silencer_name  				= wpn_addon_sil_tmp		; section name for the attachable silencer
-silencer_x                  = 65		; offset in inventory icon
-silencer_y                  = 7
+silencer_x                  = 83		; offset in inventory icon
+silencer_y                  = 11
 
 ;sounds (name of the sound, volume (0.0 - 1.0), delay (sec))
 snd_draw					= Arsenal\pistol_draw
@@ -210,14 +211,14 @@ description            = enc_arsenal_sil_tmp
 $prefetch              = 32
 
 cost                   = 600
-inv_name               = ars-sil_tmp
-inv_name_short         = ars-sil_tmp
+inv_name               = ars_sil_tmp
+inv_name_short         = ars_sil_tmp
 inv_weight             = .1
 
-inv_grid_width     = 2
+inv_grid_width     = 1
 inv_grid_height    = 1
-inv_grid_x         = 8
-inv_grid_y         = 33
+inv_grid_x         = 11
+inv_grid_y         = 40
 
 bullet_hit_power_k     = 0.8
 bullet_speed_k         = 0.8

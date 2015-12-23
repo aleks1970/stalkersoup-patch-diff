@@ -1,8 +1,9 @@
---<!-- TB3D 1.0.9.9.9.8 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.9 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
---item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals, lukash brains
-function my_ver() return "1.0.9.9.9.8" end
+--item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals,
+--lukash brains, agro knockdown
+function my_ver() return "1.0.9.9.9.9" end
 
 local translate = game.translate_string
 local text_color_tip = TB3D_Services.get_text_color("tip")
@@ -13,12 +14,30 @@ function update(tnow, sbase)							--109983
 	if upd_pos < tnow then
 		upd_pos = tnow + (100 * sbase)
 		--109989, moved remove_brainlab_alife() to item take: amk_zapiska
+		if TB3D_Modders.zaton_lost then															--109999, can be deactivated
+			if not has_alife_info("tb3d_teleport_zaton") then									--109999 moved here, check if hideout done yet
+				if has_alife_info("agr_knockdown") then											--entered strelok hideout
+					if has_alife_info("tb3d_agr_knockdown") then								--send player to backwater
+						TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
+						TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
+						return																	--109999
+					elseif level.name() == "l03u_agr_underground" then							--109999, must be in agro under
+						TB3D_Services.give_info("tb3d_agr_knockdown")							--109999, delay one cycle
+					else
+						TB3D_Services.give_info("tb3d_teleport_zaton")							--109999, disable teleport if not agro under
+					end
+				end
+			end
+		end
+		braad_test.actor_update()										--TB3D 109999, moved from bind_stalker
 	end
 end
 
 function on_info(info_id)
 	if info_id=="fanat_teleport_04_have" then
 		TB3D_Triggers.fanat_laptop_have()
+	--elseif info_id=="agr_knockdown" then
+		--if not TB3D_Modders.zaton_lost then TB3D_Services.give_info("tb3d_agr_knockdown") end
 	elseif info_id=="tutorial_wounded_start" then
 		TB3D_Triggers.spawn_esc_medkit()
 	elseif info_id == "tutorial_end" then
@@ -27,6 +46,8 @@ function on_info(info_id)
 		end
 	--elseif info_id=="brat_luis_have" then
 		--TB3D_Triggers.spawn_marmor()
+	elseif info_id=="yan_labx16_switcher_1_end" then
+		TB3D_Triggers.remove_brainlab_alife()
 	elseif info_id=="yan_has_ghost_pda" then
 		news_manager.send_tip(db.actor, "storyline_ghost_tip", nil, "wolf")
 		amk.spawn_item("amk_zapiska",vector():set(-117.381,18.722,-21.890),1529,84)		--109989, kept getting lost so moved it
@@ -96,6 +117,13 @@ function on_info(info_id)
 		--alife():create("nebo_heavy_outfit",vector():set(23.890,19.8,18.771),80551,3263)
 	elseif info_id == "info_way_bar_wild_territory" then												--109989, remove emi blocking entrance
 		TB3D_Services.remove_bar_emi()
+	elseif info_id == "cit_jail_actor_wake" then														--109999, play docter dialog
+		local snd_obj = xr_sound.get_safe_sound_object("characters_voice\\scenario\\agroprom\\doctor_1")
+		if snd_obj then
+			snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+		else
+			TB3D_Services.packet_alert("tb3s stalker: play snd nil!!!!")
+		end
 	elseif info_id == "cit_fail_first_task" then
 		TB3D_Mobs.spawn_bandits(-57.551,-6.502,13.167,4007,778,6)										--109989, institute entrance
 		TB3D_Mobs.spawn_bandits(-96.612,-16.465,-78.895,1922,754,6)										--109989, room near hideout entrance
@@ -499,10 +527,10 @@ function on_item_take(obj)
 		if has_alife_info("doktor_teleport_12_faze1") and not has_alife_info("doktor_teleport_12_done") then
 			TB3D_Services.give_info("doktor_teleport_12_have")
 		end
-	elseif sect == "pisma_stalka" then		--109998
-		if has_alife_info("plot_dialog_say_start") and not has_alife_info("plot_dialog_say_done") then
-			TB3D_Services.give_info("plot_dialog_say_have")
-		end
+	elseif sect == "pisma_stalka" then		--109998	--disabled/changed/not needed - aleks1970
+		--if has_alife_info("plot_dialog_say_start") and not has_alife_info("plot_dialog_say_done") then
+			--TB3D_Services.give_info("plot_dialog_say_have")
+		--end
 	elseif sect == "outfit_specnaz_m1" then		--109998, found in first trip to yantar
 		if ln == "l08_yantar" then
 			TB3D_Services.give_info("mil_lukash_heal_reward")
@@ -779,6 +807,8 @@ function process_levels(lname, sname)
 			end
 			if has_alife_info("brat_luis_spawn") then										--109992, Brother Luis
 				TB3D_Services.give_info("brat_luis_start")
+			elseif has_alife_info("brat_luis_start") then										--109999, Brother Luis
+				TB3D_Services.give_info("brat_luis_spawn")
 			end
 		elseif lname=="l10_radar" then
 			if sname == "l10u_bunker" then

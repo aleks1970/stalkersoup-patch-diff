@@ -1,3 +1,4 @@
+---TB3D 1.0.9.9.9.9 
 --[[-----------------------------------------------------------------------
 | 					<<< Invisibility in a suit >>>
 | To work used battery, which lasts for a certain time,
@@ -7,10 +8,12 @@
 | It does not show.
 | Is not compatible with old scripts, it needs to remove or disable!
 | (C) Intro aka nanobots ver. 10/17/2014 2.15 g
-| Rewritten for StalkerSoup by aleks1970 03/26/2015
+| Rewritten for StalkerSoup by aleks1970 12/15/2015
 --]]-----------------------------------------------------------------------
+function my_ver() return "1.0.9.9.9.9" end	--modders append with initials and rev.
 
 local invisible_global 	= 1		-- switch script: 0 - off. 1 - incl.
+local invisible_debug 	= false	-- switch debug mode --/on off
 local fake_knife_on 	= true 	-- uses the fake knives?
 local time_invisible 	= 360	-- when battery is fully discharged, at which ceases to be invisible, sec.
 local time_batar 		= 60	-- while a full charge time, sec	-- previous 120 aleks1970
@@ -27,10 +30,11 @@ local ramka = nil
 local polosa = nil
 local blink = 0
 local invisible_weapons = {						-- invisible weapon (transparent) for NPC
-			["wpn_bizon1"] 			= true,
-			["wpn_m16a2_sk12"] 		= true,
-			["intergral_knife"] 	= true,
-			["mobile"] 				= true,
+			["mobile"] 					= true,
+			["wpn_bizon1"] 				= true,
+			["wpn_m16a2_sk12"] 			= true,
+			["intergral_knife"] 		= true,
+			["wpn_ghost_gauss_elcan"] 	= true,
 	}
 
 local con = get_console()
@@ -59,7 +63,9 @@ function intknife_binder:fastcall_knife()
 	if par and par:id() == actor_id  then return false
 	end
 	alife():release(alife():object(self.id)) -- If the emissions, then remove
-	--log("intknife_binder:fastcall_knife()knife away! id-("..self.id..")time-("..time_global()..")")
+	if invisible_debug then
+	--	log("intknife_binder:fastcall_knife()knife away! id-("..self.id..")time-("..time_global()..")")
+	end
 	return true
 end
 ----------------------------------------------------------------
@@ -89,7 +95,9 @@ function mashalat_binder:__init(obj) super(obj)
 	self.time_invisible = time_invisible * 1000
 	if time_batar < 1 then time_batar = 1 end
 	self.time_batar = time_batar * 1000
-	log("mashalat_binder:__init(obj)id-("..obj:id()..")time-("..time_global()..")")
+	if invisible_debug then
+		log("mashalat_binder:__init(obj)id-("..obj:id()..")time-("..time_global()..")")
+	end
 end
 
 function mashalat_binder:update(delta)
@@ -103,15 +111,19 @@ function mashalat_binder:update(delta)
 	local wpn_inv = false
 	local camouflage_strelok_dressed = outfit_cammo and outfit_cammo:section() == "meceniy_outfit_strelok"
 	if not camouflage_strelok_dressed then		-- not wearing camouflage cloak 
-		if self.not_invizible == false then 
-			log("Camouflage shot! time-("..time_global()..")")
+		if self.not_invizible == false then
+			if invisible_debug then
+				log("Camouflage shot! time-("..time_global()..")")
+			end
 			self.invisible = false
 			if ramka then
 				hud:RemoveDialogToRender(ramka)
 				ramka = nil
 				hud:RemoveDialogToRender(polosa)
 				polosa = nil
-				--log("RemoveDialogToRender()time-("..time_global()..")")
+				if invisible_debug then
+				--	log("RemoveDialogToRender()time-("..time_global()..")")
+				end
 			end
 			bind_stalker.restore_weapon()
 			if self.effector_on == true then
@@ -148,7 +160,9 @@ function mashalat_binder:update(delta)
 			alife():create("intergral_knife", vector():set(0,0,0),1,1, actor_id)
 		end
 		if self.make_invizible == false then -- for the first time put camouflage cloak
-			log("Wearing camouflage! time-("..time_global()..")")
+			if invisible_debug then
+			--	log("Wearing camouflage! time-("..time_global()..")")
+			end
 			level.add_pp_effector ("teleport.ppe", 1111, false)
 			level.set_pp_effector_factor(1111, 1.0)
 			self.effector_on = true
@@ -183,7 +197,9 @@ function mashalat_binder:update(delta)
 						self.invisible = false
 						self.no_inv_time = time_global() + update_npc -- how much time will be visible after the shot
 						self.tormoz = time_global()
-						--log("Shooting! ac_slot-("..ac_slot..")self.no_inv_time-("..self.no_inv_time..")time-("..time_global()..")")
+						if invisible_debug then
+						--	log("Shooting! ac_slot-("..ac_slot..")self.no_inv_time-("..self.no_inv_time..")time-("..time_global()..")")
+						end
 					end
 					self.last_ammo_elapsed = ammo_elapsed
 				end	
@@ -222,7 +238,9 @@ function mashalat_binder:update(delta)
 			ramka = nil
 			hud:RemoveDialogToRender(polosa)
 			polosa = nil
-			--log("RemoveDialogToRender()time-("..time_global()..")")
+			if invisible_debug then
+			--	log("RemoveDialogToRender()time-("..time_global()..")")
+			end
 		end
 		self.time_msg = time_global()
 	else
@@ -235,7 +253,9 @@ function mashalat_binder:update(delta)
 				ramka:SetFont(GetFontGraffiti22Russian())
 				ramka:SetTextAlign(CGameFont.alCenter)
 				hud:AddDialogToRender(ramka)
-				--log("AddDialogToRender(ramka)time-("..time_global()..")")
+				if invisible_debug then
+				--	log("AddDialogToRender(ramka)time-("..time_global()..")")
+				end
 			end
 			if not polosa then
 				polosa = CUIStatic()
@@ -243,7 +263,9 @@ function mashalat_binder:update(delta)
 				polosa:InitTexture("invizhud\\ProgressBatteryBar")
 				polosa:SetStretchTexture(true)
 				hud:AddDialogToRender(polosa)
-				--log("AddDialogToRender(polosa)time-("..time_global()..")")
+				if invisible_debug then
+				--	log("AddDialogToRender(polosa)time-("..time_global()..")")
+				end
 			end
 			local dln = math.floor(self.batar*244+0.5)
 			polosa:SetWidth(dln)
@@ -260,7 +282,9 @@ function mashalat_binder:update(delta)
 		end
 	end
 	if self.tormoz <= time_global() then -- Apparently NPSov update every second update_npc
-		--log("Setting visibility invisiblee-("..tostring(self.invisible)..")batar-("..math.floor(self.batar*100+0.5)..")time-("..time_global()..")")
+		if invisible_debug then
+		--	log("Setting visibility invisiblee-("..tostring(self.invisible)..")batar-("..math.floor(self.batar*100+0.5)..")time-("..time_global()..")")
+		end
 		invisible_npc(self.invisible)
 		self.tormoz = time_global() + update_npc
 	end
@@ -273,7 +297,9 @@ function mashalat_binder:net_Relcase(obj) -- works a little faster net_destroy()
 			ramka = nil
 			hud:RemoveDialogToRender(polosa)
 			polosa = nil
-			log("mashalat_binder:net_Relcase(id-"..obj:id()..")RemoveDialogToRender()time-("..time_global()..")")
+			if invisible_debug then
+				log("mashalat_binder:net_Relcase(id-"..obj:id()..")RemoveDialogToRender()time-("..time_global()..")")
+			end
 		end
 	end
 end
@@ -284,7 +310,9 @@ function mashalat_binder:net_destroy()
 		ramka = nil
 		hud:RemoveDialogToRender(polosa)
 		polosa = nil
-		log("RemoveDialogToRender()time-("..time_global()..")")
+		if invisible_debug then
+			log("RemoveDialogToRender()time-("..time_global()..")")
+		end
 	end
 	if db.actor then
 		invisible_npc(false)	-- in case you suddenly removed the costume!
@@ -292,9 +320,13 @@ function mashalat_binder:net_destroy()
 		if wpn0 and wpn0:section() == "intergral_knife" then
 			alife():release(alife():object(wpn0:id()), true) -- clear it
 		end
-		log("mashalat_binder:net_destroy()camouflage cloak away! id-("..self.object:id()..")time-("..time_global()..")")
+		if invisible_debug then
+			log("mashalat_binder:net_destroy()camouflage cloak away! id-("..self.object:id()..")time-("..time_global()..")")
+		end
 	end
-	log("mashalat_binder:net_destroy() id-("..self.object:id()..")time-("..time_global()..")")
+	if invisible_debug then
+		log("mashalat_binder:net_destroy() id-("..self.object:id()..")time-("..time_global()..")")
+	end
 	object_binder.net_destroy(self)
 end
 
@@ -320,7 +352,9 @@ function invisible_npc(invisible)
 				end
 				object_all:set_range(range)	
 			end
-			--log("Object-("..section..")name-("..object_all:name()..")range-("..range..")Visibility NPC default-("..eyer..")")
+			if invisible_debug then
+			--	log("Object-("..section..")name-("..object_all:name()..")range-("..range..")Visibility NPC default-("..eyer..")")
+			end
 		end
 	end
 end
@@ -331,7 +365,9 @@ function look_angle(npc)
 	local actor_pos = db.actor:position()
 	local npc_pos_dir = get_dir_to_obj(npc_pos, actor_pos)
 	local ugl = yaw_degree3d(npc_pos_dir, dir) -- angle of view of the actor
-	--log("angle-("..ugl..")")
+	if invisible_debug then
+	--	log("angle-("..ugl..")")
+	end
 	return ugl
 end
 

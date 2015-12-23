@@ -169,7 +169,8 @@
 	<string id="data_downloaded">
 		<text>Downloaded PDA data:</text>
 	</string>
-	<string id="mil_secret">
+<!-- <string id="mil_secret"> - Duplicated with the 119 line in to the "string_table_tasks_military.xml" file - aleks1970 -->
+	<string id="mil_secret_arhara">
 		<text>Military Secret:</text>
 	</string>
 	<string id="flame_tip1">
@@ -528,7 +529,7 @@
 		<text>Have to go to the Hermit for information, then find the Fiery cave and try to take out the batteries for Jora. Find watches for elders. We need to find both the entrance to the cave and try to get inside.</text>
 	</string>
 	<string id="tex_piligrim_britva">
-		<text>Hence, so ... We need to find a cache for Pilgrim. It is located somewhere behind the old cabins near the right of the trail leading to the caves. Bring him all that is in the backpack. However, there is a problem. The trailhas been made base for snipers, and Pilgrim asked not to make noise and get the job done without unnecessary killings. He does not want punitive responses from the snipers. If you detected... then to the order will have to make more, and seventy thousand. Otherwise, the conversation with the Pilgrim will not happen.</text>
+		<text>Hence, so ... We need to find a cache for Pilgrim. It is located somewhere behind the old cabins near the right of the trail leading to the caves. Bring him all that is in the backpack. However, there is a problem. The trail has been made base for snipers, and Pilgrim asked not to make noise and get the job done without unnecessary killings. He does not want punitive responses from the snipers. If you detected... then to the order will have to make more, and seventy thousand. Otherwise, the conversation with the Pilgrim will not happen.</text>
 	</string>
 	<string id="tex_otsh_pda">
 		<text>Victor-hologram is terminal but can be treated by special medical device, the Ultra-detector. Get one, and preferably two... and bring to Adrenaline. In addition, Adrenaline will give me the information.</text>
@@ -600,7 +601,7 @@
 		<text>We must help the group to capture the headquarters of the Kolmogor punishers in the Village. All the military is to clean up, and there should be only not numerous guards. The headquarters is situated on a hill in the central house. If the capture succeeds, after talks with Kolmogor.</text>
 	</string>
 	<string id="tex_kolm_obsledov">
-		<text>Kolmogor asked to bring pilgrim and explore the village. It is necessary to determine whether remains there punishers. After the reconnaissance, I need to talk to Kolmogor.</text>
+		<text>Kolmogor asked to bring Pilgrim and explore the village. It is necessary to determine whether remains there punishers. After the reconnaissance, I need to talk to Kolmogor.</text>
 	</string>
 	<string id="tex_derevny_zashita">
 		<text>Need help stalkers to repel the attack squad, returning with a stripper on helicopters. After the successful outcome of the bout to talk to Kolmogor.</text>
@@ -627,7 +628,7 @@
 		<text>Mutated Rat Embryo</text>
 	</string>
 	<string id="tushkano_cocoon_description">
-		<text>Cocoon Tushkano. Contains up to five embryos. Growth to the state of adult Tushkana - instant. Activated by impact (throw on the ground). Time after the activation before the appearance of an adult organism within ten to fifteen seconds. Edible, satisfies hunger, a little healing and accelerates wound healing. The recommended distance to the center of activation - no less than seven meters.</text>
+		<text>Tushkano Cocoon. Contains up to five embryos. Growth to the state of adult Tushkana - instant. Activated by impact (throw on the ground). Time after the activation before the appearance of an adult organism within ten to fifteen seconds. Edible, satisfies hunger, a little healing and accelerates wound healing. The recommended distance to the center of activation - no less than seven meters.</text>
 	</string>
 	<string id="gigant_cocoon_item">
 		<text>Pseudogiant Embryo</text>
@@ -904,15 +905,7 @@
 	<string id="tex_neud_pomozch">
 		<text>Fang has found the Astrologer at some other place, and has sent you to an ambush location.\nGet back to Fang as fast as possible, and help him fight off the Astrologer's troops.</text>
 	</string>
-	<string id="det_art_ultra_info">
-		<text>Artifact Detector Series 'ULTRA'. This detector is the latest created by local scientists. Thanks to nanotechnology, the sensitivity of the detector is increased to one hundred meters. The presence of Artifacts displays markers on the map. In addition to their location, the detector detects the types of Artifacts, which makes this unit the best of all the series of detectors to hunt for Artifacts. Activated when in the pistol slot.</text>
-	</string>
-	<string id="det_art_indy_info">
-		<text>A simple Artifact Detector . The device is capable of detecting within a radius of fifty meters to notify the owner about the presence of Artifacts by beeping. Location of the Artifact on the map display can not. Activated when in the pistol slot.</text>
-	</string>
-	<string id="detektor_amorf_info">
-		<text>Detector able to detect items containing particles of an Alien power and display these items on the map within a radius of fifty to sixty meters, also beeps. It is also possible to locate Artifacts. Activated when in the pistol slot.</text>
-	</string>
+	<!-- moved string id: "det_art_ultra_info", "detektor_amorf_info" and "det_art_indy_info" in to the "dmx_mod_items.xml" file -aleks1970 -->
 	<string id="tex_podval_sarkofag">
 		<text>To find accommodation and help Lightning, there is useful information. It is located in a sort of control center, where many corridors.</text>
 	</string>
@@ -1056,9 +1049,6 @@
 	</string>
 	<string id="tex_starsh_say">
 		<text>Will have to raise the morale of stalkers engage in robbery. We need to find the stalkers, the leading surveillance camp of bandits and place them at the right moment to commit robbery at the camp. Probably will not profit as much as, but we need to bring: twenty cans of corned beef, ten first-aid kits, five bottles of vodka, ten packs of rounds, 'Kalash' and two truncated AKMA. Question. But whether all this is in the camp of bandits? Then you have to gather and bring the survivors of stalkers to their guests.</text>
-	</string>
-	<string id="enc_rudiment_big">
-		<text>Mutated vestige of the sternum. Dimensions and weight significantly higher than its predecessor. Properties are unknown. But has no effect on the wearer. Price from merchants significantly higher than that of the original rudiment. Remains, or to sell it, or look for the second part of the recipe. And can it and not at all?</text>
 	</string>
 	<string id="tex_dci_kontrik">
 		<text>It is necessary to pay a visit to this village and to protect the country Controller ... Really do not know how to defend a hostile mutant to you ...</text>

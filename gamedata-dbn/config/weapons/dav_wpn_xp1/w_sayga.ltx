@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_sayga]:identity_immunities
 GroupControlSection				= spawn_group
-discovery_dependency 			= 
+;;discovery_dependency 			= 
 $spawn                  		= "weapons\sayga"		; option for Level Editor
 $npc			 				= on					; option for Level Editor
 $prefetch 		 				= 8
@@ -9,7 +10,7 @@ cform                   		= skeleton
 class                   		= WP_AK74
 min_radius              		= 1
 max_radius              		= 60
-description						= dav_wpn_xp1_saiga12c
+description						= dav_wpn_xp1_saiga12c_descr
 
 ef_main_weapon_type				= 1
 ef_weapon_type					= 7
@@ -35,8 +36,8 @@ launch_speed					= 0
 hand_dependence		 			= 1
 single_handed					= 0
 
-inv_name						= "Sayga 12C EXP 01"
-inv_name_short					= "Sayga 12C EXP 01"
+inv_name						= dav_wpn_xp1_saiga12c
+inv_name_short					= dav_wpn_xp1_saiga12c_s
 inv_weight						= 3.6
 
 inv_grid_width     				= 5
@@ -96,7 +97,7 @@ grenade_vel						= 76
 hit_power                		= 0.8			; size of damage by bullet
 hit_impulse		 				= 25			; size of physic impulse by bullet	
 hit_type 						= fire_wound 	; [] type of the wound
-fire_distance            		= 60			; maximum fire distance that bullet can fly
+fire_distance            		= 8					;;;109974 10:1
 bullet_speed					= 320			; starting bullet speed
 rpm                      		= 400			; max round per minute
 
@@ -105,7 +106,7 @@ time_to_aim						= 1.0
 
 silencer_hit_power       		= 0.72
 silencer_hit_impulse	 		= 25
-silencer_fire_distance   		= 100
+silencer_fire_distance   		= 6					;;;109974 10:1
 silencer_bullet_speed	 		= 260
 
 hud                     		= wpn_sayga_hud
@@ -195,7 +196,7 @@ anim_holster					= holster
 anim_shoot						= shoot
 anim_idle_sprint				= idle_sprint
 
-----------------------
+;----------------------
 ; animation names
 ; attached grenade launcher [GRENADE fire mode]
 anim_idle_g						= idle

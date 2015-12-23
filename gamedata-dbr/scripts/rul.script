@@ -26,7 +26,7 @@ function type_to_name(type)
     elseif  type == "vehicle_niva" then text   = "Military Niva"
     elseif  type == "vehicle_kamaz" then text  = "Kamaz"
     elseif  type == "vehicle_btr" then text    = "APC"
-	elseif  type == "vehicle_dodje" then text  = "Dodge Charger"
+	elseif  type == "vehicle_dodge" then text  = "Dodge Charger"	--corrected "vehicle_dodje" ta an "vehicle_dodge" - aleks1970
 	elseif  type == "vehicle_hammer" then text = "Hummer"
 	else text = "Junker"
     end

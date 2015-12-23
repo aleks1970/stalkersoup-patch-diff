@@ -1,5 +1,5 @@
-;<!-- TB3D 1.0.9.9.8.6  new levels, karina and tweed, dav update 16Apr14, gen to dm, 98977-98995, 98975, 6, organized, 4000-4001 started, 4500
-; form: sid = <object_story_id> that is used in game task descriptions, jupu to tunnels
+;<!-- TB3D 1.0.9.9.9.9  new levels, karina and tweed, dav update 16Apr14, gen to dm, 98977-98995, 98975, 6, organized, 4000-4001 started, 4500, 99300
+; form: sid = <object_story_id> that is used in game task descriptions, jupu to tunnels, 99043
 ; generic_m_story_id = 4294967296 used by engine when not specified in all.spawn
 
 [story_ids]
@@ -171,7 +171,7 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;marsh					;;;;109940
   299           = "mar_level_changer_to_swamp"
   
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Agroprom (300-321)
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Agroprom (300-350)
   300          = "agr_military_documents"
   301          = "agr_gunslinger_collector_entrance"
   302          = "agr_krot"
@@ -187,6 +187,8 @@
   316		   = "agr_collector_entrance6"
   320		   = "agr_factory_location"
   321		   = "agr_nii_location"
+  350		   = "agr_doctor_spot"
+;  350			= "kat_stalker"
   
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;marsh					;;;;109940
   351           = "mar_level_changer_to_zaton"
@@ -220,7 +222,8 @@
   367           = "exit_to_npp2"
   368           = "yantar_old_to_tech"
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Agroprom (391-370)
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Agroprom (370-399)
+  370          = "agr_ratcatcher_new"
   391		   = "agr_exit_to_garbage_01"
   392		   = "agr_exit_to_garbage_02"
   393		   = "agr_attacking_heli"
@@ -230,8 +233,6 @@
   397		   = "agr_controller_e3_growl"
   398		   = "agr_stalker_on_enter"
   399		   = "agr_hanging_lamp"
-  350		   = "agr_doctor_spot"
-  370          = "agr_ratcatcher_new"
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DarkValley (400-499)
   400          = "val_escort_captive"
@@ -519,7 +520,7 @@
   1305			= "sar2_destroyable_monolith"
   1306			= "sar_monolith_find"
   1307			= "mon_stalker"
-
+  
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Warlab (1400 - 1499)
   1400			= "warlab_pointer"
 
@@ -608,7 +609,7 @@
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;new characters 109977
   4000			= "predbannik_barman"			;moved 109977 to resolve conflict
-  4001			= "predbannik_m_trader"			;109977, don't use! model needs fixing
+  4001			= "predbannik_m_trader"			;109998, fixed
   4002			= "kras_trader"					;pogost_militlager_kill_return
   4003			= "dd_trader"					;pogost_militlager_kill
   4004			= "l02_stalker"					;+kras_killer_spawn -dd_svdkill
@@ -834,7 +835,7 @@
   5478		  = "ros_secret_0023"
   5479		  = "ros_secret_0024"
   5480		  = "ros_secret_0025"
-  
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;can be used for treasures, 109999
   5481		  = "atp_inventory_box_1"					;;;;109940
   5482		  = "hr_inventory_box_vdv"					;;;Broken Road
   5483		  = "hr_inventory_box_specnaz"
@@ -1294,6 +1295,12 @@
 
  ;9002        = "exit_to_peshera_from_agroprom"
  
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;treasure locations
+  9060	= "krysyk_inventory_box1"
+  9061	= "krysyk_inventory_box2"
+  9062	= "borov_inventory_box"
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   9100  = "exit_to_escape_100"				;;;;!!!!TB3D  DMX
   9101  = "exit_to_agroprom_101"
   9102  = "exit_to_yantar_102"
@@ -1550,6 +1557,7 @@
    14091        = "radar_to_red_forest"
    14092        = "bkot"
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;treasures
    14050        = "limansk_secret_0000"
    14051        = "limansk_secret_0001"
    14052        = "limansk_secret_0002"
@@ -1595,6 +1603,7 @@
    14082        = "red_forest_secret_0012"
    14083        = "red_forest_secret_0013"
    14084        = "red_forest_secret_0014"
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;;;17000 thru 17004, 17008 thru 17016, 17020 thru 17025, 17040, 17043 are m_teleports
   17000         = "m_teleport_aver_baza_vxod"
@@ -1660,7 +1669,7 @@
   17051         = "spawn_bland_restrictor"
   17052         = "spawn1_bland1_restrictor"
   17053         = "video_finish_dopa_restrictor"
-
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;treasures
   18000		  = "aver_arhara_secret_1"				;;;;!!!!TB3D   DMX
   18001		  = "aver_arhara_secret_2"
   18002		  = "aver_arhara_secret_3"
@@ -1681,16 +1690,19 @@
   18017		  = "atp_arhara_secret_1"
   18018		  = "atp_arhara_secret_2"
   18019		  = "atp_arhara_secret_3"
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   18020		  = "zone_smallrain_s"
   18021		  = "zone_zavesa_s"
   18022		  = "zone_fountain_s"
   18023		  = "zone_sphere_s"
   18024		  = "zone_ogon_s"
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;treasures
   18025		  = "dead_city_secret_1"					;18025 = "zone_monolith_s"
   18026		  = "dead_city_secret_2"
   18027		  = "dead_city_secret_3"
   18028		  = "dead_city_secret_4"
   18029		  = "dead_city_secret_5"  				;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   18100         = "gener_na_boloto"						;;;marsh_heli_dok lc
   18101         = "boloto_na_gener"						;;;marsh_heli_dok lc
   18102         = "generators_heli_zaschita_baza"
@@ -1937,10 +1949,15 @@
   99040		= "redf_to_tunnels"
   99041		= "npp1_to_radar"
   99042		= "radar_to_npp1"
-  
+  99043		= "npp1west_to_npp2west"		;;109998
+ 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;dark_scape
   ;99200		= "dark_forest_to_village"				;;all.spawn id: 3188
   ;99201		= "dark_forest_to_swamp"				;;all.spawn id: 3228
+  
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;new treasures 109999
+  99300			= "lost_village_inventory_box"			;;all.spawn id: 18872
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   
   481516        = "gar_stalker_flame_quest23"
   
@@ -1951,7 +1968,7 @@
   1999903		= "m_teleport_tb3d3"
   1999904		= "m_teleport_tb3d4"
   
-  1999975		= "skip_to_prip"				--109986
+  1999975		= "skip_to_prip"				;;109986
   1999976		= "skip_to_x14"
   1999977		= "skip_to_yan"
   

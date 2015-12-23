@@ -1,10 +1,11 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 
 ; Winchester SuperX3 / Composite / Cantilever deer / 12ga --------------------------------------
 ; --------------------------------------------------------------------------- by Nafigator -----
 
 [wpn_superx3]:identity_immunities
 GroupControlSection			= spawn_group
-discovery_dependency 			= 
+;;discovery_dependency 			= 
 $spawn                   		= "weapons\superX3"		; option for Level Editor
 $npc			 		= on				; option for Level Editor
 $prefetch 		 		= 8
@@ -61,8 +62,8 @@ single_handed				= 1
 slot 				 	= 2
 animation_slot		 		= 9		
 
-inv_name				= "Winchester SX-3"
-inv_name_short				= "Winchester SX-3"
+inv_name				= desc_superx3_dav
+inv_name_short				= desc_superx3_dav_s
 inv_weight				= 3.0
 
 inv_grid_width				= 6
@@ -98,7 +99,7 @@ hit_power        			= 1
 hit_impulse      			= 300
 hit_rate				= 2.0
 hit_type 				= fire_wound
-fire_distance            		= 350
+fire_distance            		= 35					;;;109974 10:1
 bullet_speed				= 350			
 rpm                      		= 180
 ; end ttc ----------------------------------------------------------------
@@ -154,7 +155,7 @@ snd_add_cartridge			= weapons\superx3\insert
 snd_close_weapon			= weapons\superx3\zatvor
  
 ; ----------------------------------------------------------------------------------
-[wpn_superx3_hud]----------------------------------------------------------------------
+[wpn_superx3_hud];----------------------------------------------------------------------
 
 shell_point		 		= 0,0,0
 fire_point				= 0.6,0,0

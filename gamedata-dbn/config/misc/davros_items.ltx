@@ -1,4 +1,4 @@
-;-- TB3D 1.0.9.9.5.1 edits by glowworm,  excluded duplicates sections aleks1970, dav update 16Apr14 -->
+;-- TB3D 1.0.9.9.9.8 edits by glowworm,  excluded duplicates sections aleks1970, dav update 16Apr14, attach_bone_name must exist, adjustments -->
 ;  dAVROs weapons and other items for the Collector CS134 extended                   Rev 1         Aug 2011
 ;==================================================================================================
 
@@ -13,7 +13,7 @@ class				= G_RGD5
 cform				= skeleton
 visual				= dav\grenade\wpn_rgd6.ogf
 inv_name			= electric_grenade
-inv_name_short			= electric_grenade
+inv_name_short			= electric_grenade_s
 inv_weight			= 0.85	;.1
 description			= desc_grenade-rgd6
 
@@ -82,7 +82,7 @@ snd_checkout = weapons\generic_checkout
 
 attach_position_offset	= -0.053,-0.089,0.0
 attach_angle_offset		= 0,0,0
-attach_bone_name		= 
+attach_bone_name		= bip01_r_hand
 
 ;// should be deleted after update
 position_offset			 = 0.0,0.0,0.0
@@ -128,7 +128,7 @@ class				= G_RGD5
 cform				= skeleton
 visual				= dav\grenade\wpn_rgd7.ogf
 inv_name			= thermal_grenade
-inv_name_short			= thermal_grenade
+inv_name_short			= thermal_grenade_s
 inv_weight			= 0.95	;.1
 description			= desc_grenade-rgd7
 
@@ -196,7 +196,7 @@ snd_checkout = weapons\generic_checkout
 
 attach_position_offset	= -0.053,-0.089,0.0
 attach_angle_offset		= 0,0,0
-attach_bone_name		= 
+attach_bone_name		= bip01_r_hand
 
 ;// should be deleted after update
 position_offset			 = 0.0,0.0,0.0
@@ -242,7 +242,7 @@ class				= G_RGD5
 cform				= skeleton
 visual				= dav\grenade\wpn_rgd8.ogf
 inv_name			= gravic_grenade
-inv_name_short			= gravic_grenade
+inv_name_short			= gravic_grenade_s
 inv_weight			= 0.35	;.1
 description			= desc_grenade-rgd8
 
@@ -310,7 +310,7 @@ snd_checkout = weapons\generic_checkout
 
 attach_position_offset	= -0.053,-0.089,0.0
 attach_angle_offset		= 0,0,0
-;attach_bone_name		= 
+attach_bone_name		= bip01_r_hand
 
 ;// should be deleted after update
 position_offset			 = 0.0,0.0,0.0
@@ -356,7 +356,7 @@ class				= G_RGD5
 cform				= skeleton
 visual				= dav\grenade\wpn_rgd9.ogf
 inv_name			= mini_nuke
-inv_name_short			= mini_nuke
+inv_name_short			= mini_nuke_s
 inv_weight			= 3.2	;.1
 description			= desc_grenade-rgd9
 
@@ -424,7 +424,7 @@ snd_checkout = weapons\generic_checkout
 
 attach_position_offset	= -0.053,-0.089,0.0
 attach_angle_offset		= 0,0,0
-;attach_bone_name		= 
+attach_bone_name		= bip01_r_hand
 
 ;// should be deleted after update
 position_offset			 = 0.0,0.0,0.0
@@ -470,7 +470,7 @@ class				= G_RGD5
 cform				= skeleton
 visual				= dav\grenade\wpn_rgd10.ogf
 inv_name			= quantum_grenade
-inv_name_short			= quantum_grenade
+inv_name_short			= quantum_grenade_s
 inv_weight			= 0.75	;.1
 description			= desc_grenade-rgd10
 
@@ -538,7 +538,7 @@ snd_checkout = weapons\generic_checkout
 
 attach_position_offset	= -0.053,-0.089,0.0
 attach_angle_offset		= 0,0,0
-;attach_bone_name		= 
+attach_bone_name		= bip01_r_hand
 
 ;// should be deleted after update
 position_offset			 = 0.0,0.0,0.0
@@ -584,7 +584,7 @@ class				= G_RGD5
 cform				= skeleton
 visual				= dav\grenade\wpn_rgd11.ogf
 inv_name			= time_delay_grenade
-inv_name_short			= time_delay_grenade
+inv_name_short			= time_delay_grenade_s
 inv_weight			= 0.35	;.1
 description			= desc_grenade-rgd11
 
@@ -653,7 +653,7 @@ snd_checkout = weapons\generic_checkout
 
 attach_position_offset	= -0.053,-0.089,0.0
 attach_angle_offset		= 0,0,0
-;attach_bone_name		= 
+attach_bone_name		= bip01_r_hand
 
 ;// should be deleted after update
 position_offset			 = 0.0,0.0,0.0
@@ -699,7 +699,7 @@ class				= G_RGD5
 cform				= skeleton
 visual				= dav\grenade\wpn_rgd12.ogf
 inv_name			= enhanced_grenade
-inv_name_short			= enhanced_grenade
+inv_name_short			= enhanced_grenade_s
 inv_weight			= 0.65	;.1
 description			= desc_grenade-rgd12
 
@@ -767,7 +767,7 @@ snd_checkout = weapons\generic_checkout
 
 attach_position_offset	= -0.053,-0.089,0.0
 attach_angle_offset		= 0,0,0
-;attach_bone_name		= 
+attach_bone_name		= bip01_r_hand
 
 ;// should be deleted after update
 position_offset			 = 0.0,0.0,0.0
@@ -821,7 +821,6 @@ cform                   = skeleton
 class                   = WP_AK74
 min_radius              = 0
 max_radius              = 50
-description				= desc_oicw_cs
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -848,8 +847,9 @@ launch_speed = 0
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name				= XM-29 OICW
-inv_name_short			= XM-29 OICW
+description				= enc_wpn_xm_29_oicw_dav_descr
+inv_name				= wpn_xm_29_oicw_dav
+inv_name_short			= wpn_xm_29_oicw_dav_s
 inv_weight			= 6.8
 
 inv_grid_width     = 5
@@ -1086,7 +1086,6 @@ cform               	= skeleton
 class               	= WP_LR300
 min_radius          	= 1			
 max_radius          	= 100
-description				= desc_bizon_cs
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -1096,7 +1095,7 @@ holder_range_modifier	= 1.0		       ; eye_range
 holder_fov_modifier		= 0.7              ; eye_fov
 ;-----------------------------------------------------------------------------------
 
-cost					= 4000
+cost					= 14000
 weapon_class			= assault_rifle		
 	
 ammo_limit				= 210
@@ -1105,7 +1104,7 @@ ammo_elapsed			= 64
 ammo_mag_size			= 64	
 fire_modes				= 1, 3, -1
 
-ammo_class				= ammo_9x18_fmj, ammo_9x18_pmm
+ammo_class				= ammo_9x19_fmj, ammo_9x19_pbp, ammo_9x19_super
 
 hand_dependence			= 1
 single_handed			= 0
@@ -1113,14 +1112,15 @@ single_handed			= 0
 slot 					= 1
 animation_slot			= 2  ;8
 
-inv_name	        	= wpn-bizon
-inv_name_short			= wpn-bizon
+description				= enc_wpn_wpn_bizon_dav_descr
+inv_name	        	= wpn_wpn_bizon_dav
+inv_name_short			= wpn_wpn_bizon_dav_s
 inv_weight			= 2.1
 
 inv_grid_width			= 5
 inv_grid_height			= 2
-inv_grid_x				= 52
-inv_grid_y				= 50
+inv_grid_x				= 60
+inv_grid_y				= 4
 
 kill_msg_x	= 0
 kill_msg_y	= 28
@@ -1166,7 +1166,7 @@ hit_power                	=  0.66
 hit_impulse		 			= 54
 hit_type 					= fire_wound
 hit_rate	        = 1.85
-fire_distance            	= 120
+fire_distance            	= 420
 bullet_speed				= 480
 rpm                      	= 680
 
@@ -1176,7 +1176,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.63
 silencer_hit_impulse	 	= 120
-silencer_fire_distance   	= 100
+silencer_fire_distance   	= 200
 silencer_bullet_speed	 	= 450
 
 hud                      	= wpn_bizon_cs_hud
@@ -1201,16 +1201,16 @@ ph_mass						= 5
 
 ;addons
 scope_status				= 2
-silencer_status				= 2
+silencer_status				= 1
 grenade_launcher_status		= 0
 
 zoom_enabled				= true						; (on,off)zoom mode (right mouse button)
 scope_zoom_factor	    	= 50						; fov for zoom mode
 
-scope_name 					= wpn_tulip_scope			; section name for the attachable scope
-scope_x 					= 79						; offset in inventory icon
-scope_y 					= 10
-silencer_name  				= wpn_addon_silencer		; section name for the attachable silencer
+scope_name 					= wpn_tulip_cs_scope			; section name for the attachable scope
+scope_x 					= 132						; offset in inventory icon
+scope_y 					= -5
+silencer_name  				= wpn_addon_sil_9_p		; section name for the attachable silencer
 silencer_x 					= 205						; offset in inventory icon
 silencer_y 					= 16					
 
@@ -1223,7 +1223,7 @@ snd_empty					= weapons\gen_empty, 0.5
 snd_reload					= weapons-new\bizon\reload, 0.4
 snd_silncer_shot			      	= weapons-new\bizon\bizon_sil_shot
 
-;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_flame_particles 	= weapons\generic_weapon01	;aleks1970
 silencer_smoke_particles 	= weapons\generic_shoot_00
 
 silencer_light_color		= 0.6,0.5,0.3
@@ -1251,13 +1251,13 @@ position                	= 0.1,-0.04,-0.01
 
 visual                  	= dav\bizon\wpn_bizon_cs_hud.ogf
 
- anim_idle           = idle
- anim_idle_aim       = idle_aim
- anim_reload         = reload
- anim_draw           = draw
- anim_holster        = holster
- anim_shoot          = shoot
- anim_idle_sprint    = idle_sprint
+anim_idle           = idle
+anim_idle_aim       = idle_aim
+anim_reload         = reload
+anim_draw           = draw
+anim_holster        = holster
+anim_shoot          = shoot
+anim_idle_sprint    = idle_sprint
 
 
 zoom_offset			= -0.10,0.023,-0.1
@@ -1273,7 +1273,7 @@ condition_shot_dec 					= 0.0000007
 ;----------------------------------------------------------------------------
 ;----------------------------------------------------------------------------
 
-[wpn_bizon_cs_kol]:wpn_bizon
+[wpn_bizon_cs_kol]:wpn_bizon_cs	;;;;wpn_bizon ;109998, aleks1970
 
 ammo_mag_size				= 60
 ammo_class					= ammo_9x19_fmj, ammo_9x19_pbp, ammo_9x19_super
@@ -1283,22 +1283,23 @@ inv_grid_height				= 2
 inv_grid_x					= 60
 inv_grid_y					= 4
 
-inv_name	        		= "Caesiers Bizon"
-inv_name_short				= "Caesiers Bizon"
+inv_name	        		= wpn_wpn_bizon_kol_dav
+inv_name_short				= wpn_wpn_bizon_kol_dav_s
 inv_weight					= 2.78 
-description					= desc_bizon_cs_kol
+description					= enc_wpn_wpn_bizon_kol_dav_descr
 
 fire_modes					= 1, 3, 5
 
+cost						= 18500			;109998
 hit_power                	=  2	;0.65
 hit_impulse					= 80	;50	
-fire_distance            	 = 20	;120
-bullet_speed				 = 80	;480
+fire_distance            	 = 200	;120
+bullet_speed				 = 380	;480
 rpm                      	= 1500	;750
 hud                      	= wpn_bizon_cs_kol_hud
 visual                  	= dav\bizon\wpn_bizon_cs_kol.ogf
 
-scope_status				= 0
+;scope_status				= 0	;109998, aleks1970
 silencer_status				= 1
 
 snd_shoot					=weapons\bizon\bizon_shot_sil
@@ -1323,7 +1324,7 @@ GroupControlSection			= spawn_group
 $spawn						= "weapons\addons\scope" ; option for Level Editor
 class						= WP_SCOPE
 cform           			= skeleton
-visual          			= dav\upgrades\wpn_scope2.ogf		;aleks1970
+visual          			= dav\upgrades\upg_1p29.ogf		;aleks1970
 $prefetch 					= 32
 description					= desc_tulip_cs_scope
 cost						= 200
@@ -1331,14 +1332,14 @@ cost						= 200
 holder_range_modifier		= 1.2
 holder_fov_modifier			= 0.3
 
-inv_name					= "Tulip_Scope"
-inv_name_short				= "Tulip_Scope"
+inv_name					= tulip_cs_scope
+inv_name_short				= tulip_cs_scope_s
 inv_weight					= .8
 
 inv_grid_width				= 1
 inv_grid_height				= 1
-inv_grid_x					= 51
-inv_grid_y					= 49
+inv_grid_x					= 54
+inv_grid_y					= 29
 scope_texture				= wpn\wpn_crosshair_1p21
 scope_zoom_factor			= 20		
 
@@ -1358,7 +1359,6 @@ cform                    	= skeleton
 class                    	= WP_AK74
 min_radius               	= 0
 max_radius               	= 50
-description					= desc_sbr_cs
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -1384,8 +1384,9 @@ launch_speed = 0
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name			= SBR
-inv_name_short			= SBR
+description			= desc_dav_sbr_cs_descr
+inv_name			= dav_sbr_cs
+inv_name_short			= dav_sbr_cs_s
 inv_weight			= 2.7
 
 inv_grid_width			= 5
@@ -1592,7 +1593,6 @@ cform 						= skeleton
 class 						= WP_BINOC
 min_radius 					= 5
 max_radius 					= 200
-description					= desc_vihlop_cs
 ef_main_weapon_type			= 3
 ef_weapon_type				= 8
 
@@ -1616,8 +1616,9 @@ single_handed				= 0
 slot 						= 2			; secondary
 animation_slot				= 2			; type of the animation that will be used
 
-inv_name					= "VSSK Vychlop_cs"
-inv_name_short				= "VSSK Vychlop_cs"
+description					= desc_vihlop_cs
+inv_name					= vihlop_cs
+inv_name_short				= vihlop_cs_s
 inv_weight					= 7
 
 inv_grid_width     			= 6
@@ -1672,7 +1673,7 @@ hit_impulse		 			= 110
 hit_type 					= fire_wound
 hit_rate					= 2.0
 
-fire_distance           	= 800
+fire_distance           	= 1000
 bullet_speed		 		= 1500
 rpm                     	= 1200
 ; end ttc
@@ -1730,7 +1731,7 @@ silencer_smoke_particles 	= weapons\generic_shoot_00
 
 silencer_hit_power 			=  1.6
 silencer_hit_impulse	 	= 90
-silencer_fire_distance 		= 640
+silencer_fire_distance 		= 840
 silencer_bullet_speed	 	= 1150
 
 silencer_light_color		= 0.6, 0.5, 0.3
@@ -1798,7 +1799,7 @@ repair_compatibility = vihlop
 ;--dAVROs laser-----------------------------------------------------------------
 
 
-;NOT USED ---- yet
+;NOT USED ---- yet, displays beam aiming north only, 109982
 [wpn_laser]:wpn_ognemet			
 
 ammo_limit					= 50000
@@ -1807,13 +1808,14 @@ ammo_mag_size				= 50000
 
 ammo_class					= ammo_laser
 
-inv_name					= wpn_laser
-inv_name_short				= wpn_laser
+description					= enc_wpn_laser_dav_descr
+inv_name					= wpn_laser_dav
+inv_name_short				= wpn_laser_dav_s
 
 inv_grid_width				= 5
 inv_grid_height				= 2
-inv_grid_x					= 40
-inv_grid_y					= 50
+inv_grid_x					= 15	;40 - aleks1970
+inv_grid_y					= 57	;50
 
 hit_power               	= 250
 hit_impulse					= 240
@@ -1860,7 +1862,7 @@ light_color					= 0.6,0.5,0.3
 light_range					= 1	;5					
 light_var_color				= 0.05						
 light_var_range				= 0.5
-light_time 					= 0.1	
+light_time 					= 0.01	
 
 hud                     	= wpn_laser_hud
 visual                  	= dav\gauss\wpn_laser.ogf
@@ -1886,7 +1888,7 @@ anim_shoot					= shoot
 
 
 [ammo_laser]:ammo_9x18_pmm
-inv_weight					= .0.001
+inv_weight					= 0.001
 
 hit_type 					= burn
 
@@ -1925,7 +1927,6 @@ cform                   	= skeleton
 class                   	= WP_LR300
 min_radius              	= 1
 max_radius              	= 40
-description					= desc_aa12_cs
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -1951,9 +1952,10 @@ launch_speed			= 0
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name			= AA-12
-inv_name_short			= AA-12
-inv_weight			= 5.2
+description				= desc_aa12_cs_descr
+inv_name				= desc_aa12_cs
+inv_name_short			= desc_aa12_cs_s
+inv_weight				= 5.2
 
 inv_grid_width     		= 5
 inv_grid_height    		= 2
@@ -2121,9 +2123,9 @@ class                    	= WP_LR300
 min_radius               	= 0
 max_radius               	= 100
 
-inv_name 					= "Colt_M4"
-inv_name_short 				= "Colt_M4"
-description 				= desc_colt_m4_cs 
+inv_name 					= colt_m4_cs
+inv_name_short 				= colt_m4_cs_s
+description 				= desc_colt_m4_cs_descr 
 
 upg = nil
 upg_last = nil
@@ -2150,8 +2152,8 @@ animation_slot			 	= 8
 
 inv_grid_width				= 5
 inv_grid_height				= 2
-inv_grid_x					= 26
-inv_grid_y					= 61
+inv_grid_x					= 52
+inv_grid_y					= 17
 
 kill_msg_x					= 0
 kill_msg_y					= 28
@@ -2335,8 +2337,8 @@ quest_item			= false
 
 description			= desc_htd_rft
 
-inv_name			= "Caesiers Red Forest Teleport"
-inv_name_short			= "Caesiers Red Forest Teleport"
+inv_name			= htd_rft
+inv_name_short			= htd_rft_s
 inv_weight			= 0.05
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -2366,8 +2368,8 @@ quest_item			= false
 
 description			= desc_htd_npp
 
-inv_name			= "Caesiers NPP Teleport"
-inv_name_short			= "Caesiers NPP Teleport"
+inv_name			= htd_npp
+inv_name_short			= htd_npp_s
 inv_weight			= 0.05
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -2397,8 +2399,8 @@ quest_item			= false
 
 description			= desc_htd_lmk
 
-inv_name			= "Caesiers Limansk Teleport"
-inv_name_short			= "Caesiers Limansk Teleport"
+inv_name			= htd_lmk
+inv_name_short			= htd_lmk_s
 inv_weight			= 0.05
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -2427,10 +2429,10 @@ visual				= dav\equipments\item_htd_lmk.ogf
 radius				= 1
 quest_item			= false
 
-description			= "Caesiers special UP teleporter"
+description			= desc_htd_z_lmk
 
-inv_name			= "Caesiers Z Teleport"
-inv_name_short			= "Caesiers Z Teleport"
+inv_name			= htd_lmk_z
+inv_name_short			= htd_lmk_z_s
 inv_weight			= 0.05
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -2467,10 +2469,9 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= desc_cspics1
-
-inv_name			= "Caesiers photos"
-inv_name_short			= "Caesiers photos"
+description			= desc_cs_pics1_descr
+inv_name			= doc_cs_pics1
+inv_name_short			= doc_cs_pics1_s
 inv_weight			= 0.01
 inv_grid_width		     	= 2
 inv_grid_height			= 1
@@ -2488,14 +2489,14 @@ $spawn      			= "devices\quest_items\yan_x16_documents" ; option for Level Edit
 class     			= AMMO
 cform                   	= skeleton
 visual                  	= dav\equipments\item_davdocx.ogf
-description       		= desc_cs_docx
+description       		= desc_cs_docx_descr
 $prefetch     			= 64
 
 radius=1
 cost           			= 100
 
-inv_name    			= X_marks_the_spot
-inv_name_short   		= X_marks_the_spot
+inv_name    			= doc_cs_docx
+inv_name_short   		= doc_cs_docx_s
 inv_weight    			= 1
 
 inv_grid_width    		= 2
@@ -2535,7 +2536,6 @@ cform                    	= skeleton
 class                    	= WP_BM16
 min_radius               	= 0
 max_radius               	= 50
-description			= desc_bm16_flare
 
 ef_main_weapon_type		= 1
 ef_weapon_type			= 7
@@ -2574,14 +2574,14 @@ single_handed				= 0
 slot 						= 2		; // secondary
 animation_slot				= 3 ;2 ;3		; type of the animation that will be used
 
+description					= desc_dav_bm16_flare_descr
+inv_name					= desc_dav_bm16_flare
+inv_name_short				= desc_dav_bm16_flare_s
 
-inv_name					= flare-shot gun
-inv_name_short				= flare-shot gun
-
-inv_grid_width				= 4
-inv_grid_height				= 2
-inv_grid_x					= 9
-inv_grid_y					= 27
+inv_grid_width				= 3
+inv_grid_height				= 1
+inv_grid_x					= 65
+inv_grid_y					= 24
  
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2592,21 +2592,21 @@ $spawn			= "weapons\ammo\ammo_12x76_dart" ; option for Level Editor
 class			= AMMO
 cform                   = skeleton
 visual                  = weapons\ammo\ammo_12x76_dart.ogf
-description		= desc_ammo-12x70-flare
+description		= desc_ammo-12x70-flare_descr
 $prefetch 		= 64
 
 cost			= 150
 
 box_size		= 10
 
-inv_name		= flare-rounds
-inv_name_short		= flare-rounds
+inv_name		= desc_ammo-12x70-flare
+inv_name_short		= desc_ammo-12x70-flare_s
 inv_weight		= .50
 
 inv_grid_width		= 2
 inv_grid_height		= 1
-inv_grid_x		= 10
-inv_grid_y		= 25
+inv_grid_x		= 65
+inv_grid_y		= 11
 
 k_dist			= 2.5
 k_disp			= 0.2
@@ -2631,7 +2631,7 @@ cost			= 2660
 
 box_size		= 6
 inv_name		= ammo_20x85a	;;"20x85HE" 
-inv_name_short		= ammo_20x85a	;;"20x85HE" 
+inv_name_short	= ammo_20x85a_s	;;"20x85HE" 
 inv_weight		= 0.9
 
 inv_grid_width     	= 2
@@ -2707,10 +2707,10 @@ snd_explode = weapons\explo\grenade_m406_boom
 ;------------------------------------------------------------------------------------------
 ;свойства которые читаются, но не используются
 inv_name		= ammo_20x85a	;;"20x85HE "
-inv_name_short	= ammo_20x85a	;;"20x85HE "
+inv_name_short	= ammo_20x85a_s	;;"20x85HE "
 inv_weight		= 0.2
-inv_grid_x			= 5
-inv_grid_y			= 13
+inv_grid_x			= 65
+inv_grid_y			= 7
 
 kill_msg_x			= 61
 kill_msg_y			= 232
@@ -2720,6 +2720,7 @@ kill_msg_height		= 22
 trail_light_color 	= 0.6,0.5,0.3
 trail_light_range 	= 8.0
 force_explode_time  = 10000
+inv_grid_width = 2
 
 
 ;=================================================================================================
@@ -2740,7 +2741,7 @@ cost			= 550
 box_size		= 10
 
 inv_name		= ammo-16x70-xrep1	;;"XREP stun shells"
-inv_name_short		= ammo-16x70-xrep1	;;"XREP stun shells"
+inv_name_short		= ammo-16x70-xrep1_s	;;"XREP stun shells"
 inv_weight		= .58
 
 inv_grid_width		= 2
@@ -2779,7 +2780,7 @@ cost			= 750
 box_size		= 10
 
 inv_name		= ammo-16x70-xrep2	;;"XREP kill shells"
-inv_name_short		= ammo-16x70-xrep2	;;"XREP kill shells"
+inv_name_short		= ammo-16x70-xrep2_s	;;"XREP kill shells"
 inv_weight		= .67
 
 inv_grid_width		= 2
@@ -2819,7 +2820,7 @@ cost			= 2760
 box_size		= 10
 
 inv_name		= ammo-16x70-xrep3	;;"XREP revive shells"
-inv_name_short		= ammo-16x70-xrep3	;;"XREP revive shells"
+inv_name_short		= ammo-16x70-xrep3_s	;;"XREP revive shells"
 inv_weight		= .74
 
 inv_grid_width		= 2
@@ -2850,7 +2851,7 @@ $spawn					= "weapons\ammo\ammo_9x19_fmj" ; option for Level Editor
 class					= AMMO
 cform                   = skeleton
 visual                  = dav\Ammo\ammo_9x19_super.ogf
-description				= desc_ammo-9x19-super
+description				= desc_ammo-9x19-super_descr
 $prefetch 				= 64
 
 cost					= 1550
@@ -2858,7 +2859,7 @@ cost					= 1550
 box_size				= 50
 
 inv_name				= ammo-9x19-super
-inv_name_short			= ammo-9x19-super
+inv_name_short			= ammo-9x19-super_s
 inv_weight				= .72
 
 inv_grid_width			= 2
@@ -2888,13 +2889,13 @@ cform                    	= skeleton
 $prefetch 		      		= 64
 $spawn			      		= "weapons\ammo\ammo_12.7x108" 
 visual                   	= dav\Ammo\ammo_sts130vps.ogf
-description		      		= desc_ammo-STs-130vps
+description		      		= desc_ammo-STs-130vps_descr
 
 cost			           	= 3800
 box_size		           	= 20
 
-inv_name		      		= STs-130vps
-inv_name_short   	  		= STs-130vps
+inv_name		      		= desc_ammo-STs-130vps
+inv_name_short   	  		= desc_ammo-STs-130vps_s
 inv_weight		     		= 0.97
 
 inv_grid_width	      		= 2
@@ -2917,16 +2918,16 @@ buck_shot		      		= 1
 
 [ammo_railgun]:ammo_gauss
 visual                  = dav_wpn_xp1\ammo\railgun_battery.ogf
-description				= desc_ammo_railgun
+description				= desc_ammo_railgun_descr
 cost					= 81500
 box_size				= 20
 
-inv_name				= Railgun_Battery
-inv_name_short			= Railgun_Battery
+inv_name				= ammo_railgun
+inv_name_short			= ammo_railgun_s
 inv_weight				= 3.75
 
-inv_grid_x				= 54
-inv_grid_y				= 29
+inv_grid_x				= 58
+inv_grid_y				= 12
 
 k_dist					= 1
 k_disp					= 1
@@ -2949,9 +2950,9 @@ tracer_color_ID			= 5
 
 ;;===========================================================
 [af_shield_health]:af_buliz
-description			= enc_zone_artifact_af-shield-health
-inv_name			= af-shield-health
-inv_name_short		= af-shield-health
+description			= enc_zone_artifact_af_shield_health
+inv_name			= af_shield_health
+inv_name_short		= af_shield_health_s
 inv_grid_x			= 60
 inv_grid_y			= 2
 cost				= 5000
@@ -2963,9 +2964,9 @@ bleeding_restore_speed = 0.003
 ;;===========================================================
 
 [af_shield_electric]:af_buliz
-description			= enc_zone_artifact_af-shield-electric
-inv_name			= af-shield-electric
-inv_name_short		= af-shield-electric
+description			= enc_zone_artifact_af_shield_electric
+inv_name			= af_shield_electric
+inv_name_short		= af_shield_electric_s
 inv_grid_x			= 61
 inv_grid_y			= 2
 cost				= 5000
@@ -2979,9 +2980,9 @@ shock_immunity			= 0.1
 ;;===========================================================
 
 [af_shield_radiation]:af_buliz
-description			= enc_zone_artifact_af-shield-radiation
-inv_name			= af-shield-radiation
-inv_name_short		= af-shield-radiation
+description			= enc_zone_artifact_af_shield_radiation
+inv_name			= af_shield_radiation
+inv_name_short		= af_shield_radiation_s
 inv_grid_x			= 63
 inv_grid_y			= 2
 cost				= 5000
@@ -2992,9 +2993,9 @@ radiation_restore_speed = -0.0095
 ;;===========================================================
 
 [af_shield_heat]:af_buliz
-description			= enc_zone_artifact_af-shield-heat
-inv_name			= af-shield-heat
-inv_name_short		= af-shield-heat
+description			= enc_zone_artifact_af_shield_heat
+inv_name			= af_shield_heat
+inv_name_short		= af_shield_heat_s
 inv_grid_x			= 62
 inv_grid_y			= 2
 cost				= 5000
@@ -3008,9 +3009,9 @@ burn_immunity			= 0.009
 ;;===========================================================
 
 [af_shield_endurance]:af_buliz
-description			= enc_zone_artifact_af-shield-endurance
-inv_name			= af-shield-endurance
-inv_name_short		= af-shield-endurance
+description			= enc_zone_artifact_af_shield_endurance
+inv_name			= af_shield_endurance
+inv_name_short		= af_shield_endurance_s
 inv_grid_x			= 64
 inv_grid_y			= 2
 cost				= 5000
@@ -3021,9 +3022,9 @@ power_restore_speed = 0.026
 ;;===========================================================
 
 [af_shield_armor]:af_buliz
-description			= enc_zone_artifact_af-shield-armor
-inv_name			= af-shield-armor
-inv_name_short		= af-shield-armor
+description			= enc_zone_artifact_af_shield_armor
+inv_name			= af_shield_armor
+inv_name_short		= af_shield_armor_s
 inv_grid_x			= 65
 inv_grid_y			= 2
 cost				= 5000
@@ -3108,7 +3109,7 @@ explosion_immunity		= 0.0001
 fire_wound_immunity		= 0.0001
 
 
-
+;;missing ogf, 109982
 [dav_laser_psu]:bomba_big
 visual 					= dav\laser\war_laser.ogf 						;dav\equipments\item_anomaly_generator 
 can_take				= false
@@ -3121,7 +3122,7 @@ inv_name_short			= ""
 ;;      dAVROs turrets
 
 
-
+;;crashes with: particle error, 109982
 [ldk_laser1]:turret_mgun
 visual							= dav\laser\ldk_laser_turret.ogf
 ammo_class						= ammo_laser

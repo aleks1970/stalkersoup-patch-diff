@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="windows-1251"?>
-<!-- TB3D 1.0.9.9.9.8 minor edits 700 - end of file, hand_radio, attachable_item, Astrologer, The Doctor, gold bars, fosfor_r,g,b,y, Bomb Casing, item_arhara_instruk, item_flyga_s, removed includes -->
+<!-- TB3D 1.0.9.9.9.9 minor edits 700 - end of file, hand_radio, attachable_item, Astrologer, The Doctor, gold bars, fosfor_r,g,b,y, Bomb Casing, item_arhara_instruk, item_flyga_s, removed includes, Fang -->
 <string_table>
 
 <!-- excluded section-1 
@@ -294,9 +294,7 @@
 	<string id="st_detector_descr3">
 		<text>Anomaly Detector invented by scientists in the Zone. Defines not only presence of abnormal fields and indignations, but also shows on a map their arrangement, informs on them a sound signal. For work it is necessary to activate, having placed the device on a belt.</text>
 	</string>
-	<string id="bolt_descr">
-		<text>Bolt 32x100. Stalker's best friend.</text>
-	</string>
+	<!-- moved string id: "bolt_descr" in to the "dmx_mod_items.xml" file - aleks1970 -->
 	<string id="item_disket">
 		<text>Computer Disk</text>
 	</string>
@@ -856,22 +854,22 @@
 		<text>A tattered, and worn children's doll ... I wonder who this belonged to ... poor kid...</text>
 	</string>
 	<string id="item_kluk_karta">
-		<text>'Canine's Map</text>
+		<text>Fang's Map</text>
 	</string>
 	<string id="item_kluk_karta_s">
-		<text>'Canine's Map</text>
+		<text>Fang's Map</text>
 	</string>
 	<string id="enc_item_kluk_karta_descr">
-		<text>An Old, torn, shabby map from the second World War. It is said that it once belonged to a STALKER known as 'Canine'...</text>
+		<text>An Old, torn, shabby map from the second World War. It is said that it once belonged to a STALKER known as 'Fang'...</text>
 	</string>
 	<string id="item_kluk_karta_kopiy">
-		<text>Copy of Canin's Map</text>
+		<text>Copy of Fang's Map</text>
 	</string>
 	<string id="item_kluk_karta_kopiy_s">
-		<text>Copy of Canin's Map</text>
+		<text>Copy of Fang's Map</text>
 	</string>
 	<string id="enc_item_kluk_karta_kopiy_descr">
-		<text>A copy of Canine's map, only without transition markers. It is a very well made copy ... obviously the work of an expert Cartographer.</text>
+		<text>A copy of Fang's map, only without transition markers. It is a very well made copy ... obviously the work of an expert Cartographer.</text>
 	</string>
 	<string id="item_naem_bloknot">
 		<text>Mercenary's Notebook</text>
@@ -1024,244 +1022,11 @@
 	<string id="enc_equipment_amanita_mushroom">
 		<text>The Amanita Mushroom is slightly radioactive. Edible after prolonged boiling, lightly fonit. Often used by local drug addicts, for the manufacture of potent tranquilizers and pain medication. It grows mostly in marshland.</text>
 	</string>
-	<!-- Duplicated section!!! - game will use text from "dmx_mod_items.xml" file instead -aleks1970 -->
-	<!-- excluded section-2 
-	<string id="cigara">
-		<text>Cuba Cigar</text>
-	</string>
-	<string id="enc_cigara">
-		<text>This Cuban cigar. In the Zone gets smuggled. According to this, local merchants to sell cigars can be bought and they can not be the same. Tobacco natural, strength and flavor excellent. Complementing the picture beautiful form of cigars, which makes smoking a real pleasure when you consider that we are in the Zone.</text>
-	</string>
-	<string id="sandwich">
-		<text>Sandwich</text>
-	</string>
-	<string id="enc_sandwich">
-		<text>The most common sausage sandwich. Prepared in advance, so that you can eat on the go, without a knife uncovered and not digging in his backpack in search of food ingredients.</text>
-	</string>
-	<string id="beer_a">
-		<text>Beer</text>
-	</string>
-	<string id="enc_beer_a">
-		<text>Beer of local production. Composition of the course has been written. A good way to get drunk to the blue tomato.</text>
-	</string>
-	<string id="flaska">
-		<text>Flask</text>
-	</string>
-	<string id="enc_flaska">
-		<text>Flask, filled to the edge of water from a pure spring. Cleaner water in these places do not find.</text>
-	</string>
-	<string id="sweetness">
-		<text>Bar of chocolate</text>
-	</string>
-	<string id="enc_sweetness">
-		<text>A delicious chocolate bar. Soybeans in excess, the presence of natural cocoa is doubtful. Well satisfies hunger and positive effect on brain activity.</text>
-	</string>
-	<string id="box_cigara">
-		<text>Cigar Box</text>
-	</string>
-	<string id="enc_box_cigara">
-		<text>A box with Cuban cigars. Very expensive thing.</text>
-	</string>
-	<string id="balalaika_a">
-		<text>Balalaika</text>
-	</string>
-	<string id="enc_balalaika_a">
-		<text>Normal balalaika. A wonderful Russian folk instrument. In the Zone, too, lacks the masters of playing.</text>
-	</string>
-	<string id="det_artefact_indy">
-		<text>Detector artifacts</text>
-	</string>
-	<string id="det_art_indy_info">
-		<text>This is the first detector artifacts, designed by local craftsmen. The device is ineffective because it does not reach over and 40 meters, and the presence of an artifact is recognized only an audible signal. But in its time, with the help of this device has been found so many artifacts.</text>
-	</string>
-	<string id="det_artefact_super">
-		<text>Improved detection of artifacts</text>
-	</string>
-	<string id="det_art_ultra_info">
-		<text>This is an improved version of the detector artifacts, past upgrades among scientists. Added map of the area with the output label on it. Range increased to 70 meters. In connection with the reasonable price and improved performance, its use is considered preferable.</text>
-	</string>
-	<string id="detektor_amorf">
-		<text>The detector is isomorphic</text>
-	</string>
-	<string id="detector_elite_john">
-		<text>Detector Holograms</text>
-	</string>
-	 excluded section-2 -->
-	<!-- Mayor Documents -->
-	<!-- excluded section-3
-	<string id="doc_garbage">
-		<text>Old paper from the landfill</text>
-	</string>
-	<string id="enc_doc_garbage">
-		<text>Documents found in the Garbage. Formula, write a foreign language. By type - ravings of a madman...</text>
-	</string>
-	<string id="doc_agro">
-		<text>Old paper with agricultural industry</text>
-	</string>
-	<string id="enc_doc_agro">
-		<text>A stack of documents found in the catacombs of agricultural industry. Formula, write a foreign language. By type - not very much like the previous...</text>
-	</string>
-	<string id="doc_x18_1">
-		<text>The old document. Part I</text>
-	</string>
-	<string id="enc_doc_x18_1">
-		<text>Documents found in Dark Valley. By all appearances this is the first part.</text>
-	</string>
-	<string id="doc_x18_2">
-		<text>The old document. Part II</text>
-	</string>
-	<string id="enc_doc_x18_2">
-		<text>The second part doumentov found in the laboratory X-18.</text>
-	</string>
-	<string id="doc_x18_3">
-		<text>The old document. Part III</text>
-	</string>
-	<string id="enc_doc_x18_3">
-		<text>The third part doumentov found in the laboratory X-18.</text>
-	</string>
-	<string id="doc_x18_4">
-		<text>The old document. Part IV</text>
-	</string>
-	<string id="enc_doc_x18_4">
-		<text>Last quarter of doumentov found in the laboratory X-18.</text>
-	</string>
-	<string id="doc_x16">
-		<text>Old document from the X-16</text>
-	</string>
-	<string id="enc_doc_x16">
-		<text>Documents found in the laboratory X-16. Formula, write a foreign language. Apparently this is the last part of the documents found.</text>
-	</string>
-	<string id="pda_info">
-		<text>Broken PDA</text>
-	</string>
-	<string id="enc_pda_info">
-		<text>A typical PDA, which many in the Zone. Besides - a non-working and bruised. It is evident that the former owner was with him not very frugal. Insert a PDA can not be due to a broken screen. Flash card no. In general, nothing can fuck.</text>
-	</string>
-	<string id="hand_teleporter_arhara">
-		<text>Faulty manual teleportator</text>
-	</string>
-	<string id="hand_teleporter">
-		<text>Hand teleportator</text>
-	</string>
-	excluded section-3 -->
-	<!--=Documents at Uhud -->
-	<string id="bloknot_pantera">
-		<text>Panthers Notebook</text>
-	</string>
-	<string id="bloknot_pantera_s">
-		<text>Panthers Notebook</text>
-	</string>
-	<string id="enc_equipment_bloknot_pantera">
-		<text>Personal notebook Panthers. It was written a few sentences and some code: 25,190,456. To view a document, insert in pistol slot.</text>
-	</string>
-	<string id="dosye_zvez">
-		<text>Astrologer Profile</text>
-	</string>
-	<string id="dosye_zvez_s">
-		<text>Astrologer Profile</text>
-	</string>
-	<string id="enc_equipment_dosye_zvez">
-		<text>Quick profile on Astrologer. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="foto_kukla">
-		<text>Photo Doll</text>
-	</string>
-	<string id="foto_kukla_s">
-		<text>Photo</text>
-	</string>
-	<string id="enc_equipment_foto_kukla">
-		<text>Old photo normal infant dolls. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="pilot_zapiska">
-		<text>Letter to the pilot</text>
-	</string>
-	<string id="pilot_zapiska_s">
-		<text>'Letter'</text>
-	</string>
-	<string id="enc_equipment_pilot_zapiska">
-		<text>Letter from a helicopter pilot with important information. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="foto_chaes_truba">
-		<text>Photo Driver</text>
-	</string>
-	<string id="foto_chaes_truba_s">
-		<text>Photo</text>
-	</string>
-	<string id="enc_equipment_foto_chaes_truba">
-		<text>Photo taken a helicopter pilot. It is visible to a large pipe with the burning helicopter. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="foto_aver_mono">
-		<text>Photo of</text>
-	</string>
-	<string id="foto_aver_mono_s">
-		<text>Photo</text>
-	</string>
-	<string id="enc_equipment_foto_aver_mono">
-		<text>Group photo, fired on the helicopter. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="foto_aver_zvezd">
-		<text>Photos of the leader</text>
-	</string>
-	<string id="foto_aver_zvezd_s">
-		<text>Photo</text>
-	</string>
-	<string id="enc_equipment_foto_aver_zvezd">
-		<text>Photos of the leader who fired on the helicopter. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="chaes2_karta_kluk">
-		<text>Chernobyl Photo</text>
-	</string>
-	<string id="chaes2_karta_kluk_s">
-		<text>Chernobyl...</text>
-	</string>
-	<string id="enc_equipment_chaes2_karta_kluk">
-		<text>Photo northern region of Chernobyl. It marked a rough passage on the other - the south side of the Chernobyl NPP. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="kreditka">
-		<text>Credit Card</text>
-	</string>
-	<string id="kreditka_s">
-		<text>Credit Card</text>
-	</string>
-	<string id="enc_equipment_kreditka">
-		<text>Credit Card Bank of America in denominations 5 mil. USD. To view the credit card insert in pistol slot.</text>
-	</string>
-	<string id="razved_karta">
-		<text>Scrap maps</text>
-	</string>
-	<string id="razved_karta_s">
-		<text>Scrap maps</text>
-	</string>
-	<string id="enc_equipment_razved_karta">
-		<text>Old scrap card with the coordinates of the transition. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="karta_peschera">
-		<text>Map of Cave</text>
-	</string>
-	<string id="karta_peschera_s">
-		<text>Map of Cave</text>
-	</string>
-	<string id="enc_equipment_karta_peschera">
-		<text>An old map of the Cave. It shows all the moves and tunnels. There's also a label with the outputs of the Cave. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="recipi_bpb">
-		<text>Note stalker</text>
-	</string>
-	<string id="recipi_bpb_s">
-		<text>Note stalker</text>
-	</string>
-	<string id="enc_equipment_recipi_bpb">
-		<text>Note an unknown stalker. There is information on the modification of the artifacts. Insert in Pistol slot to view.</text>
-	</string>
-	<string id="stukach_book">
-		<text>Notebook informer</text>
-	</string>
-	<string id="stukach_book_s">
-		<text>Notebook informer</text>
-	</string>
-	<string id="stukach_book_desc">
-		<text>Notebook informer group of Liberty. There is information about the new artmod. Insert in Pistol slot to view.</text>
-	</string>
+	<!-- Duplicated section!!! - game will use text from "dmx_mod_items.xml" file instead - aleks1970 -->
+	<!-- Duplicated string id was moved in to the "dmx_mod_items.xml" file - aleks1970 -->
+	<!-- Documents at Uhud -->
+	<!-- moved string id: "stukach_book" and "stukach_book_desc" in to the dmx_mod_items file - aleks1970 -->
+
 	<!-- HAND TELEPORT-->
 	<string id="device_teleport">
 		<text>Disposable Teleport</text>
@@ -1677,7 +1442,7 @@
 		<text>AfMerger</text>
 	</string>
 	<string id="enc_item_AfMerger_descr">
-		<text>-</text>
+		<text>Artefact Merger - the origin is unknown ...</text>
 	</string>
 	<string id="item_document_viewer">
 		<text>Document Viewer</text>
@@ -1685,7 +1450,7 @@
 	<string id="item_document_viewer_s">
 		<text>Document Viewer</text>
 	</string>
-	<string id="enc_item_AfMerger_descr">
+	<string id="enc_item_document_descr">
 		<text>Used for viewing Important Documents</text>
 	</string>
 	<string id="item_photograph_monolith">

@@ -1,6 +1,8 @@
+;;;; TB3D 1.0.9.9.8.6 - TB3D style weapons
+
 [wpn_rpk_74]:identity_immunities
 GroupControlSection	= spawn_group
-discovery_dependency	= 
+;;discovery_dependency	= 
 $spawn		= "weapons\rpk_74"	; option for Level Editor
 $npc		= on			; option for Level Editor
 $prefetch		= 8
@@ -9,7 +11,7 @@ cform		= skeleton
 class               	= W_AK74
 min_radius               	= 5
 max_radius               	= 100
-description	= "5,45-мм ручной пулемет Калашникова — ручной пулемёт, разработанный для замены в войсках пулемета РПК под патрон 7,62?39 мм в рамках системы стрелкового оружия под малоимпульсный патрон 5,45х39 мм. Принят на вооружение в 1974 году вместе с автоматом АК74."
+description	= enc_wpn_rpk_tmp_descr
 
 ef_main_weapon_type	= 2
 ef_weapon_type		= 6
@@ -38,14 +40,14 @@ animation_slot	= 2	; type of the animation that will be used
 hand_dependence	= 1
 single_handed	= 0
 
-inv_name		= "РПК-74"
-inv_name_short	= "РПК-74"
+inv_name		= enc_wpn_rpk_tmp
+inv_name_short	= enc_wpn_rpk_tmp
 inv_weight	= 5.0
 
-inv_grid_width	= 6
-inv_grid_height	= 2
-inv_grid_x		= 31
-inv_grid_y		= 20
+inv_grid_width			= 6
+inv_grid_height			= 2
+inv_grid_x				= 24
+inv_grid_y				= 4
 
 kill_msg_x	= 175
 kill_msg_y	= 0
@@ -89,7 +91,7 @@ PDM_crouch_no_acc	= 1.0
 hit_power		= 0.54
 hit_impulse	= 140
 hit_type		= fire_wound
-fire_distance	= 1000
+fire_distance	= 100					;;;109974 10:1
 bullet_speed	= 960
 rpm		= 600
 rpm_empty_click	= 200

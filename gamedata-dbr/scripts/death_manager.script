@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.8 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.0.9.9.9.9 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
---has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts, last_day
-function my_ver() return "1.0.9.9.9.8" end
+--has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts, last_day, reduced vog-25 ammo
+function my_ver() return "1.0.9.9.9.9" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
@@ -137,6 +137,7 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 		--if lname == "red_forest" or lname == "dead_city" then return end
 	end
 	local npc_id = self.npc:id()
+	local art_count = 0
 	local loot_count = 0							--109989, keep track of random loot
 	local has_ammo = {}								--109981, used to store types of ammo
 	local ammo_count = TB3D_Modders.loadout_ammo_loot
@@ -172,12 +173,14 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 					else
 						loot_count = loot_count + 1				--109989, for give_loot below
 					end
+				elseif string_find(name, "af_") then
+					art_count = art_count + 1
 				end
 			end
 		end
 		return true
 	end
-	self.npc:iterate_inventory(clear_pda, self.npc)					--removes old pda and bad_psy_helmet, spawns mil_pda 30% of the time, also some clutter removed
+	self.npc:iterate_inventory(clear_pda, self.npc)			--removes old pda and bad_psy_helmet, spawns mil_pda 30% of the time, also some clutter removed
 	--TB3D_Services.packet_alert("death mgr: check dead items clear pda done")
 	if ammo_count > 0 then
 		for ammo, cnt in pairs(has_ammo) do
@@ -185,11 +188,15 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 			create_ammo(self.npc, ammo, math_random(1, ammo_count+1))
 		end
 	end
+	local give_art = (TB3D_Modders.give_art_on_death and has_alife_info("bun_antenna_off") and art_count == 0 and math_random(10) == 5)
 	local spawn_rate = TB3D_Modders.pda_spawn_rate or 30				--109981
 	if spawn_rate > 80 then spawn_rate = 80 end
 	if community == "zombied" then
 		if math_random(100) > 30 then
 			give_some_stuff(self.npc, "bread_a", 1)
+		end
+		if give_art then
+			give_some_stuff(self.npc, amk_anoms.get_art_type(0), 1)
 		end
 	elseif community == "bandit" then 							--109996
 		if math_random(100) < 30 then
@@ -199,6 +206,9 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 						self.npc:game_vertex_id(),
 						self.npc:id())
 		end
+		if give_art then
+			give_some_stuff(self.npc, amk_anoms.get_art_type(1), 1)
+		end
 	elseif community == "stalker" or community == "green" or community == "ecolog" or community == "humter" then
 		if math_random(100) < spawn_rate then
 			alife():create("device_pda",
@@ -206,6 +216,9 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 						self.npc:level_vertex_id(),
 						self.npc:game_vertex_id(),
 						self.npc:id())
+		end
+		if give_art then
+			give_some_stuff(self.npc, amk_anoms.get_art_type(2), 1)
 		end
 	elseif community ~= "arena_enemy" and community ~= "fotoman" then
 		if not string_find(self.npc:name(), "dead_military_esc") then
@@ -217,6 +230,9 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 						self.npc:id())
 			end
 		end
+		if give_art then
+			give_some_stuff(self.npc, amk_anoms.get_art_type(3), 1)
+		end
 	end
 	if string_find(self.npc:name(), "military_ecolog_agro1") then		--Ivanshenko in agro
 		give_some_stuff(self.npc, "bad_psy_helmet", 1)
@@ -225,7 +241,7 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 		if ini and ini:section_exist("dont_spawn_loot") == true then
 			if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("death mgr: check_dead_items["..utils.to_str(self.npc:name()).."] dont_spawn_loot!!!!") end
 		else
-			if loot_count < 3 then spawn_random_loot(self.npc) end			--109989
+			if loot_count < 3 then spawn_random_loot(self.npc) end			--109989, basic items from TB3D_loot.ltx
 		end
 	end
 	--TB3D_Services.packet_alert("death mgr: check dead items done["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
@@ -431,7 +447,7 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 					if ini:line_exist("ammo","secondary") then
 						item = ini:r_string("ammo","secondary")
 						if item and item ~= "" then
-							create_ammo(self.npc, item, math_random(20))
+							create_ammo(self.npc, item, math_random(10))
 						end
 					end
 				end
@@ -441,9 +457,15 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 							item = ini:r_string("extras", tostring(cnt))
 							if item and item ~= "" then
 								if string_find(item, "ammo") then
-									create_ammo(self.npc, item, math_random(20))
+									if string_find(item, "vog-25") then
+										create_ammo(self.npc, item, math_random(0,4))
+									else
+										create_ammo(self.npc, item, math_random(10))
+									end
 								elseif string_find(item, "wpn_") then
 									if math_random(1,50) == 25 then give_weapon(self.npc, 0, item) end
+								elseif string_find(item, "grenade") then
+									give_some_stuff(self.npc, item, math_random(0,2))
 								else
 									give_some_stuff(self.npc, item, math_random(0,ltx_max))
 								end

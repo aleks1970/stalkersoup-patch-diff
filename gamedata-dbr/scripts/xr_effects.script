@@ -399,7 +399,7 @@ end
 
 -- play sound from a specific object
 function play_snd_now(actor, npc, p)
-	TB3D_Services.packet_alert("xr effects: play_snd_now["..utils.to_str(p[1]).."] for ["..npc:name().."]")
+	--TB3D_Services.packet_alert("xr effects: play_snd_now["..utils.to_str(p[1]).."] for ["..npc:name().."]")
 	xr_sound.set_sound_play(npc, p[1])
 end
 
@@ -1924,16 +1924,23 @@ end
 
 function yan_saharov_message(actor, npc)
 	if not has_alife_info("tb3d_skip_group1") and TB3D_Services.is_collector(2000) == false then
+		news_manager.send_tip(db.actor, "yan_saharov_message_p2", nil, "saharov", nil, 902)
 		news_manager.send_tip(db.actor, "yan_saharov_message", nil, "saharov", nil, 902)
 		TB3D_Services.give_info("labx16_find")
 	end
 end
 
 function yan_saharov_message_2(actor, npc)
-	if not has_alife_info("tb3d_skip_group1") and TB3D_Services.is_collector(2000) == false then news_manager.send_tip(db.actor, "yan_saharov_message_2", nil, "saharov", nil, 902) end
+	if not has_alife_info("tb3d_skip_group1") and TB3D_Services.is_collector(2000) == false then
+		news_manager.send_tip(db.actor, "yan_saharov_message_2_p2", nil, "saharov", nil, 902)
+		news_manager.send_tip(db.actor, "yan_saharov_message_2", nil, "saharov", nil, 902)
+	end
 end
 function yan_saharov_message_3(actor, npc)
-	if not has_alife_info("tb3d_skip_group1") and TB3D_Services.is_collector(2000) == false then news_manager.send_tip(db.actor, "yan_saharov_message_3", nil, "saharov", nil, 902) end
+	if not has_alife_info("tb3d_skip_group1") and TB3D_Services.is_collector(2000) == false then
+		news_manager.send_tip(db.actor, "yan_saharov_message_3_p2", nil, "saharov", nil, 902)
+		news_manager.send_tip(db.actor, "yan_saharov_message_3", nil, "saharov", nil, 902)
+	end
 end
 function yan_ghost_pda(actor, npc)
 	if TB3D_Services.is_collector(2000) == true then

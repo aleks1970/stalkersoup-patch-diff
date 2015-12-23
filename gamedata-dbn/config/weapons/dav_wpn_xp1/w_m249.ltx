@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_m249]:identity_immunities
 GroupControlSection				= spawn_group
-discovery_dependency 			= 
+;;discovery_dependency 			= 
 $spawn                  		= "weapons\m249"					; option for Level Editor
 $npc			 				= on				; option for Level Editor
 $prefetch 		 				= 8
@@ -9,7 +10,7 @@ cform                   		= skeleton
 class                   		= WP_LR300
 min_radius              		= 0
 max_radius              		= 150
-description						= desc_m249
+description						= desc_m249_descr
 ef_main_weapon_type				= 2
 ef_weapon_type					= 6
 
@@ -28,14 +29,14 @@ ammo_current					= 200
 ammo_elapsed		 			= 200
 
 ammo_mag_size		 			= 200
-ammo_class						= ammo_5.56x45_ap, ammo_5.56x45_ss190
+ammo_class						= ammo_5.56x45r, ammo_5.56x45_ap, ammo_5.56x45_ss190
 fire_modes						= -1
 
 hand_dependence		 			= 1
 single_handed					= 0
 
-inv_name						= "M 249"
-inv_name_short					= "M 249"
+inv_name						= desc_m249
+inv_name_short					= desc_m249_s
 inv_weight						= 10
 
 inv_grid_width					= 6
@@ -95,7 +96,7 @@ hit_power           			= 0.44
 hit_impulse		 				= 40
 hit_type 						= fire_wound
 
-fire_distance          			= 1000 
+fire_distance          			= 100					;;;109974 10:1
 bullet_speed					= 915 
 rpm                     		= 750 
 ; end ttc
@@ -105,7 +106,7 @@ time_to_aim						= 1.0
 
 silencer_hit_power       		= 0.44
 silencer_hit_impulse	 		= 35
-silencer_fire_distance   		= 1000
+silencer_fire_distance   		= 100					;;;109974 10:1
 silencer_bullet_speed	 		= 915
 
 hud                     		= wpn_m249_hud

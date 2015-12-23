@@ -1,12 +1,12 @@
--- TB3D 1.0.9.9.9.8 new
-function my_ver() return "1.0.9.9.9.8" end
+-- TB3D 1.0.9.9.9.9 new
+function my_ver() return "1.0.9.9.9.9" end
 --[[--------------------------------------------------------------------------------------------------------------------------------
  File         : repair.script
  Description  : Repair Kit Revamped: - allows you to salvage parts from weapons and armor and use them to repair your equipment...
  Copyright    : barak1001, StalkerSoup
  Author       : barak1001 (Moddb)
  Rewritten	  : for StalkerSoup by aleks1970 08/22/2015
- LastUpdate   : 06.09.2015 by aleks1970
+ LastUpdate   : 31.10.2015 by aleks1970
 --]]--------------------------------------------------------------------------------------------------------------------------------
 local act = db.actor
 local slot1_item
@@ -16,7 +16,6 @@ local dont_run = nil
 local sparep_static = nil
 local sparer_static = nil
 local sparea_static = nil
-local repair_enemy_enable = true	--(true) enable/disable enemy check function - aleks1970
 local table_insert = table.insert
 local string_find = string.find
 local translate = game.translate_string
@@ -41,7 +40,13 @@ function update()
 				local section = slot1_w:section()
 				if string_find(section, "wpn_fuck") then
 					slot1_item = false
+				elseif string_find(section, "wpn_soulcube") then
+					slot1_item = false
 				elseif string_find(section, "fake_wpn_crowbar") then
+					slot1_item = false
+				elseif string_find(section, "_cocoon") then
+					slot1_item = false
+				elseif string_find(section, "caps_") then
 					slot1_item = false
 				elseif string_find(section, "stco") then
 					slot1_item = false
@@ -51,16 +56,76 @@ function update()
 					slot1_item = false
 				end
 			else
-				slot1_item = true
+				slot1_item = true		--allows kit if slot empty
 			end
 		end
 	end
 end
 
+-- -----------------excluded-items----------------------
+--[["mutant_dog_cocoon",
+ 	"mutant_krovosos_cocoon",
+ 	"mutant_burer_cocoon",
+ 	"mutant_zombie_cocoon",
+ 	"mutant_snork_cocoon",
+ 	"mutant_flesh_cocoon",
+ 	"mutant_gigant_cocoon",
+ 	"mutant_poltergeist_cocoon",
+ 	"mutant_psevdodog_cocoon",
+ 	"mutant_controller_cocoon",
+ 	"mutant_chimera_cocoon",
+ 	"mutant_boar_cocoon",
+ 	"mutant_tushkano_cocoon",
+ 	"mutant_psydog_cocoon",
+ 	"mutant_cat_cocoon",
+ 	"caps_mosquito_bald",
+ 	"caps_gravi",
+ 	"caps_mincer",
+ 	"caps_electra",
+ 	"caps_zharka",
+ 	"caps_ameba",
+ 	"caps_ice",]]
+-- -----------------------------------------------------
+
 function have_revamped_kit()
 	return amk_utils.inventory_search("repair_kit",1) ~= false
 end
 
+-- -------------------------------------- add outfit and weapons parts ---------------------------------------
+function add_3repair_revamped_outfit()
+	local revampout =amk.load_variable("spare_armor", 0)
+	revampout = revampout + 25
+	amk.save_variable("spare_armor", revampout)
+	news_manager.amk_send_tip_id("rec_revampa10_3",nil,0,10,"gen_info")
+end
+
+function add_3repair_revamped_weapon()
+	local revampweaps =amk.load_variable("spare_pistol", 0)
+	local revampweapb =amk.load_variable("spare_rifle", 0)
+	revampweaps = revampweaps + 5
+	revampweapb = revampweapb + 15
+	amk.save_variable("spare_pistol", revampweaps)
+	amk.save_variable("spare_rifle", revampweapb)
+	news_manager.amk_send_tip_id("rec_revampw10_3",nil,0,10,"gen_info")
+end
+
+function add_repair_revamped_outfit()
+	local revampout =amk.load_variable("spare_armor", 0)
+	revampout = revampout + 10
+	amk.save_variable("spare_armor", revampout)
+	news_manager.amk_send_tip_id("rec_revampa10",nil,0,10,"gen_info")
+end
+
+function add_repair_revamped_weapon()
+	local revampweaps =amk.load_variable("spare_pistol", 0)
+	local revampweapb =amk.load_variable("spare_rifle", 0)
+	revampweaps = revampweaps + 3
+	revampweapb = revampweapb + 5
+	amk.save_variable("spare_pistol", revampweaps)
+	amk.save_variable("spare_rifle", revampweapb)
+	news_manager.amk_send_tip_id("rec_revampw10",nil,0,10,"gen_info")
+end
+-- -----------------------------------------------------------------------------------------------------------
 function repair_used(obj)
 	local text
 	if obj then
@@ -77,12 +142,14 @@ function repair_used(obj)
 					else
 						news_manager.send_tip_txt(act,text,1,"default",20000)
 						create_kit("repair_kit")
+						dont_run = nil		--109999
 					end
 				end
 			else
 				text = text_color_system..translate("repair_salv_enemy_1")..translate("repair_salv_enemy_2")
 				news_manager.send_tip_txt(act,text,1,"default",20000)
 				create_kit("repair_kit")
+				dont_run = nil		--109999
 			end
 		end
 	end
@@ -234,34 +301,38 @@ function repair_ui:InitControls()
 	self:Register(btn,"sparesp_text")
 	sparep_static = btn
 	sparep_static:SetText(amk.load_variable("spare_pistol", 0))
-	sparep_static:SetTextY(20)
+	sparep_static:SetTextY(23)
 	
 	btn = xml:InitStatic("sparesr_text", self)
 	self:Register(btn,"sparesr_text")
 	sparer_static = btn
 	sparer_static:SetText(amk.load_variable("spare_rifle", 0))
-	sparer_static:SetTextY(20)
+	sparer_static:SetTextY(23)
 	
 	btn = xml:InitStatic("sparesa_text", self)
 	self:Register(btn,"sparesa_text")
 	sparea_static = btn
 	sparea_static:SetText(amk.load_variable("spare_armor", 0))
-	sparea_static:SetTextY(20)
+	sparea_static:SetTextY(23)
 	
 	btn = xml:InitStatic("sparesp_title", self)
 	self:Register(btn,"sparesp_title")
 	text = translate("repair_str_spareparts_s")
 	btn:SetText(text)
+	btn:SetTextY(4)
 
 	btn = xml:InitStatic("sparesr_title", self)
 	self:Register(btn,"sparesr_title")
 	text = translate("repair_str_spareparts_l")
 	btn:SetText(text)
+	btn:SetTextY(4)
 
 	btn = xml:InitStatic("sparesa_title", self)
 	self:Register(btn,"sparesa_title")
 	text = translate("repair_str_spareparts_a")
 	btn:SetText(text)
+	btn:SetTextY(4)
+	set_counter()	--aleks1970
 end
 
 function repair_ui:InitCallBacks()
@@ -302,6 +373,7 @@ function repair_ui:tab_on_clicked()
 		self.tab_clicked = nil
 		self.dlg_repair:set_buttons()
 	end
+	set_counter()	--aleks1970
 end
 
 function repair_ui:exit_on_clicked()
@@ -327,27 +399,29 @@ function repair_ui:next_on_clicked()
 end
 
 function use_kit()
-	local new_kit = nil
-	local found = nil
+	--local new_kit = nil
+	--local found = nil
 	for index = 0, act:object_count() - 1 do
 		local inv_item = act:object(index)
-		if found == nil then
+		--if found == nil then
 			if inv_item then
-			local inv_name = inv_item:name()
+				local inv_name = inv_item:name()
 				if (string_find(inv_name, "repair_kit")) then
 					alife():release(alife():object(inv_item:id()), true)
-					found = "true"
-					dont_run = "true"
+					--found = "true"
+					dont_run = "true"			--109999, use break instead
+					break
 				end
 			end
-		end
+		--end
 	end
 end
 
 function create_kit(item)
-	local pos = device().cam_pos
-	pos.x = pos.x + 1
-	repair_kit_id = alife():create(item, pos, act:level_vertex_id(), act:game_vertex_id())
+	--local pos = device().cam_pos
+	--pos.x = pos.x + 1
+	--repair_kit_id = alife():create(item, pos, act:level_vertex_id(), act:game_vertex_id())
+	alife():create(item,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())	--109999, put in inv
 end
 
 function copy_addons(item)
@@ -457,7 +531,7 @@ local count = 0
 end
 
 function repair_ui:load_spare_parts()
-	--set_counter()
+	-- set_counter()
 end
 
 --[[function repair_ui:make_spares_table()
@@ -479,29 +553,71 @@ end]]--
 end]]--
 
 function delete_parts(slot, number)
-		local parts = amk.load_variable("type", 0)
-		parts = parts - number
-		if parts < 0 then parts = 0 end
-		if slot == 1 then type = "spare_pistol"
-		elseif slot == 2 then type = "spare_rifle"
-		else type = "spare_armor" end
-		amk.save_variable("type", parts)
-		set_counter()
+	local parts = nil
+	local armor_p = amk.load_variable("spare_armor", 0)	--aleks1970
+	local rifle_p = amk.load_variable("spare_rifle", 0)
+	local pistol_p = amk.load_variable("spare_pistol", 0)
+	if slot == 1 then
+		parts = pistol_p - number
+		amk.save_variable("spare_pistol", parts)
+	elseif slot == 2 then
+		parts = rifle_p - number
+		amk.save_variable("spare_rifle", parts)
+	elseif slot == 3 then
+		parts = armor_p - number
+		amk.save_variable("spare_armor", parts)
+	end
+	set_counter()
+	--	local parts = amk.load_variable("type", 0)
+	--	parts = parts - number
+	--	if parts < 0 then parts = 0 end
+	--	if slot == 1 then type = "spare_pistol"
+	--	elseif slot == 2 then type = "spare_rifle"
+	--	else type = "spare_armor" end
+	--	amk.save_variable("type", parts)
+	--	set_counter()
 end
 
 function set_counter()
-	local count = amk.load_variable("spare_pistol", 0)
-	if count > 99 then count = 99 end
-	sparep_static:SetText(count)
-	sparep_static:SetTextY(20)	
-	count = amk.load_variable("spare_rifle", 0)
-	if count > 99 then count = 99 end
-	sparer_static:SetText(count)
-	sparer_static:SetTextY(20)	
-	count = amk.load_variable("spare_armor", 0)
-	if count > 99 then count = 99 end
-	sparea_static:SetText(count)
-	sparea_static:SetTextY(20)	
+	local max_s = TB3D_Modders.max_small_parts
+	local max_l = TB3D_Modders.max_large_parts
+	local max_a = TB3D_Modders.max_armor_parts
+	local p_count = amk.load_variable("spare_pistol", 0)
+	local r_count = amk.load_variable("spare_rifle", 0)
+	local a_count = amk.load_variable("spare_armor", 0)	--aleks1970
+--	local count = amk.load_variable("spare_pistol", 0)
+	sparep_static:SetText(p_count)
+	sparep_static:SetTextColor(255,240,240,240)
+	if p_count > 100 then
+		p_count = 100
+		sparep_static:SetText("MAX")
+	elseif p_count >= max_s then
+		sparep_static:SetText("MAX")
+		sparep_static:SetTextColor(255,128,0,0)
+	end	
+	sparep_static:SetTextY(23)
+--	count = amk.load_variable("spare_rifle", 0)
+	sparer_static:SetText(r_count)
+	sparer_static:SetTextColor(255,240,240,240)
+	if r_count > 100 then
+		r_count = 100
+		sparer_static:SetText("MAX")
+	elseif r_count >= max_l then
+		sparer_static:SetText("MAX")
+		sparer_static:SetTextColor(255,128,0,0)
+	end
+	sparer_static:SetTextY(23)	
+--	count = amk.load_variable("spare_armor", 0)
+	sparea_static:SetText(a_count)
+	sparea_static:SetTextColor(255,240,240,240)
+	if a_count > 100 then
+		a_count = 100
+		sparea_static:SetText("MAX")
+	elseif a_count >= max_a then
+		sparea_static:SetText("MAX")
+		sparea_static:SetTextColor(255,128,0,0)
+	end
+	sparea_static:SetTextY(23)	
 end
 
 function calculate_parts(wpn)
@@ -596,7 +712,7 @@ end
 -- --------------------------------------- addon - enemy - aleks1970 ---------------------------------
 function rep_enemy_detect()
 	repair_enemy=false
-	if not repair_enemy_enable then return end	--aleks1970
+	if not TB3D_Modders.enemy_near_check then return end	--aleks1970
 	local obj
 	local stalker
 	local monster
@@ -605,6 +721,8 @@ function rep_enemy_detect()
 	local lvo_id = level.object_by_id
 	local objPos
 	local dist
+	local check_radius = TB3D_Modders.enemy_check_radius	--109999
+	local chkdist = TB3D_Modders.enemy_check_distance		--109999
 	if has_alife_info("ui_inventory") then
 		IAmAMonster_rInit()
 		for npcId, npc in pairs(db.storage) do
@@ -615,9 +733,9 @@ function rep_enemy_detect()
 				if (stalker or monster) and (obj.alive and obj:alive() == true) then
 					objPos = obj:position()
 					dist = actorPos:distance_to(objPos)
-					if dist < 120 then
+					if dist < check_radius then			--109999
 						if monster and obj:section() ~= "dogfrend" then
-							if dist < 20 then	--40 - aleks1970
+							if dist < chkdist then	--109999, 40 - aleks1970
 								repair_enemy=true
 							elseif obj:see(db.actor) then
 								repair_enemy=true
@@ -625,7 +743,7 @@ function rep_enemy_detect()
 								repair_enemy = false
 							end
 						elseif stalker and amk.get_npc_relation(obj,actor)=="enemy" then
-							if dist < 20 then	--40 - aleks1970
+							if dist < chkdist then	--109999, 40 - aleks1970
 								repair_enemy=true
 							end
 						end
@@ -645,20 +763,20 @@ end
 IAmAMonster_r = {}
 function IAmAMonster_rInit()
     IAmAMonster_r = {
-       [clsid.boar_s] = true,
-       [clsid.bloodsucker_s] = true,
-       [clsid.dog_s] = true,
-       [clsid.flesh_s] = true,
-       [clsid.pseudodog_s] = true,
-       [clsid.psy_dog_s] = true,
-       [clsid.burer_s] = true,
-       [clsid.cat_s] = true,
-       [clsid.chimera_s] = true,
-       [clsid.controller_s] = true,
-       [clsid.poltergeist_s] = true,
-       [clsid.gigant_s] = true,
-       [clsid.zombie_s] = true,
-       [clsid.snork_s] = true,
+		[clsid.boar_s] = true,
+		[clsid.bloodsucker_s] = true,
+		[clsid.dog_s] = true,
+		[clsid.flesh_s] = true,
+		[clsid.pseudodog_s] = true,
+		[clsid.psy_dog_s] = true,
+		[clsid.burer_s] = true,
+		[clsid.cat_s] = true,
+		[clsid.chimera_s] = true,
+		[clsid.controller_s] = true,
+		[clsid.poltergeist_s] = true,
+		[clsid.gigant_s] = true,
+		[clsid.zombie_s] = true,
+		[clsid.snork_s] = true,
 		[clsid.psy_dog_phantom_s] = true
     }
 end

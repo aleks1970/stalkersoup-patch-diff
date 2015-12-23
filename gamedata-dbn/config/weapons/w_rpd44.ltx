@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_rpd44]:identity_immunities
 GroupControlSection		= spawn_group
-discovery_dependency 	= 
+;;discovery_dependency 	= 
 $spawn                  = "weapons\rpd44"					; option for Level Editor
 $npc			 		= on				; option for Level Editor
 $prefetch 		 		= 8
@@ -9,7 +10,7 @@ cform                   = skeleton
 class                   = WP_LR300
 min_radius              = 0
 max_radius              = 50
-description				= "7,62-мм ручной пулемЄт ƒегт€рЄва Ч советский ручной пулемЄт, разработанный в 1944 году под патрон 7,62х39 мм."
+description				= enc_wpn_degtyarev_tmp_descr
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -35,8 +36,8 @@ fire_modes				= -1
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name				= "–ѕƒ"
-inv_name_short			= "–ѕƒ"
+inv_name				= enc_wpn_degtyarev_tmp
+inv_name_short			= enc_wpn_degtyarev_tmp_s
 inv_weight				= 7.4
 
 inv_grid_width			= 6
@@ -94,7 +95,7 @@ hit_power           = 0.60
 hit_impulse		 	= 25
 hit_type 			= fire_wound
 
-fire_distance          	= 800 ; дистанци€
+fire_distance          	= 80					;;;109974 10:1
 bullet_speed			= 735 ;начальна€ скорость пули
 rpm                     = 700 ; выстрелов/мин
 ; end ttc
@@ -144,7 +145,7 @@ snd_shoot			= weapons\ak47_shot
 snd_empty			= weapons\gen_empty, 0.5
 snd_reload			= weapons\rpk\rpk_reload, 0.5
 snd_silncer_shot		= weapons\rpk\ak_silent1
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 snd_shoot_grenade			= weapons\gen_grenshoot
 snd_reload_grenade			= weapons\gen_grenload, 1.0, 0.8
 snd_switch					= weapons\groza_switch, 1.0, 0.5

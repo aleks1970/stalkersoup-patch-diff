@@ -1,4 +1,4 @@
-;<!-- TB3D 1.0.9.9.4.2 changed terrain to allow underground (014  vice 000 for y chunk), immunities/damage, new levels
+;<!-- TB3D 1.0.9.9.9.9 changed terrain to allow underground (014  vice 000 for y chunk), immunities/damage, new levels
 ;<!-- aleks1970; excluded duplicates section -->
 [m_fracture_e]:monster_base
 GroupControlSection	= spawn_group
@@ -222,61 +222,6 @@ corpse_visual		 = monsters\izlom\izlom
 spec_rank			= strong
 community			= fracture
 Tele_Time_To_Hold	= 200
-
-; работа Scarabay с правками, но не особо удачными. Пока так.
-[bibliotekar]:fracture_strong
-$spawn               = "monsters\fracture\bibliotekar"
-monster_type		= indoor
-rank				= 0
-visual			 = monsters\bibliotekar\bibliotekar
-corpse_visual		 = monsters\izlom\izlom
-icon                = ui_npc_monster_bibliotekar
-spec_rank			= strong
-panic_threshold	= 0.0
-community			= fracture
-Tele_Time_To_Hold	= 200
-
-Spawn_Inventory_Item_Section = part_digitis_biblio
-Spawn_Inventory_Item_Probability = 1 ;0.4
-
-sound_distant_idle		= monsters\bibliotekar\idle_
-sound_idle			    = monsters\bibliotekar\idle_ 
-sound_eat				= monsters\zombie\zombie_eat_ 
-sound_aggressive		= monsters\giant\giant_threaten_
-sound_attack_hit		= monsters\bibliotekar\attack_hit_
-sound_take_damage		= monsters\bibliotekar\hurt_
-sound_die				= monsters\bibliotekar\die_
-sound_threaten			= monsters\biting\def_		
-sound_landing			= monsters\biting\def_
-sound_steal			    = monsters\biting\def_
-sound_panic			    = monsters\bibliotekar\hurt_
-sound_growling			= monsters\biting\def_
-sound_die_in_anomaly	= monsters\bibliotekar\die_
-
-ph_box0_center 		 = 0.0,  1.0,  0.0
-ph_box0_size 		 = 0.4, 1.0,  0.4
-ph_box1_center 		 = 0.0,  0.7,  0.0
-ph_box1_size 		 = 0.45, 0.7,  0.45
-ph_crash_speed_min			= 8
-ph_crash_speed_max			= 25
-ph_collision_damage_factor	= 0.2
-ph_mass 		     		= 210.0
-
-hit_power			 	= 0.5
-
-attack_params	        = bibliotekar_attack_params
-condition_sect			= bibliotekar_conditions
-immunities_sect		    = bibliotekar_immunities
-damage					= bibliotekar_damage
-DamagedThreshold		= 0.75
-
-[bibliotekar_attack_params]
-;----------------------------------------------------------------------------------------------------------------
-;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
-;------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.35,		1.60,		    750,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
-stand_attack_1 =	  	0.40,		1.30,		    600,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
-stand_attack_2 =	  	0.90,		1.70,		    950,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
 
 ; Матерый излом
 [fracture_master]:fracture_strong

@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.8   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
-function my_ver() return "1.0.9.9.9.8" end
+-- TB3D 1.0.9.9.9.9   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
+function my_ver() return "1.0.9.9.9.9" end
 ----------------------------------------------------------------------------------------------------
 -- Physic objects binding
 ----------------------------------------------------------------------------------------------------
@@ -148,23 +148,36 @@ end
 function generic_physics_binder:net_destroy()
 	--TB3D_Services.packet_alert("bind physic object: net destroy")
 	local sobj = self.object
-	local st = db.storage[sobj:id()]
+	local obj_name
 	if sobj then
-  		self.object:set_callback(callback.hit, nil)			--109990
-  		self.object:set_callback(callback.death, nil)			--109990
-  		self.object:set_callback(callback.use_object, nil)			--109990
-		if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy["..utils.to_str(sobj:name()).."] section["..sobj:section().."]") end
-		if st and (st.active_scheme) then
-			xr_logic.issue_event(sobj, st[st.active_scheme], "net_destroy")
+		if sobj.name then obj_name = sobj:name() else obj_name = "nil" end
+		if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."]") end
+--[[		if string_find(obj_name,"x16_physic_destroyable_object_0000") then						--109996
+			TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."] !!!!")
+			if has_alife_info("yantar_tunnel_finish") then return end										--grate can fall shut in an explosion
+		elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--109996, inner door of upper room
+			TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."] !!!!")
+			return
+		end]]--
+		if sobj.id then
+			self.object:set_callback(callback.hit, nil)			--109990
+			self.object:set_callback(callback.death, nil)			--109990
+			self.object:set_callback(callback.use_object, nil)			--109990
+			local st = db.storage[sobj:id()]
+			if st and (st.active_scheme) then
+				xr_logic.issue_event(sobj, st[st.active_scheme], "net_destroy")
+			end
+			if self.particle ~= nil then
+				self.particle:stop()
+			end
+			if (sobj.clsid) and sobj:clsid() == clsid.projector then
+				db.del_sl(sobj)
+			end
+			db.destroy_my_storage(sobj)
+			object_binder.net_destroy(self)
+		else
+			TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."] no id!!!!")
 		end
-		if self.particle ~= nil then
-			self.particle:stop()
-		end
-		if (sobj.clsid) and sobj:clsid() == clsid.projector then
-			db.del_sl(sobj)
-		end
-		db.destroy_my_storage(sobj)
-		object_binder.net_destroy(self)
 	end
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy done") end
 	--TB3D_Services.packet_alert("bind physic object: net destroy done")

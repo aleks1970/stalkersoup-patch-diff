@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.8 debug, spawn_mobs
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.0.9.9.9.9 debug
+function my_ver() return "1.0.9.9.9.9" end
 
 --'spawn teleporter on the radar
 function spawn_tel()
@@ -22,111 +22,15 @@ function spawn_zap_coll()
 	alife():create("af_dummy_mushy_small",vector():set(-199.5027,-19.8969,-164.0164),52949,51)
 	if nobj and TB3D_Modders.coll_spots then
 		level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", "First Note")
-		TB3D_Services.packet_alert("Collector: spawn stash 1 in Cordon")
 	end
+	if TB3D_Modders.coll_states then TB3D_Services.packet_alert("Collector: spawn stash 1 in Cordon") end
 end
 
---'mobs spawned on stash found
-function spawn_mobs(stash_desc)
-	tb3d_services.packet_alert("tb3d collector dialog: stash found["..utils.to_str(stash_desc).."]")
-	if stash_desc == "collector_clue_1" then			--cordon tunnel
-		--spawn more bandits
-	elseif stash_desc == "collector_clue_2_1" then		--south of outpost
-		--spawn mil patrol at gate
-	elseif stash_desc == "collector_clue_2_2" then		--railroad cars
-		--??
-	elseif stash_desc == "collector_clue_2_3" then		--stones east of guide camp
-		--spawn bloodsuckers
-	elseif stash_desc == "collector_clue_3_1" then		--near agro exit
-		--bandits
-	elseif stash_desc == "collector_clue_3_2" then		--hill near bar exit
-		--psydogs
-	elseif stash_desc == "collector_clue_3_3" then		--hill near vehicle yard
-		--psydogs
-	elseif stash_desc == "collector_clue_4_1" then
-	elseif stash_desc == "collector_clue_4_2" then
-	elseif stash_desc == "collector_clue_4_3" then
-	elseif stash_desc == "collector_clue_5_1" then
-	elseif stash_desc == "collector_clue_5_2" then
-	elseif stash_desc == "collector_clue_5_3" then
-	elseif stash_desc == "collector_clue_6_1" then
-	elseif stash_desc == "collector_clue_6_2" then
-	elseif stash_desc == "collector_clue_6_3" then
-	elseif stash_desc == "collector_clue_7_1" then
-	elseif stash_desc == "collector_clue_7_2" then
-	elseif stash_desc == "collector_clue_7_3" then
-	elseif stash_desc == "collector_clue_8_1" then
-	elseif stash_desc == "collector_clue_8_2" then
-	elseif stash_desc == "collector_clue_8_3" then
-	elseif stash_desc == "collector_clue_9_1" then
-	elseif stash_desc == "collector_clue_9_2" then
-	elseif stash_desc == "collector_clue_9_3" then
-	elseif stash_desc == "collector_clue_10_1" then
-	elseif stash_desc == "collector_clue_10_2" then
-	elseif stash_desc == "collector_clue_10_3" then
-	elseif stash_desc == "collector_clue_11_1" then
-	elseif stash_desc == "collector_clue_11_2" then
-	elseif stash_desc == "collector_clue_11_3" then
-	elseif stash_desc == "collector_clue_12_1" then
-	elseif stash_desc == "collector_clue_12_2" then
-	elseif stash_desc == "collector_clue_12_3" then
-	elseif stash_desc == "collector_clue_13_1" then
-	elseif stash_desc == "collector_clue_13_2" then
-	elseif stash_desc == "collector_clue_13_3" then
-	elseif stash_desc == "collector_clue_14_1" then
-	elseif stash_desc == "collector_clue_14_2" then
-	elseif stash_desc == "collector_clue_14_3" then
-	elseif stash_desc == "collector_clue_15" then
-	elseif stash_desc == "collector_clue_16" then
-	elseif stash_desc == "collector_clue_17" then
-	elseif stash_desc == "collector_clue_18" then
-	elseif stash_desc == "collector_clue_19_1" then
-	elseif stash_desc == "collector_clue_19_2" then
-	elseif stash_desc == "collector_clue_19_3" then
-	elseif stash_desc == "collector_clue_19_4" then
-	elseif stash_desc == "collector_clue_20_1" then
-	elseif stash_desc == "collector_clue_29_2" then
-	elseif stash_desc == "collector_clue_20_3" then
-	elseif stash_desc == "collector_clue_20_4" then
-	elseif stash_desc == "collector_clue_21_1" then
-	elseif stash_desc == "collector_clue_21_2" then
-	elseif stash_desc == "collector_clue_21_3" then
-	elseif stash_desc == "collector_clue_21_4" then
-	elseif stash_desc == "collector_clue_22_1" then
-	elseif stash_desc == "collector_clue_22_2" then
-	elseif stash_desc == "collector_clue_22_3" then
-	elseif stash_desc == "collector_clue_22_4" then
-	elseif stash_desc == "collector_clue_23_1" then
-	elseif stash_desc == "collector_clue_23_2" then
-	elseif stash_desc == "collector_clue_23_3" then
-	elseif stash_desc == "collector_clue_23_4" then
-	elseif stash_desc == "collector_clue_24_1" then
-	elseif stash_desc == "collector_clue_24_2" then
-	elseif stash_desc == "collector_clue_24_3" then
-	elseif stash_desc == "collector_clue_24_4" then
-	elseif stash_desc == "collector_clue_25_1" then
-	elseif stash_desc == "collector_clue_25_2" then
-	elseif stash_desc == "collector_clue_25_3" then
-	elseif stash_desc == "collector_clue_25_4" then
-	elseif stash_desc == "collector_clue_26_1" then
-	elseif stash_desc == "collector_clue_26_2" then
-	elseif stash_desc == "collector_clue_26_3" then
-	elseif stash_desc == "collector_clue_26_4" then
-	elseif stash_desc == "collector_clue_27_1" then
-	elseif stash_desc == "collector_clue_27_2" then
-	elseif stash_desc == "collector_clue_27_3" then
-	elseif stash_desc == "collector_clue_27_4" then
-	elseif stash_desc == "collector_clue_28_1" then
-	elseif stash_desc == "collector_clue_28_2" then
-	elseif stash_desc == "collector_clue_28_3" then
-	elseif stash_desc == "collector_clue_28_4" then
-	elseif stash_desc == "collector_clue_29_1" then
-	elseif stash_desc == "collector_clue_29_2" then
-	elseif stash_desc == "collector_clue_29_3" then
-	elseif stash_desc == "collector_clue_29_4" then
-	elseif stash_desc == "collector_clue_30_1" then
-	elseif stash_desc == "collector_clue_30_2" then
-	elseif stash_desc == "collector_clue_30_3" then
-	elseif stash_desc == "collector_clue_30_4" then
-	end
-end
+--'Characters that need dialogs in collector
+--yantar_ecolog_general
+--sim_stalker_master_chuchelo		--wild territory Scarecrow
+--military_neytral_stalk1 thru 6		--millitary warehouses, ranch
+--mil_freedom_member0021 and 26
+--sim_stalker_master_diador
+--sim_stalker_master_master
+--sak 								--trader in radar

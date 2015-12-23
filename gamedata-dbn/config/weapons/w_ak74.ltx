@@ -1,4 +1,5 @@
-;<!-- TB3D 1.0.9.9.3.1 excluded empty "discovery_dependency" aleks1970, adj sound -->
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons, wpn_ak74m_arma
+;<!--excluded empty "discovery_dependency" aleks1970, adj sound -->
 [wpn_ak74]:identity_immunities
 GroupControlSection		= spawn_group
 ; discovery_dependency = ; aleks1970
@@ -93,7 +94,7 @@ PDM_crouch_no_acc 			= 1.0
 hit_power                	= 2.2
 hit_impulse		 			= 140
 hit_type 					= fire_wound
-fire_distance            	= 6000
+fire_distance            	= 600			;;;109974 10:1
 bullet_speed				= 800
 rpm                      	= 600
 
@@ -140,18 +141,18 @@ grenade_launcher_x 			= 103
 grenade_launcher_y 			= 23
 
 ;sounds (name of the sound, volume (0.0 - 1.0), delay (sec))
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 snd_draw					= weapons-new\aks74u\draw
 snd_holster					= weapons-new\aks74u\holster
 snd_shoot					= weapons-new\aks74u\shot
 snd_reload					= weapons-new\ak74\reload, 1.0, 0.5
 snd_empty					= weapons\gen_empty, 0.5
 snd_silncer_shot			= weapons\w_ak74_shot1 
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 snd_shoot_grenade			= weapons\gen_grenshoot
 snd_reload_grenade			= weapons\gen_grenload, 1.0, 0.8
 snd_switch					= weapons\groza_switch, 1.0, 0.5
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 silencer_light_color		= 0.6,0.5,0.3
 silencer_light_range		= 0.01
 silencer_light_var_color	= 0.05
@@ -244,7 +245,7 @@ cform               	= skeleton
 class               	= WP_AK74			; class of the weapon that corresponding to CPP class
 min_radius          	= 30				; [] for AI
 max_radius          	= 100				; [] for AI
-description				= "АКМС — вариант АКМ со складным прикладом. Система крепления приклада была изменена относительно АКС (складывался вниз-вперед, под ствольную коробку). Модификация разработана специально для десантников."
+description				= enc_wpn_AKMS_tmp_descr
 	
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -273,14 +274,14 @@ single_handed			= 0
 slot 					= 2									; number of slot in inventory we put weapon in (1 - knife slot, 2 - pistol, 3 - rifle, 4 - grenade, 5 - apparatus)
 animation_slot			= 2									; type of the animation that will be used
 
-inv_name	        	= "АКМС"						; name in inventory	
-inv_name_short			= "АКМС"
+inv_name	        	= enc_wpn_AKMS_tmp					; name in inventory	
+inv_name_short			= enc_wpn_AKMS_tmp
 inv_weight			= 3.3								; weight in inventory
 
 inv_grid_width     = 5
 inv_grid_height    = 2
-inv_grid_x         = 20
-inv_grid_y         = 28
+inv_grid_x         = 30
+inv_grid_y         = 53
 
 scope_name 				= wpn_addon_scope
 scope_x 				= 42
@@ -339,7 +340,7 @@ PDM_crouch_no_acc 			= 1.0
 hit_power        	= 0.57
 hit_impulse		 	= 17
 hit_type 			= fire_wound
-fire_distance            	= 1000		; maximum fire distance that bullet can fly
+fire_distance            	= 100					;;;109974 10:1
 bullet_speed				= 600		; starting bullet speed
 rpm                      	= 600		; max round per minute
 
@@ -351,7 +352,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.45
 silencer_hit_impulse	 	= 12
-silencer_fire_distance   	= 250
+silencer_fire_distance   	= 80					;;;109974 10:1
 silencer_bullet_speed	 	= 600
 
 hud                      	= wpn_ak76_hud				; name of the section of the hud
@@ -485,3 +486,6 @@ grenade_zoom_offset			= -0.0973,-0.136,0.130000
 grenade_zoom_rotate_x		= -0.0
 grenade_zoom_rotate_y		= -0.0
 
+[wpn_ak74m_arma]:wpn_akms		;;109980, pred trader
+inv_grid_x = 30
+inv_grid_y = 53

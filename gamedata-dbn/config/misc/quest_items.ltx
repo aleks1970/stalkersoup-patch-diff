@@ -1,4 +1,4 @@
-;<!-- TB3D 1.0.9.9.3.6.3 fixed icons --> contains local strings, edits by glowworm, rgd5_new fix, iglo_new icon width,
+;<!-- TB3D 1.0.9.9.9.8 fixed icons --> contains local strings, edits by glowworm, rgd5_new fix, iglo_new icon width,
 ;; ara_flash, bland_flash, travka, pda_priz icon -->
 ;<!-- aleks1970  excluded duplicates sections -->
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -172,9 +172,9 @@ inv_name_short		= glushitel
 inv_weight			= 12
 
 inv_grid_width		= 2
-inv_grid_height		= 2
-inv_grid_x			= 16
-inv_grid_y			= 33
+inv_grid_height		= 3
+inv_grid_x			= 2
+inv_grid_y			= 44
 cost				= 5000
 
 [pda_francuz]:identity_immunities
@@ -220,6 +220,7 @@ visual   = weapons\awm\wpn_awm_new_hud.ogf
 GroupControlSection	= spawn_group
 ; discovery_dependency = ; aleks1970  
 $spawn			= "devices\quest_items\ammo_igl_new"
+class			= AMMO ; -aleks1970
 visual          = weapons\ammo_igl_new.ogf
 description		= ammo_igl_new_desc
 inv_name		= ammo_igl_new
@@ -309,18 +310,18 @@ $prefetch			= 128
 class				= G_RGD5
 cform				= skeleton
 visual				= weapons\grenade\wpn_rgd_5.ogf
-inv_name			= grenade-rgd5
-inv_name_short		= grenade-rgd5
-inv_weight			= 0.35	;.1
-description			= enc_weapons1_grenade-rgd5
+inv_name			= grenade-rgd5_m
+inv_name_short		= grenade-rgd5_m
+inv_weight			= 0.45	;.1
+description			= enc_weapons1_grenade-rgd5_m
 
 ;belt				= true
 ef_weapon_type		= 10
 
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 10
-inv_grid_y			= 9
+inv_grid_x			= 25  ; 10 ;aleks1970
+inv_grid_y			= 63  ; 9
 
 kill_msg_x			= 240
 kill_msg_y			= 123
@@ -339,7 +340,7 @@ force_grow_speed		= 15;2 ;30
 
 destroy_time		= 2500;3500
 
-cost				= 100	;40
+cost				= 210	;40
 ;;;;TB3D 10976
 ammo_mag_size	= 1
 ammo_class		= grenade_rgd5	;;;;_new
@@ -707,8 +708,8 @@ inv_weight			= 0.15
 
 inv_grid_width		= 2
 inv_grid_height		= 1
-inv_grid_x			= 44
-inv_grid_y			= 66
+inv_grid_x			= 36
+inv_grid_y			= 64
 cost				= 0
 
 [netpacket_pda]:identity_immunities
@@ -941,8 +942,8 @@ inv_name_short		= item_computer_new_name
 inv_weight			= 5.5
 inv_grid_width		= 2
 inv_grid_height		= 2
-inv_grid_x			= 18
-inv_grid_y			= 36
+inv_grid_x			= 50
+inv_grid_y			= 0
 cost				= 0
 
 [nauch_flash]:identity_immunities
@@ -1012,8 +1013,8 @@ inv_name_short		= item_notebook_name
 inv_weight			= 3.5
 inv_grid_width		= 2
 inv_grid_height		= 2
-inv_grid_x			= 18
-inv_grid_y			= 33
+inv_grid_x			= 50
+inv_grid_y			= 0
 cost				= 0
 
 [new_book]:identity_immunities
@@ -1745,8 +1746,8 @@ inv_name_short		= item_decoder1_name
 inv_weight			= 0.05
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 11
-inv_grid_y			= 3
+inv_grid_x			= 34
+inv_grid_y			= 63
 cost				= 0
 
 [gunslinger_flash]:identity_immunities
@@ -1769,8 +1770,8 @@ inv_weight			= 0.01
 
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 11
-inv_grid_y			= 23
+inv_grid_x			= 3 ;11
+inv_grid_y			= 19 ;23
 cost				= 0
 
 
@@ -1917,7 +1918,7 @@ quest_item			= false
 description			= enc_equipment_device_pda_npc
 
 inv_name			= device_pda_npc
-inv_name_short		= device_pda_npc
+inv_name_short		= device_pda_npc_s
 inv_weight			= 0.0 ;0.15
 
 inv_grid_width		= 2
@@ -2307,8 +2308,8 @@ inv_name_short		= item_bland_flash_name
 inv_weight			= 0.01
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 5
-inv_grid_y			= 14
+inv_grid_x			= 29
+inv_grid_y			= 0
 cost				= 0
 
 
@@ -2536,8 +2537,8 @@ inv_weight			= 0.01
 
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 34
-inv_grid_y			= 64
+inv_grid_x			= 65
+inv_grid_y			= 71
 cost				= 0
 
 [dar_pass_document]:identity_immunities
@@ -2557,8 +2558,8 @@ inv_weight			= 0.05
 
 inv_grid_width		= 2
 inv_grid_height		= 1
-inv_grid_x			= 7
-inv_grid_y			= 18
+inv_grid_x			= 49
+inv_grid_y			= 63
 cost				= 0
 
 [dar_document1]:identity_immunities
@@ -2870,22 +2871,22 @@ radius                = 1
 ;script_binding        = stalker.object_init
 ;quest_item            = true
 
-description            = flame_part_desc
+description            = gorelka_descr	;flame_part_desc
 
-inv_name            = item_flame1_name    
-inv_name_short        = item_flame1_name
+inv_name              = gorelka	;item_flame1_name    
+inv_name_short        = gorelka	;item_flame1_name
 inv_weight            = 0
 inv_grid_width        = 1
-inv_grid_height        = 1
+inv_grid_height       = 1
 inv_grid_x            = 1
 inv_grid_y            = 40  ; - aleks1970
-cost                = 50
+cost                  = 550
 
 
 [gorelka]:flame_parts
 visual                = amk\flame_prt_gorelka.ogf
-description            = gorelka_descr
-inv_name            = gorelka    
+description           = gorelka_descr
+inv_name              = gorelka
 inv_name_short        = gorelka
 inv_weight            = 1
 inv_grid_width        = 1
@@ -2937,9 +2938,9 @@ inv_name			= item_quest_sak_plan_name
 inv_name_short		= item_quest_sak_plan_name
 inv_weight			= 0.14
 inv_grid_width      = 2
-inv_grid_height     = 1
-inv_grid_x          = 33 ;16
-inv_grid_y          = 2 ;1
+inv_grid_height     = 2
+inv_grid_x          = 16  ; 16
+inv_grid_y          = 31  ; 1
 cost                = 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2949,6 +2950,10 @@ cost                = 0
 [kostya_af_gold_fish]:af_gold_fish
 particles			= samples\tut2_pe_with_child
 quest_item			= true
+inv_grid_width      = 1
+inv_grid_height     = 1
+inv_grid_x          = 4
+inv_grid_y          = 36
 description         = enc_quest_kostya_gold_fish
 
 [kostya_pda]:identity_immunities

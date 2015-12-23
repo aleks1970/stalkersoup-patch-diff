@@ -216,10 +216,10 @@ function checking_droped_obj(obj)
 		end
 		if is_go then
 			--TB3D_Services.packet_alert("spawn level changer: droped["..utils.to_str(obj_sect).."] 3")
-			if obj_id then
-				local sobj_id = sim:object(obj_id)
-				if sobj_id then sim:release(sobj_id) end	--if dropped
-			end
+			--if obj_id then			--109999, on use instead of on drop
+				--local sobj_id = sim:object(obj_id)
+				--if sobj_id then sim:release(sobj_id) end	--if dropped
+			--end
 			if teleports[obj_sect].can_eat == false then
 				amk.spawn_item_in_inv(obj_sect)
 			end

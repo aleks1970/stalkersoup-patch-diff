@@ -1,5 +1,7 @@
---TB3D 1.0.9.9.9.8, new rep system, sim_getNpcType, get_monster_spot, pda_is_blocked, "NIL" to "nil"
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.0.9.9.9.9, new rep system, sim_getNpcType, get_monster_spot, pda_is_blocked, "NIL" to "nil"
+function my_ver() return "1.0.9.9.9.9" end
+
+local string_find = string.find
 
 local killCountProps = {
 	neutral_novice = 1, 	neutral_experienced = 2, 	neutral_veteran = 3, 	neutral_master = 4,
@@ -85,7 +87,9 @@ monster_classes = {
 			[clsid.poltergeist_s ] = "poltergeist",
 			[clsid.gigant_s      ] = "pseudo_gigant",
 			[clsid.controller_s  ] = "controller",
-			[clsid.bloodsucker_s ] = "bloodsucker"
+			[clsid.bloodsucker_s ] = "bloodsucker"--,
+			--[clsid.werewolf_s 	 ] = "werewolf",
+			--[clsid.bibliotekar_s ] = "bibliotekar"
 		}		
 
 
@@ -179,16 +183,26 @@ function get_monster_spot(obj)
 	local community = nil
 	if TB3D_Services.pda_is_blocked() == false then			--109981
 		local cls
+		local obj_name
+		if obj.name then obj_name = obj:name() else obj_name = "NIL" end
 		if obj.clsid then
 			 cls = obj:clsid()
-		elseif obj.name then
-			cls = TB3D_Population_Control.get_clsid(obj:name())										--clsid not always available so use name
+		elseif obj_name ~= "NIL" then
+			cls = TB3D_Population_Control.get_clsid(obj_name)										--clsid not always available so use name
 		end
 		if cls then
 			--TB3D_Services.packet_alert("xr statistic: get monster community["..utils.to_str(obj:name()).."]["..utils.to_str(cls).."]")
 			if cls == clsid.gigant_s then community = "pseudo_gigant"
-			elseif cls == clsid.controller_s then community = "controller"
-			elseif cls == clsid.bloodsucker_s then community = "bloodsucker" end
+				elseif cls == clsid.burer_s then community = "burer"
+				elseif cls == clsid.chimera_s then
+					if string_find(obj_name, "werewolf") then community = "werewolf" else community = "chimera" end
+				--elseif cls == clsid.werewolf_s then community = "werewolf"
+				elseif cls == clsid.controller_s then community = "controller"
+				elseif cls == clsid.bloodsucker_s then community = "bloodsucker"
+				elseif cls == clsid.fracture_s then
+					if string_find(obj_name, "bibliotekar") then community = "bibliotekar" else community = "fracture" end
+				--elseif cls == clsid.bibliotekar_s then community = "bibliotekar"
+			end
 		end
 	end
 	return community

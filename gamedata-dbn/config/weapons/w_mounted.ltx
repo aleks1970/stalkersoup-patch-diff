@@ -1,4 +1,5 @@
-;--TB3D 1.0.9.9.5.0 turret put/get packets, put OGSE values in comments, updated
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
+;-- turret put/get packets, put OGSE values in comments, updated
 ;<!-- excluded empty "discovery_dependency" aleks1970 -->
 
 [mounted_weapon]:identity_immunities
@@ -32,7 +33,7 @@ hit_power					= 2.77		;1.2
 hit_impulse					= 220
 hit_type 					= fire_wound 	
 
-fire_distance  		        = 600		;500
+fire_distance  		        = 200					;;;109974 10:1
 bullet_speed				= 800
 rpm            		        = 600		;650
 
@@ -105,7 +106,7 @@ fire_dispersion_base		= 0.02			;1
 rpm            		        = 600			;650
 hit_power					= 1.0			;1.2
 hit_impulse					= 100			;220
-fire_distance  		        = 600			;500
+fire_distance  		        = 200					;;;109974 10:1
 bullet_speed				= 800
 
 light_color					= 0.9,0.9,0.5
@@ -123,8 +124,8 @@ tracer_trail_scale	 		= 1.0			;0.15
 tracer_start_length	 		= 1.0			;2
 tracer_width		 		= 0.5			;0.07
 
-inv_name	        		= "Mounted Weapon"								; name in inventory	
-inv_name_short				= "Mounted Weapon"
+inv_name	        		= enc_wpn_mounted_weapon_tmp	; name in inventory	
+inv_name_short				= enc_wpn_mounted_weapon_tmp
 
 [turret_kpvt]:stationary_mgun									;;veh_btr_u_01
 hit_power					= 2.2
@@ -180,7 +181,7 @@ rpm				= 620					;650
 fire_dispersion_base		= 0.02		;0.4
 hit_power					= 2.77		;0.95
 hit_impulse					= 240		;300
-fire_distance				= 600		;500
+fire_distance				= 100					;;;109974 10:1
 bullet_speed				= 800		;870
 use_aim_bullet				= false
 
@@ -259,18 +260,18 @@ rpm						= 700
 fire_dispersion_base	= 0.014			;0.3
 hit_power				= 2.3			;0.7
 hit_impulse				= 180			;280
-fire_distance			= 600			;500
+fire_distance			= 200					;;;109974 10:1
 bullet_speed			= 920			;970
 
 [turret_tb3d_tripod]:turret_mgun
-visual				= weapons\mounted_weapons\wpn_turret_nato.ogf					--green camo on tripod
+visual				= weapons\mounted_weapons\wpn_turret_nato.ogf					;;--green camo on tripod
 ammo_class			= ammo_5.56x45_ap
 snd_shoot			= weapons\lr300_shoot2
 rpm						= 300
 fire_dispersion_base	= 0.014
 hit_power				= 1.0
 hit_impulse				= 100
-fire_distance			= 600
+fire_distance			= 60					;;;109974 10:1
 bullet_speed			= 720
 
 cam_relax_speed         = 1.0
@@ -290,7 +291,7 @@ max_mgun_attack_dist	= 60
 immunities_sect			= turret_tb3d_immunities
 
 [turret_tb3d_pivot]:turret_tb3d_tripod
-visual					= weapons\mounted_weapons\wpn_turret_pkm.ogf				--green camo on pivit
+visual					= weapons\mounted_weapons\wpn_turret_pkm.ogf				;;--green camo on pivit
 max_mgun_attack_dist	= 60
 
 [turret_tb3d_barrier]:turret_tb3d_pivot
@@ -300,7 +301,7 @@ misfire_probability 		= 0.0
 condition_shot_dec 			= 0.0
 
 [turret_tb3d_pkm]:turret_tb3d_tripod
-visual						= weapons\mounted_weapons\wpn_pkm_trenoga.ogf			--open PKM on tripod
+visual						= weapons\mounted_weapons\wpn_pkm_trenoga.ogf			;;--open PKM on tripod
 min_mgun_attack_dist	= 1
 max_mgun_attack_dist	= 30
 

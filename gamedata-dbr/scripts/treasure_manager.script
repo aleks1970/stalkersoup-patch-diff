@@ -1,5 +1,6 @@
---TB3D 1.0.9.9.8.0 fixed spawn={} in loop, removed af_ameba_ from lists as they cannot motivate in stashes, \\n, debug, translate and text color - aleks1970
-function my_ver() return "1.0.9.9.8.0" end
+--TB3D 1.0.9.9.9.9 fixed spawn={} in loop, removed af_ameba_ from lists as they cannot motivate in stashes, \\n, debug,
+-- translate and text color - aleks1970, misc\ to trade\
+function my_ver() return "1.0.9.9.9.9" end
 -- solid_list based on Linspiro Addon v1.1
 local translate = game.translate_string
 local text_color_name = TB3D_Services.get_text_color("name")
@@ -350,45 +351,47 @@ class "CTreasure"
 function CTreasure:__init()
 	--' At Designer proofreads LTX and create a piece of quests.
 	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure init") end
-	local iniFileName = "misc\\treasure_manager.ltx"
+	local iniFileName = "trade\\treasure_manager.ltx"
 	self.ini = ini_file(iniFileName)
 	--' We iterate over all settings phrases
 	if not iniLineSectionExist("list",iniFileName) then
 		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("TRSR MGR: There is no section [list] in treasure_manager.ltx") end
-	end
-	local n = iniLinesCount("list",iniFileName)
-	local id, value = "",""
-	--' initial setup
-	self.treasure_info = {}
-	for i=0,n-1 do
-		result, id, value	= getIniLine("list",i,"","",iniFileName)
-		self.treasure_info[id] = {}
-		self.treasure_info[id].target		= utils.cfg_get_number(self.ini, id, "target", nil, true)
-		--self.treasure_info[id].target		= getIniValueFloat(id, "target", nil, iniFileName)
-		self.treasure_info[id].name			= utils.cfg_get_string(self.ini, id, "name", nil, true, "")
-		--self.treasure_info[id].name			= getIniValueString(id, "name", "", iniFileName)
-		self.treasure_info[id].description	= utils.cfg_get_string(self.ini, id, "description", nil, true, "")
-		--self.treasure_info[id].description	= getIniValueString(id, "description", "", iniFileName)
-		self.treasure_info[id].items		= parse_spawns(utils.cfg_get_string(self.ini, id, "items", nil, true, ""))
-		--self.treasure_info[id].items		= parse_spawns(getIniValueString(id, "items", "", iniFileName))
-		local community	= parse_names(getIniValueString(id, "community", "stalker, bandit, dolg, freedom", iniFileName))
-		self.treasure_info[id].community = {}
-		for k,v in pairs(community) do
-			self.treasure_info[id].community[v] = true
+	else
+		local n = iniLinesCount("list",iniFileName)
+		local id, value = "",""
+		--' initial setup
+		self.treasure_info = {}
+		for i=0,n-1 do
+			result, id, value	= getIniLine("list",i,"","",iniFileName)
+			--TB3D_Services.packet_alert("treasure mgr: init result["..utils.to_str(result).."] id["..id.."] value["..value.."]")
+			self.treasure_info[id] = {}
+			self.treasure_info[id].target		= utils.cfg_get_number(self.ini, id, "target", nil, true)
+			--self.treasure_info[id].target		= getIniValueFloat(id, "target", nil, iniFileName)
+			self.treasure_info[id].name			= utils.cfg_get_string(self.ini, id, "name", nil, true, "")
+			--self.treasure_info[id].name			= getIniValueString(id, "name", "", iniFileName)
+			self.treasure_info[id].description	= utils.cfg_get_string(self.ini, id, "description", nil, true, "")
+			--self.treasure_info[id].description	= getIniValueString(id, "description", "", iniFileName)
+			self.treasure_info[id].items		= parse_spawns(utils.cfg_get_string(self.ini, id, "items", nil, true, ""))
+			--self.treasure_info[id].items		= parse_spawns(getIniValueString(id, "items", "", iniFileName))
+			local community	= parse_names(getIniValueString(id, "community", "stalker, bandit, dolg, freedom", iniFileName))
+			self.treasure_info[id].community = {}
+			for k,v in pairs(community) do
+				self.treasure_info[id].community[v] = true
+			end
+			if self.treasure_info[id].items == nil then
+				if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("TRSR MGR: cant find 'items' in  "..id) end
+			end
+			self.treasure_info[id].condlist		= xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", getIniValueString(id, "condlist", "", iniFileName))
+			--' It should be noted as a new cache
+			self.treasure_info[id].active = false
+			self.treasure_info[id].done = false
+			--if TB3D_Modders.show_tables then show_tables(self.treasure_info, nil, "treasuer mgr") end
 		end
-		if self.treasure_info[id].items == nil then
-			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("TRSR MGR: cant find 'items' in  "..id) end
+		--' Auxiliary tables for easy retrieval
+		self.treasure_by_target = {}
+		for k,v in pairs(self.treasure_info) do
+			self.treasure_by_target[v.target] = k	
 		end
-		self.treasure_info[id].condlist		= xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", getIniValueString(id, "condlist", "", iniFileName))
-		--' It should be noted as a new cache
-		self.treasure_info[id].active = false
-		self.treasure_info[id].done = false
-		--if TB3D_Modders.show_tables then show_tables(self.treasure_info, nil, "treasuer mgr") end
-	end
-	--' Auxiliary tables for easy retrieval
-	self.treasure_by_target = {}
-	for k,v in pairs(self.treasure_info) do
-		self.treasure_by_target[v.target] = k	
 	end
 	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure init DONE") end
 end
@@ -508,7 +511,7 @@ function CTreasure:give_treasure(k)
        sim:set_switch_offline (obj.id, true)
 --       sim:set_switch_online  (obj.id, true)
 --       sim:set_switch_offline (obj.id, false)
-       amk.convert_npc[obj.id]=1 -- put in place for withdrawal in the online
+       amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
     end
 	else
 		--printf("TREASURE %s, target doesnt exist", k)

@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons
 [wpn_l115a3]:identity_immunities
 GroupControlSection	= spawn_group
-discovery_dependency = 
+;;discovery_dependency = 
 $spawn                  = "weapons\svd"		; option for Level Editor
 $npc			 		= on				; option for Level Editor
 $prefetch 		 		= 8
@@ -9,7 +10,7 @@ cform                   = skeleton
 class                   = WP_SVD
 min_radius              = 0
 max_radius              = 50
-description				= desc_l115a3
+description				= desc_l115a3_descr
 
 ef_main_weapon_type		 = 3
 ef_weapon_type			 = 8
@@ -58,8 +59,8 @@ slot 					= 2		; // secondary
 animation_slot			= 2		; type of the animation that will be used
 
 
-inv_name				= L115A3
-inv_name_short			= wpn_l115a3_name
+inv_name				= desc_l115a3
+inv_name_short			= desc_l115a3_s
 inv_weight				= 4.9
 
 inv_grid_width			= 6
@@ -95,7 +96,7 @@ hit_power           		= 0.99
 hit_impulse		 			= 100
 hit_type 					= fire_wound
 
-fire_distance       = 1400
+fire_distance       = 140					;;;109974 10:1
 bullet_speed		= 936	;начальная скорость пули
 rpm                 = 27
 ; end ttc
@@ -197,21 +198,21 @@ $spawn						= "weapons\ammo\ammo_7.62x54_7h1" ; option for Level Editor
 class						= AMMO
 cform                   	= skeleton
 visual                  	= dav_wpn_xp1\ammo\30x06.ogf
-description					= enc_weapons1_ammo300_Magnum
+description					= enc_weapons1_ammo300_Magnum_descr
 $prefetch 					= 64
 
 cost					 	= 900
 
 box_size					= 10
 
-inv_name					= .300-Winchester-Magnum
-inv_name_short				= .300-Winchester-Magnum
+inv_name					= dav_weapons1_ammo300_Magnum
+inv_name_short				= dav_weapons1_ammo300_Magnum_s
 inv_weight					= .23
 
 inv_grid_width				= 2
 inv_grid_height				= 1
-inv_grid_x					= 31
-inv_grid_y					= 39
+inv_grid_x					= 62
+inv_grid_y					= 1
 
 k_dist						= 1
 k_disp						= 1.5;3

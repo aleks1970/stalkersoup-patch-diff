@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.8 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.9 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started,
---ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2, level up 3, cleanup
-function my_ver() return "1.0.9.9.9.8" end
+--ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2, level up 3, cleanup, agro knockdown
+function my_ver() return "1.0.9.9.9.9" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -13,8 +13,6 @@ function on_net_spawn()
 end
 
 local spawned_1, spawned_2, spawned_3, spawned_4, spwaned_5, spawned_6				--109981, spawn triggers
-local tower_pos = vector():set(-278.763,15.172,23.567)		--109976
-local deadm_dogs = vector():set(75.784,4.777,79.351)		--109980, dogs
 local upd_timeLDK
 local upd_timeTB3D
 function update(time_now, slice_base)															--only called if is_collector() = true
@@ -26,7 +24,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 		end
 		local ln = level.name()
 		local level_up = TB3D_Services.get_level_up()											--109955 for actions past the Collector levelup
-		if level_up < 4 then
+		if level_up < 4 then								--level-up 1 thru 3 are collector, 4 is the live-link multiplayer and dlc services
 			local pos = db.actor:position()
 			amk.oau_watchdog=678
 			if upd_timeLDK < time_now then							--109986, treasure hunt
@@ -38,6 +36,8 @@ function update(time_now, slice_base)															--only called if is_collecto
 							TB3D_Services.packet_alert("tb3d collector: actor_update - LDK["..utils.to_str(time_now).."]")
 						end
 						dav_ldk.spawn_ldk1(ln, pos)
+					else
+						upd_timeLDK = upd_timeLDK + 10000			--109999, check less often if not active
 					end
 				end
 			elseif upd_timeTB3D < time_now then
@@ -47,18 +47,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 					if TB3D_Modders.use_slice_message then
 						TB3D_Services.packet_alert("tb3d collector: actor_update - TB3D["..utils.to_str(time_now).."]")
 					end
-					if not has_alife_info("tb3d_teleport_zaton") then									--check if hideout done yet
-						if has_alife_info("agr_knockdown") then											--entered strelok hideout
-							if has_alife_info("tb3d_agr_knockdown") then								--send player to backwater
-								TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
-								TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
-							else
-								TB3D_Services.give_info("tb3d_agr_knockdown")							--delay one cycle
-							end
-							return				--109982
-						end
-					end
-					if ln == "l01_escape" then		--109981
+					if ln == "l01_escape" then						--109981 ==============================================================
 						if has_alife_info("zep00_have") then
 							if spawned_1 == 0 then
 								if actor_in_range(vector():set(115.079,-7.688,-15.837), 10000) then
@@ -82,19 +71,24 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 						end
-					elseif ln == "l06_rostok" then		--109982
+					elseif ln == "l06_rostok" then					--109982 ==============================================================
 						amk.oau_watchdog=676
-						if actor_in_range(vector():set(-99.404,-0.003,161.465), 1) then			--fell in crack
-							TB3D_Services.move_actor(-220.78823852539,2.810574054718,203.17919921875, true)				--top of sheds n of tracks
+						if actor_in_range(vector():set(-99.404,-0.003,161.465), 1) then								--fell in crack
+							TB3D_Services.move_actor(-220.78823852539,2.810574054718,203.17919921875, true)			--top of sheds n of tracks
 						end
-					elseif ln == "l11_pripyat" then		--109976
+					elseif ln == "l04_military" then				--109999 ==============================================================
+						amk.oau_watchdog=677
+						if actor_in_range(vector():set(-286.114,2.106,478.011), 50) then		--leaving map
+							TB3D_Services.move_actor(-304.358,2.487,428.065, true)				--top of fence by outpost
+						end
+					elseif ln == "l11_pripyat" then					--109976 ==============================================================
 						amk.oau_watchdog=675
 						if actor_in_range(vector():set(68.234,0.988,341.640), 2) then			--right end of trailer in stadium
 							TB3D_Services.move_actor(169.125,-5.537,70.595, true)				--e end of main ave in underpass
 						elseif actor_in_range(vector():set(74.482,0.987,335.851), 2) then		--left end of trailer in stadium
 							TB3D_Services.move_actor(-167.298,-2.273,83.898, true)				--w end of main ave
 						end
-					elseif ln == "l12_stancia" then
+					elseif ln == "l12_stancia" then						--  ==============================================================
 						amk.oau_watchdog=674
 						if spawned_1 == 0 then
 							if actor_in_range(vector():set(363.191,-0.101,-360.855), 6000) then		--hot spot s. of viaduct on tracks at fence exit
@@ -105,15 +99,15 @@ function update(time_now, slice_base)															--only called if is_collecto
 						end
 						if has_alife_info("tb3d_goldbar_10") and not has_alife_info("tb3d_goldbar_15") then
 							if not has_alife_info("tb3d_npp1_signal_1") then
-								if actor_in_range(vector():set(55.859,-0.001,-306.080), 800) then		--hot spot pipes (80m)
+								if actor_in_range(vector():set(55.859,-0.001,-306.080), 800) then					--hot spot pipes (80m)
 									TB3D_Triggers.signal_green(154.902,1.000,-231.807,386473,2400)					--smoke at pipes
 									TB3D_Services.give_info("tb3d_npp1_signal_1")
 								end
 							end
 							if not has_alife_info("tb3d_npp1_signal_2") then
-								if actor_in_range(vector():set(138.420,-7.920,-266.784), 4000) then		--hot spot sump (400m)
+								if actor_in_range(vector():set(138.420,-7.920,-266.784), 4000) then					--hot spot sump (400m)
 									TB3D_Triggers.spawn_aes_stampede()
-									if TB3D_Services.give_info("tb3d_npp1_signal_1") then				--missed it on entry
+									if TB3D_Services.give_info("tb3d_npp1_signal_1") then							--missed it on entry
 										TB3D_Triggers.signal_green(154.902,1.000,-231.807,386473,2400)				--smoke near portal
 									end
 									TB3D_Services.give_info("tb3d_npp1_signal_2")
@@ -128,9 +122,9 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 						end
-					elseif ln == "l12_stancia_2" then											--purple fog blocking bad culling
-						amk.oau_watchdog=673
-						if pos.x>756 and pos.x<782 and pos.z>179 and pos.z<194 then
+					elseif ln == "l12_stancia_2" then					--  ==============================================================
+						amk.oau_watchdog=673				
+						if pos.x>756 and pos.x<782 and pos.z>179 and pos.z<194 then				--purple fog blocking bad culling
 							TB3D_Services.move_actor(520.281,18.204,268.394,true)				--rooftop near generators
 							if has_alife_info("tb3d_note_04") then
 								TB3D_Dialog.spawn_snorks_on_roof()
@@ -151,7 +145,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 						end
-					elseif ln == "l12u_sarcofag" then
+					elseif ln == "l12u_sarcofag" then					--  ==============================================================
 						amk.oau_watchdog=672
 						if has_alife_info("tb3d_goldbar_15") then
 							if not has_alife_info("tb3d_sarc_signal_1") then
@@ -171,11 +165,12 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 						end
-					elseif ln == "marsh" then
+					elseif ln == "marsh" then							--  ==============================================================
 						amk.oau_watchdog=671
 						if spawned_1 == 0 then
 							local spawns = amk.load_variable("swamp_spawns", 0)
 							if spawns == 0 and not has_alife_info("tb3d_marmor_have") then
+								local tower_pos = vector():set(-278.763,15.172,23.567)		--109999
 								if actor_in_range(tower_pos, 40000) then 								--10:1 = 4000m	(10k = campfire N. accross water)
 									alife():create("nebo_heavy_outfit", tower_pos, 7283, 3351)			--far west tower smoke signal and armor	
 									TB3D_Triggers.signal_green(-278.763,17.172,23.567,7283,3351)		--zone removed on level change
@@ -186,8 +181,9 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 						end
-					elseif ln == "swamp_old" then	
+					elseif ln == "swamp_old" then						--  ==============================================================
 						if spawned_1 == 0 then
+							local deadm_dogs = vector():set(75.784,4.777,79.351)		--109999, dogs
 							if actor_in_range(deadm_dogs, 10000) then
 									TB3D_Services.packet_alert("in range")
 								if TB3D_Services.is_night() then
@@ -199,7 +195,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 								amk.save_variable("has_spawned1", spawned_1)
 							end
 						end
-					elseif ln == "hospital" then
+					elseif ln == "hospital" then						--  ==============================================================
 						amk.oau_watchdog=670
 						hospital_fog_maze()
 					elseif ln == "hiding_road" then
@@ -215,12 +211,12 @@ function update(time_now, slice_base)															--only called if is_collecto
 								amk.save_variable("hr_spawns",4)
 							end
 						end
-					elseif ln == "cs_agroprom_underground" then
+					elseif ln == "cs_agroprom_underground" then			--  ==============================================================
 						amk.oau_watchdog=669
 						TB3D_Services.give_info("red_krovosos_spawn")			--109982, start tunnel rat sequence in red forest
 						TB3D_Services.give_info("red_polter_spawn")
 						if spawned_1 == 0 then
-							if actor_in_range(vector():set(110.616,-2.236,-25.753), 100) then		--hot spot central
+							if actor_in_range(vector():set(110.616,-2.236,-25.753), 100) then			--hot spot central
 								local spawns = amk.load_variable("cs_agro_spawns", 0)
 								if spawns == 0 or spawns == 10 then
 									TB3D_Mobs.spawn_snorks(108.668,-7.732,37.993,3159,3865,3)
@@ -233,7 +229,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 							end
 						end
 						if spawned_2 == 0 then
-							if actor_in_range(vector():set(107.733,-7.817,52.732), 10) then		--hot spot spiral stairs
+							if actor_in_range(vector():set(107.733,-7.817,52.732), 10) then				--hot spot spiral stairs
 								local spawns = amk.load_variable("cs_agro_spawns", 0)
 								if spawns < 10 then 
 									TB3D_Mobs.spawn_snorks(72.605,-16.118,103.204,1323,3858,3)			--snorks far end gate
@@ -244,14 +240,14 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 						end
-					elseif ln == "l01_krasivay" then						--109993, construcion site top level ambush
+					elseif ln == "l01_krasivay" then			--109993,  ==============================================================
 						amk.oau_watchdog=668
 						local spawns = amk.load_variable("dist_spawns", 0)
 						if spawns == 0 then
 							if pos.y > 17 then								--on stairs or (climbing crain -12.932,24.026,122.353)
 								if pos.x < -6 and pos.x > -44 then			--in construction area
 									if pos.z < 174 and pos.z > 125 then		--109995, adjusted for crane
-										TB3D_Triggers.dist_center_ambush()
+										TB3D_Triggers.dist_center_ambush()	--construcion site top level ambush
 										amk.save_variable("dist_spawns", 1)
 									end
 								end
@@ -259,7 +255,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 						elseif spawns == 1 then
 							--future use
 						end
-					elseif ln == "jupiter" then
+					elseif ln == "jupiter" then							--  ==============================================================
 						if has_alife_info("collector_done_with_jupiter") or not has_alife_info("collector_ready_for_jupiter") then
 							if has_alife_info("zep05_have") then
 								if spawned_1 == 0 then
@@ -277,13 +273,21 @@ function update(time_now, slice_base)															--only called if is_collecto
 									end
 								end
 							end
+							if spawned_3 == 0 then
+								if actor_in_range(vector():set(-407.480,2.841,13.412), 5) then
+									TB3D_Mobs.spawn_killer_squad(-388.932,2.640,-2.787,60712,3708,6,2,false)					--109999, radar station
+									TB3D_Mobs.spawn_killer_squad(-391.627,11.415,-3.504,57669,3708,6,2,false)					--radar station
+									spawned_3=1
+									amk.save_variable("has_spawned3", spawned_3)
+								end
+							end
 						end
-					elseif ln == "zaton" then								--109976
+					elseif ln == "zaton" then						--109976  ==============================================================
 						amk.oau_watchdog=667
 						if has_alife_info("collector_done_with_zaton") or not has_alife_info("collector_ready_for_zaton") then
 							local spawns = amk.load_variable("zat_spawns", 0)
 							if spawned_1 == 0 then
-								if actor_in_range(vector():set(557.005,-7.415,-189.347), 1000) then					--exit to eprip
+								if actor_in_range(vector():set(557.005,-7.415,-189.347), 1000) then						--exit to eprip
 									if spawns == 1 or spawns == 3 then
 										TB3D_Mobs.spawn_killer_squad(544.057,-6.068,-223.529,1823654,3696,6,1,false)
 										TB3D_Mobs.spawn_killer_squad(570.633,-6.671,-208.310,1839422,3696,6,1,false)
@@ -323,13 +327,13 @@ function update(time_now, slice_base)															--only called if is_collecto
 									alife():create("ammo_9x39_izomorf", vector():set(150.074,-5.908,-138.724),1224672,3688)			--ammo on table
 									alife():create("ammo_9x39_izomorf", vector():set(150.074,-5.908,-138.724),1224672,3688)			--ammo on table
 									alife():create("wpn_fn2000_paratrooper", vector():set(150.074,-5.908,-138.724),1224672,3688)	--sniper rifle on table
-									TB3D_Triggers.signal_green(154.777,25.015,-138.116,1230702,3688)												--in crows nest
+									TB3D_Triggers.signal_green(154.777,25.015,-138.116,1230702,3688)								--in crows nest
 									spawned_3=1
 									amk.save_variable("has_spawned3", spawned_3)
 								end
 							end
 							if spawned_4 == 0 then
-								if actor_in_range(vector():set(155.453,20.015,-138.648), 10) then					--crows nest hot spot
+								if actor_in_range(vector():set(155.453,20.015,-138.648), 10) then						--crows nest hot spot
 									if spawns == 1 or spawns == 3 then
 										TB3D_Mobs.spawn_killer_squad(162.406,4.821,-194.288,1243956,3688,6,1,true)		--site next to boat
 										TB3D_Mobs.spawn_killer_squad(170.868,10.786,-260.843,1258149,3683,6,1,true)
@@ -348,7 +352,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 							if spawned_5 == 0 then
-								if actor_in_range(vector():set(322.044,33.323,-428.168), 10000) then					--crows nest hot spot
+								if actor_in_range(vector():set(322.044,33.323,-428.168), 10000) then						--crows nest hot spot
 									if spawns == 1 or spawns == 3 then
 										TB3D_Mobs.spawn_killer_squad(324.381,41.749,-394.286,1509432,3690,6,1,false)		--site next to boat
 									elseif spawns == 2 or spawns == 4 then
@@ -369,7 +373,7 @@ function update(time_now, slice_base)															--only called if is_collecto
 								end
 							end
 						end
-					elseif ln == "yantar_old" then								--109993
+					elseif ln == "yantar_old" then					--109993  ==============================================================
 						if actor_in_range(vector():set(-151.652,1.866,-181.755), 10) then					--basement no ladder
 							TB3D_Triggers.old_research_send()
 						elseif actor_in_range(vector():set(-167.746,2.116,-214.804), 10) then				--basement no ladder
@@ -377,12 +381,12 @@ function update(time_now, slice_base)															--only called if is_collecto
 						end
 					end
 				end			-- slice base < 4
-			elseif upd_timeTB3D < time_now then			-- > level-up 3
+			elseif upd_timeTB3D < time_now then			-- level-up > 3
 				amk.oau_watchdog=666
 				upd_timeTB3D = time_now + (110 * slice_base) 								--*(<3) TB3D spawns, avg 0.11gs
 				if slice_base < 4 then
 					if TB3D_Modders.use_slice_message then
-						TB3D_Services.packet_alert("tb3d collector: actor_update - TB3D["..utils.to_str(time_now).."]")
+						TB3D_Services.packet_alert("tb3d collector: actor_update - DLC["..utils.to_str(time_now).."]")
 					end
 					if TB3D_DLC_001 then TB3D_DLC_001.update(time_now, slice_base, ln) end								--109978, optional dlc content				
 					if TB3D_DLC_002 then TB3D_DLC_002.update(time_now, slice_base, ln) end								--109978, optional dlc content				
@@ -417,8 +421,8 @@ function on_item_take(obj)
 				TB3D_Services.info_alert("Collector Spawning: ["..obj:section().."]")
 			end
 			TB3D_dav_hunt.spawn_next(1)																				--Randomly spawns caches
-			TB3D_Triggers.spawn_alife_rand("rat_normal",-208.098,-20.370,-171.540,45243,50,8)
-			TB3D_Triggers.spawn_alife_rand("rat_weak",-208.098,-20.370,-171.540,45243,50,8)
+			TB3D_Triggers.spawn_alife_rand("rat_normal",-208.098,-20.370,-171.540,45243,50,4)
+			TB3D_Triggers.spawn_alife_rand("rat_weak",-208.098,-20.370,-171.540,45243,50,4)
 		elseif string_sub(sect,1,8)=="zep_doc_" then
 			TB3D_Dialog.found_zep_document(tonumber(string_sub(sect,9)))
 		elseif string_sub(sect,1,9)=="zep_note_" then

@@ -655,7 +655,7 @@ function companion_start_following(npc, actor)
 		xr_companion.save_var_companion(npc:id(), "release_time", time_to_release)
 		npc:set_character_community(npc_com, 0, 0)
 		npc:set_relation(game_object.friend, db.actor) 
-		trade_manager.trade_init(npc, "misc\\trade_obmen.ltx")
+		trade_manager.trade_init(npc, "trade\\trade_obmen.ltx")	-- misc to trade folder - aleks1970
 		level.map_add_object_spot_ser(npc:id(), "alife_presentation_companion", "Companion")	
 		st_c.enabled = true
 		st_c.behavior = xr_companion.beh_walk_simple
@@ -671,7 +671,7 @@ function companion_stop_following(npc, actor)
 	local relation = xr_companion.load_var_companion(npc:id(), "friendship_status", nil)
 	npc:set_character_community(comm, 0, 0)
 	npc:set_relation(tonumber(relation), db.actor)
-	trade_manager.trade_init(npc, "misc\\trade_generic.ltx")	
+	trade_manager.trade_init(npc, "trade\\trade_generic.ltx")	
 	level.map_remove_object_spot(npc:id(), "alife_presentation_companion")
 	xr_companion.companions[npc:id()] = nil
 	xr_gulag.resetJob(npc)

@@ -1,12 +1,12 @@
----TB3D 1.0.9.9.9.8 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.9.9 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
 -- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
--- old_research_send, spawn_sewer_stuff, zat lost, night creatures
-function my_ver() return "1.0.9.9.9.8" end
+-- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs
+function my_ver() return "1.0.9.9.9.9" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random = math.random
 local math_floor = math.floor
@@ -328,6 +328,7 @@ function tunnel_rat()
 	spawn_suit(6,-136.159,0.380,34.015,7478,3240)
 	--intersect1: (-137.315,0.673,24.377),7432,3240)
 	alife():create("wpn_sg552_fss_de", vector():set(-177.644,3.123,-25.667),3556,3240)	--behind gate
+	news_manager.amk_send_tip_id("sms_tunnel_rat_2","sms_sid",10,30,"trader")
 	news_manager.amk_send_tip_id("sms_tunnel_rat","sms_sid",10,30,"trader")
 end
 
@@ -918,6 +919,161 @@ function delayed_action(info_id)					--called from timers
 	TB3D_Services.give_info(info_id)
 end
 
+local has_spawned = false
+function actor_idle()							--109999 called from timers, levelup 1 and up
+	local pos = db.actor:position()
+	local is_idle = (db.actor:position():distance_to_sqr(db.actor_pos) <= TB3D_Modders.actor_idle_dist)		-- if still idle then see if need stimulation
+	if has_spawned then
+		--if is_idle == false then has_spawned = false end									-- reset it
+		--tb3d_services.packet_alert("tb3d triggers: actor idle has already spawned!!!!")
+	elseif is_idle then
+		if TB3D_Services.blow() then
+			--tb3d_services.packet_alert("tb3d triggers: actor idle blowout!!!!")
+			--blowouts?
+		else
+			has_spawned = true
+			--tb3d_services.packet_alert("tb3d triggers: actor idle!!!!")
+			local ln = level.name()
+			if ln == "l01_escape" then
+				if has_alife_info("zep00_have") then
+					TB3D_Mobs.spawn_bandits(113.044,-7.495,8.628,414741,118,6)		--carpark
+				end
+			elseif ln == "l02_garbage" then
+				if has_alife_info("zep00_have") then
+					TB3D_Triggers.spawn_gar_bandits()	--hangar and swamps
+					TB3D_Mobs.spawn_dogs(192.357,-1.344,57.052,338382,384, math_random(6,12))				--big tree
+				end
+			elseif lname == "l05_bar" then
+				--nothing
+			elseif lname == "l06_rostok" then
+				if has_alife_info("zep00_have") then
+					TB3D_Mobs.spawn_ros_bandits()
+				end
+			elseif lname == "l04_darkvalley" then
+				TB3D_Mobs.check_dv_spawns()
+			elseif lname == "l03_agroprom" then
+				TB3D_Triggers.spawn_agro_dogs()
+			elseif lname == "l03u_agr_underground" then
+				TB3D_Mobs.spawn_agrou_bandits()
+			elseif lname == "l08_yantar" then
+				TB3D_Mobs.check_yantar_spawns()
+			elseif lname == "l12u_sarcofag" then
+				TB3D_Triggers.sarc_spawns(1)
+			elseif lname == "l12u_control_monolith" then
+				--future
+			elseif lname == "marsh" then
+				TB3D_Mobs.check_swamp_spawns()
+			elseif lname == "l10u_bunker" then
+				TB3D_Triggers.bunker_spawns(1)
+			elseif lname == "l10_radar" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Mobs.check_radar_spawns()
+				end
+			elseif lname == "jupiter" then
+				if not has_alife_info("collector_ready_for_jupiter") or has_alife_info("collector_done_with_jupiter") then
+					TB3D_Mobs.check_jupiter_spawns()
+				end
+			elseif lname == "jupiter_underground" then
+				if not has_alife_info("collector_ready_for_jupund") or has_alife_info("collector_done_with_jupund") then
+					TB3D_Mobs.check_jupu_spawns(1)			
+				end
+			elseif lname == "zaton" then
+				if not has_alife_info("collector_ready_for_zaton") or has_alife_info("collector_done_with_zaton") then
+					TB3D_Triggers.zat_spawns(1)
+				end
+			elseif lname == "l11_pripyat" then
+				TB3D_Mobs.check_pripyat_spawns()
+			elseif lname == "pripyat" then
+				if not has_alife_info("collector_ready_for_eastprip") or has_alife_info("collector_done_with_eastprip") then
+					TB3D_Mobs.check_eprip_spawns()
+				end
+			elseif lname == "dead_city" then
+				if not has_alife_info("collector_ready_for_dcity") or has_alife_info("collector_done_with_dcity") then
+					TB3D_Mobs.check_dcity_spawns(1)
+				end
+			elseif lname == "l07_military" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Mobs.check_mil_spawns(spawns)
+					TB3D_Dialog.killers_in_camp()
+				end
+			elseif lname == "l12_stancia_2" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Dialog.npp2_killers_npp1()
+					TB3D_Mobs.check_npp2_spawns()
+				end
+			elseif lname == "l12_stancia" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Triggers.npp_spawns(1)
+					TB3D_Mobs.check_npp1_spawns()
+				end
+			elseif lname == "l01_poligon" then
+				--TODO
+			elseif lname == "k01_darkscape" then
+				TB3D_Mobs.check_ds_spawns()
+				TB3D_Triggers.ds_spawns(1)
+			elseif lname == "l04_pogost" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Mobs.check_cemetery_spawns()
+				end
+			elseif lname == "dark_forest" then
+				TB3D_Mobs.check_wasted_spawns()
+				TB3D_Triggers.spawn_df_killers()
+			elseif lname == "l01_krasivay" then
+				TB3D_Mobs.check_kras_spawns()
+			elseif lname == "l02_dd" then
+				--future use
+			elseif lname == "hiding_road" then
+				TB3D_Triggers.hr_spawns(1)
+			elseif lname == "predbannik" then
+				--TODO
+			elseif lname == "level_f-1" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Mobs.check_f1_spawns()
+				end
+			elseif lname == "generators" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Mobs.spawn_gen_skelets()
+					TB3D_Triggers.warlab_spawns(1)
+					TB3D_Mobs.spawn_gen_north(1)
+					TB3D_Mobs.check_gen_spawns(1)
+				end
+			elseif lname == "swamp_old" then
+				TB3D_Mobs.spawn_deadm_mobs()																--dogs, dogs, dogs
+			elseif lname == "aver" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Mobs.spawn_recon_mobs()
+				end
+			elseif lname == "l03_rinok" then
+				if not has_alife_info("tb3d_harsh_environment") then
+					TB3D_Mobs.check_mkt_spawns()
+				end
+			elseif lname == "lost_village" then
+				TB3D_Mobs.check_village_spawns()
+			elseif lname == "limansk" then
+				TB3D_Mobs.check_limansk_spawns()
+			elseif lname == "warlab" then
+				TB3D_Mobs.check_warlab_spawns(1)
+			elseif lname == "red_forest" then
+				if not has_alife_info("collector_ready_for_redf") or has_alife_info("collector_done_with_redf") then
+					TB3D_Mobs.check_redf_spawns()
+				end
+			elseif lname == "cs_agroprom_underground" then
+				if has_alife_info("tb3d_gb1_done") then
+					TB3D_Mobs.check_tunnels_spawns(1)
+				end
+			elseif lname == "promzone" then	
+				TB3D_Mobs.check_promzone_spawns(1, 1)
+			elseif lname == "digger_stash" then	
+				if has_alife_info("zep18_have") then TB3d_Mobs.check_diggers_spawns(1) end
+			end
+		end
+		if not has_spawned then
+			db.actor_pos = pos
+			amk.start_timer("tb3d_delay_idle", TB3D_Modders.actor_idle_delay)
+		end
+	end
+end
+
 function check_bar_drop(barnum)
 	local seq = amk.load_variable("tb3d_bar_seq", 0)
 	if seq == 0 then
@@ -1270,93 +1426,116 @@ function spawn_x14_guard()
 end
 
 function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in empty areas
-	local enemies
 	local qty = 1
 	local rand = amk.load_variable("hunt_last_rnd", 1)
 	amk.save_variable("hunt_last_rnd", rnd)
 	TB3D_Services.packet_alert("tb3d triggers: treasure hunt spawn["..utils.to_str(stash_num).."] rand["..utils.to_str(rand).."]")
-	if stash_num == 2 then			--cordon, on tunnel w/exit to dv
-		--none
-	elseif stash_num == 3 then		--cordon
-		--none, 3 rand
+	if stash_num == 1 then			--109999, cordon, house/start
+		TB3D_Mobs.spawn_bandits(113.044,-7.495,8.628,414741,118,qty)					--carpark
+		TB3D_Mobs.spawn_bandits(216.924,12.865,66.787,509099,154,qty)					--tree on hill
+		TB3D_Mobs.spawn_bandits(309.609,2.860,119.955,569821,143,qty)					--north campfire
+	elseif stash_num < 4 then			--109999, cordon, on tunnel w/exit to dv
+		qty = 2
+		TB3D_Mobs.spawn_killer_squad(-58.486,-30.666,-362.659,218265,16,3,qty,true)		--fallen tree by mines
+		TB3D_Mobs.spawn_bandits(-17.653,0.638,253.559,259851,184,qty)					--barn
+		TB3D_Mobs.spawn_bandits(-20.830,2.474,90.465,256236,86,qty)						--factory
+		TB3D_Mobs.spawn_bandits(-57.682,-0.837,202.535,220954,164,qty)					--viaduct
+		qty = 3
+		TB3D_Mobs.spawn_killer_squad(-118.567,-26.226,-474.365,135535,11,3,qty,true)	--gate to firing range
+		TB3D_Mobs.spawn_bandits(131.663,-0.454,312.142,436179,236,qty)					--skygazer camp
+		TB3D_Mobs.spawn_bandits(309.734,14.935,275.283,570028,246,qty)					--fallen tree by tracks
+		TB3D_Mobs.spawn_bandits(256.294,3.111,301.735,535972,245,qty)					--tree with corpse
+		TB3D_Mobs.spawn_bandits(183.217,1.817,360.398,484425,230,qty)					--tent
 	elseif stash_num == 4 then		--garbage
-		--TODO, 3 rand
+		TB3D_dialog.spawn_gar_found()		--snorks and spetnaz
+		qty = 3
+		TB3D_Mobs.spawn_bandits(-198.757,0.419,-28.941,30412,306,qty)					--pipes
+		qty = 4
+		TB3D_Mobs.spawn_bandits(-60.105,-2.433,-215.753,136069,268,qty)					--graveyard camp
+		TB3D_Mobs.spawn_bandits(-58.560,0.421,-11.850,136967,324,qty)					--hangar yard
 	elseif stash_num == 5 then		--agro
-		--TODO, 3 rand
+		TB3D_Triggers.spawn_agro_dogs()
 	elseif stash_num == 6 then		--garbage
-		--TODO, 3 rand
+		TB3D_dialog.spawn_gar_found()		--snorks and spetnaz
 	elseif stash_num == 7 then		--dv
-		--none, 3 rand
+		TB3D_Mobs.check_dv_spawns()
 	elseif stash_num == 8 then		--bar
 		--none, 3 rand
 	elseif stash_num == 9 then		--rostok
+		qty = 3
 		if rand == 1 then
-			TB3D_Mobs.spawn_snorks(-240.717,-0.005,37.312,13510,1423,3)
-			TB3D_Mobs.spawn_snorks(-237.589,-0.000,71.116,15237,1376,3)
-			TB3D_Mobs.spawn_snorks(-207.689,-0.030,86.989,25108,1373,3)
+			TB3D_Mobs.spawn_snorks(-240.717,-0.005,37.312,13510,1423,qty)
+			TB3D_Mobs.spawn_snorks(-237.589,-0.000,71.116,15237,1376,qty)
+			TB3D_Mobs.spawn_snorks(-207.689,-0.030,86.989,25108,1373,qty)
 		--elseif rand == 2 then
 		else
-			TB3D_Mobs.spawn_killer_squad(-145.445,-0.015,144.576,39631,1313,6,4,false)
-			TB3D_Mobs.spawn_killer_squad(-32.389,-0.001,144.550,62406,1417,6,4,false)
+			TB3D_Mobs.spawn_killer_squad(-145.445,-0.015,144.576,39631,1313,6,qty,false)
+			TB3D_Mobs.spawn_killer_squad(-32.389,-0.001,144.550,62406,1417,6,qty,false)
 		end
-		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,6)				--wt on hill near yantar exit
+		qty = 6
+		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,qty)				--wt on hill near yantar exit
 	elseif stash_num == 10 then		--yantar
-		--if rand == 3 then
-			spawn_alife_rand("tb3dm_zombie_strong",116.301,1.523,-70.573,102270,1441,9)		--on the road back
-		--end
-		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,8)			--wt on hill near yantar exit
-	elseif stash_num == 11 then		--rostok
-		if rand == 1 then
-			TB3D_Mobs.spawn_killer_squad(-253.802,-0.002,102.696,8349,1378,6,4,false)
-			TB3D_Mobs.spawn_killer_squad(-246.876,-0.002,61.497,10778,1383,6,4,false)
-		elseif rand == 2 then
-			TB3D_Mobs.spawn_killer_squad(-145.445,-0.015,144.576,39631,1313,6,4,false)
-			TB3D_Mobs.spawn_killer_squad(-32.389,-0.001,144.550,62406,1417,6,4,false)
+		if rand < 3 then
+			qty = 4
 		else
-			TB3D_Mobs.spawn_killer_squad(-160.540,0.098,185.461,35929,1329,6,4,false)
-			TB3D_Mobs.spawn_killer_squad(-251.983,0.799,172.561,9149,1342,6,4,false)
+			qty = 6
+		end
+		spawn_alife_rand("tb3dm_zombie_strong",116.301,1.523,-70.573,102270,1441,qty)		--on the road back
+		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,qty)			--wt on hill near yantar exit
+	elseif stash_num == 11 then		--rostok
+		qty = 4
+		if rand == 1 then
+			TB3D_Mobs.spawn_killer_squad(-253.802,-0.002,102.696,8349,1378,6,qty,false)
+			TB3D_Mobs.spawn_killer_squad(-246.876,-0.002,61.497,10778,1383,6,qty,false)
+		elseif rand == 2 then
+			TB3D_Mobs.spawn_killer_squad(-145.445,-0.015,144.576,39631,1313,6,qty,false)
+			TB3D_Mobs.spawn_killer_squad(-32.389,-0.001,144.550,62406,1417,6,qty,false)
+		else
+			TB3D_Mobs.spawn_killer_squad(-160.540,0.098,185.461,35929,1329,6,qty,false)
+			TB3D_Mobs.spawn_killer_squad(-251.983,0.799,172.561,9149,1342,6,qty,false)
 		end
 		if TB3D_Services.get_level_up() == 2 then TB3D_Services.give_info("tb3d_sms_storm_suit") end		--article about storm and geeks
 		
 	---------------------------------------------------------------------------------------------------------	
 	--following are in storm area and may have to wait for storm to end or wear special suit from lanky
 	elseif stash_num == 12 then		--warehouses
+		local enemies
 		if has_alife_info("tb3d_harsh_environment") then
-			enemies = "tb3dm_zombie_strong"
-			qty = 10
+			enemies = "tb3dm_zombie_babka_strong"
+			spawn_alife_rand(enemies,-6.784,-6.146,78.494,300362,1580, rand)			--warehouses, entrance to base
+			spawn_alife_rand(enemies,27.919,-8.876,-47.801,333061,1590, rand)			--warehouses, inside base
+			spawn_alife_rand(enemies,80.613,-13.523,402.588,378152,1808, rand)			--warehouses, exit to radar
+			spawn_alife_rand(enemies,-26.449,-13.582,335.959,281075,1803, rand)			--warehouses, chopper
+			spawn_alife_rand(enemies,-269.732,-6.571,406.570,68860,1851, rand)			--warehouses, below rocks
+			qty = 4
 		else
 			enemies = "tb3dm_killer_exo_unic"
-			qty = 5
+			qty = 2
+			spawn_alife_rand(enemies,-269.732,-6.571,406.570,68860,1851, rand)			--warehouses, below rocks
+			spawn_alife_rand(enemies,-26.449,-13.582,335.959,281075,1803, rand)			--warehouses, chopper
 		end
-		if rand == 1 then
-			spawn_alife_rand(enemies,-26.449,-13.582,335.959,281075,1803, qty)			--chopper
-		elseif rand == 2 then
-			spawn_alife_rand(enemies,-6.784,-6.146,78.494,300362,1580, qty)				--entrance to base
-			spawn_alife_rand(enemies,27.919,-8.876,-47.801,333061,1590, qty)			--inside base
-		else
-			spawn_alife_rand(enemies,-269.732,-6.571,406.570,68860,1851, qty)			--below rocks
-		end
-		spawn_alife_rand(enemies,80.613,-13.523,402.588,378152,1808, qty)				--exit to radar
-		spawn_alife_rand(enemies,615.869,-52.257,-301.292,221303,1882, qty)				--radar camp 1
-		spawn_alife_rand(enemies,583.710,-63.105,-179.654,207039,1886, qty)				--109984, radar camp 2 with tank
-		spawn_alife_rand(enemies,590.816,-50.166,15.045,210249,1900, qty)				--camp at turn
-		spawn_alife_rand(enemies,376.672,-50.020,9.989,108274,1864, qty)				--prip intersection
-		spawn_alife_rand(enemies,195.515,-12.702,83.415,53913,1936, qty)				--camp on upper road
-	elseif stash_num == 13 then		--radar
-		if rand == 1 then
-			spawn_alife_rand("tb3dm_zombie_strong",204.447,5.769,-14.557,72763,2030, 10)				--all around power lines
-			spawn_alife_rand("tb3dm_zombie_strong",133.932,6.594,-42.438,72759,2030, 10)
-			spawn_alife_rand("tb3dm_zombie_strong",127.306,1.572,-9.984,51093,1975, 10)
-		elseif rand == 2 then
-			--TODO
-		else
-			--TODO
-		end
+		spawn_alife_rand(enemies,615.869,-52.257,-301.292,221303,1882, qty)				--radar, camp 1
+		spawn_alife_rand(enemies,583.710,-63.105,-179.654,207039,1886, qty)				--radar, camp 2 with tank
+		spawn_alife_rand(enemies,590.816,-50.166,15.045,210249,1900, qty)				--radar, camp at turn
+		spawn_alife_rand(enemies,376.672,-50.020,9.989,108274,1864, qty)				--radar, prip intersection
+		spawn_alife_rand(enemies,195.515,-12.702,83.415,53913,1936, qty)				--radar, camp on upper road
+	elseif stash_num == 13 then		--109999, radar
+		local enemies
 		if has_alife_info("tb3d_harsh_environment") then
-			spawn_alife_rand("tb3dm_zombie_babka_strong",382.320,-33.843,145.775,112679,1926, 20)		--exit to pripyat
+			enemies = "tb3dm_zombie_babka_strong"
 		else
-			TB3D_Mobs.spawn_npcs(382.320,-33.843,145.775,112679,1926, 2, 10)						--109985, zombied npc below stash
+			enemies = "tb3dm_zombie_strong"
+			TB3D_Mobs.spawn_npcs(382.320,-33.843,145.775,112679,1926, 2, rand)						--109999, zombied npc below stash
 		end
+		gty = rand
+		spawn_alife_rand(enemies,382.320,-33.843,145.775,112679,1926, qty)			--exit to pripyat
+		spawn_alife_rand(enemies,208.683,3.740,-0.728,67298,1930, qty)				--all around power lines
+		spawn_alife_rand(enemies,202.037,6.476,14.384,67298,1930, qty)
+		spawn_alife_rand(enemies,175.939,10.920,-39.170,67298,1930, qty)
+		spawn_alife_rand(enemies,150.206,11.950,-77.123,67298,1930, qty)
+		spawn_alife_rand(enemies,204.447,5.769,-14.557,72763,2030, qty)
+		spawn_alife_rand(enemies,133.932,6.594,-42.438,72759,2030, qty)
+		spawn_alife_rand(enemies,127.306,1.572,-9.984,51093,1975, qty)
 	elseif stash_num == 15 then		--npp
 		if rand == 1 then
 			--TODO
@@ -1369,14 +1548,15 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 	elseif stash_num == 16 then		--radar, monster tree
 		--TODO, 1 rand
 	elseif stash_num == 17 then		--radar, final stash for part 1
+		qty = 6
 		if has_alife_info("tb3d_harsh_environment") then
-			spawn_alife_rand("tb3dm_zombie_strong",590.280,-51.316,-45.751,209879,1898, 6)		--below stash
-			spawn_alife_rand("tb3dm_zombie_strong",590.987,-50.149,15.658,210250,1900, 6)		--camp at corner
-			spawn_alife_rand("tb3dm_zombie_strong",652.157,-43.881,182.037,226763,1912, 6)		--exit to dv
+			spawn_alife_rand("tb3dm_zombie_strong",590.280,-51.316,-45.751,209879,1898, qty)		--below stash
+			spawn_alife_rand("tb3dm_zombie_strong",590.987,-50.149,15.658,210250,1900, qty)			--camp at corner
+			spawn_alife_rand("tb3dm_zombie_strong",652.157,-43.881,182.037,226763,1912, qty)		--exit to dv
 		else
-			TB3D_Mobs.spawn_npcs(590.280,-51.316,-45.751,209879,1898, 2, 6)						--zombied npc below stash
-			TB3D_Mobs.spawn_npcs(590.987,-50.149,15.658,210250,1900, 2, 6)						--zombied camp at corner
-			TB3D_Mobs.spawn_npcs(652.157,-43.881,182.037,226763,1912, 2, 4)						--zombied npc exit to dv
+			TB3D_Mobs.spawn_npcs(590.280,-51.316,-45.751,209879,1898, 2, qty)						--zombied npc below stash
+			TB3D_Mobs.spawn_npcs(590.987,-50.149,15.658,210250,1900, 2, qty)						--zombied camp at corner
+			TB3D_Mobs.spawn_npcs(652.157,-43.881,182.037,226763,1912, 2, qty)						--zombied npc exit to dv
 		end
 	-----------------------------------------------------------------------------------------------------
 	
@@ -1399,20 +1579,21 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 			--TODO
 		end
 	elseif stash_num == 20 then		--recon
+		local enemies
 		if has_alife_info("tb3d_harsh_environment") then
 			enemies = "tb3dm_zombie_strong"
 			qty = 10
 		else
 			enemies = "tb3dm_dog_habaruch"
-			qty = 10
-		end
-		if rand == 1 then
-			--TODO
-		elseif rand == 2 then
+			if rand == 1 then
+				qty = 8
+			elseif rand == 2 then
+				qty = 10
+			else
+				qty = 6
+			end
 			spawn_alife_rand(enemies,328.834,-6.943,-19.136,1454049,2902, qty)		--center of crater
 			spawn_alife_rand(enemies,383.709,13.251,-103.709,1557659,2907, qty)		--above rock
-		else
-			--TODO
 		end
 	elseif stash_num == 21 then					--swamp
 		if rand == 1 then
@@ -1425,6 +1606,10 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 	end
 end
 
+-- on item take: amk_zapiska, 109999 this works
+-- Critical: SMapLocation binded to non-existent object id=22462 stalker:x16_stalker_ghost
+-- Critical: SMapLocation binded to non-existent object id=22521 stalker_zombied:x16_zombied_0018
+-- Critical: SMapLocation binded to non-existent object id=22533 stalker_zombied:x16_zombied_0013
 function remove_brainlab_alife()
 	if not fix_done then
 		local is_fixed
@@ -1438,15 +1623,15 @@ function remove_brainlab_alife()
 					obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
 					level_name = alife():level_name(obj_level)
 					if level_name == "l08u_brainlab" then
+						if obj.alive then is_fixed = true end
 						--if string_find(obj:name(), "x16_stalker_ghost")
-						if string_find(obj:name(), "x16_m_controller_e") then
-							is_fixed = true
-						end
-						--TB3D_Services.remove_info("yan_controller_respawn_01")
-						--if obj.alive then is_fixed = true end				--creature or npc so remove
+						--or string_find(obj:name(), "x16_zombied_0018")
+						--or string_find(obj:name(), "x16_zombied_0013") then
+							--is_fixed = true
+						--end
 					end
 				else
-					is_fixed = true
+					is_fixed = true		--always get rid of bad objects
 				end
 				if is_fixed then alife():release(obj, true) end
 			end

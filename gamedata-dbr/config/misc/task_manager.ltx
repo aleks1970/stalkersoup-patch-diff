@@ -1,4 +1,4 @@
-;<!-- TB3D 1.0.9.9.9.8 new ranks, blocked barmen_eliminate_camp_2, missing "," and correct link for green_artefact task (Zahar 1666-1680 lines) aleks1970,
+;<!-- TB3D 1.0.9.9.9.9 new ranks, blocked barmen_eliminate_camp_2, missing "," and correct link for green_artefact task (Zahar 1666-1680 lines) aleks1970,
 ; tm_kill_stalker_2, mil_lukash_heal_reward, yan snork lair, agroprom_military_case_done, barmen eliminate camp 2 fixed, sim_stalker_gusarov, esc2-->
 [list]
 
@@ -570,7 +570,6 @@ reward_money = 5000
 reward_reputation = +20
 reward_rank = 10
 reward_item = wpn_mossberg590, ammo_12x70_kart, ammo_12x70_kart, ammo_12x70_kart
-
 prior = 2
 
 
@@ -627,7 +626,6 @@ reward_reputation = +40
 reward_relation = dolg, +25
 reward_rank = 7
 reward_item = wpn_stg44, ammo_7.92x33_ap, ammo_7.92x33_ap  
-
 prior = 4
 
 [barmen_eliminate_camp_5]
@@ -643,7 +641,6 @@ reward_reputation = +35
 reward_relation = dolg, +15
 reward_rank = 5
 reward_item = wpn_ak47_md, ammo_7.62x39_ap, ammo_7.62x39_ap
-
 prior = 3
 
 [barmen_eliminate_camp_6]
@@ -658,7 +655,6 @@ reward_reputation = +35
 reward_relation = dolg, 20
 reward_rank = 7
 reward_item = wpn_galil_arm_sk1, ammo_5.56x45_ap, ammo_5.56x45_ap, ammo_5.56x45_ap
-
 prior = 2
 
 [barmen_eliminate_camp_7]
@@ -673,7 +669,6 @@ reward_reputation = +35
 reward_relation = dolg, +15
 reward_rank = 6
 reward_item = ammo_7.62x51_ap, ammo_7.62x51_ap, ammo_7.62x51_ap
-
 prior = 5
 
 
@@ -688,7 +683,6 @@ target = af_mincer_meat
 reward_reputation = +35
 reward_rank = 5
 reward_item = medkit_scientic, medkit_scientic, medkit_scientic, ammo_5.45x39_ap, ammo_5.45x39_ap    
-
 prior = 1
 
 
@@ -704,7 +698,6 @@ target = af_rusty_kristall
 reward_reputation = +25
 reward_rank = 6
 reward_item = medkit_scientic, medkit_scientic, wpn_tgp-a_silencer  
-
 prior = 3
 
 
@@ -733,7 +726,6 @@ reward_money = 1000
 reward_reputation = +20
 reward_rank = 4
 reward_item = ammo_7.62x39_ap, ammo_7.62x39_ap, ammo_7.62x39_ap
-
 prior = 2
 
 [barmen_find_artefact_5]
@@ -752,17 +744,16 @@ prior = 5
 [barmen_kill_stalker_1]
 type = kill_stalker
 community = actor
+condlist = {+mil_Svoboda_trader_ammo_done}
 text = barmen_kill_stalker_1_text
 description = barmen_kill_stalker_1_descr
 parent = barman
 target = agr_ratcatcher
 target_dialog = amk_recipts_ratcatcher
 reward_reputation = +15
-;reward_relation = dolg, -5
 reward_rank = 5
 reward_item = af_ameba_slug
 reward_info = sniper_begin_five
-prior = 1
 
 [barmen_kill_stalker_2]
 type = kill_stalker
@@ -782,7 +773,6 @@ prior = 3
 type = kill_stalker
 community = actor
 condlist = {+yan_kill_brain_done}
-;;need_return = false
 text = barmen_kill_stalker_3_text
 description = barmen_kill_stalker_3_descr
 parent = barman
@@ -864,7 +854,6 @@ target = mutant_flesh_eye
 reward_reputation = +20
 reward_rank = 5
 reward_item = ammo_7.62x39_ap, ammo_7.62x39_ap, vodka, vodka
-
 prior = 3
 
 [barmen_monster_part_2]
@@ -878,7 +867,6 @@ reward_money = 1500
 reward_reputation = +20
 reward_rank = 5
 reward_item = vodka, ammo_7.92x33_ap
-
 prior = 4
 
 [barmen_monster_part_3]
@@ -892,7 +880,6 @@ target = mutant_tail_cat
 reward_reputation = +20
 reward_rank = 5
 reward_item = medkit_army, antirad, ammo_20x85
-
 prior = 1
 
 [barmen_monster_part_4]
@@ -906,7 +893,6 @@ target = mutant_face_tushkano
 reward_reputation = +20
 reward_rank = 5
 reward_item = medkit, ammo_5.56x45_ss190
-
 prior = 2
 
 [barmen_defend_camp_1]
@@ -1668,8 +1654,8 @@ prior = 2
 [green_find_artefact_3]
 type = artefact
 community = actor
-text = green_find_artefact_3_text	; aleks1970
-description = green_find_artefact_3_descr	; aleks1970
+text = green_find_artefact_3_text
+description = green_find_artefact_3_descr
 parent = green
 target = af_babka_1
 reward_reputation = +15
@@ -1682,8 +1668,8 @@ prior = 3
 [green_find_artefact_4]
 type = artefact
 community = actor
-text = green_find_artefact_4_text	; aleks1970
-description = green_find_artefact_4_descr	; aleks1970
+text = green_find_artefact_4_text
+description = green_find_artefact_4_descr
 parent = green
 target = af_dik_2
 reward_reputation = +15

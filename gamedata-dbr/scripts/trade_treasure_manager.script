@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.1, translate and text color - aleks1970
-function my_ver() return "1.0.9.9.1" end
+--TB3D 1.0.9.9.9, translate and text color - aleks1970
+function my_ver() return "1.0.9.9.9" end
 
 local translate = game.translate_string
 local text_color_treasure = TB3D_Services.get_text_color("treasure")
@@ -129,7 +129,7 @@ class "CTreasure"
 function CTreasure:__init()
 if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("trade trsr mgr: treasure init") end
 	--' At Designer proofreads LTX and create a piece of quests.
-	self.ini = ini_file("misc\\treasure_manager.ltx")
+	self.ini = ini_file("trade\\treasure_manager.ltx")	-- changed misc to trade!!! - aleks1970
 
 	--' We iterate over all settings phrases
 	if not self.ini:section_exist("list") then
@@ -293,7 +293,7 @@ function CTreasure:give_treasure(k)
 		if sim ~= nil and obj.online then
 			sim:set_switch_online  (obj.id, false)
 			sim:set_switch_offline (obj.id, true)
-			amk.convert_npc[obj.id]=1 -- put in place for withdrawal in the online
+			amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
 		end
 	else
 	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: treasure not exist ["..utils.to_str(k).."]") end

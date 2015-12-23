@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.5.0  added my_ver
-function my_ver() return "1.0.9.9.5.0" end
+--TB3D 1.0.9.9.9.9  added my_ver 
+function my_ver() return "1.0.9.9.9.9" end
 prefetch("_G")
 
 function cs_register(factory,client_object_class,server_object_class,clsid,script_clsid)
@@ -50,6 +50,8 @@ function register(object_factory)
 	cs_register	(object_factory, "CTushkano",       "se_monster.se_monster",	"SM_TUSHK",	"tushkano_s")
 	cs_register	(object_factory, "CPsyDog",         "se_monster.se_monster",	"SM_DOG_P", "psy_dog_s")
 	cs_register	(object_factory, "CPsyDogPhantom",  "se_monster.se_monster",	"SM_DOG_F", "psy_dog_phantom_s")
+	--cs_register	(object_factory, "CChimera",        "se_monster.se_monster",	"SM_WEREW",	"werewolf_s")
+	--cs_register	(object_factory, "CFracture",   	"se_monster.se_monster",	"SM_BIBLI",	"bibliotekar_s")
 	
 --[[   --109950  la
 	cs_register(object_factory, "CTushkano",         "se_monster.se_monster",            "SM_RAT",   "rat_s") --/#+#

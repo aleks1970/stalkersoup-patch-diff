@@ -1,5 +1,5 @@
+;;;; TB3D 1.0.9.9.8.8 - TB3D style weapons, icon
 ;<!-- excluded empty "discovery_dependency" aleks1970,ammo silencer and cyrillic -->
-; Ручной пулемет Калашникова РПК-74
 [wpn_rpk74_sk1]:identity_immunities
 GroupControlSection		= spawn_group
 ; discovery_dependency = ; aleks1970
@@ -84,7 +84,7 @@ PDM_crouch_no_acc 		= 1.0
 hit_power        	= 2.21
 hit_impulse		 	= 180
 hit_type 			= fire_wound
-fire_distance       = 600
+fire_distance       = 60					;;;109974 10:1
 bullet_speed		= 890 ;начальная скорость пули
 rpm                 = 550
 ; end ttc
@@ -94,7 +94,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.67
 silencer_hit_impulse	 	= 25
-silencer_fire_distance   	= 800
+silencer_fire_distance   	= 60					;;;109974 10:1
 silencer_bullet_speed	 	= 870
 
 hud                     = wpn_rpk74_sk1_hud
@@ -185,7 +185,7 @@ cform                   = skeleton
 class                   = WP_LR300
 min_radius              = 0
 max_radius              = 150
-description				= "Советский пулемет РПК (ручной пулемет Калашникова) предназначен для поражения живой силы противника и небронированной и легкобронированной техники. Разработка пулемета под 7,62 мм промежуточный патрон образца 1943 года была начата в 1954 году (был еще вариант от 1943 года, но он не имел ничего общего с РПК) и в 1955 году уже появился первый вариант пулемета. После дальнейших совершенствований пулемет был принят на вооружение Советской армии в 1961 году под индексом 6П2, заменив в войсках РПД - 44. Данный вариант имеет облегчённый затвор что увеличило скорострельность и дисковый магазин на 75 патронов."
+description				= enc_wpn_Kalashnikov_tmp_descr
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -208,14 +208,14 @@ launch_speed			= 0
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name				= "RPK-47B"
-inv_name_short			= "RPK-47B"
+inv_name				= enc_wpn_Kalashnikov_tmp
+inv_name_short			= enc_wpn_Kalashnikov_tmp_s
 inv_weight				= 5.6
 
 inv_grid_width			= 6
 inv_grid_height			= 2
-inv_grid_x				= 31
-inv_grid_y				= 16
+inv_grid_x				= 24
+inv_grid_y				= 4
 
 kill_msg_x			= 72
 kill_msg_y			= 82
@@ -269,7 +269,7 @@ hit_power        	= 0.65
 hit_impulse		 	= 75
 hit_type 			= fire_wound
 
-fire_distance       = 1000
+fire_distance       = 100					;;;109974 10:1
 bullet_speed		= 745 ;начальная скорость пули
 rpm                 = 600
 ; end ttc
@@ -279,7 +279,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.8
 silencer_hit_impulse	 	= 67
-silencer_fire_distance   	= 320
+silencer_fire_distance   	= 80					;;;109974 10:1
 silencer_bullet_speed	 	= 715
 
 hud                     = wpn_rpk47_bub_hud
@@ -331,7 +331,7 @@ silencer_light_time 		= 0.2
 zoom_enabled			= true
 scope_zoom_factor	    = 50
 
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 snd_draw					= weapons\rpk47_buben\draw
 snd_holster					= weapons\rpk47_buben\holster
 snd_shoot					= weapons\ak47_shot
@@ -363,3 +363,4 @@ zoom_offset = -0.1213, 0.0361, -0.057
 zoom_rotate_x = 0.0293
 zoom_rotate_y = 0.0161
 
+[wpn_rpk47_m1]:wpn_rpk47_bub			;;109986, pred trader

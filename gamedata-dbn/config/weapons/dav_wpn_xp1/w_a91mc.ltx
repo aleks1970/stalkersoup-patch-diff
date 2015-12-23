@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_a91mc]:identity_immunities
 GroupControlSection	= spawn_group
-discovery_dependency = 
+;;discovery_dependency = 
 $spawn                   			= "weapons\dav_wpn_xp1\a91mc"					; option for Level Editor
 $npc								= on				; option for Level Editor
 $prefetch 							= 16
@@ -9,7 +10,7 @@ cform                   			= skeleton
 class                   			= WP_VINT
 min_radius              			= 30
 max_radius              			= 100
-description							= desc_a91mc
+description							= desc_a91mc_descr
 
 ef_main_weapon_type					= 2
 ef_weapon_type						= 6
@@ -36,8 +37,8 @@ single_handed						= 0
 slot 								= 2		
 animation_slot						= 8		
 
-inv_name	         				= A-91M-C
-inv_name_short		 				= wpn_a91mc_b
+inv_name	         				= desc_a91mc
+inv_name_short		 				= desc_a91mc_s
 inv_weight		 					= 3.97
 
 inv_grid_width						= 5
@@ -93,7 +94,7 @@ hit_power           				= 0.5
 hit_impulse		 					= 40
 hit_type 							= fire_wound
 
-fire_distance           			= 1000
+fire_distance           			= 100					;;;109974 10:1
 bullet_speed						= 600
 rpm                    				= 700
 
@@ -104,7 +105,7 @@ time_to_aim							= 1.0
 
 silencer_hit_power       			= 0.5
 silencer_hit_impulse	 			= 30
-silencer_fire_distance   			= 1000
+silencer_fire_distance   			= 100					;;;109974 10:1
 silencer_bullet_speed	 			= 600
 
 hud                     			= wpn_a91mc_hud

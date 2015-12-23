@@ -1,3 +1,4 @@
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons, grenades shok and gravi
 ;<!-- excluded empty "discovery_dependency" aleks1970 -->
 ; ручная оборонительная граната Ф-1
 [grenade_f1]:identity_immunities
@@ -11,7 +12,7 @@ class					= G_F1
 cform					= skeleton
 visual					= weapons\grenade\wpn_f_1.ogf
 inv_name				= grenade-f1
-inv_name_short			= grenade-f1
+inv_name_short			= grenade-f1_s
 inv_weight				= 0.63
 description				= enc_weapons1_grenade-f1
 ;belt					= true
@@ -114,6 +115,7 @@ visual				= weapons\grenade\wpn_gd_05.ogf
 inv_name			     = st_grenade_gd5
 inv_name_short		     = st_grenade_gd5
 description			= enc_weapons1_grenade-gd05
+inv_weight				= 0.48
 inv_grid_width			= 1
 inv_grid_height		= 1
 inv_grid_x			= 19
@@ -191,17 +193,17 @@ $prefetch				= 128
 class					= G_F1
 cform					= skeleton
 visual					= weapons\grenade\yadrena_bomba.ogf
-inv_name				= grenade-f1
-inv_name_short			= grenade-f1
-inv_weight				= 0.63	;.1
+inv_name				= enc_bomba_item
+inv_name_short			= enc_bomba_item
+inv_weight				= 12.00	;.1
 description				= enc_weapons1_grenade-f1
 ;belt					= true
 ef_weapon_type			= 10
 
-inv_grid_width			= 1
-inv_grid_height			= 1
-inv_grid_x				= 9
-inv_grid_y				= 9
+inv_grid_width		= 3	;1 ;aleks1970
+inv_grid_height		= 2	;1
+inv_grid_x			= 34 ;9
+inv_grid_y			= 45 ;9
 
 kill_msg_x				= 1
 kill_msg_y				= 232
@@ -277,11 +279,11 @@ $spawn             				= "weapons\uniq\granade_gravi"
 visual					= weapons\grenade\anom\wpn_f_1.ogf
 inv_grid_width     = 1
 inv_grid_height    = 1
-inv_grid_x         = 6
-inv_grid_y         = 40
-description						= enc_weapons1_granade_gravi
-inv_name						= wpn-grenade_gravi
-inv_name_short					= wpn-grenade_gravi
+inv_grid_x         = 23
+inv_grid_y         = 63
+description						= enc_weapons1_grenade_gravi
+inv_name						= wpn_grenade_gravi
+inv_name_short					= wpn_grenade_gravi
 explode_particles		 =  anomaly2\gravity_blast_final00
 hide_in_explosion = true
 explode_duration			= 6
@@ -314,9 +316,9 @@ anim_throw_end		= attack_0_end
 [grenade_shok]:grenade_f1
 $spawn             				= "weapons\uniq\granade_shok"
 visual				= weapons\grenade\anom\wpn_f_1.ogf	
-description						= enc_weapons1_granade_gravi
-inv_name						= wpn-grenade_shok
-inv_name_short					= wpn-grenade_shok
+description						= enc_weapons1_grenade_shok
+inv_name						= wpn_grenade_shok
+inv_name_short					= wpn_grenade_shok
 explode_particles		 =  anomaly2\electra2_blast
 hide_in_explosion = true
 explode_duration			= 5
@@ -326,8 +328,8 @@ single_handed			= 1
 hud					= grenade_shok_hud
 inv_grid_width     = 1
 inv_grid_height    = 1
-inv_grid_x         = 7
-inv_grid_y         = 40
+inv_grid_x         = 63
+inv_grid_y         = 3
 
 [grenade_shok_hud]
 fire_point          = 0.05, 0.0, 0.1

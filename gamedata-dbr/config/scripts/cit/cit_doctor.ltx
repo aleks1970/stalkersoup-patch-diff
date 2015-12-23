@@ -1,5 +1,6 @@
 [logic]
-active              = remark@wait_update ;walker@go_to_actor
+;active              = remark@wait_update
+active              = walker@go_to_actor
 on_death            = death
 combat_ignore       = combat_ignore
 
@@ -18,7 +19,8 @@ victim_wpn 		    = 3 | actor
 [remark@wait_update]
 anim                = wait_na
 target              = actor
-on_info             = {!black_screen} remark@wait_actor_wake ;walker@go_to_actor
+on_info             = {!black_screen} remark@wait_actor_wake
+;on_info             = {!black_screen} walker@go_to_actor
 combat_ignore_cond  = always
 
 ;-----------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.1 fixed detach errors
-function my_ver() return "1.0.9.9.1" end
+--TB3D 1.0.9.9.9.9 fixed detach errors, debug
+function my_ver() return "1.0.9.9.9.9" end
 ---- Rulix aka Bak --- 2.7.2009
 
 function read_from_ini(iniFileName,sec,val,def,typ)
@@ -93,8 +93,8 @@ function update(tg)
 end
 
 function npc_update(npc,st)
-	if TB3D_Modders.Global_Debug == true then
-		TB3D_Services.info_alert("rx addons: npc update start")
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("rx addons: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta <<<<["..utils.to_str(delta).."]>>>>")
 	end
 	if addons_sets.enabled ~= true then
 		return
@@ -112,8 +112,8 @@ function npc_update(npc,st)
 		end
 		st.rx_addons_time = tg+math.random(addons_sets.check_prd,addons_sets.check_prd+addons_sets.check_prd*0.5)
 	end
-	if TB3D_Modders.Global_Debug == true then
-		TB3D_Services.info_alert("rx addons: npc update done")
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("rx addons: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] <<<<done>>>>")
 	end
 end
 

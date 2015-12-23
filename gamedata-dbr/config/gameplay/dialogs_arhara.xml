@@ -4328,6 +4328,7 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<!-- Fang in Recon cave under lake -->
 	<dialog id="kluk_vstrecha">
 		<dont_has_info>kluk_vstrecha_start</dont_has_info>
 		<dont_has_info>kluk_vstr_after_prizrak_start</dont_has_info>
@@ -4429,6 +4430,7 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<!-- Fang after warlab -->
 	<dialog id="kluk_vstrecha_otchet">
 		<precondition>arhara_dialog.kluk_vstrecha_have</precondition>
 		<dont_has_info>kluk_vstrecha_done</dont_has_info>
@@ -9905,7 +9907,7 @@
 		</phrase_list>
 	</dialog>
 	<!-- 109998, need create new task that does not involve eagle -->
-	<dialog id="plot_dialog_say">
+	<dialog id="plot_dialog_say">	<!-- error test/corrected/done - aleks1970 -->
 		<dont_has_info>plot_dialog_say_start</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -9955,12 +9957,13 @@
 			<phrase id="11">
 				<text>plot_dialog_say_11</text>
 				<give_info>plot_dialog_say_start</give_info>
+				<action>arhara_dialog.plot_dialog_say_info</action>	<!-- remove info "plot_dialog_say_done" if exist - aleks1970 -->
 				<action>arhara_dialog.sp_ploti_svalka</action>
 			</phrase>
 		</phrase_list>
 	</dialog>
-	<dialog id="plot_dial_ok">			
-		<precondition>arhara_dialog.plot_dialog_say_have</precondition>
+	<dialog id="plot_dial_ok">	<!-- error test - aleks1970 -->
+		<precondition>arhara_dialog.plot_dialog_say_have_itm</precondition>
 		<has_info>plot_dialog_say_have</has_info>
 		<dont_has_info>plot_dialog_say_done</dont_has_info>
 		<phrase_list>

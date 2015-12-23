@@ -151,15 +151,7 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="stranger">
 		<text>Loner</text>
 	</string>
-	<string id="wpn-p90_name">
-		<text>FN P90</text>
-	</string>
-	<string id="ammo-5.7x28_name">
-		<text>5.7x28mm FN SS190</text>
-	</string>
-	<string id="ammo-5.7x28_s">
-		<text>5.7x28mm FN SS190</text>
-	</string>
+	<!-- moved string id: "ammo-5.7x28_name" in to the string_table_enc_weapons file -aleks1970 -->
 	<string id="enc_weapons1_wpn-pkm">
 		<text>Ammunition - \n: 7.62x54mm\n Capacity - \n: 100 rounds\n.\nSuch a weapon is usually only found on heavily armed detachments of Military STALKERs ... Extremely rare because of it's large size and weight. Requires the use of Exoskeleton armour due to it's large size, as it must be strapped on, and attached to the users armour. \nThe original PK Pulemyot Kalashnikova or Kalashnikovs Machinegun was a development of Kalashnikovs automatic rifle design, firing the 7.62x54mmR Eastern Bloc standard ammunition originally from the Mosin-Nagant. It is equipped with a simple bipod and is designed as a squad-level support weapon; it is also suitable for installation and vehicle mounting. The PK machine gun can be used as a light anti-aircraft weapon when it is put on an AA mount. Most are belt-fed, using linked 25 round belts. These 25-round belts can be linked to any length necessary. Typical of Soviet machine guns, the standard model feeds from the right and ejects it's spent cases via an ejection port on the left side of the weapon, contrary to the right side ejection port seen in most Western machine guns.\nThe PKM Kalashnikovs Machine-gun Modernized is the current model. It is a modernized, product-improved version of the PK weighing only 7.5 kg without ammunition</text>
 	</string>
@@ -181,15 +173,10 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="wpn-p90_name">
 		<text>FN P90</text>
 	</string>
-	<string id="enc_weapons1_ammo_ammo-5.7x28">
-		<text>The 5.7x28mm cartridge is a small caliber, high velocity cartridge created by FN Herstal in Belgium in conjunction with the FN P90 personal defense weapon (PDW) and FN Five-seven pistol. Developed in response to NATO requests for a replacement for 9x19mm Parabellum, the 5.7x28mm is a bottlenecked centerfire cartridge that is somewhat similar to the .22 Hornet or .22 K-Hornet.</text>
-	</string>
-	<string id="ammo-5.7x28_name">
-		<text>5.7x28mm SS190</text>
-	</string>
-	<string id="ammo-5.7x28_s">
-		<text>5.7x28mm SS190</text>
-	</string>
+<!--	<string id="wpn-p90_name"> - Duplicated - aleks1970
+		<text>FN P90</text>
+	</string> -->
+	<!-- moved string id: "enc_weapons1_ammo_ammo-5.7x28" in to the string_table_enc_weapons file -aleks1970 -->
 	<string id="sak_military_stalker">
 		<text>Ensign Sherstuk</text>
 	</string>
@@ -216,12 +203,6 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	</string>
 	<string id="enc_weapons1_saiga12c">
 		<text>"Saiga-12C" automatic shotgun. It is used as an assault weapon for close combat operations. Recommended as a reliable and accurate weapon. It is reloaded automatically due to the energy of powder combustion gases bled from the barrel bore through the barrel port. The shotgun may be equipped with a sight leaf adjustable for windage and elevation, which makes zeroing and firing at moving targets more convenient. \nAmmunition: \n12x70 buckshot, \n12x76 slug, \n12x76 dart.</text>
-	</string>
-	<string id="enc_weapons1_ammo_ammo-7.62x39-ap">
-		<text>Armour-piercing ammunition for automatic AK-47, AKM, AK-103, and AK-104. Improved armor-piercing capabilities.From the Barnaul plant(headstamp 17), Ulanovsk plant (headstamp 3) and the Soviet State Factory at Lugansk, Ukraine (headstamp 270). This ammo is hardened AP not soft filler steel like some other steel core. This ammo is rare in itself ...</text>
-	</string>
-	<string id="enc_weapons1_ammo_ammo-7.62x39-fmj">
-		<text>Standard cartridge for automatic AK-47, AKM, AK-103, and AK-104. The cartridge produces significant wounding (including remote wounding effects known as hydrostatic shock) in cases where the bullet tumbles and fragments in tissue, but produces relatively minor wounds in cases where the bullet exits before beginning to yaw.</text>
 	</string>
 	<string id="enc_weapons1_wpn-ak47">
 		<text>Kalashnikov model 1947 chambered for 7.62x39mm ammunition. It is a simple and reliable weapon, although the cheapness in the production of so many affected the overall useability and accuracy. In the Zone is a fairly rare weapon because of it's lack in service with the army. \nAmmunition: \n7.62x39mm fmj \n7.62x39mm AP</text>
@@ -259,18 +240,7 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="wpn-ak47">
 		<text>AK-47</text>
 	</string>
-	<string id="ammo-7.62x39-ap">
-		<text>7.62x39mm AP</text>
-	</string>
-	<string id="ammo-7.62x39-ap_s">
-		<text>7.62x39 PSU</text>
-	</string>
-	<string id="ammo-7.62x39-fmj">
-		<text>7.62x39mm FMJ</text>
-	</string>
-	<string id="ammo-7.62x39-fmj_s">
-		<text>7.62x39mm FMJ</text>
-	</string>
+	<!-- moved string id: "ammo-7.62x39-ap", "ammo-7.62x39-ap_s", "enc_weapons1_ammo_ammo-7.62x39-ap", "ammo-7.62x39-fmj", "ammo-7.62x39-fmj_s" and the "enc_weapons1_ammo_ammo-7.62x39-fmj" in to the "string_table_enc_weapons.xml" file -aleks1970 -->
 	<string id="Hello_sak">
 		<text>%c[255,255,128,128]\nBest regards from Syak!</text>
 	</string>
@@ -458,9 +428,17 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="item_quest_case_02_desc">
 		<text>Document case. It is made of a thick, refractory material.</text>
 	</string>
+<!--	Duplicated string id from "string_table_items.xml" file - aleks1970
+	<string id="item_quest_case_02_desc">
+		<text>Slightly damaged, but secure fire-proof briefcase containing Important Documents...</text>
+	</string> -->
 	<string id="item_quest_case_02_name">
 		<text>Military Documents</text>
 	</string>
+<!--	Duplicated string id from "string_table_items.xml" file - aleks1970
+	<string id="item_quest_case_02_name">
+		<text>Military Documents XGF497ff2_339t7</text>
+	</string> -->
 	<string id="item_quest_case_06_desc">
 		<text>Locked metal briefcase. According to the Soldier hiding in the old trailer in the swamp, it contains data sent by the Base Commander about one of the excursions deep into the Zone. It requires a code to unlock it electronically.</text>
 	</string>
@@ -491,6 +469,10 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="item_case_esc_name">
 		<text>Outpost Documents</text>
 	</string>
+<!--	Duplicated string id from the "string_table_items.xml" file - aleks1970
+	<string id="item_case_esc_name">
+		<text>Documents taken from the Outpost</text>
+	</string> -->
 	<string id="sak_document_desc">
 		<text>Documents found on the figures in the path.</text>
 	</string>
@@ -515,15 +497,15 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="sak_document2_name">
 		<text>Documents plus unreadable disc</text>
 	</string>
-	<string id="garbage_pda_desc">
-		<text>PDA found at the dump, in a camp of Bandits. Among other useful information, it contains instructions on how to transmutate an Artefact.</text>
-	</string>
 	<string id="garbage_pda_name">
 		<text>PDA containing important information</text>
 	</string>
 	<string id="garbage_pda_desc">
 		<text>PDA found at the dump, in a Bandit camp. Among other useful information, it contains instructions on how to transmutate an Artefact.</text>
 	</string>
+<!--	<string id="garbage_pda_desc"> - Duplicated - aleks1970
+		<text>PDA found at the dump, in a camp of Bandits. Among other useful information, it contains instructions on how to transmutate an Artefact.</text>
+	</string> -->
 	<string id="inventory_sakbox_01_name">
 		<text>box of cartridges</text>
 	</string>
@@ -605,9 +587,7 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="item_notebook_name">
 		<text>Laptop containing important information.</text>
 	</string>
-	<string id="stukach_book_desc">
-		<text>To view: insert the Laptop into the first slot.\nPavliks laptop. Besides some boring financial records, it contains a recipe for 'Artpreobrazovaniya'.</text>
-	</string>
+	<!-- moved string id: "stukach_book_desc" in to the dmx_mod_items file - aleks1970 -->
 	<string id="item_decoder1_name">
 		<text>Kruglovs device</text>
 	</string>
@@ -1835,12 +1815,7 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 	<string id="enc_artmod">
 		<text>Artefact Modification</text>
 	</string>
-	<string id="enc_wpn-gungauss">
-		<text>Ammunition - \n: "SuperGauss" - basic \nM72-GG Gauss-gun, a weapon that brought together and advanced on the model of M72-M Gauss-rifle master loner who was last seen in the area East Pripyat. Despite huge power shots, accuracy and affects a very small range, but at close distances proved to be an indispensable weapon in the fight against the most tenacious monsters. Is there any other similar instance, unknown.</text>
-	</string>
-	<string id="wpn-gungauss">
-		<text>M72-GG "Gauss-gun"</text>
-	</string>
+	<!-- moved string id: "enc_wpn-gungauss" and "wpn-gungauss" in to the "string_table_enc_weapons.xml" file -aleks1970 -->
 	<string id="enc_artmod_mincer_meat_mosquito_bald_text">
 		<text>\n.\nArtifact "Meat Chunk" produced by the joint anomalies in the transmutation of "Springboard" just four ingredients: \nquirk \nStone Blood \nbottle of vodka \ntail of the dog. \ntransformation occurs within 5-10 minutes</text>
 	</string>
@@ -1963,72 +1938,72 @@ new PKM ammunition box and descr. line:172 aleks1970, artmod_322_dialog_4, remov
 		<text>%c[255,224,224,160]unique, very rare artifact. It has truly miraculous properties - to resurrect the dead! The only drawback - a large burden. \n.\nartifact produced by a joint anomalies in the transmutation of "Snow" just four artifacts: \nNight Star "Goldfish", "sea urchin", "Babys dummy. \n %c[255,255,255,255]Time transmutation %c[255,224,224,160]5 minutes Zones \n %c[255,255,255,255]The probability of successful transmutation %c[255,1,255,1] 100% %c[default]</text>
 	</string>
 	<string id="af_life_heart">
-		<text>"The heart"</text>
+		<text>The heart</text>
 	</string>
 	<string id="af_life_heart_s">
-		<text>"The heart"</text>
+		<text>The heart</text>
 	</string>
 	<string id="af_life_heart_desc">
 		<text>\n.\nunique, very rare artifact. It has truly miraculous properties - to resurrect the dead! The only drawback - a large burden.</text>
 	</string>
-	<string id="af_medusa">
-		<text>"Emerald jellyfish"</text>
+	<string id="af_medusa_emerald">
+		<text>Emerald jellyfish</text>
 	</string>
-	<string id="af_medusa_s">
+	<string id="af_medusa_emerald_s">
 		<text>'Emerald'</text>
 	</string>
-	<string id="af_medusa_green">
+	<string id="enc_af_medusa_green">
 		<text>\n.\nUnique artifact. In appearance, the usual "Medusa", but green. Is not radioactive, emits a weak light. There is a perception that it is a result of combining the two anomalies - "Trampoline" and "aspic". Adds protection from bullet impacts, but drops her from the monsters and anomalies.</text>
 	</string>
 	<string id="af_Jellyfish">
-		<text>"Emerald Medusa"</text>
+		<text>Emerald Medusa</text>
 	</string>
 	<string id="af_Jellyfish_green">
 		<text>\n.\nunique artifact, seemingly ordinary "Medusa", but green. It is not radioactive, emits a weak light. There is a perception that it appears as a result of combining the two anomalies - "jumping" and "brawn". Adds protection from bullet impacts, but lowers it from the monsters and anomalies.</text>
 	</string>
-	<string id="af_vyvert">
-		<text>"Emerald Quirk"</text>
+	<string id="af_vyvert_emerald">
+		<text>Emerald Quirk</text>
 	</string>
-	<string id="af_vyvert_s">
-		<text>"Emerald Quirk"</text>
+	<string id="af_vyvert_emerald_s">
+		<text>Emerald Quirk</text>
 	</string>
-	<string id="af_vyvert_green">
+	<string id="enc_af_vyvert_green">
 		<text>\n.\nunique artifact, seemingly ordinary "Quirk", but green. It is not radioactive, emits a weak light. It is believed that he appears as a result of combining two anomalies - the "Vortex" and "brawn". Pretty good protection against monsters, but reduces the protection from bullet impacts.</text>
 	</string>
-	<string id="af_blood">
-		<text>"The Emerald Stone Blood"</text>
+	<string id="af_blood_emerald">
+		<text>The Emerald Stone Blood</text>
 	</string>
-	<string id="af_blood_s">
-		<text>"Emerald Stone Blood"</text>
+	<string id="af_blood_emerald_s">
+		<text>Emerald Stone</text>
 	</string>
-	<string id="af_blood_green">
+	<string id="enc_af_blood_green">
 		<text>\n.\nunique artifact, seemingly normal "Stone Blood", but green. It is not radioactive, emits a weak light. There is a perception that it appears as a result of combining the two anomalies - "Whirligig" and "brawn". Pretty good protection against anomalies, but also reduces protection from bullet impacts.</text>
 	</string>
 	<string id="af_pellicle">
-		<text>"Ruby Pellicle"</text>
+		<text>Ruby Pellicle</text>
 	</string>
 	<string id="af_pellicle_s">
-		<text>"Ruby Pellicle"</text>
+		<text>Ruby Pellicle</text>
 	</string>
 	<string id="af_pellicle_red">
 		<text>%c[1,1,1,1 ]_______ %c[255,255,255,255]Radiation %c[255,255,1,1] +5% \n %c[default]unique artifact in appearance resembles a regular "Pellicle", but red. Slightly radioactive, emits light. Perhaps transmutes from the "Pellicles" by ingestion of an anomaly "Snow." Has the effect of the rapid healing of open wounds, little protection against anomalies but significantly reduces the protection of bullet impacts.</text>
 	</string>
-	<string id="af_dummy_spring">
-		<text>"Ruby spring"</text>
+	<string id="af_red_spring">
+		<text>Ruby spring</text>
 	</string>
-	<string id="af_dummy_spring_s">
-		<text>"Ruby spring"</text>
+	<string id="af_red_spring_s">
+		<text>Ruby spring</text>
 	</string>
-	<string id="af_dummy_spring_red">
+	<string id="enc_af_red_spring">
 		<text>%c[1,1,1,1 ]_______ %c[255,255,255,255]The radiation %c[255,255,1,1] +5% \n %c[default]unique artifacts, resembles normal "Spring" but red. Slightly radioactive, emits light. Perhaps transmutes from the "spring" if it enters the anomaly of "Snow". Has the effect of protection against impact.</text>
 	</string>
-	<string id="af_dummy_battery">
-		<text>"Ruby battery"</text>
+	<string id="af_red_battery">
+		<text>Ruby battery</text>
 	</string>
-	<string id="af_dummy_battery_s">
-		<text>"Ruby battery"</text>
+	<string id="af_red_battery_s">
+		<text>Ruby battery</text>
 	</string>
-	<string id="af_dummy_battery_red">
+	<string id="enc_af_red_battery">
 		<text>%c[1,1,1,1 ]_______ %c[255,255,255,255]Radiation %c[255,255,1,1] +10% \n %c[default]unique artifact in appearance resembles a regular "battery", but red. Slightly radioactive, emits light. Perhaps transmutes from the "Batteries" if it enters the anomaly of "Snow". Has the effect of restoration of forces, protection from electro anomalies and a little protection from shock impacts.</text>
 	</string>
 	<string id="st_detector_sak">

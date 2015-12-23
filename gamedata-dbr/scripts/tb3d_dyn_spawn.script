@@ -1,8 +1,8 @@
----TB3D 1.0.9.9.9.8 new - creates objects that get removed on level load prior to alloc then creates new objects,
+---TB3D 1.0.9.9.9.9 new - creates objects that get removed on level load prior to alloc then creates new objects,
 -- tb3d_esc_spawns, dyn_rad, get_monster_spot, marsh zones, cooling zones, new levels, rats back, marsh, hiding_road,
 -- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector, x14,
--- spawn_sarc_pack, bar
-function my_ver() return "1.0.9.9.9.8" end
+-- spawn_sarc_pack, bar, deathclaws
+function my_ver() return "1.0.9.9.9.9" end
 
 --============= non-dynamic vehicles only spawned once ============================================================
 --	vehicle_tb3d_atv				- quad atvs
@@ -177,6 +177,10 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		meceniy_dinrad.spawn_rad_zone(vector():set(-102.238,-0.701,371.592),96542,3393,0.05)
 		alife():create("zone_small_low_fog_tb3d",vector():set(-47.897,-0.385,301.973),115772,3402)			--pit in village with water tower
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-47.897,-0.385,301.973),115772,3402)
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(-269.555,-0.526,459.091,8913,3356,2,2)			--far edge accross the water
+			TB3D_Mobs.spawn_deathclaws(-182.024,2.115,534.371,119948,3393,1,2)			--small cave
+		end
 	elseif lname == "l05_bar" then -------------------------------------------------------------------------------------------bar
 		if TB3D_Modders.use_smoke == true then					-- from DMX_mod  smoke
 			alife():create("zone_fog_cigarette",vector():set(139.75,-3.12,28.88),36058,1236) -- Cigarette smoke in the bar
@@ -363,15 +367,21 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 	
 	
 	elseif lname == "red_forest" then
-	
-	
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(-102.003,0.655,-175.177,11922,3241,1,2)				--w, tunnel
+			TB3D_Mobs.spawn_deathclaws(164.108,7.716,-163.902,117393,3307,1,2)				--e, by passage
+		end
 	elseif lname == "aver" then				--recon
 		--TB3D_Services.give_info("tb3d_marsh_zones")
-		
-		
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(-105.871,20.231,-49.451,688417,2894,1,2)				--w, strong
+			TB3D_Mobs.spawn_deathclaws(316.166,44.045,-199.592,1433720,2903,1,2)			--e, strong
+		end
 	elseif lname == "puzir" then			--forgotten forest
-	
-	
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(198.513,2.766,8.906,349494,2885,1,2)					--e rocks
+			TB3D_Mobs.spawn_deathclaws(-218.170,6.224,54.305,13009,2881,1,2)				--w rocks
+		end
 	elseif lname == "hospital" then
 		if TB3D_Services.is_collector(704) then															--fog areas that send actor places
 			alife():create("zone_fog_cigarette",vector():set(-86.397,40.580,766.351),3792,3052)			--back of cave roof around tree, sends to ledge
@@ -589,6 +599,10 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		spawn_anomoly("zone_emi_tb3d",372.700,25.577,-322.988,1583389,3690) --chute
 		spawn_anomoly("zone_emi_tb3d",428.535,21.126,-284.241,1668046,3696)  --bridge
 		spawn_anomoly("zone_emi_tb3d",426.339,29.208,-279.480,1664095,3696)
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(-71.391,7.477,254.903,799048,3675,2,2) --cave under houses
+			TB3D_Mobs.spawn_deathclaws(-99.357,-6.429,-194.681,740340,3673,2,2) --bl pit
+		end
 	elseif lname == "dead_city" then
 		if not has_alife_info("kod_vveden_verno") then
 			spawn_anomoly("zone_radioactive_tb3d",-228.285,-2.086,288.101,110398,3593)
@@ -601,12 +615,18 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			TB3D_Services.remove_info("tb3d_dcity_rads")
 		end
 	elseif lname == "dark_forest" then
-	
-	
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(336.081,5.287,-233.313,1407202,4665,1,2)				--nw, strong
+			TB3D_Mobs.spawn_deathclaws(-167.699,0.929,79.624,502926,4660,1,2)				--se, strong
+		end
 	elseif lname == "yantar_old" then
 		spawn_anomoly("zone_burning_tb3d",135.328,-1.409,59.732,435242,4372)
 		spawn_anomoly("zone_burning_tb3d",135.242,-1.243,65.743,435261,4372)
 		spawn_anomoly("zone_burning_tb3d",135.299,-1.207,71.583,435270,4372)
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(250.703,11.526,-91.552,565109,4383,2,2)				--se, strong
+			TB3D_Mobs.spawn_deathclaws(-152.144,20.099,259.131,117457,4344,2,2)				--nw, strong
+		end
 	elseif lname == "l01_krasivay" then
 		--if TB3D_Modders.use_random_tanks and TB3D_Services.is_collector() then
 			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(-66.896,1.09,122.875), "killer", "", 40, 60)
@@ -663,8 +683,10 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		spawn_fire(vector():set(202.624,2.096,-44.856),1594528,4394)
 		spawn_anomoly("zone_no_gravity_tb3d",-196.062,2.827,63.715,726096,4386)		--109980, floating blocks on bridge
 	elseif lname == "hiding_road" then
-	
-	
+		if has_alife_info("tb3d_gb1_done") then
+			TB3D_Mobs.spawn_deathclaws(75.337,3.689,404.473,590172,4511,1,2)			--n, strong
+			TB3D_Mobs.spawn_deathclaws(182.847,7.325,-173.439,762940,4540,1,2)			--s, strong
+		end
 	elseif lname == "level_f-1" then
 		spawn_anomoly("zone_no_gravity_tb3d",-148.421,14.752,180.150,131171,4680)		--floating islands
 		spawn_anomoly("zone_no_gravity_tb3d",-152.246,12.923,186.362,127362,4680)		--floating islands
@@ -870,7 +892,9 @@ function spawn_fire(lpos, lv, gv)
 	--alife():create("zone_campfire_tb3d",lpos,lv,gv)		--smoke around fire
 end
 
+--[[ removed 109999
 function spawn_kill_zones()					--killing force anti grav zone, cannot be dynamic
+	TB3D_Services.packet_alert("dyn spawn: spawn kill zones")
 	local zones = amk.load_variable("kill_zones", 0)
 	if zones == 0 then
 		spawn_anomoly("zone_anti_grav_tb3d",135.328,-1.409,59.732,435242,4372)				--rs under floating boat, aft
@@ -881,6 +905,7 @@ function spawn_kill_zones()					--killing force anti grav zone, cannot be dynami
 		--future use
 	end
 end
+]]--
 
 --props: tb3d_roof_tile, tb3d_fly_island, tb3d_laputa_island, tb3d_old_dozer
 function spawn_fix_props()

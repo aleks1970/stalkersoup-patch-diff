@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_msg91]:identity_immunities
 GroupControlSection				= spawn_group
-discovery_dependency 			= 
+;;discovery_dependency 			= 
 $spawn                  		= "weapons\msg91"					; option for Level Editor
 $npc			 				= on				; option for Level Editor
 $prefetch 		 				= 8
@@ -9,7 +10,7 @@ cform                   		= skeleton
 class                   		= WP_SVD
 min_radius              		= 0
 max_radius              		= 50
-description						= desc_msg91
+description						= desc_msg91_descr
 
 ef_main_weapon_type				= 2
 ef_weapon_type					= 6
@@ -34,8 +35,8 @@ fire_modes						= 1
 hand_dependence		 			= 1
 single_handed					= 0
 
-inv_name						= MSG91
-inv_name_short					= wpn_msg91
+inv_name						= desc_msg91
+inv_name_short					= desc_msg91_s
 inv_weight						= 6.4
 
 inv_grid_width					= 6
@@ -95,7 +96,7 @@ hit_power        				= 0.7
 hit_impulse		 				= 60
 hit_type 						= fire_wound
 
-fire_distance          			= 700
+fire_distance          			= 70					;;;109974 10:1
 bullet_speed					= 868
 rpm                     		= 270
 
@@ -104,7 +105,7 @@ time_to_aim						= 1.0
 
 silencer_hit_power       		= 0.30
 silencer_hit_impulse	 		= 110
-silencer_fire_distance   		= 250
+silencer_fire_distance   		= 25					;;;109974 10:1
 silencer_bullet_speed	 		= 290
 
 hud                     		= msg91_hud
@@ -156,18 +157,6 @@ snd_holster						= weapons\generic_holster
 snd_shoot						= weapons\msg90\shot11
 snd_empty						= weapons\gen_empty
 snd_reload						= weapons\msg_reload2.ogg, 0.82, 0.1
-
-;params when silencer is attached 
-;similar to corresponding params without prefix silencer_
-
-silencer_hit_power       		= 40
-silencer_hit_impulse	 		= 65
-silencer_fire_distance   		= 250
-silencer_bullet_speed	 		= 380
-
-;silencer_flame_particles 		= weapons\generic_weapon01
-silencer_smoke_particles 		= weapons\generic_shoot_00
-
 snd_silncer_shot				= weapons\msg_shoot 
 
 

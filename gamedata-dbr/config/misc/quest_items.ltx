@@ -1,6 +1,5 @@
-;<!-- TB3D 1.0.9.9.9.8 fixed icons --> contains local strings, edits by glowworm, rgd5_new fix, iglo_new icon width,
-;; ara_flash, bland_flash, travka, pda_priz icon -->
-;<!-- aleks1970  excluded duplicates sections -->
+;<!-- TB3D 1.0.9.9.9.9 fixed icons --> contains local strings, edits by glowworm, rgd5_new fix, iglo_new icon width,
+;; ara_flash, bland_flash, travka, pda_priz icon, excluded duplicates sections, can_trade -->
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ESCAPE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -20,7 +19,7 @@ visual				= equipments\item_document_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
-
+can_trade			= off	;; - new disabled - aleks1970
 description			= klyak_forest_doc_descr
 
 inv_name			= klyak_forest_doc
@@ -44,6 +43,7 @@ visual              = equipments\item_rukzak.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 description  = rukzak_green_descr
 inv_name   = rukzak_green
@@ -66,6 +66,7 @@ visual				= equipments\item_datchik3.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
  
 description         = anigilator_anomal_zones
 inv_name			= nebo_clear
@@ -88,6 +89,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
  
 description         = case_nebo_desc
 inv_name			= case_nebo
@@ -115,6 +117,7 @@ inv_name			= lekar_kalmyak
 inv_name_short		= lekar_kalmyak
 inv_weight			= 0.1	
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 inv_grid_width     = 1
 inv_grid_height    = 1
@@ -164,6 +167,7 @@ visual				= equipments\item_transiver
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= glushitel_desc
 
@@ -188,6 +192,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= pda_francuz_desc
 
@@ -230,6 +235,7 @@ inv_grid_height		= 1
 inv_grid_x      = 41
 inv_grid_y      = 19
 k_hit			= 0.15
+can_trade			= off	;; - new disabled - aleks1970
 
 [televizor]:identity_immunities
 GroupControlSection = spawn_group
@@ -241,7 +247,8 @@ cform				= skeleton
 visual				= physics\decor\tv_1.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
-quest_item			= false
+;quest_item			= false
+can_trade			= off
 
 description         = televizor_desc
 
@@ -265,6 +272,7 @@ visual				= equipments\item_book_01.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 description         = mono_note_desc
 
@@ -288,6 +296,7 @@ visual				= equipments\item_document_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 description			= mono_dead_doc_desc
 
@@ -314,6 +323,7 @@ inv_name			= grenade-rgd5_m
 inv_name_short		= grenade-rgd5_m
 inv_weight			= 0.45	;.1
 description			= enc_weapons1_grenade-rgd5_m
+can_trade			= off	;; - new disabled - aleks1970
 
 ;belt				= true
 ef_weapon_type		= 10
@@ -405,6 +415,7 @@ cform				= skeleton
 visual				= equipments\item_krovosos_red_jaw.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 inv_name			= mutant_krovosos_red_jaw
 inv_name_short		= mutant_krovosos_red_jaw
@@ -430,6 +441,7 @@ cform				= skeleton
 visual				= equipments\item_burer_red_hand.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 inv_name			= mutant_burer_red_hand
 inv_name_short		= mutant_burer_red_hand
@@ -455,6 +467,7 @@ cform				= skeleton
 visual				= equipments\item_red_mozg.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 inv_name			= red_mozg
 inv_name_short		= red_mozg
@@ -479,6 +492,7 @@ class				= II_FOOD
 cform				= skeleton
 visual				= equipments\konfets.ogf
 quest_item			= false
+;can_trade			= off	;;test - new disabled - aleks1970
 
 description			= maz_desc
 
@@ -511,6 +525,7 @@ visual				= physics\box\box_lab_01
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = box_kalmyak_desc
 
@@ -533,6 +548,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= new_prizrak_document1_desc
 
@@ -556,6 +572,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= new_prizrak_document2_desc
 
@@ -579,6 +596,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= new_prizrak_document3_desc
 
@@ -603,6 +621,7 @@ visual				= equipments\item_document_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= plan_document_desc
 
@@ -627,6 +646,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= voen_pda_desc
 
@@ -651,6 +671,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= siv_pda_desc
 
@@ -675,6 +696,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = ara_flash_desc
 
@@ -699,6 +721,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= fraer_pda_desc
 
@@ -723,6 +746,7 @@ visual				= equipments\item_net_pda.ogf
 radius				= 1
 script_binding		= netpacket_pda_binder.init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= desc_net_pda
 
@@ -747,6 +771,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= bandranen_pda_desc
 
@@ -770,6 +795,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= voen_document_desc
 
@@ -793,6 +819,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= sysh_document_desc
 
@@ -817,6 +844,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = sysh_flash_desc
 
@@ -840,6 +868,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= new_document_sniper_desc
 
@@ -864,6 +893,7 @@ visual				= equipments\item_box_01_visual
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = inventory_new_box_desc
 
@@ -887,6 +917,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 description         = item_sniper_flash_desc
 
@@ -911,6 +942,7 @@ visual				= equipments\item_book_01.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = new_book_prizrak_desc
 
@@ -934,6 +966,7 @@ visual				= physics\technica\komp_block.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_computer_new_desc
 
@@ -957,6 +990,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_nauch_flash_desc
 
@@ -981,6 +1015,7 @@ visual				= equipments\item_notebook.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_notebook_new_desc
 
@@ -1005,6 +1040,7 @@ visual				= equipments\item_notebook.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_notebook_desc
 
@@ -1028,6 +1064,7 @@ visual				= equipments\item_book_01.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = new_book_desc
 
@@ -1051,6 +1088,7 @@ visual				= equipments\item_dipl.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_diplomat_desc
 
@@ -1071,6 +1109,7 @@ inv_name			= repair_box_name
 inv_name_short		= repair_box_name
 inv_grid_x			= 18
 inv_grid_y			= 39
+can_trade			= off	;;test - new disabled - aleks1970
 
 [computer]:identity_immunities
 GroupControlSection	= spawn_group
@@ -1083,6 +1122,7 @@ visual				= physics\technica\komp_block.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_computer_desc
 
@@ -1106,6 +1146,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_case_esc_desc
 
@@ -1129,6 +1170,7 @@ visual				= physics\box\box_1b
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = inventory_sakbox_01_desc
 
@@ -1153,6 +1195,7 @@ visual				= equipments\item_box_01_visual
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = inventory_sakbox_02_desc
 
@@ -1177,6 +1220,7 @@ visual				= physics\box\seif_01
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = inventory_sakbox_03_desc
 
@@ -1201,6 +1245,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = inventory_sakbox_04_desc
 
@@ -1225,6 +1270,7 @@ visual				= physics\box\box_lab_01
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = inventory_sakbox_05_desc
 
@@ -1248,6 +1294,7 @@ visual				= equipments\item_book_01.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = sak_book1_desc
 
@@ -1271,6 +1318,7 @@ visual				= equipments\item_book_02.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = sak_book2_desc
 
@@ -1294,6 +1342,7 @@ visual				= equipments\item_book_03.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = sak_book3_desc
 
@@ -1318,6 +1367,7 @@ visual				= equipments\item_book_02.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = doktor_book_desc
 
@@ -1340,6 +1390,7 @@ cform				= skeleton
 visual				= equipments\item_delp1.ogf
 radius				= 0
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 description			= playboy_kruglov_desc
 
 inv_name			= playboy_kruglov_name
@@ -1361,6 +1412,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp1.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1383,6 +1435,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp2.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1405,6 +1458,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp3.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1426,6 +1480,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp4.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1447,6 +1502,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp5.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1468,6 +1524,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp6.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1489,6 +1546,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp7.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1510,6 +1568,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp8.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1531,6 +1590,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp9.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1552,6 +1612,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp10.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1573,6 +1634,7 @@ class				= II_DOC
 cform				= skeleton
 visual				= equipments\item_delp11.ogf
 radius				= 0
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= playboy_desc
 
@@ -1596,6 +1658,7 @@ visual				= equipments\item_plannik.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_quest_sak_plan_desc
 
@@ -1620,6 +1683,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_quest_case_02_desc
 
@@ -1643,6 +1707,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_quest_case_06_desc
 
@@ -1666,6 +1731,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = quest_manycase_01_desc
 
@@ -1689,6 +1755,7 @@ visual				= physics\box\expl_dinamit.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_dynamite_esc_desc
 
@@ -1714,6 +1781,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_flash_esc_desc
 
@@ -1738,6 +1806,7 @@ visual				= equipments\item_decoder.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_decoder1_desc
 
@@ -1761,6 +1830,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_flash_gslinger_agro_desc
 
@@ -1786,6 +1856,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_quest_case_02_desc
 inv_name			= item_quest_case_02_name
@@ -1812,6 +1883,7 @@ visual				= equipments\item_flash_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_key_x18_desc
 
@@ -1841,6 +1913,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_pda_tiran_desc
 
@@ -1866,6 +1939,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= garbage_pda_desc
 
@@ -1890,6 +1964,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= pda_krysyka_desc
 
@@ -1914,6 +1989,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_equipment_device_pda_npc
 
@@ -1939,7 +2015,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
-
+can_trade			= off	;; - new disabled - aleks1970
 description			= agroprom_pda_desc
 
 inv_name			= agroprom_pda_name
@@ -1963,6 +2039,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= und_pda_desc
 
@@ -1987,6 +2064,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= volkodav_pda_desc
 
@@ -2011,6 +2089,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= ara_pda_desc
 
@@ -2035,6 +2114,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= rad_pda_desc
 
@@ -2059,6 +2139,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= strelok_pda_desc
 
@@ -2083,6 +2164,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= scaintist_pda_desc
 
@@ -2107,6 +2189,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_pda_lucky_desc
 
@@ -2132,6 +2215,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= desc_bolt_pda
 
@@ -2157,6 +2241,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_flash_eco_rost_desc
 
@@ -2181,6 +2266,7 @@ visual				= equipments\item_document_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_doc_x16_desc
 
@@ -2205,6 +2291,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= pda_priz_desc
 
@@ -2229,6 +2316,7 @@ visual				= equipments\item_document_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= scaintist_docs_desc
 
@@ -2254,6 +2342,7 @@ visual				= equipments\item_merger.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+can_trade			= off	;; - new disabled - aleks1970
 
 description         = item_case_freeman_desc
 inv_name			= item_case_freeman_name
@@ -2276,6 +2365,7 @@ visual				= equipments\item_document_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_lab_x10_documents_desc
 
@@ -2300,6 +2390,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_bland_flash_desc
 
@@ -2327,6 +2418,7 @@ visual				= equipments\item_psi_helmet.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = yan_good_psy_helmet_desc
 
@@ -2350,6 +2442,7 @@ visual				= equipments\item_psi_helmet.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description         = yan_bad_psy_helmet_desc
 
@@ -2376,6 +2469,7 @@ buzzer_radius		= 1.5
 noise				= zone_mosquito_bald       ;detectors\geiger_noise_loop 
 buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 ef_detector_type	= 1
 
@@ -2433,6 +2527,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 description			= item_flash_crazy_mil_desc
 
@@ -2457,6 +2552,7 @@ visual				= equipments\item_transiver
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= sak_resiver_desc
 
@@ -2481,6 +2577,7 @@ visual				= equipments\item_transiver
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 
 description			= sak_resiver_yantar_desc
 
@@ -2505,6 +2602,7 @@ visual				= equipments\item_minipda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 inv_name			= Svoboda Leader PDA
 inv_name_short		= Svoboda Leader PDA
@@ -2530,6 +2628,7 @@ cform				= skeleton
 visual				= equipments\item_minipda.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 inv_name			= sci_flash
 inv_name_short		= sci_flash
@@ -2551,6 +2650,7 @@ cform				= skeleton
 visual				= equipments\item_document_2.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 inv_name			= CodeX-18
 inv_name_short		= CodeX-18
@@ -2572,6 +2672,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_doc_x18_desc
 
@@ -2595,6 +2696,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_doc_x18_desc
 
@@ -2618,6 +2720,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_doc_x18_desc
 
@@ -2641,6 +2744,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_doc_x18_desc
 
@@ -2664,6 +2768,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_doc_x18_desc
 
@@ -2687,6 +2792,7 @@ cform				= skeleton
 visual				= equipments\item_document_2.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= sak_document_desc
 
@@ -2710,6 +2816,7 @@ cform				= skeleton
 visual				= equipments\item_document_2.ogf
 radius				= 1
 quest_item			= false
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= sak_document2_desc
 
@@ -2737,6 +2844,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_rad_document6_desc
 
@@ -2760,6 +2868,7 @@ cform				= skeleton
 visual				= equipments\item_document_1.ogf
 radius				= 1
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_rad_document7_desc
 
@@ -2788,6 +2897,7 @@ visual				= equipments\item_document_01.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_docs_hiden_pri_desc
 
@@ -2817,6 +2927,7 @@ visual				= equipments\item_flash_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 inv_name			= cit_doctors_key_desc
 inv_name_short		= cit_doctors_key_short_desc
@@ -2842,6 +2953,7 @@ visual				= equipments\item_decoder.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_decoder_desc
 
@@ -2857,7 +2969,7 @@ cost				= 0
 [amk_af_night_star]:af_night_star
 particles			= samples\tut2_pe_with_child
 quest_item			= true
-
+;can_trade			= off	;; - new disabled - aleks1970
 
 [flame_parts]:identity_immunities
 GroupControlSection    = spawn_group
@@ -2870,6 +2982,7 @@ visual                = amk\flame_prt_gorelka.ogf
 radius                = 1
 ;script_binding        = stalker.object_init
 ;quest_item            = true
+;can_trade			= off	;;test - new disabled - aleks1970
 
 description            = gorelka_descr	;flame_part_desc
 
@@ -2893,6 +3006,7 @@ inv_grid_width        = 1
 inv_grid_height        = 1
 inv_grid_x            = 1
 inv_grid_y            = 40
+can_trade			= off	;;test - new disabled - aleks1970
 
 
 [manometr]:flame_parts
@@ -2905,6 +3019,7 @@ inv_grid_width        = 1
 inv_grid_height        = 1
 inv_grid_x            = 0
 inv_grid_y            = 40
+can_trade			= off	;;test - new disabled - aleks1970
 
 [trubka]:flame_parts
 visual                = amk\flame_prt_trubka.ogf
@@ -2917,6 +3032,7 @@ inv_grid_height        = 1
 inv_grid_x            = 2
 inv_grid_y            = 40
 cost                = 500
+;can_trade			= off	;;test - new disabled - aleks1970
 
 [flamethrower_bad]:flame_parts
 visual                = amk\wpn_flame_brk.ogf
@@ -2928,11 +3044,13 @@ inv_grid_width        = 4
 inv_grid_height        = 2
 inv_grid_x            = 13
 inv_grid_y            = 38
+can_trade			= off	;; - new disabled - aleks1970
 
 [travka]:binocular_a	;;;;TB3D 109931 - bag of weed
 visual				= equipments\item_plannik.ogf
 radius				= 1
 quest_item			= false
+can_trade			= off	;; - new disabled - aleks1970
 description         = item_quest_sak_plan_desc
 inv_name			= item_quest_sak_plan_name
 inv_name_short		= item_quest_sak_plan_name
@@ -2955,6 +3073,7 @@ inv_grid_height     = 1
 inv_grid_x          = 4
 inv_grid_y          = 36
 description         = enc_quest_kostya_gold_fish
+can_trade			= off	;; - new disabled - aleks1970
 
 [kostya_pda]:identity_immunities
 GroupControlSection	= spawn_group
@@ -2967,6 +3086,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda
 
@@ -2992,6 +3112,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda2
 
@@ -3017,6 +3138,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda3
 
@@ -3042,6 +3164,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda4
 
@@ -3067,6 +3190,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda5
 
@@ -3092,6 +3216,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda6
 
@@ -3117,6 +3242,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda7
 
@@ -3142,6 +3268,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda8
 
@@ -3167,6 +3294,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_pda9
                     
@@ -3193,6 +3321,7 @@ visual				= equipments\item_document_2.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_kostya_documents
 
@@ -3218,6 +3347,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= enc_pda_vasilyev
                    
@@ -3243,6 +3373,7 @@ visual				= equipments\item_pda.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;; - new disabled - aleks1970
 
 description			= item_delete1
                     

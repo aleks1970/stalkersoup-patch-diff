@@ -1,4 +1,4 @@
-;<!-- TB3D 1.0.9.9.8.1 new Collector additions, trader edits by glowworm, ldk edits, removed narod_opt, ald weapons,
+;<!-- TB3D 1.0.9.9.9.9 new Collector additions, trader edits by glowworm, ldk edits, removed narod_opt, ald weapons,
 ; immunities/damages and added conditions.ltx and terrains.ltx, criticals.ltx, ldk, attachable_item,
 ; aleks1970; excluded duplicates section, revamped and seperated into includes, new levels, consolidated weapon includes, cleanup, plug ins, ui_enc_locations - aleks1970
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -83,7 +83,7 @@
 #include "inventory_sect.ltx"				;actor inventory settings
 #include "physics_engine.ltx"				;;;; TB3D 109933
 #include "hud.ltx"							;;;; TB3D 109933
-#include "inventory\inventory_items.ltx"	;;;; TB3D 109974
+;#include "inventory\inventory_items.ltx"	;;;; TB3D 109974, removed 109999
 #include "camera_views.ltx"					;;;; TB3D 109933
 #include "script_engine.ltx"				;;;; TB3D 109933
 #include "name_generator.ltx"				;;;; TB3D 109933
@@ -97,13 +97,15 @@
 #include "TB3D_Texture_Pack.ltx"			;;;; 109975 used to identify plug in
 #include "TB3D_Music_Pack.ltx"				;;;; 109975 used to identify plug in
 #include "ui\TB3D_Ui_Pack.ltx"				;;;; 109975 used to identify plug in
-#include "TB3D_Scopes_Pack.ltx"				;;;; 109975 used to identify plug in
-#include "misc\TB3D_Outfit_Pack.ltx"				;;;; 109975 used to identify plug in
-#include "mp\TB3D_Livelink_Pack.ltx"				;;;; 109975 used to identify plug in
+#include "weapons\TB3D_Scopes_Pack.ltx"				;;;; 109975 used to identify plug in
 #include "weapons\TB3D_Weapons_Pack.ltx"			;;;; 109975 used to identify plug in
+#include "weapons\TB3D_Outfit_Pack.ltx"				;;;; 109975 used to identify plug in
+#include "mp\TB3D_Livelink_Pack.ltx"				;;;; 109975 used to identify plug in
 #include "text\TB3D_Localization_Pack.ltx"			;;;; 109975 used to identify plug in
 #include "inventory\TB3D_Inventory_Pack.ltx"		;;;; 109975 used to identify plug in
 #include "weathers\TB3D_Environment_Pack.ltx"		;;;; 109975 used to identify plug in
+#include "trade\TB3D_Trade_Pack.ltx"				;;;; 109999 used to identify plug in
+
 
 [sound]
 occlusion_scale = 0.4
@@ -126,7 +128,7 @@ inv_grid_size=50	;4096x4096 ui_icon_equipment.dds, for future use
 ;---------------------------------------------------------------------------------------
 
 [texture_desc]
-files = ui_mp_icon_rank, ui_icons_map, ui_common, ui_old_textures, ui_ingame, ui_map_description, ui_models_multiplayer, ui_team_logo, ui_team_logo_small, ui_mainmenu, ui_mp_main, ui_statistics, ui_si_frame, amk_transmutator, ui_enc_locations, ui_hud, ui_numpad, ui_inventory, ui_inventory2, ui_iconstotal, ui_pda, ui_icons_npc, ui_npc_monster, ui_npc_unique, ui_buy_menu, ui_asus_intro, amk_ui_base, aem_ui_npc, ui_arhara_unique, ui_razgruzka, amk_pda, amk_blank, ui_npc_ldk
+files = ui_mp_icon_rank, ui_icons_map, ui_common, ui_old_textures, ui_ingame, ui_map_description, ui_models_multiplayer, ui_team_logo, ui_team_logo_small, ui_mainmenu, ui_mp_main, ui_statistics, ui_si_frame, amk_transmutator, ui_enc_locations, ui_hud, ui_numpad, ui_inventory, ui_inventory2, ui_iconstotal, ui_pda, ui_icons_npc, ui_npc_monster, ui_npc_unique, ui_buy_menu, ui_asus_intro, amk_ui_base, aem_ui_npc, ui_arhara_unique, ui_razgruzka, amk_pda, amk_blank, ui_npc_ldk, ui_repair_buttons
 
 [info_portions]
 ;a list of xml files containing info_portions
@@ -136,7 +138,7 @@ files = info_portions, info_portions_light, info_portions_test, info_lchanger_ic
 files = encyclopedia_infos, storyline_info_to_diary, encyclopedia_weapons, encyclopedia_mutants, encyclopedia_zone, encyclopedia_social, encyclopedia_equipment, encyclopedia_tutorial, encyclopedia_new, dmx_mod_encyclopedia, enc_legacy
 
 [dialogs]		;;removed: dialogs_test
-files = dialogs, dialogs_escape, dialogs_garbage, dialogs_agroprom, dialogs_deadcity, dialogs_darkvalley, dialogs_pripyat, dialogs_bar, dialogs_yantar, dialogs_military, dialogs_labx18, dialogs_radar, dialogs_aes, dialogs_repair, dialogs_miniquest, dialogs_amk_recipts, dialogs_flamequest, dialogs_reload, dialogs_amk_escape, dialogs_teleport, dialogs_trading, dialogs_amk, dialogs_new, dialogs_wawka, meceniy_dialogs, dialogs_arhara, dmx_mod_dialogs, valerich_dialogs, dialogs_tb3d
+files = dialogs, dialogs_escape, dialogs_garbage, dialogs_agroprom, dialogs_deadcity, dialogs_darkvalley, dialogs_pripyat, dialogs_bar, dialogs_yantar, dialogs_military, dialogs_labx18, dialogs_radar, dialogs_aes, dialogs_repair, dialogs_miniquest, dialogs_amk_recipts, dialogs_flamequest, dialogs_reload, dialogs_amk_escape, dialogs_teleport, dialogs_trading, dialogs_amk, dialogs_new, dialogs_wawka, meceniy_dialogs, dialogs_arhara, dmx_mod_dialogs, valerich_dialogs, dialogs_tb3d;, tb3d_dialogs_arhara_eco
 
 [profiles]
 ;a list of xml files containing the profiles of stalkers and traders
@@ -146,8 +148,7 @@ files =  npc_profile, npc_amk, npc_new, aem_profile, npc_profile_tb3d
 specific_characters_files = character_desc_general, character_desc_simulation, character_desc_escape, character_desc_garbage, character_desc_agroprom, character_desc_darkvalley, character_desc_deadcity, character_desc_bar, character_desc_yantar, character_desc_military, character_desc_radar, character_desc_pripyat, character_desc_aes, character_desc_kishka, character_desc_sarcofag, character_desc_amk, character_desc_new, character_desc_sniper, aem_characters, character_desc_arhara, character_desc_final, dmx_mod_character, character_desc_ldk, character_desc_tb3d
 
 [artefacts_tasks]
-;the name of the scripting function that is invoked to create
-;list of artifacts
+;the name of the scripting function that is invoked to create list of artifacts
 script_func = ;trader_job.artefacts_task_list_text
 
 [game_tasks]

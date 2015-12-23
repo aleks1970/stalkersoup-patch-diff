@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.8 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.0.9.9.9.9 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
 -- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns, spawn quest bandits,
--- spawn_mob, spawn_tushkanos, promzone
-function my_ver() return "1.0.9.9.9.8" end
+-- spawn_mob, spawn_tushkanos, promzone, 906 -harsh, spawn_deathclaws
+function my_ver() return "1.0.9.9.9.9" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -255,6 +255,36 @@ function spawn_tushkanos(x, y, z, lv, gv, max)										--109998
 	end
 	for i=1, cnt do
 		alife():create("tushkano_normal", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+	end
+end
+
+function spawn_deathclaws(x, y, z, lv, gv, max, type)										--109998
+	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())
+	local min = 1
+	if type == nil then type = 1 end
+	if max > 9 then min = 4 end
+	local cnt = math_floor(math_random(min, max) * flevel)
+	if cnt < 1 then cnt = 1 end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	end
+	if TB3D_Modders.use_mob_messages then
+		if type == 0 then
+			TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [deathclaw_weak]")
+		elseif type == 1 then
+			TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [deathclaw_normal]")
+		else
+			TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [deathclaw_strong]")
+		end
+	end
+	for i=1, cnt do
+		if type == 0 then
+			alife():create("deathclaw_weak", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		elseif type == 1 then
+			alife():create("deathclaw_normal", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		else
+			alife():create("deathclaw_strong", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		end
 	end
 end
 
@@ -903,7 +933,7 @@ end
 
 function check_cemetery_spawns()
 	if has_alife_info("tb3d_harsh_environment") then
-		local typ, qty = 6,6			-harsh
+		local typ, qty = 6,6			--harsh
 		spawn_mob(-57.880,-0.002,-89.222,3329,5318,typ, qty)		--sw corner
 		spawn_mob(-56.243,0.091,-28.432,4094,5322,typ, qty)			--west side
 		spawn_mob(-34.151,0.062,8.722,10905,5325,typ, qty)			--near shack
@@ -957,7 +987,7 @@ function spawn_recon_mobs()
 end
 
 function check_radar_spawns()
-	local typ, qty = 2,8				--zombied
+	local typ, qty = 2,4				--zombied
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		spawn_mob(590.280,-51.316,-45.751,209879,1898, typ, qty)		--below stash
@@ -1059,10 +1089,10 @@ function check_npp2_spawns()
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 20
-		--spawn_mob(975.748,-0.048,78.427,243783,2635, typ, qty)		--se corner
+		--spawn_mob(975.748,-0.048,78.427,243783,2635, typ, qty)	--se corner
 		--spawn_mob(1040.521,-0.101,192.322,245052,2636, typ, qty)	--e intersection
 		--spawn_mob(1048.023,-0.000,380.676,245052,2636, typ, qty)	--ne corner
-		--spawn_mob(733.635,-0.104,300.891,212718,2643, typ, qty)		--cooling stacks
+		--spawn_mob(733.635,-0.104,300.891,212718,2643, typ, qty)	--cooling stacks
 		spawn_mob(565.675,-0.000,208.089,168082,2622, typ, qty)		--under tall chimney
 		spawn_mob(467.079,-0.100,270.656,160942,2622, typ, qty)		--below gens by pipes
 		spawn_mob(370.937,-0.007,386.450,160942,2622, typ, qty)		--below gens between choppers
@@ -1092,7 +1122,7 @@ function check_dcity_spawns(spawns)
 	elseif has_alife_info("collector_done_with_dcity") or not has_alife_info("collector_ready_for_dcity") then
 		--TODO
 	end
-	--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
+	--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)
 end
 
 function check_gen_spawns(level_up)
@@ -1120,7 +1150,7 @@ function check_mkt_spawns()
 		typ = 6				--harsh
 		qty = 20
 	end
-		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
+		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)
 end
 
 function spawn_gen_north(level_up)			--109993

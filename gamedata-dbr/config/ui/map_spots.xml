@@ -518,7 +518,32 @@
 	<pseudo_gigant_target_spot x="0" y="0" width="15" height="15" alignment="c" stretch="1" scale="1">
 		<texture>ui_mapPDA_gigant_targ_spot</texture>
 	</pseudo_gigant_target_spot>
-	<!-- ***************A place to sleep			new in 134*************** -->
+	<!-- new textures for the new minimap spot - aleks1970 -->
+	<wolf_spot>
+		<mini_map spot="wolf_target_spot" pointer="quest_pointer"/>
+	</wolf_spot>
+	<wolf_target_spot x="0" y="0" width="15" height="15" alignment="c" stretch="1" scale="1">
+		<texture>ui_mapPDA_werewolf_targ_spot</texture>
+	</wolf_target_spot>
+	<chimera_spot>
+		<mini_map spot="chimera_target_spot" pointer="quest_pointer"/>
+	</chimera_spot>
+	<chimera_target_spot x="0" y="0" width="15" height="15" alignment="c" stretch="1" scale="1">
+		<texture>ui_mapPDA_chimera_targ_spot</texture>
+	</chimera_target_spot>
+	<bibliotekar_spot>
+		<mini_map spot="bibliotekar_target_spot" pointer="quest_pointer"/>
+	</bibliotekar_spot>
+	<bibliotekar_target_spot x="0" y="0" width="15" height="15" alignment="c" stretch="1" scale="1">
+		<texture>ui_mapPDA_biblio_targ_spot</texture>
+	</bibliotekar_target_spot>
+	<burer_spot>
+		<mini_map spot="burer_target_spot" pointer="quest_pointer"/>
+	</burer_spot>
+	<burer_target_spot x="0" y="0" width="15" height="15" alignment="c" stretch="1" scale="1">
+		<texture>ui_mapPDA_burer_targ_spot</texture>
+	</burer_target_spot>
+	<!-- ***************A place to sleep new in 134*************** -->
 	<sleep_place>
 		<level_map spot="sleep_place_spot" pointer="quest_pointer"/>
 		<mini_map spot="sleep_place_mini_spot" pointer="quest_pointer"/>

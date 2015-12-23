@@ -1,7 +1,8 @@
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons
 ;--------------------------------------
 [wpn_g11]:identity_immunities
 GroupControlSection				= spawn_group
-discovery_dependency			= 
+;;discovery_dependency			= 
 $spawn              			= "weapons\dav_wpn_xp1\g11"		; name and section in level editor
 $npc							= on				
 $prefetch 						= 8
@@ -10,7 +11,7 @@ cform               			= skeleton
 class               			= WP_LR300			; class of the weapon that corresponding to CPP class
 min_radius          			= 0					; [] for AI
 max_radius          			= 150				; [] for AI
-description						= desc_g11
+description						= desc_g11_descr
 	
 ef_main_weapon_type				= 2
 ef_weapon_type					= 6
@@ -36,8 +37,8 @@ single_handed					= 0
 slot 							= 2					; number of slot in inventory we put weapon in (1 - knife slot, 2 - pistol, 3 - rifle, 4 - grenade, 5 - apparatus)
 animation_slot					= 2					; type of the animation that will be used
 
-inv_name	        			= HK_G11		; name in inventory	
-inv_name_short					= wpn_hk_g11
+inv_name	        			= desc_g11		; name in inventory	
+inv_name_short					= desc_g11_s
 inv_weight						= 3.6				; weight in inventory
 
 inv_grid_width					= 5					; position and size of the icon that will be used to display weapon in the inventory menu
@@ -91,7 +92,7 @@ PDM_crouch_no_acc 				= 1.0
 hit_power                		= 0.65						; size of damage by bullet
 hit_impulse		 				= 30						; size of physic impulse by bullet	
 hit_type 						= fire_wound 				; [] type of the wound
-fire_distance            		= 250						; maximum fire distance that bullet can fly
+fire_distance            		= 25					;;;109974 10:1
 bullet_speed					= 960						; starting bullet speed
 hit_rate						= 1.85
 rpm                      		= 400						; max round per minute
@@ -104,7 +105,7 @@ time_to_aim						= 1.0
 
 silencer_hit_power       		= 0.65
 silencer_hit_impulse	 		= 25
-silencer_fire_distance   		= 250
+silencer_fire_distance   		= 25					;;;109974 10:1
 silencer_bullet_speed	 		= 960
 
 hud                      		= wpn_g11_hud				; name of the section of the hud
@@ -147,18 +148,18 @@ grenade_launcher_x 				= 121						; offset in inventory icon
 grenade_launcher_y 				= 23
 
 ;sounds (name of the sound, volume (0.0 - 1.0), delay (sec))
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 snd_draw						= weapons\g11\draw, 0.7
 snd_holster						= weapons\g11\holster, 0.5
 snd_shoot						= weapons\g11\g11_shoot
 snd_reload						= weapons\g11\reload    
 snd_empty						= weapons\g11\empty, 0.6
 snd_silncer_shot				= weapons\g11\shoot_sil, 0.5
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 snd_shoot_grenade				=  weapons\gp30_grenload, 0.7
 snd_reload_grenade				=  weapons\gp30_grenshoot, 1.0, 0.8
 snd_switch						= weapons\gp30_switch, 1.0, 0.5
-------------------------------------------------------------------------
+;------------------------------------------------------------------------
 silencer_light_color			= 0.6,0.5,0.3
 silencer_light_range			= 0.01
 silencer_light_var_color		= 0.05
@@ -209,7 +210,7 @@ $prefetch 						= 64
 ;belt							= true
 $spawn							= "dav_wpn_xp1\assault\g11\ammo_47x33" ; option for Level Editor
 visual          				= dav_wpn_xp1\assault\g11\ammo_47x33_fmj.ogf
-description						= "4.73x33 mm caseless ammunition, with the propellant shaped into square blocks. The ammunition has also been designated as 4.92 mm because for the HK G11 ACR, a variant developed for US Military trials, the US convention of groove to groove measurements of the bore was employed, rather than land-land.[6] The projectile is 4.93 mm in diameter with a case length of 33mm, the US case length measurement is 34mm since for the ACR trials the chamber length, not the actual case length was used. The 4.73 mm round is half the weight and 40% the size by volume of the 5.56x45mm NATO round. The round also has similar ballistics to a 5.56x45mm NATO round, but the 4.73 mm is much less likely to tumble when hitting or penetrating a target, and thus not as lethal. It is not clear to what extent the round would fragment, which could also make it more lethal."
+description						= ammo_4.73_33_g11_descr
 
 buck_shot						= 1
 explosive						= off
@@ -223,10 +224,10 @@ inv_name						= ammo_4.73_33_g11
 inv_name_short					= ammo_4.73_33_g11_s
 inv_weight						= 0.17
 
-inv_grid_width					= 2
-inv_grid_height					= 2
-inv_grid_x						= 28
-inv_grid_y						= 46
+inv_grid_width					= 3
+inv_grid_height					= 1
+inv_grid_x						= 39
+inv_grid_y						= 50
 
 k_dist							= 1
 k_disp							= 2.5

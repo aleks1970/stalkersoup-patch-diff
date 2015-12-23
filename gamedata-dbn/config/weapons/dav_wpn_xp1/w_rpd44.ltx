@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_rpd44d]:identity_immunities
 GroupControlSection				= spawn_group
-discovery_dependency 			= 
+;;discovery_dependency 			= 
 $spawn                  		= "weapons\rpd44"					; option for Level Editor
 $npc			 				= on				; option for Level Editor
 $prefetch 		 				= 8
@@ -9,7 +10,7 @@ cform                   		= skeleton
 class                   		= WP_LR300
 min_radius              		= 0
 max_radius              		= 50
-description						= desc_rpd44d
+description						= desc_rpd44d_descr
 
 ef_main_weapon_type				= 2
 ef_weapon_type					= 6
@@ -35,8 +36,8 @@ fire_modes						= -1
 hand_dependence		 			= 1
 single_handed					= 0
 
-inv_name						= RPD
-inv_name_short					= RPD
+inv_name						= desc_rpd44d
+inv_name_short					= desc_rpd44d_s
 inv_weight						= 7.4
 
 inv_grid_width					= 6
@@ -92,7 +93,7 @@ hit_power           			= 0.60
 hit_impulse		 				= 25
 hit_type 						= fire_wound
 
-fire_distance          			= 1000 
+fire_distance          			= 100					;;;109974 10:1
 bullet_speed					= 735 
 rpm                     		= 750 
 

@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.8  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init
-function my_ver() return "1.0.9.9.9.8" end
+-- TB3D 1.0.9.9.9.9  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init, get_art_type
+function my_ver() return "1.0.9.9.9.9" end
 
 --[[-------------------------- variable and table --------------------------]]
 local table_sort=table.sort
@@ -412,6 +412,57 @@ function dynamic_art(obj_name, lname, sect)
 		end
 	end
 	return result
+end
+local arts_get1={
+	"af_medusa",
+	"af_ameba_slime",
+	"af_electra_flash",
+	"af_electra_moonlight",
+	"af_rusty_thorn",
+	"af_rusty_kristall",
+	"af_cristall_flower",
+	"af_fuzz_kolobok",
+	"af_rusty_sea_urchin"
+}
+local arts_get2={
+	"af_armor_1",
+	"af_babka_1",
+	"af_ameba_slug",
+	"af_ameba_mica",
+	"af_cry_1",
+	"af_dik_1",
+	"af_dummy_spring",
+	"af_fireball",
+	"af_dummy_glassbeads",
+	"af_electra_sparkler",
+	"af_drops",
+	"af_vyvert",
+	"af_cristall"
+}
+local arts_get3={
+	"af_dummy_dummy",
+	"af_dummy_battery",
+	"af_dummy_pellicle",
+	"af_night_star",
+	"af_gravi",
+	"af_gold_fish",
+	"af_kol_1",
+	"af_blood",
+	"af_mincer_meat",
+	"af_soul",
+	"af_pudd_1",
+	"af_spirit_1"
+}
+function get_art_type(type)
+	if type == 0 then							--zombie
+		return arts_get1[math_random(9)]
+	elseif type == 1 then						--bandit
+		return arts_get2[math_random(8)]
+	elseif type == 2 then						--stalker, ecolog, green, hunter
+		return arts_get2[math_random(13)]
+	else										--last day
+		return arts_get3[math_random(12)]
+	end
 end
 
 function generate_anoms()
@@ -874,8 +925,8 @@ function anom_binder:net_spawn(sobj)
 	if not object_binder.net_spawn( self,sobj ) then return false end
 	local status=get_anomaly_status(sobj)
 	if status=="del" or status=="off" then
-		if status=="del" then
-		end
+		--if status=="del" then
+		--end
 		self.object:disable_anomaly()
 	else
 		amk_anoms.add_anomaly(sobj.id,sobj.position,sobj.radius)

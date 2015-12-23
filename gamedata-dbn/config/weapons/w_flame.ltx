@@ -1,3 +1,4 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 ;<!-- excluded empty "discovery_dependency" aleks1970 -->
 ; Огнемет АМК системы Шурупа
 [wpn_flame]:identity_immunities
@@ -18,7 +19,7 @@ ef_weapon_type			= 6
 holder_range_modifier	= 1.0		    
 holder_fov_modifier		= 0.7
 
-cost					= 30000				
+cost					= 25000				
 weapon_class			= assault_rifle	
 ammo_limit				= 210		
 ammo_elapsed			= 30			
@@ -31,7 +32,7 @@ ammo_class				= ammo_flame
 hand_dependence			= 2									
 single_handed			= 0
 slot 					= 2
-animation_slot			= 2							
+animation_slot			= 2
 
 inv_name	        	= wpn-flame_name							
 inv_name_short			= wpn-flame_name_s	
@@ -106,7 +107,6 @@ light_var_color				= 0.05
 light_var_range				= 0.5
 light_time 					= 0.2						
 ph_mass						= 5						
-
 scope_status				= 0						
 silencer_status				= 0						
 grenade_launcher_status		= 0						
@@ -167,17 +167,18 @@ GroupControlSection	= spawn_group
 $spawn			= "weapons\ammo\ammo_5.45x39_fmj" ; option for Level Editor
 class			= AMMO
 cform                   = skeleton
-visual                  = weapons\ammo\ammo_545x39_fmj.ogf
-description				= ammo_flame_name
+;;;visual                  = amk\amk_ballon.ogf
+visual                  = weapons-new\flame\flame_balon.ogf	;new aleks1970
+description				= enc_ammo_flame_name_descr
 $prefetch 		= 64
 
-cost					 = 200	;150
+cost					 = 1600	;150
 
-box_size		= 150	;60
+box_size		= 75	;60
 
 inv_name		= ammo_flame_name
 inv_name_short	= ammo_flame_name
-inv_weight		= 0.02
+inv_weight		= 2.50
 
 inv_grid_width		= 2
 inv_grid_height		= 1

@@ -248,10 +248,14 @@ end
 
 --show TIPS
 function amk_send_tip_id(news_id, header_id, timeout, showtime, sender, sound)
-	if TB3D_Modders.use_news_message then 
-		TB3D_Services.info_alert("news mgr: AMK send tip["..news_id.."]") 
-	end
 	if news_id then
+		if TB3D_Modders.use_news_message then 
+			TB3D_Services.packet_alert("news mgr: AMK send tip id["..news_id.."]") 
+		end
+		local news_tip = translate(news_id)
+		if TB3D_Modders.use_news_message then 
+			TB3D_Services.packet_alert("news mgr: AMK send tip id["..news_tip.."]") 
+		end
 		local tmout = timeout or 1
 		local shwtme = showtime or 5
 		if shwtme < 1 then shwtme = 5 end
@@ -264,15 +268,21 @@ function amk_send_tip_id(news_id, header_id, timeout, showtime, sender, sound)
 			player=pda_tips
 		end   
 		--' Play's default sound
+		if TB3D_Modders.use_news_message then 
+			TB3D_Services.packet_alert("news mgr: AMK send tip id["..news_id.."] play sound") 
+		end
 		player:play(db.actor, tmout, sound_object.s2d)
 		if sender == nil or tips_icons[sender] == nil then sender = "default" end
 		local x = tips_icons[sender][1]
 		local y = tips_icons[sender][2]
 		local ntext
-		if header_id then ntext = translate(header_id) else ntext = translate("st_tip") end
-		ntext = text_color_tip..ntext.." %c[default]"..translate(news_id)
+		if header_id then ntext = translate(header_id) elseif st_tip then ntext = translate(st_tip) else ntext = "UNKNOWN" end
+		if TB3D_Modders.use_news_message then 
+			TB3D_Services.packet_alert("news mgr: AMK send tip id["..news_id.."] sender["..ntext.."]") 
+		end
+		ntext = text_color_tip..ntext.." %c[default]"..news_tip
 		if TB3D_Modders.use_news_message then
-			TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(ntext).."]") 
+			TB3D_Services.packet_alert("news mgr: send the tip["..ntext.."]") 
 		end
 		db.actor:give_game_news(ntext, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), tmout*1000, shwtme*1000)
 		return true
@@ -282,7 +292,7 @@ end
 
 function amk_send_tip(news_text, header, timeout, showtime, sender, sound)
 	if TB3D_Modders.use_news_message then 
-		TB3D_Services.info_alert("news mgr: send tip["..utils.to_str(news_text).."]") 
+		TB3D_Services.info_alert("news mgr: amk send tip["..utils.to_str(news_text).."]") 
 	end
 	  if news_text then
 			local hdr 
@@ -307,7 +317,7 @@ function amk_send_tip(news_text, header, timeout, showtime, sender, sound)
 		  local y = tips_icons[sender][2]
 			local ntext = text_color_tip..hdr.."  %c[default]"..news_text
 			if TB3D_Modders.use_news_message then
-				TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(ntext).."]") 
+				TB3D_Services.info_alert("news mgr: amk send the tip["..utils.to_str(ntext).."]") 
 			end
 		  give_game_news(ntext, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), tmout*1000, shwtme*1000)
 	  return true
@@ -317,7 +327,7 @@ end
 
 function send_tip_txt(actor, news_text, timeout, sender, showtime)
 	if TB3D_Modders.use_news_message then 
-		TB3D_Services.info_alert("news mgr: send tip["..utils.to_str(news_text).."]") 
+		TB3D_Services.info_alert("news mgr: send tip txt["..utils.to_str(news_text).."]") 
 	end
 	if news_text then
 		local tmout = timeout or 1
@@ -331,7 +341,7 @@ function send_tip_txt(actor, news_text, timeout, sender, showtime)
 		local x = tips_icons[sender][1]
 		local y = tips_icons[sender][2]
 		if TB3D_Modders.use_news_message then
-			TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(news_text).."]") 
+			TB3D_Services.info_alert("news mgr: send the tip txt["..utils.to_str(news_text).."]") 
 		end
 		give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), tmout, shwtme)
 		return true

@@ -1,8 +1,9 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 ;;;;;;;;;;;;;;; –ÂÏËÌ„ÚÓÌ ¿ – ;;;;;;;;;;;;;;;
 ;--------------------------------------------
 [wpn_acr]:identity_immunities
 GroupControlSection		= spawn_group
-discovery_dependency	= 
+;;discovery_dependency	= 
 $spawn              	= "weapons\acr"	; name and section in level editor
 $npc					= on				
 $prefetch 				= 8
@@ -11,7 +12,7 @@ cform               	= skeleton
 class               	= WP_LR300			; class of the weapon that corresponding to CPP class
 min_radius          	= 30				; [] for AI
 max_radius          	= 100				; [] for AI
-description				= desc_acr
+description				= desc_acr_descr
 	
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -39,8 +40,8 @@ slot 					= 2									; number of slot in inventory we put weapon in (1 - knife 
 animation_slot			= 2									; type of the animation that will be used
 
 
-inv_name	        	= ACR		
-inv_name_short		= ACR	
+inv_name	        = desc_acr
+inv_name_short		= desc_acr_s
 inv_weight			= 2.7	
 
 inv_grid_width			= 5	 ; position and size of the icon that will be used to display weapon in the inventory menu
@@ -106,7 +107,7 @@ hit_power               = 0.75		;size of damage by bullet
 hit_impulse		 	= 60		;size of physic impulse by bullet	
 hit_type 			   = fire_wound 	;[] type of the wound
 hit_rate	            = 1.9
-fire_distance           = 350		;maximum fire distance that bullet can fly
+fire_distance           = 35					;;;109974 10:1
 bullet_speed		= 790		;starting bullet speed
 rpm                     = 750		;max round per minute
 
@@ -115,7 +116,7 @@ time_to_aim					= 0.5
 
 silencer_hit_power       		= 0.71
 silencer_hit_impulse	 		= 48
-silencer_fire_distance   		= 280
+silencer_fire_distance   		= 28					;;;109974 10:1
 silencer_bullet_speed	 		= 710
 
 hud                      	= wpn_acr_hud				; name of the section of the hud

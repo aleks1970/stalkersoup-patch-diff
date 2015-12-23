@@ -618,6 +618,7 @@ end
 function prizrak_zver_done(first_speaker, second_speaker) 
     dialogs.relocate_item_section(first_speaker, "sniper_flash", "out")
 	dialogs.relocate_item_section(second_speaker, "wpn_dark_gauss", "in")
+	treasure_manager.get_treasure_manager():give_treasure("lost_village_inventory_box") -- Lost Village - Ghost blue box - aleks1970
 end	
 
 function prizrak_finalzver_have(task, objective) 

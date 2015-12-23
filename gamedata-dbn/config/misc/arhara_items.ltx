@@ -1,5 +1,5 @@
-;<!-- TB3D 1.0.9.9.3.5 --> contains local strings (some were vars!!), edits by glowworm, fixed camera icon, fuzer, wpn_svd_foto_hud
-;<!-- 450 and 3608 aleks1970;  excluded duplicates sections aleks1970, fixed izomorph crystal and compass -->
+;<!-- TB3D 1.0.9.9.8.6 --> contains local strings (some were vars!!), edits by glowworm, fixed camera icon, fuzer, wpn_svd_foto_hud
+;<!-- 450 and 3608 aleks1970;  excluded duplicates sections aleks1970, fixed izomorph crystal and compass, arhara_instruk, babka_4 -->
 
 [vorona_egg]:identity_immunities
 GroupControlSection	= spawn_group
@@ -60,8 +60,8 @@ description			= enc_equipment_lekarstvo
 
 ef_weapon_type		= 0
 
-inv_name			= lekarstvo
-inv_name_short		= lekarstvo
+inv_name			= item_lekarstvo
+inv_name_short		= item_lekarstvo_s
 inv_weight			= 0.1	;0.2
 
 inv_grid_width		= 1
@@ -110,10 +110,10 @@ $spawn					= "food and drugs\arhara_tele"
 cform                   = skeleton
 class					= II_ANTIR	;II_ATTCH
 visual                  = equipments\skelet_head3.ogf 
-description			= enc_equipment_arhara_tele 
+description			= enc_equipment_arhara_tele_descr 
 cost				= 1
-inv_name			= "Monolithian Teleport"
-inv_name_short			= "Monolithian Teleport"
+inv_name			= enc_equipment_arhara_tele
+inv_name_short			= enc_equipment_arhara_tele_s
 inv_weight				= 0.55
 inv_grid_width			= 2
 inv_grid_height			= 2
@@ -150,8 +150,8 @@ cform				= skeleton
 visual				= equipments\item_mozg.ogf
 description			= enc_equipment_food_mozg
 
-inv_name			= mozg
-inv_name_short			= mozg
+inv_name			= item_mozg
+inv_name_short			= item_mozg_s
 inv_weight			= 0.7	;0.2
 
 inv_grid_width		= 2
@@ -197,8 +197,8 @@ cform				= skeleton
 visual				= monster_items\spleen_rat_bezoar.ogf
 description			= enc_equipment_bezoar
 
-inv_name			= bezoar
-inv_name_short			= bezoar
+inv_name			= item_bezoar
+inv_name_short			= item_bezoar_s
 inv_weight			= 0.4
 
 inv_grid_width		= 1
@@ -318,8 +318,8 @@ description			= enc_equipment_snotvornoe_tele
 
 ef_weapon_type		= 0
 
-inv_name			= "Strange Medicine"
-inv_name_short			= "Strange Medicine"
+inv_name			= equip_snotvornoe_tele
+inv_name_short			= equip_snotvornoe_tele_s
 inv_weight			= 0.1	;0.2
 quest_item         = true
 
@@ -374,15 +374,15 @@ description			= enc_equipment_shaxter_tele
 
 ef_weapon_type		= 0
 
-inv_name			= "Miner's Medicine"
-inv_name_short			= "Miner's Medicine"
+inv_name			= equip_shaxter_tele
+inv_name_short			= equip_shaxter_tele_s
 inv_weight			= 0.1	;0.2
 quest_item         = true
 
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 38
-inv_grid_y			= 17
+inv_grid_x			= 41 ;38
+inv_grid_y			= 15 ;
 cost				= 0
 
 attach_angle_offset		= 0.000000, 0.000000, 0.000000
@@ -449,10 +449,10 @@ cform                   = skeleton
 class					= II_ATTCH
 visual                  = equipments\manual_torch.ogf	; aleks1970
 
-description			= item_fonarik
+description			= enc_item_fonarik_descr
 
-inv_name			= "Small Flashlight"
-inv_name_short			= "Small Flashlight"
+inv_name			= item_fonarik
+inv_name_short			= item_fonarik_s
 inv_weight				= 0.35
 inv_grid_width			= 2
 inv_grid_height			= 1
@@ -461,7 +461,7 @@ inv_grid_y				= 17
 attach_angle_offset		= 0.000000, -1.204452, -1.262921
 attach_position_offset	= 0.081856, -0.035081, 0.011694
 attach_bone_name		= bip01_l_hand
-auto_attach				= fals
+auto_attach				= false
 cost				= 250
 
 
@@ -497,9 +497,9 @@ cform                   = skeleton
 class				= II_ATTCH
 visual                  = money\money.ogf
 cost					= 300
-description			= enc_equipment_money
-inv_name			= "Silver Rouble"
-inv_name_short			= "Silver Rouble"
+description			= enc_equip_money_descr
+inv_name			= equip_money_rouble
+inv_name_short			= equip_money_rouble_s
 inv_weight				= 0.02
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -516,9 +516,9 @@ cform                   = skeleton
 class				= II_ATTCH
 visual                  = money\money1.ogf
 cost					= 6000
-description			= enc_equipment_money1
-inv_name			= "Gold Chervonet"
-inv_name_short			= "Gold Chervonet"
+description			= enc_equip_money1_descr
+inv_name			= equip_money1_gold
+inv_name_short			= equip_money1_gold_s
 inv_weight				= 0.02
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -536,9 +536,9 @@ cform                   = skeleton
 class					= II_ATTCH
 visual                  = money\money2.ogf
 cost					= 1000
-description			= enc_equipment_money2
-inv_name			= "Silver Rouble"
-inv_name_short			= "Silver Rouble"
+description			= enc_equip_money2_silver_descr
+inv_name			= equip_money2_silver
+inv_name_short			= equip_money2_silver_s
 inv_weight				= 0.02
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -556,9 +556,9 @@ cform                   = skeleton
 class				= II_ATTCH
 visual                  = money\money3.ogf
 cost					= 3000
-description			= enc_equipment_money3
-inv_name			= "Silver Rouble"
-inv_name_short			= "Silver Rouble"
+description			= enc_equip_money3_silver_descr
+inv_name			= equip_money3_silver
+inv_name_short			= equip_money3_silver_s
 inv_weight				= 0.02
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -575,9 +575,9 @@ cform                   = skeleton
 class				= II_ATTCH
 visual                  = equipments\book.ogf
 cost					= 0
-description			= enc_book_xabarych
-inv_name			= "Miner's Book"
-inv_name_short			= "Miner's Book"
+description			= enc_book_xabarych_descr
+inv_name			= item_book_xabarych
+inv_name_short			= item_book_xabarych_s
 inv_weight				= 0.3
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -599,15 +599,15 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_arhara_obman
+description			= enc_item_arhara_obman_descr
 
-inv_name			= "Strelok's Teleport"
-inv_name_short			= "Strelok's Teleport"
+inv_name			= item_arhara_obman
+inv_name_short			= item_arhara_obman_s
 inv_weight			= 0.05
 inv_grid_width		= 2
 inv_grid_height		= 1
-inv_grid_x			= 26
-inv_grid_y			= 37
+inv_grid_x			= 34
+inv_grid_y			= 64
 cost				= 0
 ; eatable item
 eat_health = 0
@@ -636,10 +636,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_arhara_listok
+description			= enc_item_arhara_listok_descr
 
-inv_name			= "Strelok's Note"
-inv_name_short			= "Strelok's Note"
+inv_name			= item_arhara_listok
+inv_name_short			= item_arhara_listok_s
 inv_weight			= 0.05
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -660,10 +660,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_arhara_instruk
+description			= enc_item_arhara_instruk_descr
 
-inv_name			= "Suit Instructions"
-inv_name_short			= "Suit Instructions"
+inv_name			= item_arhara_instruk			;;109986
+inv_name_short		= item_arhara_instruk_s
 inv_weight			= 0.05
 inv_grid_width		= 2
 inv_grid_height		= 1
@@ -685,9 +685,9 @@ radius				= 1
 quest_item			= false
 cost					= 300
 
-description			= electro_charge_12
-inv_name			= "Micro-Circuit Repair-Kit"
-inv_name_short			= "Micro-Circuit Repair-Kit"
+description			= enc_electro_charge_12_descr
+inv_name			= electro_charge_12
+inv_name_short			= electro_charge_12_s
 inv_weight				= 0.02
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -708,10 +708,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_flyga
+description			= enc_item_flyga_descr
 
-inv_name			= "Petrenko's '9 Rota' Flask"
-inv_name_short			= "Petrenko's '9 Rota' Flask"
+inv_name			= item_flyga
+inv_name_short			= item_flyga_s
 inv_weight			= 0.2
 inv_grid_width			= 2
 inv_grid_height			= 2
@@ -732,10 +732,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_termos_big
+description			= enc_item_termos_big_descr
 
-inv_name			= "Large Thermos"
-inv_name_short		    	= "Large Thermos"
+inv_name			= item_termos_big
+inv_name_short		    	= item_termos_big_s
 inv_weight			= 0.6
 inv_grid_width		     = 2
 inv_grid_height		= 2
@@ -756,10 +756,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_termos_small
+description			= enc_item_termos_small_descr
 
-inv_name			= "Small Thermos"
-inv_name_short			= "Small Thermos"
+inv_name			= item_termos_small
+inv_name_short			= item_termos_small_s
 inv_weight			= 0.45
 inv_grid_width		= 1
 inv_grid_height		= 2
@@ -780,10 +780,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_kuvalda
+description			= enc_item_kuvalda_descr
 
-inv_name			= "Sledgehammer"
-inv_name_short			= "Sledgehammer"
+inv_name			= item_kuvalda
+inv_name_short			= item_kuvalda_s
 inv_weight			= 25
 inv_grid_width		= 2
 inv_grid_height		= 3
@@ -804,10 +804,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_kluch
+description			= enc_item_kluch_descr
 
-inv_name			= "Wrench"
-inv_name_short			= "Wrench"
+inv_name			= item_kluch
+inv_name_short			= item_kluch_s
 inv_weight			= 0.6
 inv_grid_width		= 3
 inv_grid_height		= 1
@@ -828,10 +828,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_otvertka
+description			= enc_item_otvertka_descr
 
-inv_name			= "Screwdriver"
-inv_name_short			= "Screwdriver"
+inv_name			= item_otvertka
+inv_name_short			= item_otvertka_s
 inv_weight			= 0.2
 inv_grid_width		= 3
 inv_grid_height		= 1
@@ -852,10 +852,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_malyva
+description			= enc_item_malyva_descr
 
-inv_name			= "Notebook for Borov"
-inv_name_short		        = "Notebook for Borov"
+inv_name			= item_malyva
+inv_name_short		        = item_malyva_s
 inv_weight			= 0.05
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -877,10 +877,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_pribor
+description			= enc_item_pribor_descr
 
-inv_name		        = "Computer [audio/visual]"
-inv_name_short		        = "Computer [audio/visual]"
+inv_name		        = item_pribor
+inv_name_short		        = item_pribor_s
 inv_weight			= 9
 inv_grid_width		= 2
 inv_grid_height		= 4
@@ -901,10 +901,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_3d_raziy
+description			= enc_item_3d_raziy_descr
 
-inv_name			= "Portable Radio [audio/visual]"
-inv_name_short		        = "Portable Radio [audio/visual]"
+inv_name			= item_3d_raziy
+inv_name_short		        = item_3d_raziy_s
 inv_weight			= 5
 inv_grid_width			= 2
 inv_grid_height			= 3
@@ -925,10 +925,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_telefon
+description			= enc_item_telefon_descr
 
-inv_name			= "'Manpack' Portable Radio"
-inv_name_short		        = "'Manpack' Portable Radio"
+inv_name			= item_telefon
+inv_name_short		        = item_telefon_s
 inv_weight			= 0.5
 inv_grid_width			= 1
 inv_grid_height			= 2
@@ -945,9 +945,9 @@ $prefetch 			= 8
 class				= II_FOOD
 cform				= skeleton
 visual				= equipments\suvorotka.ogf
-description			= enc_equipment_suvorotka
-inv_name			= "Whey Tablets"
-inv_name_short			= "Whey Tablets"
+description			= enc_equipment_suvorotka_descr
+inv_name			= enc_equipment_suvorotka
+inv_name_short			= enc_equipment_suvorotka_s
 inv_weight			= 0.05	
 
 inv_grid_width		= 2
@@ -986,10 +986,10 @@ radius    = 1
 ;script_binding  = stalker.object_init
 quest_item   = false
 
-description         	= gonets_flash_desc
+description         	= enc_gonets_flash_descr
 
-inv_name   		= "Messenger's USB-Stick"
-inv_name_short 	 	= "Messenger's USB-Stick"
+inv_name   		= gonets_flash_desc
+inv_name_short 	 	= gonets_flash_desc_s
 inv_weight   = 0.03
 
 inv_grid_width  = 1
@@ -1011,10 +1011,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_kod_kamera
+description			= enc_item_kod_kamera_descr
 
-inv_name			= "Prison Log-Book"
-inv_name_short		        = "Prison Log-Book"
+inv_name			= item_kod_kamera
+inv_name_short		        = item_kod_kamera_s
 inv_weight			= 0.03
 inv_grid_width		= 1
 inv_grid_height		= 1
@@ -1035,10 +1035,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_soap
+description			= enc_item_soap_descr
 
-inv_name			     = "Bar of Soap"
-inv_name_short		    	     = "Bar of Soap"
+inv_name			     = item_soap
+inv_name_short		    	     = item_soap_s
 inv_weight			= 0.1
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -1059,10 +1059,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
 
-description			= item_amulet
+description			= enc_item_amulet_descr
 
-inv_name			     = "Monolithian Amulet"
-inv_name_short		     	     = "Monolithian Amulet"
+inv_name			     = item_amulet
+inv_name_short		     	     = item_amulet_s
 inv_weight			= 0.03
 inv_grid_width		     = 2
 inv_grid_height		= 2
@@ -1083,10 +1083,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_remontnyi_box
+description			= enc_item_remontnyi_box_descr
 
-inv_name			= "Field Repair-Kit"
-inv_name_short		     	= "Field Repair-Kit"
+inv_name			= item_remontnyi_box
+inv_name_short		     	= item_remontnyi_box_s
 inv_weight			= 12
 inv_grid_width		     	= 3
 inv_grid_height			= 2
@@ -1107,10 +1107,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_shkatulka
+description			= enc_item_shkatulka_descr
 
-inv_name			= "Casket"
-inv_name_short		     	= "Casket"
+inv_name			= item_shkatulka
+inv_name_short		     	= item_shkatulka_s
 inv_weight			= 0.2
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -1131,10 +1131,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_arhara_seif
+description			= enc_item_arhara_seif_descr
 
-inv_name			= "Small Safe"
-inv_name_short		     	= "Small Safe"
+inv_name			= item_arhara_seif
+inv_name_short		     	= item_arhara_seif_s
 inv_weight			= 20
 inv_grid_width		     = 3
 inv_grid_height		= 2
@@ -1155,10 +1155,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= true
 
-description			= item_kluch_dell_teleport
+description			= enc_item_kluch_dell_teleport_descr
 
-inv_name			= "Damaged Teleporter"
-inv_name_short		     	= "Damaged Teleporter"                    
+inv_name			= item_kluch_dell_teleport
+inv_name_short		     	= item_kluch_dell_teleport_s                    
 
 inv_weight			= 0.05
 
@@ -1181,10 +1181,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= true
 
-description			= item_kluch_dell_teleport
+description			= enc_item_kluch_dell_teleport1_descr
 
-inv_name			= "Damaged Teleporter"
-inv_name_short		     	= "Damaged Teleporter"                    
+inv_name			= item_kluch_dell_teleport1
+inv_name_short		     	= item_kluch_dell_teleport1_s                    
 
 inv_weight			= 0.05
 
@@ -1207,10 +1207,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= true
 
-description			= item_kluch_dell_teleport
+description			= enc_item_kluch_dell_teleport2_descr
 
-inv_name			= "Damaged Teleporter"
-inv_name_short		     	= "Damaged Teleporter"                    
+inv_name			= item_kluch_dell_teleport2
+inv_name_short		     	= item_kluch_dell_teleport2_s
 
 inv_weight			= 0.05
 
@@ -1233,10 +1233,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= true
 
-description			= item_parcel
+description			= enc_item_parcel_descr
 
-inv_name			= "Parcel of Medicine"
-inv_name_short		     	= "Parcel of Medicine"                   
+inv_name			= item_parcel
+inv_name_short		     	= item_parcel_s
 
 inv_weight			= 2.0
 
@@ -1259,10 +1259,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_box_with_weapon
+description			= enc_item_box_with_weapon_descr
 
-inv_name			= "Weapon Box"
-inv_name_short		     	= "Weapon Box"                    
+inv_name			= item_box_with_weapon
+inv_name_short		     	= item_box_with_weapon_s
 
 inv_weight			= 25.0
 inv_grid_width			= 2
@@ -1284,10 +1284,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_tabletki
+description			= enc_item_tabletki_descr
 
-inv_name			= "Strange Tablets"
-inv_name_short		     	= "Strange Tablets"                  
+inv_name			= item_tabletki
+inv_name_short		     	= item_tabletki_s
 
 inv_weight			= 0.05
 inv_grid_width		     	= 2
@@ -1310,10 +1310,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_tabletki
+description			= enc_item_tabletki1_descr
 
-inv_name			= "Strange Tablets"
-inv_name_short		     	= "Strange Tablets"                  
+inv_name			= item_tabletki1
+inv_name_short		     	= item_tabletki1_s
 
 inv_weight			= 0.05
 inv_grid_width		     	= 2
@@ -1336,10 +1336,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_tabletki
+description			= enc_item_tabletki2_descr
 
-inv_name			= "Strange Tablets"
-inv_name_short		     	= "Strange Tablets"                   
+inv_name			= item_tabletki2
+inv_name_short		     	= item_tabletki2_s
 
 inv_weight			= 0.05
 inv_grid_width		     	= 2
@@ -1361,10 +1361,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_shpriz
+description			= enc_item_shpriz_descr
 
-inv_name			= "Dirty Syringe"
-inv_name_short		     	= "Dirty Syringe"                  
+inv_name			= item_shpriz
+inv_name_short		     	= item_shpriz_s
 
 inv_weight			= 0.05
 inv_grid_width		     	= 2
@@ -1386,9 +1386,9 @@ radius				= 1
 quest_item			= false
 cost				= 3000
 
-description			= item_akkumulytor
-inv_name			= "Accumulator"
-inv_name_short			= "Accumulator"
+description			= enc_item_akkumulytor_descr
+inv_name			= item_akkumulytor
+inv_name_short			= item_akkumulytor_s
 inv_weight			= 1.0
 inv_grid_width			= 2
 inv_grid_height			= 1
@@ -1408,9 +1408,9 @@ radius				= 1
 quest_item			= false
 cost					= 560
 
-description			= item_britva
-inv_name			= "Razor"
-inv_name_short			= "Razor"
+description			= enc_item_britva_descr
+inv_name			= item_britva
+inv_name_short			= item_britva_s
 inv_weight				= 0.05
 inv_grid_width			= 2
 inv_grid_height			= 1
@@ -1431,9 +1431,9 @@ radius				= 1
 quest_item			= false
 cost					= 30000
 
-description			= item_starik_chasy
-inv_name			= "Gold Pocket Watch"
-inv_name_short			= "Gold Pocket Watch"
+description			= enc_item_starik_chasy_descr
+inv_name			= item_starik_chasy
+inv_name_short			= item_starik_chasy_s
 inv_weight				= 0.2
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -1454,9 +1454,9 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_land_disketka
-inv_name			= "Computer Disk"
-inv_name_short			= "Computer Disk"
+description			= enc_item_land_disketka_descr
+inv_name			= item_land_disketka
+inv_name_short			= item_land_disketka_s
 inv_weight				= 0.1
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -1474,10 +1474,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\kolba_pust.ogf
-description			= item_kolba_pustay
+description			= enc_item_kolba_pustay_descr
 
-inv_name			= "'Mica' Flask"
-inv_name_short			= "'Mica' Flask"
+inv_name			= item_kolba_pustay
+inv_name_short			= item_kolba_pustay_s
 inv_weight			= 0.2
 
 inv_grid_width			= 2
@@ -1533,9 +1533,9 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_ekza_akkumul
-inv_name			= "Exo-Power Unit"
-inv_name_short			= "Exo-Power Unit"
+description			= enc_item_ekza_akkumul_descr
+inv_name			= item_ekza_akkumul
+inv_name_short			= item_ekza_akkumul_s
 inv_weight				= 0.3
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -1555,9 +1555,9 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_elek_plata
-inv_name			= "Payment Details"
-inv_name_short			= "Payment Details"
+description			= enc_item_elek_plata_descr
+inv_name			= item_elek_plata
+inv_name_short			= item_elek_plata_s
 inv_weight				= 0.08
 inv_grid_width			= 2
 inv_grid_height			= 1
@@ -1578,9 +1578,9 @@ radius				= 1
 quest_item			= false
 cost					= 5000
 
-description			= item_kluk_karta
-inv_name			= "'Canine's Map"
-inv_name_short			= "'Canine's Map"
+description			= enc_item_kluk_karta_descr
+inv_name			= item_kluk_karta
+inv_name_short			= item_kluk_karta_s
 inv_weight				= 0.3
 inv_grid_width			= 2
 inv_grid_height			= 2
@@ -1601,9 +1601,9 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_kluk_karta_kopiy
-inv_name			= "Copy of Canin's Map"
-inv_name_short			= "Copy of Canin's Map"
+description			= enc_item_kluk_karta_kopiy_descr
+inv_name			= item_kluk_karta_kopiy
+inv_name_short			= item_kluk_karta_kopiy_s
 inv_weight				= 0.3
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -1621,10 +1621,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\kolba_siniy.ogf
-description			= item_kolba_siniy_poln
+description			= enc_item_kolba_siniy_poln_descr
 
-inv_name			= "Rejuvenating Flask"
-inv_name_short			= "Rejuvenating Flask"
+inv_name			= item_kolba_siniy_poln
+inv_name_short			= item_kolba_siniy_poln_s
 inv_weight			= 0.4
 
 inv_grid_width			= 2
@@ -1635,7 +1635,7 @@ inv_grid_y			= 43
 
 cost				= 15000
 
-jump_height			= .0
+jump_height			= 0
 
 particles			= anomaly2\artefact\artefact_electra
 
@@ -1676,10 +1676,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\kolba_orand.ogf
-description			= item_kolba_orand_poln
+description			= enc_item_kolba_orand_poln_descr
 
-inv_name			= "Rejuvenating Flask"
-inv_name_short			= "Rejuvenating Flask"
+inv_name			= item_kolba_orand_poln
+inv_name_short			= item_kolba_orand_poln_s
 inv_weight			= 0.4
 
 inv_grid_width			= 2
@@ -1690,7 +1690,7 @@ inv_grid_y			= 44
 
 cost				= 15000
 
-jump_height			= .0
+jump_height			= 0
 
 particles			= anomaly2\artefact\artefact_mincer
 
@@ -1733,9 +1733,9 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_trupak
-inv_name			= "Controller's Corpse"
-inv_name_short			= "Controller's Corpse"
+description			= enc_item_trupak_descr
+inv_name			= item_trupak
+inv_name_short			= item_trupak_s
 inv_weight				= 80.0
 inv_grid_width			= 4
 inv_grid_height			= 2
@@ -1755,9 +1755,9 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_sidor_head
-inv_name			= "Stuffed Head of 'Sidorovich'"
-inv_name_short			= "Stuffed Head of 'Sidorovich'"
+description			= enc_item_sidor_head_descr
+inv_name			= item_sidor_head
+inv_name_short			= item_sidor_head_s
 inv_weight				= 5.0
 inv_grid_width			= 2
 inv_grid_height			= 2
@@ -1777,10 +1777,10 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_perfuzor_pust
-inv_name			= "Perfuzor Flask [empty]"
-inv_name_short			= "Perfuzor Flask [empty]"
-inv_weight				= 10.0	;1000.0		;;;TB3D 109925
+description			= enc_item_perfuzor_pust_descr
+inv_name			= item_perfuzor_pust
+inv_name_short			= item_perfuzor_pust_s
+inv_weight				= 10.0	;;;TB3D 109925
 inv_grid_width			= 2
 inv_grid_height			= 2
 inv_grid_x				= 20
@@ -1800,9 +1800,9 @@ quest_item			= false
 cost					= 0
 can_take			     = false
 
-description			= item_perfuzor_poln
-inv_name			= "Perfuzor Flask [full]"
-inv_name_short			= "Perfuzor Flask [full]"
+description			= enc_item_perfuzor_poln_descr
+inv_name			= item_perfuzor_poln
+inv_name_short			= item_perfuzor_poln_s
 inv_weight				= 1000.0
 inv_grid_width			= 2
 inv_grid_height			= 2
@@ -1822,9 +1822,9 @@ radius				= 1
 quest_item			= false
 cost					= 0
 
-description			= item_kukla_1
-inv_name			= "Old Doll"
-inv_name_short			= "Old Doll"
+description			= enc_item_kukla_1_descr
+inv_name			= item_kukla_1
+inv_name_short			= item_kukla_1_s
 inv_weight				= 0.4
 inv_grid_width			     = 2
 inv_grid_height			= 2
@@ -1844,10 +1844,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_naem_bloknot
+description			= enc_item_naem_bloknot_descr
 
-inv_name			= "Mercenary's Notebook"
-inv_name_short		        = "Mercenary's Notebook"
+inv_name			= item_naem_bloknot
+inv_name_short		        = item_naem_bloknot_s
 inv_weight			= 0.03
 inv_grid_width		= 2
 inv_grid_height		= 1
@@ -1868,10 +1868,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
 
-description			= item_amul_naemn
+description			= enc_item_amul_naemn_descr
 
-inv_name			= "Mercenary's Ring"
-inv_name_short		     	= "Mercenary's Ring"
+inv_name			= item_amul_naemn_s
+inv_name_short		     	= item_amul_naemn_s
 inv_weight			= 0.03
 inv_grid_width		     = 1
 inv_grid_height		= 1
@@ -1892,17 +1892,17 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
 
-description			= item_kluch_dell_teleport_warlab
+description			= enc_item_kluch_dell_teleport_warlab_descr
 
-inv_name			= "Deactivated Teleport"
-inv_name_short		     	= "Deactivated Teleport"                    
+inv_name			= item_kluch_dell_teleport_warlab
+inv_name_short		= item_kluch_dell_teleport_warlab_s
 
 inv_weight			= 0.05
 
 inv_grid_width		= 2
 inv_grid_height		= 1
-inv_grid_x			= 26
-inv_grid_y			= 37
+inv_grid_x			= 30
+inv_grid_y			= 64
 cost				= 0
 
 
@@ -1918,10 +1918,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_chuchelo_body
+description			= enc_item_chuchelo_body_descr
 
-inv_name			= "Stuffed Pseudodog"
-inv_name_short		     	= "Stuffed Pseudodog"
+inv_name			= item_chuchelo_body
+inv_name_short		     	= item_chuchelo_body_s
 inv_weight			= 10.0
 inv_grid_width		     = 3
 inv_grid_height		= 2
@@ -1942,10 +1942,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_disk_pantera
+description			= enc_item_disk_pantera_descr
 
-inv_name			= "Computer Disk [contains data]"
-inv_name_short			= "Computer Disk [contains data]"
+inv_name			= item_disk_pantera
+inv_name_short			= item_disk_pantera_s
 inv_weight			= 0.1
 inv_grid_width		= 1
 inv_grid_height		= 1
@@ -1966,10 +1966,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= true
 
-description			= item_amul_naemn
+description			= enc_item_amul_naemn1_descr
 
-inv_name			= "Mercenary's Ring"
-inv_name_short		     	= "Mercenary's Ring"
+inv_name			= item_amul_naemn1
+inv_name_short		     	= item_amul_naemn1_s
 inv_weight			= 0.01
 inv_grid_width		     = 1
 inv_grid_height		= 1
@@ -1986,9 +1986,9 @@ cform                   = skeleton
 class					= II_ATTCH
 visual                  = money\bullion_gild.ogf
 cost					= 50000
-description			= equipment_bullion_gild
-inv_name			= "Gold Ingot"
-inv_name_short			= "Gold Ingot"
+description			= enc_equipment_bullion_gild_descr
+inv_name			= equipment_bullion_gild
+inv_name_short			= equipment_bullion_gild_s
 inv_weight				= 1.0
 inv_grid_width			= 2
 inv_grid_height			= 1
@@ -2013,10 +2013,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_zapiska_ranennogo
+description			= enc_item_zapiska_ranennogo_descr
 
-inv_name			= "Dead S.T.A.L.K.E.R.s Note"
-inv_name_short			= "Dead S.T.A.L.K.E.R.s Note"
+inv_name			= item_zapiska_ranennogo
+inv_name_short			= item_zapiska_ranennogo_s
 inv_weight			= 0.01
 inv_grid_width		= 2
 inv_grid_height		= 1
@@ -2036,10 +2036,10 @@ $prefetch                 = 32
 class                     = II_ANTIR
 cform                     = skeleton
 visual                    = equipments\item_pda.ogf
-description               = item_pda_art_mod
+description               = enc_item_pda_art_mod_descr
 
-inv_name                = "PDA containing information on Artefact Modification"
-inv_name_short          = "PDA containing information on Artefact Modification"
+inv_name                = item_pda_art_mod
+inv_name_short          = item_pda_art_mod_s
 inv_weight              = 0
 
 inv_grid_width          = 2
@@ -2077,10 +2077,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_x_ray_antenna
+description			= enc_item_x_ray_antenna_descr
 
-inv_name			= "Portable Psi-Antenna"
-inv_name_short		     	= "Portable Psi-Antenna"
+inv_name			= item_x_ray_antenna
+inv_name_short		     	= item_x_ray_antenna_s
 inv_weight			= 40.0
 inv_grid_width		     = 2
 inv_grid_height		= 3
@@ -2101,10 +2101,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_kapitan_pda
+description			= enc_item_kapitan_pda_descr
 
-inv_name			= "Military Captain's PDA"
-inv_name_short			= "Military Captain's PDA"
+inv_name			= item_kapitan_pda
+inv_name_short			= item_kapitan_pda_s
 inv_weight			= 0.1
 
 inv_grid_width		     = 2
@@ -2124,10 +2124,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\psp.ogf
-description			= item_pult_anders
+description			= enc_item_pult_anders_descr
 
-inv_name			= "Sony PSP"
-inv_name_short			= "Sony PSP"
+inv_name			= item_pult_anders
+inv_name_short			= item_pult_anders_s
 inv_weight			= 0.3
 
 inv_grid_width		     = 2
@@ -2136,7 +2136,7 @@ inv_grid_x			= 22
 inv_grid_y			= 46
 cost				     = 8600
 
-jump_height			= .0
+jump_height			= 0
 
 particles			= anomaly2\artefact\artefact_ameba
 
@@ -2178,10 +2178,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\nevidimka   ;weapons\bolt\wpn_bolt.ogf
-description			= "Simulator"
+description			= enc_item_simulator1_descr
 
-inv_name			= "Simulator"
-inv_name_short		     	= "Simulator"
+inv_name			= item_simulator1
+inv_name_short		     	= item_simulator1_s
 
 inv_weight			= 0.01
 
@@ -2193,7 +2193,7 @@ cost				     = 100
 can_take			     = false
 belt                     = false
 
-jump_height			= .0
+jump_height			= 0
 
 particles			     = anomaly2\electra_idle
 
@@ -2236,10 +2236,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\nevidimka
-description			= "Simulator"
+description			= enc_item_simulator2_descr
 
-inv_name			= "Simulator"
-inv_name_short		     	= "Simulator"
+inv_name			= item_simulator2
+inv_name_short		     	= item_simulator2_s
 inv_weight			= 0.01
 
 inv_grid_width		     = 1
@@ -2250,7 +2250,7 @@ cost				     = 1
 can_take			     = false
 belt                     = false
 
-jump_height			= .0
+jump_height			= 0
 
 particles			= amk_anoms\mincer_idle
 
@@ -2296,10 +2296,10 @@ radius				= 1
 ;script_binding		        = stalker.object_init
 quest_item			= false
 
-description			= item_samopisez
+description			= enc_item_samopisez_descr
 
-inv_name			= item_samop
-inv_name_short		     	= item_samop
+inv_name			= item_samopisez
+inv_name_short		     	= item_samopisez_s
 inv_weight			= 20.0
 inv_grid_width		     = 2
 inv_grid_height		= 2
@@ -2319,16 +2319,16 @@ class				= ARTEFACT
 
 visual				= physics\anomaly\part_monolit.ogf  
 description			= artifact_af_part_monolit1
-inv_name			= af-part-monolit1
-inv_name_short		     	= af-part-monolit1
+inv_name			= af_part_monolit1
+inv_name_short		     	= af_part_monolit1
 inv_weight			= 0.3
 
 inv_grid_x			= 39
-inv_grid_y			= 17
+inv_grid_y			= 18
 
 cost				     = 45000
 
-jump_height			= .4
+jump_height			= 0.4
 
 particles			= anomaly2\gravity_damage_01_smoke
 
@@ -2367,16 +2367,16 @@ class				= ARTEFACT
 
 visual				= physics\anomaly\part_monolit.ogf  
 description			= artifact_af_part_monolit2
-inv_name			= af-part-monolit2
-inv_name_short		     	= af-part-monolit2
+inv_name			= af_part_monolit2
+inv_name_short		     	= af_part_monolit2
 inv_weight			= 0.4
 
 inv_grid_x			= 39
-inv_grid_y			= 17
+inv_grid_y			= 19
 
 cost				     = 50000
 
-jump_height			= .4
+jump_height			= 0.4
 
 particles			= anomaly2\artefact\artefact_ameba
 
@@ -2415,8 +2415,8 @@ class				    = ARTEFACT
 
 visual				    = physics\anomaly\flower_1.ogf  
 description			    = artifact_af_water_flower
-inv_name			    = af-water-flower
-inv_name_short		            = af-water-flower
+inv_name			    = af_water_flower
+inv_name_short		            = af_water_flower
 inv_weight			    = 0.5
 
 inv_grid_x			    = 5
@@ -2424,7 +2424,7 @@ inv_grid_y			    = 50
 
 cost				         = 16000
 
-jump_height			    = .2
+jump_height			    = 0.2
 
 particles			    = anomaly2\gravity_damage_01_smoke
 
@@ -2466,8 +2466,8 @@ class				    = ARTEFACT
 
 visual				    = physics\anomaly\flower_2.ogf  
 description			    = artifact_af_water_flower1
-inv_name			    = af-water-flower1
-inv_name_short		            = af-water-flower1
+inv_name			    = af_water_flower1
+inv_name_short		            = af_water_flower1
 inv_weight			    = 0.5
 
 inv_grid_x			    = 7
@@ -2475,7 +2475,7 @@ inv_grid_y			    = 48
 
 cost				         = 12000
 
-jump_height			    = .2
+jump_height			    = 0.2
 
 particles			    = anomaly2\gravity_damage_01_smoke
 
@@ -2515,8 +2515,8 @@ class   		          = ARTEFACT
 
 visual				= physics\anomaly\af_spiral.ogf
 description			= enc_zone_af_spiral
-inv_name			= af-spiral
-inv_name_short		        = af-spiral
+inv_name			= af_spiral
+inv_name_short		        = af_spiral
 inv_weight			= 0.8
 
 inv_grid_x			= 4
@@ -2567,10 +2567,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= "The downed Helicopter"
+description			= enc_item_downed_helicopter_descr
 
-inv_name			= "The downed Helicopter"
-inv_name_short		    	= "The downed Helicopter"
+inv_name			= item_downed_helicopter
+inv_name_short		    	= item_downed_helicopter_s
 inv_weight			= 10000
 
 inv_grid_width		     = 2
@@ -2591,8 +2591,8 @@ class   		          = ARTEFACT
 
 visual				= physics\anomaly\af_eye_voron.ogf
 description			= enc_zone_af_eye_voron
-inv_name			= af-eye-voron
-inv_name_short		     	= af-eye-voron
+inv_name			= af_eye_voron
+inv_name_short		     	= af_eye_voron
 inv_weight			= 0.5
 
 inv_grid_x			= 8
@@ -2638,9 +2638,9 @@ cform                 = skeleton
 class   		        = ARTEFACT
 
 visual				= equipments\mini_antenna.ogf 
-description			= item_mini_antenna
-inv_name			= name_adj_psi_gen_1
-inv_name_short		     	= name_adj_psi_gen_1
+description			= enc_item_mini_antenna_descr
+inv_name			= item_mini_antenna
+inv_name_short		     	= item_mini_antenna_s
 inv_weight			= 10.0
 
 inv_grid_width		     = 1
@@ -2691,9 +2691,9 @@ cform                 = skeleton
 class   		        = ARTEFACT
 
 visual				= equipments\mini_antenna.ogf 
-description			= item_mini_antenna
-inv_name			= name_adj_psi_gen_2
-inv_name_short		     	= name_adj_psi_gen_2
+description			= enc_item_mini_antenna_descr
+inv_name			= item_mini_antenna2
+inv_name_short		     	= item_mini_antenna2_s
 inv_weight			= 10.0
 
 inv_grid_width		     = 1
@@ -2702,7 +2702,7 @@ inv_grid_x			= 10
 inv_grid_y			= 48
 cost				     = 1500
 belt						= false ;true
-jump_height			= .0
+jump_height			= 0
 
 ;particles			= anomaly2\artefact\artefact_ameba
 
@@ -2745,9 +2745,9 @@ cform                 = skeleton
 class   		        = ARTEFACT
 
 visual				= equipments\mini_antenna.ogf 
-description			= item_mini_antenna
-inv_name			= name_adj_psi_gen_3
-inv_name_short		     	= name_adj_psi_gen_3
+description			= enc_item_mini_antenna_descr
+inv_name			= item_mini_antenna3
+inv_name_short		     	= item_mini_antenna3_s
 inv_weight			= 10.0
 
 inv_grid_width		     = 1
@@ -2756,7 +2756,7 @@ inv_grid_x			= 10
 inv_grid_y			= 48
 cost				     = 1500
 belt						= false ;true
-jump_height			= .0
+jump_height			= 0
 
 ;particles			= anomaly2\artefact\artefact_ameba
 
@@ -2798,9 +2798,9 @@ cform                 = skeleton
 class   		        = ARTEFACT
 
 visual				= equipments\mini_antenna_anime.ogf
-description			= item_mini_antenna
-inv_name			= name_adj_psi_gen_4
-inv_name_short		     	= name_adj_psi_gen_4
+description			= enc_item_mini_antenna_descr
+inv_name			= item_mini_antenna4
+inv_name_short		     	= item_mini_antenna4_s
 ;inv_weight			= 10.0	;  excluded duplicates sections aleks1970
 
 inv_weight			= 12.0
@@ -2852,9 +2852,9 @@ cform                 = skeleton
 class   		        = ARTEFACT
 
 visual				= equipments\mini_antenna_anime.ogf
-description			= item_mini_antenna
-inv_name			= name_adj_psi_gen_5
-inv_name_short		     	= name_adj_psi_gen_5
+description			= enc_item_mini_antenna_descr
+inv_name			= item_mini_antenna5
+inv_name_short		     	= item_mini_antenna5_s
 ;inv_weight			= 10.0	;  excluded duplicates sections aleks1970
 
 inv_weight			= 12.0
@@ -2911,10 +2911,10 @@ radius				= 1
 quest_item			= false
 can_take			     = false
 
-description			= item_mini_antenna
+description			= enc_item_mini_antenna_generator_descr
 
-inv_name			= name_adj_psi_generator
-inv_name_short		     	= name_adj_psi_generator
+inv_name			= item_mini_antenna_generator
+inv_name_short		     	= item_mini_antenna_generator_s
 inv_weight			= 10000.0
 inv_grid_width		     = 1
 inv_grid_height		= 2
@@ -2933,10 +2933,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\nevidimka.ogf
-description			= "Simulator-1"
+description			= enc_item_1_simulator_descr
 
-inv_name			= "Simulator-1"
-inv_name_short		     	= "Simulator-1"
+inv_name			= item_1_simulator
+inv_name_short		     	= item_1_simulator_s
 
 inv_weight			= 0.01
 
@@ -2989,10 +2989,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\nevidimka.ogf
-description			= "Simulator-1"
+description			= enc_item_3_simulator_descr
 
-inv_name			= "Simulator-1"
-inv_name_short		     	= "Simulator-1"
+inv_name			= item_3_simulator
+inv_name_short		     	= item_3_simulator_s
 
 inv_weight			= 0.01
 
@@ -3004,7 +3004,7 @@ cost				     = 1
 can_take			     = false
 belt                     = false
 
-jump_height			= .3
+jump_height			= 0.3
 
 particles	               = anomaly2\studen_idle_bottom000
 
@@ -3044,8 +3044,8 @@ class				    = ARTEFACT
 
 visual				    = physics\anomaly\kamen_udachy.ogf  
 description			    = artifact_af_kamen_udachy
-inv_name			    = af-kamen-udachy
-inv_name_short		            = af-kamen-udachy
+inv_name			    = af_kamen_udachy
+inv_name_short		            = af_kamen_udachy
 inv_weight			    = 2.1
 
 inv_grid_x			    = 9
@@ -3053,7 +3053,7 @@ inv_grid_y			    = 50
 
 cost				         = 450000
 
-jump_height			    = .3
+jump_height			    = 0.3
 
 particles			    = explosions\explosion_dym
 
@@ -3093,10 +3093,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\nevidimka.ogf
-description			= "Simulator-1"
+description			= enc_item_4_simulator_descr
 
-inv_name			= "Simulator-1"
-inv_name_short		     	= "Simulator-1"
+inv_name			= item_4_simulator
+inv_name_short		     	= item_4_simulator_s
 
 inv_weight			= 0.01
 
@@ -3108,7 +3108,7 @@ cost				     = 1
 can_take			     = false
 belt                     = false
 
-jump_height			= .4
+jump_height			= 0.4
 
 particles	               = anomaly2\generator\anomaly_teleport_00001
 
@@ -3146,10 +3146,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\nevidimka.ogf
-description			= "Simulator-1"
+description			= enc_item_2_simulator_descr
 
-inv_name			= "Simulator-1"
-inv_name_short		     	= "Simulator-1"
+inv_name			= item_2_simulator
+inv_name_short		     	= item_2_simulator_s
 
 inv_weight			= 0.01
 
@@ -3159,7 +3159,7 @@ inv_grid_x              = 0
 inv_grid_y              = 81
 cost				     = 1
 
-jump_height			= .3
+jump_height			= 0.3
 can_take			     = false
 belt                     = false
 particles	               = anomaly2\teleport_idle 
@@ -3202,9 +3202,9 @@ cform              = skeleton
 class   		     = ARTEFACT
 
 visual				= physics\anomaly\artifact_lava.ogf
-description			= enc_zone_artifact_af-babka_4_d
-inv_name			= af-babka_4
-inv_name_short		     	= af-babka_4
+description			= enc_zone_artifact_af_babka_4
+inv_name			= af_babka_4
+inv_name_short		     	= af_babka_4
 inv_weight			= 1.0
 
 inv_grid_x			= 23
@@ -3212,7 +3212,7 @@ inv_grid_y			= 7
 
 cost				     = 18000
 
-jump_height			= .3
+jump_height			= 0.3
 
 particles			= 1935\artefact\artefact_pux00 
 
@@ -3257,10 +3257,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= "Videocassette with recorded information on it. Contents Unknown. For one reason or another, the Military want to get their hands on it. Most likely containing some old information on the Zone's formation, and other confidential data .. I will exchange it with Sakharov for a Minigun, and wash my hands clean of it ASAP .. The less you know .. the better you sleep..."
+description			= enc_item_videocassette_descr
 
-inv_name			= "Videocassette"
-inv_name_short		     	= "Videocassette"
+inv_name			= item_videocassette
+inv_name_short		     	= item_videocassette_s
 inv_weight			= 0.25
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -3281,10 +3281,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= true
 
-description			= "Special Detector invented by Sakharov. Able to pick up nearby signals within a radius of ten meters..."
+description			= enc_item_detector1_descr
 
-inv_name			= "'Special' Detector"
-inv_name_short		     	= "'Special' Detector"
+inv_name			= item_detector1
+inv_name_short		     	= item_detector1_s
 inv_weight			= 0.2
 inv_grid_width		     = 1
 inv_grid_height		= 1
@@ -3306,10 +3306,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_strannik_bloknot
+description			= enc_item_strannik_bloknot_descr
 
-inv_name			= "Wanderer's Notebook"
-inv_name_short		        = "Wanderer's Notebook"
+inv_name			= item_strannik_bloknot
+inv_name_short		        = item_strannik_bloknot_s
 inv_weight			= 0.01
 inv_grid_width		     	= 2
 inv_grid_height			= 1
@@ -3327,9 +3327,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = weapons\ammo\ammo_545x39_ap.ogf  
-description			    = "5.45x39mm 'Isomorphic' ammunition"
-inv_name			    = "5.45x39mm 'Isomorphic'"
-inv_name_short		            = "5.45x39mm 'Isomorphic'"
+description			    = enc_item_ammo_545x39_descr
+inv_name			    = item_ammo_545x39
+inv_name_short		            = item_ammo_545x39_s
 inv_weight			    = 0.35
 
 inv_grid_width		         = 2
@@ -3378,9 +3378,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = weapons\ammo\ammo_545x39_ap.ogf  
-description			    = "5.45x39mm 'Isomorphic' ammunition"
-inv_name			    = "5.45x39mm 'Isomorphic'"
-inv_name_short		            = "5.45x39mm 'Isomorphic'"
+description			    = enc_item_ammo_545x39_descr
+inv_name			    = item_ammo_545x39
+inv_name_short		            = item_ammo_545x39_s
 inv_weight			    = 0.35
 
 inv_grid_width		         = 2
@@ -3429,9 +3429,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = equipments\item_rukzak.ogf  
-description			    = "Backpack containing 'Isomorphic' ammunition"
-inv_name			    = "Isomorphic Backpack"
-inv_name_short		            = "Isomorphic Backpack"
+description			    = enc_item_ammo_backpack_descr
+inv_name			    = item_ammo_backpack
+inv_name_short		            = item_ammo_backpack_s
 inv_weight			    = 3.2
 
 inv_grid_x			    = 0
@@ -3481,10 +3481,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_blok_neizvestn
+description			= enc_item_blok_neizvestn_descr
 
-inv_name			= "Unknown S.T.A.L.K.E.R.s Notebook"
-inv_name_short		     	= "Unknown S.T.A.L.K.E.R.s Notebook"
+inv_name			= item_blok_neizvestn
+inv_name_short		     	= item_blok_neizvestn_s
 inv_weight			= 0.03
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -3503,10 +3503,10 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= equipments\nevidimka
-description			= "Photo"
+description			= enc_item_photo_backpack_descr
 
-inv_name			= "Photo"
-inv_name_short		     	= "Photo"
+inv_name			= item_photo_backpack
+inv_name_short		     	= item_photo_backpack_s
 inv_weight			= 0.0
 
 inv_grid_width		     = 0
@@ -3515,7 +3515,7 @@ inv_grid_x			= 0
 inv_grid_y			= 81
 cost				     = 1
 
-jump_height			= .0
+jump_height			= 0
 can_take			     = false
 belt                     = false
 ;particles			= amk_anoms\mincer_idle
@@ -3554,7 +3554,7 @@ GroupControlSection	= spawn_group
 ; discovery_dependency = ; aleks1970 = 
 $spawn                  = "devices\arhara_items\wpn_svd_foto"	
 
-description			= enc_weapons1_wpn-svd-foto
+description			= enc_weapons1_wpn-svd-foto_descr
 cost				= 10000
 ;quest_item			= false
 ammo_mag_size			= 1
@@ -3564,8 +3564,8 @@ sprint_allowed			= true; false
 
 condition_shot_dec 		= 0.00001 ;increase of wear at each shot
 
-inv_name			= "Photo Gun"
-inv_name_short			= "Photo Gun"
+inv_name			= enc_weapons1_wpn-svd-foto
+inv_name_short			= enc_weapons1_wpn-svd-foto_s
 
 inv_grid_width			= 6
 inv_grid_height			= 2
@@ -3631,9 +3631,9 @@ radius				= 1
 quest_item			= true
 cost					= 30
 
-description			= "Photo of the Monolith with erased coded figures..."
-inv_name			= "Pseudo-Photo of the Monolith"
-inv_name_short			= "Pseudo-Photo of the Monolith"
+description			= enc_item_photo_monolit_descr
+inv_name			= item_photo_monolit
+inv_name_short			= item_photo_monolit_s
 inv_weight				= 0.1
 inv_grid_width			= 1
 inv_grid_height			= 1
@@ -3654,10 +3654,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= "Bomb Casing .. both the warhead and detonator are missing..."
+description			= enc_item_bomb_casing_descr
 
-inv_name			= "Bomb Casing"
-inv_name_short		        = "Bomb Casing"
+inv_name			= item_bomb_casing
+inv_name_short		        = item_bomb_casing_s
 inv_weight			= 15.0
 inv_grid_width		     = 3
 inv_grid_height		= 2
@@ -3676,9 +3676,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\globus_izomorf.ogf  
-description			    = "'Isomorphic' Globe .. of a strange, and undetermined origin .. Carrying it inside of a backpack will reduce the radioactive level of any artefacts currently in possession..."
-inv_name			    = "'Isomorphic' Globe"
-inv_name_short		            = "'Isomorphic' Globe"
+description			    = enc_item_isomorfhic_globe_descr
+inv_name			    = item_isomorfhic_globe
+inv_name_short		            = item_isomorfhic_globe_s
 inv_weight			    = 1.0
 
 inv_grid_width		         = 2
@@ -3728,9 +3728,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\fotik_osnova.ogf  
-description			    = "The main part of the 'Special' camera..."
-inv_name			    = "'Isomorphic' Camera Part"
-inv_name_short		            = "'Isomorphic' Camera Part"
+description			    = enc_item_isomorfhic_camera_descr
+inv_name			    = item_isomorfhic_camera
+inv_name_short		            = item_isomorfhic_camera_s
 inv_weight			    = 0.4
 
 inv_grid_width			    = 2
@@ -3784,10 +3784,10 @@ radius				= 1
 ;script_binding			= stalker.object_init
 quest_item			= false
 
-description			= item_neizv_zapiska
+description			= enc_item_neizv_zapiska_descr
 
-inv_name			= "Notebook containing Intel"
-inv_name_short			= "Notebook containing Intel"
+inv_name			= item_neizv_zapiska
+inv_name_short			= item_neizv_zapiska_s
 inv_weight			= 0.01
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -3806,9 +3806,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\fotik_linza.ogf  
-description			    = "'Isomorphic' Camera Lens. Wearing it on the belt has a negative side-effect of increasing radiation levels due to the unique coating found on the actual lens itself..."
-inv_name			    = "'Isomorphic' Lens"
-inv_name_short		            = "'Isomorphic' Lens"
+description			    = enc_item_isomorfhic_camera_lens_descr
+inv_name			    = item_isomorfhic_camera_lens
+inv_name_short		            = item_isomorfhic_camera_lens_s
 inv_weight			    = 0.25
 
 inv_grid_width			    = 2
@@ -3859,9 +3859,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\fotik_pushka.ogf  
-description			    = "Shutter for the Camera. a specialized 'Unique' Desert Eagle is required in order to make use of it..."
-inv_name			    = "'Isomorphic' Camera Shutter"
-inv_name_short		            = "'Isomorphic' Camera Shutter"
+description			    = enc_item_isomorfhic_shutter_camera_descr
+inv_name			    = item_isomorfhic_shutter_camera
+inv_name_short		            = item_isomorfhic_shutter_camera_s
 inv_weight			    = 0.6
 
 inv_grid_width			    = 2
@@ -3912,9 +3912,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\izomorf_kristal.ogf  
-description			    = enc_zone_izomorf_kristal
-inv_name			    = af-ikristal
-inv_name_short		            = af-ikristal
+description			    = enc_zone_izomorf_kristal_descr
+inv_name			    = enc_zone_izomorf_kristal
+inv_name_short		            = enc_zone_izomorf_kristal_s
 inv_weight			    = 0.6
 
 inv_grid_x			    = 5
@@ -3922,7 +3922,7 @@ inv_grid_y			    = 47
 
 cost				         = 5000
 
-jump_height			    = .3
+jump_height			    = 0.3
 
 particles			    = alwen\artefact_kaktus
 
@@ -3962,9 +3962,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\izomorf_kristal.ogf  
-description			    = enc_zone_izomorf_kristal
-inv_name			    = af-pkristal
-inv_name_short		            = af-pkristal
+description			    = enc_zone_izomorf_kristal2_descr
+inv_name			    = enc_zone_izomorf_kristal2
+inv_name_short		            = enc_zone_izomorf_kristal2_s
 inv_weight			    = 0.6
 
 inv_grid_x			    = 5
@@ -3972,7 +3972,7 @@ inv_grid_y			    = 47
 
 cost				         = 5650
 
-jump_height			    = .3
+jump_height			    = 0.3
 
 particles			    = alwen\artefact_kaktus
 
@@ -4016,10 +4016,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_forest_last_dead_listok
+description			= enc_item_forest_last_dead_listok_descr
 
-inv_name			= Instructions
-inv_name_short			= Instructions
+inv_name			= item_forest_last_dead_listok
+inv_name_short			= item_forest_last_dead_listok_s
 inv_weight			= 0.01
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -4038,9 +4038,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\izomorf_kaktus.ogf  
-description			    = "Unknown Origin; but, for some unexplicable reason, the owner of this 'affected' Cactus is somehow immune from Zombie attacks. Is it possible that through this simple plant, the cure for Zombification could be found?!..."
-inv_name			    = "'Isomorphic' Cactus"
-inv_name_short		            = "'Isomorphic' Cactus"
+description			    = enc_zone_izomorf_cactus2_descr
+inv_name			    = enc_zone_izomorf_cactus2
+inv_name_short		            = enc_zone_izomorf_cactus2_s
 inv_weight			    = 0.6
 
 inv_grid_x			    = 36
@@ -4091,10 +4091,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_chemodan_piyan
+description			= enc_item_chemodan_piyan_descr
 
-inv_name			= "Case Checking"
-inv_name_short		     	= "Case Checking"
+inv_name			= item_chemodan_piyan
+inv_name_short		     	= item_chemodan_piyan_s
 inv_weight			= 7.0
 inv_grid_width		     = 3
 inv_grid_height		= 2
@@ -4113,9 +4113,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = weapons\ammo\ammo_762x54_7h14.ogf  
-description			    = "7.62x54mm 'Isomorphic' ammunition..."
-inv_name			    = "7.62x54mm 'Isomorphic'"
-inv_name_short		            = "7.62x54mm 'Isomorphic'"
+description			    = enc_item_isomorfhic_7_62x54mm_descr
+inv_name			    = item_isomorfhic_7_62x54mm
+inv_name_short		            = item_isomorfhic_7_62x54mm_s
 inv_weight			    = 0.33
 
 inv_grid_width		         = 2
@@ -4165,9 +4165,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual                      = weapons\walther_wa_2000\wpn_walther_wa_2000.ogf  
-description			    = "Anomalous Chernomor Sniper Rifle based on the Walther WA 2000 design .. Significantly reduced weight, and wear due to the change itself beginning at the molecular level under the direct influence of an unknown Isomorphic Element. Computerized sight. Used a homemade high-capacity clip. But most importantly - a weapon capable of firing abnormal 7.62x54mm calibre rounds..."
-inv_name			    = "Anomalous Walther WA 2000"
-inv_name_short		            = "Anomalous Walther WA 2000"
+description			    = enc_item_wpn_walther_wa_2000_descr
+inv_name			    = item_wpn_walther_wa_2000
+inv_name_short		            = item_wpn_walther_wa_2000_s
 inv_weight			    = 4.1
 
 inv_grid_width			= 6
@@ -4220,10 +4220,10 @@ radius				= 1
 ;script_binding		= stalker.object_init
 quest_item			= false
 
-description			= item_klenov_opisalovo
+description			= enc_item_klenov_opisalovo_descr
 
-inv_name			= "Instructions from Klenow"
-inv_name_short		        = "Instructions from Klenow"
+inv_name			= item_klenov_opisalovo
+inv_name_short		        = item_klenov_opisalovo_s
 inv_weight			= 0.03
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -4244,9 +4244,9 @@ radius				= 1
 quest_item			= false
 cost					= 30
 
-description			= "Pack of letters belonging to the Rookie S.T.A.L.K.E.R. .. Poorly scribbled in pencil, and nothing of great interest. They seem to be covered in foul smelling slime from a Flesh's stomach?!..."
-inv_name			= "S.T.A.L.K.E.R. Letters"
-inv_name_short			= "S.T.A.L.K.E.R. Letters"
+description			= enc_item_stalker_1_letters_descr
+inv_name			= item_stalker_1_letters
+inv_name_short			= item_stalker_1_letters_s
 inv_weight				= 0.2
 inv_grid_width			     = 2
 inv_grid_height			= 2
@@ -4263,9 +4263,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = izomorf\kompas_izomorf.ogf  
-description			    = enc_zone_izomorf_kompas
-inv_name			    = af-ikompas
-inv_name_short		            = af-ikompas
+description			    = enc_zone_izomorf_kompas_descr
+inv_name			    = art_izomorf_kompas1
+inv_name_short		            = art_izomorf_kompas1_s
 inv_weight			    = 0.6
 
 inv_grid_x			    = 38
@@ -4273,7 +4273,7 @@ inv_grid_y			    = 49
 
 cost				         = 19000
 
-jump_height			    = .3
+jump_height			    = 0.3
 
 particles			         = anomaly2\artefact\artefact_mincer
 
@@ -4316,9 +4316,9 @@ radius				= 1
 quest_item			= false
 cost					= 50
 
-description			= item_planshetka 
-inv_name			= "Tablet PC"
-inv_name_short			= "Tablet PC"
+description			= enc_item_planshetka_descr 
+inv_name			= item_planshetka
+inv_name_short			= item_planshetka_s
 inv_weight				= 0.3
 inv_grid_width			     = 2
 inv_grid_height			= 2
@@ -4336,9 +4336,9 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= physics\anomaly\cocoo2.ogf  
-description			= "Plastic explosive (or plastique) is a specialised form of explosive material. It is soft and hand moldable solid material. Plastic explosives are properly known as putty explosives within the field of explosives engineering. Common plastic explosives include Semtex and C-4. Plastic explosives are especially suited for explosive demolition as they can be easily formed into the best shapes for cutting structural members, and have a high enough velocity of detonation and density for metal cutting work. They are generally not used for ordinary blasting as they tend to be significantly more expensive than other materials that perform just as well in that field. Also, when an explosive is combined with a plasticizer, its power is generally lower than when it is pure."
-inv_name			= "Plastique"
-inv_name_short		        = "Plastique"
+description			= enc_item_stalker_plastic1_descr
+inv_name			= item_stalker_plastic1
+inv_name_short		        = item_stalker_plastic1_s
 inv_weight			= 0.45
 
 inv_grid_x			= 42
@@ -4346,7 +4346,7 @@ inv_grid_y			= 47
 
 cost				     = 5000
 
-jump_height			= .4
+jump_height			= 0.4
 
 particles			= anomaly2\gravity_damage_01_smoke
 
@@ -4386,9 +4386,9 @@ cform				= skeleton
 class				= ARTEFACT
 
 visual				= izomorf\izom_plastilin.ogf  
-description			= "'Isomorphic' Plastique [or C-4]; Soft explosives which can be molded into convenient shapes. Plastic explosives tend to be safe from accidental detonation caused by fire and impact. The convenience and safety of plastic explosives makes them very well suited for Military application. The higher relative costs of plastic explosives means that they are not commonly utilized for commercial blasting."
-inv_name			= "'Isomorphic' Plasticine"
-inv_name_short		        = "'Isomorphic' Plasticine"
+description			= enc_item_stalker_plastique1_descr
+inv_name			= item_stalker_plastique1
+inv_name_short		        = item_stalker_plastique1_s
 inv_weight			= 0.35
 
 inv_grid_x			= 45
@@ -4439,9 +4439,9 @@ radius				= 1
 quest_item			= false
 cost					= 30
 
-description			= item_nauch_recomend 
-inv_name			= "Recommendation"
-inv_name_short			= "Recommendation"
+description			= enc_item_nauch_recomend_descr 
+inv_name			= item_nauch_recomend
+inv_name_short			= item_nauch_recomend_s
 inv_weight				= 0.1
 inv_grid_width			     = 2
 inv_grid_height			= 2
@@ -4459,9 +4459,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = weapons\ammo\ammo_9x39_ap.ogf  
-description			    = "9x39mm 'Isomorphic' ammunition"
-inv_name			    = "9x39mm 'Isomorphic'"
-inv_name_short		            = "9x39mm 'Isomorphic'"
+description			    = enc_item_9x39mm_isomorph1_descr
+inv_name			    = item_9x39mm_isomorph1
+inv_name_short		            = item_9x39mm_isomorph1_s
 inv_weight			    = 0.35
 
 inv_grid_width		         = 2
@@ -4515,9 +4515,9 @@ radius				= 1
 quest_item			= false
 cost					= 50
 
-description			= item_planshetka 
-inv_name			= "Cigar Box with a note inside"
-inv_name_short			= "Cigar Box with a note inside"
+description			= enc_item_planshetka2_descr
+inv_name			= item_planshetka2
+inv_name_short			= item_planshetka2_s
 inv_weight				= 0.3
 inv_grid_width			     = 2
 inv_grid_height			= 1
@@ -4534,9 +4534,9 @@ cform				    = skeleton
 class				    = ARTEFACT
 
 visual				    = equipments\memory_module.ogf  
-description			    = "Teleportation Module"
-inv_name			    = "Teleportation Module"
-inv_name_short		            = "Teleportation Module"
+description			    = enc_item_teleport_module_descr
+inv_name			    = item_teleport_module
+inv_name_short		            = item_teleport_module_s
 inv_weight			    = 2.3
 
 inv_grid_width		         = 2
@@ -4614,10 +4614,10 @@ visual				= amk\item_zapiska.ogf
 radius				= 1
 quest_item			= false
 
-description			= item_iskra_listok
+description			= enc_item_iskra_listok_descr
 
-inv_name			= "Spark's Note"
-inv_name_short		        = "Spark's Note"
+inv_name			= item_iskra_listok
+inv_name_short		        = item_iskra_listok_s
 inv_weight			= 0.03
 inv_grid_width		     = 2
 inv_grid_height		= 1
@@ -4637,10 +4637,10 @@ visual				= equipments\verevka.ogf
 radius				= 1
 quest_item			= false
 
-description			= "a typical piece of synthetic rope. Could comer in useful here in the Zone..."
+description			= enc_item_synthetic_rope1_descr
 
-inv_name			= "Rope"
-inv_name_short		        = "Rope"
+inv_name			= item_synthetic_rope1
+inv_name_short		        = item_synthetic_rope1_s
 inv_weight			= 0.3
 inv_grid_width		     = 2
 inv_grid_height		= 1

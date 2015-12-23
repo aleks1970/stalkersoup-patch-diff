@@ -1,4 +1,5 @@
-;<!-- TB3D 1.0.9.9.3.1 excluded empty "discovery_dependency" aleks1970 -->
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons
+;<!-- excluded empty "discovery_dependency" aleks1970 -->
 [wpn_vss_tk1]:identity_immunities
 GroupControlSection		= spawn_group
 ; discovery_dependency = ; aleks1970
@@ -38,13 +39,13 @@ single_handed			= 0
 slot 					= 2									; number of slot in inventory we put weapon in (1 - knife slot, 2 - pistol, 3 - rifle, 4 - grenade, 5 - apparatus)
 animation_slot			= 2									; type of the animation that will be used
 
-inv_name	        	= enc_weapons1_VSS-Taktikal			; name in inventory	
-inv_name_short			= enc_weapons1_VSS-Taktikal
+inv_name	        	= enc_weapons1_VSS_Taktikal		; name in inventory	
+inv_name_short			= enc_weapons1_VSS_Taktikal_s
 inv_weight			= 3.3								; weight in inventory
 
 inv_grid_width     = 5
 inv_grid_height    = 2
-inv_grid_x         = 16			;horizontal
+inv_grid_x         = 15			;horizontal
 inv_grid_y         = 53			;vertical
 
 
@@ -106,7 +107,7 @@ hit_power                	= 2.29		; size of damage by bullet
 hit_impulse		 			= 192		; size of physic impulse by bullet	
 hit_type 					= fire_wound 	; [] type of the wound
 
-fire_distance            	= 2550		; maximum fire distance that bullet can fly
+fire_distance            	= 555					;;;109974 10:1
 bullet_speed				= 450		; starting bullet speed
 rpm                      	=  600 	; max round per minute
 
@@ -118,7 +119,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 1.95
 silencer_hit_impulse	 	= 160
-silencer_fire_distance   	= 850
+silencer_fire_distance   	= 85					;;;109974 10:1
 silencer_bullet_speed	 	= 450
 
 hud                      	= wpn_vss_tk1_hud				; name of the section of the hud

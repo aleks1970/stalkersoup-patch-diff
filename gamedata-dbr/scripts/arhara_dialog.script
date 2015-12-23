@@ -1,11 +1,11 @@
---' TB3D 1.0.9.9.9.8 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.0.9.9.9.9 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
 -- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, repair_kit
--- text color, give repair_kit and spare_parts Revamped - aleks1970
-function my_ver() return "1.0.9.9.9.8" end
+-- text color, give repair_kit and spare_parts Revamped - aleks1970, 186 char size limit to sms messages!!!!
+function my_ver() return "1.0.9.9.9.9" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -2509,6 +2509,7 @@ function kanal_sms()
 	if TB3D_Services.is_collector(4000) == true then
 		TB3D_Triggers.kanal_sms()
 	else
+		news_manager.amk_send_tip_id("sms_kanal_2","sms_arhara",1,30,"default")		--109999, size limit to strings passed to translate()
 		news_manager.amk_send_tip_id("sms_kanal","sms_arhara",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_117]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2738,6 +2739,7 @@ function band_yantar_sms()
 end
 function razvod_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_razvod_2","sms_sid",1,45,"trader")
 		news_manager.amk_send_tip_id("sms_razvod","sms_sid",1,45,"trader")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_108]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2814,6 +2816,7 @@ function sidor_piyn_sms()
 		if has_alife_info("tb3d_cave_done") then
 			news_manager.amk_send_tip_id("sms_sidor_piyn_done","sms_sid",1,20,"trader")
 		else
+			news_manager.amk_send_tip_id("sms_sidor_piyn_2","sms_sid",1,20,"trader")			--109999, size limit
 			news_manager.amk_send_tip_id("sms_sidor_piyn","sms_sid",1,20,"trader")
 			local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_138]])
 			snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2822,6 +2825,7 @@ function sidor_piyn_sms()
 end
 function kluk_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_kluk3_2","sms_fang",1,60,"default")
 		news_manager.amk_send_tip_id("sms_kluk3","sms_fang",1,60,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_25]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2843,6 +2847,7 @@ function kluk_sms2()
 end
 function yan_sms_barmen()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_yan_barmen_2","sms_marked_one",1,40,"actor_sms")
 		news_manager.amk_send_tip_id("sms_yan_barmen","sms_marked_one",1,40,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_24]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2885,6 +2890,7 @@ function village_sms_obsledovanie()
 end
 function village_pantera_otvet()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_village_pantera_otvet_2","sms_panther",1,30,"default")
 		news_manager.amk_send_tip_id("sms_village_pantera_otvet","sms_panther",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_52]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2906,6 +2912,7 @@ function sms_pobeda()
 end
 function strelok_kluk_vopros1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_strelok_kluk_vopros1_2","sms_strelok",1,30,"actor_sms")
 		news_manager.amk_send_tip_id("sms_strelok_kluk_vopros1","sms_strelok",1,30,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_51]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2913,6 +2920,7 @@ function strelok_kluk_vopros1()
 end
 function kluk_perexod_derevny()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_kluk_perexod_derevny_2","sms_fang",1,30,"default")
 		news_manager.amk_send_tip_id("sms_kluk_perexod_derevny","sms_fang",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_27]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2920,6 +2928,7 @@ function kluk_perexod_derevny()
 end
 function kluk_sms_pili_lovushka()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_kluk_pili_lovushka_2","sms_fang",1,40,"default")
 		news_manager.amk_send_tip_id("sms_kluk_pili_lovushka","sms_fang",1,40,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_28]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2948,6 +2957,7 @@ function warl_gg_pili_sms()
 end
 function warl_pili_gg_otvet_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_warl_pili_gg_otvet_2","sms_piligrim",1,30,"default")
 		news_manager.amk_send_tip_id("sms_warl_pili_gg_otvet","sms_piligrim",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_71]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2969,6 +2979,7 @@ function gg_black_doc_sms1()
 end
 function otsroch_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_otsroch_2","sms_delayed",1,30,"default")
 		news_manager.amk_send_tip_id("sms_otsroch","sms_delayed",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_53]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2976,6 +2987,7 @@ function otsroch_sms()
 end
 function gg_black_doc_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_gg_black_doc2_2","sms_black_guard",1,25,"default")
 		news_manager.amk_send_tip_id("sms_gg_black_doc2","sms_black_guard",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_24]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -2997,6 +3009,7 @@ function gg_black_doc_sms4()
 end
 function gg_black_doc_sms5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_gg_black_doc5_2","sms_ghost",1,30,"default")
 		news_manager.amk_send_tip_id("sms_gg_black_doc5","sms_ghost",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_72]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3011,6 +3024,7 @@ function gg_black_doc_sms6()
 end
 function sms_ubit_glavar()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_ubit_glavar_2","sms_kolmogor",1,35,"default")
 		news_manager.amk_send_tip_id("sms_ubit_glavar","sms_kolmogor",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_73]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3033,6 +3047,7 @@ function actor_trup_sms()
 end
 function sms_uchenuy_pobeg()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_uchenuy_pobeg_2","sms_countryman",1,35,"default")
 		news_manager.amk_send_tip_id("sms_uchenuy_pobeg","sms_countryman",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_76]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3230,6 +3245,7 @@ end
 function udav_antenna_sms2()
 	if TB3D_Services.is_collector(4000) == false then
 		--TB3D_Services.packet_alert("arhara dialog: sms2")
+		news_manager.amk_send_tip_id("sms_udav_antenna_2_2","sms_bosun",1,25,"default")
 		news_manager.amk_send_tip_id("sms_udav_antenna_2","sms_bosun",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_86]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3260,6 +3276,7 @@ function priz_bomz_sms()
 end
 function fritz_shturm_mat()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_fritz_shturm_mat_2","sms_fritz",1,30,"default")
 		news_manager.amk_send_tip_id("sms_fritz_shturm_mat","sms_fritz",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_88]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3365,6 +3382,7 @@ function podgotovka_zahvata_sms1()
 end
 function podgotovka_zahvata_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_podgotovka_zahvata_2_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_podgotovka_zahvata_2","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_28]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3386,6 +3404,7 @@ function podgotovka_zahvata_sms4()
 end
 function podgotovka_zahvata_sms5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_podgotovka_zahvata_5_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_podgotovka_zahvata_5","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_66]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3449,6 +3468,7 @@ function dok_podvox_sms2()
 end
 function dok_podvox_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dok_podvox_3_2","sms_black_doc",1,25,"default")
 		news_manager.amk_send_tip_id("sms_dok_podvox_3","sms_black_doc",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_125]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3456,6 +3476,7 @@ function dok_podvox_sms3()
 end
 function dok_podvox_sms4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dok_podvox_4_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_dok_podvox_4","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_49]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3463,6 +3484,7 @@ function dok_podvox_sms4()
 end
 function dok_podvox_sms5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dok_podvox_5_2","sms_black_doc",1,30,"default")
 		news_manager.amk_send_tip_id("sms_dok_podvox_5","sms_black_doc",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_126]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3470,6 +3492,7 @@ function dok_podvox_sms5()
 end
 function dok_podvox_sms6()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dok_podvox_6_2","sms_strelok",1,30,"actor_sms")
 		news_manager.amk_send_tip_id("sms_dok_podvox_6","sms_strelok",1,30,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_30]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3491,6 +3514,7 @@ function idu_na_nz_sms1()
 end
 function idu_na_nz_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_idu_na_nz_2_2","sms_ghost",1,30,"default")
 		news_manager.amk_send_tip_id("sms_idu_na_nz_2","sms_ghost",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_99]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3582,6 +3606,7 @@ function posadka_pant_sms3()
 end
 function pant_proschay_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_pant_proschay_1_2","sms_panther",1,30,"default")
 		news_manager.amk_send_tip_id("sms_pant_proschay_1","sms_panther",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_54]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3589,6 +3614,7 @@ function pant_proschay_sms1()
 end
 function pant_proschay_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_pant_proschay_2_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_pant_proschay_2","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_43]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3596,6 +3622,8 @@ function pant_proschay_sms2()
 end
 function pant_proschay_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_pant_proschay_3_3","sms_panther",1,30,"default")
+		news_manager.amk_send_tip_id("sms_pant_proschay_3_2","sms_panther",1,30,"default")
 		news_manager.amk_send_tip_id("sms_pant_proschay_3","sms_panther",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_55]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3631,6 +3659,8 @@ function voronin_voen_sms1()
 end
 function voronin_voen_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_voronin_voen_2_3","sms_voronin",1,30,"default")
+		news_manager.amk_send_tip_id("sms_voronin_voen_2_2","sms_voronin",1,30,"default")
 		news_manager.amk_send_tip_id("sms_voronin_voen_2","sms_voronin",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_101]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3645,6 +3675,7 @@ function voronin_voen_sms3()
 end
 function voronin_voen_sms4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_voronin_voen_4_2","sms_voronin",1,25,"default")
 		news_manager.amk_send_tip_id("sms_voronin_voen_4","sms_voronin",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_102]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3673,6 +3704,7 @@ function chaes2_kluk_sms1()
 end
 function chaes2_kluk_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_chaes2_kluk_2_2","sms_fang",1,25,"default")
 		news_manager.amk_send_tip_id("sms_chaes2_kluk_2","sms_fang",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_40]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3772,6 +3804,7 @@ function after_die_muha_sms1()
 end
 function after_die_muha_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_after_die_muha_2_2","sms_strelok",1,20,"actor_sms")
 		news_manager.amk_send_tip_id("sms_after_die_muha_2","sms_strelok",1,20,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_75]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3779,6 +3812,7 @@ function after_die_muha_sms2()
 end
 function after_die_muha_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_after_die_muha_3_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_after_die_muha_3","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_76]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3786,6 +3820,7 @@ function after_die_muha_sms3()
 end
 function after_die_muha_sms4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_after_die_muha_4_2","sms_black_doc",1,25,"default")
 		news_manager.amk_send_tip_id("sms_after_die_muha_4","sms_black_doc",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_127]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3793,6 +3828,7 @@ function after_die_muha_sms4()
 end
 function after_die_muha_sms5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_after_die_muha_5_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_after_die_muha_5","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_77]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3800,6 +3836,8 @@ function after_die_muha_sms5()
 end
 function after_die_muha_sms6()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_after_die_muha_6_3","sms_fang",1,30,"default")
+		news_manager.amk_send_tip_id("sms_after_die_muha_6_2","sms_fang",1,30,"default")
 		news_manager.amk_send_tip_id("sms_after_die_muha_6","sms_fang",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_41]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3807,6 +3845,7 @@ function after_die_muha_sms6()
 end
 function mono_netu_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_mono_netu_1_2","sms_strelok",1,20,"actor_sms")
 		news_manager.amk_send_tip_id("sms_mono_netu_1","sms_strelok",1,20,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_78]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3847,6 +3886,7 @@ function mono_netu_sms6()
 end
 function vitamin_posrednik_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_vitamin_posrednik_1_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_vitamin_posrednik_1","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_82]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3854,6 +3894,7 @@ function vitamin_posrednik_sms1()
 end
 function vitamin_posrednik_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_vitamin_posrednik_2_2","sms_vitamin",1,25,"default")
 		news_manager.amk_send_tip_id("sms_vitamin_posrednik_2","sms_vitamin",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_107]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3868,6 +3909,7 @@ function vitamin_posrednik_sms3()
 end
 function vitamin_posrednik_sms4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_vitamin_posrednik_4_2","sms_sapsan",1,25,"default")
 		news_manager.amk_send_tip_id("sms_vitamin_posrednik_4","sms_sapsan",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_43]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3889,6 +3931,8 @@ function sv_chern_peregovor_sms1()
 end
 function sv_chern_peregovor_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_2_3","sms_freedom",1,25,"freedom")
+		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_2_2","sms_freedom",1,25,"freedom")
 		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_2","sms_freedom",1,25,"freedom")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_50]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3896,6 +3940,7 @@ function sv_chern_peregovor_sms2()
 end
 function sv_chern_peregovor_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_3_2","sms_sapsan",1,25,"default")
 		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_3","sms_sapsan",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_45]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3910,6 +3955,7 @@ function sv_chern_peregovor_sms4()
 end
 function sv_chern_peregovor_sms5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_5","sms_sapsan_2",1,25,"default")
 		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_5","sms_sapsan",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_46]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3917,6 +3963,8 @@ function sv_chern_peregovor_sms5()
 end
 function sv_chern_peregovor_sms6()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_6_3","sms_strelok",1,25,"actor_sms")
+		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_6_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_sv_chern_peregovor_6","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_86]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3938,6 +3986,7 @@ function u_shlagbauma_sms2()
 end
 function u_shlagbauma_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_u_shlagbauma_3_2","sms_solvador",1,20,"default")
 		news_manager.amk_send_tip_id("sms_u_shlagbauma_3","sms_solvador",1,20,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_108]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -3995,6 +4044,7 @@ function u_tretego_generatora_sms6()
 end
 function u_tretego_generatora_sms7()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_u_tretego_generatora_7_2","sms_fang",1,35,"default")
 		news_manager.amk_send_tip_id("sms_u_tretego_generatora_7","sms_fang",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_47]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4009,6 +4059,8 @@ function mesto_gg_na_chaes2_sms()
 end
 function kluk_pogib_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_kluk_pogib_1_3","sms_fang",1,35,"default")
+		news_manager.amk_send_tip_id("sms_kluk_pogib_1_2","sms_fang",1,35,"default")
 		news_manager.amk_send_tip_id("sms_kluk_pogib_1","sms_fang",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_48]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4051,6 +4103,7 @@ function after_kluk_pogib_sms1()
 end
 function after_kluk_pogib_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_after_kluk_pogib_2_2","sms_ghost",1,30,"default")
 		news_manager.amk_send_tip_id("sms_after_kluk_pogib_2","sms_ghost",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_111]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4072,6 +4125,7 @@ function after_kluk_pogib_sms4()
 end
 function after_kluk_pogib_sms5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_after_kluk_pogib_5_2","sms_black_doc",1,30,"default")
 		news_manager.amk_send_tip_id("sms_after_kluk_pogib_5","sms_black_doc",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_118]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4093,6 +4147,7 @@ function poshel_bazar_otsek_sms1()
 end
 function poshel_bazar_otsek_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_poshel_bazar_otsek_2_2","sms_panther",1,25,"default")
 		news_manager.amk_send_tip_id("sms_poshel_bazar_otsek_2","sms_panther",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_56]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4107,6 +4162,8 @@ function poshel_bazar_otsek_sms3()
 end
 function poshel_bazar_otsek_sms4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_poshel_bazar_otsek_4_3","sms_panther",1,25,"default")
+		news_manager.amk_send_tip_id("sms_poshel_bazar_otsek_4_2","sms_panther",1,25,"default")
 		news_manager.amk_send_tip_id("sms_poshel_bazar_otsek_4","sms_panther",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_57]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4135,6 +4192,7 @@ function poshel_bazar_otsek_sms7()
 end
 function poshel_bazar_otsek_sms8()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_poshel_bazar_otsek_8_2","sms_panther_dad",1,25,"default")
 		news_manager.amk_send_tip_id("sms_poshel_bazar_otsek_8","sms_panther_dad",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_112]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4177,6 +4235,8 @@ function sms_k_muhe()
 end
 function atp_torgovetz_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_atp_torgovetz_3","sms_dealer",1,35,"default")
+		news_manager.amk_send_tip_id("sms_atp_torgovetz_2","sms_dealer",1,35,"default")
 		news_manager.amk_send_tip_id("sms_atp_torgovetz","sms_dealer",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_129]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4254,6 +4314,7 @@ function agro_boltobny_sms6()
 end
 function agro_boltobny_sms7()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_agro_boltobny_7_2","sms_sakharov",1,30,"saharov")
 		news_manager.amk_send_tip_id("sms_agro_boltobny_7","sms_sakharov",1,30,"saharov")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_98]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4261,6 +4322,7 @@ function agro_boltobny_sms7()
 end
 function agro_boltobny_sms8()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_agro_boltobny_8_2","sms_barman",1,30,"barman")
 		news_manager.amk_send_tip_id("sms_agro_boltobny_8","sms_barman",1,30,"barman")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_152]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4315,6 +4377,7 @@ function agro_boltobny_sms15()
 end
 function agro_boltobny_sms16()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_agro_boltobny_16_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_agro_boltobny_16","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_108]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4371,6 +4434,7 @@ function agro_boltobny_sms23()
 end
 function agro_boltobny_sms24()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_agro_boltobny_24_2","sms_akim",1,25,"default")
 		news_manager.amk_send_tip_id("sms_agro_boltobny_24","sms_akim",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_177]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4481,6 +4545,7 @@ function proschalnoe_sms4()
 end
 function td_preduprezhdenie1_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_td_preduprezhdenie1_2","sms_system",1,30,"pda_icon")
 		news_manager.amk_send_tip_id("sms_td_preduprezhdenie1","sms_system",1,30,"pda_icon")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_15]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4488,6 +4553,7 @@ function td_preduprezhdenie1_sms1()
 end
 function td_preduprezhdenie2_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_td_preduprezhdenie2_2","sms_system",1,30,"pda_icon")
 		news_manager.amk_send_tip_id("sms_td_preduprezhdenie2","sms_system",1,30,"pda_icon")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_16]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4609,6 +4675,7 @@ function girl3_nachalo_sms1()
 end
 function girl3_nachalo_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_girl3_nachalo_2_2","sms_black_doc",1,25,"default")
 		news_manager.amk_send_tip_id("sms_girl3_nachalo_2","sms_black_doc",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_14]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4630,6 +4697,7 @@ function molniy_bar_sms()
 end
 function molniy_bar_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_molniy_bar_1_2","sms_lightning",1,30,"default")
 		news_manager.amk_send_tip_id("sms_molniy_bar_1","sms_lightning",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_118]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4728,6 +4796,7 @@ function vopros_k_prizraku_sms()
 end
 function vopros_k_prizraku_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_vopros_k_prizraku_1_2","sms_ghost",1,35,"default")
 		news_manager.amk_send_tip_id("sms_vopros_k_prizraku_1","sms_ghost",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_99]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4749,6 +4818,8 @@ function molniy_posle_foto_sms()
 end
 function molniy_posle_foto_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_molniy_posle_foto_1_3","sms_lightning",1,37,"default")
+		news_manager.amk_send_tip_id("sms_molniy_posle_foto_1_2","sms_lightning",1,37,"default")
 		news_manager.amk_send_tip_id("sms_molniy_posle_foto_1","sms_lightning",1,37,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_120]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4756,6 +4827,7 @@ function molniy_posle_foto_sms1()
 end
 function molniy_posle_foto_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_molniy_posle_foto_2_2","sms_strelok",1,30,"actor_sms")
 		news_manager.amk_send_tip_id("sms_molniy_posle_foto_2","sms_strelok",1,30,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_40]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4770,6 +4842,7 @@ function molniy_posle_foto_sms3()
 end
 function molniy_posle_foto_sms4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_molniy_posle_foto_4_2","sms_fang",1,35,"default")
 		news_manager.amk_send_tip_id("sms_molniy_posle_foto_4","sms_fang",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_100]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4784,6 +4857,7 @@ function molniy_posle_foto_sms5()
 end
 function molniy_posle_foto_sms6()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_molniy_posle_foto_6_2","sms_fang",1,35,"default")
 		news_manager.amk_send_tip_id("sms_molniy_posle_foto_6","sms_fang",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_101]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4798,6 +4872,7 @@ function molniy_posle_foto_sms7()
 end
 function molniy_posle_foto_sms8()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_molniy_posle_foto_8_2","sms_fang",1,35,"default")
 		news_manager.amk_send_tip_id("sms_molniy_posle_foto_8","sms_fang",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_102]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4812,6 +4887,7 @@ function pozisiy_bunker_gg_sms()
 end
 function pozisiy_bunker_gg_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_pozisiy_bunker_gg_1_2","sms_fang",1,30,"default")
 		news_manager.amk_send_tip_id("sms_pozisiy_bunker_gg_1","sms_fang",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_103]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4861,6 +4937,7 @@ function seif_zakrut_sms()
 end
 function seif_zakrut_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_seif_zakrut_1_2","sms_fang",1,30,"default")
 		news_manager.amk_send_tip_id("sms_seif_zakrut_1","sms_fang",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_105]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4896,6 +4973,7 @@ function forest_pozisiy_na_dome_sms()
 end
 function forest_pozisiy_na_dome_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_forest_pozisiy_na_dome_1_2","sms_forester",1,25,"default")
 		news_manager.amk_send_tip_id("sms_forest_pozisiy_na_dome_1","sms_forester",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_125]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4938,6 +5016,7 @@ function superzhekan_sms()
 end
 function superzhekan_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_superzhekan_1_2","sms_strelok",1,30,"actor_sms")
 		news_manager.amk_send_tip_id("sms_superzhekan_1","sms_strelok",1,30,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_53]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -4973,6 +5052,7 @@ function sms_kuznets()
 end
 function sms_kuznets1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_kuznets_1_2","sms_kuznet",1,28,"default")
 		news_manager.amk_send_tip_id("sms_kuznets_1","sms_kuznet",1,28,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_26]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5085,6 +5165,7 @@ function bazar_s_klenovum5()
 end
 function bazar_s_klenovum6()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_bazar_s_klenovum6_2","sms_maple",1,30,"default")
 		news_manager.amk_send_tip_id("sms_bazar_s_klenovum6","sms_maple",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_86]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5113,6 +5194,8 @@ function kl_pos_est_sms2()
 end
 function prizrak_ranen_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_prizrak_ranen_23","sms_ghost",1,35,"default")
+		news_manager.amk_send_tip_id("sms_prizrak_ranen_22","sms_ghost",1,35,"default")
 		news_manager.amk_send_tip_id("sms_prizrak_ranen","sms_ghost",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_5]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5127,6 +5210,7 @@ function prizrak_ranen_sms1()
 end
 function prizrak_ranen_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_prizrak_ranen_2_2","sms_ghost",1,35,"default")
 		news_manager.amk_send_tip_id("sms_prizrak_ranen_2","sms_ghost",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_7]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5134,6 +5218,9 @@ function prizrak_ranen_sms2()
 end
 function prizrak_ranen_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_prizrak_ranen_3_24","sms_strelok",1,35,"actor_sms")
+		news_manager.amk_send_tip_id("sms_prizrak_ranen_3_23","sms_strelok",1,35,"actor_sms")
+		news_manager.amk_send_tip_id("sms_prizrak_ranen_3_22","sms_strelok",1,35,"actor_sms")
 		news_manager.amk_send_tip_id("sms_prizrak_ranen_3","sms_strelok",1,35,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_67]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5176,6 +5263,7 @@ function pantera_na_kordone_sms1()
 end
 function poslednie_sms_pantera()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_poslednie_pantera_2","sms_strelok",1,30,"actor_sms")
 		news_manager.amk_send_tip_id("sms_poslednie_pantera","sms_strelok",1,30,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_71]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5183,6 +5271,7 @@ function poslednie_sms_pantera()
 end
 function poslednie_sms_pantera1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_poslednie_pantera_1_2","sms_panther",1,30,"default")
 		news_manager.amk_send_tip_id("sms_poslednie_pantera_1","sms_panther",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_89]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5234,6 +5323,8 @@ function sms_otez_poreshil1()
 end
 function sms_otez_poreshil2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_otez_poreshil_2_3","sms_panther_dad",1,37,"default")
+		news_manager.amk_send_tip_id("sms_otez_poreshil_2_2","sms_panther_dad",1,37,"default")
 		news_manager.amk_send_tip_id("sms_otez_poreshil_2","sms_panther_dad",1,37,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_91]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5269,6 +5360,7 @@ function sms_razgovor_sxod_nz()
 end
 function sms_razgovor_sxod_nz1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_razgovor_sxod_nz_1_2","sms_max",1,25,"default")
 		news_manager.amk_send_tip_id("sms_razgovor_sxod_nz_1","sms_max",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_113]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5276,6 +5368,7 @@ function sms_razgovor_sxod_nz1()
 end
 function sms_razgovor_sxod_nz2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_razgovor_sxod_nz_2_2","sms_malicious",1,25,"default")
 		news_manager.amk_send_tip_id("sms_razgovor_sxod_nz_2","sms_malicious",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_94]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5304,6 +5397,8 @@ function sms_razgovor_sxod_nz5()
 end
 function sms_razgovor_sxod_nz6()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_razgovor_sxod_nz_6_3","sms_malicious",1,25,"default")
+		news_manager.amk_send_tip_id("sms_razgovor_sxod_nz_6_2","sms_malicious",1,25,"default")
 		news_manager.amk_send_tip_id("sms_razgovor_sxod_nz_6","sms_malicious",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_96]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5311,6 +5406,7 @@ function sms_razgovor_sxod_nz6()
 end
 function sms_taynik_zlobnuy()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_taynik_zlobnuy_2","sms_malicious",1,32,"default")
 		news_manager.amk_send_tip_id("sms_taynik_zlobnuy","sms_malicious",1,32,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\labux\labux_97]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5414,6 +5510,8 @@ function parfum_sms_kontrik2()
 end
 function parfum_sms_kontrik3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_parfum_kontrik3_3","sms_perfumer",1,45,"default")
+		news_manager.amk_send_tip_id("sms_parfum_kontrik3_2","sms_perfumer",1,45,"default")
 		news_manager.amk_send_tip_id("sms_parfum_kontrik3","sms_perfumer",1,45,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\parfuym_norman]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5442,6 +5540,7 @@ function sms_obmorok2()
 end
 function sms_obmorok3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_obmorok3_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_obmorok3","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\strelok_dcity13]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5449,6 +5548,7 @@ function sms_obmorok3()
 end
 function sms_obmorok4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_obmorok4_2","sms_omborok",1,30,"default")
 		news_manager.amk_send_tip_id("sms_obmorok4","sms_omborok",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\obmorok_vstrecha2]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5484,6 +5584,7 @@ function sms_dcity_zenter_doza_otkl()
 end
 function sms_dcity_gorod2_doza2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dcity_gorod2_doza2_2","sms_system",1,30,"pda_icon")
 		news_manager.amk_send_tip_id("sms_dcity_gorod2_doza2","sms_system",1,30,"pda_icon")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\system_10min]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5517,6 +5618,7 @@ function suki_rasstrel_sms()
 end
 function sms_zlobnomu_rasstrel()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_zlobnomu_rasstrel_2","sms_strelok",1,25,"actor_sms")
 		news_manager.amk_send_tip_id("sms_zlobnomu_rasstrel","sms_strelok",1,25,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\strelok_dcity9]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5559,6 +5661,7 @@ function sms_zlobnomu_rasstrel4_1()
 end
 function sms_zlobnomu_rasstrel5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_zlobnomu_rasstrel5_2","sms_norman",1,35,"default")
 		news_manager.amk_send_tip_id("sms_zlobnomu_rasstrel5","sms_norman",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\norman_perexod]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5580,6 +5683,7 @@ function sms_zlobnomu_rasstrel7()
 end
 function agro_tainik_norman_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_agro_tainik_norman_2","sms_norman",1,35,"default")
 		news_manager.amk_send_tip_id("sms_agro_tainik_norman","sms_norman",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\norman_taynik1]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5594,6 +5698,9 @@ function sms_k_normany1()
 end
 function sms_k_normany2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_k_normany2_4","sms_norman",1,45,"default")
+		news_manager.amk_send_tip_id("sms_k_normany2_3","sms_norman",1,45,"default")
+		news_manager.amk_send_tip_id("sms_k_normany2_2","sms_norman",1,45,"default")
 		news_manager.amk_send_tip_id("sms_k_normany2","sms_norman",1,45,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\norman_taynik2]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5629,6 +5736,7 @@ function dcity_otvet_ok_obmor4()
 end
 function dcity_duda_zvonok_sms1()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dcity_duda_zvonok1_2","sms_perfumer",1,25,"default")
 		news_manager.amk_send_tip_id("sms_dcity_duda_zvonok1","sms_perfumer",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\parfuym_duda1]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5643,6 +5751,8 @@ function dcity_duda_zvonok_sms2()
 end
 function dcity_duda_zvonok_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dcity_duda_zvonok3_3","sms_perfumer",1,40,"default")
+		news_manager.amk_send_tip_id("sms_dcity_duda_zvonok3_2","sms_perfumer",1,40,"default")
 		news_manager.amk_send_tip_id("sms_dcity_duda_zvonok3","sms_perfumer",1,40,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\parfuym_duda2]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5650,6 +5760,7 @@ function dcity_duda_zvonok_sms3()
 end
 function dcity_duda_zvonok_sms4()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dcity_duda_zvonok4_2","sms_duda",1,40,"default")
 		news_manager.amk_send_tip_id("sms_dcity_duda_zvonok4","sms_duda",1,40,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\duda_babki]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5664,6 +5775,7 @@ function dcity_iskra_zvonok_sms1()
 end
 function dcity_iskra_zvonok_sms2()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_dcity_iskra_zvonok2_2","sms_spark",1,25,"default")
 		news_manager.amk_send_tip_id("sms_dcity_iskra_zvonok2","sms_spark",1,25,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\iskra_privet]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5706,6 +5818,7 @@ function sms_otkl_zona4()
 end
 function sms_otkl_zona5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_otkl_zona5_2","sms_incomming",1,35,"default")
 		news_manager.amk_send_tip_id("sms_otkl_zona5","sms_incomming",1,35,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\molniy_chmok]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5713,6 +5826,7 @@ function sms_otkl_zona5()
 end
 function vylozhit_oruzhie_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_vylozhit_oruzhie_2","sms_system",1,35,"pda_icon")
 		news_manager.amk_send_tip_id("sms_vylozhit_oruzhie","sms_system",1,35,"pda_icon")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\system_vulozhit_oruzhie]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5734,6 +5848,8 @@ function remen_dialog_sms2()
 end
 function remen_dialog_sms3()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_remen_dialog3_3","sms_lightning",1,40,"default")
+		news_manager.amk_send_tip_id("sms_remen_dialog3_2","sms_lightning",1,40,"default")
 		news_manager.amk_send_tip_id("sms_remen_dialog3","sms_lightning",1,40,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\molniy_sex]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5748,6 +5864,7 @@ function remen_dialog_sms4()
 end
 function remen_dialog_sms5()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_remen_dialog5_2","sms_lightning",1,40,"default")
 		news_manager.amk_send_tip_id("sms_remen_dialog5","sms_lightning",1,40,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\molniy_ne_staraysy]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -5819,6 +5936,7 @@ function operator_babki_otdat_sms4()
 end
 function bland_sms()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_bland_2","sms_bland",1,30,"default")
 		news_manager.amk_send_tip_id("sms_bland","sms_bland",1,30,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\blend_samoskoki]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -6345,6 +6463,10 @@ end
 
 function village_kap_pda()
 	if TB3D_Services.is_collector(4000) == false then
+		news_manager.amk_send_tip_id("sms_village_kap_pda_2_4","sms_incomming",1,60,"default")
+		news_manager.amk_send_tip_id("sms_village_kap_pda_2_3","sms_incomming",1,60,"default")
+		news_manager.amk_send_tip_id("sms_village_kap_pda_2_2","sms_incomming",1,60,"default")
+		news_manager.amk_send_tip_id("sms_village_kap_pda_2","sms_incomming",1,60,"default")
 		news_manager.amk_send_tip_id("sms_village_kap_pda","sms_incomming",1,60,"default")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_132]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -8912,29 +9034,14 @@ function posulka_nomer_dva()
 	end
 end
 
-function sp_ploti_svalka()
+function sp_ploti_svalka()	-- error test/corrected/done - aleks1970
 	if TB3D_Services.is_collector(4000) == false then
-		local contr,habr
+		local contr,habr,contl,habl,contg,habg
 		contr = amk.spawn_item("flesh_strong",vector():set(-236.463,-1.910,171.242),343,13329)
-		repeat
-			habr = alife():object(contr.id)
-		until ( habr~=nil )
-		alife():create("wpn_desert_eagle",
-			habr.position,
-			habr.m_level_vertex_id,
-			habr.m_game_vertex_id,
-			habr.id)
-			alife():create("pisma_stalka",
-			habr.position,
-			habr.m_level_vertex_id,
-			habr.m_game_vertex_id,
-			habr.id)
-		alife():create_ammo("ammo_11.43x23_hydro",
-			habr.position,
-			habr.m_level_vertex_id,
-			habr.m_game_vertex_id,
-			habr.id,20)
-		amk.spawn_item("flesh_strong",vector():set(-236.463,-1.910,171.242),343,13329)
+		contl = amk.spawn_item("flesh_normal",vector():set(-228.464,-1.910,171.242),343,13329)
+		contg = amk.spawn_item("flesh_strong",vector():set(217.098,0.399,-137.657),401,349493)
+		amk.spawn_item("flesh_normal",vector():set(-236.466,-1.910,171.242),343,13329)
+		amk.spawn_item("flesh_strong",vector():set(-236.465,-1.910,171.242),343,13329)
 		amk.spawn_item("flesh_normal",vector():set(273.645,1.435,147.333),257,378180)
 		amk.spawn_item("flesh_normal",vector():set(273.645,1.435,147.333),257,378180)
 		amk.spawn_item("flesh_strong",vector():set(273.645,1.435,147.333),257,378180)
@@ -8942,6 +9049,63 @@ function sp_ploti_svalka()
 		amk.spawn_item("flesh_strong",vector():set(-78.291,-3.818,197.277),351,127104)
 		amk.spawn_item("flesh_normal",vector():set(-78.291,-3.818,197.277),351,127104)
 		amk.spawn_item("flesh_normal",vector():set(-78.291,-3.818,197.277),351,127104)
+-- -------------------------------------addon-aleks1970---------------------------------------
+		amk.spawn_item("zombie_babka_strong",vector():set(215.098,0.399,-137.657),401,349493)
+		amk.spawn_item("zombie_babka_strong",vector():set(211.098,0.399,-137.657),401,349493)
+		amk.spawn_item("flesh_strong",vector():set(215.098,0.399,-137.657),401,349493)
+		amk.spawn_item("m_controller_old",vector():set(200.098,0.399,-137.657),401,349493)
+		amk.spawn_item("kontroller_yazva",vector():set(220.098,0.399,-137.657),401,349493)
+-- -------------------------------------------------------------------------------------------
+		repeat
+			habr = alife():object(contr.id)
+			habl = alife():object(contl.id)
+			habg = alife():object(contg.id)
+		alife():create("fake_bolt_detector_medved",
+			habr.position,
+			habr.m_level_vertex_id,
+			habr.m_game_vertex_id,
+			habr.id)
+		alife():create("yantar",
+			habr.position,
+			habr.m_level_vertex_id,
+			habr.m_game_vertex_id,
+			habr.id)
+		alife():create_ammo("ammo_9x18_fmj",	--ammo_11.43x23_hydro
+			habr.position,
+			habr.m_level_vertex_id,
+			habr.m_game_vertex_id,
+			habr.id,50)
+		alife():create("wpn_fort_m1",	--wpn_desert_eagle
+			habl.position,
+			habl.m_level_vertex_id,
+			habl.m_game_vertex_id,
+			habl.id)
+		alife():create("bandage_dmx",
+			habl.position,
+			habl.m_level_vertex_id,
+			habl.m_game_vertex_id,
+			habl.id)
+		alife():create("bandage",
+			habl.position,
+			habl.m_level_vertex_id,
+			habl.m_game_vertex_id,
+			habl.id)
+		alife():create("pisma_stalka",
+			habg.position,
+			habg.m_level_vertex_id,
+			habg.m_game_vertex_id,
+			habg.id)
+		alife():create("kolbasa",
+			habg.position,
+			habg.m_level_vertex_id,
+			habg.m_game_vertex_id,
+			habg.id)
+		alife():create_ammo("ammo_11.43x23_hydro",
+			habg.position,
+			habg.m_level_vertex_id,
+			habg.m_game_vertex_id,
+			habg.id,30)
+		until ((habr~=nil) and (habl~=nil) and (habg~=nil))
 	end
 end
 
@@ -8961,14 +9125,27 @@ function dell_gospital_pantera2()
 end
 
 --' check the availability of things stalker
-function plot_dialog_say_have()
-	return amk_utils.inventory_search("pisma_stalka",1) ~= false and
-		new_dialog.item_much("wpn_desert_eagle",1) ~= false
+function plot_dialog_say_have_itm()	-- error test - aleks1970
+	if amk_utils.inventory_search("pisma_stalka",1) ~= false and
+		new_dialog.item_much("wpn_fort_m1",1) ~= false and
+		new_dialog.item_much("fake_bolt_detector_medved",1) ~= false then	--wpn_desert_eagle
+		TB3D_Services.give_info("plot_dialog_say_have")
+		return true
+	end
+	return false
+end
+
+-- check and remove preloaded "plot_dialog_say_done" info - aleks1970
+function plot_dialog_say_info()
+	if has_alife_info("plot_dialog_say_start") and has_alife_info("plot_dialog_say_done") and not has_alife_info("plot_dialog_say_have") then
+		TB3D_Services.remove_info("plot_dialog_say_done")
+	end
 end
 
 --' 'll give things a stalker
-function otdal_veschi(first_speaker, second_speaker)
-	sak.out_item_namber("wpn_desert_eagle",1)
+function otdal_veschi(first_speaker, second_speaker)	-- error test - aleks1970
+	sak.out_item_namber("fake_bolt_detector_medved",1)
+	sak.out_item_namber("wpn_fort_m1",1)	--wpn_desert_eagle
 	sak.out_item_namber("pisma_stalka",1)
 	alife():create("m_inventory_box35", vector():set(52.520462036133,-0.035371631383896,-295.6975402832),221820,253)
  end

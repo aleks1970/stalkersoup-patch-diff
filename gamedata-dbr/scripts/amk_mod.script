@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.8 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.9.9 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -9,8 +9,8 @@
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
--- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over
-function my_ver() return "1.0.9.9.9.8" end
+-- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over, debug
+function my_ver() return "1.0.9.9.9.9" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -204,11 +204,13 @@ function check_spawn()
 			TB3D_Services.remove_info("tb3d_marsh_zones")											--frog sounds, set in dyn spawn
 			TB3D_Services.remove_info("tb3d_cooling_zones")											--ventillators, set in dyn spawn
 			TB3D_FIXER.force_fixes()																--109976 must be before dynamic spawns and env update
-			if not blow then
-				amk_anoms.pre_blow_off()							--109989 moved from amk_anoms.init(), always regenerate on level change
-				amk_anoms.generate_anoms()
+			if has_alife_info("esc_tutorial_start") then											--109999, keep anoms and arts until goes to garbage
+				if not blow then
+					amk_anoms.pre_blow_off()							--109989 moved from amk_anoms.init(), always regenerate on level change
+					amk_anoms.generate_anoms()
+				end
+				amk_anoms.generate_arts(lname)															--109976 now per level
 			end
-			amk_anoms.generate_arts(lname)															--109976 now per level
 			TB3D_dyn_spawn.dynamic_objects(lname)													--dynamic spawns - TB3D 109934
 			if not has_alife_info("tb3d_game_end") then
 				set_ALD_weapons(amk.load_variable("tb3d_ald_weapons", 0))							--special spawns from time to time
@@ -2913,9 +2915,9 @@ function respawned(obj,respawner)
 						end
 					end	
 				elseif obj.name then
-					--if TB3D_Modders.use_respawn_message == true then
+					if TB3D_Modders.use_respawn_message == true then
 						TB3D_Services.packet_alert("amk mod: respawned["..utils.to_str(obj:name()).."] no clsid!!!!!")
-					--end
+					end
 					local sini = respawner:spawn_ini()
 					if sini then
 						if sini:line_exist ("respawn", "creature_binded_logic") == true then
@@ -2953,9 +2955,9 @@ function respawned(obj,respawner)
 							if obj.amk_name then obj.clsid = TB3D_Population_Control.get_clsid(obj.amk_name) end
 							if not obj.clsid then obj.clsid = TB3D_Population_Control.get_clsid(obj:name()) end
 							if obj.clsid and not string_find(obj:section_name(), "zombied") then
-								--if TB3D_Modders.use_respawn_message == true then
-									TB3D_Services.packet_alert("se RESPAWN: ["..utils.to_str(obj:name()).."]["..utils.to_str(obj.amk_name).."] created monster clsid["..utils.to_str(obj.clsid).."] !!!!")
-								--end
+								if TB3D_Modders.use_respawn_message == true then
+									TB3D_Services.packet_alert("amk mod: ["..utils.to_str(obj:name()).."]["..utils.to_str(obj.amk_name).."] created monster clsid["..utils.to_str(obj.clsid).."] !!!!")
+								end
 								local t = amk.read_monster_params(obj)
 								if t then amk.write_monster_params(t, obj) end
 							else
@@ -2990,13 +2992,13 @@ function respawned(obj,respawner)
 										obj.clsid = clsid.script_stalker
 										amk.write_stalker_params(t, obj)
 									end
-									--if TB3D_Modders.use_respawn_message == true then
-										TB3D_Services.packet_alert("se RESPAWN: ["..utils.to_str(obj:name()).."]["..utils.to_str(obj.amk_name).."] created stalker clsid["..utils.to_str(obj.clsid).."] !!!!")
-									--end
+									if TB3D_Modders.use_respawn_message == true then
+										TB3D_Services.packet_alert("amk mod: ["..utils.to_str(obj:name()).."]["..utils.to_str(obj.amk_name).."] created stalker clsid["..utils.to_str(obj.clsid).."] !!!!")
+									end
 								else
-									--if TB3D_Modders.use_respawn_message == true then
-										TB3D_Services.packet_alert("se RESPAWN: ["..utils.to_str(obj:name()).."]["..utils.to_str(obj.amk_name).."]["..utils.to_str(sect).."] no clsid found")
-									--end
+									if TB3D_Modders.use_respawn_message == true then
+										TB3D_Services.packet_alert("amk mod: ["..utils.to_str(obj:name()).."]["..utils.to_str(obj.amk_name).."]["..utils.to_str(sect).."] no clsid found")
+									end
 								end
 							end
 						end

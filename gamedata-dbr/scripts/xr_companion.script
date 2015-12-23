@@ -840,7 +840,7 @@ function action_companion_activity:execute()
 		amk.save_variable("dead_fr", dead_friends)		
 		local comm = load_var_companion(self.object:id(), "orig_community", nil)
 		self.object:set_character_community(comm, 0, 0)
-		trade_manager.trade_init(self.object, "misc\\trade_generic.ltx")	
+		trade_manager.trade_init(self.object, "trade\\trade_generic.ltx")	
 		companions[self.object:id()] = nil
 	end	
 end

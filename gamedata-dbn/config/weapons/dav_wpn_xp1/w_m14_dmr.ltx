@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_m14_dmr]:identity_immunities
 GroupControlSection	= spawn_group
-discovery_dependency = 
+;;discovery_dependency = 
 $spawn                  		= "weapons\m14_dmr"		; option for Level Editor
 $npc			 				= on				; option for Level Editor
 $prefetch 		 				= 8
@@ -9,7 +10,7 @@ cform                   		= skeleton
 class                   		= WP_SVU
 min_radius              		= 0
 max_radius              		= 50
-description						= desc_m14dmr
+description						= desc_m14dmr_descr
 
 ef_main_weapon_type		 		= 3
 ef_weapon_type			 		= 8
@@ -57,8 +58,8 @@ single_handed					= 0
 slot 			 				= 2		; // secondary
 animation_slot					= 2		; type of the animation that will be used
 
-inv_name		 				= M14-dmr
-inv_name_short		 			= wpn-m14_dmr
+inv_name		 				= desc_m14dmr
+inv_name_short		 			= desc_m14dmr_s
 inv_weight		 				= 5.1
 
 inv_grid_width     				= 5
@@ -95,7 +96,7 @@ hit_power          				= 0.80
 hit_impulse	       				= 120
 hit_type 		   				= fire_wound
 
-fire_distance           		= 900
+fire_distance           		= 90					;;;109974 10:1
 bullet_speed					= 850	
 rpm                     		= 700
 ; end ttc

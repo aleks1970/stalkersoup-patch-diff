@@ -1,6 +1,7 @@
+;;;; TB3D 1.0.9.9.7.4 - TB3D style weapons
 [wpn_m60]:identity_immunities
 GroupControlSection		= spawn_group
-discovery_dependency 	= 
+;;discovery_dependency 	= 
 $spawn                  = "weapons\m60"					; option for Level Editor
 $npc			 		= on				; option for Level Editor
 $prefetch 		 		= 8
@@ -9,7 +10,7 @@ cform                   = skeleton
 class                   = WP_LR300
 min_radius              = 0
 max_radius              = 50
-description				= "М60 — американский единый пулемёт, разработанный в послевоенные годы и принятый на вооружение Армии и Корпуса морской пехоты в 1957 году. За недостатки конструкции и внешний вид получил прозвище «Свинья»"
+description				= enc_wpn_M60_tmp_descr
 
 ef_main_weapon_type		= 2
 ef_weapon_type			= 6
@@ -35,8 +36,8 @@ fire_modes				= -1
 hand_dependence		 	= 1
 single_handed			= 0
 
-inv_name				= M60
-inv_name_short			= M60
+inv_name				= enc_wpn_M60_tmp
+inv_name_short			= enc_wpn_M60_tmp
 inv_weight				= 10.5
 
 inv_grid_width			= 6
@@ -94,7 +95,7 @@ hit_power           = 1.1
 hit_impulse		 	= 14
 hit_type 			= fire_wound
 
-fire_distance          	= 1100 ; дистанция
+fire_distance          	= 110					;;;109974 10:1
 bullet_speed			= 853 ;начальная скорость пули
 rpm                     = 550 ; выстрелов/мин
 ; end ttc
@@ -104,7 +105,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.62
 silencer_hit_impulse	 	= 10
-silencer_fire_distance   	= 200
+silencer_fire_distance   	= 90					;;;109974 10:1
 silencer_bullet_speed	 	= 400
 
 hud                     = wpn_m60_hud

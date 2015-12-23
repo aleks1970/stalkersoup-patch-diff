@@ -2108,14 +2108,17 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<!-- new dialogue - aleks1970 -->
 	<dialog id="bar_docent_dialog">
 		<precondition>sak_dialog.docent_have_done</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>bar_docent_0</text>
 				<next>1</next>
+				<next>11</next>
 			</phrase>
 			<phrase id="1">
+				<dont_has_info>bar_docent_dialog_tut</dont_has_info>
 				<text>bar_docent_1</text>
 				<next>2</next>
 			</phrase>
@@ -2132,11 +2135,35 @@
 				<next>5</next>
 			</phrase>
 			<phrase id="5">
-				<text>bar_docent_5</text>
+				<text>bar_docent_dialog_5</text>
 				<next>51</next>
 				<next>52</next>
 				<next>53</next>
 				<next>54</next>
+				<next>55</next>
+				<next>56</next>
+				<next>57</next>
+				<next>58</next>
+			</phrase>
+			<phrase id="11">
+				<has_info>bar_docent_dialog_tut</has_info>
+				<text>bar_docent_dialog_11</text>
+				<next>12</next>
+			</phrase>
+			<phrase id="12">
+				<text>bar_docent_dialog_12</text>
+				<next>13</next>
+			</phrase>
+			<phrase id="13">
+				<text>bar_docent_dialog_13</text>
+				<next>51</next>
+				<next>52</next>
+				<next>53</next>
+				<next>54</next>
+				<next>55</next>
+				<next>56</next>
+				<next>57</next>
+				<next>59</next>
 			</phrase>
 			<phrase id="51">
 				<dont_has_info>docent_detector1_start</dont_has_info>
@@ -2160,45 +2187,127 @@
 				<next>63</next>
 			</phrase>
 			<phrase id="54">
-				<text>bar_docent_54</text>
+				<text>bar_docent_dialog_54</text>
+				<dont_has_info>docent_detector4_start</dont_has_info>
+				<dont_has_info>docent_detector4_have</dont_has_info>
+				<dont_has_info>docent_detector4_done</dont_has_info>
+				<next>64</next>
+			</phrase>
+			<phrase id="55">
+				<text>bar_docent_dialog_55</text>
+				<dont_has_info>docent_detector5_start</dont_has_info>
+				<dont_has_info>docent_detector5_have</dont_has_info>
+				<dont_has_info>docent_detector5_done</dont_has_info>
+				<next>65</next>
+			</phrase>
+			<phrase id="56">
+				<text>bar_docent_dialog_56</text>
+				<dont_has_info>docent_detector6_start</dont_has_info>
+				<dont_has_info>docent_detector6_have</dont_has_info>
+				<dont_has_info>docent_detector6_done</dont_has_info>
+				<next>66</next>
+			</phrase>
+			<phrase id="57">
+				<text>bar_docent_dialog_57</text>
+				<dont_has_info>docent_detector7_start</dont_has_info>
+				<dont_has_info>docent_detector7_have</dont_has_info>
+				<dont_has_info>docent_detector7_done</dont_has_info>
+				<next>67</next>
+			</phrase>
+			<phrase id="58">
+				<text>bar_docent_dialog_58</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+			<phrase id="59">
+				<text>bar_docent_dialog_59</text>
 				<action>dialogs.break_dialog</action>
 			</phrase>
 			<phrase id="61">
 				<text>bar_docent_61</text>
 				<next>71</next>
-				<next>74</next>
+				<next>78</next>
 			</phrase>
 			<phrase id="62">
 				<text>bar_docent_62</text>
 				<next>72</next>
-				<next>74</next>
+				<next>78</next>
 			</phrase>
 			<phrase id="63">
 				<text>bar_docent_63</text>
 				<next>73</next>
-				<next>74</next>
+				<next>78</next>
 			</phrase>
 			<phrase id="64">
-				<text>bar_docent_64</text>
-				<action>dialogs.break_dialog</action>
+				<text>bar_docent_dialog_64</text>
+				<next>74</next>
+				<next>78</next>
+			</phrase>
+			<phrase id="65">
+				<text>bar_docent_dialog_65</text>
+				<next>75</next>
+				<next>78</next>
+			</phrase>
+			<phrase id="66">
+				<text>bar_docent_dialog_66</text>
+				<next>76</next>
+				<next>78</next>
+			</phrase>
+			<phrase id="67">
+				<text>bar_docent_dialog_67</text>
+				<next>77</next>
+				<next>78</next>
 			</phrase>
 			<phrase id="71">
 				<text>bar_docent_71</text>
 				<give_info>docent_detector1_start</give_info>
+				<give_info>bar_docent_dialog_tut</give_info>
 				<action>dialogs.break_dialog</action>
+				<action>sak_dialog.docent_have_mutant_task</action>
 			</phrase>
 			<phrase id="72">
 				<text>bar_docent_72</text>
 				<give_info>docent_detector2_start</give_info>
+				<give_info>bar_docent_dialog_tut</give_info>
 				<action>dialogs.break_dialog</action>
+				<action>sak_dialog.docent_have_mutant_task</action>
 			</phrase>
 			<phrase id="73">
 				<text>bar_docent_73</text>
 				<give_info>docent_detector3_start</give_info>
+				<give_info>bar_docent_dialog_tut</give_info>
 				<action>dialogs.break_dialog</action>
+				<action>sak_dialog.docent_have_mutant_task</action>
 			</phrase>
 			<phrase id="74">
-				<text>bar_docent_74</text>
+				<text>bar_docent_dialog_74</text>
+				<action>dialogs.break_dialog</action>
+				<give_info>docent_detector4_start</give_info>
+				<give_info>bar_docent_dialog_tut</give_info>
+				<action>sak_dialog.docent_have_mutant_task</action>
+			</phrase>
+			<phrase id="75">
+				<text>bar_docent_dialog_75</text>
+				<action>dialogs.break_dialog</action>
+				<give_info>docent_detector5_start</give_info>
+				<give_info>bar_docent_dialog_tut</give_info>
+				<action>sak_dialog.docent_have_mutant_task</action>
+			</phrase>
+			<phrase id="76">
+				<text>bar_docent_dialog_76</text>
+				<action>dialogs.break_dialog</action>
+				<give_info>docent_detector6_start</give_info>
+				<give_info>bar_docent_dialog_tut</give_info>
+				<action>sak_dialog.docent_have_mutant_task</action>
+			</phrase>
+			<phrase id="77">
+				<text>bar_docent_dialog_77</text>
+				<action>dialogs.break_dialog</action>
+				<give_info>docent_detector7_start</give_info>
+				<give_info>bar_docent_dialog_tut</give_info>
+				<action>sak_dialog.docent_have_mutant_task</action>
+			</phrase>
+			<phrase id="78">
+				<text>bar_docent_dialog_78</text>
 				<action>dialogs.break_dialog</action>
 			</phrase>
 		</phrase_list>
@@ -2293,6 +2402,123 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<dialog id="bar_docent_4dialog">
+		<has_info>docent_detector4_have</has_info>
+		<dont_has_info>docent_detector4_done</dont_has_info>
+		<phrase_list>
+			<phrase id="1">
+				<text>bar_docent_4dialog_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>bar_docent_4dialog_2</text>
+				<action>sak_dialog.give_docent_wolf_paw</action>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>bar_docent_4dialog_3</text>
+				<give_info>docent_detector4_done</give_info>
+				<give_info>have_wolf_spot</give_info>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>bar_docent_4dialog_4</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+			<phrase id="0">
+				<text>bar_docent_4dialog_0</text>
+				<next>1</next>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="bar_docent_5dialog">
+		<has_info>docent_detector5_have</has_info>
+		<dont_has_info>docent_detector5_done</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>bar_docent_5dialog_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>bar_docent_5dialog_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>bar_docent_5dialog_2</text>
+				<action>sak_dialog.give_docent_chimera_claw</action>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>bar_docent_5dialog_3</text>
+				<give_info>docent_detector5_done</give_info>
+				<give_info>have_chimera_spot</give_info>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>bar_docent_5dialog_4</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="bar_docent_6dialog">
+		<has_info>docent_detector6_have</has_info>
+		<dont_has_info>docent_detector6_done</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>bar_docent_6dialog_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>bar_docent_6dialog_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>bar_docent_6dialog_2</text>
+				<action>sak_dialog.give_docent_burer_hand</action>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>bar_docent_6dialog_3</text>
+				<give_info>docent_detector6_done</give_info>
+				<give_info>have_burer_spot</give_info>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>bar_docent_6dialog_4</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="bar_docent_7dialog">
+		<has_info>docent_detector7_have</has_info>
+		<dont_has_info>docent_detector7_done</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>bar_docent_7dialog_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>bar_docent_7dialog_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>bar_docent_7dialog_2</text>
+				<action>sak_dialog.give_docent_biblio_hand</action>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>bar_docent_7dialog_3</text>
+				<give_info>docent_detector7_done</give_info>
+				<give_info>have_biblio_spot</give_info>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>bar_docent_7dialog_4</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<!-- new dialogue -END- - aleks1970 -->
 	<dialog id="bar_docent_npc_dialog">
 		<phrase_list>
 			<phrase id="0">
@@ -4371,8 +4597,7 @@
 				<next>22</next>
 				<next>23</next>
 				<next>24</next>
-				<next>25</next>
-				<next>54</next>
+				<next>27</next>
 			</phrase>
 			<phrase id="22">
 				<text>trade_dialog_sherstyk_22</text>
@@ -4413,20 +4638,23 @@
 			</phrase>
 			<phrase id="24">
 				<text>trade_dialog_sherstyk_24</text>
-				<next>242</next>
-			</phrase>
-			<phrase id="242">
-				<text>trade_dialog_sherstyk_242</text>
-				<next>241</next>
-				<next>666</next>
+				<next>25</next>
 			</phrase>
 			<phrase id="25">
 				<text>trade_dialog_sherstyk_25</text>
+				<next>241</next>
+				<next>243</next>
+				<next>666</next>
+			</phrase>
+			<phrase id="27">
+				<text>trade_dialog_sherstyk_27</text>
 				<next>252</next>
+				<next>254</next>
 			</phrase>
 			<phrase id="252">
+				<precondition>sak_dialog.not_have_sherstyk40_credit</precondition>
 				<text>trade_dialog_sherstyk_252</text>
-				<next>251</next>
+				<next>250</next>
 				<next>666</next>
 			</phrase>
 			<phrase id="241">
@@ -4438,16 +4666,35 @@
 		<!-- **	<action>sak_dialog.add_ammo_pkm_box_2</action> *** -->
 			</phrase>
 			<phrase id="251">
-				<precondition>sak_dialog.have_15vodka</precondition>
+				<precondition>sak_dialog.have_25vodka</precondition>
 				<text>trade_dialog_sherstyk_251</text>
+				<action>sak_dialog.give_25vodka</action>
+				<action>sak_dialog.reset_sherstyk_credit</action>
+				<action>sak_dialog.add_military_spec_outfit</action>
+			</phrase>
+			<phrase id="250">
+				<precondition>sak_dialog.have_15vodka</precondition>
+				<text>trade_dialog_sherstyk_250</text>
 				<action>sak_dialog.give_15vodka</action>
 				<action>sak_dialog.add_military_outfit</action>
+			</phrase>
+			<phrase id="243">
+				<precondition>sak_dialog.have_12vodka</precondition>
+				<text>trade_dialog_sherstyk_243</text>
+				<action>sak_dialog.give_12vodka</action>
+				<action>sak_dialog.add_ammo_pkm_box_2</action>
+			</phrase>
+			<phrase id="254">
+				<precondition>sak_dialog.have_sherstyk40_credit</precondition>
+				<text>trade_dialog_sherstyk_254</text>
+				<next>250</next>
+				<next>251</next>
+				<next>666</next>
 			</phrase>
 			<phrase id="31">
 				<text>trade_dialog_sherstyk_31</text>
 				<next>32</next>
 				<next>33</next>
-				<next>54</next>
 			</phrase>
 			<phrase id="32">
 				<text>trade_dialog_sherstyk_32</text>
@@ -4461,8 +4708,10 @@
 			<phrase id="33">
 				<text>trade_dialog_sherstyk_33</text>
 				<next>332</next>
+				<next>333</next>
 			</phrase>
 			<phrase id="332">
+				<precondition>sak_dialog.have_sherstyk33_credit</precondition>
 				<text>trade_dialog_sherstyk_332</text>
 				<next>331</next>
 				<next>666</next>
@@ -4478,11 +4727,11 @@
 				<text>trade_dialog_sherstyk_331</text>
 				<action>sak_dialog.give_20vodka</action>
 				<action>sak_dialog.add_wpn_pkm</action>
+				<action>sak_dialog.reset_sherstyk_credit</action>
 			</phrase>
 			<phrase id="41">
 				<text>trade_dialog_sherstyk_41</text>
 				<next>42</next>
-				<next>54</next>
 			</phrase>
 			<phrase id="42">
 				<text>trade_dialog_sherstyk_42</text>
@@ -4499,11 +4748,16 @@
 				<action>sak_dialog.give_vodka</action>
 				<action>sak_dialog.add_2medkit_army</action>
 			</phrase>
-			<phrase id="54">
-				<text>trade_dialog_sherstyk_54</text>
-			</phrase>
 			<phrase id="666">
 				<text>trade_dialog_sherstyk_666</text>
+			</phrase>
+			<phrase id="334">
+				<text>trade_dialog_sherstyk_334</text>
+			</phrase>
+			<phrase id="333">
+				<text>trade_dialog_sherstyk_333</text>
+				<precondition>sak_dialog.not_have_sherstyk33_credit</precondition>
+				<next>334</next>
 			</phrase>
 		</phrase_list>
 	</dialog>

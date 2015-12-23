@@ -1,15 +1,22 @@
---TB3D 1.0.9.9.1
-function my_ver() return "1.0.9.9.1" end
+--TB3D 1.0.9.9.9.9
+function my_ver() return "1.0.9.9.9.9" end
 -- DocViewer for "Authentic documents"
 -- 7.9 (79mxm@rambler.ru)
 
 local item_view = ""
+--local subs_view = ""
+local hud = get_hud()
+local string_format = string.format
+local translate	= game.translate_string
 
 function update()
 	if db.actor:active_slot() == 1 then
 		item = db.actor:active_item():section()
 		if system_ini():line_exist(item, "doc_view") then
-			if item ~= item_view then doc_view_on(item) end
+			if item ~= item_view then
+				doc_view_on(item)
+				doc_view_on_subs(item)
+			end
 		else
 		doc_view_off()
 		end
@@ -24,18 +31,67 @@ function doc_view_on(item)
 		if item_view == "auto" then item_view = "docs\\"..item end
 		pos_x = system_ini():r_s32(item,"pos_x")
 		pos_y = system_ini():r_s32(item,"pos_y")
+		pos_x = pos_x + 35	--aleks1970
 		X = CUIStatic()
 		X:Init(item_view,pos_x,pos_y,0,0)
-		get_hud():AddCustomStatic("doc_viewer", true)
-		get_hud():GetCustomStatic("doc_viewer"):wnd():AttachChild(X)
+		hud:AddCustomStatic("doc_viewer", true)
+		hud:GetCustomStatic("doc_viewer"):wnd():AttachChild(X)
 		item_view = item
 	end
 end
 
+function doc_view_on_subs(item)
+	if item then
+		local doc_sub
+		local msg = string_format("")
+		if item == "recipi_bpb" then
+			doc_sub = true
+			msg = string_format(translate("recipi_bpb_scr"))
+		elseif item == "dosye_zvez" then
+			doc_sub = true
+			msg = string_format(translate("dosye_zvez_scr"))
+		elseif item == "stukach_book" then
+			doc_sub = true
+			msg = string_format(translate("stukach_book_scr"))
+		elseif item == "bloknot_pantera" then
+			doc_sub = true
+			msg = string_format(translate("bloknot_pantera_scr"))
+		elseif item == "razved_karta" then
+			doc_sub = true
+			msg = string_format(translate("razved_karta_scr"))
+		elseif item == "pilot_zapiska" then
+			doc_sub = true
+			msg = string_format(translate("pilot_zapiska_scr"))
+		else
+			doc_sub = false
+		end
+		if doc_sub then
+			local cs = hud:GetCustomStatic("doc_viewer_scr")
+			if cs == nil then
+				hud:AddCustomStatic("doc_viewer_scr", true)
+				cs = hud:GetCustomStatic("doc_viewer_scr")
+			end
+			if cs ~= nil then	
+				cs:wnd():SetText(msg)
+			end
+			cs = nil
+	--	else
+	--		local msg = string_format("")
+	--		if cs ~= nil then	
+	--			cs:wnd():SetText(msg)
+	--			cs = nil
+	--		end
+		end
+	end
+end
+
 function doc_view_off()
-	if get_hud():GetCustomStatic("doc_viewer") then
-		get_hud():RemoveCustomStatic("doc_viewer")
+	if hud:GetCustomStatic("doc_viewer") then
+		hud:RemoveCustomStatic("doc_viewer")
 		item_view = ""
+	elseif hud:GetCustomStatic("doc_viewer_scr") then
+		hud:RemoveCustomStatic("doc_viewer_scr")
+	--	subs_view = ""
 	end
 end
  

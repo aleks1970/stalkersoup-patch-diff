@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<!-- TB3D 1.0.9.9.9.8 additional items, fixed typos, added 135 items, corrected text and strings aleks1970, det_art_super -->
+<!-- TB3D 1.0.9.9.9.9 additional items, fixed typos, added 135 items, corrected text and strings aleks1970, det_art_super -->
 <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 FOOD AND PROVISIONS 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
@@ -424,7 +424,7 @@ FOOD AND PROVISIONS
 		<text>Antiradin Device</text>
 	</string>
 	<string id="enc_zombie_antiradiation">
-		<text>This device is intended to protect humans from radiation emitted by zombie. Device is in a backpack completely absorbs radiation, which subsequently accumulates in a special container made of similar material, which covered stalkerskie containers for artifacts. "Antiradin" - expensive, but very useful thing in areas of high PSI activity - in fact most often it can run into a zombie.</text>
+		<text>This device is intended to protect humans from radiation emitted by zombie. Device in a backpack completely absorbs radiation, which subsequently accumulates in a special container made of similar material, which covered stalker's containers for artifacts. "Antiradin" - expensive, but very useful thing in areas of high PSI activity - in fact most often it can run into a zombie.</text>
 	</string>
 	<string id="device_warning_module">
 		<text>Decoder Module</text>
@@ -558,6 +558,10 @@ FOOD AND PROVISIONS
 	<string id="bolt_descr">
 		<text>Bolt 32h100. Stalker's best friend.</text>
 	</string>
+<!--	Duplicated from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="bolt_descr">
+		<text>Bolt 32x100. Stalker's best friend.</text>
+	</string> -->
 	<string id="rover_bot_stancion">
 		<text>Station for a mobile robot</text>
 	</string>
@@ -571,6 +575,12 @@ FOOD AND PROVISIONS
 	<string id="enc_cigara">
 		<text>Cuban cigars are rolled from tobacco leaves found throughout the country of Cuba. The filler, binder, and wrapper may come from different portions of the island. All cigar production in Cuba is controlled by the Cuban government, and each brand may be rolled in several different factories in Cuba. Cuban cigar rollers or "torcedores" are claimed by cigar experts to be the most skilled rollers in the world. Torcedores are highly respected in Cuban society and culture and travel worldwide displaying their art of hand rolling cigars. These are a rare find in the Zone ... and can be worth a lot of Rubles to the right buyer ...</text>
 	</string>
+<!--	<string id="cigara">
+		<text>Cuba Cigar</text>
+	</string>
+	<string id="enc_cigara">
+		<text>This Cuban cigar. In the Zone gets smuggled. According to this, local merchants to sell cigars can be bought and they can not be the same. Tobacco natural, strength and flavor excellent. Complementing the picture beautiful form of cigars, which makes smoking a real pleasure when you consider that we are in the Zone.</text>
+	</string> -->
 	<string id="fake_cigara">
 		<text>This needs to be fixed...</text>
 	</string>
@@ -583,6 +593,12 @@ FOOD AND PROVISIONS
 	<string id="enc_sandwich">
 		<text>A very basic sandwich using any available meat, or sausage product. The bread doesn't seem to be too stale to eat ... will satisfy hunger for the time being, or until something more nutritious comes along ...</text>
 	</string>
+<!--	<string id="sandwich">
+		<text>Sandwich</text>
+	</string>
+	<string id="enc_sandwich">
+		<text>The most common sausage sandwich. Prepared in advance, so that you can eat on the go, without a knife uncovered and not digging in his backpack in search of food ingredients.</text>
+	</string> -->
 	<string id="beer_a">
 		<text>Zone Beer</text>
 	</string>
@@ -592,6 +608,12 @@ FOOD AND PROVISIONS
 	<string id="enc_beer_a">
 		<text>Apparently, this beer is brewed right here in the Zone somewhere. No-one seems to know where, but no-one seems to complain about it either ...</text>
 	</string>
+<!--	<string id="beer_a">
+		<text>Beer</text>
+	</string>
+	<string id="enc_beer_a">
+		<text>Beer of local production. Composition of the course has been written. A good way to get drunk to the blue tomato.</text>
+	</string> -->
 	<string id="flaska">
 		<text>Flask</text>
 	</string>
@@ -601,6 +623,12 @@ FOOD AND PROVISIONS
 	<string id="enc_flaska">
 		<text>A flask filled with clean, spring water ... possibly just re-filled from the "Crystal" brand water found throughout the Zone ...</text>
 	</string>
+<!--	<string id="flaska">
+		<text>Flask</text>
+	</string>
+	<string id="enc_flaska">
+		<text>Flask, filled to the edge of water from a pure spring. Cleaner water in these places do not find.</text>
+	</string> -->
 	<string id="sweetness">
 		<text>"Alenka" Chocolate Bar</text>
 	</string>
@@ -610,6 +638,12 @@ FOOD AND PROVISIONS
 	<string id="enc_sweetness">
 		<text>First produced in 1966 in Moscow's Red October Factory following a Kremlin directive to create a new brand of milk chocolate, "Alenka" became a sign of the good times ... and a favorite snack of several generations to follow. Ingredients: sugar, dried whole milk, cocoa oil, ground cocoa, emulsifier lecithin E322 ...</text>
 	</string>
+<!--	<string id="sweetness">
+		<text>Bar of chocolate</text>
+	</string>
+	<string id="enc_sweetness">
+		<text>A delicious chocolate bar. Soybeans in excess, the presence of natural cocoa is doubtful. Well satisfies hunger and positive effect on brain activity.</text>
+	</string> -->
 	<string id="box_cigara">
 		<text>Box of Cigars</text>
 	</string>
@@ -619,6 +653,12 @@ FOOD AND PROVISIONS
 	<string id="enc_box_cigara">
 		<text>A box of Cuban Cigars ... worth a lot of money in a place such as this!!!</text>
 	</string>
+<!--	<string id="box_cigara">
+		<text>Cigar Box</text>
+	</string>
+	<string id="enc_box_cigara">
+		<text>A box with Cuban cigars. Very expensive thing.</text>
+	</string> -->
 	<string id="balalaika_a">
 		<text>Balalaika</text>
 	</string>
@@ -628,39 +668,63 @@ FOOD AND PROVISIONS
 	<string id="enc_balalaika_a">
 		<text>A stringed instrument of Russian origin, with a characteristic triangular body and three strings. The balalaika family of instruments includes, from the highest-pitched to the lowest, the prima balalaika, sekunda balalaika, alto balalaika, bass balalaika and contrabass balalaika. The earliest mention of the term balalaika dates back to a 1688 BC Russian document.The term became widely used in Ukrainian language documents from 1717-1732. According to one theory, it is thought that the term was borrowed into Russian where, in literary language, it first appeared in a poem by V. Maikov "Elysei" in 1771.</text>
 	</string>
+<!--	<string id="balalaika_a">
+		<text>Balalaika</text>
+	</string>
+	<string id="enc_balalaika_a">
+		<text>Normal balalaika. A wonderful Russian folk instrument. In the Zone, too, lacks the masters of playing.</text>
+	</string> -->
 	<string id="det_artefact_indy">
 		<text>"Response" Artefact Detector</text>
 	</string>
 	<string id="det_art_indy_info">
 		<text>The "Response" Detector was developed by the Zone's Scientific Community. It was the first model of Detector to surface within the Zone. Detection radius is limited to 40 meters, and the presence of an Artefact is distinguished only by a simple sound. Further developments of this model have led to far more effective devices, which can be difficult to obtain both inside, and outside the Zone's perimeter.</text>
 	</string>
-	<!--109984 string id="det_art_super">
+<!--	<string id="det_artefact_indy">
+		<text>Detector artifacts</text>
+	</string>
+	<string id="det_art_indy_info">
+		<text>This is the first detector artifacts, designed by local craftsmen. The device is ineffective because it does not reach over and 40 meters, and the presence of an artifact is recognized only an audible signal. But in its time, with the help of this device has been found so many artifacts.</text>
+	</string> -->
+	<string id="det_art_ultra_super">
 		<text>"Svarog" Artefact Detector</text>
 	</string>
-	<string id="det_art_super_info">
-		<text>The last known invention to come out of the Scientific Research Institute. Using advanced "Nanotechnology", this sensitive detector can detect Artefacts from as far away as 1.5 km, and displays such finds on the user's map. Besides their precise location, this excellent detector can distinguish the type of Artefact found. This alone, sets it apart from all other models. "Svarog" - ( Old Slavic mythological god of the sky, the father of the sun and fire ) ...</text>
-	</string-->
-	<string id="det_artefact_super">
-		<text>"Svarog" Artefact Detector</text>
-	</string>
-	<string id="det_artefact_super_s">
+	<string id="det_art_ultra_super_s">
 		<text>"Svarog"</text>
 	</string>
-	<string id="det_art_ultra_info">
+	<string id="enc_det_art_ultra_info">
 		<text>The last known invention to come out of the Scientific Research Institute. Using advanced "Nanotechnology", this sensitive detector can detect Artefacts from as far away as 1.5 km, and displays such finds on the user's map. Besides their precise location, this excellent detector can distinguish the type of Artefact found. This alone, sets it apart from all other models. "Svarog" - ( Old Slavic mythological God of the sky, the father of the sun and fire ) ...</text>
 	</string>
+<!-- Duplicated string id's from "string_table_arhara.xml" and the "string_table_enc_equipment.xml" files.
+ TB. you should choose only one string id and delete the rest - aleks1970 -->
+	<!-- before was "det_art_ultra_info" id(which was also duplicated), but now have new string to match "items.ltx" file - aleks1970 -->
+<!--	<string id="enc_det_art_ultra_info">
+		<text>Artifact Detector Series 'ULTRA'. This detector is the latest created by local scientists. Thanks to nanotechnology, the sensitivity of the detector is increased to one hundred meters. The presence of Artifacts displays markers on the map. In addition to their location, the detector detects the types of Artifacts, which makes this unit the best of all the series of detectors to hunt for Artifacts. Activated when in the pistol slot.</text>
+	</string>
+	<string id="enc_det_art_ultra_info">
+		<text>This is an improved version of the detector artifacts, past upgrades among scientists. Added map of the area with the output label on it. Range increased to 70 meters. In connection with the reasonable price and improved performance, its use is considered preferable.</text>
+	</string> -->
 	<string id="detektor_amorf">
 		<text>Isomorphic Detector</text>
 	</string>
 	<string id="detektor_amorf_s">
 		<text>Isomorphic Detector</text>
 	</string>
+	<string id="detektor_amorf_info">
+		<text>Detector able to detect items containing particles of an Alien power and display these items on the map within a radius of fifty to sixty meters, also beeps. It is also possible to locate Artifacts. Activated when in the pistol slot.</text>
+	</string>
+<!--	<string id="detektor_amorf">
+		<text>The detector is isomorphic</text>
+	</string> -->
 	<string id="detector_elite_john">
 		<text>Hologram Detector</text>
 	</string>
 	<string id="detector_elite_john_s">
 		<text>Hologram Detector</text>
 	</string>
+<!--	<string id="detector_elite_john">
+		<text>Detector Holograms</text>
+	</string> -->
 	<!-- DOCUMENTS AKIM -->
 	<string id="doc_garbage">
 		<text>Old documents from the Dump</text>
@@ -671,6 +735,12 @@ FOOD AND PROVISIONS
 	<string id="enc_doc_garbage">
 		<text>Documents found at the Dump. Some sort of Scientific formula .... written in an incomprehensible language. By the looks of it - could quite easily be the senseless scribblings of a lunatic...</text>
 	</string>
+<!--	<string id="doc_garbage">
+		<text>Old paper from the landfill</text>
+	</string>
+	<string id="enc_doc_garbage">
+		<text>Documents found in the Garbage. Formula, write a foreign language. By type - ravings of a madman...</text>
+	</string> -->
 	<string id="doc_agro">
 		<text>Old documents from Agroprom</text>
 	</string>
@@ -680,6 +750,12 @@ FOOD AND PROVISIONS
 	<string id="enc_doc_agro">
 		<text>A stack of documents found in the Catacombs beneath the Agroprom Institute. Some sort of formula written in a language I don't understand. Very strange indeed...</text>
 	</string>
+<!--	<string id="doc_agro">
+		<text>Old paper with agricultural industry</text>
+	</string>
+	<string id="enc_doc_agro">
+		<text>A stack of documents found in the catacombs of agricultural industry. Formula, write a foreign language. By type - not very much like the previous...</text>
+	</string> -->
 	<string id="doc_x18_1">
 		<text>Old Document - Part I</text>
 	</string>
@@ -689,6 +765,12 @@ FOOD AND PROVISIONS
 	<string id="enc_doc_x18_1">
 		<text>Documentation found in the Dark Valley. Appears to be the first part of something more in depth...</text>
 	</string>
+<!--	<string id="doc_x18_1">
+		<text>The old document. Part I</text>
+	</string>
+	<string id="enc_doc_x18_1">
+		<text>Documents found in Dark Valley. By all appearances this is the first part.</text>
+	</string> -->
 	<string id="doc_x18_2">
 		<text>Old Document - Part II</text>
 	</string>
@@ -698,6 +780,12 @@ FOOD AND PROVISIONS
 	<string id="enc_doc_x18_2">
 		<text>The second part of a series of Documents to be found in Laboratory X-18...</text>
 	</string>
+<!--	<string id="doc_x18_2">
+		<text>The old document. Part II</text>
+	</string>
+	<string id="enc_doc_x18_2">
+		<text>The second part doumentov found in the laboratory X-18.</text>
+	</string> -->
 	<string id="doc_x18_3">
 		<text>Old Document - Part III</text>
 	</string>
@@ -707,6 +795,12 @@ FOOD AND PROVISIONS
 	<string id="enc_doc_x18_3">
 		<text>The third part of a series of Documents to be found in Laboratory X-18...</text>
 	</string>
+<!--	<string id="doc_x18_3">
+		<text>The old document. Part III</text>
+	</string>
+	<string id="enc_doc_x18_3">
+		<text>The third part doumentov found in the laboratory X-18.</text>
+	</string> -->
 	<string id="doc_x18_4">
 		<text>Old Document - Part IV</text>
 	</string>
@@ -716,15 +810,27 @@ FOOD AND PROVISIONS
 	<string id="enc_doc_x18_4">
 		<text>The fourth part of a series of Documents to be found in Laboratory X-18...</text>
 	</string>
+<!--	<string id="doc_x18_4">
+		<text>The old document. Part IV</text>
+	</string>
+	<string id="enc_doc_x18_4">
+		<text>Last quarter of doumentov found in the laboratory X-18.</text>
+	</string> -->
 	<string id="doc_x16">
 		<text>Old Document from Laboratory X-16</text>
 	</string>
 	<string id="doc_x16_s">
-		<text>Old Document</text>
+		<text>Old X-16 Document</text>
 	</string>
 	<string id="enc_doc_x16">
 		<text>Documentation found inside Laboratory X-16. A series of Scientific Formulas written in a language I do not understand. Apparently this is the last portion of a series of Documents which make up some sort of Report on Secretive Experiments throughout the Zone ... It is signed by a one 'Benjamin Linus' of the Dharma Initiative ... what does this mean?! .... and, who / what is this Dharma Initiative I keep seeing all over the place!!?</text>
 	</string>
+<!--	<string id="doc_x16">
+		<text>Old document from the X-16</text>
+	</string>
+	<string id="enc_doc_x16">
+		<text>Documents found in the laboratory X-16. Formula, write a foreign language. Apparently this is the last part of the documents found.</text>
+	</string> -->
 	<string id="pda_info">
 		<text>Broken PDA</text>
 	</string>
@@ -734,95 +840,244 @@ FOOD AND PROVISIONS
 	<string id="enc_pda_info">
 		<text>A typical PDA, which in the zone a lot. Besides - a non-working and bruised. It is seen that the former owner was with him, not very thrifty. Activate the PDA can not be due to a broken screen. Flash cards do not. So fuck anything.</text>
 	</string>
+<!--	<string id="pda_info">
+		<text>Broken PDA</text>
+	</string>
+	<string id="enc_pda_info">
+		<text>A typical PDA, which many in the Zone. Besides - a non-working and bruised. It is evident that the former owner was with him not very frugal. Insert a PDA can not be due to a broken screen. Flash card no. In general, nothing can fuck.</text>
+	</string> -->
 	<string id="hand_teleporter_arhara">
 		<text>Defective hand teleportator</text>
 	</string>
 	<string id="hand_teleporter_arhara_s">
 		<text>Defective teleportator</text>
 	</string>
+<!--	<string id="hand_teleporter_arhara">
+		<text>Faulty manual teleportator</text>
+	</string> -->
 	<string id="hand_teleporter">
 		<text>Hand teleportator</text>
 	</string>
 	<string id="hand_teleporter_s">
 		<text>Hand teleportator</text>
 	</string>
-	<!---Documents on the Hood -->
+<!--	<string id="hand_teleporter">
+		<text>Hand teleportator</text>
+	</string> -->
+	<!-- Documents on the Hood -->
 	<string id="bloknot_pantera">
 		<text>Panther's Notebook</text>
+	</string>
+	<string id="bloknot_pantera_s">
+		<text>P. Notebook</text>
 	</string>
 	<string id="enc_equipment_bloknot_pantera">
 		<text>Panther's personal notebook. It contains several indecipherable phrases, and the following code: 25190456 ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="bloknot_pantera">
+		<text>Panthers Notebook</text>
+	</string>
+	<string id="enc_equipment_bloknot_pantera">
+		<text>Personal notebook Panthers. It was written a few sentences and some code: 25,190,456. To view a document, insert in pistol slot.</text>
+	</string> -->
 	<string id="dosye_zvez">
-		<text>the "Astrologer" file</text>
+		<text>The "Astrologer" file</text>
+	</string>
+	<string id="dosye_zvez_s">
+		<text>Astrologer Profile</text>
 	</string>
 	<string id="enc_equipment_dosye_zvez">
 		<text>A file containing information on the "Astrologer" ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="dosye_zvez">
+		<text>Astrologer Profile</text>
+	</string>
+	<string id="enc_equipment_dosye_zvez">
+		<text>Quick profile on Astrologer. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="foto_kukla">
 		<text>Photo of a Doll</text>
+	</string>
+	<string id="foto_kukla_s">
+		<text>Photo</text>
 	</string>
 	<string id="enc_equipment_foto_kukla">
 		<text>An old photograph of a child's toy doll ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--		Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="foto_kukla">
+		<text>Photo Doll</text>
+	</string>
+	<string id="enc_equipment_foto_kukla">
+		<text>Old photo normal infant dolls. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="pilot_zapiska">
 		<text>the Pilot's Letter</text>
+	</string>
+	<string id="pilot_zapiska_s">
+		<text>Letter</text>
 	</string>
 	<string id="enc_equipment_pilot_zapiska">
 		<text>The Helicoptor Pilot's letter ... which contains some very important information ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="pilot_zapiska">
+		<text>Letter to the pilot</text>
+	</string>
+	<string id="enc_equipment_pilot_zapiska">
+		<text>Letter from a helicopter pilot with important information. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="foto_chaes_truba">
 		<text>Photo of the Pilot</text>
+	</string>
+	<string id="foto_chaes_truba_s">
+		<text>Photo</text>
 	</string>
 	<string id="enc_equipment_foto_chaes_truba">
 		<text>The photograph of the burned helicoptor taken by the Pilot. In it, the large pipe alongside the burned helicopter can be seen clearly ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="foto_chaes_truba">
+		<text>Photo Driver</text>
+	</string>
+	<string id="enc_equipment_foto_chaes_truba">
+		<text>Photo taken a helicopter pilot. It is visible to a large pipe with the burning helicopter. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="foto_aver_mono">
 		<text>Group Photo</text>
+	</string>
+	<string id="foto_aver_mono_s">
+		<text>Photo</text>
 	</string>
 	<string id="enc_equipment_foto_aver_mono">
 		<text>Photograph of the group that burned the helicoptor ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="foto_aver_mono">
+		<text>Photo of</text>
+	</string>
+	<string id="enc_equipment_foto_aver_mono">
+		<text>Group photo, fired on the helicopter. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="foto_aver_zvezd">
 		<text>Photo of the group "Leader"</text>
+	</string>
+	<string id="foto_aver_zvezd_s">
+		<text>Photo</text>
 	</string>
 	<string id="enc_equipment_foto_aver_zvezd">
 		<text>Photograph of the Leader of the group that burned the helicoptor ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="foto_aver_zvezd">
+		<text>Photos of the leader</text>
+	</string>
+	<string id="enc_equipment_foto_aver_zvezd">
+		<text>Photos of the leader who fired on the helicopter. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="chaes2_karta_kluk">
 		<text>Photo of the NPP</text>
+	</string>
+	<string id="chaes2_karta_kluk_s">
+		<text>Chernobyl...</text>
 	</string>
 	<string id="enc_equipment_chaes2_karta_kluk">
 		<text>Photograph of the northern side of the Chernobyl NPP. There is a mark on it possibly indicating the way to the southern side of the NPP ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="chaes2_karta_kluk">
+		<text>Chernobyl Photo</text>
+	</string>
+	<string id="enc_equipment_chaes2_karta_kluk">
+		<text>Photo northern region of Chernobyl. It marked a rough passage on the other - the south side of the Chernobyl NPP. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="kreditka">
+		<text>Credit Card</text>
+	</string>
+	<string id="kreditka_s">
 		<text>Credit Card</text>
 	</string>
 	<string id="enc_equipment_kreditka">
 		<text>A Credit Card issued from the Bank of America with a $5000,000 limit on it!!! ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="kreditka">
+		<text>Credit Card</text>
+	</string>
+	<string id="enc_equipment_kreditka">
+		<text>Credit Card Bank of America in denominations 5 mil. USD. To view the credit card insert in pistol slot.</text>
+	</string> -->
 	<string id="razved_karta">
+		<text>Map Fragments</text>
+	</string>
+	<string id="razved_karta_s">
 		<text>Map Fragments</text>
 	</string>
 	<string id="enc_equipment_razved_karta">
 		<text>Old scraps of a map containing directions, or coordinates of some sort ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="razved_karta">
+		<text>Scrap maps</text>
+	</string>
+	<string id="enc_equipment_razved_karta">
+		<text>Old scrap card with the coordinates of the transition. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="karta_peschera">
 		<text>Cave Map</text>
+	</string>
+	<string id="karta_peschera_s">
+		<text>Map</text>
 	</string>
 	<string id="enc_equipment_karta_peschera">
 		<text>Old map of the caves ... somebody has scribbled some possible directions on it ... hard to decipher ... maybe the way out of here?! ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="karta_peschera">
+		<text>Map of Cave</text>
+	</string>
+	<string id="enc_equipment_karta_peschera">
+		<text>An old map of the Cave. It shows all the moves and tunnels. There's also a label with the outputs of the Cave. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="recipi_bpb">
+		<text>STALKERs Note</text>
+	</string>
+	<string id="recipi_bpb_s">
 		<text>STALKERs Note</text>
 	</string>
 	<string id="enc_equipment_recipi_bpb">
 		<text>Unidentified STALKERs' note ... there appears to be information here regarding being able to modify certain Artefacts!? ... sounds interesting ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+<!--	Duplicated string id from the "string_table_enc_equipment.xml" file - aleks1970
+	<string id="recipi_bpb">
+		<text>Note stalker</text>
+	</string>
+	<string id="enc_equipment_recipi_bpb">
+		<text>Note an unknown stalker. There is information on the modification of the artifacts. Insert in Pistol slot to view.</text>
+	</string> -->
 	<string id="stukach_book">
 		<text>Informant's Notebook</text>
+	</string>
+	<string id="stukach_book_s">
+		<text>Notebook</text>
 	</string>
 	<string id="stukach_book_desc">
 		<text>Notebook belonging to the "Freedom" informant. It contains information about modifying Artefacts ... can be viewed by placing it in the first weapon slot:</text>
 	</string>
+	<!-- from the "string_table_enc_equipment" file - aleks1970
+		<string id="stukach_book">
+		<text>Notebook informer</text>
+	</string>
+	<string id="stukach_book_s">
+		<text>Notebook informer</text>
+	</string>
+	<string id="stukach_book_desc">
+		<text>Notebook informer group of Liberty. There is information about the new artmod. Insert in Pistol slot to view.</text>
+	</string> -->
+	<!-- from the "sak_strings" file - aleks1970
+		<string id="stukach_book_desc">
+		<text>To view: insert the Laptop into the first slot.\nPavliks laptop. Besides some boring financial records, it contains a recipe for 'Artpreobrazovaniya'.</text>
+	</string> -->
 </string_table>

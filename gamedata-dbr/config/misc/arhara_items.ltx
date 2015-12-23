@@ -1,5 +1,5 @@
-;<!-- TB3D 1.0.9.9.8.6 --> contains local strings (some were vars!!), edits by glowworm, fixed camera icon, fuzer, wpn_svd_foto_hud
-;<!-- 450 and 3608 aleks1970;  excluded duplicates sections aleks1970, fixed izomorph crystal and compass, arhara_instruk, babka_4 -->
+;<!-- TB3D 1.0.9.9.9.9 --> contains local strings (some were vars!!), edits by glowworm, fixed camera icon, fuzer, wpn_svd_foto_hud,
+450 and 3608 aleks1970;  excluded duplicates sections aleks1970, fixed izomorph crystal and compass, arhara_instruk, babka_4, can_trade -->
 
 [vorona_egg]:identity_immunities
 GroupControlSection	= spawn_group
@@ -110,6 +110,7 @@ $spawn					= "food and drugs\arhara_tele"
 cform                   = skeleton
 class					= II_ANTIR	;II_ATTCH
 visual                  = equipments\skelet_head3.ogf 
+can_trade			= off	;; - new disabled - aleks1970
 description			= enc_equipment_arhara_tele_descr 
 cost				= 1
 inv_name			= enc_equipment_arhara_tele
@@ -269,6 +270,7 @@ visual				= equipments\tisku.ogf
 radius				= 2
 ;script_binding		= stalker.object_init
 quest_item			= false
+can_trade			= off	;;test - new disabled - aleks1970
 
 description			= item_tisku_desc
 
@@ -293,6 +295,7 @@ visual				= equipments\bag_stalker.ogf
 radius				= 2
 ;script_binding		= stalker.object_init
 quest_item			= true
+;can_trade			= off	;;test - new disabled - aleks1970
 
 description			= item_sumka_desc
 

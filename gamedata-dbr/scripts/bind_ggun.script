@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.8  use_binder_message
-function my_ver() return "1.0.9.9.9.8" end
+-- TB3D 1.0.9.9.9.9  use_binder_message, update
+function my_ver() return "1.0.9.9.9.9" end
 
 local indicator = nil
 local ind_bar = nil
@@ -65,7 +65,9 @@ function ggun_binder:net_spawn(data)
 end
 
 function ggun_binder:update(delta)
-	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("gravi gun: update["..utils.to_str(time_global()).."]") end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("gravi gun: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta <<<<["..utils.to_str(delta).."]>>>>")
+	end
 	object_binder.update(self, delta)
 	local ammo_elapsed = self.object:get_ammo_in_magazine()
 	local accuracy = db.actor:accuracy()
@@ -130,7 +132,9 @@ function ggun_binder:update(delta)
 	if self.thrown then
 		self:track_thrown()
 	end
-	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("gravi gun: update done") end
+	if TB3D_Modders.Global_Debug then
+		TB3D_Services.packet_alert("gravi gun: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] <<<<done>>>>")
+	end
 end
 
 function ggun_binder:net_destroy()

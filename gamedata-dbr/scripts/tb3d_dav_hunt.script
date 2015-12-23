@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.8 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.9 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 -- dav update 16Apr14, item 17, send_tip_id optimization, fixed send_tip_id to amk_send_tip_id, debug, save now, moved triggers and added debug,
--- af gold on roof in eprip, stash 14 lc to npp1, spawn_tel, text color - aleks1970, spawn_next
-function my_ver() return "1.0.9.9.9.8" end
+-- af gold on roof in eprip, stash 14 lc to npp1, spawn_tel, text color - aleks1970, spawn_next, spawn_mobs
+function my_ver() return "1.0.9.9.9.9" end
 -- randomly caches Collector treasures and provides base for bind_stalker services
 
 local string_sub = string.sub
@@ -19,10 +19,9 @@ local treasure = {	"treasure_2_","treasure_3_","treasure_4_","treasure_5_","trea
 local ini = ""
 function spawn_next(n)		--n = found doc, not next one
 	if n <= 31 then
-		TB3D_Services.packet_alert("Collector Hunt found stash ["..utils.to_str(n).."]")
+		if TB3D_Modders.coll_states then TB3D_Services.packet_alert("Collector Hunt found stash ["..utils.to_str(n).."]") end
 		if n > 1 then
 			amk.remove_item(db.actor:object("val_zapis_"..tostring(n-1)))	-- delete the old note
-			tb3d_collector_dialog.spawn_mobs(amk.load_variable("val_descr", "none"))
 		end
 		if amk.load_variable("option_autosave",1)~=0 then
 			news_manager.save_collector("Hunt Stash "..tostring(n), true)									--109981, save now
@@ -102,13 +101,13 @@ function spawn_next(n)		--n = found doc, not next one
 		end
 		a = ""
 		spawn_shrooms(n)
-		--TB3D_Services.packet_alert("Collector Hunt spawned shroom ["..tostring(n).."]")
 		ini = ""
 		TB3D_Triggers.treasure_hunt_spawn(n,rnd)							--109984, add content in some areas
 	end
 end
 
 function spawn_shrooms(n)
+	if TB3D_Modders.coll_states then  TB3D_Services.packet_alert("Collector Hunt spawned shrooms["..tostring(n).."]") end
 	if n == 1 then
 		get_item("cordon_m1")
 	elseif n == 2 then

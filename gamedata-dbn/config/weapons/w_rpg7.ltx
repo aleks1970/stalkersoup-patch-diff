@@ -1,4 +1,5 @@
-;<!-- TB3D 1.0.9.9.3.6.1 excluded empty "discovery_dependency" aleks1970, missile type -->
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons
+;<!-- excluded empty "discovery_dependency" aleks1970, missile type -->
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ручной противотанковый гранатомет РПГ-7
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -93,7 +94,7 @@ hit_impulse					= 450
 hit_type 					= explosion
 hit_rate	= 2.3
 
-fire_distance            	= 1000
+fire_distance            	= 100					;;;109974 10:1
 bullet_speed			 	= 115 ;300			;начальная скорость пули
 rpm                      	= 5
 
@@ -239,14 +240,14 @@ snd_explode 				= weapons\rpg7_explode
 snd_fly_sound				= weapons\rocket_fly
 
 ;свойства которые читаются, но не используются (надо убрать)
-inv_name					= "Og-7b"
-inv_name_short				= "Og-7b"
+inv_name					= ammo-og-7b
+inv_name_short				= ammo-og-7b
 inv_weight					= .2
 
-inv_grid_width				= 4
+inv_grid_width				= 3
 inv_grid_height				= 1
 inv_grid_x					= 15
-inv_grid_y					= 5
+inv_grid_y					= 19
 
 kill_msg_x			= 0
 kill_msg_y			= 85
@@ -258,7 +259,7 @@ kill_msg_height		= 19
 engine_present				= true		;присутствует ли в ракете двигатель
 engine_work_time			= 3000		;время работы двигателя (в милисекундах)
 engine_impulse				= 300
-engine_impulse_up			= 133,906	;137.34 ;137.34 = 2*9.81*7 - значение этого параметра (который является некой подъемной силой, вопреки названию),
+engine_impulse_up			= 133.906	;137.34 ;137.34 = 2*9.81*7 - значение этого параметра (который является некой подъемной силой, вопреки названию),
 										;при котором ракета массой 7кг не опускается под дейсвием 
 										;гравитации. 2*9.81=19.62 - ускорение свободного падения в мире сталкеров
 										;при меньших значениях ракета будет опускаться, при больших подниматься

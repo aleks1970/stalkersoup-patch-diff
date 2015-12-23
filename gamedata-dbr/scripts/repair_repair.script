@@ -6,7 +6,7 @@ function my_ver() return "1.0.9.9.9.8" end
  Copyright    : barak1001, StalkerSoup
  Author       : barak1001 (Moddb)
  Rewritten	  : for StalkerSoup by aleks1970 08/22/2015
- LastUpdate   : 06.09.2015 by aleks1970
+ LastUpdate   : 29.10.2015 by aleks1970
 --]]--------------------------------------------------------------------------------------------------------------------------------
 local item_vers
 local act = db.actor
@@ -62,7 +62,7 @@ function choose_slot:InitControls(x,y,xml,handler)
 	
 		self.short_name1 = translate(handler.slot1.inv_name_short)
 		pistol_text:SetText(self.short_name1)
-		pistol_text:SetTextY(10)
+		pistol_text:SetTextY(20)
 		pistol_text:SetTextX(15)
 		pistol_text:SetTextAlign(CGameFont.alCenter)
 
@@ -172,7 +172,7 @@ function choose_slot:InitControls(x,y,xml,handler)
 	
 		self.short_name2 = translate(handler.slot2.inv_name_short)
 		rifle_text:SetText(self.short_name2)
-		rifle_text:SetTextY(10)
+		rifle_text:SetTextY(0)
 		rifle_text:SetTextX(15)
 		rifle_text:SetTextAlign(CGameFont.alCenter)
 
@@ -429,7 +429,7 @@ function choose_slot:set_buttons()
 			header:SetText(name)
 			icon:SetColor(GetARGB(255,128,128,128))
 			header:SetTextX(16)	-- aleks1970
-			header:SetTextY(20)
+			header:SetTextY(-5)
 		elseif item2_cond >= max_to_repair then
 			use1:Enable(false)
 			use5:Enable(false)
@@ -439,7 +439,7 @@ function choose_slot:set_buttons()
 			header:SetText(name)
 			icon:SetColor(GetARGB(255,128,128,128))
 			header:SetTextX(16)	-- aleks1970
-			header:SetTextY(20)
+			header:SetTextY(-5)
 		else
 			if minus1 < 0 then
 				use1:Enable(false)
@@ -641,9 +641,11 @@ function choose_slot:use_buttons(pbar,item,number)
 	if new_cond > 1 then
 		new_cond = 1
 	end
+	local slot = item_vers
 --	item:set_condition(new_cond)
 	pbar:SetProgressPos(new_cond * 1000)
-	repair.delete_parts(pbar, number)
+	repair.delete_parts(slot, number)	--aleks1970
+--	repair.delete_parts(pbar, number)
 	self.set_buttons()
 	if StalkerSoup_comp then	-- for StalkerSoup mod - aleks1970
 		local amk_repair_armor = amk_mod.repair_armor

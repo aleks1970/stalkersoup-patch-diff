@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.8 fixed wounded, optimized, func check, pstor item count reporting, added checks,
+--TB3D 1.0.9.9.9.9 fixed wounded, optimized, func check, pstor item count reporting, added checks,
 -- debug, state control, obj level, localized string funcs, determine_section_to_activate,
---  added "nil" to switch_to_section, pstor cleanup
-function my_ver() return "1.0.9.9.9.8" end
+--  added "nil" to switch_to_section, pstor cleanup, show_logic_state_calls
+function my_ver() return "1.0.9.9.9.9" end
 prefetch("xr_conditions")
 local string_find = string.find
 local string_sub = string.sub
@@ -140,7 +140,7 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 	-- Initialization of trade
 	--TB3D_Services.packet_alert("xr logic: configure schemes2")
 	if stype == modules.stype_stalker or npc:clsid() == clsid.script_trader then
-		local trade_ini = utils.cfg_get_string(actual_ini, section_logic, "trade", npc, false, "", "misc\\trade_generic.ltx")
+		local trade_ini = utils.cfg_get_string(actual_ini, section_logic, "trade", npc, false, "", "trade\\trade_generic.ltx")
 		trade_manager.trade_init(npc, trade_ini)
 	end
 	--TB3D_Services.packet_alert("xr logic: configure schemes3")
@@ -362,8 +362,14 @@ function activate_by_section(npc, ini, section, loading)
 			if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: can't call ["..utils.to_str(filename).."].set_scheme() - a nil value") end
 			return
 		end
-		if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: calling ["..utils.to_str(filename).."] for ["..utils.to_str(npc_id).."]") end
-		_G[filename].set_scheme(npc, ini, scheme, section, db.storage[npc_id]["gulag_name"])
+		if TB3D_Modders.use_logic_message or TB3D_Modders.show_logic_state_calls then
+			TB3D_Services.packet_alert("xr logic: calling["..utils.to_str(filename).."] for["..utils.to_str(npc:name()).."] id["..utils.to_str(npc_id).."]")
+		end
+		if _G[filename].set_scheme then
+			_G[filename].set_scheme(npc, ini, scheme, section, db.storage[npc_id]["gulag_name"])
+		else
+			TB3D_Services.packet_alert("xr logic: calling ["..utils.to_str(filename).."] for ["..utils.to_str(db.storage[npc_id]["gulag_name"]).."] no set_scheme!!!!")
+		end
 		--printf("DEBUG: activate_by_section: scheme '%s' activated from section '%s'", scheme, section)
 		db.set_my_section(npc, section)
 		db.set_my_scheme(npc, scheme)

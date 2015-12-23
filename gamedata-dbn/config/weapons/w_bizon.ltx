@@ -1,3 +1,4 @@
+;;;; TB3D 1.0.9.9.9.8 - TB3D style weapons
 ;<!-- excluded empty "discovery_dependency" aleks1970 -->
 ; ПП-19 "Бизон"
 [wpn_bizon]:identity_immunities 
@@ -82,7 +83,7 @@ hit_power           = 0.92
 hit_impulse	        = 140
 hit_type 	        = fire_wound
 hit_rate	        = 1.85
-fire_distance       = 1000
+fire_distance       = 100			;;;109974 10:1
 bullet_speed		= 330
 rpm                 = 650
 
@@ -159,21 +160,21 @@ zoom_rotate_y	= 0.018
 zoom_hide_crosshair	= true
 
 [wpn_bizon_kol]:wpn_bizon
-description				= "Модификация пистолета-пулемета «Бизон ПП-19» под патрон 9х19 мм. Парабеллум. Оснащен коллиматорным прицелом «Кобра-ЭКП-1С-03»"
+description				= enc_wpn_Bison_2_01_tmp_descr
 ammo_mag_size			= 64
 ammo_class				= ammo_9x19_fmj, ammo_9x19_pbp
---------------------;иконка;--------------------
-inv_grid_width			= 5
+;--------------------;иконка;--------------------
+inv_grid_width			= 4
 inv_grid_height			= 2
-inv_grid_x				= 20
-inv_grid_y				= 34
--------------------------------------------------
-inv_name	        	= "Бизон 2-01"
-inv_name_short			= "Бизон 2-01"
+inv_grid_x				= 70
+inv_grid_y				= 71
+;-------------------------------------------------
+inv_name	        	= enc_wpn_Bison_2_01_tmp
+inv_name_short			= enc_wpn_Bison_2_01_tmp
 inv_weight			= 2.9
 hit_power           = 0.44, 0.48, 0.48, 0.51
 hit_impulse	        = 2	
-fire_distance       = 150
+fire_distance       = 150					;;;109974 10:1
 bullet_speed		= 410
 rpm                 = 900
 hud                      	= wpn_bizon_kol_hud

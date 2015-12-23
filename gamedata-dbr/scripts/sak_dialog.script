@@ -1,11 +1,17 @@
---TB3D 1.0.9.9.9.0 added my_ver, fixed thunder for guide, commented out line 1180, sherstyk ammo_pkm_box_1 ammunition on line: 185 aleks1970,
+--TB3D 1.0.9.9.9.9 added my_ver, fixed thunder for guide, commented out line 1180, sherstyk ammo_pkm_box_1 ammunition on line: 185 aleks1970,
 -- mil_Svoboda_trader_plan_check
-function my_ver() return "1.0.9.9.9.0" end
+function my_ver() return "1.0.9.9.9.9" end
 -------------------------------------------------------------------------------------------------------
 -- Syakovy Dialogues 
 -------------------------------------------------------------------------------------------------------
+local act = db.actor
+local debug = false
+local color_orange = TB3D_Services.get_text_color("system")
+local color_green = TB3D_Services.get_text_color("money")
+local color_yellow = TB3D_Services.get_text_color("tip")
 function repair_box_not_have()
-	return amk_utils.inventory_search("repair_box_outfit",1) == false
+	--return amk_utils.inventory_search("repair_box_outfit",1) == false	--aleks1970
+	return amk_utils.inventory_search("repair_kit",1) == false
 end
 function add_abakan(first_speaker, second_speaker)
 	dialogs.relocate_item_section(first_speaker, "wpn_abakan", "in")
@@ -149,7 +155,31 @@ function add_5antirad(first_speaker, second_speaker)
 	dialogs.relocate_item_section(first_speaker, "antirad", "in")
 end
 function add_repair_box(first_speaker, second_speaker)
-	dialogs.relocate_item_section(first_speaker, "repair_box_outfit", "in")
+	local act = db.actor
+	local okit = act:object("repair_box_outfit")	-- new aleks1970
+	if okit then
+		local repiout =amk.load_variable("repair_item_outfit", 0)
+		local repiweap =amk.load_variable("repair_item_weapon", 0)
+		if (repiout and repiout~=0) or (repiweap and repiweap~=0) then
+			if repiout and repiout~=0 then
+				local revampout = repiout
+				amk.save_variable("spare_armor", revampout)
+				amk.del_variable("repair_item_outfit")
+			end
+			if repiweap and repiweap~=0 then
+				local repiweaps = 4	--repiweap /2
+				local repiweapb = repiweap --/2
+				amk.save_variable("spare_pistol", repiweaps)
+				amk.save_variable("spare_rifle", repiweapb)
+				amk.del_variable("repair_item_weapon")
+			end
+		end
+		local obj = alife():object(okit:id())
+		if obj then
+			alife():release(obj, true)
+		end
+	end
+	dialogs.relocate_item_section(first_speaker, "repair_kit", "in")	-- repair_box_outfit
 end
 function add_4medkit_scientic(first_speaker, second_speaker)
 	sak.create_items(db.actor,"medkit_scientic",3)
@@ -200,6 +230,11 @@ end
 function add_military_outfit(first_speaker, second_speaker)
 	dialogs.relocate_item_section(first_speaker, "military_outfit", "in")
 end
+-- --------------new - militaryspec - outfit - aleks1970---------------
+function add_military_spec_outfit(first_speaker, second_speaker)
+	dialogs.relocate_item_section(first_speaker, "militaryspec_outfit_goodplus", "in")
+end
+-- --------------------------------------------------------------------
 function add_wpn_abakan_m1(first_speaker, second_speaker)
 	dialogs.relocate_item_section(first_speaker, "wpn_abakan_m1", "in")
 end
@@ -279,6 +314,7 @@ end
 function docent_5pda_have()
   	return amk_utils.inventory_search("device_pda_npc",5) ~= false
 end
+-- ------------------redesigned functions for the new minimap spot - aleks1970-----------------
 function give_docent_hand_kontroler(first_speaker, second_speaker)
 	sak.out_item_namber("mutant_hand_kontroler",1)
 	sak.out_item_namber("device_pda_npc",30)
@@ -300,13 +336,60 @@ end
 function docent_krovosos_jaw_have()
   	return amk_utils.inventory_search("mutant_krovosos_jaw",2) ~= false and amk_utils.inventory_search("device_pda_npc",20) ~= false
 end
-function docent_have_done()
-	if (db.actor:has_info("docent_detector1_done")) and (db.actor:has_info("docent_detector2_done")) and (db.actor:has_info("docent_detector3_done")) then
-  	return false
-	else
-	return true
-	end 
+function give_docent_wolf_paw(first_speaker, second_speaker)
+	sak.out_item_namber("mutant_werewolf_kogot",3)	--new part is needed - aleks1970
+	sak.out_item_namber("device_pda_npc",20)
 end
+function docent_wolf_paw_have()
+  	return amk_utils.inventory_search("mutant_werewolf_kogot",3) ~= false and amk_utils.inventory_search("device_pda_npc",20) ~= false
+end
+function give_docent_chimera_claw(first_speaker, second_speaker)
+	sak.out_item_namber("mutant_chimera_kogot",4)	--new part is needed - aleks1970
+	sak.out_item_namber("device_pda_npc",40)
+end
+function docent_chimera_claw_have()
+  	return amk_utils.inventory_search("mutant_chimera_kogot",4) ~= false and amk_utils.inventory_search("device_pda_npc",40) ~= false
+end
+function give_docent_burer_hand(first_speaker, second_speaker)
+	sak.out_item_namber("mutant_burer_hand",4)
+	sak.out_item_namber("device_pda_npc",15)
+end
+function docent_burer_hand_have()
+  	return amk_utils.inventory_search("mutant_burer_hand",4) ~= false and amk_utils.inventory_search("device_pda_npc",15) ~= false
+end
+function give_docent_biblio_hand(first_speaker, second_speaker)
+	sak.out_item_namber("part_digitis_biblio",1)
+	sak.out_item_namber("device_pda_npc",30)
+end
+function docent_biblio_hand_have()
+  	return amk_utils.inventory_search("part_digitis_biblio",1) ~= false and amk_utils.inventory_search("device_pda_npc",30) ~= false
+end
+function docent_have_mutant_task()
+local m_num = amk.load_variable("m_count", 0)
+	if m_num == nil then m_num = 0 end
+	if (db.actor:has_info("docent_detector1_done")) and (db.actor:has_info("docent_detector2_done")) and (db.actor:has_info("docent_detector3_done")) and (db.actor:has_info("docent_detector4_done")) and (db.actor:has_info("docent_detector5_done")) and (db.actor:has_info("docent_detector6_done")) and (db.actor:has_info("docent_detector7_done")) then
+		m_num = 7
+		amk.save_variable("m_count", m_num)
+	else
+		m_num = m_num + 1
+		amk.save_variable("m_count", m_num)
+	end
+end
+function docent_have_done()
+--	if (db.actor:has_info("docent_detector1_done")) and (db.actor:has_info("docent_detector2_done")) and (db.actor:has_info("docent_detector3_done")) and (db.actor:has_info("docent_detector4_done")) and (db.actor:has_info("docent_detector5_done")) and (db.actor:has_info("docent_detector6_done")) and (db.actor:has_info("docent_detector7_done")) then
+--		return false
+--	else
+--		return true
+--	end 
+	local m_num = amk.load_variable("m_count", 0)
+	if m_num == nil then return end
+	if m_num == 7 then	--hide the text dialog on condition 7 - aleks1970
+		return false
+	else
+		return true
+	end
+end
+-- ------------------redesigned functions for the new minimap spot -END- aleks1970-----------------
 function docent_have_have()
 	if db.actor:has_info("sak_gold_fish_have") or db.actor:has_info("sak_find_seif_have") or db.actor:has_info("sak_repair_box_have") or db.actor:has_info("sak_reward_outfit_have") then
   	return true
@@ -441,34 +524,70 @@ function fox_pay_money(actor, npc)
 	treasure_manager.get_treasure_manager():give_treasure("esc_secret_truck_goods")
 end
 function give_vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 2	--added 2 points of credit to the player - aleks1970
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka", 1)
 end
 function give_2vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 3	--added 3 credit points
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka",2)
 end
 function give_3vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 4	--added 4 credit points
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka",3)
 end
 function give_5vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 6	--added 6 credit points
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka",5)
 end
 function give_6vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 7	--added 7 credit points
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka",6)
 end
 function give_7vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 8	--added 8 credit points
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka",7)
 end
 function give_8vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 9	--added 9 credit points
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka",8)
 end
 function give_10vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 9	--added 9 credit points
+	amk.save_variable("sh_credit", credit)
 	sak.out_item_namber("vodka",10)
+end
+function give_12vodka()	-- vodka for 250 ammo box - aleks1970
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 10	--added 10 credit points
+	amk.save_variable("sh_credit", credit)
+	sak.out_item_namber("vodka",12)
+end
+function give_15vodka()
+local credit = amk.load_variable("sh_credit", 0)
+	credit = credit + 12	--added 12 points of credit to player
+	amk.save_variable("sh_credit", credit)
+	sak.out_item_namber("vodka",15)
 end
 function give_20vodka()
 	sak.out_item_namber("vodka",20)
 end
-function give_15vodka()
-	sak.out_item_namber("vodka",15)
+function give_25vodka()
+	sak.out_item_namber("vodka",25)
 end
 function give_40vodka()
 	sak.out_item_namber("vodka",40)
@@ -497,15 +616,77 @@ end
 function have_10vodka()
 	return amk_utils.inventory_search("vodka",10) ~= false
 end
+function have_12vodka()	-- new for the 250 ammo box - aleks1970
+	return amk_utils.inventory_search("vodka",12) ~= false
+end
 function have_15vodka()
 	return amk_utils.inventory_search("vodka",15) ~= false
 end
 function have_20vodka()
 	return amk_utils.inventory_search("vodka",20) ~= false
 end
+function have_25vodka()
+	return amk_utils.inventory_search("vodka",25) ~= false
+end
 function have_40vodka()
 	return amk_utils.inventory_search("vodka",40) ~= false
 end
+-- ------------------new - sherstyk credits - aleks1970--------------------
+function on_update()
+	local dis_txt = amk.load_variable("m_count", 0)
+	local credit = amk.load_variable("sh_credit", 0)
+	local text = color_green..("credit status: - "..color_yellow.."[".." - "..utils.to_str(credit).." - ".."]").."\\n"..color_green..("mutant scaneer task done: - "..color_orange.."[".." - "..utils.to_str(dis_txt).." - ".."]")
+	news_manager.send_tip_txt(act,text,1,"default",7000)
+end
+
+function reset_sherstyk_credit()
+	local credit = amk.load_variable("sh_credit", 0)
+	if credit ~= nil and credit >= 40 then	-- leave some small credits for later use - aleks1970
+		credit = 20
+		amk.save_variable("sh_credit", credit)
+	elseif credit ~= nil and credit >= 33 then	-- leave some small credits for later use - aleks1970
+		credit = 16
+		amk.save_variable("sh_credit", credit)
+	else
+		credit = 0
+		amk.save_variable("sh_credit", credit)
+	end
+end
+
+function have_sherstyk40_credit()
+	local credit = amk.load_variable("sh_credit", 0)
+	if credit ~= nil and credit >= 40 then
+		return true	-- enable and sell the SKAT-10 armor and reset credit points
+	else
+		return false	-- not sell SKAT-10 armor
+	end
+end
+function have_sherstyk33_credit()
+	local credit = amk.load_variable("sh_credit", 0)
+	if credit ~= nil and credit >= 33 then
+		return true	-- enable and sell the PKM and reset credit points
+	else
+		return false	-- not sell PKM
+	end
+end
+
+function not_have_sherstyk40_credit()
+	local credit = amk.load_variable("sh_credit", 0)
+	if credit ~= nil and credit < 40 then
+		return true	-- not enough credit to sell SKAT-10 armor
+	else
+		return false
+	end
+end
+function not_have_sherstyk33_credit()
+	local credit = amk.load_variable("sh_credit", 0)
+	if credit ~= nil and credit < 33 then
+		return true	-- not enough credit to sell PKM
+	else
+		return false
+	end
+end
+-- ------------------------------------------------------------------------
 function give_drops(first_speaker, second_speaker)
 	sak.out_item_namber("af_drops", 1)
 end

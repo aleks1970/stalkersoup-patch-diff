@@ -1,6 +1,6 @@
--- TB3D 1.0.9.9.9.8 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric,
--- targets_killed, translate, task complete
-function my_ver() return "1.0.9.9.9.8" end
+-- TB3D 1.0.9.9.9.9 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric,
+-- targets_killed, translate, task complete, cleanup
+function my_ver() return "1.0.9.9.9.9" end
 
 local table_remove = table.remove
 local string_len = string.len
@@ -60,16 +60,16 @@ local ct_to_hash={}
 local hash_to_ct={}
 -- a hash function for strings (see the literature on the subject of optimal)
 function stringhash(str)
-  local mpl=1
-  local hash=0
-  local val=0
-  for i=1,string_len(str),1 do
-    val=string.byte(string_sub(str,i,i))
-    hash=hash+mpl*val
-    mpl=mpl*2
-    if mpl==512 then mpl=1 end
-  end
-  return bit_and(hash,value_65535)
+	local mpl=1
+	local hash=0
+	local val=0
+	for i=1,string_len(str),1 do
+		val=string.byte(string_sub(str,i,i))
+		hash=hash+mpl*val
+		mpl=mpl*2
+		if mpl==512 then mpl=1 end
+	end
+	return bit_and(hash,value_65535)
 end
 
 class "CRandomTask"
@@ -223,24 +223,24 @@ end
 --------- Award Information --------
 function CRandomTask:read_info_reward_section(ini,sect,container)
 	if TB3D_Modders.use_task_message == true then TB3D_Services.packet_alert("TASK MGR: read info reward") end
---  TB3D_Services.info_alert("reading section "..sect)
-  --container.reward_info_portion=utils.cfg_get_string(ini,sect,"info_portion",nil,true,"")
-  local rip = utils.cfg_get_string(ini,sect,"info_portion",nil,true,"")
-  if rip ~= nil then
-    container.reward_info_portion = se_respawn.parse_names(rip)
-  else
-    container.reward_info_portion = rip
-  end
-  container.reward_info_dialog={}
-  local phr=1
-  local phrase_id=nil
-  while true do
-    phrase_id=utils.cfg_get_string(ini,sect,"phrase_"..phr,nil,false,"")
-    if phrase_id==nil or phrase_id=="" then break end
-    if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("task manager: reward info sect["..sect.."] phrase_"..phr.." is ["..phrase_id.."]") end
-    container.reward_info_dialog[#container.reward_info_dialog+1] = phrase_id
-    phr=phr+1
-  end  
+	--TB3D_Services.info_alert("reading section "..sect)
+	--container.reward_info_portion=utils.cfg_get_string(ini,sect,"info_portion",nil,true,"")
+	local rip = utils.cfg_get_string(ini,sect,"info_portion",nil,true,"")
+	if rip ~= nil then
+		container.reward_info_portion = se_respawn.parse_names(rip)
+	else
+		container.reward_info_portion = rip
+	end
+	container.reward_info_dialog={}
+	local phr=1
+	local phrase_id=nil
+	while true do
+		phrase_id=utils.cfg_get_string(ini,sect,"phrase_"..phr,nil,false,"")
+		if phrase_id==nil or phrase_id=="" then break end
+		if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("task manager: reward info sect["..sect.."] phrase_"..phr.." is ["..phrase_id.."]") end
+		container.reward_info_dialog[#container.reward_info_dialog+1] = phrase_id
+		phr=phr+1
+	end  
 	if TB3D_Modders.use_task_message == true then TB3D_Services.packet_alert("TASK MGR: read info reward done") end
 end
 --------------------------------------
@@ -252,73 +252,69 @@ local status_to_num={normal=0, selected=1, completed=2, refused=3,
   failed=4, rewarded=5}
 local num_to_status={[0]="normal", [1]="selected", [2]="completed", [3]="refused", 
   [4]="failed", [5]="rewarded"}
-
+local new_pack = 255
 -- We will not record a task id and its hash - sevenfold savings.
 function CRandomTask:save(p)
-	if TB3D_Modders.use_packet_message == true then TB3D_Services.info_alert("TASK MGR: save packet") end
-  -- Indication that this is a new version of the format.
-  p:w_u8(255)
-  --' We believe the number of entries
-  local i = 0
-  for k,v in pairs(self.task_info) do
-    i = i + 1
-  end
-  p:w_u8(i)
-  for k,v in pairs(self.task_info) do
-    if not id_to_hash[k] then
-      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Cannot find hash for id["..utils.to_str(k).."]") end
-    end
-    p:w_u16(id_to_hash[k]) 
-    p:w_bool(v.enabled) 
-    p:w_bool(v.enabled_props)
-    if not status_to_num[v.status] then
-      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Wrong status["..utils.to_str(v.status).."] for task["..utils.to_str(k).."]") end
-    end
-    p:w_u8(status_to_num[v.status])
-    p:w_u32(v.selected_target or -1)
-    utils.w_CTime(p, v.last_task_time)
-  end
-  --' The same procedure with active dragging
-  i = 0
-  for k,v in pairs(self.active_task_by_type) do
-    i = i + 1
-  end
-  p:w_u8(i)
-  for k,v in pairs(self.active_task_by_type) do
-    if not ct_to_hash[k] then
-      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Cannot find hash for complex type["..utils.to_str(k).."]") end
-    end
-    p:w_u16(ct_to_hash[k]) 
-    if not id_to_hash[v] then
-      if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Cannot find hash for task id["..utils.to_str(v).."]") end
-    end
-    p:w_u16(id_to_hash[v])
-  end
+	if TB3D_Modders.use_packet_message == true then
+		TB3D_Services.info_alert("TASK MGR: save packet")
+	end
+	p:w_u8(new_pack)	-- Indication that this is a new version of the format.
+	local i = 0
+	for k,v in pairs(self.task_info) do	i = i + 1 end	--' get the number of entries
+	p:w_u8(i)
+	TB3D_Services.packet_alert("TASK MGR: save new packet tasks["..utils.to_str(i).."]")
+	for k,v in pairs(self.task_info) do
+		if not id_to_hash[k] then
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Save Cannot find hash for id["..utils.to_str(k).."]") end
+		end
+		p:w_u16(id_to_hash[k]) 
+		p:w_bool(v.enabled) 
+		p:w_bool(v.enabled_props)
+		if not status_to_num[v.status] then
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Save Wrong status["..utils.to_str(v.status).."] for task["..utils.to_str(k).."]") end
+		end
+		p:w_u8(status_to_num[v.status])
+		p:w_u32(v.selected_target or -1)
+		utils.w_CTime(p, v.last_task_time)
+	end
+	--' The same procedure with active dragging
+	i = 0
+	for k,v in pairs(self.active_task_by_type) do i = i + 1	end
+	p:w_u8(i)
+	TB3D_Services.packet_alert("TASK MGR: save new packet active tasks["..utils.to_str(i).."]")
+	for k,v in pairs(self.active_task_by_type) do
+		if not ct_to_hash[k] then
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Save Cannot find hash for complex type["..utils.to_str(k).."]") end
+		end
+		p:w_u16(ct_to_hash[k]) 
+		if not id_to_hash[v] then
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Save Cannot find hash for task id["..utils.to_str(v).."]") end
+		end
+		p:w_u16(id_to_hash[v])
+	end
 end
 
 --' Download
 function CRandomTask:load(p)
 	if TB3D_Modders.use_packet_message == true then TB3D_Services.info_alert("TASK MGR: load packet") end
-	--' We believe the number of entries
 	if p then
-	--if TB3D_Modders.use_packet_message == true then TB3D_Services.info_alert("TASK MGR: load packet is p") end
-		local rt0=p:r_tell()
-	--if TB3D_Modders.use_packet_message == true then TB3D_Services.info_alert("TASK MGR: load packet r tell") end
+		local rt0=p:r_tell()				--get the packet size
 		if not rt0 then
 			if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: load packet rt0[nil] !!!!!") end
 			return
 		end
-		local i = p:r_u8()
+		if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: load packet size["..utils.to_str(rt0).."]") end
+		local i = p:r_u8()			--can be: ('new_pack' indicating new packet format) or (number of entries in old packets)
 		if not i then
 			if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: load packet i[nil] !!!!!") end
 			return
 		end
-	--if TB3D_Modders.use_packet_message == true then TB3D_Services.info_alert("TASK MGR: load packet r u8") end
+		--TB3D_Services.packet_alert("TASK MGR: load packet val1["..utils.to_str(i).."] size["..utils.to_str(rt0).."]")
 		local selected_target = 0
 		local id = ""
 		local hash = "" 
-		--if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: tasks ["..utils.to_str(i).."]") end
-		if i<255 then
+		if i<new_pack then
+			TB3D_Services.packet_alert("TASK MGR: load old packet tasks["..utils.to_str(i).."]")
 			for k = 1,i do
 				id = p:r_stringZ()
 				if id ~= nil and self.task_info[id] ~= nil then
@@ -332,15 +328,15 @@ function CRandomTask:load(p)
 					self.task_info[id].last_task_time = utils.r_CTime(p)
 				end
 			end
-			--' The same procedure with active dragging
 			i = p:r_u8()  
-			--if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: active ["..utils.to_str(i).."]") end
+			TB3D_Services.packet_alert("TASK MGR: load old packet active["..utils.to_str(i).."]")
 			for k = 1,i do
 				id = p:r_stringZ()
 				self.active_task_by_type[id] = p:r_stringZ()  
 			end
 		else
 			i=p:r_u8()
+			TB3D_Services.packet_alert("TASK MGR: load new packet tasks["..utils.to_str(i).."]")
 			for k = 1,i do
 				hash = p:r_u16() 
 				id=hash_to_id[hash]
@@ -354,29 +350,27 @@ function CRandomTask:load(p)
 					end
 					self.task_info[id].last_task_time = utils.r_CTime(p)
 				else
-					if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Cannot find id for hash ["..hash.."]") end
+					if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: load Cannot find id for new hash["..hash.."]") end
+				end
+			end
+			i = p:r_u8()  
+			TB3D_Services.packet_alert("TASK MGR: load new packet active["..utils.to_str(i).."]")
+			for k = 1,i do
+				hash = p:r_u16()
+				id=hash_to_ct[hash]
+				if id then
+					hash=p:r_u16()
+					self.active_task_by_type[id] = hash_to_id[hash]
+					if not self.active_task_by_type[id] then
+						if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: load Cannot find task id for new hash["..utils.to_str(hash).."]") end
+					end
+				else
+					if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: load Cannot find complex type for new hash["..utils.to_str(hash).."]") end
 				end
 			end
 		end
-		--' The same procedure with active dragging
-		i = p:r_u8()  
-		--if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: active ["..utils.to_str(i).."]") end
-		for k = 1,i do
-			hash = p:r_u16()
-			id=hash_to_ct[hash]
-			if id then
-				hash=p:r_u16()
-				self.active_task_by_type[id] = hash_to_id[hash]
-				if not self.active_task_by_type[id] then
-					if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Cannot find task id for hash  ["..utils.to_str(hash).."]") end
-				end
-			else
-				if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Cannot find complex type for hash ["..utils.to_str(hash).."]") end
-			end
-		end
-		if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: size ["..utils.to_str(p:r_tell()-rt0).."]") end
 	else
-		if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: load packet p[nil] !!!!!") end
+		if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: load new packet p[nil] !!!!!") end
 	end
 	if TB3D_Modders.use_packet_message == true then TB3D_Services.info_alert("TASK MGR: load packet done") end
 end
@@ -389,11 +383,11 @@ end
 
 --' Returns the ID of the vendor with whom we are talking
 function CRandomTask:get_parent(npc)
-  local story_id = npc:story_id()
-  if parent_by_story[story_id] == nil then
-    if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Task manager error: wrong parent story_id = ["..utils.to_str(story_id).."]") end
-  end
-  return parent_by_story[story_id]
+	local story_id = npc:story_id()
+	if parent_by_story[story_id] == nil then
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("task mgr: Task manager error: wrong parent story_id = ["..utils.to_str(story_id).."]") end
+	end
+	return parent_by_story[story_id]
 end
 
 --' Can the vendor give quest
@@ -416,9 +410,9 @@ function CRandomTask:active_parent_task(actor, npc)
   local parent = self:get_parent(npc)
   if parent then
 	  for k,v in pairs(self.active_task_by_type) do
-	--    printf("active_parent_task: %s", tostring(v))
-	--    printf("active_parent_task: parent = %s", tostring(self.task_info[v].parent))
-	--    printf("active_parent_task: status = %s", tostring(self.task_info[v].status))
+		--printf("active_parent_task: %s", tostring(v))
+		--printf("active_parent_task: parent = %s", tostring(self.task_info[v].parent))
+		--printf("active_parent_task: status = %s", tostring(self.task_info[v].status))
 		if self.task_info and self.task_info[v] then
 			if self.task_info[v].parent == parent and
 				(self.task_info[v].status == "selected" or
@@ -438,10 +432,9 @@ function CRandomTask:have_completed_job(actor, npc)
   local parent = self:get_parent(npc)
   if parent then
 	  for k,v in pairs(self.active_task_by_type) do
-	--    printf("have_completed_job: %s", tostring(v))
-	--    printf("have_completed_job: parent = %s", tostring(self.task_info[v].parent))
-	--    printf("have_completed_job: status = %s", tostring(self.task_info[v].status))
-
+		--printf("have_completed_job: %s", tostring(v))
+		--printf("have_completed_job: parent = %s", tostring(self.task_info[v].parent))
+		--printf("have_completed_job: status = %s", tostring(self.task_info[v].status))
 		if self.task_info[v].parent == parent and
 		   self.task_info[v].status == "completed"
 		then
@@ -451,94 +444,89 @@ function CRandomTask:have_completed_job(actor, npc)
   end
   return false
 end
+
 --' Issue quest player
 function CRandomTask:action_give_task(actor, npc, p1, p2)
-  local task = CGameTask()
+	local task = CGameTask()
 	if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: give random task") end
-  local task_id=self.task_id_by_yes_phrase_id[p2]
-  local task_desc = self.task_info[task_id]
-   task:load(task_desc.complex_type)
-  task:set_title(task_desc.type)
-  local oo = task:get_objective(0)
-  oo:set_article_id(task_desc.description)
-  local objective = SGameTaskObjective(task,1)
-  objective:set_description(task_desc.name)
-  --' Select the current target Quest
-  if task_desc.target_objects ~= nil then
-    self.task_info[task_id].selected_target = task_desc.target_objects[math_random(#task_desc.target_objects)]
-    --printf("TARGET DEBUG INFO")
-    --printf("selected = %s", tostring(self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target))
-    if TB3D_Modders.show_tables == true then show_tables(task_desc.target_objects, nil, "task mgr") end
-  end
-  if task_desc.type == "eliminate_lager" then
-    objective:set_map_hint(task_desc.text)
-    objective:set_map_location("eliminate_lager_location")
-    objective:set_object_id(task_desc.selected_target)
-  elseif task_desc.type == "defend_lager" then
-    objective:set_map_hint(task_desc.text)
-    objective:set_map_location("defend_lager_location")
-    objective:set_object_id(task_desc.selected_target)
-    local defend_object = alife():object(task_desc.selected_target)
-    local sm_ini = defend_object:spawn_ini()
-    self.task_info[task_id].defend_target = utils.cfg_get_number(sm_ini, "random_task", "defend_target", nil, true)
-  elseif task_desc.type == "kill_stalker" then
-    objective:set_map_hint(task_desc.text)
-    objective:set_map_location("kill_stalker_location")
-    objective:set_object_id(task_desc.selected_target)
-    -- Add id stalker in the list of targets
-    if task_desc.target_dialog then
-      amk_add_target_id_to_kill_targets(task_desc.selected_target,task_desc.target_dialog,task_id)
-	  TB3D_Services.check_kill_target_spawned(task_desc.selected_target)			--109998, make sure target spawns
-    end
-    -------------------------------------
-  elseif task_desc.type == "find_item" then
-    objective:set_map_hint(task_desc.text)
-    objective:set_map_location("find_item_location")
-    objective:set_object_id(task_desc.selected_target)
-  end
-  objective:add_complete_func("task_manager.task_complete")
-  task:add_objective(objective)
-  if task_desc.need_return then
-    objective = SGameTaskObjective(task,2)
-    objective:set_description(return_task_by_type[task_desc.type])
-    objective:set_map_hint(return_task_by_type[task_desc.type])
-    objective:set_map_location("blue_location")
-    if not alife():story_object(tonumber(story_by_parent[task_desc.parent])) then
-    -- Kvestodatel profits.
-      return 
-    end
-    objective:set_object_id(alife():story_object(tonumber(story_by_parent[task_desc.parent])).id)
-    task:add_objective(objective)
-  end
-  local time = 0
-  if task_desc.time ~= nil then
-    time = task_desc.time * 1000
-  end
+	local task_id=self.task_id_by_yes_phrase_id[p2]
+	local task_desc = self.task_info[task_id]
+	task:load(task_desc.complex_type)
+	task:set_title(task_desc.type)
+	local oo = task:get_objective(0)
+	oo:set_article_id(task_desc.description)
+	local objective = SGameTaskObjective(task,1)
+	objective:set_description(task_desc.name)
+	if task_desc.target_objects ~= nil then	--' Select the current target Quest
+		self.task_info[task_id].selected_target = task_desc.target_objects[math_random(#task_desc.target_objects)]
+		--printf("TARGET DEBUG INFO")
+		--printf("selected = %s", tostring(self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target))
+		if TB3D_Modders.show_tables == true then show_tables(task_desc.target_objects, nil, "task mgr") end
+	end
+	if task_desc.type == "eliminate_lager" then
+		objective:set_map_hint(task_desc.text)
+		objective:set_map_location("eliminate_lager_location")
+		objective:set_object_id(task_desc.selected_target)
+	elseif task_desc.type == "defend_lager" then
+		objective:set_map_hint(task_desc.text)
+		objective:set_map_location("defend_lager_location")
+		objective:set_object_id(task_desc.selected_target)
+		local defend_object = alife():object(task_desc.selected_target)
+		local sm_ini = defend_object:spawn_ini()
+		self.task_info[task_id].defend_target = utils.cfg_get_number(sm_ini, "random_task", "defend_target", nil, true)
+	elseif task_desc.type == "kill_stalker" then
+		objective:set_map_hint(task_desc.text)
+		objective:set_map_location("kill_stalker_location")
+		objective:set_object_id(task_desc.selected_target)
+		if task_desc.target_dialog then		-- Add id stalker in the list of targets
+			amk_add_target_id_to_kill_targets(task_desc.selected_target,task_desc.target_dialog,task_id)
+			TB3D_Services.check_kill_target_spawned(task_desc.selected_target)			--109998, make sure target spawns
+		end
+	elseif task_desc.type == "find_item" then
+		objective:set_map_hint(task_desc.text)
+		objective:set_map_location("find_item_location")
+		objective:set_object_id(task_desc.selected_target)
+	end
+	objective:add_complete_func("task_manager.task_complete")
+	task:add_objective(objective)
+	if task_desc.need_return then
+		objective = SGameTaskObjective(task,2)
+		objective:set_description(return_task_by_type[task_desc.type])
+		objective:set_map_hint(return_task_by_type[task_desc.type])
+		objective:set_map_location("blue_location")
+		if not alife():story_object(tonumber(story_by_parent[task_desc.parent])) then
+			return 			-- Kvestodatel profits.
+		end
+		objective:set_object_id(alife():story_object(tonumber(story_by_parent[task_desc.parent])).id)
+		task:add_objective(objective)
+	end
+	local time = 0
+	if task_desc.time ~= nil then
+		time = task_desc.time * 1000
+	end
 	db.actor:give_task(task,time,false)
-  --' dizablim all the other tasks of this type, since a player can not simultaneously have two jobs of the same type.
-  self.task_info[self.task_id_by_yes_phrase_id[p2]].status = "selected"
-  self.active_task_by_type[task_desc.complex_type] = self.task_id_by_yes_phrase_id[p2]
-  for k,v in pairs(self.task_info) do
-    if v.complex_type == task_desc.complex_type then
-      v.enabled = false
-    end
-  end
- 	if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: give random task done") end
+	--' dizable all the other tasks of this type, since a player can not simultaneously have two jobs of the same type.
+	self.task_info[self.task_id_by_yes_phrase_id[p2]].status = "selected"
+	self.active_task_by_type[task_desc.complex_type] = self.task_id_by_yes_phrase_id[p2]
+	for k,v in pairs(self.task_info) do
+		if v.complex_type == task_desc.complex_type then
+			v.enabled = false
+		end
+	end
+	if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: give random task done") end
 end
+
 --' The refusal of a player quest
 function CRandomTask:action_refuse_task(actor, npc, p1, p2)
-  local task_desc = self.task_info[self.task_id_by_yes_phrase_id[p2]]
-  --' Make available all the tasks of this type
-  self.task_info[self.task_id_by_yes_phrase_id[p2]].status = "refused"
-  -- Remove the target from the list 
-  amk_remove_target_id_from_kill_targets(self.task_info[self.active_task_by_type[task_desc.complex_type]].selected_target)
-  -------------------------
-  self.task_info[self.active_task_by_type[task_desc.complex_type]].selected_target = nil
-  for k,v in pairs(self.task_info) do
-    if v.complex_type == task_desc.complex_type then
-      v.enabled = true
-    end
-  end
+	local task_desc = self.task_info[self.task_id_by_yes_phrase_id[p2]]
+	self.task_info[self.task_id_by_yes_phrase_id[p2]].status = "refused"	--' Make available all the tasks of this type
+	amk_remove_target_id_from_kill_targets(self.task_info[self.active_task_by_type[task_desc.complex_type]].selected_target)	-- Remove the target from the list 
+	self.task_info[self.active_task_by_type[task_desc.complex_type]].selected_target = nil
+	for k,v in pairs(self.task_info) do
+		if v.complex_type == task_desc.complex_type then
+			v.enabled = true
+		end
+	end
 end
 
 local esc2_spawned
@@ -567,7 +555,7 @@ function CRandomTask:task_complete(p1, p2)
 				return true
 			end
 		elseif p2 == 1 then
-			if string.find(p1, "eliminate_lager") ~= nil then
+			if string_find(p1, "eliminate_lager") ~= nil then
 				local oo = alife():object(sel_task.selected_target)
 				if oo then
 					--TB3D_Services.packet_alert("task mgr: task["..tostring(self.active_task_by_type[p1]).."] target["..utils.to_str(oo:name()).."] pop["..utils.to_str(oo.gulag:get_population_comed()).."]")
@@ -624,7 +612,7 @@ function CRandomTask:task_complete(p1, p2)
 						return true
 					end
 				end
-			elseif string.find(p1, "defend_lager") ~= nil then
+			elseif string_find(p1, "defend_lager") ~= nil then
 				--' Quest is made because the raid stopped
 				if xr_gulag.getGulagState(sel_task.defend_target) == 0 then
 					self.task_info[self.active_task_by_type[p1]].status = "completed"
@@ -632,7 +620,7 @@ function CRandomTask:task_complete(p1, p2)
 					return true
 				end
 				--TB3D_Services.info_alert("task mgr: task["..tostring(self.active_task_by_type[p1]).."] not done["..utils.to_str(oo.gulag:get_population_comed()).."]")
-			elseif string.find(p1, "kill_stalker") ~= nil then
+			elseif string_find(p1, "kill_stalker") ~= nil then
 				local oo = alife():object(sel_task.selected_target)
 				--' Verifying bug
 --[[				if oo == nil then
@@ -649,17 +637,17 @@ function CRandomTask:task_complete(p1, p2)
 					self.task_info[self.active_task_by_type[p1]].status = "completed"
 					return true
 				end
-			elseif string.find(p1, "artefact") ~= nil then
+			elseif string_find(p1, "artefact") ~= nil then
 				if db.actor:object(sel_task.target) ~= nil then
 					self.task_info[self.active_task_by_type[p1]].status = "completed"
 					return true
 				end
-			elseif string.find(p1, "monster_part") ~= nil then
+			elseif string_find(p1, "monster_part") ~= nil then
 				if db.actor:object(sel_task.target) ~= nil then
 					self.task_info[self.active_task_by_type[p1]].status = "completed"
 					return true
 				end
-			elseif string.find(p1, "find_item") ~= nil then
+			elseif string_find(p1, "find_item") ~= nil then
 				if db.actor:object(sel_task.target) ~= nil then
 					self.task_info[self.active_task_by_type[p1]].status = "completed"
 					return true
@@ -693,7 +681,7 @@ function CRandomTask:task_fail(p1, p2)
       self.task_info[self.active_task_by_type[p1]].last_task_time = game.get_game_time()
       return true
     end
-    if string.find(p1, "defend_lager") ~= nil then
+    if string_find(p1, "defend_lager") ~= nil then
       if alife():object(sel_task.selected_target).gulag:get_population_comed() == 0 then
         self.task_info[self.active_task_by_type[p1]].status = "failed"
         self.task_info[self.active_task_by_type[p1]].last_task_time = game.get_game_time()
