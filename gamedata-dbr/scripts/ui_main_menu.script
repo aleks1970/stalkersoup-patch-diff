@@ -1,7 +1,7 @@
---<!-- TB3D 1.0.9.9.8.3   more options, The Collector, dmx135, removed peudoquicksave, connect message, ddof moved,
+--<!-- TB3D 1.0.9.9.9.5   more options, The Collector, dmx135, removed peudoquicksave, connect message, ddof moved,
 -- removed duplicate cheat_spawner, cleanup, auto levels, added red forest, level_intro, disconnecting, db report,
 -- load_pause Mini texture init aleks1970, pause menu volume
-function my_ver() return "1.0.9.9.8.3" end
+function my_ver() return "1.0.9.9.9.5" end
 --TB3D re-written 08/15/2011
 -- File:        UI_MAIN_MENU.SCRIPT
 -- Description: Load Dialog for STALKER
@@ -372,7 +372,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 			self:tele()			
 		elseif 	dik == DIK_keys.DIK_F3 then		--remove anoms in 10 mtr radius
 			if level.present() and (db.actor ~= nil) and db.actor:alive() then
-				anom_remover.remove_anoms()
+				if anom_remover then anom_remover.remove_anoms() end
 			end
 			console:execute("main_menu off")
 		elseif 	dik == DIK_keys.DIK_F4 then	--spawn item into game

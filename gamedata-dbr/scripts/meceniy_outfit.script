@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.4  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
--- Localization, nano outfit, redesign, tb3d adapted
-function my_ver() return "1.0.9.9.9.4" end
+--TB3D 1.0.9.9.9.5  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
+-- Localization, nano outfit, redesign, tb3d adapted, is_storm
+function my_ver() return "1.0.9.9.9.5" end
 --[[---------------------------------------------------------
  File         : meceniy_outfit.script
  Description  : \\"Nano and Exoskeleton Skat-15M outfits" .. With life support system (SZHP) and upgradeable options ..
@@ -294,7 +294,7 @@ function on_sub_actor_update(is_scope)
 		elseif suit_type == 4 then	-- Skat15 - DMX
 			outfit_system_max(is_scope)						-- DMX UPGRADE OFF
 		elseif suit_type == 5 then	-- Skat15 - Storm
-			outfit_system_max(is_scope)
+			outfit_system_max(is_scope, true)				-- 109995, moves mine to below minimap
 		elseif suit_type == 6 then	-- nano_outfit_addh_ outfit - aleks1970
 			outfit_system_max(is_scope)
 		elseif suit_type == 7 then	-- nano_outfit_addw_ outfit - aleks1970
@@ -439,7 +439,7 @@ end
 -- ----------------------------------------------------------------------------
 local blink = 0
 local time_msg = 50000
-function new_enemy_radar(is_scope)
+function new_enemy_radar(is_scope, is_storm)
 	if (not enemy_detector) then return end
 	local hud = get_hud()
 	local msg_new = true
@@ -454,7 +454,12 @@ function new_enemy_radar(is_scope)
 		if obj_distance == nil then
 			obj_distance = 220
 		end
-		local msg = translate("enemy_sms_skat_system_m1").." "..obj_distance.." "..translate("enemy_sms_skat_system_m2")
+		local msg
+		if is_storm then
+			msg = translate("enemy_sms_storm_system_m1").." "..obj_distance.." "..translate("enemy_sms_skat_system_m2")
+		else
+			msg = translate("enemy_sms_skat_system_m1").." "..obj_distance.." "..translate("enemy_sms_skat_system_m2")
+		end
 		if level.main_input_receiver() then
 			if ramka then
 				hud:RemoveDialogToRender(ramka)
@@ -465,11 +470,16 @@ function new_enemy_radar(is_scope)
 			if msg_new == true then
 				if not ramka then
 					ramka = CUIStatic()
-					ramka:SetAutoDelete(true)
-					ramka:Init(386,735,250,24)
+					if is_storm then									--109995
+						ramka:Init(1,154,170,24)
+						ramka:SetFont(GetFontGraffiti19Russian())
+					else
+						ramka:Init(386,735,250,24)
+						ramka:SetFont(GetFontGraffiti19Russian())
+					end
 					ramka:SetTextColor(255, 0, 220, 10)
-					ramka:SetFont(GetFontGraffiti19Russian())
 					ramka:SetTextAlign(CGameFont.alCenter)
+					ramka:SetAutoDelete(true)
 					hud:AddDialogToRender(ramka)
 				end
 				ramka:SetText(msg)
@@ -539,7 +549,7 @@ function net_destroy()
 	remove_txt()
 end
 -- -------------------------------------------------------------------------------
-function outfit_system_max(is_scope)
+function outfit_system_max(is_scope, is_storm)
 	if delay_function > time_global() then return end	-- small delay for the smooth level start - aleks1970
 	system_outfit()
 	new_system_bleeding()
@@ -548,7 +558,7 @@ function outfit_system_max(is_scope)
 	new_system_power()
 	new_anti_dot()
 	meceniy_enemy(is_scope)
-	new_enemy_radar(is_scope)
+	new_enemy_radar(is_scope, is_storm)
 end
 
 function outfit_system_mid(is_scope)

@@ -1,10 +1,10 @@
---' TB3D 1.0.9.9.9.4 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.0.9.9.9.5 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
--- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls
-function my_ver() return "1.0.9.9.9.4" end
+-- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff
+function my_ver() return "1.0.9.9.9.5" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -82,9 +82,14 @@ function atp_propusk_shurup_done(first_speaker, second_speaker)
 	second_speaker:set_relation(game_object.friend, first_speaker)
 end
 
---' check availability antizombina
-function chaes_perexod_have()
-	return amk_utils.inventory_search("antizombie",1) ~= false
+--' check availability antizombin
+function chaes_perexod_have()										--109995, force info if has one
+	TB3D_Services.packet_alert("peroxide have")
+	if amk_utils.inventory_search("antizombie",1) ~= false then
+		TB3D_Services.give_info("chaes_perexod_have")
+		return true
+	end
+	return false
 end
 function chaes_perexod_have_info()
 	return has_alife_info("chaes_perexod_have")
@@ -5750,12 +5755,12 @@ function remen_dialog_sms6()
 		news_manager.amk_send_tip_id("sms_remen_dialog6","sms_perfumer",1,35,"default")
 	end
 end
-function otkr_perex_zaton_sms1()
-	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_otkr_perex_zaton1","sms_norman",1,20,"default")
+function otkr_perex_zaton_sms1()		--109995, do nothing, collector start
+	--if TB3D_Services.is_collector(4000) == false then
+		--news_manager.amk_send_tip_id("sms_otkr_perex_zaton1","sms_norman",1,20,"default")
 		--local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\ozvuchka\strelok_dcity3]])
 		--snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-	end
+	--end
 end
 function otkr_perex_zaton_sms2()
 	--if TB3D_Services.is_collector(4000) == false then
@@ -9864,7 +9869,7 @@ function iskra_listok_spawn()
 end
 
 --' spawn teleport livnevku MG
-function spawn_tele_dcity_kanaliy()	--!!!!TB3D Dead City
+function spawn_tele_dcity_kanaliy()	--!!!!TB3D Dead City into sewer
 	if TB3D_Services.is_collector(4000) == false then
 		local se_obj = alife():create("m_teleport_dcity_kanaliy",vector():set(-89.229080200195,1.1233458518982,-27.065231323242),254634,3620)
 		  local t = amk.get_anomaly_data(se_obj) 
@@ -9934,12 +9939,13 @@ function kanaliy_dinamit_nevid1(actor, npc)
 		if source then
 			TB3D_hit_styles.dynamite(source, 200, 60)
 		end
+		TB3D_Triggers.spawn_sewer_stuff()
 	end
 end
 
 function hit_dcity_imitator()
 	if TB3D_Services.is_collector(4000) == false and TB3D_Modders.default_hit == true then
-		TB3D_hit_styles.strike(db.actor, db.actor, nil, 1.5, 190, vector_rotate_y(db.actor:direction(), 45))
+		TB3D_hit_styles.strike(db.actor, db.actor, nil, 0.5, 100, vector_rotate_y(db.actor:direction(), 45))	--109995
 	end
 end
 
@@ -10004,8 +10010,8 @@ end
 function imitator_kanaliy_spavn()
 	if TB3D_Services.is_collector(4000) == false then
 		alife():create("imitator_holodez",vector():set(-96.308708190918,-1.8240934610367,-19.150089263916),247176,3620)
-		alife():create("imitator",vector():set(-94.969078063965,-1.824152469635,-20.891218185425),248712,3620)
-		alife():create("imitator",vector():set(-95.195724487305,-1.8241112232208,-19.7877368927),248713,3620)
+		--alife():create("imitator",vector():set(-94.969078063965,-1.824152469635,-20.891218185425),248712,3620)		--109995
+		--alife():create("imitator",vector():set(-95.195724487305,-1.8241112232208,-19.7877368927),248713,3620)
 	end
 end
 

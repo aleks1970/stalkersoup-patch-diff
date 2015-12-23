@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.4 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.5 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started,
 --ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2
-function my_ver() return "1.0.9.9.9.4" end
+function my_ver() return "1.0.9.9.9.5" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -176,10 +176,10 @@ amk.oau_watchdog=680
 					amk.oau_watchdog=672
 					if spawned_1 == 0 then
 						local spawns = amk.load_variable("swamp_spawns", 0)
-						if spawns == 0 then
+						if spawns == 0 and not has_alife_info("tb3d_marmor_have") then
 							if actor_in_range(tower_pos, 40000) then 								--10:1 = 4000m	(10k = campfire N. accross water)
 								alife():create("nebo_heavy_outfit", tower_pos, 7283, 3351)			--far west tower smoke signal and armor	
-								TB3D_Triggers.signal_green(-278.763,17.172,23.567,7283,3351)
+								TB3D_Triggers.signal_green(-278.763,17.172,23.567,7283,3351)		--zone removed on level change
 								--TODO: add note in trailer (-290.241,1.309,29.753),5490,3348)
 								spawned_1=1
 								amk.save_variable("swamp_spawns", spawned_1)
@@ -251,7 +251,7 @@ amk.oau_watchdog=680
 					if spawns == 0 then
 						if pos.y > 17 then								--on stairs or (climbing crain -12.932,24.026,122.353)
 							if pos.x < -6 and pos.x > -44 then			--in construction area
-								if pos.z < 174 and pos.z > 120 then
+								if pos.z < 174 and pos.z > 125 then		--109995, adjusted for crane
 									TB3D_Triggers.dist_center_ambush()
 									amk.save_variable("dist_spawns", 1)
 								end
@@ -437,6 +437,8 @@ function on_item_take(obj)
 					TB3D_Dialog.has_soul_cube_f1()
 					amk.save_variable("soul_cube", 2)
 				end
+			else
+				is_remove_item = true							--109995
 			end
 		elseif sect == "bandranen_pda" then
 			TB3D_Triggers.bandranen_pda()
@@ -475,6 +477,7 @@ function on_item_take(obj)
 		elseif sect == "af_dummy_mushroom" then
 			if ln == "l12_stancia_2" then
 				TB3D_Services.give_info("tb3d_found_in_npp2")
+				TB3D_Dialog.npp2_mushroom_take()
 			end
 		end
 	elseif level_up == 4 then

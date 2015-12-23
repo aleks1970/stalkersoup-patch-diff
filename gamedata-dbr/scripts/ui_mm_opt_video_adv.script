@@ -1,6 +1,7 @@
---TB3D 1.0.9.9.8.2 mblur added, more adv ctrls added, hdr adapt, sun advanced
-function my_ver() return "1.0.9.9.8.2" end
+--TB3D 1.0.9.9.9.5 mblur added, more adv ctrls added, hdr adapt, sun advanced
+function my_ver() return "1.0.9.9.9.5" end
 class "opt_video_adv" (CUIWindow)
+local is_soft_effects_ok = false		--109995, while set to true when fully verified functunal
 
 function opt_video_adv:__init() super()
 end
@@ -180,7 +181,7 @@ end
 	ctl				= xml:InitTrackBar			("video_adv:track_r2_ls_bloom_speed",		_st)
 	handler.m_preconditions[ctl]		= only_2_mode
 
-if TB3D_Modders.use_soft_effects then	
+if TB3D_Modders.use_soft_effects and is_soft_effects_ok then	
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_soft_particles",				_st)
 	xml:InitCheck								("video_adv:check_r2_soft_particles",			_st)

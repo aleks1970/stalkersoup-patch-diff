@@ -1,10 +1,10 @@
--- TB3D 1.0.9.9.9.0   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
+-- TB3D 1.0.9.9.9.5   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
 -- zaton to red forest, dmx135, using dmx blood instead of amk, fixed soul cube, tp news removed, chg redeffect call,
 -- drop item to inv, dose_asses removed, frogs and cooling moved to services, dav update 16Apr14, hud, gen to dm,
 -- hosp to agro, tip_id, send_tip_id optimization, 97104, 98975,6, _ds_to_poli target, sticks,
 -- changed "exo_mil_exoskeleton_addrs" to "exo_mil_exoskeleton_addx" aleks1970, npp2 to x14, eprip to prip, removed blowout_wave,
--- switched targets; hosp and red forest to tunnels, jup to eprip, shadows_cube_prov_check
-function my_ver() return "1.0.9.9.9.0" end
+-- switched targets; hosp and red forest to tunnels, jup to eprip, shadows_cube_prov_check, allow cube quest in collector
+function my_ver() return "1.0.9.9.9.5" end
 --[[- max.script, centralized create_level_changer, uncommtd line 48 (11/21/11)------------
  File         : dmx_mod.script
  Description  : The main script fashion, contain quest function, spawn, etc.
@@ -327,14 +327,14 @@ function shadows_cube_many_25000(t1,t2)
 end
 
 -- spawn Shadows
-function shadows_spawn()
-	if TB3D_Services.is_collector(903) == false then
+function shadows_spawn()		--109995
+	--if TB3D_Services.is_collector(903) == false then
 		local obj = alife():create("shadows",vector():set(-279.516,0.972,35.288),7088,3351)
 		local tbl = amk.read_stalker_params(obj)
 		tbl.sid = 97121
 		amk.write_stalker_params(tbl, obj)
 		TB3D_Triggers.eprip_spawns()
-	end
+	--end
 end
 
 -- Shadows - enemy
@@ -354,8 +354,8 @@ function fake_cube_otdal(first_speaker, second_speaker)
 end
 
 -- revive some of Pripyat
-function cube_pripyat_spawn() 
-	if TB3D_Services.is_collector(904) == false then
+function cube_pripyat_spawn() 		--109995
+	--if TB3D_Services.is_collector(904) == false then
 		alife():create("m_controller_normal",vector():set(287.109,-0.371,266.864),474028,3769)
 		alife():create("fracture_swamp",vector():set(287.109,-0.371,266.864),474028,3769)
 		alife():create("fracture_master",vector():set(132.561,-0.238,216.951),359942,3769)
@@ -375,11 +375,11 @@ function cube_pripyat_spawn()
 		alife():create("glow_stick_blue",vector():set(133.024,28.908,239.756),364239,3769)
 		alife():create("glow_stick_blue",vector():set(133.024,28.908,239.756),364239,3769)
 		monolith_kbo_spawn()
-	end
+	--end
 end
 
-function monolith_kbo_spawn()
-	if TB3D_Services.is_collector(905) == false then
+function monolith_kbo_spawn()			--109995
+	--if TB3D_Services.is_collector(905) == false then
 		alife():create("kbo_monolit1",vector():set(-42.540,0.400,81.989),146270,3755)
 		alife():create("kbo_monolit3",vector():set(-43.463,0.401,110.734),145710,3755)
 		alife():create("kbo_monolit4",vector():set(-82.692,0.399,96.015),107366,3754)
@@ -392,7 +392,7 @@ function monolith_kbo_spawn()
 		alife():create("kbo_monolit15",vector():set(-46.727,12.700,110.448),142386,3755)
 		alife():create("kbo_monolit17",vector():set(-61.830,16.801,104.961),128245,3755)
 		alife():create("kbo_monolit1",vector():set(-42.900,20.900,115.329),146501,3755)
-	end
+	--end
 end
 
 -- settlement facilities
@@ -435,28 +435,28 @@ function spawn_vodka_callback(arg,id,item)								--109982
 end
 
 -- a couple of monsters in quest map search Pripyat
-function monsters_quest_spawn() 
-	if TB3D_Services.is_collector(906) == false then
+function monsters_quest_spawn() 			--109995
+	--if TB3D_Services.is_collector(906) == false then
 		alife():create("zombie_ghost",vector():set(184.295,0.674,47.489),414274,3770)
 		alife():create("bloodsucker_strong",vector():set(199.468,2.501,-8.367),427539,3768)
 		alife():create("zombie_ghost",vector():set(234.454,0.547,22.189),452741,3768)
 		alife():create("zombie_swamp",vector():set(234.454,0.547,22.189),452741,3768)
 		alife():create("dmx_pripyat_map",vector():set(205.422,5.444,-25.960),433226,3768)
-	end
+	--end
 end
 
 -- pick up a map of Pripyat
-function dmx_pripyat_map_have()
-	if TB3D_Services.is_collector(907) then
-		return true
-	else
+function dmx_pripyat_map_have()			--109995
+	--if TB3D_Services.is_collector(907) then
+		--return true
+	--else
 		return amk_utils.inventory_search("dmx_pripyat_map",1) ~= false
-	end
+	--end
 end
 
 -- give a transition in X-8
-function next_labx8()
-	if TB3D_Services.is_collector(908) == false then
+function next_labx8()			--109995
+	--if TB3D_Services.is_collector(908) == false then
 		news_manager.amk_send_tip_id("labx8_private1", "unknown_private", 10, 20, "actor_sms")
 		news_manager.amk_send_tip_id("labx8_private2", "shadows_private", 30, 20)
 		amk.save_variable("torch_state", 1)		--109970
@@ -465,12 +465,12 @@ function next_labx8()
 		pripyat_cop_to_lab_x8()
 		alife():create("werewolf",vector():set(295.981,-0.193,119.076),477049,3770)	--hospital roof
 		TB3D_Triggers.wolf_howls()
-	end
+	--end
 end
 
 -- population of laboratory X-8
-function labx8_cube_spawn()
-	if TB3D_Services.is_collector(910) == false then
+function labx8_cube_spawn()			--109995
+	--if TB3D_Services.is_collector(910) == false then
 		alife():create("lab_x8_treasure",vector():set(-43.313,-20.517,72.710),6747,3850)
 		alife():create("burer_strong",vector():set(-83.113,-15.939,108.460),2780,3837)
 		alife():create("snork_strong",vector():set(-98.249,-18.130,86.008),919,3838)
@@ -502,66 +502,66 @@ function labx8_cube_spawn()
 		alife():create("glow_stick_blue",vector():set(-54.697,-20.974,91.194),6433,3840)
 		alife():create("glow_stick_red",vector():set(-54.697,-20.974,91.194),6433,3840)
 		alife():create("glow_stick_red",vector():set(-54.697,-20.974,91.194),6433,3840)
-	end
+	--end
 end
 
 -- spawn dead scientist
-function labx8_spawn_trup_ps()
-	if TB3D_Services.is_collector(911) == false then
+function labx8_spawn_trup_ps()			--109995
+	--if TB3D_Services.is_collector(911) == false then
 		local obj = alife():create("pavel_sergeevich",vector():set(-56.302,-22.017,87.185),6352,3840)
 		local tbl = amk.read_stalker_params(obj)
 		tbl.sid = 97124
 		tbl.health = 0
 		tbl.updhealth = 0
 		amk.write_stalker_params(tbl, obj)
-	end
+	--end
 end
 
 -- check the presence of Cube in the Shadow backpack
-function wpn_soulcube_have()
-	if TB3D_Services.is_collector(912) then
-		return true
-	else
+function wpn_soulcube_have()			--109995
+	--if TB3D_Services.is_collector(912) then
+		--return true
+	--else
 		return amk_utils.inventory_search("wpn_soulcube",1) ~= false
-	end
+	--end
 end
 
 -- timer and the appearance of a ghost controller
-function labx8_cube_take()
-	if TB3D_Services.is_collector(913) == false then
+function labx8_cube_take()			--109995
+	--if TB3D_Services.is_collector(913) == false then
 		TB3D_Triggers.spawn_alife("werewolf",234.454,0.547,22.189,452741,3768, 2)
 		TB3D_Triggers.wolf_howls()
 		--local snd_obj = xr_sound.get_safe_sound_object( [[monsters\\werewolf\\howls_01]] )
 		--if snd_obj then snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0) end
 		amk.start_timer("ghost_timer",4,"")
-	end
+	--end
 end
 
 -- whether the AU card in his backpack
-function dmx_military_map_have()
-	if TB3D_Services.is_collector(914) then
-		return true
-	else
+function dmx_military_map_have()			--109995
+	--if TB3D_Services.is_collector(914) then
+		--return true
+	--else
 		return amk_utils.inventory_search("dmx_military_map",1) ~= false
-	end
+	--end
 end
 
 -- whether there is a diary in my backpack
-function item_doc_x8_have()
-	if TB3D_Services.is_collector(915) then
-		return true
-	else
+function item_doc_x8_have()			--109995
+	--if TB3D_Services.is_collector(915) then
+		--return true
+	--else
 		return amk_utils.inventory_search("item_doc_x8",1) ~= false
-	end
+	--end
 end
 
 -- whether there is documentation of X-8 in a backpack
-function item_doc_x8_2_have()
-	if TB3D_Services.is_collector(916) then
-		return true
-	else
+function item_doc_x8_2_have()			--109995
+	--if TB3D_Services.is_collector(916) then
+		--return true
+	--else
 		return amk_utils.inventory_search("item_doc_x8_2",1) ~= false
-	end
+	--end
 end
 
 -- give up a map of Pripyat
@@ -593,11 +593,11 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 -- TOOLS FOR SAGE
 -- Tools and spawns controller
-function instruments_spawn() 
-	if TB3D_Services.is_collector(917) == false then
+function instruments_spawn() 			--109995
+	--if TB3D_Services.is_collector(917) == false then
 		alife():create("mudrec_instruments",vector():set(-188.578,0.582,-209.861),29111,3748)
 		alife():create("m_controller_normal",vector():set(-182.600,-0.283,-205.787),32993,3748)
-	end
+	--end
 end
 
 -- check whether the tools in his backpack

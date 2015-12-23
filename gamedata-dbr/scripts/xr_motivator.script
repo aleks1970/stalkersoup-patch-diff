@@ -1,10 +1,10 @@
---TB3D 1.0.9.9.9.4 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+--TB3D 1.0.9.9.9.5 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
 -- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
 -- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
 -- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions, radar_monolit_dead, generic_m_story_id,
 -- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update,
--- agro soldiers health, krysuk, death callback
-function my_ver() return "1.0.9.9.9.4" end
+-- agro soldiers health, krysuk, death callback, "NIL" to "nil"
+function my_ver() return "1.0.9.9.9.5" end
 --[[------------------------------------------------------------------------------------------------------------------
 Author: Ruslan Didenko (Stohe)
 how to call methods of Binder:
@@ -622,7 +622,7 @@ function motivator_binder:death_callback(victim, who)
 	amk.on_death(victim, who)										-- added by xStream for AMK miniSDK
 	local community = self.object:character_community()
 	if community == nil then
-		community = "NIL"
+		community = "nil"					--109995
 	elseif community == "zombied" then		--not registered in ranking
 		TB3D_Services.inc_targets_dead(1)
 	elseif community == "monolith" then		--not registered in ranking
@@ -891,7 +891,7 @@ end
 
 function motivator_binder:hear_callback(self, who, sound_type, sound_position, sound_power)
 	if who:id() == db.actor:id() then
-		local type = "NIL"
+		local type = "nil"		--109995
 		if sound_type then
 			if sound_type == 134217856 then							--collision like landing or hitting an object 
 				type = "Collision"

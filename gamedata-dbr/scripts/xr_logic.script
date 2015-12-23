@@ -1,6 +1,7 @@
---TB3D 1.0.9.9.7.7 fixed wounded, optimized, func check, pstor item count reporting, added checks,
--- debug, state control, obj level, localized string funcs, determine_section_to_activate
-function my_ver() return "1.0.9.9.7.7" end
+--TB3D 1.0.9.9.9.5 fixed wounded, optimized, func check, pstor item count reporting, added checks,
+-- debug, state control, obj level, localized string funcs, determine_section_to_activate,
+--  added "nil" to switch_to_section
+function my_ver() return "1.0.9.9.9.5" end
 prefetch("xr_conditions")
 local string_find = string.find
 local string_sub = string.sub
@@ -160,6 +161,7 @@ end
 
 -- Called Binder in order to determine the first active circuit
 function determine_section_to_activate(npc, ini, section_logic, actor)
+	--TB3D_Services.packet_alert("xr logic: determine_section_to_activate["..npc:name().."] section logic["..section_logic.."]")
 	if ini:section_exist(section_logic) then
 		-- Parse the string section of an active choice based commands enclosed in%%
 		local active_section_cond = cfg_get_condlist(ini, section_logic, "active", npc)
@@ -169,7 +171,8 @@ function determine_section_to_activate(npc, ini, section_logic, actor)
 			end
 		else
 			local active_section = pick_section_from_condlist(actor, npc, active_section_cond.condlist)
-			if active_section ~= nil then
+			if active_section and  active_section ~= "nil" then		--109995
+				--TB3D_Services.packet_alert("xr logic: determine_section_to_activate["..npc:name().."] active section["..active_section.."]")
 				if db.storage[npc:id()].stype then
 					local stype = db.storage[npc:id()].stype
 					if stype <= 1 then																	--  0=stalker, 1=monster
@@ -178,11 +181,11 @@ function determine_section_to_activate(npc, ini, section_logic, actor)
 						if schm_type ~= nil then
 							if stype ~= schm_type then					--109977, if scheme type does not match
 								if TB3D_Modders.use_abort_message then
-									TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] stype["..utils.to_str(stype).."] schm_type["..utils.to_str(schm_type).."] wrong scheme type!!!!!")
+									TB3D_Services.packet_alert("xr logic: determine_section_to_activate["..utils.to_str(npc:name()).."] stype["..utils.to_str(stype).."] schm_type["..utils.to_str(schm_type).."] wrong scheme type!!!!!")
 								end
 								return "nil"			--removes schemes for npc
 							end
-						elseif TB3D_Modders.use_info_message then
+						elseif TB3D_Modders.use_abort_message then
 							TB3D_Services.packet_alert("xr logic: determine_section_to_activate npc["..utils.to_str(npc:name()).."] sect["..utils.to_str(npc:section()).."] stype["..utils.to_str(stype).."] schm_type[nil] no scheme type exists!!!!!")
 						end
 					--else																				-- not a stalker or monster
@@ -646,26 +649,22 @@ end
 -- Switches to the specified section if defined.
 -- Anee section == nil, still work the old section.
 function switch_to_section(npc, st, section)
-  if section == nil or section == "" then
-    return false
-  end
-  if (section == "sr_aes_deadzone") then
-	if (has_alife_info("strelok_pda_have")) then
-	return false
+	if section ~= nil and section ~= "" then
+		if (section == "sr_aes_deadzone" and has_alife_info("strelok_pda_have")) then		--109995
+			return false
+		end
+		local active_section = db.storage[npc:id()].active_section
+		if active_section then
+			if active_section ~= section then
+				issue_event(npc, db.storage[npc:id()][db.storage[npc:id()].active_scheme], "deactivate", npc)
+				db.storage[npc:id()].active_section = nil
+				db.storage[npc:id()].active_scheme = nil
+				activate_by_section(npc, st.ini, section, false)
+				return true
+			end
+		end
 	end
-  end
-  local active_section = db.storage[npc:id()].active_section
-  if active_section == section then
-    return false
-  end
-  -- call scheme::finalize()
-  if active_section then
-    issue_event(npc, db.storage[npc:id()][db.storage[npc:id()].active_scheme], "deactivate", npc)
-  end
-  db.storage[npc:id()].active_section = nil
-  db.storage[npc:id()].active_scheme = nil
-  activate_by_section(npc, st.ini, section, false)
-  return true
+	return false
 end
 
 function see_actor(npc)
@@ -1103,7 +1102,7 @@ function cfg_get_npc_and_zone(ini, section, field, npc)
   return t
 end
 
--- Returns a reference to overraydy registered in the currently active section,
+-- Returns a reference to overrides registered in the currently active section,
 -- either nil, if none of the sections is not active, or overrides if not.
 function generic_scheme_overrides(npc)
   return db.storage[npc:id()].overrides

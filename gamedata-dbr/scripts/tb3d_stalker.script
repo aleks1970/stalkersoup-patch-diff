@@ -1,8 +1,8 @@
---<!-- TB3D 1.0.9.9.9.4 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.5 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
---item take
-function my_ver() return "1.0.9.9.9.4" end
+--item take, chaes_perexod_start
+function my_ver() return "1.0.9.9.9.5" end
 
 local upd_pos = 0
 local fix_done = false
@@ -118,6 +118,8 @@ function on_info(info_id)
 		TB3D_Services.complete_group(5)
 	elseif info_id == "have_a_hand" or info_id == "have_a_doc" or info_id == "have_a_doc_p" then		--109976
 		if TB3D_Modders.effector_spawn == true then meceniy_spawn.effector_spawn() end
+	elseif info_id == "chaes_perexod_start" then
+		arhara_dialog.chaes_perexod_have()									--109995, check to see if already has one
 	elseif string.gsub(info_id, 1, 14) == "have_a_doc_p_s" then
 		if TB3D_Modders.effector_spawn == true then
 			if has_alife_info("have_a_doc_p_s_1") 
@@ -466,11 +468,11 @@ function on_item_take(obj)
 				TB3D_Services.give_info("svoboda_lukash_have")
 			end
 		end
-	elseif sect == "antizombie" then													--109993
+	elseif sect == "antizombie" then													--109995
 		if has_alife_info("chaes_perexod_start") and not has_alife_info("chaes_perexod_have") then
-			if arhara_dialog.chaes_perexod_have() == true then
+			--if arhara_dialog.chaes_perexod_have() == true then
 				TB3D_Services.give_info("chaes_perexod_have")
-			end
+			--end
 		end
 	elseif sect == "wpn_m_134" then														--109993
 		if has_alife_info("atp_propusk_start") and not has_alife_info("atp_propusk_have") then

@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.4 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+--TB3D 1.0.9.9.9.5 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
 -- bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art
-function my_ver() return "1.0.9.9.9.4" end
+function my_ver() return "1.0.9.9.9.5" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -1104,14 +1104,46 @@ function mush_art_done(first_speaker, second_speaker)
 	TB3D_Services.remove_info("tb3d_found_in_npp2")
 end
 
-function spawn_mushroom_arts_npp2()
-	local rndm = math_random(1,3)
+function spawn_mushroom_arts_npp2()		--109995
+	local rndm = math_random(1,10)
 	if rndm == 1 then
-		alife():create("af_dummy_mushroom", vector():set(490.540,17.100,372.640),137926,2586)	--in npp2
+		alife():create("af_dummy_mushroom", vector():set(490.540,17.100,372.640),137926,2586)		--e chute
 	elseif rndm == 2 then
-		alife():create("af_dummy_mushroom", vector():set(490.709,17.102,412.743),137926,2586)	--in npp2
+		alife():create("af_dummy_mushroom", vector():set(466.934,16.755,436.732),189412,2619)		--end of chute
+	elseif rndm == 3 then
+		alife():create("af_dummy_mushroom", vector():set(519.963,15.996,410.171),169836,2609)		--se gen
+	elseif rndm == 4 then
+		alife():create("af_dummy_mushroom", vector():set(517.790,16.053,366.531),169836,2609)		--s gen
+	elseif rndm == 5 then
+		alife():create("af_dummy_mushroom", vector():set(519.396,16.027,328.596),169826,2609)		--sw gen
+	elseif rndm == 6 then
+		alife():create("af_dummy_mushroom", vector():set(461.239,16.063,372.241),169836,2609)		--ne gen
+	elseif rndm == 7 then
+		alife():create("af_dummy_mushroom", vector():set(461.396,16.088,330.333),169828,2609)		--n gen
+	elseif rndm == 8 then
+		alife():create("af_dummy_mushroom", vector():set(461.644,16.098,409.809),169836,2609)		--nw gen
+	elseif rndm == 9 then
+		alife():create("af_dummy_mushroom", vector():set(490.709,17.102,412.743),137926,2586)		--w chute
 	else
-		alife():create("af_dummy_mushroom", vector():set(490.895,17.099,331.450),137926,2586)	--in npp2
+		alife():create("af_dummy_mushroom", vector():set(490.895,17.099,331.450),137926,2586)		--center chute
 	end
 end
 
+function npp2_mushroom_take()
+	local tgt = math_random(1,7)
+	if tgt == 1 then
+		TB3D_Services.move_actor(944.056,-0.099,150.380, true)		--,244635,2636)		--under tank near npp1 exit
+	elseif tgt == 2 then
+		TB3D_Services.move_actor(975.355,13.191,224.725, true)		--),240903,2637)		--antannae dish
+	elseif tgt == 2 then
+		TB3D_Services.move_actor(864.172,8.223,128.372, true)		--),224634,2636)		--under walkway
+	elseif tgt == 2 then
+		TB3D_Services.move_actor(719.056,19.225,118.530, true)		--),196907,2633)		--high ledge
+	elseif tgt == 2 then
+		TB3D_Services.move_actor(257.971,51.630,139.722, true)		--),92127,2574)		--blind corner
+	elseif tgt == 2 then
+		TB3D_Services.move_actor(577.760,9.090,205.097, true)		--),173488,2631)		--under tower
+	else
+		TB3D_Services.move_actor(444.933,10.101,177.676, true)		--),148554,2599)		--suspended platform
+	end
+end

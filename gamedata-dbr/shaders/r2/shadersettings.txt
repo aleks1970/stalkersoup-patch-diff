@@ -1,4 +1,4 @@
-// TB3D 1.0.9.9.9.4 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
+// TB3D 1.0.9.9.9.5 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
 // adj sun and now default to standard smap, f32, sun saturation, Meltac DX11, removed MELTAC20, some tweaks, Launcher
 //////////////////////////////////////////////////////////////////
 // Adapted from: DYNAMIC DEPTH OF FIELD SHADERS 1.02 - By Meltac
@@ -68,9 +68,9 @@
 		
 /////////////////////////// Direct X Support ////////////////////////////
 //== DX9 Default or DX11
-#ifndef DX11_LAUNCHER		// 109994, Launcher application takes precedence if used
+#ifndef DX11_LAUNCHER		// 109995, Launcher application takes precedence if used
 	#ifndef DX11
-		//#define DX11 		// <<use only when running TB3D_Meltac20 custom DirectX 11 bin folder>>
+		//#define DX11 		// <<if not using the Launcher then remove // to use DirectX 11 as well as setting use_dx11 to true in modder script>>
 	#endif
 #endif
 
@@ -138,7 +138,8 @@
 	//Depth Of Field - By Meltac, Sky4ce
 	#define DOF_QUALITY float(12)				//Amount of DOF samples. Maximum value is 12.
 	//== Distance Options:
-	#define MINDIST float(22.0)	                // Minimum distance DOF starts. Default is 0.4.  // TWILIGHT KET USES 15
+//	#define MINDIST float(22.0)	                // Minimum distance DOF starts. Default is 0.4.  // TWILIGHT KET USES 15
+	#define MINDIST float(40.0)	                // zextino
 	#define MAXDIST float(275)	                // Distance at which DOF stops rendering. Default is 375
 	#define MAXCOF	float(1.0)					// Blur amount - if using DDOF, this should not differ too much from DDOF_MAXCOF (I use same value). 2.5 is good.	
 	#define DOF_CORRECTION float (2.0)			// Factor to equalize the amount of gaussian to classic blur. Default is 2.0.
@@ -162,7 +163,8 @@
 	#define DDOF_MAXDIST float(9.0)				// Focus distance at which DDOF start to fade/decrease blur.
 	#define DDOF_MAXBARRIER float(15.0)			// Focus distance at which DDOF stops rendering. Beyond this focus distance, no DDOF, only regular (distance) DOF
 	#define DDOF_MINBARRIER float (4.0)			// Focus distance that makes the upper barrier for near field DDOF.
-	#define DDOF_MAXCOF	float(5.0)				// DDOF distance blur factor - good balanced is value 2.0 - 5.0 - see also MAXCOF
+//	#define DDOF_MAXCOF	float(5.0)				// DDOF distance blur factor - good balanced is value 2.0 - 5.0 - see also MAXCOF
+	#define DDOF_MAXCOF	float(1.0)				// zextino
 	#define DDOF_MAXCOF_NEAR float (1.0)		// DDOF near field blur factor
 	#define DDOF_MAXALPHA float (0.1)			// Used to fix wrong DDOF distance when aiming to the sky. Change only if experiencing issues.
 	//#define DDOF_DEBUG						// Debug only - do not use in production environment

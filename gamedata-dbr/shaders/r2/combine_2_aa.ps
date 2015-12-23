@@ -1,14 +1,15 @@
 //TB3D 109993 Adapted from Meltac 2.0 DX11 shaders
+#include "ShaderSettings.txt"
 #include "common.h"
 
 #ifdef DX11
-#undef SSH
-//#undef WET
+	#undef SSH
+	//#undef WET
 
-#define VSD
-//#define LFX_NAA
+	#define VSD
+	//#define LFX_NAA
 
-#include "combine_2_gen.ps"
+	#include "combine_2_gen.ps"
 
 #else
 

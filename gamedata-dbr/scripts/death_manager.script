@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.1 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.0.9.9.9.5 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
---has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi
-function my_ver() return "1.0.9.9.9.1" end
+--has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts
+function my_ver() return "1.0.9.9.9.5" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
@@ -223,7 +223,7 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 	local lname = level:name()
 	local npc_name = self.npc:name()
 	local commun = self.npc:character_community()
-	if TB3D_Modders.use_loadout_message == true then
+	if TB3D_Modders.Global_Debug == true then
 		TB3D_Services.packet_alert("death mgr: check_npc_loadout["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."] ["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
 	end
 	if commun == "trader" 													--never touch
@@ -345,51 +345,25 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 				--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[lastday]")
 			--end
 		else
-			local rank = self.npc:character_rank()
-			local actor_koef = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109986, based on actor rank and game difficulty/fp level
-			local npc_koef = TB3D_Services.global_koef(0, rank+1)							--npc rank and level 0
-			local result_intregal = math.floor((actor_koef * npc_koef) * 1000)				--quantize both and put in range
-			local quant_factor = 0
-			if result_intregal > 1000 then
+			local ltx_max = 3
+			local rank = self.npc:character_rank()			--109995, simplified process
+			if rank > 999 then
+				if rank > 1200 then ltx_max = 5 end
 				rank = 1000
-				result_intregal = 1099
-			elseif result_intregal > 900 then
+			elseif rank > 899 then
+				if rank > 950 then ltx_max = 5 end
 				rank = 900
-			elseif result_intregal > 800 then
-				rank = 900
-				result_intregal = result_intregal + 100
-			elseif result_intregal > 700 then
-				rank = 900
-				result_intregal = result_intregal + 200
-			elseif result_intregal > 600 then
+			elseif rank > 599 then
+				if rank > 650 then ltx_max = 5 end
 				rank = 600
-			elseif result_intregal > 500 then
-				rank = 600
-				result_intregal = result_intregal + 100
-			elseif result_intregal > 400 then
+			elseif rank > 399 then
+				if rank > 450 then ltx_max = 5 end
 				rank = 400
-			elseif result_intregal > 300 then
-				rank = 400
-				result_intregal = result_intregal + 100
-			elseif result_intregal > 200 then
-				rank = 200
-			elseif result_intregal > 100 then
-				rank = 200
-				result_intregal = result_intregal + 100
 			else
+				if rank > 250 then ltx_max = 5 end
 				rank = 200
-				result_intregal = result_intregal + 200
 			end
-			quant_factor = result_intregal - rank
-			--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] result["..utils.to_str(result_intregal).."]["..utils.to_str(quant_factor).."]")
-			if quant_factor < 20 then quant_factor = 1
-			  elseif quant_factor < 40 then quant_factor = 2
-			  elseif quant_factor < 60 then quant_factor = 3
-			  elseif quant_factor < 80 then quant_factor = 4
-			  else quant_factor = 5
-			end
-			local ltx_id = math_random(quant_factor, quant_factor+1)
-			if ltx_id > 5 then ltx_id = 4 end
+			local ltx_id = math_random(1, ltx_max)
 			local ini_name = "inventory\\"..utils.to_str(commun).."\\"..utils.to_str(rank).."\\"..utils.to_str(ltx_id)..".ltx" 		--109980, removed level
 			local ini = ini_file(ini_name) 
 			if ini and ini:section_exist("loadout") then									--make sure it is a loadout file	
@@ -435,7 +409,7 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 								elseif string_find(item, "wpn_") then
 									if math_random(1,50) == 25 then give_weapon(self.npc, 0, item) end
 								else
-									give_some_stuff(self.npc, item, math_random(0,quant_factor))
+									give_some_stuff(self.npc, item, math_random(0,ltx_max))
 								end
 							end
 						else

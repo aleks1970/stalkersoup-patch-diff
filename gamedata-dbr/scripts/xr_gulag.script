@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.5 npc_info and job checks, actor checks, lager, db, exclusives, gulag_generators, gulag_aver
-function my_ver() return "1.0.9.9.7.5" end
+--TB3D 1.0.9.9.9.5 npc_info and job checks, actor checks, lager, db, exclusives, gulag_generators, gulag_aver, "nil"
+function my_ver() return "1.0.9.9.9.5" end
 -- (Stohe), (Chugai)
 local table_sort = table.sort
 local math_min = math.min
@@ -42,7 +42,7 @@ function gulag:__init(smrttrn, type, squad, groups, npc_info, capacity)
 	self.groups   = groups or {}
 	self.npc_info = npc_info
 	self.capacity = capacity     -- общая ёмкость гулага
---	self.capacity_non_exclusive  -  ёмкость гулага для неэксклюзивных персонажей
+--	self.capacity_non_exclusive  --  ёмкость гулага для неэксклюзивных персонажей
 	self.population = 0					-- Население гулага
 	self.population_comed = 0			-- Уже пришедшее население гулага
 	self.population_non_exclusive = 0	-- Неэксклюзивное население
@@ -82,7 +82,7 @@ function gulag:load_jobs()
 		end
 	end
 	self.capacity               = math_min( capacity, self.capacity )
-	self.capacity_non_exclusive = self.capacity
+	self.capacity_non_exclusive = self.capacity				--109995, smart terrain requires this!
 	if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then
 		TB3D_Services.packet_alert("XR GULAG: LOAD JOBS ["..utils.to_str(self.name).."] ["..utils.to_str(self.capacity).."] done")
 	end
@@ -447,7 +447,7 @@ function gulag:clear_dead(obj_id)
 		local n = self.npc_info[obj_id]
 		if n and n.se_obj and n.se_obj.id and strn_id and strn_id:name() == self.name then
 			if TB3D_Modders.use_smh2_message then 
-			TB3D_Services.packet_alert("XR GULAG: clear dead unregistered["..utils.to_str(strn_id:name()).."]") end
+			TB3D_Services.packet_alert("XR GULAG: clear dead unregistered["..utils.to_str(strn_id:name()).."]!!!!") end
 			self.smrttrn:unregister_npc( n.se_obj )
 		else
 			if strn_id then

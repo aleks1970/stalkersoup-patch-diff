@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.4 tb3d_launcher_
-function my_ver() return "1.0.9.9.9.4" end
+--TB3D 1.0.9.9.9.5 tb3d_launcher_
+function my_ver() return "1.0.9.9.9.5" end
 --[[
 rename incomming to .ltx files and put filename in pda database to retrieve when reading
 ]]--
@@ -13,7 +13,7 @@ function launcher_check()
 		local _first = string.find(fileName, "_", 1, true)
 		local _second = string.find(fileName, "_", _first + 1, true)
 		local newPacket = string.sub(fileName, _second + 1, string.find(fileName, ".", 1, true) - 1)
-		f:file_delete(f:update_path("$downloads$", fileName))
+		--f:file_delete(f:update_path("$downloads$", fileName))			--109995, launcher removes it on change
 		return newPacket
 	end
 	return nil

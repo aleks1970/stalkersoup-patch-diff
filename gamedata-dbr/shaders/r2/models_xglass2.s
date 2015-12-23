@@ -1,4 +1,4 @@
-//TB3D 109993 Adapted from Meltac 2.0 DX11 shaders, line 18 textur#include "common.h"ifdef DX11function l_special (shader,t_base,t_second,t_detail)
+//TB3D 109994 Adapted from Meltac 2.0 DX11 shaders, line 18 textur, ifdef#include "common.h"#ifdef DX11function l_special (shader,t_base,t_second,t_detail)
 shader:begin ("model_distort4glass","particle_distort")
 :sorting(3,true)
 :blend(true,blend.srcalpha,blend.invsrcalpha)

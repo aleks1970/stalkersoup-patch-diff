@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.4 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric
-function my_ver() return "1.0.9.9.9.4" end
+-- TB3D 1.0.9.9.9.5 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric, targets_killed
+function my_ver() return "1.0.9.9.9.5" end
 
 local table_remove = table.remove
 local string_len = string.len
@@ -567,7 +567,7 @@ function CRandomTask:task_complete(p1, p2)
 						self.task_info[self.active_task_by_type[p1]].status = "completed"
 						return true
 					elseif oo:name() == "esc2_st_fabric" then
-						if oo.gulag:get_population_comed() -1 == 0 then
+						if oo.gulag:get_population_comed() -1 == 0 or TB3D_Services.targets_killed(3) > 3 then		--109995
 							self.task_info[self.active_task_by_type[p1]].status = "completed"
 							return true
 						end

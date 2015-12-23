@@ -1,5 +1,6 @@
-<!-- ************ TB3D 1.0.9.9.8.8 chgd line 2072 to _Services, contains calls to TB3D_modders.script, kalinin_otvet,
-  land_oxot_prines_3, final_agro_arhara_ok_start, chernomor_stalk, pantera_fone_nayti_done, humpback, can_start_arhara *************** -->
+<!-- ************ TB3D 1.0.9.9.9.5 chgd line 2072 to _Services, contains calls to TB3D_modders.script, kalinin_otvet,
+  land_oxot_prines_3, final_agro_arhara_ok_start, chernomor_stalk, pantera_fone_nayti_done, humpback, can_start_arhara
+  chaes_perexod_start  *************** -->
 <game_dialogs>
 	<dialog id="bland_say_norma">
 		<has_info>dospawn_bland_naemnik</has_info>
@@ -230,6 +231,7 @@
 			</phrase>
 			<phrase id="7">
 				<text>ugrum_perexod_7</text>
+				<action>arhara_dialog.chaes_perexod_have</action>
 				<action>dialogs.break_dialog</action>
 			</phrase>
 		</phrase_list>

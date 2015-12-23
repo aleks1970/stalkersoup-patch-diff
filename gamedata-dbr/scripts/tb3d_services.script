@@ -1,16 +1,16 @@
----TB3D 1.0.9.9.9.4 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.9.5 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
--- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef
-function my_ver() return "1.0.9.9.9.4" end	--modders append with initials and rev.
+-- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed
+function my_ver() return "1.0.9.9.9.5" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.4}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.5}" end
 
-major_version = 109994							--used in saves
+major_version = 109995							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -256,11 +256,6 @@ function report_gulags()
 end
 
 function report_plug_ins()
-	if TB3D_Modders.use_DX11 then
-		packet_alert("tb3d services: USING DX11 SHADERS")
-	else
-		packet_alert("tb3d services: USING DX9 SHADERS")
-	end			--109991
 	packet_alert("tb3d services: reporting plug ins...")
 	get_language_pack()							--in localization.ltx
 	get_texture_pack()							--in TB3D_Texture_pack.ltx
@@ -288,6 +283,9 @@ function report_plug_ins()
 	packet_alert("tb3d_services: actor goodwill monolith["..utils.to_str(relation_registry.community_goodwill("monolith",  act_id)).."]")
 	packet_alert("tb3d_services: actor goodwill zombied["..utils.to_str(relation_registry.community_goodwill("zombied",  act_id)).."]")
 	packet_alert("tb3d_services: actor goodwill trader["..utils.to_str(relation_registry.community_goodwill("trader",  act_id)).."]")
+	--packet_alert("tb3d_services: actor goodwill hunter["..utils.to_str(relation_registry.community_goodwill("hunter",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill stranger["..utils.to_str(relation_registry.community_goodwill("stranger",  act_id)).."]")
+	packet_alert("tb3d_services: actor goodwill lastday["..utils.to_str(relation_registry.community_goodwill("lastday",  act_id)).."]")
 end
 function get_language_pack()
     local ltx = system_ini()
@@ -1268,12 +1266,12 @@ function get_all_quests()
 end
 
 -- communities ------------------------------------------------------------------
--- military, freedom, dolg, stalker, bandit, monolith, ecolog, killer, lastday, trader,
--- zombied, stranger, arena_enemy, sniper, green, nebo, fotoman
+-- used: military, freedom, dolg, stalker, bandit, monolith, ecolog, killer, lastday, trader, zombied
+-- not used: stranger, arena_enemy, sniper, green, nebo, fotoman
 -- normal game_relations.ltx values: -400 = enemy, 0 = neutral, 500 = friend
 ---------------------------------------------------------------------------------
 function set_player_relations(standings)
-	local mil, freedom, dolg, stalker, bandit, mono, ecolog, killer, lastday, trader
+	local mil, freedom, dolg, stalker, bandit, mono, ecolog, killer, lastday, trader, zombied
 	if standings == 1 then					--good standings all
 		mil = 500
 		freedom = 500
@@ -1285,6 +1283,7 @@ function set_player_relations(standings)
 		killer = 500
 		lastday = 500
 		trader = 500
+		zombied = -500
 	elseif standings == 2 then				--fair standings
 		mil = 100
 		freedom = 100
@@ -1296,6 +1295,7 @@ function set_player_relations(standings)
 		killer = -400
 		lastday = -400
 		trader = 100
+		zombied = -500
 	elseif standings == 3 then				--normal good standings
 		mil = 200
 		freedom = 200
@@ -1307,6 +1307,7 @@ function set_player_relations(standings)
 		killer = -400
 		lastday = -400
 		trader = 500
+		zombied = -500
 	elseif standings == 4 then				--normal game standings
 		mil = 0
 		freedom = 0
@@ -1318,6 +1319,7 @@ function set_player_relations(standings)
 		killer = -500
 		lastday = -500
 		trader = 200
+		zombied = -500
 	elseif standings == 5 then				--collector start
 		mil = 0
 		freedom = 0
@@ -1329,6 +1331,7 @@ function set_player_relations(standings)
 		killer = -500
 		lastday = -500
 		trader = 500
+		zombied = -500
 	else									--all neutral
 		mil = 0
 		freedom = 0
@@ -1340,6 +1343,7 @@ function set_player_relations(standings)
 		killer = 0
 		lastday = 0
 		trader = 0
+		zombied = -500
 	end
 	relation_registry.set_community_goodwill ("military", db.actor:id(), mil)
 	relation_registry.set_community_goodwill ("freedom", db.actor:id(), freedom)
@@ -1351,6 +1355,8 @@ function set_player_relations(standings)
 	relation_registry.set_community_goodwill ("killer", db.actor:id(), killer)
 	relation_registry.set_community_goodwill ("lastday", db.actor:id(), lastday)
 	relation_registry.set_community_goodwill ("trader", db.actor:id(), trader)			--109989
+	relation_registry.set_community_goodwill ("zombied", db.actor:id(), zombied)		--109995
+	--packet_alert("community goodwill reset")
 end
 function save_player_relations()			--109989
 	amk.save_variable("tb3d_relation_mil", relation_registry.community_goodwill("military", db.actor:id()))
@@ -1363,6 +1369,7 @@ function save_player_relations()			--109989
 	amk.save_variable("tb3d_relation_kil", relation_registry.community_goodwill("killer", db.actor:id()))
 	amk.save_variable("tb3d_relation_ldk", relation_registry.community_goodwill("lastday", db.actor:id()))
 	amk.save_variable("tb3d_relation_trd", relation_registry.community_goodwill("trader", db.actor:id()))
+	amk.save_variable("tb3d_relation_zmb", relation_registry.community_goodwill("zombied", db.actor:id()))		--109995
 end
 function restore_player_relations()			--109989
 	relation_registry.set_community_goodwill("military", db.actor:id(), amk.load_variable("tb3d_relation_mil"))
@@ -1375,6 +1382,7 @@ function restore_player_relations()			--109989
 	relation_registry.set_community_goodwill("killer", db.actor:id(), amk.load_variable("tb3d_relation_kil"))
 	relation_registry.set_community_goodwill("lastday", db.actor:id(), amk.load_variable("tb3d_relation_ldk"))
 	relation_registry.set_community_goodwill("trader", db.actor:id(), amk.load_variable("tb3d_relation_trd"))
+	relation_registry.set_community_goodwill("zombied", db.actor:id(), amk.load_variable("tb3d_relation_zmb"))		--109995
 end
 
 function get_collector_items(sect, num)
