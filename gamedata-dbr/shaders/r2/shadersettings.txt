@@ -1,5 +1,5 @@
-// TB3D 1.0.9.9.9.5 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
-// adj sun and now default to standard smap, f32, sun saturation, Meltac DX11, removed MELTAC20, some tweaks, Launcher
+// TB3D 1.0.9.9.9.7 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
+// adj sun and now default to standard smap, f32, sun saturation, Meltac DX11, removed MELTAC20, some tweaks, Launcher, smap
 //////////////////////////////////////////////////////////////////
 // Adapted from: DYNAMIC DEPTH OF FIELD SHADERS 1.02 - By Meltac
 // and Dynamic Shaders 2.0 Alpha - Extreme Preset - By Meltac, Kingo64, Sky4ce, JJ Walker, Daemonjax, K.D., Ketxxx
@@ -42,11 +42,11 @@
 			#define PARALLAX_OCCLUSION	// Enables Parallax Occlusion Mapping  # Makes surfaces look bumpy and 3d at the cost of fps. Worth it
 			#define USE_SUNMASK			// Enables sun shadow masking, smooths shadows but darkens world overall.
 			#define USE_SJITTER			// Uses shadow jittering, a modern method of smoothing out shadow edges. Applies to flashlight, and to world if SUN_FILTER is enabled.
-			#define CUSTOM_SHADOW_RESOLUTION int(2048) // Use a custom shadow size. Default is 1024 (1024x1024). <<You'll notice a performance hit at 4096>>
+			//#define CUSTOM_SHADOW_RESOLUTION int(2048) // Use a custom shadow size. Default is 1024 (1024x1024). <<You'll notice a performance hit at 4096>>
 			#define KERNEL float(1.2) 					// IMPORTANT For custom shadow resolution... Minimum recommended values: 1024 = .6, 2048 = 1.2, 3072 = 1.8, 4096 = 2.4, etc... Higher values produce softer shadows.
 			#define XKERNEL float(1.2) 					// Probably should be same as KERNEL!	
 		#else
-			#define CUSTOM_SHADOW_RESOLUTION int(1024)
+			//#define CUSTOM_SHADOW_RESOLUTION int(1024)
 			#define KERNEL float(0.6) 					// IMPORTANT For custom shadow resolution... Minimum recommended values: 1024 = .6, 2048 = 1.2, 3072 = 1.8, 4096 = 2.4, etc... Higher values produce softer shadows.
 			#define XKERNEL float(0.6) 					// Probably should be same as KERNEL!	
 		#endif
@@ -57,9 +57,9 @@
 		#define USE_SJITTER				// Uses shadow jittering, a modern method of smoothing out shadow edges. Applies to flashlight, and to world if SUN_FILTER is enabled.
 		#define USE_SJITTER_SUN			// Uses shadow jittering for shadows created by the sun/moon, a modern method of smoothing out shadow edges. Highly recommended.
 		#define USE_SJITTER_OTHER		// Enable shadow jittering (4 samples) for dynamic lights (e.g. flashlight/campfires).  Recommended.
-		#define CUSTOM_SHADOW_RESOLUTION int(3072) // Use a custom shadow size. Default is 1024 (1024x1024). <<You'll notice a performance hit at 4096>>
-		#define KERNEL float(1.8) 		// IMPORTANT For custom shadow resolution... Minimum recommended values: 1024 = .6, 2048 = 1.2, 3072 = 1.8, 4096 = 2.4, etc... Higher values produce softer shadows.
-		#define XKERNEL float(1.8) 		// Probably should be same as KERNEL!	
+		//#define CUSTOM_SHADOW_RESOLUTION int(3072) // Use a custom shadow size. Default is 1024 (1024x1024). <<You'll notice a performance hit at 4096>>
+		#define KERNEL float(0.6) //1.8) 		// IMPORTANT For custom shadow resolution... Minimum recommended values: 1024 = .6, 2048 = 1.2, 3072 = 1.8, 4096 = 2.4, etc... Higher values produce softer shadows.
+		#define XKERNEL float(0.6) //1.8) 		// Probably should be same as KERNEL!	
 	#endif
 	//#define DEPTH_OF_FIELD 		//109992 not implemented yet, Enables Depth Of Field   # Blurs objects in the distance
 	#define SATURATION_FILTER		// Enables Saturation Filter, giving a grey like appearance to areas which are "unsafe".

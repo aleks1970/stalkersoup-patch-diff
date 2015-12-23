@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.0 debug
-function my_ver() return "1.0.9.9.8.0" end
+--TB3D 1.0.9.9.9.6 debug, hunter's rifle
+function my_ver() return "1.0.9.9.9.6" end
 
 function proceed()
 	-- Bar Rostok
@@ -31,12 +31,12 @@ function process_info_portion(info_id)
 	return false
 end
 
-function has_hunter_rifle(task, objective)
-	if TB3D_Services.is_collector(952) then
-		return true
-	else
+function has_hunter_rifle(task, objective)		--109996
+	--if TB3D_Services.is_collector(952) then
+		--return true
+	--else
 		return db.actor and db.actor:object("hunters_toz") ~= nil
-	end
+	--end
 end
 
 function has_lucky_pda(task, objective)

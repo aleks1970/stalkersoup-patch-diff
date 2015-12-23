@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.6 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.0.9.9.9.7 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
@@ -6,8 +6,8 @@
 -- redone for new 'can go on line', sak_book4, f1 to dyn content, hog, dark_btr2_restrictor, af_ameba_slug to af_ameba_,
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
 -- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
--- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin
-function my_ver() return "1.0.9.9.9.6" end
+-- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin, missing scientist in pripyat
+function my_ver() return "1.0.9.9.9.7" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -35,6 +35,7 @@ local child_count = 0				--109991
 local accum_count = 0				--109991
 local mushroom_count = 0			--109991
 local contrlr = false
+local bloodsuckers = 0				--109997
 
 function force_fixes()
 	TB3D_Services.packet_alert("tb3d fixer: ver["..utils.to_str(my_ver()).."]: start")
@@ -759,6 +760,13 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 			is_skip = true 													--this keeps it from the cleaner
 		elseif obj.m_story_id==9660	then									--stalker_agro_und
 			is_skip = true
+		elseif string_find(obj_name, "bloodsucker") then					--109996, runaway respawns
+			bloodsuckers = bloodsuckers + 1
+			if bloodsuckers > 2 then
+				is_fixed = true
+			else
+				is_skip = true
+			end
 		end
 	elseif obj_level == 5 then												--l04_darkvalley
 		if sect == "m_car" or sect == "zone_ameba1" then
@@ -984,10 +992,10 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 		elseif string_find(obj_name,"sak_book4") then						--protect from duplicating
 			TB3D_Services.give_info("tb3d_sak_book4")
 			is_skip = true
-		elseif string_find(obj_name,"_respawn") then					--remove any migrated ones to reduce population
-			if has_alife_info("pri_stadium_reached") or has_alife_info("pri_stadium_scene_start") then
-				is_fixed = true
-			end
+		--elseif string_find(obj_name,"_respawn") then					--109996, remove any migrated ones to reduce population
+			--if has_alife_info("pri_stadium_reached") or has_alife_info("pri_stadium_scene_start") then
+				--is_fixed = true
+			--end
 		end
 	elseif obj_level == 14 then												--l12_stancia
 		if string_find(obj_name, "aes_helicopter")

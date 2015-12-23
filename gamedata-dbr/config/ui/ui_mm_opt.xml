@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ************ TB3D 1.0.9.9.8.2 mblur added, mblur step, lumscale_amb, more adv ctrls added, sun advanced*************** -->
+<!-- ************ TB3D 1.0.9.9.8.2 mblur added, mblur step, lumscale_amb, more adv ctrls added, sun advanced, check_dyn_suit: advanced suit - on/off - aleks1970 *************** -->
 <window>
 	<back_video x="0" y="0" width="1024" height="430">
 		<texture x="0" y="0" width="1024" height="430">ui\ui_mm_window_back_crop</texture>
@@ -444,10 +444,10 @@
 			<list_font_s r="240" g="217" b="182"/>
 			<list_font r="216" g="186" b="140" font="letterica16"/>
 		</list_difficulty>
-		<check_tips x="150" y="180" width="243" height="21">
+		<!--check_tips x="150" y="180" width="243" height="21">
 			<options_item entry="hud_info" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_tips</text>
-		</check_tips>
+		</check_tips-->
 		<check_crosshair x="150" y="80" width="243" height="21">
 			<options_item entry="hud_crosshair" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_show_crosshair</text>
@@ -464,10 +464,10 @@
 			<options_item entry="hud_crosshair_dist" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_crosshair_distance</text>
 		</check_dist>
-		<btn_check_updates x="472" y="310" width="111" height="29">
+		<!--btn_check_updates x="472" y="310" width="111" height="29">
 			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_check_updates</text>
 			<texture>ui_button_ordinary</texture>
-		</btn_check_updates>
+		</btn_check_updates-->
 	</tab_gameplay>
 	<tab_controls>
 		<cap_mousesens x="150" y="20" width="150" height="21">

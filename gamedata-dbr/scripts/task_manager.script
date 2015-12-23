@@ -1,5 +1,6 @@
--- TB3D 1.0.9.9.9.5 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric, targets_killed, translate
-function my_ver() return "1.0.9.9.9.5" end
+-- TB3D 1.0.9.9.9.7 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric,
+-- targets_killed, translate, task complete
+function my_ver() return "1.0.9.9.9.7" end
 
 local table_remove = table.remove
 local string_len = string.len
@@ -151,68 +152,68 @@ function CRandomTask:__init()
 		--TB3D_Services.info_alert("reward info read")
 		reward_info=utils.cfg_get_string(self.task_ini, id, "reward_info", nil, false,"")   
 		if reward_info=="" then reward_info=nil end
-			curr_task_info.reward_info = reward_info
-			if reward_info then
-				self:read_info_reward_section(self.task_ini,reward_info,curr_task_info)
-			end
-			--TB3D_Services.info_alert("reward info read done")
-			-- Dialog for Quest victims
-			curr_task_info.target_dialog = utils.cfg_get_string(self.task_ini, id, "target_dialog", nil, false,"")
-			----------------------
-			if self.task_ini:line_exist(id, "community") then
-				curr_task_info.community = self.task_ini:r_string(id, "community")
-			end		
-			curr_task_info.reward_rank = utils.cfg_get_number(self.task_ini, id, "reward_rank", nil, false, 0)
-			curr_task_info.reward_reputation = utils.cfg_get_number(self.task_ini, id, "reward_reputation", nil, false)
-			curr_task_info.reward_relation = parse_key_value(utils.cfg_get_string(self.task_ini, id, "reward_relation", nil, false, ""))
-			if self.task_ini:line_exist(id, "condlist") then
-				curr_task_info.condlist = xr_logic.parse_condlist(db.actor, "task_manager", "condlist", self.task_ini:r_string(id, "condlist"))
-			else
-				curr_task_info.condlist = xr_logic.parse_condlist(db.actor, "task_manager", "condlist", "true")
-			end		
-			curr_task_info.need_return = utils.cfg_get_bool(self.task_ini, id, "need_return", nil, false, true)
-			curr_task_info.init_phrase_id = self:gen_phrase_id()
-			curr_task_info.desc_phrase_id = self:gen_phrase_id()
-			curr_task_info.yes_phrase_id = self:gen_phrase_id()
-			curr_task_info.no_phrase_id = self:gen_phrase_id()
-			curr_task_info.completed_phrase_id = self:gen_phrase_id()
-			--' By default, the quest is available for the issuance of
-			curr_task_info.enabled = true
-			--' Whether the quest for their properties. The default is always available.
-			--' This option depends on the objectives for quests and the quest is triggered if prekondishn
-			curr_task_info.enabled_props		= false
-			--' The status of the quest can be: "normal", "selected", "completed", "refused", "failed", "rewarded"
-			curr_task_info.status = "normal"
+		curr_task_info.reward_info = reward_info
+		if reward_info then
+			self:read_info_reward_section(self.task_ini,reward_info,curr_task_info)
 		end
-		--' Creation of additional associative table for easy retrieval
-		self.task_id_by_type = {}
-		self.task_id_by_parent = {}
-		self.task_id_by_yes_phrase_id = {}
-		self.task_id_by_completed_phrase_id = {}
-		self.task_id_by_desc_phrase_id = {}
-		self.task_id_by_init_phrase_id = {}
-		self.active_task_by_type = {}
-		self.task_id_self_inited = {}
-		for k,v in pairs(self.task_info) do
-			--' By type of quest
-			if self.task_id_by_type[v.type] == nil then
-				self.task_id_by_type[v.type] = {}
-			end
-			self.task_id_by_type[v.type][#self.task_id_by_type[v.type]+1] = k
-			--' By type of vendor
-			if self.task_id_by_parent[v.parent] == nil then
-				self.task_id_by_parent[v.parent] = {}
-			end
-			self.task_id_by_parent[v.parent][#self.task_id_by_parent[v.parent]+1] = k
-			--' By id phrases consent to the quest
-			self.task_id_by_yes_phrase_id[tostring(v.yes_phrase_id)] = k
-			self.task_id_by_completed_phrase_id[v.completed_phrase_id] = k
-			self.task_id_by_desc_phrase_id[v.desc_phrase_id] = k
-			-- TB3D_Services.info_alert("task "..v.complex_type .. " id " .. v.completed_phrase_id)
-			--' By id phrases issuance quest.
-			self.task_id_by_init_phrase_id[tostring(v.init_phrase_id)] = k
-			--' By samovydavaemosti
-			if v.init_condition ~= nil then
+		--TB3D_Services.info_alert("reward info read done")
+		-- Dialog for Quest victims
+		curr_task_info.target_dialog = utils.cfg_get_string(self.task_ini, id, "target_dialog", nil, false,"")
+		----------------------
+		if self.task_ini:line_exist(id, "community") then
+			curr_task_info.community = self.task_ini:r_string(id, "community")
+		end		
+		curr_task_info.reward_rank = utils.cfg_get_number(self.task_ini, id, "reward_rank", nil, false, 0)
+		curr_task_info.reward_reputation = utils.cfg_get_number(self.task_ini, id, "reward_reputation", nil, false)
+		curr_task_info.reward_relation = parse_key_value(utils.cfg_get_string(self.task_ini, id, "reward_relation", nil, false, ""))
+		if self.task_ini:line_exist(id, "condlist") then
+			curr_task_info.condlist = xr_logic.parse_condlist(db.actor, "task_manager", "condlist", self.task_ini:r_string(id, "condlist"))
+		else
+			curr_task_info.condlist = xr_logic.parse_condlist(db.actor, "task_manager", "condlist", "true")
+		end		
+		curr_task_info.need_return = utils.cfg_get_bool(self.task_ini, id, "need_return", nil, false, true)
+		curr_task_info.init_phrase_id = self:gen_phrase_id()
+		curr_task_info.desc_phrase_id = self:gen_phrase_id()
+		curr_task_info.yes_phrase_id = self:gen_phrase_id()
+		curr_task_info.no_phrase_id = self:gen_phrase_id()
+		curr_task_info.completed_phrase_id = self:gen_phrase_id()
+		--' By default, the quest is available for the issuance of
+		curr_task_info.enabled = true
+		--' Whether the quest for their properties. The default is always available.
+		--' This option depends on the objectives for quests and the quest is triggered if prekondishn
+		curr_task_info.enabled_props		= false
+		--' The status of the quest can be: "normal", "selected", "completed", "refused", "failed", "rewarded"
+		curr_task_info.status = "normal"
+	end
+	--' Creation of additional associative table for easy retrieval
+	self.task_id_by_type = {}
+	self.task_id_by_parent = {}
+	self.task_id_by_yes_phrase_id = {}
+	self.task_id_by_completed_phrase_id = {}
+	self.task_id_by_desc_phrase_id = {}
+	self.task_id_by_init_phrase_id = {}
+	self.active_task_by_type = {}
+	self.task_id_self_inited = {}
+	for k,v in pairs(self.task_info) do
+		--' By type of quest
+		if self.task_id_by_type[v.type] == nil then
+			self.task_id_by_type[v.type] = {}
+		end
+		self.task_id_by_type[v.type][#self.task_id_by_type[v.type]+1] = k
+		--' By type of vendor
+		if self.task_id_by_parent[v.parent] == nil then
+			self.task_id_by_parent[v.parent] = {}
+		end
+		self.task_id_by_parent[v.parent][#self.task_id_by_parent[v.parent]+1] = k
+		--' By id phrases consent to the quest
+		self.task_id_by_yes_phrase_id[tostring(v.yes_phrase_id)] = k
+		self.task_id_by_completed_phrase_id[v.completed_phrase_id] = k
+		self.task_id_by_desc_phrase_id[v.desc_phrase_id] = k
+		-- TB3D_Services.info_alert("task "..v.complex_type .. " id " .. v.completed_phrase_id)
+		--' By id phrases issuance quest.
+		self.task_id_by_init_phrase_id[tostring(v.init_phrase_id)] = k
+		--' By samovydavaemosti
+		if v.init_condition ~= nil then
 			self.task_id_self_inited[#self.task_id_self_inited+1] = k
 		end
 	end
@@ -538,6 +539,11 @@ function CRandomTask:action_refuse_task(actor, npc, p1, p2)
     end
   end
 end
+
+local esc2_spawned
+local agro_spawned
+local agrou_spawned
+local ros_spawned
 --' Checks made whether TASK
 function CRandomTask:task_complete(p1, p2)
 	if db.actor then
@@ -564,14 +570,57 @@ function CRandomTask:task_complete(p1, p2)
 				local oo = alife():object(sel_task.selected_target)
 				if oo then
 					--TB3D_Services.packet_alert("task mgr: task["..tostring(self.active_task_by_type[p1]).."] target["..utils.to_str(oo:name()).."] pop["..utils.to_str(oo.gulag:get_population_comed()).."]")
-					if oo.gulag:get_population_comed() < 1 then
+					if oo:name() == "esc2_st_fabric" then
+						if level:name() == "l01_escape" then
+							if esc2_spawned then
+								if TB3D_Services.targets_killed(3) > 3 then		--109995
+									self.task_info[self.active_task_by_type[p1]].status = "completed"
+									return true
+								end
+							else
+								TB3D_Mobs.spawn_quest_bandits(113.044,-7.495,8.628,414741,118,6)
+								esc2_spawned = true
+							end
+						end
+					elseif oo:name() == "ros_smart_stalker2" then
+						if level:name() == "l06_rostok" then
+							if ros_spawned then
+								if TB3D_Services.targets_killed(3) > 3 then		--109997
+									self.task_info[self.active_task_by_type[p1]].status = "completed"
+									return true
+								end
+							else
+								TB3D_Mobs.spawn_quest_bandits(-162.000,0.024,184.062,35434,1329,6)
+								ros_spawned = true
+							end
+						end
+					elseif oo:name() == "agr_u_bandits" then
+						if level:name() == "l03u_agr_underground" then
+							if agrou_spawned then
+								if TB3D_Services.targets_killed(3) > 3 then		--109997
+									self.task_info[self.active_task_by_type[p1]].status = "completed"
+									return true
+								end
+							else
+								TB3D_Mobs.spawn_quest_bandits(-69.827,-6.499,13.221,3459,712,6)
+								agrou_spawned = true
+							end
+						end
+					elseif oo:name() == "agr2_bandit_st" then
+						if level:name() == "l03_agroprom" then
+							if agro_spawned then
+								if TB3D_Services.targets_killed(3) > 3 then		--109997
+									self.task_info[self.active_task_by_type[p1]].status = "completed"
+									return true
+								end
+							else
+								TB3D_Mobs.spawn_quest_bandits(-65.405,0.698,21.058,176079,699,8)
+								agro_spawned = true
+							end
+						end
+					elseif oo.gulag:get_population_comed() < 1 then
 						self.task_info[self.active_task_by_type[p1]].status = "completed"
 						return true
-					elseif oo:name() == "esc2_st_fabric" then
-						if oo.gulag:get_population_comed() -1 == 0 or TB3D_Services.targets_killed(3) > 3 then		--109995
-							self.task_info[self.active_task_by_type[p1]].status = "completed"
-							return true
-						end
 					end
 				end
 			elseif string.find(p1, "defend_lager") ~= nil then

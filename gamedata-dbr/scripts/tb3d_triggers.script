@@ -1,12 +1,12 @@
----TB3D 1.0.9.9.9.5 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.9.7 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
 -- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
--- old_research_send, spawn_sewer_stuff
-function my_ver() return "1.0.9.9.9.5" end
+-- old_research_send, spawn_sewer_stuff, zat lost
+function my_ver() return "1.0.9.9.9.7" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random = math.random
 local math_floor = math.floor
@@ -402,27 +402,27 @@ function spawn_sarc_pack(count)		--way back behind wish granter
 end
 
 -----------------------------------------zaton----------------------------------------
-function zaton_lost()
+function zaton_lost()			--109997
 	alife():create("m_poltergeist_strong_flame",vector():set(-199.406,6.393,27.741),543661,3674,expendable_object)
 	spawn_alife("m_poltergeist_strong_flame",-421.097,-6.691,154.488,230735,3666,2)	--chopper in swirls
 	alife():create("kontroller_yazva",vector():set(-221.778,-6.183,165.204),500584,3670,expendable_object)	--viaduct
 	alife():create("kontroller_yazva",vector():set(-423.613,36.258,-397.799),142983,3664,expendable_object)
-	alife():create("af_cristall_flower",vector():set(430.570,33.254,-318.276),1671859,3694)
-	alife():create("af_cristall_flower",vector():set(429.551,6.755,-282.545),1670653,3696,3694)
+	--alife():create("af_cristall_flower",vector():set(430.570,33.254,-318.276),1671859,3694)
+	--alife():create("af_cristall_flower",vector():set(429.551,6.755,-282.545),1670653,3696,3694)
   	spawn_item_rand("ammo_5.56x45_ap", 405.235,33.366,-440.100,1632001,3694,4)	--old factory
   	spawn_item_rand("medkit_scientic", 405.235,33.366,-440.100,1632001,3694,4)	--large storage container
-	alife():create("af_cristall_flower",vector():set(288.217,29.474,-399.527),1457658,3690,3670)
+	--alife():create("af_cristall_flower",vector():set(288.217,29.474,-399.527),1457658,3690,3670)
   	spawn_item_rand("ammo_5.56x45_ap", 288.217,29.474,-399.527,1457658,3690,4)
   	spawn_item_rand("medkit_scientic", 288.217,29.474,-399.527,1457658,3690,4)
   	spawn_item_rand("sandwich", -221.778,-6.180,165.204,500584,3670,6)
   	spawn_item_rand("antirad", -221.778,-6.180,165.204,500584,3670,4)
-	alife():create("af_fireball",vector():set(-199.406,6.393,27.741),543661,3674)
-	alife():create("af_cristall_flower",vector():set(-171.915,7.542,103.861),596577,3670)
+	--alife():create("af_fireball",vector():set(-199.406,6.393,27.741),543661,3674)
+	--alife():create("af_cristall_flower",vector():set(-171.915,7.542,103.861),596577,3670)
   	spawn_item_rand("ammo_5.56x45_ap", -221.778,-6.183,165.204,500584,3670,4)
   	spawn_item_rand("medkit_scientic", -221.778,-6.183,165.204,500584,3670,4)
-	alife():create("af_cristall_flower",vector():set(-421.097,-6.691,154.488),230735,3666)
-	alife():create("af_vyvert_green",vector():set(-455.100,-4.365,152.6498),106689,3660)
-	alife():create("af_cristall_flower",vector():set(-423.613,36.258,-397.799),142983,3664)	--lab entrance
+	--alife():create("af_cristall_flower",vector():set(-421.097,-6.691,154.488),230735,3666)
+	--alife():create("af_vyvert_green",vector():set(-455.100,-4.365,152.6498),106689,3660)
+	--alife():create("af_cristall_flower",vector():set(-423.613,36.258,-397.799),142983,3664)	--lab entrance
   	spawn_item_rand("ammo_5.56x45_ap", -423.613,36.258,-397.799,142983,3664,4)
   	spawn_item_rand("ammo_12x70_buck", -423.613,36.258,-397.799,142983,3664,4)
   	alife():create("neytral_exo_antigas_outfit_blackwhiteplus", vector():set(-423.613,36.258,-397.799),142983,3664)
@@ -430,10 +430,10 @@ function zaton_lost()
 	alife():create("af_cristall_flower",vector():set(-149.779,-23.300,-181.774),642848,3673)
   	spawn_item_rand("ammo_5.56x45_ap", -149.779,-23.300,-181.774,642848,3673,12)
   	spawn_item_rand("ammo_12x70_buck", -149.779,-23.300,-181.774,642848,3673,8)
-  	alife():create("af_water_flower1", vector():set(-149.779,-23.300,-181.774),642848,3673)
-  	alife():create("af_eye_voron", vector():set(-149.779,-23.300,-181.774),642848,3673)
+  	--alife():create("af_water_flower1", vector():set(-149.779,-23.300,-181.774),642848,3673)
+  	--alife():create("af_eye_voron", vector():set(-149.779,-23.300,-181.774),642848,3673)
   	spawn_item_rand("ammo_5.56x45_ap", 327.670,44.208,-401.420,1513907,3690,8)	--factory near bridge
-  	alife():create("wpn_fn2000_sniper", vector():set(327.670,44.208,-401.420),1513907,3690)
+  	--alife():create("wpn_fn2000_sniper", vector():set(327.670,44.208,-401.420),1513907,3690)
   	spawn_item_rand("ammo_5.56x45_ap", 322.413,42.826,-404.901,1507608,3690,8)
   	alife():create("fake_wpn_wakizashi", vector():set(322.413,42.826,-404.901),1507608,3690)
   	spawn_item_rand("ammo_12x70_buck", 308.473,33.723,-401.669,1488318,3690,8)
@@ -447,7 +447,7 @@ function zaton_lost()
   	spawn_item_rand("medkit_scientic",55.248,-9.187,32.501,1050641,3677,4)
   	spawn_item_rand("ammo_5.56x45_ap",105.488,1.360,179.663,1152919,3686,4)
   	spawn_item_rand("ammo_12x70_buck",105.488,1.360,179.663,1152919,3686,4)
-  	spawn_item_rand("ammo_flame",105.488,1.360,179.663,1152919,3686,4)
+  	--spawn_item_rand("ammo_flame",105.488,1.360,179.663,1152919,3686,4)
   	spawn_item_rand("ammo_5.56x45_ap", 152.482,-6.824,-139.548,1227074,3688,4)	--hunter's barge
   	spawn_item_rand("ammo_12x70_buck", 152.482,-6.824,-139.548,1227074,3688,4)
 	alife():create("artifact_electro_crystal_thorn", vector():set(-416.169,-10.524,209.710),182015,3666)	--arts in swirls

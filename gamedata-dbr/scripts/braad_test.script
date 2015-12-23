@@ -1,7 +1,8 @@
---TB3D 1.0.9.9.9.0 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
+--TB3D 1.0.9.9.9.7 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
 -- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
--- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info, translate and text color - aleks1970
-function my_ver() return "1.0.9.9.9.0" end
+-- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info,
+-- translate and text color - aleks1970, grib_respawn
+function my_ver() return "1.0.9.9.9.7" end
 
 local string_find = string.find
 local math_random = math.random
@@ -1850,18 +1851,18 @@ local points={
 {position={x=194.8108,y=-1.7354,z=62.4528},gv=3318,lv=127327}  -- red_forest
 }
 
-function grib_respawn()
-	local timeh =level.get_time_hours()
+function grib_respawn()				--109997, now called from services at midnight
+	--local timeh =level.get_time_hours()
 	--local times =level.get_time_minutes()
-	if has_alife_info("info_respawn_grib") then
-		if timeh ~= 22 then TB3D_Services.remove_info("info_respawn_grib") end
-	elseif timeh == 22 and not has_alife_info("info_respawn_grib") then
-		TB3D_Services.packet_alert("braad test: grib respawn")
+	--if has_alife_info("info_respawn_grib") then
+		--if timeh ~= 22 then TB3D_Services.remove_info("info_respawn_grib") end
+	--elseif timeh == 22 and not has_alife_info("info_respawn_grib") then
+		--TB3D_Services.packet_alert("braad test: grib respawn")
 		del_mushroom()
         spawn_grib()
-		TB3D_Services.give_info("info_respawn_grib")
-		TB3D_Services.packet_alert("braad test: grib respawn done")
-	end
+		--TB3D_Services.give_info("info_respawn_grib")
+		--TB3D_Services.packet_alert("braad test: grib respawn done")
+	--end
 	
 --[[    if (timeh == 22 and times < 3)  then
         if TB3D_Services.give_info("info_respawn_grib") == true then --not has_alife_info("info_respawn_grib") then

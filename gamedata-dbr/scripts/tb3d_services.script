@@ -1,17 +1,17 @@
----TB3D 1.0.9.9.9.6 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.9.7 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
 -- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed,
--- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over
-function my_ver() return "1.0.9.9.9.6" end	--modders append with initials and rev.
+-- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over, zat lost, grib_respawn
+function my_ver() return "1.0.9.9.9.7" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.6}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.7}" end
 
-major_version = 109996							--used in saves
+major_version = 109997							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -52,16 +52,7 @@ function inc_vodka(val)
 end
 
 function update()
-	if is_collector(0) then		--future use
-		if level.name() == "zaton" then
-			if has_alife_info("tb3d_agr_knockdown") then
-				--TB3D_Triggers.zaton_lost()
-				--TB3D_Services.remove_info("tb3d_agr_knockdown")
-			end
-		end
-	else
-		amk.start_timer("tb3d_update",20)
-	end
+	amk.start_timer("tb3d_update",20)			--109997
 end
 
 function delayed_action(num, info_id, delay)					-- 1 thru 4
@@ -97,10 +88,10 @@ function get_level_up()							--109980
 	return level_up
 end
 function set_new_levelup(levelup)				--109980
-	level_up = levelup
+	--level_up = levelup
 	local ntext = translate("services_stalkersoup_level")
 	amk.save_variable("freeplay",levelup)
-	if level_up > 0 then news_manager.send_tip_txt(db.actor, ntext.." "..utils.to_str(level_up).." "..translate("services_Achieved_level"), 1, "tb3d_master", 40) end
+	if levelup > 0 then news_manager.send_tip_txt(db.actor, ntext.." "..utils.to_str(levelup).." "..translate("services_Achieved_level"), 1, "tb3d_master", 40) end
 end
 
 function fell_through_level(pos)
@@ -233,9 +224,9 @@ function show_belt_items()			--109975
 	for i = 0, 12 do
 		local oitem = db.actor:item_in_slot(i)
 		if oitem then
-			TB3D_Services.packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] ["..oitem:name().."]")
+			packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] ["..oitem:name().."]")
 		else
-			TB3D_Services.packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] [empty]")
+			packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] [empty]")
 		end
 	end
 end
@@ -553,7 +544,7 @@ end
 function skip_cave()
 	if give_info("tb3d_cave_done") == false then
 		--packet_alert("tb3d: skip cave [already done]")
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip")..translate("services_cave_already_done"))
+		news_manager.send_tip_txt(db.actor, get_text_color("tip")..translate("services_cave_already_done"))
 	else
 		if give_info("zvezdochet_talk_start") == true then		--didn't talk to stargazer
 			--packet_alert("tb3d: skip cave [zvezdochet_talk_start]")
@@ -603,7 +594,7 @@ function skip_cave()
 			sak.out_item_namber("shaxter_tele",1)
 		end
 		give_info("esc_trader_can_leave")
-		if not is_skipping then news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]ESCAPE Teleport Released, cave skipped") end
+		if not is_skipping then news_manager.send_tip_txt(db.actor, get_text_color("tip").."TB3D:\\n  %c[default]ESCAPE Teleport Released, cave skipped") end
 	end
 end
 function skip_esc()
@@ -799,7 +790,9 @@ function check_teleportation()
 			t_obj = sim:story_object(1999997) -- 'zatlost' teleport used, game info completion reqr'd
 			if t_obj then
 				sim:release(t_obj, true)
-				sname = "zaton"
+				sname = "l03u_agr_underground"			--109997
+				TB3D_Triggers.zaton_lost()
+				remove_info("tb3d_agr_knockdown")
 			else
 				t_obj = sim:story_object(1999996) -- talked to momolith
 				if t_obj then
@@ -1509,7 +1502,7 @@ function check_valid_spawns()
 			if game_graph():valid_vertex_id(obj.m_game_vertex_id) then
 				obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
 				if obj_level == 39 or obj_level == 55 or obj_level > 56 then
-					TB3D_Services.abort_alert("fixer: invalid spawn for["..utils.to_str(obj:name()).."] level["..utils.to_str(obj_level).."] gv["..utils.to_str(obj.m_game_vertex_id).."] !!!!")
+					abort_alert("fixer: invalid spawn for["..utils.to_str(obj:name()).."] level["..utils.to_str(obj_level).."] gv["..utils.to_str(obj.m_game_vertex_id).."] !!!!")
 					alife():release(obj, true)
 				end
 			end
@@ -1637,11 +1630,16 @@ function env_update()
 	local m_m = level.get_time_minutes()
 	if m_h < TB3D_Modders.day_start or m_h > TB3D_Modders.day_end then						-- night
 		if ismidnight then
-			if m_m > 5 then ismidnight = false end
+			if m_m > 5 then
+				ismidnight = false
+				remove_info("info_respawn_grib")
+			end
 		elseif m_h == 0 and m_m < 4 then
 			ismidnight = true
 			math.randomseed(level.get_time_minutes()+1133)										--start a new random seed
 			if has_alife_info("sar_monolith_go") then meceniy_art.art_respawn() end				--spawn an art_accumm on active level
+			braad_test.grib_respawn()		--109997
+			give_info("info_respawn_grib")
 		end
 		isnight = true
 	else
@@ -1650,7 +1648,9 @@ function env_update()
 		elseif m_h == 12 and m_m < 4 then
 			isnoon = true
 			remove_info("art_mec_spawn")
-			check_storm_over()				--109996
+			if has_alife_info("tb3d_sms_storm") and not has_alife_info("tb3d_storm_over") then			--109997
+				check_storm_over()
+			end
 		end
 		isnight = false
 	end
@@ -1938,13 +1938,13 @@ function check_storm_over()					--109996
 	local days = level.get_time_days()
 	if strm_strtd > 0 then
 		if not has_alife_info("tb3d_block_1") and strm_strtd + 3 > days then
-			TB3D_Services.give_info("tb3d_block_1")
+			give_info("tb3d_block_1")
 		elseif strm_strtd + 5 > days then
-			TB3D_Services.give_info("tb3d_block_2")						--only NPP areas
+			give_info("tb3d_block_2")						--only NPP areas
 		elseif strm_strtd + 7 > days then
-			TB3D_Services.give_info("tb3d_storm_over")
+			give_info("tb3d_storm_over")
 			amk.del_variable("tb3d_storm_started")
-			TB3D_Services.set_new_levelup(3)							--set for process_levels
+			give_info("tb3d_game_end") --set_new_levelup(3)		--set for process_levels
 		end
 	else
 		amk.save_variable("tb3d_storm_started", days)
@@ -2334,7 +2334,7 @@ end
 
 function shadowman_cleanup()
 	remove_info_portions("shadowman_zver")
-	TB3D_Services.give_info("shadowman_zver_have")
+	give_info("shadowman_zver_have")
 end
 
 function clear_snip_infos()
@@ -2915,7 +2915,7 @@ function check_prior_version(tb3d_ver)											--109972
 		stage = 4			--109981
 	end
 	if stage < 5 then
-		if is_collector() then TB3D_Services.set_player_relations(5) end	--109981, fixed relations: killer, lastday and mono -500, all others 0
+		if is_collector() then set_player_relations(5) end	--109981, fixed relations: killer, lastday and mono -500, all others 0
 		stage = 5
 	end
 	if stage < 6 then
@@ -2929,7 +2929,7 @@ function check_flashlight()					--109982
 	if stage == 1 then													--start broken flashlight
 		local oitem = db.actor:item_in_slot(9)
 		if oitem then
-			TB3D_Services.packet_alert("tb3d stalker: stage 1 item in slot 9["..oitem:name().."] removed")
+			packet_alert("tb3d stalker: stage 1 item in slot 9["..oitem:name().."] removed")
 			db.actor:drop_item(oitem)
 			alife():release(alife():object(oitem:id()), true)
 		end
@@ -2939,17 +2939,17 @@ function check_flashlight()					--109982
 	elseif stage == 3 then														--tb3d_stalker.process_levels() sets it to 3 to end it
 		local oitem = db.actor:object("device_torch_bad")						--see if one in inventory
 		if oitem then
-			TB3D_Services.packet_alert("tb3d stalker: item in slot 9["..oitem:name().."] removed")
+			packet_alert("tb3d stalker: item in slot 9["..oitem:name().."] removed")
 			db.actor:drop_item(oitem)
 			alife():release(alife():object(oitem:id()), true)
 		end
 		oitem = db.actor:item_in_slot(9)							--make sure slot empty
 		if oitem then
-			TB3D_Services.packet_alert("tb3d stalker: stage 3 item in slot 9["..oitem:name().."] removed")
+			packet_alert("tb3d stalker: stage 3 item in slot 9["..oitem:name().."] removed")
 			db.actor:drop_item(oitem)
 			alife():release(alife():object(oitem:id()), true)
 		end
-		TB3D_Services.remove_info("tb3d_bad_torch")
+		remove_info("tb3d_bad_torch")
 		amk.spawn_item_in_inv("device_torch")						--restores nv and light
 		amk.del_variable("torch_state")
 	end

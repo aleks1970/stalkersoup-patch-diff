@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.6 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.9.7 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -10,7 +10,7 @@
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
 -- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over
-function my_ver() return "1.0.9.9.9.6" end
+function my_ver() return "1.0.9.9.9.7" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -110,6 +110,7 @@ function first_run() 		--mod_call() from amk.script on_game_load, do not spawn o
 	if amk.load_variable("option_auto",nil) == nil then amk.save_variable("option_auto", TB3d_Modders.auto_levels) end
 	if amk.load_variable("option_megafone",nil) == nil then amk.save_variable("option_megafone", 1) end
 	if amk.load_variable("option_weather",nil) == nil then amk.save_variable("option_weather", 0) end
+	if amk.load_variable("option_dyn_suit",nil) == nil then amk.save_variable("option_dyn_suit", 1) end
 	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("AMK MOD: first run done") end
 end --first run
 
@@ -314,7 +315,8 @@ function check_spawn()
 				TB3D_Services.delayed_action(1, "tb3d_sms_storm", 10)				--start timer to send sms
 				TB3D_Services.set_harsh_environment(2)								--start earthquake and wake
 			elseif levelup == 3 then												--109996, reclamation
-				alife():create("zep_note_gen_grimwald", vector():set(-223.757,33.071,-127.943),78486,3077)		--109996, tent ne near checkpoint	
+				alife():create("zep_note_gen_grimwald", vector():set(-223.757,33.071,-127.943),78486,3077)		--109997, tent ne near checkpoint
+				TB3D_Services.give_info("tb3d_spawn_oman")							--oman occupies waiting room helipad
 			elseif levelup == 4 then												--109996, free play and DLC
 				TB3D_Services.set_player_relations(5)								--109996, killer, lastday and mono -500, all others 0
 			end
@@ -331,9 +333,6 @@ function check_spawn()
 					dmx_cars.car_spawn()
 					dmx_cars.quest_cars_spawn()									--spawn quest cars
 				end
-			end
-			if has_alife_info("tb3d_sms_storm") and not has_alife_info("tb3d_storm_over") then								--109984
-				TB3D_Services.check_storm_over()			--109996
 			end
 		--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
 			TB3D_Collector.process_levels(lname, sname)

@@ -5,7 +5,7 @@ function my_ver() return "1.0.9.9.9.2" end
  Description  : Button to sort items in their class when you move the box
  Copyright    : DMX MOD
  Author       : Charsi (Thanks: Malandrinus, Erlik)
- LastUpdate   : 03.05.2015 by aleks1970
+ LastUpdate   : 03.09.2015 by aleks1970
 --]]-----------------------------------------------------------------------------------------
 
 local debug = false	 -- system placement of buttons (true - incl. \ false - off).
@@ -19,7 +19,7 @@ local items_in_box2  = {["weapon"]={},["ammo"]={},["outfit"]={},["artifact"]={},
 local items_in_slots = {}
 local timer1, timer2  = 0,0
 local time_shift     = 1000
-local no_drop_items  = {["separator"]=true, ["fake_bolt"]=true} --, ["remontnyi_box"]=true, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true, ["amk_metka"]=true,["amk_transmutator"]=true,["bioradar"]=true}
+local no_drop_items  = {["separator"]=true, ["fake_bolt"]=true, ["remontnyi_box"]=true, ["amk_metka"]=true, ["amk_transmutator"]=true,["bioradar"]=true}	--, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true}	--corrected transmutator and the other respawn errors - aleks1970
 
 class "BkgrWnd" (CUIScriptWnd)
 function clear_items_in_box(num)

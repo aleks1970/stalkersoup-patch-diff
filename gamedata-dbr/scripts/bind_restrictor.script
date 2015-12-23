@@ -111,21 +111,16 @@ end
 
 -- called locally
 function restrictor_binder:actor_update(delta)
-	--if TB3D_Modders.Global_Debug then
-		--TB3D_Services.packet_alert("restrictor: update["..utils.to_str(self.object:name()).."]")
-	--end
 	if not self.initialized then
 		amk.oau_watchdog=887												-----------------887
 		self.initialized = true
 		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_restrictor)
+		if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("restrictor: init["..utils.to_str(self.object:name()).."]") end
 	elseif self.st.active_section ~= nil then
 		amk.oau_watchdog=888												-----------------888
 		if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("restrictor: update["..utils.to_str(self.object:name()).."]") end
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
 	end
-	--if TB3D_Modders.Global_Debug then
-		--TB3D_Services.packet_alert("restrictor: update done")
-	--end
 end
 
 function restrictor_binder:net_save_relevant()
@@ -139,7 +134,6 @@ end
 
 function restrictor_binder:load(reader)
 	self.loaded = true
-	----printf( "restrictor_binder:load" )
 	object_binder.load(self, reader)
 	xr_logic.load_obj(self.object, reader)
 end

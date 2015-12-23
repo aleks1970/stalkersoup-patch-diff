@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.5  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
--- Localization, nano outfit, redesign, tb3d adapted, is_storm
-function my_ver() return "1.0.9.9.9.5" end
+--TB3D 1.0.9.9.9.7  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
+-- Localization, nano outfit, redesign, tb3d adapted, is_storm, suit option
+function my_ver() return "1.0.9.9.9.7" end
 --[[---------------------------------------------------------
  File         : meceniy_outfit.script
  Description  : \\"Nano and Exoskeleton Skat-15M outfits" .. With life support system (SZHP) and upgradeable options ..
@@ -37,6 +37,7 @@ local flag_skat_3 = false
 local flag_skat_4 = false -- DMX UPGRADE
 
 local SMS_Skat = true
+local SMS_global_enabled
 local SMS_enabled = true	-- Reporting Skat15/Nano version on sms... - aleks1970
 local SMS_used_supp = true	-- Reporting Skat15/Nano used supplays on sms... - aleks1970
 local SMS_sound_enabled = true	-- Enable/disable sound - aleks1970
@@ -60,6 +61,7 @@ local nano_heal
 local suit_type
 local outfit_type
 local obj_distance
+local enemy_status
 local supp_check_en
 local outfit_debug = false --true
 
@@ -112,112 +114,111 @@ local nano_system = Text_color_orange..translate("nano_sms_skat_system_m")
 local log_delay = 0
 local outfit_check = 0
 function on_actor_update(is_scope)
-	local advanced_outfit = act:get_current_outfit()
-	if not advanced_outfit or not act:alive() then SMS_Skat = true remove_txt() return end	--shutdown, if the player is dead or not wearing outfit - aleks1970
-	if advanced_outfit then
-		local outfit_section = advanced_outfit:section()
-		if string_find(outfit_section, "nano_outfit_") and not string_find(outfit_section, "nano_outfit_add") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = true
-				do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_name"), 10000)
-				SMS_Skat = false
+	if amk.load_variable("option_dyn_suit",0) == 0 then
+		local advanced_outfit = act:get_current_outfit()
+		if not advanced_outfit or not act:alive() then SMS_Skat = true remove_txt() return end	--shutdown, if the player is dead or not wearing outfit - aleks1970
+		if advanced_outfit then
+			local outfit_section = advanced_outfit:section()
+			if string_find(outfit_section, "nano_outfit_") and not string_find(outfit_section, "nano_outfit_add") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = true
+					do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_name"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "nano_outfit_addh_") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = true
+					do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_addh_name"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "nano_outfit_addw_") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = true
+					do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_addw_name"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "exo_mil_exoskeleton_tb3d") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = false
+					do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_tb3d_s"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "exo_mil_exoskeleton_dmx") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = false
+					do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_dmx_upgrade_s"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "exo_mil_exoskeleton_addx") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = false
+					do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_addx_s"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "exo_mil_exoskeleton_addr") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = false
+					do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_addr_s"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "exo_mil_exoskeleton_add") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = false
+					do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_add_s"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			elseif string_find(outfit_section, "exo_mil_exoskeleton") then
+				if SMS_enabled and SMS_Skat then
+					nano_heal = false
+					do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name"), 10000)
+					SMS_Skat = false
+				end
+				outfit_type = true
+			else
+			outfit_type = false
 			end
-			outfit_type = true
-		elseif string_find(outfit_section, "nano_outfit_addh_") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = true
-				do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_addh_name"), 10000)
-				SMS_Skat = false
+		end
+		
+		if outfit_debug then
+			if log_delay < time_global() then
+				TB3D_Services.packet_alert("meceniy outifit: suit["..utils.to_str(section).."] type["..utils.to_str(suit_type).."] used["..utils.to_str(used).."]")
+				TB3D_Services.packet_alert("meceniy outifit: food-delay["..utils.to_str(food_ok_interval).."] rad-food-delay["..utils.to_str(rad_food_interval).."]")
+				log_delay = time_global() + 1500
 			end
-			outfit_type = true
-		elseif string_find(outfit_section, "nano_outfit_addw_") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = true
-				do_heal_sms(true, "suit_0", nano_system..Text_color_green..translate("nano_outfit_addw_name"), 10000)
-				SMS_Skat = false
-			end
-			outfit_type = true
-		elseif string_find(outfit_section, "exo_mil_exoskeleton_tb3d") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = false
-				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_tb3d_s"), 10000)
-				SMS_Skat = false
-			end
-			outfit_type = true
-		elseif string_find(outfit_section, "exo_mil_exoskeleton_dmx") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = false
-				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_dmx_upgrade_s"), 10000)
-				SMS_Skat = false
-			end
-			outfit_type = true
-		elseif string_find(outfit_section, "exo_mil_exoskeleton_addx") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = false
-				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_addx_s"), 10000)
-				SMS_Skat = false
-			end
-			outfit_type = true
-		elseif string_find(outfit_section, "exo_mil_exoskeleton_addr") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = false
-				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_addr_s"), 10000)
-				SMS_Skat = false
-			end
-			outfit_type = true
-		elseif string_find(outfit_section, "exo_mil_exoskeleton_add") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = false
-				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name_add_s"), 10000)
-				SMS_Skat = false
-			end
-			outfit_type = true
-		elseif string_find(outfit_section, "exo_mil_exoskeleton") then
-			if SMS_enabled and SMS_Skat then
-				nano_heal = false
-				do_heal_sms(true, "suit_0", skat_system..Text_color_green..translate("mil_exoskeleton_name"), 10000)
-				SMS_Skat = false
-			end
-			outfit_type = true
+		end
+		
+		if outfit_type then
+		--	if outfit_check_2 < time_global() then
+		--		news_manager.send_tip_txt(act, skat_system..Text_color_green.."advanced outfit on...", nil, 5000)
+		--		outfit_check_2 = time_global() + 5000
+		--	end
+			supplay_check()
+			on_sub_actor_update(is_scope)
 		else
-		outfit_type = false
-		end
-	end
-	
-	if outfit_debug then
-		if log_delay < time_global() then
-			TB3D_Services.packet_alert("meceniy outifit: suit["..utils.to_str(section).."] type["..utils.to_str(suit_type).."] used["..utils.to_str(used).."]")
-			TB3D_Services.packet_alert("meceniy outifit: food-delay["..utils.to_str(food_ok_interval).."] rad-food-delay["..utils.to_str(rad_food_interval).."]")
-			log_delay = time_global() + 1500
-		end
-	end
-	
-	if outfit_type then
-	--	if outfit_check_2 < time_global() then
-	--		news_manager.send_tip_txt(act, skat_system..Text_color_green.."advanced outfit on...", nil, 5000)
-	--		outfit_check_2 = time_global() + 5000
-	--	end
-		supplay_check()
-		on_sub_actor_update(is_scope)
-	--	if level.main_input_receiver() then
-	--		SMS_Skat = true
-	--	end
-	else
-		if rad_heal == nil then
-			rad_heal = 0
-		else
-			if (rad_heal >= 1) then
-			new_rad_food()
+			if rad_heal == nil then
+				rad_heal = 0
+			else
+				if (rad_heal >= 1) then
+				new_rad_food()
+				end
 			end
+			--	if outfit_check_2 < time_global() then
+			--		news_manager.send_tip_txt(act, skat_system..Text_color_green.."advanced outfit off...", nil, 5000)
+			--		outfit_check_2 = time_global() + 5000
+			--	end
+				SMS_Skat = true
+			return
 		end
-	--	if outfit_check_2 < time_global() then
-	--		news_manager.send_tip_txt(act, skat_system..Text_color_green.."advanced outfit off...", nil, 5000)
-	--		outfit_check_2 = time_global() + 5000
-	--	end
-		SMS_Skat = true
-	return
+		meceniy_send_tip_txt()
 	end
-	meceniy_send_tip_txt()
 end
 
 -- ----------------------------------------------------- outfit version check end --------------------------------------------------------
@@ -282,7 +283,7 @@ function on_sub_actor_update(is_scope)
 			end
 		end
 		if suit_type == 1 then
-			outfit_system_base()
+			outfit_system_base(is_scope)
 		elseif suit_type == 2 then
 			outfit_system_min(is_scope)	-- Concatenation functions - aleks1970
 		elseif suit_type == 3 then
@@ -309,20 +310,24 @@ end
 -- -------------------------- test for the enemy nearby --------------------------
 local enemy_txt_reset = 0
 local enemy_log_delay_1 = 0
+--local enemy_log_delay_2 = 0
 function meceniy_enemy(is_scope)
-	local enemy=false
+	local enemy_status=false
+	if is_scope then
+		SMS_global_enabled = false
+	else
+		SMS_global_enabled = true
+	end
 	if not is_scope then
 		local obj
 		local txt
 		local stalker
 		local monster
 		local actor = db.actor
-	--	local obj_distance = 140
 		local actorPos = actor:position()
 		local lvo_id = level.object_by_id
 		local objPos
 		local dist
-		--local a_see
 		local last_dist
 		if enemy_log_delay_1 < time_global() then
 			last_dist = 220												--force new search
@@ -339,14 +344,25 @@ function meceniy_enemy(is_scope)
 							if monster and obj:section() ~= "dogfrend" then
 								if dist < 80 then
 									last_dist = dist
+									enemy_status = true
 								elseif obj:see(db.actor) then
 									last_dist = dist
+									enemy_status = true
+								else
+									enemy_status = false
 								end
 							elseif stalker and amk.get_npc_relation(obj,actor)=="enemy" then
+								if dist < 80 then
+									enemy_status = true
+								else
+									enemy_status = false
+								end
 								last_dist = dist
 							end
 							if last_dist < 20 then break end					--in your face so stop searching
 						end
+					else
+						enemy_status = false
 					end
 				end
 			end		--loop
@@ -355,56 +371,56 @@ function meceniy_enemy(is_scope)
 			if dist < 220 then				-- 109994
 				if dist < 20 then
 					obj_distance = 20
-					enemy = true
+				--	enemy_status = true
 				elseif dist < 30 then
 					obj_distance = 30
-					enemy = true
+				--	enemy_status = true
 				elseif dist < 40 then
 					obj_distance = 40
-					enemy = true
+				--	enemy_status = true
 				elseif dist < 50 then
 					obj_distance = 50
-					enemy = true
+				--	enemy_status = true
 				elseif dist < 60 then
 					obj_distance = 60
-					enemy = true
+				--	enemy_status = true
 				elseif dist < 70 then
 					obj_distance = 70
-					enemy = true
+				--	enemy_status = true
 				elseif dist < 80 then
 					obj_distance = 80
-					enemy = true
+				--	enemy_status = true
 				elseif dist < 90 then
 					obj_distance = 90
-					enemy = false	--enough distance to drink vodka - check 422 line - aleks1970
+				--	enemy_status = false	--enough distance to drink vodka - check 422 line - aleks1970
 				elseif dist < 100 then
 					obj_distance = 100
-					enemy = false
+				--	enemy_status = false
 				elseif dist < 110 then
 					obj_distance = 110
-					enemy = false
+				--	enemy_status = false
 				elseif dist < 120 then
 					obj_distance = 120
-					enemy = false
+				--	enemy_status = false
 				elseif dist < 140 then
 					obj_distance = 140
-					enemy = false
+				--	enemy_status = false
 				elseif dist < 160 then
 					obj_distance = 160
-					enemy = false
+				--	enemy_status = false
 				elseif dist < 180 then
 					obj_distance = 180
-					enemy = false
+				--	enemy_status = false
 				elseif dist < 200 then
 					obj_distance = 200
-					enemy = false
+				--	enemy_status = false
 				else
 					obj_distance = 220
-					enemy = false
+				--	enemy_status = false
 				end
 			else
 				obj_distance = 220
-				enemy = false
+			--	enemy_status = false
 			end
 			enemy_log_delay_1 = time_global() + 1200
 		elseif enemy_txt_reset < time_global() then	-- reset(hide) onscreen text
@@ -413,25 +429,26 @@ function meceniy_enemy(is_scope)
 		end
 	--	TB3D_Services.info_alert("news mgr: enemy2["..utils.to_str(enemy2).."] npc_relation["..utils.to_str(lvo_id).."] npc_relation_id["..utils.to_str(obj).."]")
 	end
-	if enemy==true then
-	--	if enemy_log_delay_1 < time_global() then --and enemy_see then
+	--if enemy_status==true then
+		--if enemy_log_delay_2 < time_global() then --and enemy_see then
 		--	do_heal_sms(true, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo: sovraznik je blizu - je bila uspesna...", 6000)
-	--		do_heal_sms(true, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo-true: sovraznik je blizu  - je bila uspesna..."..Text_color_green..("sovraznik na oddaljenosti"..utils.to_str(obj_distance)), 6000)
-	--	enemy_log_delay_1 = time_global() + 1500
+		--	do_heal_sms(true, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo-true: sovraznik je blizu  - je bila uspesna..."..Text_color_green..("sovraznik na oddaljenosti"..utils.to_str(enemy_status)), 8000)
+		--enemy_log_delay_2 = time_global() + 7500
 		--	TB3D_Services.packet_alert("meceniy outifit: enemy["..utils.to_str(enemy).."] npc_relation["..utils.to_str(lvo_id).."] npc_relation_id["..utils.to_str(obj).."] npc_object_id["..utils.to_str(obj:id()).."] npc_see_actor["..utils.to_str(obj:see(act)).."]")
 	--	enemy_see = false
-	--	end
-		return true	--function new_system_rad():drink vodka "enabled" - aleks1970
-	else
-	--	if enemy_log_delay_1 < time_global() then --and (not enemy_see) then
-		--	do_heal_sms(false, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo: sovraznik_2 -"..Text_color_red.." ni bila uspesna...", 6000)
-	--		do_heal_sms(false, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo-false: sovraznik je blizu  - je bila uspesna..."..Text_color_red..("sovraznik na oddaljenosti"..utils.to_str(obj_distance)), 6000)
-	--	enemy_log_delay_1 = time_global() + 3000
+		--end
+	--	do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." "..("meceniy outifit: enemy-status["..utils.to_str(enemy_status).."]"), 10000)
+		--return enemy_status	--true	--function new_system_rad():drink vodka "enabled" - aleks1970
+	--else
+		--if enemy_log_delay_2 < time_global() then --and (not enemy_see) then
+	--		do_heal_sms(false, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo: sovraznik_2 -"..Text_color_red.." ni bila uspesna...", 6000)
+			--do_heal_sms(false, "suit_4", skat_system..Text_color_yellow.."preverba za funkcijo-false: sovraznik je blizu  - je bila uspesna..."..Text_color_red..("sovraznik na oddaljenosti"..utils.to_str(enemy_status)), 8000)
+		--enemy_log_delay_2 = time_global() + 8000
 		--	TB3D_Services.packet_alert("meceniy outifit: enemy["..utils.to_str(enemy).."] npc_relation["..utils.to_str(lvo_id).."] npc_relation_id["..utils.to_str(obj).."] npc_object_id["..utils.to_str(obj:id()).."] npc_see_actor["..utils.to_str(obj:see(act)).."]")
 	--	enemy_see = true
-	--	end
-		return false	--function new_system_rad():drink vodka "disabled" - aleks1970
-	end
+		--end
+		return enemy_status	--false	--function new_system_rad():drink vodka "disabled" - aleks1970
+	--end
 end
 
 -- ----------------------------------------------------------------------------
@@ -443,13 +460,13 @@ function new_enemy_radar(is_scope, is_storm)
 	if (not enemy_detector) then return end
 	local hud = get_hud()
 	local msg_new = true
-	if is_scope then
-		if ramka then
-			hud:RemoveDialogToRender(ramka)
-			ramka = nil
-			time_msg = time_global() + 5000
-		end
-	else
+--	if is_scope then
+--		if ramka then
+--			hud:RemoveDialogToRender(ramka)
+--			ramka = nil
+--			time_msg = time_global() + 5000
+--		end
+--	else
 		if (not act:alive()) or time_msg > (time_global() + 2000) then return end	-- delayed start
 		if obj_distance == nil then
 			obj_distance = 220
@@ -460,7 +477,7 @@ function new_enemy_radar(is_scope, is_storm)
 		else
 			msg = translate("enemy_sms_skat_system_m1").." "..obj_distance.." "..translate("enemy_sms_skat_system_m2")
 		end
-		if level.main_input_receiver() then
+		if (is_scope or level.main_input_receiver()) then
 			if ramka then
 				hud:RemoveDialogToRender(ramka)
 				ramka = nil
@@ -507,14 +524,6 @@ function new_enemy_radar(is_scope, is_storm)
 					else
 						ramka:Show(true)
 					end
-				--	if obj_distance < 100 then
-				--		ramka:Show(true)
-				--		if blink == 0 and obj_distance > 80 then
-				--			ramka:Show(false)
-				--		else
-				--			ramka:Show(true)
-				--		end
-				--	end
 				end
 				if time_msg < time_global() then
 					blink = 1 - blink
@@ -532,7 +541,7 @@ function new_enemy_radar(is_scope, is_storm)
 				end
 			end
 		end
-	end
+	--end
 end
 -- -------------------------------------------------------------------------------
 function remove_txt()
@@ -880,15 +889,17 @@ function new_system_rad()
 		local skat_supl = Text_color_yellow..translate("skat15_sms_cri_dose_of_rad_2")
 		do_heal_sms(true, "suit_4", lf_support.." - "..skat_supl, 12000)
 			radiation_interval = time_global() + 8500
+		do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." "..("meceniy outifit: enemy-status["..utils.to_str(enemy_status).."]"), 10000)
 	elseif SMS_danger_report and (not suppl_anti_rad) and (not suppl_anti_rad_drink) and (not f_2) then
 		local skat_supl = Text_color_yellow..translate("skat15_sms_cri_dose_of_rad")
 		do_heal_sms(true, "suit_4", lf_support.." - "..skat_supl, 12000)
 			radiation_interval = time_global() + 4500
+		do_heal_sms(true, "suit_3", lf_support_2..skat_supl.." "..("meceniy outifit: enemy-status["..utils.to_str(enemy_status).."]"), 10000)
 	end
 
 	f_2 = true
 
-	if meceniy_enemy() then
+	if meceniy_enemy(is_scope) then	--	if enemy_status==nil or enemy_status==true then	--if meceniy_enemy() then
 		drink_v = false
 	else
 		if suppl_anti_rad_drink then
@@ -1320,22 +1331,43 @@ end
 local sound_delay = 0
 local audio_sms = true
 function do_heal_sms(a,stat,text,time) --aleks1970
-	if stat == "suit_0" or stat == "suit_4" or stat == "suit_7" or stat == "suit_8" or stat == "suit_9" then
-		audio_sms = false
-	else
-		audio_sms = true
-		if audio_sms and SMS_sound_enabled and sound_delay < time_global() then
-			if a then
-				play_snd([[meceniy\outfit\est_med_new]])
-				sound_delay = time_global() + 2000
-			else
-				play_snd([[meceniy\outfit\net_med_new]])
-				sound_delay = time_global() + 2000
+	if amk.load_variable("option_dyn_suit",0) == 1 then			--109997
+		local sms_tip_0 = [[meceniy\outfit\skat-nano_on]]	-- new sounds aleks1970
+		local sms_tip_1 = [[meceniy\outfit\skat_power_error]]
+		local sms_tip_1 = [[meceniy\outfit\skat_power_error_2]]
+		local sms_tip_2 = [[meceniy\outfit\skat_nano_con]]
+		local sms_tip_3 = [[device\pda\pda_tip]]
+		local heal_tip_1 = [[meceniy\outfit\est_med_new]]
+		local heal_tip_2 = [[meceniy\outfit\net_med_new]]
+	--	if stat == "suit_0" or stat == "suit_4" or stat == "suit_7" or stat == "suit_8" or stat == "suit_9" then
+		if stat == "suit_0" then
+			play_snd(sms_tip_0)
+			audio_sms = false
+		elseif (stat == "suit_4") or (stat == "suit_9") then
+			play_snd(sms_tip_3)
+			audio_sms = false
+		elseif stat == "suit_7" then
+			play_snd(sms_tip_1)
+			audio_sms = false
+		elseif stat == "suit_8" then
+			play_snd(sms_tip_2)
+			audio_sms = false
+		else
+			audio_sms = true
+			if audio_sms and SMS_sound_enabled and sound_delay < time_global() then
+				if a then
+					play_snd(heal_tip_1)
+					sound_delay = time_global() + 2000
+				else
+					play_snd(heal_tip_2)
+					sound_delay = time_global() + 2000
+				end
 			end
 		end
+		if (SMS_global_enabled==nil or SMS_global_enabled==true) then	--hide sms onscreen text when the "is_scope" is active - aleks1970
+			meceniy_send_tip_txt(act, stat, text, nil, "icon", time)
+		end
 	end
-	--news_manager.send_tip_txt(act, str, nil, 20000)
-	meceniy_send_tip_txt(act, stat, text, nil, "icon", time)
 end
 
 function play_snd(snd)
@@ -1344,31 +1376,31 @@ function play_snd(snd)
 end
 -- --------------------------------------- new multifunctional news -----------------------------------------
 function meceniy_send_tip_txt(actor, outfit_id, meceniy_news_text, timeout, sender, showtime)
-	local send_meceniy_news = news_manager.give_game_news
-	local pda_tip_0 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat-nano_on]])	-- new sounds aleks1970
+--	local send_meceniy_news = news_manager.give_game_news
+--	local pda_tip_0 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat-nano_on]])	-- new sounds aleks1970
 --	local pda_tip_1 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_power_error]])
-	local pda_tip_1 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_power_error_2]])
-	local pda_tip_2 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_nano_con]])
-	local pda_tip_3 = xr_sound.get_safe_sound_object([[device\pda\pda_tip]])
+--	local pda_tip_1 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_power_error_2]])
+--	local pda_tip_2 = xr_sound.get_safe_sound_object([[meceniy\outfit\skat_nano_con]])
+--	local pda_tip_3 = xr_sound.get_safe_sound_object([[device\pda\pda_tip]])
 	if meceniy_news_text then
 		local tmout = timeout or 1
 		local icon_id = sender or 0
 		local sms_id = outfit_id or 0
 		local shwtme = showtime or 15000
 		if shwtme < 1 then shwtme = 15000 end
-		local player = pda_tip_0
-		if sms_id == "suit_0" then
-			player:play(act, tmout, sound_object.s2d)
-		elseif (sms_id == "suit_4") or (sms_id == "suit_9") then
-			player = pda_tip_3
-			player:play(act, tmout, sound_object.s2d)
-		elseif sms_id == "suit_7" then
-			player = pda_tip_1
-			player:play(act, tmout, sound_object.s2d)
-		elseif sms_id == "suit_8" then
-			player = pda_tip_2
-			player:play(act, tmout, sound_object.s2d)
-		end
+	--	local player = pda_tip_0
+	--	if sms_id == "suit_0" then
+	--		player:play(act, tmout, sound_object.s2d)
+	--	elseif (sms_id == "suit_4") or (sms_id == "suit_9") then
+	--		player = pda_tip_3
+	--		player:play(act, tmout, sound_object.s2d)
+	--	elseif sms_id == "suit_7" then
+	--		player = pda_tip_1
+	--		player:play(act, tmout, sound_object.s2d)
+	--	elseif sms_id == "suit_8" then
+	--		player = pda_tip_2
+	--		player:play(act, tmout, sound_object.s2d)
+	--	end
 
 		if icon_id == "icon" then
 			if nano_heal then
@@ -1425,13 +1457,15 @@ function meceniy_send_tip_txt(actor, outfit_id, meceniy_news_text, timeout, send
 		if TB3D_Modders.use_news_message then
 			TB3D_Services.info_alert("news mgr: send the tip["..utils.to_str(meceniy_news_text).."]") 
 		end
-		send_meceniy_news(meceniy_news_text, "ui\\ui_iconsTotal2", Frect():set(x,y,83,47), tmout, shwtme)
+--		send_meceniy_news(meceniy_news_text, "ui\\ui_iconsTotal2", Frect():set(x,y,83,47), tmout, shwtme)
 	--	TB3D_Services.info_alert("news mgr: outfit id["..utils.to_str(sms_id).."] outfit-nano_heal ["..utils.to_str(nano_heal).."] sender id["..utils.to_str(sender).."] icon id["..utils.to_str(icon_id).."] show["..utils.to_str(showtime).."]")
 	--	TB3D_Services.info_alert("news mgr: give meceniy news["..utils.to_str(meceniy_news_text).."] outfit id["..utils.to_str(sms_id).."] icon id["..utils.to_str(sender).."] timeout["..utils.to_str(timeout).."] show["..utils.to_str(showtime).."]") 
+		db.actor:give_game_news(meceniy_news_text, "ui\\ui_iconsTotal2", Frect():set(x,y,83,47), tmout, shwtme)
 		return true
 	end
 	return false
 end
+
 -- ----------------------------- new icons info ----------------------------- --
 --	default			= {44,229},		-- suit_9, nil							  --
 --	skat_ok			= {0,330},		-- suit_0, suit_1						  --

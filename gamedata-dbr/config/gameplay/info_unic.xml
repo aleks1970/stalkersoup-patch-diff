@@ -1,5 +1,5 @@
-<!-- TB3D 1.0.9.9.8.9 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
- predbannik_barman, zver_taken, more content, articles, suit, storm stages-->
+<!-- TB3D 1.0.9.9.9.7 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
+ predbannik_barman, zver_taken, more content, articles, suit, storm stages, storm_over-->
  
 <game_information_portions>
 <info_portion id="tb3d_started_as_collector"></info_portion>	<!-- used to control mob spawns -->
@@ -24,6 +24,7 @@
 <info_portion id="tb3d_give_storm_info">
 	<article>levelup2_desolation</article>
 </info_portion>
+<info_portion id="tb3d_storm_over"></info_portion>			<!-- 109997, storm ends -->
 <info_portion id="tb3d_sms_storm_over">						<!-- storm ends and starts level up 3 Reclamation -->
 	<article>levelup3_reclemation</article>
 </info_portion>
@@ -46,6 +47,8 @@
 <info_portion id="tb3d_blockpost_attacked"></info_portion>	<!-- 109989, triggers too easily -->
 <info_portion id="tb3d_wrenches_spawned"></info_portion>	<!-- 109992, toolkit quest -->
 <info_portion id="tb3d_tools_spawned"></info_portion>		<!-- 109992, toolkit quest -->
+
+<info_portion id="tb3d_spawn_oman"></info_portion>			<!-- 109997, after storm -->
 
 <!-- ZEP: on findind a document, place last one in journal ---------------------------------------------------->
 <info_portion id="zep00_have">								<!-- ds gas station: send sms to talk to barman -->

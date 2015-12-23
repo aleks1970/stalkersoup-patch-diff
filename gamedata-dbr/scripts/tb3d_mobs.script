@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.6 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.0.9.9.9.7 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
--- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns
-function my_ver() return "1.0.9.9.9.6" end
+-- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns, spawn quest bandits
+function my_ver() return "1.0.9.9.9.7" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -237,6 +237,12 @@ function spawn_snorks(x, y, z, lv, gv, max)
 	end
 	for i=1, cnt do
 		alife():create("tb3dm_snork_jumper", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+	end
+end
+
+function spawn_quest_bandits(x, y, z, lv, gv, cnt)									--109997
+	for i=1, cnt do
+		alife():create("tb3dm_bandit_novice", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
 	end
 end
 
@@ -816,6 +822,26 @@ function check_redf_spawns()
 	--TODO
 end
 
+function spawn_ros_bandits()						--109997
+	local spawns = amk.load_variable("ros_spawns", 0)
+	if spawns == 0 then
+		amk.save_variable("ros_spawns", 1)
+	elseif spawns == 1 then
+		spawn_bandits(-162.000,0.024,184.062,35434,1329,math_random(1,6))		--random bandits
+		amk.save_variable("ros_spawns", 0)										--nothing on next visit
+	end
+end
+
+function spawn_agrou_bandits()						--109997
+	local spawns = amk.load_variable("agrou_spawns", 0)
+	if spawns == 0 then
+		amk.save_variable("agrou_spawns", 1)	
+	elseif spawns == 1 then
+		spawn_bandits(-69.827,-6.499,13.221,3459,712,math_random(1,6))			--random bandits
+		amk.save_variable("agrou_spawns", 0)									--nothing on next visit
+	end
+end
+
 --============================ HARSH LEVEL SPAWNS ==============================================
 function check_eprip_spawns()
 	local typ, qty
@@ -1114,8 +1140,8 @@ function check_tunnels_spawns(level_up)				--109993
 	end
 	spawn_rats(127.083,-19.291,-62.401,4673,3868,qty)		--west end
 	spawn_rats(67.120,-19.292,-178.588,1190,3868,qty)		--east end
-	spawn_rats(113.766,-19.292,-132.074,3760,3868,qty)	--middle
-	spawn_rats(108.668,-7.732,37.993,3159,3865,qty)		--upper rooms
+	spawn_rats(113.766,-19.292,-132.074,3760,3868,qty)		--middle
+	spawn_rats(108.668,-7.732,37.993,3159,3865,qty)			--upper rooms
 	spawn_rats(99.830,-7.731,12.355,2454,3867,qty)
 	spawn_rats(113.939,-7.726,-62.645,3765,3868,qty)
 end

@@ -1,11 +1,11 @@
---TB3D 1.0.9.9.7.6  fixed two button texts, dmx135, translate
+--TB3D 1.0.9.9.7.6  fixed two button texts, dmx135, translate, line 299-308
 function my_ver() return "1.0.9.9.7.6" end
 --[[-----------------------------------------------------------------------------------------------
  File         : ui_weapon_upgrade.script
  Description  : Graphical frontend upgrade weapons
  Copyright    : DMX MOD\People Salsola
  Author       : Charsi, with minor revisions by Shadows
- Last edit    : 24.07.2015 By aleks1970
+ Last edit    : 13.08.2015 By aleks1970
  Version      : 0.6
 --]]-----------------------------------------------------------------------------------------------
 
@@ -295,14 +295,21 @@ function up_wnd2:__init(n,type_up,owner) super()
 	self:AttachChild(self.btn_ok)
 	self:AddCallback("btn_ok",ui_events.BUTTON_CLICKED,self.OnButton_btn_ok_clicked,self)
 	local up_name = "trader_upgrade_weapon_s"..n
-	if type_up == "reduce weight" then up_name = up_name.."_ves"
-	elseif type_up == "caliber change" then up_name = up_name.."_kalibr"
-	elseif type_up == "diminishing returns" then up_name = up_name.."_otdaca"
+	local type_txt = ""
+	if type_up == "reduce weight" then
+		type_txt = translate("repair_check_txt11")
+		up_name = up_name.."_ves"
+	elseif type_up == "caliber change" then
+		type_txt = translate("repair_check_txt12")
+		up_name = up_name.."_kalibr"
+	elseif type_up == "diminishing returns" then
+		type_txt = translate("repair_check_txt13")
+		up_name = up_name.."_otdaca"
 	end
 	self.up_name=up_name
 	local color = "green"
 	local cost = cost(n)
-	local text = for_weapons_1.." "..n.." "..upgrade_slot.." "..type_up.." "..upgrade_for.." "..cost.." RUB."
+	local text = for_weapons_1.." "..n.." "..upgrade_slot.." "..type_txt.." "..upgrade_for.." "..cost.." RUB."
 	local text_btn_no = translate("repair_check_txt8")
 	if cost > db.actor:money() then
 		text = upgrade_req_m.." "..(cost-db.actor:money()).. " RUB."	--!!!!TB3D missing "

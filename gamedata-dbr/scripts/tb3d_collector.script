@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.6 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.7 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started,
---ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2
-function my_ver() return "1.0.9.9.9.6" end
+--ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2, level up 3
+function my_ver() return "1.0.9.9.9.7" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -23,32 +23,34 @@ function update(time_now, slice_base)															--only called if is_collecto
 		local ln = level.name()
 		local level_up = TB3D_Services.get_level_up()											--109955 for actions past the Collector levelup
 		------------------------------------------------------------------------------------------main loop
-		amk.oau_watchdog=679
-		if not has_alife_info("tb3d_teleport_zaton") then									--check if hideout done yet
-			if has_alife_info("agr_knockdown") then											--entered strelok hideout
-				if has_alife_info("tb3d_agr_knockdown") then								--send player to backwater
-					TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
-					TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
-				else
-					TB3D_Services.give_info("tb3d_agr_knockdown")							--delay one cycle
-				end
-				return				--109982
-			end
-		end
 		local pos = db.actor:position()
-		if upd_timeTB3D == nil then
-			upd_timeTB3D = slice_base
-			upd_timeLDK = time_now
-		end
-		if upd_timeLDK < time_now then							--109986, treasure hunt
-			amk.oau_watchdog=678
-			upd_timeLDK = time_now + (500 * slice_base) 								--*(<3) LDK spawns, avg .5gs
-			if slice_base < 3 then
-				if has_alife_info("tb3d_collector_hunt") then
-					if TB3D_Modders.use_slice_message then
-						TB3D_Services.packet_alert("tb3d collector: actor_update - LDK["..utils.to_str(time_now).."]")
+		if level_up < 4 then
+			amk.oau_watchdog=679
+			if not has_alife_info("tb3d_teleport_zaton") then									--check if hideout done yet
+				if has_alife_info("agr_knockdown") then											--entered strelok hideout
+					if has_alife_info("tb3d_agr_knockdown") then								--send player to backwater
+						TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
+						TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
+					else
+						TB3D_Services.give_info("tb3d_agr_knockdown")							--delay one cycle
 					end
-					dav_ldk.spawn_ldk1(ln, pos)
+					return				--109982
+				end
+			end
+			if upd_timeTB3D == nil then
+				upd_timeTB3D = slice_base
+				upd_timeLDK = time_now
+			end
+			if upd_timeLDK < time_now then							--109986, treasure hunt
+				amk.oau_watchdog=678
+				upd_timeLDK = time_now + (500 * slice_base) 								--*(<3) LDK spawns, avg .5gs
+				if slice_base < 3 then
+					if has_alife_info("tb3d_collector_hunt") then
+						if TB3D_Modders.use_slice_message then
+							TB3D_Services.packet_alert("tb3d collector: actor_update - LDK["..utils.to_str(time_now).."]")
+						end
+						dav_ldk.spawn_ldk1(ln, pos)
+					end
 				end
 			end
 		end
@@ -883,8 +885,11 @@ function process_levels(lname, sname)
 			if TB3D_Modders.use_random_tanks then
 				if has_alife_info("barman_zep4_start") then turret_spawn.kordon_spawn_turret() end		--southern outpost
 			end
+			if has_alife_info("esc_darklab_documents_read") then
+				if amk.load_variable("esc2_spawns", 0) == 0 then TB3D_Mobs.spawn_bandits(113.044,-7.495,8.628,414741,118,6) end			--carpark
+			end
 		elseif lname == "l02_garbage" then				--109996
-			TB3D_Mobs.spawn_dogs(192.357,-1.344,57.052,338382,384, 12)			--big tree
+			TB3D_Mobs.spawn_dogs(192.357,-1.344,57.052,338382,384, math_random(6,12))				--big tree
 			if has_alife_info("tb3d_give_storm_info") then TB3D_Triggers.spawn_gar_bandits() end	--hangar and swamps
 		elseif lname == "l05_bar" then
 			local spawns = amk.load_variable("tb3d_bar_spawns", 0)
@@ -898,8 +903,7 @@ function process_levels(lname, sname)
 			end
 			amk.save_variable("tb3d_bar_spawns", spawns)
 		elseif lname == "l06_rostok" then
-			--local spawns = amk.load_variable("sarc_spawns", 0)
-			--TB3D_Triggers.ros_spawns(spawns)															--109978
+			TB3D_Mobs.spawn_ros_bandits()					--109997
 			if TB3D_Services.give_info("tb3d_portal_wt1") then											--treasure hunt way back out
 				local se_obj = alife():create("m_teleport_tb3d1",vector():set(-113.797,-0.001,103.625),43996,1315)
 				local t = amk.get_anomaly_data(se_obj) 
@@ -910,6 +914,8 @@ function process_levels(lname, sname)
 			TB3D_Mobs.check_dv_spawns()
 		elseif lname == "l03_agroprom" then
 			if has_alife_info("tb3d_give_storm_info") then TB3D_Triggers.spawn_agro_dogs() end			--109996
+		elseif lname == "l03u_agr_underground" then														--109997
+			TB3D_Mobs.spawn_agrou_bandits()
 		elseif lname == "l08_yantar" then
 			TB3D_Mobs.check_yantar_spawns()
 		elseif lname == "l12u_sarcofag" then
@@ -1140,8 +1146,8 @@ function process_levels(lname, sname)
 			if sname == "level_f-1" then
 				TB3D_Services.clear_harsh_environment()											--109984, visits prior to BR
 			end
-		elseif level_up == 3 then																			--LIVE LINK
-			TB3D_Services.give_info("tb3d_spawn_oman")														--oman occupies waiting room helipad
+		--elseif level_up == 3 then																			--LIVE LINK
+			--TB3D_Services.give_info("tb3d_spawn_oman")														--oman occupies waiting room helipad
 		elseif level_up == 4 then
 			if TB3D_Services.remove_info("tb3d_collector_hunt") then										--109981, never completed the treasure hunt
 				dmx_mod.create_level_changer_jup_to_yantar()

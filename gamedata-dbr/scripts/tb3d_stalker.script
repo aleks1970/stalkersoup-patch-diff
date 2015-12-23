@@ -1,8 +1,8 @@
---<!-- TB3D 1.0.9.9.9.6 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.7 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
---item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_
-function my_ver() return "1.0.9.9.9.6" end
+--item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals
+function my_ver() return "1.0.9.9.9.7" end
 
 local translate = game.translate_string
 local text_color_tip = TB3D_Services.get_text_color("tip")
@@ -650,10 +650,27 @@ function process_levels(lname, sname)
 				if not obj then alife():create(3565) end      							--109953, [3565] index in all.spawn
 			end
 			if has_alife_info("cit_fail_first_task") then			--109989, always dogs and bandits in cordon
-				TB3D_Mobs.spawn_dogs(102.492,1.620,524.469,402814,219, 10)				--cordon exit
-				TB3D_Mobs.spawn_dogs(-17.910,0.638,253.688,259155,184,10)				--farm
-				TB3D_Mobs.spawn_dogs(-50.128,-10.042,-65.347,229164,77,10)				--viaduct
-				TB3D_Mobs.spawn_bandits(113.044,-7.495,8.628,414741,118,10)				--carpark
+				local spawns = amk.load_variable("esc_spawns", 0)
+				local qty = 2
+				if spawns == 0 then
+					qty = 4
+					spawns = 1
+				elseif spawns == 1 then
+					qty = 6
+					spawns = 2
+				elseif spawns == 2 then
+					qty = 10
+					spawns = 3
+				else
+					spawns = 0
+				end
+				TB3D_Mobs.spawn_dogs(102.492,1.620,524.469,402814,219, qty)				--cordon exit
+				TB3D_Mobs.spawn_dogs(-17.910,0.638,253.688,259155,184,qty)				--farm
+				TB3D_Mobs.spawn_dogs(-50.128,-10.042,-65.347,229164,77,qty)				--viaduct
+				amk.save_variable("esc_spawns", spawns)
+				--if has_alife_info("esc_darklab_documents_read") then
+					--if amk.load_variable("esc2_spawns", 0) == 0 then TB3D_Mobs.spawn_bandits(113.044,-7.495,8.628,414741,118,6) end			--carpark
+				--end
 			end
 		elseif lname=="l02_garbage" then
 			if sname=="l01_escape" then
@@ -663,12 +680,27 @@ function process_levels(lname, sname)
 				end
 			end
 			if has_alife_info("cit_fail_first_task") then			--109989, always dogs and bandits in garbage
-				TB3D_Mobs.spawn_dogs(265.158,-8.215,2.050,375150,390, 10)			--far se corner
+				local spawns = amk.load_variable("garb_spawns", 0)
 				TB3D_Mobs.spawn_dogs(192.679,-1.401,53.181,338376,384,10)			--east dog tree
-				TB3D_Mobs.spawn_dogs(70.979,0.772,109.376,241242,370,6)				--storage tanks
-				TB3D_Mobs.spawn_bandits(-198.530,8.182,9.848,30448,308,10)			--tunnel
-				TB3D_Mobs.spawn_dogs(-132.296,-1.968,-201.368,83998,269,10)			--truck graveyard
-				TB3D_Mobs.spawn_dogs(87.328,-3.083,-254.476,255157,263,10)			--east of cordon exit
+				local qty = 6
+				if spawns == 0 then
+					qty = 4
+					spawns = 1
+				elseif spawns == 1 then
+					qty = 2
+					spawns = 2
+				elseif spawns == 2 then
+					qty = 10
+					spawns = 3
+				else
+					spawns = 0
+				end
+				TB3D_Mobs.spawn_dogs(265.158,-8.215,2.050,375150,390, qty)			--far se corner
+				TB3D_Mobs.spawn_dogs(70.979,0.772,109.376,241242,370,qty)			--storage tanks
+				TB3D_Mobs.spawn_bandits(-198.530,8.182,9.848,30448,308,qty)			--tunnel
+				TB3D_Mobs.spawn_dogs(-132.296,-1.968,-201.368,83998,269,qty)		--truck graveyard
+				TB3D_Mobs.spawn_dogs(87.328,-3.083,-254.476,255157,263,qty)			--east of cordon exit
+				amk.save_variable("garb_spawns", spawns)
 			end
 		elseif lname=="l05_bar" then
 			if sname=="l02_garbage" then
@@ -681,10 +713,25 @@ function process_levels(lname, sname)
 				TB3D_Mobs.spawn_dogs(196.248,1.741,-112.590,46678,1276, 10)			--ditch
 			end
 		elseif lname=="l04_darkvalley" then
+			local spawns = amk.load_variable("darkv_spawns", 0)
 			if has_alife_info("cit_fail_first_task") then							--109989, always dogs and bandits
-				TB3D_Mobs.spawn_dogs(136.678,0.401,-195.961,334008,926,10)			--trailor next to lab
-				TB3D_Mobs.spawn_dogs(-97.117,1.943,-295.942,61718,849,10)			--center on hill
-				TB3D_Mobs.spawn_bandits(-152.247,0.880,-188.034,11311,862,6)		--garbage exit
+				local qty = 4
+				if spawns == 0 then
+					qty = 6
+					spawns = 1
+				elseif spawns == 1 then
+					qty = 2
+					spawns = 2
+				elseif spawns == 2 then
+					qty = 10
+					spawns = 3
+				else
+					spawns = 0
+				end
+				TB3D_Mobs.spawn_dogs(136.678,0.401,-195.961,334008,926,qty)			--trailor next to lab
+				TB3D_Mobs.spawn_dogs(-97.117,1.943,-295.942,61718,849,qty)			--center on hill
+				TB3D_Mobs.spawn_bandits(-152.247,0.880,-188.034,11311,862,qty)		--garbage exit
+				amk.save_variable("darkv_spawns", spawns)
 			end
 		elseif lname=="l03_agroprom" then
 			if sname=="hospital" then														--remove lc hosp to agro, now done in amk_mod
@@ -740,6 +787,10 @@ function process_levels(lname, sname)
 					amk.save_variable("tb3d_suits", 2)
 				end
 			end
+		elseif lname == "l10u_bunker" then
+			if has_alife_info("kostya_x10_taynik_start") and not has_alife_info("kostya_x10_taynik_done") then
+				TB3D_Services.give_info("info_restriction")				--109997, make sure portals are active
+			end
 		elseif lname=="l11_pripyat" then
 			if has_alife_info("tb3d_chaes_done") and not has_alife_info("dok_arh_say_start") then		--!!!!TB3D
 				if not has_alife_info("doktor_book") and not has_alife_info("doktor_alife") then
@@ -766,6 +817,14 @@ function process_levels(lname, sname)
 				if TB3D_Services.give_info("tb3d_tools_spawned") == true then
 					arhara_dialog.remkomplekt_spawn()
 				end
+			end
+		elseif lname == "l06_rostok" then			--109997
+			if sname == "l05_bar" and has_alife_info("bar_rescue_research_done") then
+				TB3D_Mobs.spawn_ros_bandits()
+			end
+		elseif lname == "l03u_agr_underground" then			--109997
+			if has_alife_info("agroprom_military_case_done") then
+				TB3D_Mobs.spawn_agrou_bandits()
 			end
 		end
 		if lname ~= "labx8" then

@@ -1,5 +1,6 @@
---TB3D 1.0.9.9.9.1  Radio, takes place of hud while open, chgd/added options, added ddof and alife, news, cop, weather option in place of alife, DX11
-function my_ver() return "1.0.9.9.9.1" end
+--TB3D 1.0.9.9.9.7  Radio, takes place of hud while open, chgd/added options, added ddof and alife, news, cop, weather option in place of alife,
+-- DX11, option_dyn_suit
+function my_ver() return "1.0.9.9.9.7" end
 --/amk_rel_1/
 -- initialization
 
@@ -31,6 +32,11 @@ function amk_options:InitControls()
 	local AutoSave = xml:InitTab("form:radio_autosave", self.form)
 	self:Register(AutoSave, "radio_autosave")
 	AutoSave:SetNewActiveTab(amk.load_variable("option_autosave",1))
+	
+	local radio_dyn_suit = xml:InitTab("form:radio_dyn_suit", self.form)
+	self:Register(radio_dyn_suit, "radio_dyn_suit")	
+	self.radio_dyn_suit = radio_dyn_suit
+	radio_dyn_suit:SetNewActiveTab(amk.load_variable("option_dyn_suit",1))
 	
 	local ShootEffect = xml:InitTab("form:radio_shoot_effect", self.form)
 	self:Register(ShootEffect, "radio_shoot_effect")
@@ -101,6 +107,7 @@ end
 function amk_options:on_okay()
 
 	local radio_mus = self:GetTabControl("radio_amk_mus")
+	local radio_dyn_suit = self:GetTabControl("radio_dyn_suit")
 	local radio_hud = self:GetTabControl("radio_amk_hud")
 	local radio_treasure = self:GetTabControl("radio_amk_treasure")
 	local radio_ddof = self:GetTabControl("radio_amk_ddof")
@@ -125,6 +132,7 @@ function amk_options:on_okay()
 	amk.save_variable("option_helmets_snd",self:GetTabControl("radio_helmets_sound"):GetActiveIndex())
 	amk.save_variable("option_autosave",self:GetTabControl("radio_autosave"):GetActiveIndex())
 	amk.save_variable("option_shoot_eff",self:GetTabControl("radio_shoot_effect"):GetActiveIndex())
+	amk.save_variable("option_dyn_suit",self:GetTabControl("radio_dyn_suit"):GetActiveIndex())
 	self:on_quit()
 	
 end

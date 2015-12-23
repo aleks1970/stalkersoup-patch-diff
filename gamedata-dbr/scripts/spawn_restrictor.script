@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.6.0 kostya_restrictors, debug
-function my_ver() return "1.0.9.9.6.0" end
+--TB3D 1.0.9.9.9.7 kostya_restrictors, debug
+function my_ver() return "1.0.9.9.9.7" end
 -------------------------------------
 -- functions to work with no packets
 ---------------------------------------
@@ -167,5 +167,6 @@ function create_sr14()
 	"[sr_idle]\n"..
 	"on_actor_inside = {+info_restriction} nil %=spawn_teleport35 =spawn_teleport36 =new_inventory11 =create_sr15%"
 	rewrite_restrictor(se_obj, custom, 2.0)
+	--TB3D_Services.packet_alert("Kostya restrictor x10 created")
 end 
 
