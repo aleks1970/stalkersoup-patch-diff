@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.6  removed call to smart terrain unregister(npc), chg min_distance, spots, obj level
-function my_ver() return "1.0.9.9.7.6" end
+--TB3D 1.0.9.9.8.3  removed call to smart terrain unregister(npc), chg min_distance, spots, obj level, is creature day
+function my_ver() return "1.0.9.9.8.3" end
 --[[
 Changes script_version:
 	4 - conservation field job_online
@@ -286,7 +286,7 @@ end
 function is_creature_day(obj, day_night_switch)
 	--checking for Day / Night
 	local is_ok_online = true											--assume is ok to go online
-	if day_night_switch == true then
+	if day_night_switch == true and level_weathers.is_indoor(level.name()) == false then		--109983, always when indoor
 		if obj.day_begin ~= -1 and obj.day_end ~= -1 then
 			local hrs = level.get_time_hours()
 			local d_start = obj.day_begin

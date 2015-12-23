@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!-- TB3D 1.0.9.9.7.6 commented out mutant parts, changed Devil to Bes, 880 max to prapor, 1137 Tolia to Tolik, minor edits,
 several edits, moved bar_dolg_ivancov_start_41 and bar_dolg_petrenko_start_5 to stable_dialogs_bar, YURICK to Yurek, The Doctor,
-life heart 41-11, artmod_873_dialog_0, removed some hard returns, artmod_821, 841, 851, 661, 511, enc_artmod_medusa_galant_text -->
+life heart 41-11, artmod_873_dialog_0, removed some hard returns, artmod_821, 841, 851, 661, 511, enc_artmod_medusa_galant_text,
+new PKM ammunition box and descr. line:172 aleks1970 -->
 <string_table>
 #include"text\eng\arc_string_table.xml"
 #include"text\eng\sak_strings_trade.xml"
@@ -168,10 +169,13 @@ life heart 41-11, artmod_873_dialog_0, removed some hard returns, artmod_821, 84
 	<string id="wpn-pkm_name">
 		<text>PKM Pulemyot Kalashnikova</text>
 	</string>
-	<string id="enc_weapons1_ammo_ammo-7.62x54r">
-		<text>The 7.62x54mmR is a Russian rifle cartridge dating back to 1891. Originally designed for the bolt-action Mosin-Nagant rifle, it was used during the late Tsarist era and throughout the Soviet period to the present day, in machine guns and rifles such as the PKM. This cartridge remains one of the few standard issue rimmed cartridges still in military use</text>
+	<string id="enc_weapons1_ammo_ammo-7.62x54r_box">
+		<text>Regular sniper cartridge for the SVD, SVU-AS rifles and PKM machine gun. Box with 100 or 250 bullets on the ribbon for manual version of PKM machine gun.\n Despite the fact that the 7N1 adopted in 1967, it is two to three times the modern gross 7N13 in terms of dispersion. However, due to the use of blunt stamped steel core 10, the shell does not have the bullet high breakdown properties.</text>
 	</string>
-	<string id="ammo-7.62x54r_s">
+	<string id="ammo-7.62x54r_100_s">
+		<text>7.62x54mm (100)</text>
+	</string>
+	<string id="ammo-7.62x54r_250_s">
 		<text>7.62x54mm (250)</text>
 	</string>
 	<string id="enc_weapons1_wpn-p90">

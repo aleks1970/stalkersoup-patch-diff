@@ -1,12 +1,13 @@
------<!-- TB3D 1.0.9.9.7.6 
-function my_ver() return "1.0.9.9.7.6" end
+-----<!-- TB3D 1.0.9.9.8.3, new pda buttons aleks1970, search for "-- aleks1970" text 
+function my_ver() return "1.0.9.9.8.3" end
 --[[-----------------------------------------------------------------------------------------------
  File         : dmx_pda_buttons.script
  Description  : Notepad and exit button
  Copyright    : DMX MOD
  Authors      : Charsi & Shadows
  Date         : 04.05.2011
- Last edit    : 24.05.2012
+ edit         : 24.05.2012
+ Last update  : 11.03.2015 - aleks1970
 --]]-----------------------------------------------------------------------------------------------
 
 OrganizerMenu = nil
@@ -28,8 +29,10 @@ function PdaMainWnd:__init(owner) super()
 	local xml = CScriptXmlInit()
 	xml:ParseFile("dmx_mod.xml")
 	-- exit button
-	self:Register(xml:InitButton("btn_pda_exit", self.back), "btn_exit")
-	self:AddCallback("btn_exit", ui_events.BUTTON_CLICKED, self.ClickBtnExit, self)
+--	self:Register(xml:InitButton("btn_pda_exit", self.back), "btn_exit")
+	self:Register(xml:Init3tButton("btn_pda_off", self.back), "btn_pda_off") -- aleks1970
+--	self:AddCallback("btn_exit", ui_events.BUTTON_CLICKED, self.ClickBtnExit, self)
+	self:AddCallback("btn_pda_off", ui_events.BUTTON_CLICKED, self.ClickBtnExit, self)
 	-- options button
 	self.btn_options = xml:Init3tButton("btn_pda_options", self.back)
 	if device().width / device().height == 4 / 3 then
@@ -73,8 +76,10 @@ function PdaNoiseWnd:__init() super()
 	self.back:SetOriginalRect(0,0,win_x,win_y)
 	self:AttachChild(self.back)
 	-- exit button
-	self:Register(xml:InitButton("btn_pda_exit", self.back), "btn_exit")
-	self:AddCallback("btn_exit", ui_events.BUTTON_DOWN, self.ClickBtnExit, self)
+--	self:Register(xml:InitButton("btn_pda_exit", self.back), "btn_exit")
+	self:Register(xml:Init3tButton("btn_pda_intreference_off", self.back), "btn_pda_intreference_off") -- aleks1970
+--	self:AddCallback("btn_exit", ui_events.BUTTON_DOWN, self.ClickBtnExit, self)
+	self:AddCallback("btn_pda_intreference_off", ui_events.BUTTON_CLICKED, self.ClickBtnExit, self)
 end
 
 function PdaNoiseWnd:OnKeyboard(dik, keyboard_action)

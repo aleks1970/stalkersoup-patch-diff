@@ -1,8 +1,8 @@
--- TB3D 1.0.9.9.8.0   fixed rucksack, added old pda sound option, TB3D_Update, amk style hit (gg_kick), consolidated packet srvcs,
+-- TB3D 1.0.9.9.8.3   fixed rucksack, added old pda sound option, TB3D_Update, amk style hit (gg_kick), consolidated packet srvcs,
 -- removed tips, removed ^ from can see actor, updated to 135, hit styles, added collector start to pause menu, amk hit replaced,
 -- db calls, send_tip, game_start, npc_spawner, tb3d_delay, hud_weap, ogse timers, ghost_strong_timer, skip groups, send_tip_id optimization,
--- pause autosave prevention, timer
-function my_ver() return "1.0.9.9.8.0" end
+-- pause autosave prevention, timer, restore_community, removed ver and get_ver()
+function my_ver() return "1.0.9.9.8.3" end
 -- Idler: file from the mod 'People halophyte 2.0'. Adapted for fashion 'label with swag 2.1.2' 30.09.2008 0:08:52
 -- Added fenechka by TAG
 
@@ -27,7 +27,7 @@ convert_npc={}
 oAmkLauncher = amkII_launcher.CAmkLauncher()
 local StartTime
 
-ver = "0"
+--ver = "0"
 oau_watchdog=0
 
 function rep(npc,msg,tag)
@@ -1422,8 +1422,10 @@ end
 function on_death(victim, who)
 	if TB3D_Services.is_collector(42) == false then
 		if string_find(victim:name(), "val_escort_bandit_halfdead") then
-			if who:id()==db.actor:id() then TB3D_Services.remove_info("bandits_neitral") end
-			TB3D_Services.restore_community(db.actor, "actor")
+			if who:id()==db.actor:id() then
+				TB3D_Services.remove_info("bandits_neitral")
+				TB3D_Services.set_community(db.actor, "actor")		--109983
+			end
 		end
 	end
 	if (news_main and news_main.on_death) then
@@ -1450,6 +1452,7 @@ function on_monster_hit(obj, amount, local_direction, who, bone_index)
 end
 
 function on_ph_obj_hit(obj, amount, local_direction, who, bone_index)
+	--TB3D_Services.packet_alert("amk: on ph obj hit["..utils.to_str(obj:name()).."] by["..utils.to_str(who:name()).."]")
 end
 
 -- checking for visibility is made once per second
@@ -1529,7 +1532,7 @@ end
 function on_game_start()	--called from _g.script
 	if TB3D_Modders.Global_Debug == true then TB3D_Services.packet_alert("AMK: on game start") end
 	mod_call("on_game_start")
-	ver = get_ver()
+	--get_ver()			--109983
 	getStartTime()
     IAmAStalkerInit()
     IAmAMonsterInit()
@@ -2705,12 +2708,12 @@ function fill_item_weapon_packet(ret,stpk,updpk)	--!!!!TB3D just here
   return ret
 end
 
-function get_ver()
-	local ver = "0"
-	local mm = _G.main_menu.get_main_menu()
-	if mm then ver = mm:GetGSVer() end
-	return ver
-end
+--function get_ver()
+--	local ver = "0"
+--	local mm = _G.main_menu.get_main_menu()
+--	if mm then ver = mm:GetGSVer() end
+--	return ver
+--end
 
 function game_milliseconds()
 	if StartTime == nil then

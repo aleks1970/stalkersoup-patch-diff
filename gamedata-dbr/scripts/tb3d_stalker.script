@@ -1,7 +1,24 @@
---<!-- TB3D 1.0.9.9.7.7 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.8.3 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
---cube, sak_resiver, complete_group()
-function my_ver() return "1.0.9.9.7.7" end
+--cube, sak_resiver, complete_group(), autosaves, update
+function my_ver() return "1.0.9.9.8.3" end
+
+local upd_pos = 0
+local fix_done = false
+function update(tnow, sbase)							--109983
+	if upd_pos < tnow then
+		upd_pos = tnow + (100 * sbase)
+		if not fix_done then
+			local lname = level.name()
+			if lname == "l08u_brainlab" then
+				if TB3D_Collector.actor_in_range(vector():set(-124.785,18.767,-21.196), 10) then
+					fix_done = true
+					TB3D_Triggers.remove_brainlab_alife()									--remove x16_m_controller_e, causes ctd on level exit
+				end
+			end
+		end
+	end
+end
 
 function on_info(info_id)
 	if info_id=="fanat_teleport_04_have" then
@@ -15,40 +32,13 @@ function on_info(info_id)
 		if has_alife_info("agr_find_gunslinger_cache_final") then			--delay it so all.spawn will trigger provodnik first
 			TB3D_Services.give_info("yan_provodnik_spawn")
 		end
+	elseif info_id == "yan_kruglov_decoder_have" then
+		TB3D_Triggers.spawn_decoder_mob()									--109983, upto 2 burers where ghost was found
 	elseif info_id=="tb3d_esc_prison" then
 		if has_alife_info("esc_prison") then
 			TB3D_Services.remove_info("esc_prison")
 		else
 			TB3D_Services.give_info("esc_prison")
-		end
-	elseif has_alife_info("tb3d_bad_torch") then							--109970 delayed action so actor slots fully equiped
-		local stage = amk.load_variable("torch_state", 0)
-		if stage == 1 then													--start broken flashlight
-			local oitem = db.actor:item_in_slot(9)
-			if oitem then
-				TB3D_Services.packet_alert("tb3d stalker: stage 1 item in slot 9["..oitem:name().."] removed")
-				db.actor:drop_item(oitem)
-				alife():release(alife():object(oitem:id()), true)
-			end
-			amk.spawn_item_in_inv("device_torch_bad")						--breaks nv and light
-			amk.save_variable("torch_state", 2)
-			amk.start_timer("ghost_strong_timer",10,"")
-		elseif stage == 3 then
-			local oitem = db.actor:object("device_torch_bad")						--see if one in inventory
-			if oitem then
-				TB3D_Services.packet_alert("tb3d stalker: item in slot 9["..oitem:name().."] removed")
-				db.actor:drop_item(oitem)
-				alife():release(alife():object(oitem:id()), true)
-			end
-			oitem = db.actor:item_in_slot(9)							--make sure slot empty
-			if oitem then
-				TB3D_Services.packet_alert("tb3d stalker: stage 3 item in slot 9["..oitem:name().."] removed")
-				db.actor:drop_item(oitem)
-				alife():release(alife():object(oitem:id()), true)
-			end
-			TB3D_Services.remove_info("tb3d_bad_torch")
-			amk.spawn_item_in_inv("device_torch")						--restores nv and light
-			amk.del_variable("torch_state")
 		end
 	elseif info_id == "kostya_x10_taynik_have" then
 		xr_effects.clear_x10_teleports()
@@ -103,19 +93,19 @@ function on_info(info_id)
 		TB3D_Triggers.spawn_quest_suits()
 	elseif info_id == "shadowman_zver_start" then
 		--alife():create("nebo_heavy_outfit",vector():set(23.890,19.8,18.771),80551,3263)
-	elseif info_id == "tb3d_complete_group0" then																					--to mil start, delayed task completions
+	elseif info_id == "tb3d_complete_group0" then														--to mil start, delayed task completions
 		TB3D_Services.complete_group(0)
-	elseif info_id == "tb3d_complete_group1" then																					--to mil start, delayed task completions
+	elseif info_id == "tb3d_complete_group1" then														--to mil start, delayed task completions
 		TB3D_Services.complete_group(1)
-	elseif info_id == "tb3d_complete_group1a" then																					--to sarc start, delayed task completions
+	elseif info_id == "tb3d_complete_group1a" then														--to sarc start, delayed task completions
 		TB3D_Services.complete_group(2)
-	elseif info_id == "tb3d_complete_group1b" then																					--to prip start, delayed task completions 109974
+	elseif info_id == "tb3d_complete_group1b" then														--to prip start, delayed task completions 109974
 		TB3D_Services.complete_group(3)
-	elseif info_id == "tb3d_complete_group2" then																					--to monolith end(agrou), delayed task completions
+	elseif info_id == "tb3d_complete_group2" then														--to monolith end(agrou), delayed task completions
 		TB3D_Services.complete_group(4)
-	elseif info_id == "tb3d_complete_group3" then																					--to ozo end(swamp), delayed task completions
+	elseif info_id == "tb3d_complete_group3" then														--to ozo end(swamp), delayed task completions
 		TB3D_Services.complete_group(5)
-	elseif info_id == "have_a_hand" or info_id == "have_a_doc" or info_id == "have_a_doc_p" then			--109976
+	elseif info_id == "have_a_hand" or info_id == "have_a_doc" or info_id == "have_a_doc_p" then		--109976
 		if TB3D_Modders.effector_spawn == true then meceniy_spawn.effector_spawn() end
 	elseif string.gsub(info_id, 1, 14) == "have_a_doc_p_s" then
 		if TB3D_Modders.effector_spawn == true then
@@ -151,6 +141,8 @@ function on_info(info_id)
 			if not has_alife_info("tb3d_skip_group1b") then news_manager.save_collector("Scorcher here I come", true) end		--109975
 		elseif info_id=="agr_sedoy_vert_letit" then						--flying dealer
 			if not has_alife_info("tb3d_skip_group1") then news_manager.save_collector("Meet the Flying Dealer", true) end
+		elseif info_id=="start_cop_prip_info_lab" then						--109982
+			news_manager.save_collector("Search the old Hospital", true)
 		end
 	end
 end
@@ -572,7 +564,13 @@ function process_levels(lname, sname)
 			--end
 			if has_alife_info("tb3d_skip_group1") then
 				--TB3D_Services.give_info("yan_find_vasilyev_start")
+			elseif sname == "l08u_brainlab" then
+				if has_alife_info("yan_kruglov_decoder_have") and not has_alife_info("yan_kruglov_decoder_done") then
+					TB3D_Triggers.spawn_tunnel_zombied()
+				end
 			end
+		elseif lname == "l07_military" then
+			--future use
 		elseif lname=="l12u_sarcofag" then													--show the spots
 			if sname == "l12_stancia" then
 				TB3D_Services.give_info("aes_found_sarcofag")

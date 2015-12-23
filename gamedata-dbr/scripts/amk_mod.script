@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.8.1 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.8.2 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -7,8 +7,9 @@
 -- mono dead doc, cleanup, weather option, prevent blowouts in dv until done with krysyk, blowout_npc, info_recieved, marsh_band_spawn,
 -- sak_book4, tb3d_collector, corrected lighting_val, changed fixer to only be called on level change, sak_book4, news, blowout types, get_obj_level,
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
--- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr
-function my_ver() return "1.0.9.9.8.1" end
+-- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
+-- indoor/outdoor spots
+function my_ver() return "1.0.9.9.8.2" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -62,6 +63,7 @@ function first_run() 		--mod_call() from amk.script on_game_load, do not spawn o
 			amk.save_variable("temp_intro", 1)
 			if get_console():get_string("mm_net_srv_name") == game.translate_string("gd_collector") then
 				TB3D_Services.set_new_levelup(1) 				--109978
+				TB3D_Services.give_info("tb3d_started_as_collector")
 				TB3D_Services.packet_alert("TB3D version["..TB3D_Services.major_version.."] new game collector...")
 			else
 				TB3D_Services.set_new_levelup(0)				--109978
@@ -178,6 +180,7 @@ function check_spawn()
 			TB3D_Services.packet_alert("special teleport used from["..sname.."] to["..lname.."]")
 		end
 		--TB3D_Services.info_alert("AMK MOD: check spawn 6b")
+		TB3D_Services.level_on_save(sname)															--109983, set var
 		if lname ~= sname then
 			TB3D_Services.remove_info("yan_zombied_respawn_01")										--reset snork for next use
 			TB3D_Services.remove_info("yan_zombied_respawn_02")										--reset snork for next use
@@ -195,7 +198,6 @@ function check_spawn()
 				set_ALD_weapons(amk.load_variable("tb3d_ald_weapons", 0))							--special spawns from time to time
 			end
 			if level_weathers.is_indoor(sname) and not level_weathers.is_indoor(lname) then			--109981, from indoors to outdoors
-				TB3D_Spots.clear_under_spots(sname)
 				local tamt = amk.load_variable("tonemap", -1)
 				if tamt ~= -1 then
 					get_console():execute("r2_tonemap_amount "..utils.to_str(tamt))					--109981, has no effect if hdr is off
@@ -208,13 +210,18 @@ function check_spawn()
 				end
 			end
 			if level_weathers.is_indoor(lname) and not level_weathers.is_indoor(sname) then			--109981, outdoors to indoors
-				TB3D_Spots.show_under_spots(lname)
 				amk.save_variable("tonelow", get_console():get_float('r2_tonemap_lowlum'))			--109981 indoor hdr for proper mood lighting
 				amk.save_variable("tonemap", get_console():get_float('r2_tonemap_amount'))
 				get_console():execute("r2_tonemap_amount "..utils.to_str(TB3D_Modders.hdr_hilum_indoor))
 				get_console():execute("r2_tonemap_lowlum "..utils.to_str(TB3D_Modders.hdr_lowlum_indoor))
 			end
 		end
+	end
+	if level_weathers.is_indoor(sname) then
+		TB3D_Spots.clear_under_spots(sname)
+	end
+	if level_weathers.is_indoor(lname) then
+		TB3D_Spots.show_under_spots(lname)
 	end
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("AMK MOD: check spawn 3")
@@ -367,12 +374,12 @@ end --check spawn
 --'*******************************************************************************
 function show_news()
 	local blow = TB3D_Services.blow()								--109980
-	if blow and blow > run_hide then
+	if blow and blow >= run_hide then
 		--no news during blowout
 	elseif amk.load_variable("option_news", 1) > 0 then
 		if TB3D_Modders.use_news_message == true then TB3D_Services.packet_alert("amk mod: show news") end					--!!!!TB3D	
 		local ln = level.name()
-		if TB3D_Services.is_indoor(false) == false and not has_alife_info("tb3d_harsh_environment") then			--no news reception indoors or level 2 outdoors
+		if level_weathers.is_indoor(level_name) == false and not has_alife_info("tb3d_harsh_environment") then			--no news reception indoors or level 2 outdoors
 			news_main.on_news()
 			local rand1 = math_random(10)
 			if rand1 > 5 then
@@ -399,7 +406,7 @@ function show_news()
 					local uniq = ini:r_string_wq("news_uniq",tostring(news_item))
 					if news_item < 60 then
 						local name = ini:r_string("names",tostring(math.random(300)))		--contains member callsigns
-						uniq = name.."\n"..uniq
+						uniq = name.." "..uniq
 					end
 					--local sname = ini:r_string("names",tostring(math.random(300)))
 					--if sname == name then sname = ini:r_string("names",tostring(math.random(300))) end
@@ -1979,7 +1986,7 @@ end
 
 function Run_Blowout_pp()
 	local bt=blowout_type()		--returns 5 if no blowout or type
-	if TB3D_Modders.run_blowout_pp == true then
+	if TB3D_Modders.run_blowout_pp == true and not has_alife_info("tb3d_harsh_environment") then		--109982
 		if level.name() == "l04_darkvalley" and not has_alife_info("bandit_krisyk_done") then
 			TB3D_Services.stop_blow()			--skip it to not have bes and demon attack bandit base
 			bt = 5								--not 0 so no news given

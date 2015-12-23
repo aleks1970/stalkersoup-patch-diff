@@ -773,6 +773,64 @@ impair			= 1
 wm_size         = 0.05
 ;tracer_color_ID		= 1
 ;tracer				= on
+
+[ammo_pkm_box_1]:ammo_7.62x54r
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970 = 
+$spawn			= "weapons\ammo\ammo_7.62x54r" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\pkm\ammo_762x54r_box.ogf
+description				= enc_weapons1_ammo_ammo-7.62x54r_box
+$prefetch 		= 64
+
+cost			= 900
+
+box_size		= 100
+
+inv_name		= ammo-7.62x54r_100_s
+inv_name_short	= ammo-7.62x54r_100_s
+inv_weight		= 2.6
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 26
+inv_grid_y		= 14
+
+k_dist			= 1
+k_disp			= 1.5 ;1	;tB3D 10983
+k_hit			= 1
+k_impulse		= 1
+k_pierce		= 0.38
+impair			= 1
+;buck_shot		= 1
+wm_size         = 0.05
+;tracer_color_ID		= 1
+;tracer				= on
+
+[ammo_pkm_box_2]:ammo_pkm_box_1
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970 = 
+$spawn			= "weapons\ammo\ammo_7.62x54r" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\pkm\ammo_762x54r_box.ogf
+description				= enc_weapons1_ammo_ammo-7.62x54r_box
+$prefetch 		= 64
+
+cost			= 1600
+
+box_size		= 250
+
+inv_name		= ammo-7.62x54r_250_s
+inv_name_short	= ammo-7.62x54r_250_s
+inv_weight		= 5.6
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 28
+inv_grid_y		= 14
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  Боеприпасы для снайперских винтовок  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3378,7 +3436,7 @@ discovery_dependency =
 $spawn			= "weapons\ammo\ammo_5.56x45_ap" ; option for Level Editor
 class			= AMMO
 cform                   = skeleton
-visual                  = weapons\pkm\ammo_762x54r_box.ogf
+visual                  = dav\ammo_m249_box.ogf
 description				= enc_wpn_5_56x45_tmp_descr
 $prefetch 		= 64
 
@@ -3390,10 +3448,10 @@ inv_name		= enc_wpn_5_56x45_tmp
 inv_name_short	= enc_wpn_5_56x45_tmp_s
 inv_weight		= 4.8
 
-inv_grid_width		= 2
-inv_grid_height		= 1
-inv_grid_x			= 36
-inv_grid_y			= 40
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 36
+inv_grid_y		= 11
 
 k_dist			= 1
 k_disp			= 1.5;3

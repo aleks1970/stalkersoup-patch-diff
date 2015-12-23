@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ************ TB3D 1.0.9.9.7.5 mblur added, mblur step, lumscale_amb, more adv ctrls added*************** -->
+<!-- ************ TB3D 1.0.9.9.8.2 mblur added, mblur step, lumscale_amb, more adv ctrls added, sun advanced*************** -->
 <window>
 	<back_video x="0" y="0" width="1024" height="430">
 		<texture x="0" y="0" width="1024" height="430">ui\ui_mm_window_back_crop</texture>
@@ -240,7 +240,62 @@
 		<track_particles_distance x="184" y="0" width="245" height="21" step="0.01">
 			<options_item entry="r2_ls_squality" group="mm_opt_video_adv"/>
 		</track_particles_distance>
-		
+		<!-- advanced sun controls -->
+		<cap_r2_sun_focus x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_sun_focus</text>
+		</cap_r2_sun_focus>
+		<check_r2_sun_focus x="184" y="0" width="30" height="21">
+			<options_item entry="r2_sun_focus" group="mm_opt_video"/>
+		</check_r2_sun_focus>
+		<cap_r2_sun_near x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_sun_near</text>
+		</cap_r2_sun_near>
+		<track_r2_sun_near x="184" y="0" width="245" height="21" step="0.01">
+			<options_item entry="r2_sun_near" group="mm_opt_video_adv"/>
+		</track_r2_sun_near>
+		<cap_r2_sun_near_border x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_sun_near_border</text>
+		</cap_r2_sun_near_border>
+		<track_r2_sun_near_border x="184" y="0" width="245" height="21" step="0.01">
+			<options_item entry="r2_sun_near_border" group="mm_opt_video_adv"/>
+		</track_r2_sun_near_border>
+		<cap_r2_sun_tsm x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_sun_tsm</text>
+		</cap_r2_sun_tsm>
+		<check_r2_sun_tsm x="184" y="0" width="30" height="21">
+			<options_item entry="r2_sun_tsm" group="mm_opt_video"/>
+		</check_r2_sun_tsm>
+		<cap_r2_gi x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_sun_gi</text>
+		</cap_r2_gi>
+		<check_r2_gi x="184" y="0" width="30" height="21">
+			<options_item entry="r2_gi" group="mm_opt_video"/>
+		</check_r2_gi>
+		<!--cap_r2_gi_depth x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_gi_depth</text>
+		</cap_r2_gi_depth>
+		<track_r2_gi_depth x="184" y="0" width="245" height="21" >
+			<options_item entry="r2_gi_depth" group="mm_opt_video_adv"/>
+		</track_r2_gi_depth-->
+		<cap_r2_gi_clip x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_gi_clip</text>
+		</cap_r2_gi_clip>
+		<track_r2_gi_clip x="184" y="0" width="245" height="21" step="0.001">
+			<options_item entry="r2_gi_clip" group="mm_opt_video_adv"/>
+		</track_r2_gi_clip>
+		<cap_r2_gi_refl x="20" y="0" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_gi_refl</text>
+		</cap_r2_gi_refl>
+		<track_r2_gi_refl x="184" y="0" width="245" height="21" step="0.001">
+			<options_item entry="r2_gi_refl" group="mm_opt_video_adv"/>
+		</track_r2_gi_refl>
+		<!--cap_r2_gi_photons x="20" y="0" width="143" height="21" step="1">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_gi_photons</text>
+		</cap_r2_gi_photons>
+		<track_r2_gi_photons x="184" y="0" width="245" height="21">
+			<options_item entry="r2_gi_photons" group="mm_opt_video_adv"/>
+		</track_r2_gi_photons-->
+
 		<cap_r2_tonemap x="20" y="0" width="143" height="21">
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_r2_hdr</text>
 		</cap_r2_tonemap>
@@ -393,6 +448,10 @@
 			<options_item entry="hud_info" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_tips</text>
 		</check_tips>
+		<check_dyn_suit x="150" y="205" width="243" height="21">
+			<options_item entry="hud_info" group="mm_opt_gameplay"/>
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_dyn_suit</text>
+		</check_dyn_suit>
 		<check_crosshair x="150" y="80" width="243" height="21">
 			<options_item entry="hud_crosshair" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_show_crosshair</text>

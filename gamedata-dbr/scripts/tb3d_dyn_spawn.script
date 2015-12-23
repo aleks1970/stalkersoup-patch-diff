@@ -1,7 +1,7 @@
----TB3D 1.0.9.9.8.1 new - creates objects that get removed on level load prior to alloc then creates new objects,
+---TB3D 1.0.9.9.8.2 new - creates objects that get removed on level load prior to alloc then creates new objects,
 -- tb3d_esc_spawns, dyn_rad, get_monster_spot, marsh zones, cooling zones, new levels, rats back, marsh, hiding_road,
--- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector
-function my_ver() return "1.0.9.9.8.1" end
+-- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector, x14
+function my_ver() return "1.0.9.9.8.2" end
 
 --============= non-dynamic vehicles only spawned once ============================================================
 --	vehicle_tb3d_atv				- quad atvs
@@ -772,6 +772,10 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 	elseif lname == "digger_stash" then
     elseif lname == "lab_x14" then
 		TB3D_Services.give_info("tb3d_cooling_zones")											--ventillator sounds
+		if has_alife_info("tb3d_x14_done") then
+			alife():create("zone_tuman_cop",vector():set(-16.1000003814697,-34.4000015258789,27.5289993286133),1251,5372)
+			spawn_anomoly("zone_emi_tb3d",-16.1000003814697,-34.4000015258789,27.5289993286133,1251,5372)
+		end
 	end
 	TB3D_Services.info_alert("tb3d triggers: dynamic spawns level["..lname.."] done")
 end

@@ -274,7 +274,10 @@ local lc_table = {
 [99034]	= "to_darkscape",
 [99035]	= "to_aes",
 [99036]	= "to_north_aes",
-[99037]	= "to_aes"
+[99037]	= "to_aes",
+[99040] = "to_tunnels",
+[99041] = "to_radar",
+[99042] = "to_aes"
 }
 
 local test_list = {								--109980, original game lcs to be verified
@@ -371,7 +374,7 @@ end
 
 function set_spots()							--109980
 	local obj
-	for sid = 90, 99037 do
+	for sid = 90, 99042 do
 		if lc_table[sid] then
 			obj = alife():story_object(sid)
 			if obj and level.map_has_object_spot(obj.id, "level_changer") == 0 then
@@ -391,12 +394,12 @@ local under_spots = {
 [252]="av_peshera",
 [253]="av_peshera",
 [284]="lab_x14",
-[6014]="l03u_agr_underground",
+[6014]="cs_agroprom_underground",
 [6015]="digger_stash",
 [6016]="digger_stash",
 [6017]="lab_x14",
 [6018]="lab_x14",
-[6019]="l03u_agr_underground",
+[6019]="cs_agroprom_underground",
 [11510]="av_peshera",
 [11511]="av_peshera",
 [11512]="av_peshera",
@@ -414,7 +417,9 @@ local under_spots = {
 [98993]="cs_agroprom_underground",
 [98998]="l12u_sarcofag",
 [98999]="l12u_sarcofag",
-[99031]="lab_x14"
+[99031]="lab_x14",
+[99038]="jupiter_underground",
+[99039]="cs_agroprom_underground"
 }
 ------- no spots listed ---------
 --"l12u_control_monolith"
@@ -424,7 +429,7 @@ local under_spots = {
 
 function clear_under_spots(sname)
 	local obj
-	for sid = 250, 99031 do
+	for sid = 250, 99040 do
 		if under_spots[sid] and under_spots[sid] == sname then
 			obj = alife():story_object(sid)
 			if obj and level.map_has_object_spot(obj.id, "level_changer") == 1 then
@@ -436,7 +441,7 @@ end
 
 function show_under_spots(lname)
 	local obj
-	for sid = 250, 99031 do
+	for sid = 250, 99040 do
 		if under_spots[sid] and under_spots[sid] == lname then
 			obj = alife():story_object(sid)
 			if obj and level.map_has_object_spot(obj.id, "level_changer") == 0 then

@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.6 added my_ver, db calls, esc_medkit, debug
-function my_ver() return "1.0.9.9.7.6" end
+--TB3D 1.0.9.9.8.2 added my_ver, db calls, esc_medkit, debug, clear_community
+function my_ver() return "1.0.9.9.8.2" end
 
 function allow_break_dialog(first_speaker, second_speaker, id)
 	if second_speaker:profile_name() == "osoznanie" then
@@ -513,7 +513,7 @@ end
 function actor_clear_community(actor, npc)
 	--printf("ACTOR NOW IN [NEUTRAL] COMMUNITY")
 	if db.actor then
-		TB3D_Services.restore_community(db.actor, "actor")
+		TB3D_Services.set_community(db.actor, "actor")
 		--db.actor:set_character_community("actor", 0, 0)
 	end
 	return true

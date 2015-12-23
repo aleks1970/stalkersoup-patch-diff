@@ -1,9 +1,10 @@
--- TB3D 1.0.9.9.8.1 localized text, added otclik, actor, det_indy, spots, debug, pda_is_blocked
-function my_ver() return "1.0.9.9.8.1" end
+-- TB3D 1.0.9.9.8.2 localized text, added otclik, actor, det_indy, spots, debug, pda_is_blocked
+function my_ver() return "1.0.9.9.8.2" end
 --//----------------------------------------
 --//Author: Singapur22 rewritten Peregrine
 --//Released: 10.01.2010
 --//-----------------------------------------
+local detector_volume = 1.0
 
 local list_arts = {
 ["af_medusa"] = "af-medusa",
@@ -194,7 +195,7 @@ function det_indy(distance)
 					if dist <= distance and artefacts[k].tim_beep <= time_g - dist then
 						if not snd_obj:playing() then
 							artefacts[k].tim_beep = time_g
-							snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+							snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), detector_volume)
 						end
 					end
 				else
@@ -238,7 +239,7 @@ function det_izomorf()
 			        end
 					if v.tim_beep < time_g and not snd_obj:playing() then
 						artefacts[k].tim_beep = time_g + 2500
-					    snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+					    snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), detector_volume)
 					end
 				else
 					this.del_spot(k, v)

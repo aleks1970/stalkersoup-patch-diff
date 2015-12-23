@@ -8487,33 +8487,36 @@ end
 --'HS friend zombarey
 function drug_psss(actor, npc)
 	if TB3D_Services.is_collector(4000) == false then
-	if db.actor ~= nil then
-		db.actor:set_character_community("stranger", 0, 0)
-		local chkgoodwill = relation_registry.community_goodwill("zombied", db.actor:id())
-		if chkgoodwill < 0 then 
-			chkgoodwill = chkgoodwill + 6000
-			relation_registry.set_community_goodwill ("zombied", db.actor:id(), chkgoodwill)
-		else
-			relation_registry.set_community_goodwill ("zombied", db.actor:id(), 6000)
-			TB3D_Services.give_info("xvatit_uzhe")
+		if db.actor ~= nil then
+			TB3D_Services.set_community(db.actor, "stranger",0,0)			--109982
+			--db.actor:set_character_community("stranger", 0, 0)
+			local chkgoodwill = relation_registry.community_goodwill("zombied", db.actor:id())
+			if chkgoodwill < 0 then 
+				chkgoodwill = chkgoodwill + 6000
+				relation_registry.set_community_goodwill ("zombied", db.actor:id(), chkgoodwill)
+			else
+				relation_registry.set_community_goodwill ("zombied", db.actor:id(), 6000)
+			end
+			TB3D_Services.give_info("xvatit_uzhe")			--109982
 		end
-	end
 	end
 end
 
 --'HS enemy zombarey
 function vrag_zombie(actor, npc)
 	if TB3D_Services.is_collector(4000) == false then
-	if db.actor ~= nil then
-		db.actor:set_character_community("stalker", 0, 0)
-		local chkgoodwill = relation_registry.community_goodwill("zombied", db.actor:id())
-		if chkgoodwill > 0 then 
-			chkgoodwill = chkgoodwill - 6100
-			relation_registry.set_community_goodwill ("zombied", db.actor:id(), chkgoodwill)
-		else
-			relation_registry.set_community_goodwill ("zombied", db.actor:id(), - 6100)
+		if db.actor ~= nil then
+			TB3D_Services.set_community(db.actor, "stalker",0,0)			--109982
+			--db.actor:set_character_community("stalker", 0, 0)
+			local chkgoodwill = relation_registry.community_goodwill("zombied", db.actor:id())
+			if chkgoodwill > 0 then 
+				chkgoodwill = chkgoodwill - 6100
+				relation_registry.set_community_goodwill ("zombied", db.actor:id(), chkgoodwill)
+			else
+				relation_registry.set_community_goodwill ("zombied", db.actor:id(), - 6100)
+			end
+			TB3D_Services.remove_info("xvatit_uzhe")			--109982
 		end
-	end
 	end
 end
 

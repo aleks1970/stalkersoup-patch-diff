@@ -1,16 +1,16 @@
----TB3D 1.0.9.9.8.1 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.8.3 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
--- removed lastrepreward
-function my_ver() return "1.0.9.9.8.1" end	--modders append with initials and rev.
+-- removed lastrepreward, rain_factor
+function my_ver() return "1.0.9.9.8.3" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.1}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.3}" end
 
-major_version = 109981							--used in saves
+major_version = 109983							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -23,6 +23,14 @@ local medkit,antirad,bandage,vodka = 0,0,0,0         -- counters items
 local medkit_wnd,antirad_wnd,bandage_wnd,vodka_wnd   -- static window
 local is_skipping = false
 local level_up, blow_phase, blow_type								--109980
+local last_level
+
+function level_on_save(sname)
+	if last_level == nil then
+		last_level = sname
+	end
+	return last_level
+end
 
 function inc_meds(val)
 	medkit = medkit+val
@@ -924,11 +932,28 @@ function set_community(npc, comm, gw, rep)				--109981
 	end
 end
 
-function check_active_community(lname)										--109981, actor only on spawn
+function check_active_community()								--109981, actor only on spawn
+	local lname = level.name()
+	local sname = level_on_save(lname)
 	local comm = "actor"
-	if is_collector() then
-		--future use
-	else
+	if has_alife_info("zombien_already") then								--109982, zombied takes pres.
+		comm = "zombied"
+	elseif is_collector() then
+		--comm = "actor"
+	elseif lname == "l08_yantar" then
+		if has_alife_info("xvatit_uzhe") then								--109982, friends with chernomer
+			comm = "stranger"
+		--else
+			--comm = "actor"
+		end
+	elseif lname == "l04_darkvalley" then
+		if has_alife_info("bandits_neitral") then
+			comm = "stranger"
+		--else
+			--comm = "actor"
+		end
+	end
+	if comm == "actor" then
 		if amk_utils.inventory_search("amul_naemn", 1) then
 			comm = "killer"
 		elseif amk_utils.inventory_search("amulet", 1) then
@@ -937,14 +962,10 @@ function check_active_community(lname)										--109981, actor only on spawn
 			comm = "freedom"
 		elseif amk_utils.inventory_search("streyndzher", 1) then
 			comm = "stranger"
-		elseif lname == "l04_darkvalley" then	
-			if has_alife_info("bandits_neitral") then
-				comm = "stranger"
-			end
 		end
 	end
-	if db.actor:character_community() ~= comm then
-		if TB3D_Modders.use_info_message then packet_alert("tb3d services: set community actor community["..utils.to_str(comm).."]") end
+	if comm ~= db.actor:character_community() then
+		if TB3D_Modders.use_info_message then packet_alert("tb3d services: set actor community from["..utils.to_str(db.actor:character_community()).."] to["..utils.to_str(comm).."]") end
 		if comm == "actor" then
 			db.actor:set_character_community(comm)				--if actor then leave goodwill and reputation as it was
 		else
@@ -992,17 +1013,23 @@ function change_rank(npc, rval)
 end
 
 --based on rank * difficulty koef
---default: 2500:1 ratio against ((game difficulty+1) * rank)
---diff_level > 0 = 2500:1 ratio against ((freeplay level*0.1) * rank) (max 10 levels)
+--stalker: 2500:1 ratio against ((game difficulty+1) * rank)
+--collector: 25000:1 ratio against (5 * rank)
 --------------------------------------------------------------------------
 function global_koef(diff_level, force_rank)
-	local rank = db.actor:character_rank()
-	if force_rank ~= nil then rank = force_rank end
-	local diff = level.get_game_difficulty() + 1				--1 thru 4
-	if diff_level and diff_level > 0 then						--109981, levelup 1 thru 10
-		diff = diff + (diff_level * 0.1)						--shift into levelup difficulties (4.1 thru 5.0)
+	local rank, diff, result
+	if force_rank ~= nil then
+		rank = force_rank
+	else
+		rank = db.actor:character_rank()
 	end
-	local result = (diff * (1/2500)) * rank						--109981
+	if diff_level and diff_level > 0 then						--collector (levelup 1 and up)
+		diff = 5 * (diff_level * 0.5)
+		result = (diff * (1/2500)) * rank						--109982
+	else														--stalker (levelup 0)
+		diff = level.get_game_difficulty() + 1					--1 thru 4
+		result = (diff * (1/2500)) * rank						--109982
+	end
 	--packet_alert("tb3d services: global koef["..utils.to_str(result).."] rank["..utils.to_str(rank).."] level["..utils.to_str(diff_level).."] diff["..utils.to_str(diff).."]")
 	return result
 end
@@ -1550,10 +1577,11 @@ end
 
 local spawned = false
 local wasnight
-local smoke_on
+local smoke_on, fires_on
 local frogs_snd_soft
 local frogs_snd
 local cooling_snd
+local is_raining = false
 function env_update()
 	local m_h = level:get_time_hours()
 	local m_m = level.get_time_minutes()
@@ -1567,13 +1595,6 @@ function env_update()
 		end
 		isnight = true
 	else
-		if smoke_on and m_m > 1 then														-- wait a moment then remove smoke
-			--if TB3D_Modders.fires_always_on == false and is_indoor(false) == false then
-				remove_smoke()
-				update_smoke(false)
-			--end
-			smoke_on = false
-		end
 		if isnoon then
 			if m_m > 5 then isnoon = false end
 		elseif m_h == 12 and m_m < 4 then
@@ -1584,13 +1605,15 @@ function env_update()
 	end
 	if wasnight == nil then																	--for startup
 		wasnight = not isnight
+		if isnight == false then
+			campfire_update(false)
+			remove_smoke()
+		end
 	end
 	amk.oau_watchdog=761																	-----------------761
 	if wasnight ~= isnight then
 		remove_info("actor_ban_chat_info")									--remove ban if exists
 		amk.del_variable("has_fines")														--clear any fines
-		campfire_update(isnight)
-		update_smoke(isnight)
 		if isnight then																		--night events
 			amk.oau_watchdog=762															-----------------762
 			if TB3D_Modders.use_environment_message then packet_alert("tb3d: nightfall["..utils.to_str(m_h)..":"..utils.to_str(m_m).."]") end
@@ -1605,6 +1628,43 @@ function env_update()
 			spawned = false																	--reset for next night
 		end
 		wasnight = isnight
+	end
+	local is_fires_on = false
+	local rain_factor = level.rain_factor()
+	if is_raining then
+		if rain_factor < TB3D_Modders.heavy_rain_factor - 0.1 then is_raining = false end			--create a deadzone of 0.1 to prevent thrashing
+	else
+		if rain_factor > TB3D_Modders.heavy_rain_factor then is_raining = true end
+	end
+	if has_alife_info("tb3d_harsh_environment") and is_indoor(false) == false then
+		--no fires in storm except npp
+	elseif isnight or TB3D_Modders.fires_always_on == true or is_indoor(false) == true then
+		is_fires_on = true							--turn them on or keep them on
+		if TB3D_Modders.use_environment_message and not fires_on then packet_alert("tb3d: fires[on] indoor or always on") end
+	elseif is_raining then
+		is_fires_on = true							--turn them on or keep them on
+		if TB3D_Modders.use_environment_message and not fires_on then packet_alert("tb3d: fires[on] rain["..utils.to_str(level.rain_factor()).."]") end
+	elseif fires_on then							--normal daytime
+		if TB3D_Modders.use_environment_message then packet_alert("tb3d: fires[off] daytime") end
+	end
+	if is_fires_on then
+		if not fires_on then
+			--if TB3D_Modders.use_environment_message then packet_alert("tb3d: fires on") end
+			campfire_update(true)
+			fires_on = true
+			if TB3D_Modders.use_campfire_smoke and not smoke_on then
+				update_smoke()
+				smoke_on = true
+			end
+		end
+	elseif fires_on then
+		--if TB3D_Modders.use_environment_message then packet_alert("tb3d: fires off") end
+		campfire_update(false)
+		if smoke_on then
+			remove_smoke()
+			smoke_on = false
+		end
+		fires_on = false
 	end
 	if not has_alife_info("tb3d_harsh_environment") then
 		----------dynamic ambient sound zones-------------------------------------------------------------------------------
@@ -1758,8 +1818,8 @@ end
 function is_indoor(include_night)											--check if indoors or night(optional)
 	local level_name = level.name()
 	if level_name == "l12_stancia"
-	  or level_name == "l12_stancia_2"							--used for vehicle and building fires
-	  or level_name == "l08_yantar" then							--for the tunnels and trucks
+	  or level_name == "l12_stancia_2"										--used for vehicle and building fires
+	  or level_name == "l08_yantar" then									--for the tunnels and trucks
 		return true
 	elseif level_weathers.is_indoor(level_name) == true then
 		return true
@@ -1779,7 +1839,7 @@ function is_instorm(level_name)											--109978, check if outdoors in the sto
 	  or level_name == "l03_rinok"					--black market
 	  or level_name == "l07_military"
 	  or level_name == "aver"						--recon
-	  or level_name == "pripyat"
+	  or level_name == "pripyat"					--east pripyat
 	  or level_name == "dead_city"
 	  or level_name == "generators" then
 		return true
@@ -1792,8 +1852,9 @@ function set_harsh_environment(type)											--109980
 	if type == 1 then																--F1 and level_up 2 outdoors
 		level.add_pp_effector("psy_antenna.ppe", 77777771, true, "")
 		harsh_snd = sound_object("ambient\\radarsparks_1")
-		give_info("tb3d_bad_torch")													--flashlight will break if equiped
 		give_info("tb3d_harsh_environment")											--gear starts to deteriorate from environment, also starts storm effect
+		if not has_alife_info("tb3d_bad_torch") then delayed_action(1, "tb3d_bad_torch", 10) end
+		amk.save_variable("torch_state", 1)
 	elseif type == 2 then															--jupu after x14
 		level.add_pp_effector("dead_zone.ppe", 77777771, false)
 		level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
@@ -1810,8 +1871,11 @@ end
 function clear_harsh_environment()											--109980
 	if harsh_snd then harsh_snd:stop() harsh_snd = nil end
 	level.remove_pp_effector(77777771)
-	remove_info("tb3d_bad_torch")													--ok to use flashlight again
 	remove_info("tb3d_harsh_environment")											--gear stops degrading, also stops storm effect
+	if remove_info("tb3d_bad_torch") then
+		delayed_action(1, "tb3d_bad_torch", 10)
+		amk.save_variable("torch_state", 3)
+	end
 end
 
 function set_blow(phase)											--109980
@@ -1851,7 +1915,7 @@ end
 --no fires on level-----------------------
 --zaton
 ------------------------------------------
-function campfire_update(night)
+function campfire_update(is_on)
 	local name = ""
 	local obj
 	local pos
@@ -1870,7 +1934,7 @@ function campfire_update(night)
 				  or string_find(name, "koster") 		--"koster_lights")
 				  or string_find(name, "hosp_3otsek_svet3")
 				  or string_find(name, "hosp_3otsek_ogon1_svet1") then
-					if TB3D_Modders.fires_always_on == true or night or is_indoor(false) == true then
+					if is_on then
 						if TB3D_Modders.use_environment_message then packet_alert("tb3d: campfire lamp update["..utils.to_str(name).."] [on]") end
 						obj:get_hanging_lamp():turn_on()
 					else
@@ -1879,7 +1943,7 @@ function campfire_update(night)
 					end
 				end
 			elseif section == "zone_flame_small" then
-				if TB3D_Modders.fires_always_on == true or night == true or is_indoor(false) == true then
+				if is_on then
 					if TB3D_Modders.use_environment_message then packet_alert("tb3d: flame["..utils.to_str(name).."] [on]") end
 					obj:enable_anomaly()
 				else
@@ -1890,7 +1954,7 @@ function campfire_update(night)
 		end
 	end
 end
-function update_smoke(night)
+function update_smoke()
 	local name = ""
 	local obj
 	local pos
@@ -1900,18 +1964,13 @@ function update_smoke(night)
 			name = obj:name()
 			section = obj:section()
 			if section == "zone_flame_small" then
-				if TB3D_Modders.use_campfire_smoke then
-					if TB3D_Modders.fires_always_on == true or night == true or is_indoor(false) == true then
-						pos = obj:position()
-						if pos then
-							pos.y = pos.y-0.33
-							if TB3D_Modders.use_environment_message then
-								packet_alert("tb3d: campfire smoke posx["..utils.to_str(pos.x).."] posy["..utils.to_str(pos.y).."] posz["..utils.to_str(pos.z).."] lv["..utils.to_str(obj:level_vertex_id()).."] gv["..utils.to_str(obj:game_vertex_id()).."]")
-							end
-							alife():create("zone_campfire_tb3d",vector():set(pos.x,pos.y,pos.z),obj:level_vertex_id(),obj:game_vertex_id())
-							smoke_on = true
-						end
+				pos = obj:position()
+				if pos then
+					pos.y = pos.y-0.33
+					if TB3D_Modders.use_environment_message then
+						packet_alert("tb3d: campfire smoke posx["..utils.to_str(pos.x).."] posy["..utils.to_str(pos.y).."] posz["..utils.to_str(pos.z).."] lv["..utils.to_str(obj:level_vertex_id()).."] gv["..utils.to_str(obj:game_vertex_id()).."]")
 					end
+					alife():create("zone_campfire_tb3d",vector():set(pos.x,pos.y,pos.z),obj:level_vertex_id(),obj:game_vertex_id())
 				end
 			end
 		end
@@ -2708,26 +2767,27 @@ function check_prior_version(lname, sname)												--109972
 	local stage = amk.load_variable("tb3d_fixer_stage", 0)		--returns 0 if not created yet
 	--local tb3d_ver = amk.load_variable("tb3d_version",0)
 	local started = amk.load_variable("first_started", 0)
-	if started > 109980 then						--109981, skip stages 1-5
-		if stage < 5 then stage = 5 end
-	elseif started > 109979 then					--109981, skip stage 1
-		if stage < 1 then stage = 1 end
+	if started < 109983 then						--109982, redo fixes
+		stage = 0
 	end
 	if stage < 1 then
 		obj = alife():story_object(14091)																		--radar to red forest (wrong target point)
 		if obj then alife():release(obj) end
-		if has_alife_info("info_way_arhara_radar_forest") then dmx_mod.create_level_changer_rad_red() end		--14091 - fixes target location
+		obj = alife():story_object(6014)																		--tunnels to red forest
+		if obj then alife():release(obj) end
 		obj = alife():story_object(99200)																		--old ds lc, actually in wasted wood
 		if obj then alife():release(obj) end
 		obj = alife():story_object(99201)																		--old ds lc, actually in wasted wood
 		if obj then alife():release(obj) end
 		dmx_mod.create_level_changer_ww_vill()
-		--obj = alife():story_object(97001)
-		--if not obj then sak.add_new_bar_to_atp() end
 		obj = alife():story_object(97104)																		--missing reject way in all.spawn
 		if obj then alife():release(obj) end
+		if has_alife_info("tb3d_sms_storm") then dmx_mod.create_level_changer_tunnels_to_red_forest(true) end
+		if has_alife_info("info_way_arhara_radar_forest") then dmx_mod.create_level_changer_rad_red() end		--14091 - fixes target location
 		if has_alife_info("info_way_arhara_hospital_agroprom") and not has_alife_info("tb3d_final_start") then	--respawn if active
 			dmx_mod.create_level_changer_hospital_agroprom()													--hospital to agro final
+		elseif has_alife_info("tb3d_final_start") then
+			dmx_mod.create_level_changer_hosp_to_tunnels()
 		end
 		stage = 1
 	end
@@ -2776,3 +2836,48 @@ function check_prior_version(lname, sname)												--109972
 	amk.save_variable("tb3d_fixer_stage", stage)
 end
 
+function check_flashlight()					--109982
+	local stage = amk.load_variable("torch_state", 0)					--dmx_mod.next_labx8() sets it to 1 to start it
+	if stage == 1 then													--start broken flashlight
+		local oitem = db.actor:item_in_slot(9)
+		if oitem then
+			TB3D_Services.packet_alert("tb3d stalker: stage 1 item in slot 9["..oitem:name().."] removed")
+			db.actor:drop_item(oitem)
+			alife():release(alife():object(oitem:id()), true)
+		end
+		amk.spawn_item_in_inv("device_torch_bad")						--breaks nv and light
+		amk.save_variable("torch_state", 2)
+		if not is_collector() then amk.start_timer("ghost_strong_timer",10,"") end
+	elseif stage == 3 then														--tb3d_stalker.process_levels() sets it to 3 to end it
+		local oitem = db.actor:object("device_torch_bad")						--see if one in inventory
+		if oitem then
+			TB3D_Services.packet_alert("tb3d stalker: item in slot 9["..oitem:name().."] removed")
+			db.actor:drop_item(oitem)
+			alife():release(alife():object(oitem:id()), true)
+		end
+		oitem = db.actor:item_in_slot(9)							--make sure slot empty
+		if oitem then
+			TB3D_Services.packet_alert("tb3d stalker: stage 3 item in slot 9["..oitem:name().."] removed")
+			db.actor:drop_item(oitem)
+			alife():release(alife():object(oitem:id()), true)
+		end
+		TB3D_Services.remove_info("tb3d_bad_torch")
+		amk.spawn_item_in_inv("device_torch")						--restores nv and light
+		amk.del_variable("torch_state")
+	end
+end
+
+function check_has_parent(obj)			--109982, function parent() not functioning
+	local parent_id
+	if obj.parent then
+		if type(obj.parent) == "function" then			--owned objects
+			parent_id = obj:parent():id()
+		else
+			parent_id = obj.parent						--respawn boxes
+		end
+	elseif obj.parent_id then
+		parent_id = obj.parent_id						--game objects
+	end
+	if parent_id == expendable_object then parent_id = nil end
+	return parent_id
+end

@@ -1,4 +1,4 @@
---- TB3D 1.0.9.9.8.1 BETA relrease of the Modders Mega Mod, changed dyn suit options,
+--- TB3D 1.0.9.9.8.3 BETA relrease of the Modders Mega Mod, changed dyn suit options,
 -- bio radar pulse option, logic debug option, dmx135, death_hit, expanded hit styles,
 -- added cave_no_big_electros, pump_it_up to ingame menu, alife tweaks, cleaner, dist coef,
 -- population control, max_phantoms, radiation_factor, adjusted populations, start_alife_option,
@@ -9,9 +9,9 @@
 -- dog_rush, dmx_cars, debug, GPS/PDA, force_garbage_collect, use vehicle message, search_, auto_use_hdr,
 -- blow_enemy_dist, GRAPHICS DEFAULT SETTINGS, arts, COMPANIONS and LIVELINK, reorganized, swaped blow times,
 -- loadout_min_cond, loadout_ammo_loot, loadout_ammo_count, dyn_arts_always, npc_default_armor, pda_spawn_rate,
--- advanced graphics
+-- advanced graphics, chgd daytime, volume_on_pause
 
-function my_ver() return "1.0.9.9.8.1" end
+function my_ver() return "1.0.9.9.8.3" end
 --// Modders resource central for script options
 --// certain function calls from script files in the gamedata\scripts dir redirected here
 --// for mod testing and gameplay options, not compatible with non-TB3D mods
@@ -196,7 +196,7 @@ head_sway_power		= 0.4		-- (0.4)  amount of camera inertia to apply for sway and
 loadout_rand_cond	= true		-- (true) randomly set the npc load out weapons/suit conditions between 80 and 100%
 loadout_min_cond	= 80		-- (80) The minimum condition allowed if above is true, range: 0 - 99  									--109980
 loadout_ammo_count	= 200		-- (200) Rounds of ammo to give from loadout, excess rounds removed when npc dies						--109981
-loadout_ammo_loot	= 10		-- (10) Max rounds of ammo of each type to leave when npc dies (random) range: 1 to 100					--109981
+loadout_ammo_loot	= 2			-- (2) Max boxes/rounds of ammo of each type to leave when npc dies (random) range: 1 to 100			--109981
 radiation_factor	= 1.0		-- (1.0) multiplier for radiation delta, 0.0 same as god mode, higher the number, faster the rise
 zombie				= true		-- (true)  Player can be Zombied (true - on, false - off)
 invisible			= true		-- (true)  Use of Invisible Suits (true - on, false - off)
@@ -242,8 +242,8 @@ cooling_sounds		= true		-- (true) ambient ventillator system in indoor levels
 
 -----------------------------24HR CLOCK----------------------------------------------------
 --// day_start and day_end dictate when environment changes occur like campfires
-day_start			= 6			--(6)am - day starts at this hour
-day_end				= 18		--(18)pm - day ends after this hour
+day_start			= 4			--(4)am - day starts at this hour
+day_end				= 19		--(19)pm - day ends after this hour
 
 ------------------------------ANOMALIES------------------------------------------------
 --// anoms are now spawned based on player freeplay level/rank, not difficulty.
@@ -253,9 +253,9 @@ easy_anomolies			= false		-- (false) spawn only easy to detect anomolies when tr
 Cadet_level_anomolies	= false		-- (false) spawn at cadet rank only, less spawned
 
 ------------------------------ARTEFACTS---------------------------------------------------
-dyn_arts_always		= false		-- (false)!M! 109981 wait until level-up 1 before removing and regenerating arts
-arts_total			= 20		-- (20)!M! 109976 Total allowable artifacts respawned per level
-arts_max			= 5			-- (5)!M! 109976 se_zones: Anomoly artifact re-spawn limit, range: 1 to 100
+dyn_arts_always		= false		-- (false)!M! 109981, wait until level-up 1 before removing and regenerating arts
+arts_total			= 20		-- (20)!M! 109976, Total allowable artifacts respawned per level
+arts_max			= 5			-- (5)!M! 109976, se_zones: Anomoly artifact re-spawn limit, range: 1 to 100
 less_arts			= false		-- (false)!M! AMK random arts, reduces them by half when true
 
 ------------------------------BLOWOUT and HELLHOUR OPTIONS---------------------------------------------------------
@@ -273,8 +273,8 @@ blow_phase_shift	= 3			-- (3) maximum-phase output (only during the release of f
 blow_phase_max		= 3			-- (3) number is used to adjust blow_phase_basis, if equal to 0, while one phase is = blow_phase_basis
 blow_enemy_dist		= 300		-- (300) Enemy must be less than this distance to attack during blowout range: 100 to 400
 --// HELL HOUR, 20% chance novice to 50% chance master, 50% chance collector
-hell				= true		-- (true)  Time of Terror (true - on, false - off)
-hell_spawn			= true		-- (true)!M!  Spawn monsters on the level during the horror (true - on, false - off)
+hell				= true		-- (true) Time of Terror (true - on, false - off)
+hell_spawn			= true		-- (true)!M! Spawn monsters on the level during the horror (true - on, false - off)
 hell_hour_alarm		= true		-- (true) Siren or distortion (default) at start of hell hour, false = off
 
 ----------------------------------------- GPS/PDA -------------------------------------------------------------
@@ -296,6 +296,7 @@ max_display_lines		= 38		--(38) lines of comments before scrolling
 --------------------------ENVIRONMENT---------------------------------------
 --// !M! fires always on instead of just at night, does not effect indoor/cave as they are always on
 fires_always_on		= false		-- (false)!M! fires burn from 7pm to 6am - should use 'true' for static lighting
+heavy_rain_factor	= 0.5		-- (0.5) range: 0 - 1.00, Fires will turn on in heavy rain as well as some ai will be effected
 
 -------------------------ARENA OPTIONS-------------------------------------
 --// Arena lights: 1 = center row 3 lamps, 2 = center staggered 8 lamps, 3 = both 1&2 11 lamps, 4 = emergency lighting 3 dim rotating lamps
@@ -304,6 +305,7 @@ aem_light_style		= 3			-- (3) not presently usable, causes actor freeze on resto
 -------------------------MUSIC OPTIONS----------------------------------
 --// bar music default, 0 = retro, 1 = rock, 2 = rockn, 3 = modern
 bar_music			= 1			-- (1)
+volume_on_pause		= 0.5		-- (0.5) Range: 0 - 1.0, Music volume while in pause menu 109982
 
 ------------------------MINIMAP OPTIONS----------------------------------
 display_compass		= true		-- (true) heading displayed in minimap
@@ -340,10 +342,10 @@ biodetect_all		= true	-- (true) detect all creatures without parts on belt
 bioradar_max_count	= 60	-- (60) maximum number of objects to display, limited to 100 internally
 
 -----------------------------AUTO LEVEL ADJUST------------------------------------------------
-auto_levels			= 1		-- (0) if set to 1 then the render settings will be automaticaly
-							--adjusted for the level you are spawning on
-level_set_max		= 100	--(100) if auto_levels = 1 then do not set any level past this amount
-							--options are in %		120,  100,   70,   50,   30 
+auto_levels			= 0		-- (0) if set to 1 then the render settings will be automaticaly
+							-- adjusted for the level you are spawning on
+level_set_max		= 100	-- (100) if auto_levels = 1 then do not set any level past this amount
+							-- options are in %		120,  100,   70,   50,   30 
 								--lighting_val	=	2.0,  1.5,  1.2,  1.0,  0.7
 								--dist_val		=	1.5,  1.5,  1.2,  1.0,  0.7
 								--lod_a			=	 96,   96,   64,   64,   48
@@ -367,15 +369,24 @@ bloom_intensity		= 1.0		--(1.0)		range: 0.50 - 2.00, the amount of light injecte
 bloom_threshold		= 0.3		--(0.3)		range: 0 - 1.000, when bloom starts to occur
 bloom_speed			= 10.0		--(10.0)	range: 1.0 - 100.0, how quickly the bloom effect comes and goes
 
-use_soft_effects	= false		--(false) DO NOT USE 109981 - will add soft particles and water to the adv graphics opt. (unstable att)
+use_sun_advanced	= true		--(true)	show advanced sun controls in menu
+sun_near			= 50		--(50.0)	range: 1.0 - 50.0, Distance sun is from world surface
+sun_near_border		= 0.66		--(0.66)	range: 0.5 - 1.00, Distance multiplier of view fulcrum (eye origin)
+gi_clip				= 0.001		--(0.001)	range: 0 - 0.100, Global Illumination clipping range
+gi_refl				= 0.9		--(0.9)		range: 0.001 - 0.990, Global Illumination reflective light in shadows
+
+--DOES NOT WORK gi_depth		= 1			--(1)		range: 1 - 5, Global Illumination depth multiplier
+--DOES NOT WORK gi_photons		= 16		--(16)		range: 8 - 256, Global Illumination photons that penetrate shadows
+
+use_soft_effects	= false		--(false)	DO NOT USE 109981 - will add soft particles and water to the adv graphics opt. (unstable att)
 
 -----------------------------DELTA TIME SLICE THRESHOLDS---------------------------------------
 --// below delta_lowest = slice 1, each slice level causes more
 --// non crucial services to be skipped until it lowers
-delta_critical		= 60	--(60) slice = 5
-delta_moderate		= 50	--(50) slice = 4
-delta_low			= 40	--(40) slice = 3
-delta_lowest		= 30	--(30) slice = 2
+delta_critical		= 70	--(60) slice = 5
+delta_moderate		= 60	--(50) slice = 4
+delta_low			= 50	--(40) slice = 3
+delta_lowest		= 40	--(30) slice = 2
 
 --=========================COMPANIONS and LIVELINK=======================================
 max_companions_rt	= 20	--(20) total number of active timers (rt1-rt20)
@@ -472,7 +483,7 @@ use_coop_message		= false		--(false) 109980 - future use
 use_state_message		= false		--(false) logs the transition states of the state manager, can be a restrictor
 use_setup_message		= false		--(false) logs the initial smart terrain setup logic on spawn and gulag jobs
 use_smt_message			= false		--(false) logs the condition for filling a smart
-npc_to_log				= "dark_btr1_arhara1"
+npc_to_log				= "burer_"
 smt_to_log				= "esc2_dogs_zamost"
 
 ------------------------VERIFICATION TOOLS------------------------------------------------------------------
@@ -480,6 +491,7 @@ check_smart_terrain		= false		--(false) reports bad smart terrain assignments af
 show_zoom_fov			= false		--(false) displays fov and distance in zoom
 verify_script_versions	= false		--(false) special script version verifier used by support
 display_delta			= false		--(false) displays the actor slice multiplier on the minimap (1 thru 5, 5 = critical)
+show_spot_sid			= false		--(false) displays LC SID instead of target name
 
 ------------------------STAY OFFLINE-------------------------------------------------------------------------
 test_without_npc		= false		--(false) npc will not go on line except for key traders and vehicles
@@ -498,3 +510,4 @@ use_combat_planner		= false		--(false) adds the planner to the xr_combat binder,
 use_combat_monolith		= false		--(false) adds the xr_combat_monolith to the xr_combat binder, still developing/testing
 
 ------------END FILE
+;coll_spots=true

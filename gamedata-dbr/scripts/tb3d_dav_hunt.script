@@ -24,8 +24,7 @@ function spawn_next(n)
 		end
 		if n == 17 then					--finish radar and if done with zep then continue otherwise wait
 			TB3D_Services.give_info("tb3d_radar_done")					--109981, gives article
-			if not has_alife_info("zep24_have") then return end			--109981, wait for zep ending
-			if not has_alife_info("tb3d_hunt2_start") then TB3D_Services.delayed_action(1, "tb3d_hunt2_start", 30) end
+			return
 		end
 		ini =ini_file("misc\\TB3D_collector.ltx") 
 		local x=0
@@ -36,15 +35,21 @@ function spawn_next(n)
 		local reslt = true
 		local a = ""
 		local desc=""
-		if n < 2 or n == 15 or n == 16 or n == 17 or n == 18 or n == 31 then
+		local rnd
+		if n < 2 or (n > 14 and n < 19) or n == 31 then
+			rnd = 1
 			a = ("treasure_"..tostring(n))
-		elseif n == 22 or n == 25 or n == 27 or n == 28 or n == 29 or n == 30 then
-            a = (treasure[n-1]..tostring(math.random(4)))
 		elseif n == 26 then
-            a = (treasure[n-1]..tostring(math.random(5)))    	
+			rnd = math.random(5)
+            a = (treasure[n-1]..tostring(rnd))    	
+		elseif n == 22 or (n > 24 and n < 31) then
+			rnd = math.random(4)
+            a = (treasure[n-1]..tostring(rnd))
 		else
-			a = (treasure[n-1]..tostring(math.random(3)))
+			rnd = math.random(3)
+			a = (treasure[n-1]..tostring(rnd))
 		end
+		TB3D_Triggers.treasure_hunt_spawn(n,rnd)							--109982, add content in some areas
 		if ini:section_exist(a) then
 			if ini:line_exist(a,"x") then
 				 x=ini:r_float(a,"x")
@@ -137,6 +142,9 @@ function spawn_shrooms(n)
 		alife():create("vehicle_tb3d_plow", vector():set(835.862,-0.002,8.458),363036,2296)			--help get over wall
 	elseif n == 15 then
 		get_item("radar_m3")
+		get_item("stepup1")
+		get_item("stepup1")
+		get_item("stepup1")
 		get_item("stepup1")
 	elseif n == 16 then
 		get_item("radar_t1")

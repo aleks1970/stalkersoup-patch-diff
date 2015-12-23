@@ -514,6 +514,109 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<dialog id="barman_dialog_zep6">		<!-- don't have suit, comment about the storm -->
+		<has_info>tb3d_sms_storm</has_info>
+		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
+		<dont_has_info>tb3d_got_lanky_suit</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>barman_zep6_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>barman_zep6_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>barman_zep6_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>barman_zep6_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>barman_zep6_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>barman_zep6_5</text>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>barman_zep6_6</text>
+				<!--action>dialogs.break_dialog</action-->
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="barman_dialog_zep7">		<!-- has suit, comment about the storm -->
+		<has_info>tb3d_sms_storm</has_info>
+		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
+		<has_info>tb3d_got_lanky_suit</has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>barman_zep7_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>barman_zep7_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>barman_zep7_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>barman_zep7_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>barman_zep7_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>barman_zep7_5</text>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>barman_zep7_6</text>
+				<!--action>dialogs.break_dialog</action-->
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="barman_dialog_zep8">		<!-- after the storm -->
+		<has_info>tb3d_sms_storm_over</has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>barman_zep8_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>barman_zep8_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>barman_zep8_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>barman_zep8_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>barman_zep8_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>barman_zep8_5</text>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>barman_zep8_6</text>
+				<!--action>dialogs.break_dialog</action-->
+			</phrase>
+		</phrase_list>
+	</dialog>
 	<dialog id="lisiy_dialog_zep1">		<!--  ZEP extra info about stranger  -->
 		<has_info>zep00_have</has_info>
 		<dont_has_info>zep02_have</dont_has_info>
@@ -1975,6 +2078,161 @@
 			<phrase id="4">
 				<text>zika_dialog2_5</text>
 				<give_info>zika_dialog2_done</give_info>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+
+	<dialog id="tb3d_storm_suit_1">		<!-- Lanky, about special suit for mushroom art-->
+		<has_info>tb3d_sms_storm</has_info>
+		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
+		<dont_has_info>tb3d_got_lanky_suit</dont_has_info>
+		<precondition>tb3d_dialog.lanky_arts_not_have</precondition>
+		<phrase_list>
+			<phrase id="0">
+				<text>lanky_suit_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>lanky_suit_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>lanky_suit_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>lanky_suit_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>lanky_suit_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>lanky_suit_5</text>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>lanky_suit_6</text>
+				<!--action>dialogs.break_dialog</action-->
+			</phrase>
+		</phrase_list>
+	</dialog>
+
+	<dialog id="tb3d_storm_suit_2">		<!-- Lanky, have mushroom art so get special suit -->
+		<has_info>tb3d_sms_storm</has_info>
+		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
+		<dont_has_info>tb3d_got_lanky_suit</dont_has_info>
+		<precondition>tb3d_dialog.lanky_arts_have</precondition>
+		<phrase_list>
+			<phrase id="0">
+				<text>lanky_suit2_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>lanky_suit2_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>lanky_suit2_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>lanky_suit2_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>lanky_suit2_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>lanky_suit2_5</text>
+				<action>tb3d_dialog.lanky_arts_done</action>
+				<give_info>tb3d_got_lanky_suit</give_info>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>lanky_suit_6</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+
+	<dialog id="tb3d_storm_suit_3">		<!-- Lanky, need fix special suit -->
+		<has_info>tb3d_got_lanky_suit</has_info>
+		<dont_has_info>tb3d_lanky_suit_repairing</dont_has_info>
+		<precondition>tb3d_dialog.lanky_suit_have</precondition>
+		<precondition>tb3d_dialog.lanky_arts_not_have</precondition>
+		<phrase_list>
+			<phrase id="0">
+				<text>lanky_suit3_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>lanky_suit3_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>lanky_suit3_2</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+
+	<dialog id="tb3d_storm_suit_4">		<!-- Lanky, have mushroom need fix suit -->
+		<has_info>tb3d_got_lanky_suit</has_info>
+		<dont_has_info>tb3d_lanky_suit_repairing</dont_has_info>
+		<precondition>tb3d_dialog.lanky_suit_have</precondition>
+		<precondition>tb3d_dialog.lanky_arts_have</precondition>
+		<phrase_list>
+			<phrase id="0">
+				<text>lanky_suit4_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>lanky_suit4_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>lanky_suit4_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>lanky_suit4_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>lanky_suit4_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>lanky_suit4_5</text>
+				<action>tb3d_dialog.lanky_repair_start</action>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>lanky_suit4_6</text>
+				<!--action>dialogs.break_dialog</action-->
+			</phrase>
+		</phrase_list>
+	</dialog>
+
+	<dialog id="tb3d_storm_suit_5">		<!-- Lanky, repair done -->
+		<has_info>tb3d_got_lanky_suit</has_info>
+		<has_info>tb3d_lanky_suit_fixed</has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>lanky_suit5_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>lanky_suit5_1</text>
+				<action>tb3d_dialog.lanky_repair_done</action>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>lanky_suit5_2</text>
 				<action>dialogs.break_dialog</action>
 			</phrase>
 		</phrase_list>

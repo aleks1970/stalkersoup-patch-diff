@@ -661,7 +661,20 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 		if TB3D_Modders.use_setup_message and string_find(obj_name, TB3D_Modders.npc_to_log) then is_report = true end
 		--if is_report then TB3D_Services.packet_alert("tb3d pop control: can go online["..obj_name.."] ?") end
 		if has_alife_info("tb3d_harsh_environment") then
-			return result																		--109978, uninhabited
+			if string_sub(obj_name, 1, 6) == "tb3dm_"
+			  or string_sub(obj_name, 1, 4) == "amk_"
+			  or string_find(obj_name, "turret")
+			  or string_find(obj_name, "zombie")
+			  or string_find(obj_name, "poltergeist")
+			  or string_find(obj_name, "snork")
+			  or string_find(obj_name, "pseudodog")
+			  or string_find(obj_name, "psy_dog") then
+				return true
+			elseif lname == "dead_city" then
+				if string_find(obj_name, "ldk") then return true end
+			else
+				return result																		--109978, uninhabited
+			end
 		end
 		if can_start_respawn(obj) == false then
 			dont_spawn_online = true
@@ -1293,6 +1306,10 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					else
 						result = true
 					end
+				elseif hdr6 == "fractu" then
+					if has_alife_info("dar_codelock1_unlock") then
+						result = true
+					end
 				else
 					result = true
 				end
@@ -1733,15 +1750,20 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 				if hdr4 == "sak_"				--short circuit known spawns
 				  or hdr6 == "milita"			--military_
 				  or hdr6 == "m_cont"
-				  or hdr6 == "yakut_"			--yakut_agro2
+				  or hdr6 == "stalke" then					--109983
+					result = true
+				  elseif hdr6 == "yakut_"			--yakut_agro2
 				  or hdr6 == "tamaz_"
 				  or hdr6 == "piligr"
 				  or hdr6 == "francu"
 				  or hdr6 == "scromn"
-				  or hdr6 == "stalke"
 				  or hdr6 == "djoker"
 				  or hdr5 == "kluk_" then
-					result = true
+					if extended_levels then					--109983
+						dont_spawn_online = true
+					else
+						result = true
+					end
 				elseif hdr4 == "sim_"										--see if allowed simulation: prut, master_diador, master_master
 				  or hdr4 == "esc_"											--esc_fox
 				  or hdr6 == "milit_"

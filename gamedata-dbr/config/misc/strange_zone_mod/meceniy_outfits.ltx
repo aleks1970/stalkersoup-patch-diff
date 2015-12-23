@@ -1,8 +1,8 @@
-;<!-- TB3D 1.0.9.9.7.2 skat-15m icon, new suit sytem and visual... aleks1970 -->
+;<!-- TB3D 1.0.9.9.8.2 skat-15m icon, new suit sytem and visual... aleks1970, exo_mil_exoskeleton_tb3d -->
 ;---------------------------------------------------------------------------------------------
 ;		Wt. Bathrobe: Spot (Shooter)
 ;---------------------------------------------------------------------------------------------
-[meceniy_outfit_new]:bandit_outfit
+[meceniy_outfit_new]:outfit_base
 GroupControlSection	= spawn_group
 discovery_dependency = 
 $spawn 			= "outfit\bandit_outfit"
@@ -56,7 +56,7 @@ fire_wound_immunity			= 0.15
 ;-----------------------------------------
 ;New Exoskeleton, Prototype SKAT-15
 ;-----------------------------------------
-[exo_mil_exoskeleton]:exo_outfit	
+[exo_mil_exoskeleton]:exo_outfit	;;;exo_outfit	;outfit_base
 $spawn						= "outfit\uniq\outfit_exo_m1"
 $prefetch 		= 32
 class			= E_STLK
@@ -69,6 +69,7 @@ inv_grid_height    = 3
 inv_grid_x         = 28 ;18
 inv_grid_y         = 38 ;41
 
+;ef_equipment_type	= 5		;;aleks1070
 visual          = new\nano_exoskel.ogf	
 actor_visual	= new\nano_exoskel_meceniy.ogf
 ;full_icon_name		= npc_icon_exo_outfit
@@ -291,3 +292,14 @@ cost			    = 0
 inv_weight			= 1.8
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[exo_mil_exoskeleton_tb3d]:exo_mil_exoskeleton_dmx
+inv_name					= mil_exoskeleton_name_tb3d
+inv_name_short				= mil_exoskeleton_name_tb3d
+description					= mil_exoskeleton_description_tb3d
+inv_grid_width     = 3	; new icon - aleks1970
+inv_grid_height    = 3	; new icon - aleks1970
+inv_grid_x         = 66	; new icon - aleks1970
+inv_grid_y         = 49	; new icon - aleks1970
+inv_weight		   = 19.3
+cost			   = 126000

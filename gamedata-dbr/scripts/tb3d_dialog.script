@@ -1,20 +1,36 @@
---TB3D 1.0.9.9.8.1 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
--- bridge_pass_on, eprip_to_prip, more content
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.8.2 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+-- bridge_pass_on, eprip_to_prip, more content, reduced station spawns
+function my_ver() return "1.0.9.9.8.2" end
 
 --============ IMPORTANT NOTES ==========================================
 -- remove treasure hunt infos so they can be reused in future levels
 -- val_x18_exit_base_bandit_0006 winds up in wt bandit camp, might be the quest one
 -- mismatch in visual type causes error in visual ctd
---    function switch_distance() const;   if works, use for generators
---    function switch_distance(number);
+
+-- function switch_distance() const;   if works, use for generators
+-- function switch_distance(number);
+
+-- tb3d_respawn_toggle  unused att
+-- tb3d_respawn_level2
+-- tb3d_respawn_block
+	
+-- tb3d_dyn_info_0 		to be used in dlc content
+-- tb3d_dyn_info_1
+-- tb3d_dyn_info_2
+-- tb3d_dyn_info_3
+-- tb3d_dyn_info_4
+-- tb3d_dyn_info_5
+-- tb3d_dyn_info_6
+-- tb3d_dyn_info_7
+-- tb3d_dyn_info_8
+-- tb3d_dyn_info_9
 
 --============ active issues level 0 STALKER/NS =========================
 -- no bandits in wt or carpark to eliminate.
 -- Kruglov and Profesor need more work.
 -- Kept dieing during forced sleep when turning in HIV package from courier in Radar to eco trader, no matter how much food I ate.
--- Boatswain does not return from the base. <<Need to perfect 'stay on line' and use timers>>.
--- Fly did not offer quest to get doll from house in Radar. I used modders' menu to give the infoportion required to enable her dialogue.
+-- Boatswain does not return from the base. <<Need to perfect 'stay on line' and use timers>> OR TEST switch_distance function.
+-- Fly did not offer quest to get doll from house in Radar, infoportion required to enable her dialogue.
 -- Half the time I drop the Repair Kit, it disappears immediately after use; forcing the necessity to save before deploying it.
 -- Exit x16 prolog crash
 -- Ivantsov hint says Kruglov
@@ -23,6 +39,8 @@ function my_ver() return "1.0.9.9.8.1" end
 --dav_wpn_xp1 
 --in the Swamps, where the map ident shows where Dan is, he's not there... 
 --psychiatrist's suit not protecting from contollers
+--The SEVA suit and the PSZ-9MD suit have exactly the same weight and stats, but the latter costs 5.000Ru more
+--two key characters in the game named 'Max'. One at the Army Warehouses ("Come over here, let's have a little chat..."), and the trader at Radar should be called `Syak'
 
 --============================ LEVEL UP 1 Collector ================================
 --============ ACTIVE ISSUES ============================================
@@ -788,12 +806,12 @@ function station_spawns()
 	alife():create("zep_doc_20", vector():set(101.349,16.482,263.760),19340,5303)			--crty on desk
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -63.115,4.911,16.272,115,5282,6)
 	TB3D_Services.give_info("kras_el_razvvdm")												--start out with bandits and stalkers in courtyards
-	TB3D_Mobs.spawn_snorks(15.841,-3.222,61.346,10728,5342,6)								--behind underpass
-	TB3D_Mobs.spawn_snorks(58.886,-4.177,68.712,15279,5340,6)								--road curve
-	TB3D_Mobs.spawn_snorks(111.659,-4.341,51.280,20629,5340,6)								--road exit
-	TB3D_Mobs.spawn_snorks(132.867,2.006,-14.462,22481,5342,6)								--end of overpass
-	TB3D_Mobs.spawn_snorks(86.426,-1.654,-8.621,17912,5342,6)								--below overpass
-	TB3D_Mobs.spawn_snorks(81.592,-1.878,4.520,17501,5342,6)								--far end of loading dock
+	TB3D_Mobs.spawn_snorks(15.841,-3.222,61.346,10728,5342,3)								--behind underpass
+	TB3D_Mobs.spawn_snorks(58.886,-4.177,68.712,15279,5340,3)								--road curve
+	TB3D_Mobs.spawn_snorks(111.659,-4.341,51.280,20629,5340,3)								--road exit
+	TB3D_Mobs.spawn_snorks(132.867,2.006,-14.462,22481,5342,3)								--end of overpass
+	TB3D_Mobs.spawn_snorks(86.426,-1.654,-8.621,17912,5342,3)								--below overpass
+	TB3D_Mobs.spawn_snorks(81.592,-1.878,4.520,17501,5342,3)								--far end of loading dock
 end
 
 ---------------------------- ZEP Courtyards ----------------------------
@@ -1165,4 +1183,37 @@ function bridge_pass_on()											--use for article and mob spawns
 	else
 		--future use
 	end
+end
+
+function lanky_arts_have(first_speaker, second_speaker)				--mushroom artifact for special suit
+ 	return first_speaker:object("af_dummy_mushroom") ~= nil
+end
+function lanky_arts_not_have(first_speaker, second_speaker)
+ 	return first_speaker:object("af_dummy_mushroom") == nil
+end
+
+function lanky_arts_done(first_speaker, second_speaker)
+	dialogs.relocate_item_section(second_speaker, "af_dummy_mushroom","out")
+	amk.spawn_in_inv("exo_mil_exoskeleton_tb3d", 1)											--give suit
+end
+
+function lanky_suit_have(first_speaker, second_speaker)				--has special suit
+ 	return first_speaker:object("af_dummy_mushroom") ~= nil
+end
+
+function lanky_repair_start(first_speaker, second_speaker)
+	local obj = db.actor:object("exo_mil_exoskeleton_tb3d")
+	if obj then
+		db.actor:drop_item(obj)
+		amk.remove_item(obj)
+	end
+	--dialogs.relocate_item_section(second_speaker, "exo_mil_exoskeleton_tb3d","out")
+	TB3D_Services.give_info("tb3d_lanky_suit_repairing")
+	TB3D_Services.delayed_action(4, "tb3d_lanky_suit_fixed", math.random(100, 1000))
+end
+
+function lanky_repair_done(first_speaker, second_speaker)
+	amk.spawn_in_inv("exo_mil_exoskeleton_tb3d", 1)											--give suit
+	TB3D_Services.remove_info("tb3d_lanky_suit_repairng")
+	TB3D_Services.remove_info("tb3d_lanky_suit_fixed")
 end

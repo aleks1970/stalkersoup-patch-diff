@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.2.6 hit styles
+-- TB3D 1.0.9.9.2.6 hit styles, new buttons aleks1970 - search for "-- aleks1970" text
 function my_ver() return "1.0.9.9.2.6" end
 --[[
 Developed by AMK-Team
@@ -6,8 +6,9 @@ File:  amkII_transmutator.script
 Copyright:  ©  AMK-Team 2009
 Author: Refresh
 Since: 14.01.2009 1:04
+New buttons: 11.03.2015 - aleks1970
 --]]
-
+local translate = game.translate_string
 local grid = 50
 
 oDevice = nil
@@ -340,29 +341,36 @@ end
 --	InitInterface()
 --	Initialization of the window and static controls.
 --]]
-function CAmkDeviceTransmutator:InitInterface()	
+function CAmkDeviceTransmutator:InitInterface()
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_transmutator.xml")
 	self:Init(grid,grid,531,359)
 	--[[
 	--	CUIStatic()
 	--	Attach a static element of 'background'.
-	--]]	
+	--]]
+	xml:InitStatic("transmutator_frame", self) -- aleks1970 and below
 	self.oBackGround = CUIStatic()
     self.oBackGround:SetWindowName("oBackGround") 
     self.oBackGround:SetAutoDelete(true)
-    self.oBackGround:InitTexture("ui\\amk_transmutator")
-	self.oBackGround:SetOriginalRect(3,7,531,359)  
-    self.oBackGround:Init(3,7,531,359) 
+--	self.oBackGround:InitTexture("ui\\amk_transmutator")
+--	self.oBackGround:SetOriginalRect(3,7,531,359)
+--	self.oBackGround:Init(3,7,531,359)
     self:AttachChild(self.oBackGround)
 	--[[
 	--	CUIButton()
 	--	Tack cleaning panel components for cooking.
-	--]]		
-	self.oButtonClear = CUIButton()
+	--]]
+	local xml = CScriptXmlInit()  -- aleks1970 and below
+	xml:ParseFile("ui_transmutator.xml")	
+	self.oButtonClear = CUI3tButton()
+	self:Register(xml:Init3tButton("transmutator_clear_button", self), "oButtonClear")
 	self.oButtonClear:SetWindowName("oButtonClear")  
 	self.oButtonClear:SetAutoDelete(true)
-	self.oButtonClear:InitTexture("ui\\amk_transmutator")
-	self.oButtonClear:SetOriginalRect(248,365,23,39)
-    self.oButtonClear:Init(420,62,23,39)
+--	self.oButtonClear:InitTexture("ui\\amk_transmutator")
+--	self.oButtonClear:SetOriginalRect(248,365,23,39)
+--	self.oButtonClear:Init(420,62,23,39)
+--	self:Register(self.oButtonClear, "oButtonClear")
     self:AttachChild(self.oButtonClear)
     self:AddCallback("oButtonClear", ui_events.BUTTON_CLICKED, self.ClearSlots, self)
 	--[[
@@ -373,7 +381,7 @@ function CAmkDeviceTransmutator:InitInterface()
 	self.oaAnomaly:SetWindowName("oaAnomaly")
 	self.oaAnomaly:SetAutoDelete(true)
 	if aAnomaly~=nil then
-		self.oaAnomaly:SetText("Anomaly: "..get_anom_name(tostring(aAnomaly)))
+		self.oaAnomaly:SetText(translate("Anomaly_transmutator_script").." "..get_anom_name(tostring(aAnomaly)))
 	else
 		self.oaAnomaly:SetText("")
 	end
@@ -384,16 +392,21 @@ function CAmkDeviceTransmutator:InitInterface()
 	--[[
 	--	CUIButton()
 	--	Tack completion raboty'vyhod '.
-	--]]		
-	self.oButtonQuit = CUIButton()
+	--]]
+	local xml = CScriptXmlInit() -- aleks1970 and below
+	xml:ParseFile("ui_transmutator.xml")
+	self.oButtonQuit = CUI3tButton()
+	self:Register(xml:Init3tButton("transmutator_quit_button", self), "oButtonQuit")
 	self.oButtonQuit:SetWindowName("oButtonQuit")  
 	self.oButtonQuit:SetAutoDelete(true)
-	self.oButtonQuit:InitTexture("ui\\amk_transmutator")
-	self.oButtonQuit:SetOriginalRect(124,393,92,25)
-	self.oButtonQuit:SetText("Output")
-	self.oButtonQuit:SetTextColor(255,0,0,0)
-	self.oButtonQuit:SetFont(GetFontGraffiti19Russian())
-	self.oButtonQuit:Init(406,302,92,25)
+	self.oButtonQuit:SetTextAlign(CGameFont.alCenter)
+--	self.oButtonQuit:InitTexture("ui\\amk_transmutator")
+--	self.oButtonQuit:SetOriginalRect(124,393,92,25)
+--	self.oButtonQuit:SetText("Output")
+--	self.oButtonQuit:SetTextColor(255,0,0,0)
+--	self.oButtonQuit:SetFont(GetFontGraffiti19Russian())
+--	self.oButtonQuit:Init(406,302,92,25)
+--	self:Register(self.oButtonQuit, "oButtonQuit")
     self:AttachChild(self.oButtonQuit)
     self:AddCallback("oButtonQuit", ui_events.BUTTON_CLICKED, self.Quit, self)
 	
@@ -401,63 +414,69 @@ function CAmkDeviceTransmutator:InitInterface()
 	--	CUIButton()
 	--	Attach button to start transmutatsii'start '.
 	--]]		
-	self.oButtonStart = CUIButton()
+	self.oButtonStart = CUI3tButton() -- aleks1970 and below
+	self:Register(xml:Init3tButton("transmutator_start_button", self), "oButtonStart")
 	self.oButtonStart:SetWindowName("oButtonStart")  
 	self.oButtonStart:SetAutoDelete(true)
-	self.oButtonStart:InitTexture("ui\\amk_transmutator")
-	self.oButtonStart:SetOriginalRect(124,393,92,25)		
-	self.oButtonStart:SetText("Start")
-	self.oButtonStart:SetTextColor(255,0,0,0)
-	self.oButtonStart:SetFont(GetFontGraffiti19Russian())
-    self.oButtonStart:Init(189,302,92,25)	
+	self.oButtonStart:SetTextAlign(CGameFont.alCenter)
+--	self.oButtonStart:InitTexture("ui\\amk_transmutator")
+--	self.oButtonStart:SetOriginalRect(124,393,92,25)		
+--	self.oButtonStart:SetText("Start")
+--	self.oButtonStart:SetTextColor(255,0,0,0)
+--	self.oButtonStart:SetFont(GetFontGraffiti19Russian())
+--	self.oButtonStart:Init(189,302,92,25)	
     self:AttachChild(self.oButtonStart)
     self:AddCallback("oButtonStart", ui_events.BUTTON_CLICKED, self.Start, self)
 	--[[
 	--	CUIButton()
 	--	Attach button control scrollbars 'left'.
 	--]]		
-	self.oButtonPrevLeft = CUIButton()
+	self.oButtonPrevLeft = CUI3tButton() -- aleks1970 and below
+	self:Register(xml:Init3tButton("transmutator_PrevLeft_button", self), "oButtonPrevLeft")
 	self.oButtonPrevLeft:SetWindowName("oButtonPrevLeft")  
 	self.oButtonPrevLeft:SetAutoDelete(true)
-	self.oButtonPrevLeft:InitTexture("ui\\amk_transmutator")
-	self.oButtonPrevLeft:SetOriginalRect(9,393,39,23)
-    self.oButtonPrevLeft:Init(24,167,39,23)	
+--	self.oButtonPrevLeft:InitTexture("ui\\amk_transmutator")
+--	self.oButtonPrevLeft:SetOriginalRect(9,393,39,23)
+--	self.oButtonPrevLeft:Init(24,167,39,23)	
     self:AttachChild(self.oButtonPrevLeft)
     self:AddCallback("oButtonPrevLeft", ui_events.BUTTON_CLICKED, self.PreviewScrollLeft, self)
 	--[[
 	--	CUIButton()
 	--	Attach button control scrollbars 'right'.
 	--]]	
-	self.oButtonPrevRight = CUIButton()
+	self.oButtonPrevRight = CUI3tButton() -- aleks1970 and below
+	self:Register(xml:Init3tButton("transmutator_PrevRight_button", self), "oButtonPrevRight")
 	self.oButtonPrevRight:SetWindowName("oButtonPrevRight")  
 	self.oButtonPrevRight:SetAutoDelete(true)
-	self.oButtonPrevRight:InitTexture("ui\\amk_transmutator")
-	self.oButtonPrevRight:SetOriginalRect(52,393,39,23)
-    self.oButtonPrevRight:Init(404,167,39,23)	
+--	self.oButtonPrevRight:InitTexture("ui\\amk_transmutator")
+--	self.oButtonPrevRight:SetOriginalRect(52,393,39,23)
+--	self.oButtonPrevRight:Init(404,167,39,23)	
     self:AttachChild(self.oButtonPrevRight)
     self:AddCallback("oButtonPrevRight", ui_events.BUTTON_CLICKED, self.PreviewScrollRight, self)
 	--[[
 	--	CUIButton()
 	--	Attach the control button RetseptBarom 'left'.
 	--]]		
-	self.oButtonRecLeft = CUIButton()
+	self.oButtonRecLeft = CUI3tButton() -- aleks1970 and below
+	self:Register(xml:Init3tButton("transmutator_RecLeft_button", self), "oButtonRecLeft")
 	self.oButtonRecLeft:SetWindowName("oButtonRecLeft")  
 	self.oButtonRecLeft:SetAutoDelete(true)
-	self.oButtonRecLeft:InitTexture("ui\\amk_transmutator")
-	self.oButtonRecLeft:SetOriginalRect(9,393,39,23)
-    self.oButtonRecLeft:Init(24,246,39,23)	
+--	self.oButtonRecLeft:InitTexture("ui\\amk_transmutator")
+--	self.oButtonRecLeft:SetOriginalRect(9,393,39,23)
+--	self.oButtonRecLeft:Init(24,246,39,23)	
     self:AttachChild(self.oButtonRecLeft)
     self:AddCallback("oButtonRecLeft", ui_events.BUTTON_CLICKED, self.ReceptScrollLeft, self)
 	--[[
 	--	CUIButton()
 	--	Attach the control button RetseptBarom 'right'.
 	--]]	
-	self.oButtonRecRight = CUIButton()
+	self.oButtonRecRight = CUI3tButton() -- aleks1970 and below
+	self:Register(xml:Init3tButton("transmutator_RecRight_button", self), "oButtonRecRight")
 	self.oButtonRecRight:SetWindowName("oButtonRecRight")  
 	self.oButtonRecRight:SetAutoDelete(true)
-	self.oButtonRecRight:InitTexture("ui\\amk_transmutator")
-	self.oButtonRecRight:SetOriginalRect(52,393,39,23)
-    self.oButtonRecRight:Init(404,246,39,23)	
+--	self.oButtonRecRight:InitTexture("ui\\amk_transmutator")
+--	self.oButtonRecRight:SetOriginalRect(52,393,39,23)
+--	self.oButtonRecRight:Init(404,246,39,23)	
     self:AttachChild(self.oButtonRecRight)
     self:AddCallback("oButtonRecRight", ui_events.BUTTON_CLICKED, self.ReceptScrollRight, self)
 end
@@ -775,18 +794,18 @@ function CAmkDeviceTransmutator:AddArtefact(iSectIndex, iBarName)
 			oNotkomp = CUIStatic()
 			oNotkomp:SetWindowName("oNotkomp")
 			oNotkomp:SetAutoDelete(true)
-			oNotkomp:SetText("No Components Found: "..tostring(txtNotkomp))
+			oNotkomp:SetText(translate("No_Com_Found_trans_script").." "..tostring(txtNotkomp))
 			oNotkomp:SetTextColor(255,255,0,0)
 			oNotkomp:SetFont(GetFontGraffiti19Russian())
 			oNotkomp:Init(30,118,470,20)
 			self:AttachChild(oNotkomp)			
-			-- sound_object("device\pda\pda_sos"):play_at_pos(db.actor, db.actor:position())
+			--sound_object("device\pda\pda_sos"):play_at_pos(db.actor, db.actor:position())
 		-- shows lines of time cooking the recipe
 		elseif string.len(txtVremya) > 0 then
 			oNotkomp = CUIStatic()
 			oNotkomp:SetWindowName("oNotkomp")
 			oNotkomp:SetAutoDelete(true)
-			oNotkomp:SetText("Recipe Cooking Time: "..tostring(txtVremya))
+			oNotkomp:SetText(translate("Recipe_Cooking_transmutator_script").." "..tostring(txtVremya))
 			oNotkomp:SetTextColor(255,0,255,0)
 			oNotkomp:SetFont(GetFontGraffiti19Russian())
 			oNotkomp:Init(140,118,470,20)

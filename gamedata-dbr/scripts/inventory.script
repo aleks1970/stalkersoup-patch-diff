@@ -143,16 +143,16 @@ end
 function on_inventory_info(info_id)
 	if info_id == "ui_inventory" then
 		inventory_open = true
-		if TB3D_Modders.use_inventory_message == true then TB3D_Services.info_alert("inventory: [open]") end
 		if TB3D_Modders.use_ammo_belt == true then belt_ammo.on_inventory_open() end -- DMX MOD
 		bind_stalker.hide_weapon(true)				--force hiding the weapon
+		if TB3D_Modders.use_inventory_message == true then TB3D_Services.info_alert("inventory: [open]") end
 	elseif info_id == "ui_inventory_hide" then
 		inventory_open = false
 		need_update = true
-		if TB3D_Modders.use_inventory_message == true then TB3D_Services.info_alert("inventory: [close]") end
 		if TB3D_Modders.use_ammo_belt == true then belt_ammo.on_inventory_close() end -- DMX MOD
 		bind_stalker.restore_weapon()
 		--collectgarbage("collect")				-- force memory cleanup
+		if TB3D_Modders.use_inventory_message == true then TB3D_Services.info_alert("inventory: [close]") end
 	end
 end
 

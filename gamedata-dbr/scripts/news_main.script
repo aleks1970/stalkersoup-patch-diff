@@ -2897,7 +2897,7 @@ end
 function connection_message()		--called from ui_main_menu
 	--TB3D_Services.packet_alert("news main: connection message")
 	local lname = level.name()
-	local sname = amk.load_variable("level_on_save",lname)
+	local sname = TB3D_Services.level_on_save()
 	if lname ~= sname then
 		local text = ""
 		local b_text = text

@@ -1,6 +1,7 @@
---<!-- TB3D 1.0.9.9.7.6   more options, The Collector, dmx135, removed peudoquicksave, connect message, ddof moved,
--- removed duplicate cheat_spawner, cleanup, auto levels, added red forest, level_intro, disconnecting, db report
-function my_ver() return "1.0.9.9.7.6" end
+--<!-- TB3D 1.0.9.9.8.3   more options, The Collector, dmx135, removed peudoquicksave, connect message, ddof moved,
+-- removed duplicate cheat_spawner, cleanup, auto levels, added red forest, level_intro, disconnecting, db report,
+-- load_pause Mini texture init aleks1970, pause menu volume
+function my_ver() return "1.0.9.9.8.3" end
 --TB3D re-written 08/15/2011
 -- File:        UI_MAIN_MENU.SCRIPT
 -- Description: Load Dialog for STALKER
@@ -26,13 +27,15 @@ function main_menu:__init() super()
 		local xml = CScriptXmlInit()
 		xml:ParseFile("dmx_mod.xml")
 		self.load_window = xml:InitStatic("game_load_window", self)
+		self.load_window = xml:InitStatic("game_load_window_pause", self) -- new texture aleks1970
 		self.level_intro = CUIStatic()
 		self.level_intro:SetAutoDelete(true)
 		self.level_intro:SetStretchTexture(true)
 		self.level_intro:Init("Intro\\intro_dmx_"..level.name(),275,369,475,257) --pause_dmx_folder
 		self:AttachChild(self.level_intro)
 		self.sound_volume_music = get_console():get_float("snd_volume_music")
-		get_console():execute("snd_volume_music 0")						-- must be off or conflicts with pause timer
+		local vol = TB3D_Modders.volume_on_pause or 1						-- range: 0 to 1.0
+		get_console():execute("snd_volume_music "..utils.to_str(vol))		-- 109982
 		level.set_snd_volume(0)
 		level.hide_indicators()
 	 end
@@ -60,7 +63,7 @@ function main_menu:InitControls()
 	if mm.GetGSVer and mm:GetGSVer() ~= nil then
 		_ver:SetText(" GSC["..mm:GetGSVer().."] STALKERSOUP Managed MegaMOD "..TB3D_Services.title_ver())
 	else
-		TB3D_Services.packet_alert("GSC Version 1.0005/1.0006 only")
+		TB3D_Services.packet_alert("GSC Version 1.0006/1.0008ww only")
 		_ver:SetText("GSC[1.0004] STALKERSOUP Managed MegaMOD "..TB3D_Services.title_ver())
 	end
 	_ver:SetTextColor(255,60,100,180)

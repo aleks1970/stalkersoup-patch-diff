@@ -1,4 +1,4 @@
-;-- TB3D 1.0.9.9.7.2 edits by glowworm,  excluded duplicates sections aleks1970, dav update 16Apr14, attach_bone_name must exist -->
+;-- TB3D 1.0.9.9.8.2 edits by glowworm,  excluded duplicates sections aleks1970, dav update 16Apr14, attach_bone_name must exist, adjustments -->
 ;  dAVROs weapons and other items for the Collector CS134 extended                   Rev 1         Aug 2011
 ;==================================================================================================
 
@@ -1166,7 +1166,7 @@ hit_power                	=  0.66
 hit_impulse		 			= 54
 hit_type 					= fire_wound
 hit_rate	        = 1.85
-fire_distance            	= 120
+fire_distance            	= 420
 bullet_speed				= 480
 rpm                      	= 680
 
@@ -1176,7 +1176,7 @@ time_to_aim					= 1.0
 
 silencer_hit_power       	= 0.63
 silencer_hit_impulse	 	= 120
-silencer_fire_distance   	= 100
+silencer_fire_distance   	= 200
 silencer_bullet_speed	 	= 450
 
 hud                      	= wpn_bizon_cs_hud
@@ -1292,8 +1292,8 @@ fire_modes					= 1, 3, 5
 
 hit_power                	=  2	;0.65
 hit_impulse					= 80	;50	
-fire_distance            	 = 20	;120
-bullet_speed				 = 80	;480
+fire_distance            	 = 200	;120
+bullet_speed				 = 380	;480
 rpm                      	= 1500	;750
 hud                      	= wpn_bizon_cs_kol_hud
 visual                  	= dav\bizon\wpn_bizon_cs_kol.ogf
@@ -1672,7 +1672,7 @@ hit_impulse		 			= 110
 hit_type 					= fire_wound
 hit_rate					= 2.0
 
-fire_distance           	= 800
+fire_distance           	= 1000
 bullet_speed		 		= 1500
 rpm                     	= 1200
 ; end ttc
@@ -1730,7 +1730,7 @@ silencer_smoke_particles 	= weapons\generic_shoot_00
 
 silencer_hit_power 			=  1.6
 silencer_hit_impulse	 	= 90
-silencer_fire_distance 		= 640
+silencer_fire_distance 		= 840
 silencer_bullet_speed	 	= 1150
 
 silencer_light_color		= 0.6, 0.5, 0.3
@@ -1798,7 +1798,7 @@ repair_compatibility = vihlop
 ;--dAVROs laser-----------------------------------------------------------------
 
 
-;NOT USED ---- yet
+;NOT USED ---- yet, displays beam aiming north only, 109982
 [wpn_laser]:wpn_ognemet			
 
 ammo_limit					= 50000
@@ -1861,7 +1861,7 @@ light_color					= 0.6,0.5,0.3
 light_range					= 1	;5					
 light_var_color				= 0.05						
 light_var_range				= 0.5
-light_time 					= 0.1	
+light_time 					= 0.01	
 
 hud                     	= wpn_laser_hud
 visual                  	= dav\gauss\wpn_laser.ogf
@@ -1887,7 +1887,7 @@ anim_shoot					= shoot
 
 
 [ammo_laser]:ammo_9x18_pmm
-inv_weight					= .0.001
+inv_weight					= 0.001
 
 hit_type 					= burn
 
@@ -3107,7 +3107,7 @@ explosion_immunity		= 0.0001
 fire_wound_immunity		= 0.0001
 
 
-
+;;missing ogf, 109982
 [dav_laser_psu]:bomba_big
 visual 					= dav\laser\war_laser.ogf 						;dav\equipments\item_anomaly_generator 
 can_take				= false
@@ -3120,7 +3120,7 @@ inv_name_short			= ""
 ;;      dAVROs turrets
 
 
-
+;;crashes with: particle error, 109982
 [ldk_laser1]:turret_mgun
 visual							= dav\laser\ldk_laser_turret.ogf
 ammo_class						= ammo_laser

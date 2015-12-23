@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.0 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
+--TB3D 1.0.9.9.8.3 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
 -- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
--- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug
-function my_ver() return "1.0.9.9.8.0" end
+-- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info
+function my_ver() return "1.0.9.9.8.3" end
 
 local string_find = string.find
 local math_random = math.random
@@ -9,8 +9,6 @@ local math_random = math.random
 function actor_update()
 	amk.oau_watchdog=669										-----------------669
 	check_info()
-	amk.oau_watchdog=668										-----------------667
-	new_info()
 	amk.oau_watchdog=667										-----------------667
 	kot_info()
 	amk.oau_watchdog=666										-----------------666
@@ -121,37 +119,18 @@ function spawn_marsh_band()
 	alife():create("prov_ruk",v:set(-3.481797,3.3647267818451,12.3242),137219,3418)
 end
 
-function check_info()
+function check_info()		--109983
 	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking info") end
 	local ln = level.name()
-	--but as to whether these are mutually exclusive Vezha ??
-    --[[if (has_alife_info("ferma_band1_see") or
-		has_alife_info("ferma_band2_see") or 
-		has_alife_info("ferma_band3_see") or 
-		has_alife_info("ferma_band4_see") or 
-		has_alife_info("ferma_band5_see") or 
-		has_alife_info("ferma_band6_see") or 
-		has_alife_info("ferma_band7_see"))
-		and not has_alife_info("sveeblov_ferma_have") then
-		TB3D_Services.give_info("sveeblov_ferma_fail")
-    else]]--
 	if ln == "marsh" then
 		if has_alife_info("brat_luis_start") and not has_alife_info("brat_luis_dead") then
 			if has_alife_info("brat_luis_have") then
 				if TB3D_Services.give_info("brat_luis_killself") == true then amk.start_timer("luis_killself",math_random(10,15)) end
-			elseif has_alife_info("brat_luis_start") then
+			else	--if has_alife_info("brat_luis_start") then			--109983
 				TB3D_Services.give_info("brat_luis_spawn")
 			end
 		end
-    elseif ln == "l07_military" then
-		if has_alife_info("francuz_start") then	TB3D_Services.give_info("francuz_spawn") end	
-	end
-	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking info done") end
-end
-
-function new_info()
-	local ln = level.name()
---[[    if (has_alife_info("xalyava_naem1_see") or
+		--[[if (has_alife_info("xalyava_naem1_see") or
 		has_alife_info("xalyava_naem2_see") or
 		has_alife_info("xalyava_naem3_see") or
 		has_alife_info("xalyava_naem4_see") or
@@ -161,22 +140,26 @@ function new_info()
 		has_alife_info("xalyava_naem8_see"))
 		and not has_alife_info("xalyava_nebo_next") then
 		TB3D_Services.give_info("xalyava_naemnik_see")
-    else]]--
-	if (has_alife_info("xalyava_naemnik_see")
-	or has_alife_info("xalyava_dead"))
-	and not has_alife_info("xalyava_nebo_have") then
-		TB3D_Services.give_info("xalyava_nebo_fail")
-	end
-	if ln == "l03_agroprom" then
+		else]]--
+		if (has_alife_info("xalyava_naemnik_see")
+		  or has_alife_info("xalyava_dead"))
+		  and not has_alife_info("xalyava_nebo_have") then
+			TB3D_Services.give_info("xalyava_nebo_fail")
+		end
+    elseif ln == "l07_military" then
+		if has_alife_info("francuz_start") then	TB3D_Services.give_info("francuz_spawn") end	
+	elseif ln == "l03_agroprom" then
 		if has_alife_info("kot_agro_mono_start") then
-			TB3D_Services.give_info("kot_agro_mono_spawn")
+			if TB3D_Services.give_info("kot_agro_mono_spawn") == false then			--109983, spawn first
+				if (has_alife_info("chuk_dead")
+				  or has_alife_info("gek_dead"))
+				  and not has_alife_info("kot_agro_mono_have") then
+					TB3D_Services.give_info("kot_agro_mono_fail")
+				end
+			end
 		end
 	end
-    if (has_alife_info("chuk_dead")
-	or has_alife_info("gek_dead"))
-	and not has_alife_info("kot_agro_mono_have") then
-		TB3D_Services.give_info("kot_agro_mono_fail")
-    end
+	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking info done") end
 end
 
 function main_braad(npc)

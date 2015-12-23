@@ -1,9 +1,9 @@
---TB3D 1.0.9.9.8.1 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+--TB3D 1.0.9.9.8.3 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
 -- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
 -- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
 -- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions, radar_monolit_dead, generic_m_story_id,
--- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at
-function my_ver() return "1.0.9.9.8.1" end
+-- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update, agro soldiers health
+function my_ver() return "1.0.9.9.8.3" end
 --[[------------------------------------------------------------------------------------------------------------------
 Author: Ruslan Didenko (Stohe)
 how to call methods of Binder:
@@ -17,8 +17,9 @@ net_spawn
 --lastime = nil
 local table_remove = table.remove
 local string_find = string.find
+local string_sub = string.sub
 local particles={}
-local loadout_checked = false
+--local loadout_checked = false
 --local hit_table = {}
 local hit_max = 1 + TB3D_Modders.hits_to_kill_invuln
 local hit_head = 1 + (TB3D_Modders.hits_to_kill_invuln / TB3D_Modders.hits_to_head_invuln)
@@ -81,7 +82,7 @@ function motivator_binder:net_spawn(sobject)
 		local sim = alife()
 		local npc = self.object
 		local lname = level:name()
-		local sname = amk.load_variable("level_on_save", lname)
+		--local sname = amk.load_variable("level_on_save", lname)		--109983
 		local sobj_name = sobject:name()
 		if sobj_name == nil then sobj_name = nil end
 		local npc_name = npc:name()
@@ -93,7 +94,7 @@ function motivator_binder:net_spawn(sobject)
 			if is_report or TB3D_Modders.use_info_message then
 				TB3D_Services.packet_alert("xr motivator: net spawn["..npc_name.."]["..sobj_name.."] id["..utils.to_str(npc_id).."] is alive["..utils.to_str(is_alive).."]")
 			end
-			if is_alive == false and lname ~= sname then
+			if is_alive == false and lname ~= TB3D_Services.level_on_save() then
 				if TB3D_Services.can_remove_dead(lname) == true	then				--now interactive corpse cleaner
 				  if string_find(npc_name, "radar_monolit_dead")
 				    or string_find(npc_name, "yan_ecolog_respawn_2")
@@ -268,8 +269,9 @@ function motivator_binder:net_spawn(sobject)
 						end
 						sobject:smart_terrain_task_deactivate()
 					end
+				elseif commun == "fotoman" then
+					npc:set_custom_panic_threshold(0.0)			--109976 try and force them to stay in place
 				end
-				if commun == "fotoman" then npc:set_custom_panic_threshold(0.0) end			--109976 try and force them to stay in place
 				if TB3d_Modders.Global_Debug then
 					TB3D_Services.packet_alert("XR MOTIVATOR: net spawn["..npc_name.."]["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done[true]")
 				end
@@ -689,21 +691,23 @@ function motivator_binder:update(delta)
 		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("xr motivator: update[Nil self.object]") end
 		return
 	end
-	local is_report = false
-	if TB3D_Modders.use_state_message and string_find(self.object:name(), TB3D_Modders.npc_to_log) then is_report = true end
-	if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."]") end
+	local self_object = self.object						--109983
 	local self_object_id = self.object:id()
+	local self_name = self.object:name()				--109983
+	local is_report = false
+	if TB3D_Modders.use_state_message and string_find(self_name, TB3D_Modders.npc_to_log) then is_report = true end
+	if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."]") end
+	--TB3D_Services.packet_alert("xr_motivator: updating2["..utils.to_str(self_name).."] id["..utils.to_str(self_object_id).."]")
 	object_binder.update(self, delta)
-	--TB3D_Services.packet_alert("xr_motivator: updating2["..utils.to_str(self.object:name()).."] id["..utils.to_str(self.object:id()).."]")
 	if particles[self_object_id] and #particles[self_object_id] > 0 then
-		if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] removing from particle list") end
+		if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] removing from particle list") end
 		for kk,vv in pairs(particles[self_object_id]) do
 			table.insert(self.particles,amk_particle.amk_particle(vv))
 			table_remove(particles[self_object_id],kk)
 		end
 	end
     if #self.particles > 0 then
-		if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] removing self particles") end
+		if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] removing self particles") end
         for kk,vv in pairs(self.particles) do
             if vv then
                 if vv:is_finished() then
@@ -714,117 +718,107 @@ function motivator_binder:update(delta)
             end
         end
     end
-	--TB3D_Services.packet_alert("xr_motivator: updating3["..utils.to_str(self.object:name()).."] id["..utils.to_str(self.object:id()).."]")
+	--TB3D_Services.packet_alert("xr_motivator: updating3["..utils.to_str(self_name).."] id["..utils.to_str(self_object_id).."]")
 	local lname = level:name()
-	local sname = amk.load_variable("level_on_save", lname)
-	if self.object:alive() then
+	if self_object:alive() then
 		if self.first_update == false then
-			if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] first update") end
 			self.last_update = 0											--force relation update
 			self.first_update = true
-			if death_manager then death_manager.drop_manager(self.object):check_npc_loadout() end
-			self.loadout_checked = true
-			if TB3D_Services.is_collector(70) then xr_companion.is_companion_se(self.object) end		--109978
-		end
-		if self.loadout_checked == false then							--check to see if needs changing
-			if sname ~= lname then
-				if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] load out checked") end
-				if death_manager then death_manager.drop_manager(self.object):check_npc_loadout() end
-				self.loadout_checked = true
+			death_manager.drop_manager(self_object):check_npc_loadout()
+			if TB3D_Services.is_collector(70) then xr_companion.is_companion_se(self_object) end		--109978
+			if is_report then
+				TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] lname["..utils.to_str(lname).."] sname["..utils.to_str(TB3D_Services.level_on_save()).."] health["..utils.to_str(self_object.health).."] first update")
 			end
 		end
 		if self.last_update < time_global() then
 			self.last_update = time_global() + 11
-			if amk.get_npc_relation(self.object,db.actor)=="enemy" and self.object.health > 0.01 then
-				if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] am enemy so check visible") end
-				if self.object:see(db.actor) then
-					amk.enemy_see_actor(self.object,"npc")
+			if amk.get_npc_relation(self_object,db.actor)=="enemy" and self_object.health > 0.01 then
+				if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] an enemy so check visible") end
+				if self_object:see(db.actor) then
+					amk.enemy_see_actor(self_object,"npc")
 				end
-				if db.actor:see(self.object) then
-					amk.actor_see_enemy(self.object,"npc")
+				if db.actor:see(self_object) then
+					amk.actor_see_enemy(self_object,"npc")
 				end
 			end
-			sr_light.check_light(self.object)
+			sr_light.check_light(self_object)
 		end
 		if self.st.state_mgr then
-			if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] updating state manager") end
+			if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] updating state manager") end
 			if self.st.state_mgr.combat == false and self.st.state_mgr.alife == false then
-				if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] updating trade manager") end
-				if trade_manager.update(self.object) then
-					if self.object:name() == "ds_tweed" then
-						TB3D_Triggers.spawn_enemy_at(self.object)								--109981, need motivate non-mob traders
+				if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] updating trade manager") end
+				if trade_manager.update(self_object) then
+					if self_name == "ds_tweed" then
+						TB3D_Triggers.spawn_enemy_at(self_object)								--109981, need motivate non-mob traders
 					end
 				end
 			end
 			self.st.state_mgr:update()
 		end
-		--TB3D_Services.packet_alert("xr_motivator: updating6["..utils.to_str(self.object:name()).."] id["..utils.to_str(self.object:id()).."]")
-		local wpn = utils.wpn_info_get(self.object)
+		--TB3D_Services.packet_alert("xr_motivator: updating6["..utils.to_str(self_name).."] id["..utils.to_str(self_object_id).."]")
+		local wpn = utils.wpn_info_get(self_object)
 		if wpn["ammo"]~=nil then
-			local enemy = self.object:best_enemy()
-			if enemy and enemy:id()==db.actor:id() and self.object:see(db.actor) and self.prev_ammo>wpn["ammo"] then
-				amk.npc_shot_actor(self.object)
+			local enemy = self_object:best_enemy()
+			if enemy and enemy:id()==db.actor:id() and self_object:see(db.actor) and self.prev_ammo>wpn["ammo"] then
+				amk.npc_shot_actor(self_object)
 			end
 		end
 		self.prev_ammo = wpn["ammo"] or 0
-		xr_sound.update(self.object)
-		if self.object:is_talk_enabled() then
-			self.object:set_tip_text("character_use")
+		xr_sound.update(self_object)
+		if self_object:is_talk_enabled() then
+			self_object:set_tip_text("character_use")
 		else
-			self.object:set_tip_text("")
+			self_object:set_tip_text("")
 		end
-		self.object:info_clear()
-		local best_enemy = self.object:best_enemy()
+		self_object:info_clear()
+		local best_enemy = self_object:best_enemy()
 		if best_enemy then
-			self.object:info_add('enemy -- ' .. best_enemy:name())
+			self_object:info_add('enemy -- ' .. best_enemy:name())
 		end
 		local active_section = db.storage[self_object_id].active_section
 		if active_section then
-			self.object:info_add('section -- ' .. active_section)
+			self_object:info_add('section -- ' .. active_section)
 		end
-		self.object:info_add('name -- ' .. self.object:name())
+		self_object:info_add('name -- ' .. self_object:name())
 		if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.npc_update(self) end
-		rx_ai.npc_update(self.object,self.st)
+		rx_ai.npc_update(self_object,self.st)
 		if dmx_cars.actor_inside_btr() then
-			if self.object:position():distance_to(db.actor:position()) <= 3 then
-				TB3D_Hit_Styles.small_hit(self.object, 2)				--109980, hit by btr
-			elseif dmx_cars.actor_target(self.object) then
-				dmx_cars.set_target(self.object:id())					--else add to targets
+			if self_object:position():distance_to(db.actor:position()) <= 3 then
+				TB3D_Hit_Styles.small_hit(self_object, 2)				--109980, hit by btr
+			elseif dmx_cars.actor_target(self_object) then
+				dmx_cars.set_target(self_object_id)					--else add to targets
 			end
 		elseif dmx_cars.actor_inside_car() then
-			if self.object:position():distance_to(db.actor:position()) <= 3 then
-				TB3D_Hit_Styles.small_hit(self.object, 1)				--109980, hit by vehicle
+			if self_object:position():distance_to(db.actor:position()) <= 3 then
+				TB3D_Hit_Styles.small_hit(self_object, 1)				--109980, hit by vehicle
 			end
 		end	
 	else																	--dead dude
 		if self.first_update == false then
-			if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] first update dead") end
-			sr_light.check_light(self.object)
+			if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] first update dead") end
+			sr_light.check_light(self_object)
 			self.first_update = true
 			local se_obj = alife():object(self_object_id)						--spawned dead so won't trigger death callback
 			if se_obj then
-				--TB3D_Services.packet_alert("xr motivator: ["..utils.to_str(self.object:name()).."] spawned dead")
+				--TB3D_Services.packet_alert("xr motivator: ["..utils.to_str(self_name).."] spawned dead")
 				if se_obj.death_droped == false then
-					if death_manager then 												--some npc do not get this class attached
-						--death_manager.drop_manager(self.object):check_dead_info()		--give death infos
-						death_manager.drop_manager(self.object):check_dead_weapons()	--randomly changes condition and unloads them for check dead items
-						death_manager.drop_manager(self.object):check_dead_items()		--see if all.spawn npc with no inventory except pda
-					end
+					death_manager.drop_manager(self_object):check_dead_weapons()	--randomly changes condition and unloads them for check dead items
+					death_manager.drop_manager(self_object):check_dead_items()		--see if all.spawn npc with no inventory except pda
 					se_obj.death_droped = true
 				end
 			end
 		end
 		if self.st.state_mgr then												--Update manager states of the body
-			if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] updating state manager") end
+			if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] updating state manager") end
 			self.st.state_mgr:update()
 			--self.st.state_mgr = nil			--do not do here, dead bodies are re-entrant
 		end
-		self.object:set_tip_text_default()
-		--self.object:set_tip_text("character_use")
-		self.object:info_clear()
+		self_object:set_tip_text_default()
+		--self_object:set_tip_text("character_use")
+		self_object:info_clear()
 	end
-	if TB3D_Services.is_collector(407) then xr_companion.process_enemy(self.object) end		--109950 ogse	
-	if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self.object:name()).."] done") end
+	if TB3D_Services.is_collector(407) then xr_companion.process_enemy(self_object) end		--109950 ogse	
+	if is_report then TB3D_Services.packet_alert("xr motivator: updating npc["..utils.to_str(self_name).."] done") end
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("xr   motivator: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
 	end
@@ -954,10 +948,10 @@ function addCommonPrecondition(action)
 	action:add_precondition (world_property(blowout_scheme.evid_blowout, false))
 	action:add_precondition (world_property(blowout_scheme.evid_preblowout, false))
 	action:add_precondition(world_property(blowout_scheme.evid_anomaly, false))
-	if ricochet_scheme then
+	if ricochet_scheme then			--109983, scheme does not exist yet
 		action:add_precondition(world_property(ricochet_scheme.evid_ricochet_danger, false))
 	end
-	if ogsm_hideout then			--109950
+	if ogsm_hideout then			--109950, scheme does not exist yet
 		action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
 		action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
 		action:add_precondition(world_property(ogsm_hideout.property_inhide, false))
@@ -966,7 +960,7 @@ function addCommonPrecondition(action)
 	action:add_precondition(world_property(watcher_act.evid_see_stuff, false))
 	if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.addCommonPrecondition(action) end
 	rx_ai.addCommonPrecondition(action)
-	if anomaly_evader then			--109950
+	if anomaly_evader then			--109950, scheme does not exist yet
 		action:add_precondition (world_property(1099,false))
 	end	
 end

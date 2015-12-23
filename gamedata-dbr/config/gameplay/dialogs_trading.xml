@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 trasure to sake.take/have_treasure*************** -->
+<!-- ****** TB3D 1.0.9.9.7.0 trasure to sake.take/have_treasure, sherstyk exchange in line: 4438 aleks1970 ****** -->
 <game_dialogs>
 	<dialog id="about_repair_box_dialog">
 		<precondition>sak_dialog.repair_box_not_have</precondition>
@@ -4434,7 +4434,9 @@
 				<precondition>sak_dialog.have_7vodka</precondition>
 				<text>trade_dialog_sherstyk_241</text>
 				<action>sak_dialog.give_7vodka</action>
-				<action>sak_dialog.add_ammo_762x54r</action>
+		<!-- **	<action>sak_dialog.add_ammo_762x54r</action> *** -->
+				<action>sak_dialog.add_ammo_pkm_box_1</action>
+		<!-- **	<action>sak_dialog.add_ammo_pkm_box_2</action> *** -->
 			</phrase>
 			<phrase id="251">
 				<precondition>sak_dialog.have_15vodka</precondition>

@@ -1,6 +1,6 @@
---<!-- TB3D 1.0.9.9.8.1 new in dmx135, optimized db.actor, soul cube, \\n, redesign, current_time, hdr
+--<!-- TB3D 1.0.9.9.8.2 new in dmx135, optimized db.actor, soul cube, \\n, redesign, current_time, hdr, sun advanced
 
-function my_ver() return "1.0.9.9.8.1" end
+function my_ver() return "1.0.9.9.8.2" end
 --[[-----------------------------------------------------------------------------------------------
  File         : dmx_pda_dialogs.script
  Description  : Chat
@@ -52,7 +52,6 @@ local commands = {
 	"greetings",
 	"cube",
 	"soul",
-	"@",
 	"reset"
 }
 -------------- based on command, use one of the following ----------------------------
@@ -180,7 +179,7 @@ function pda_dialogs(text)
 				break
 			end
 		end
-		--TB3D_Services.packet_alert("dmx pda dialogs: command["..utils.to_str(s_command).."] id["..utils.to_str(command).."]")
+		TB3D_Services.packet_alert("dmx pda dialogs: command["..utils.to_str(s_command).."] id["..utils.to_str(command).."]")
 		--------------------------------IF COMMAND THEN PROCESS------------------------------------
 		if command == 1 then						--where is something
 			--TODO
@@ -276,7 +275,7 @@ function pda_dialogs(text)
 			------------------
 			news_manager.amk_send_tip(goodbye_answer[math.random(#goodbye_answer)], name.." "..sname, 7, 15, "common_channel")
 			return
-		elseif command == 19 or command == 20 then										--cube commands
+		elseif command == 21 or command == 22 then										--cube commands
 			if lname == "pripyat" and not has_alife_info("tb3d_cube_answered") then
 				------------------
 				-- Shadow Cube Quest
@@ -289,10 +288,9 @@ function pda_dialogs(text)
 					end
 				end
 			end
-		elseif command == 24 then
+		elseif command == 23 then
 			process_reset_command(text)
-		end										--spam
-		if lname == "l01_escape" then
+		elseif lname == "l01_escape" then
 			------------------
 			-- Military attack
 			------------------
@@ -439,7 +437,7 @@ function process_reset_command(text)
 	elseif pname == 6 then					--all
 		msg = 7
 	end
-	news_manager.amk_send_tip(reset_response[msg], "Potap", 12, 15, "common_channel")
+	news_manager.amk_send_tip(reset_response[msg], "Potap", 1, 1, "common_channel")
 	if pname == 1 or pname == 6 then
 		get_console():execute("r2_ls_bloom_kernel_scale "..utils.to_str(TB3D_Modders.bloom_intensity))
 		get_console():execute("r2_ls_bloom_threshold "..utils.to_str(TB3D_Modders.bloom_threshold))
@@ -451,6 +449,12 @@ function process_reset_command(text)
 	if pname == 3 or pname == 6 then
 		get_console():execute("r2_sun_lumscale "..utils.to_str(TB3D_Modders.sun_intensity))
 		get_console():execute("r2_sun_lumscale_amb "..utils.to_str(TB3D_Modders.sun_ambient))
+		if TB3D_Modders.use_sun_advanced then
+			get_console():execute("r2_sun_near "..utils.to_str(TB3D_Modders.sun_near))
+			get_console():execute("r2_sun_near_border "..utils.to_str(TB3D_Modders.sun_near_border))
+			get_console():execute("r2_gi_clip "..utils.to_str(TB3D_Modders.gi_clip))
+			get_console():execute("r2_gi_refl "..utils.to_str(TB3D_Modders.gi_refl))
+		end
 	end
 	if pname == 4 or pname == 6 then
 		get_console():execute("r2_tonemap_middlegray "..utils.to_str(TB3D_Modders.hdr_midpoint))

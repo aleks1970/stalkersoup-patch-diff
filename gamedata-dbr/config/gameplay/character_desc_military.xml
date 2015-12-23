@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 new inventory and dialogs*************** -->
+<!-- ************ TB3D 1.0.9.9.8.0 new inventory and dialogs*************** -->
 <xml>
 	<!-- ***************SVOBODA PROFILES*************** -->
 	<!-- ***************SVOBODA SPECNAZ*************** -->
@@ -97,6 +97,7 @@
 #include "dialogs\generic_dialogs.xml"
 	</specific_character>
 	<!-- ***************SVOBODA ZONEGUARD*************** -->
+<!--***************-Restored fn2000_old weapon - aleks1970-*************-->
 	<specific_character id="mil_Svoboda_zoneguard" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_sv_exoskeleton</icon>
@@ -111,7 +112,7 @@
 		<rank>910</rank>
 		<reputation>125</reputation>
 		<visual>actors\svoboda\stalker_sv_exoskeleton</visual>
-#include "inventory\mil_guard_items.xml"
+#include "inventory\mil_master_guard_items.xml"
 #include "gameplay\character_criticals_2.xml"
 #include "dialogs\svobodaz_mil.xml"
 	</specific_character>

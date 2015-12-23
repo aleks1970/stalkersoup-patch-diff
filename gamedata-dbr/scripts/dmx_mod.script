@@ -387,20 +387,6 @@ function monolith_kbo_spawn()
 	end
 end
 
--- select Notepad and spawn Librarian, moved 109970
---function cube_take(obj)
-	--if TB3D_Services.is_collector() == false then
-		--if obj:section()=="item_doc_x8" then
-			--if level.name()=="pripyat" and not has_alife_info("cop_prip_info_take_doc") then
-				--TB3D_Services.give_info("cop_prip_info_take_doc")
-				--alife():create("bibliotekar",vector():set(140.922,-0.367,220.575),370139,3769)
-				--news_manager.amk_send_tip_id("cop_prip_msg1", "bullseye_private", 10, 20, "actor_sms")
-				--news_manager.amk_send_tip_id("cop_prip_msg2", "shadows_private", 30, 50)
-			--end
-		--end
-	--end
---end
-
 -- settlement facilities
 function pripyat_base_spawn()
     local obj = alife():create("mudri",vector():set(144.298,-0.096,-192.662),375712,3765)
@@ -423,6 +409,7 @@ end
 function actor_drinking_vodka()
     local oItem = db.actor:object("vodka") or db.actor:object("absolut_vodka") or db.actor:object("nemiroff_vodka") or db.actor:object("smirnoff_vodka")
 	if oItem then
+		--TB3D_Services.packet_alert("dmx mod: actor_drinking_vodka["..oItem:name().."]")
 	    db.actor:eat(oItem)
 	else
 		local sobj = amk.spawn_item_in_inv("vodka")
@@ -430,9 +417,13 @@ function actor_drinking_vodka()
 	end
 end
 
-function spawn_vodka_callback(arg,id,item)
-    db.actor:eat(item)
-    amk.remove_item(item)
+function spawn_vodka_callback(arg,id,item)								--109982
+    local oItem = db.actor:object("vodka")
+	if oItem then
+		--TB3D_Services.packet_alert("dmx mod: spawn_vodka_callback["..oItem:name().."]")
+		db.actor:eat(oItem)
+		amk.remove_item(oItem)
+	end
 end
 
 -- a couple of monsters in quest map search Pripyat
@@ -468,19 +459,6 @@ function next_labx8()
 		TB3D_Triggers.wolf_howls()
 	end
 end
-
--- isportilsya lantern
---function device_torch_bad()			--109955, now handled in hidden slots
-	--if TB3D_Services.is_collector(909) == false then
-		--local oItem = db.actor:object("device_torch") or db.actor:object("fake_device_torch")
-		--if oItem then
-			--db.actor:drop_item(oItem)
-			--alife():release(alife():object(oItem:id()), true)
-			--amk.spawn_item_in_inv("device_torch_bad")
-			--TB3D_Services.give_info("tb3d_bad_torch")
-		--end
-	--end
---end
 
 -- population of laboratory X-8
 function labx8_cube_spawn()
@@ -550,11 +528,6 @@ function labx8_cube_take()
 		amk.start_timer("ghost_timer",4,"")
 	end
 end
-
--- wandering ghost
---function labx8_ghost()
-	--amk.start_timer("ghost_strong_timer",10,"")
---end
 
 -- whether the AU card in his backpack
 function dmx_military_map_have()
@@ -656,34 +629,6 @@ function actor_blockpost_propusk()		--TB3D   DMX135
 		end
 	end
 end
-
---[[function actor_blockpost_propusk()------------------------------------
-    if dmx_cars.car_section()=="vehicle_uaz_fsb" and outfit_propusk(db.actor:item_in_slot(6)) then
-        actor_set_military()
-    else
-        actor_restore_community()
-    end
-end
-
-function actor_set_military()
-    --local ac=db.actor:character_community()
-    --if ac~="military" then
-        --amk.save_variable("acmmty",ac)
-		TB3D_Services.set_community(db.actor, "military", 0, 0, true)
-        --db.actor:set_character_community("military", 0, 0)
-        TB3D_Services.give_info("actor_propusk_info")
-    end
-end
-
-function actor_restore_community()
-    --local stored_comm=amk.load_variable("acmmty",nil)
-    --if stored_comm and stored_comm~=db.actor:character_community() then
-		TB3D_Services.restore_community(db.actor, "actor")
-        --db.actor:set_character_community(stored_comm, 0, 0)
-        TB3D_Services.remove_info("actor_propusk_info")
-        --amk.del_variable("acmmty")
-    end
-end]]--------------------------------------------------------------------
 
 -- check for beryl
 function specops_outfit_have()
@@ -918,14 +863,6 @@ function visual_fix(obj)
 	end
 end
 
---[[function shnura_fix(obj)		--checked in xr cond: killed_by_actor
-	if level.name() == "atp_for_test22" and obj:profile_name() == "atp_bandit_shnura" then
-		if not has_alife_info("kalinin_zadan_done") then
-			db.actor:give_info_portion("kalinin_zadan_done")
-		end
-	end
-end]]--
-
 -------------------------------------------dmx135-------------
 -- Generator flame mixture
 -- Author - Charsi
@@ -1073,13 +1010,7 @@ function drop_item_to_inventory(number)
 			TB3D_Services.packet_alert("dmx_mod: drop item to inventory item sect["..utils.to_str(item:section()).."]")
 		end
         db.actor:drop_item(item)
-		local sobj
-		--if number == 9 then			--109955
-			--sobj=alife():create("device_torch_bad",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),0)
-		--else
-			sobj=alife():create(item:section(),db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),0)
-		--end
-		TB3D_Services.transfer_item(db.actor, sobj, db.actor, "DMXMD")
+		amk.spawn_in_inv(item:section(), 1)
         alife():release(item,true)
     end
 	if TB3D_Modders.use_inventory_message == true then TB3D_Services.info_alert("dmx_mod: drop item to inventory done") end
@@ -2537,5 +2468,69 @@ function create_level_changer_radar_ros()		--109980, when talked to Max about Cu
 		"l10_radar",0,0,"to_radar")
 	end
 end
+
+function create_level_changer_jupu_tunnels()		--109982, when x14 done
+	local obj = alife():story_object(99038)
+	if not obj then
+		create_level_changer(99038, vector():set(-8.108,0.077,70.424),8133,3784,				--small tunnel off main room to southern tunnels
+			1374,3858, vector():set(73.854,-16.122,99.230),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
+			"cs_agroprom_underground",0,0,"to_tunnels") 													
+		news_manager.amk_send_tip_id("path_jupu_tunnels", "path_new", 2, 25, "pda_icon")
+	end
+	obj = alife():story_object(99039)
+	if not obj then
+		create_level_changer(99039, vector():set(74.631,-16.117,104.100),1395,3858,				--w. end of flood tunnel
+			10926,3784, vector():set(-3.164,0.073,62.599),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 												
+		"jupiter_underground",0,0,"to_jupu")
+	end
+end
+
+function create_level_changer_tunnels_to_red_forest(is_silent)		--109982, better target points
+	local obj = alife():story_object(99040)
+	if not obj then
+		create_level_changer(99040, vector():set(-99.792,0.761,29.000),12285,3240,				--tunnel by camp
+			1579,3868, vector():set(83.660,-20.232,-186.914),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
+			"cs_agroprom_underground",0,0,"to_tunnels") 													
+		if not is_silent then news_manager.amk_send_tip_id("path_redf_tunnels", "path_new", 2, 25, "pda_icon") end
+	end
+	obj = alife():story_object(6014)
+	if not obj then
+		create_level_changer(6014, vector():set(85.695,-16.928,-189.877),1579,3868,				--tunnel with fire
+			11416,3240, vector():set(-104.958,0.638,22.358),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 												
+		"red_forest",0,0,"to_redforest")
+	end
+end
+
+function create_level_changer_npp1_to_radar()													--109982, hunt lc stash 14
+	local obj = alife():story_object(99041)
+	if not obj then
+		create_level_changer(99041, vector():set(116.663,-0.100,-76.573),61738,2376,			--hunt lc to radar
+			41971,1946, vector():set(94.869,2.475,86.134),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
+			"l10_radar",0,0,"to_radar") 													
+		news_manager.amk_send_tip_id("path_npp1_radar", "path_new", 2, 25, "pda_icon")
+	end
+	obj = alife():story_object(99042)
+	if not obj then
+		create_level_changer(99042, vector():set(92.214,6.541,94.695),40936,1947,				--far corner break in wall
+			66129,2376, vector():set(131.427,-0.101,-75.964),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 												
+		"l12_stancia",0,0,"to_aes")
+	end
+end
+
+--[red_forest]: (-99.792,0.761,29.000),12285,3240)
+--[red_forest]: (-104.958,0.638,22.358),11416,3240)
+--[cs_agroprom_underground]: (85.695,-16.928,-189.877),1579,3868)
+--[cs_agroprom_underground]: (83.660,-20.232,-186.914),1579,3868)
+
+--[jupiter_underground]: (55.961,19.181,257.618),33364,3799)			--big tunnel right before north exits to ???
+--[jupiter_underground]: (48.390,15.113,257.678),33364,3799)
+--[cs_agroprom_underground]: (121.710,-16.127,61.468),4584,3869)		--e. end of flood tunnel
+--[cs_agroprom_underground]: (114.998,-16.100,59.063),3848,3863)
 
 --/=====================================================================================================================================

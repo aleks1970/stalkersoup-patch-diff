@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.1 mblur added, more adv ctrls added, hdr adapt
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.8.2 mblur added, more adv ctrls added, hdr adapt, sun advanced
+function my_ver() return "1.0.9.9.8.2" end
 class "opt_video_adv" (CUIWindow)
 
 function opt_video_adv:__init() super()
@@ -59,12 +59,12 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_gloss_factor",			_st)
 	xml:InitTrackBar							("video_adv:track_r2_gloss_factor",			_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_parallax_h",				_st)
 	xml:InitTrackBar							("video_adv:track_r2_parallax_h",			_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	------------------- SUN and SHADOW ------------------------------------------------------------------
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
@@ -83,71 +83,113 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
-	xml:InitStatic								("video_adv:cap_r2_sun_lumscale_amb",		_st)
-	xml:InitTrackBar							("video_adv:track_r2_sun_lumscale_amb",		_st)
+	xml:InitStatic								("video_adv:cap_particles_distance",	_st)
+	ctl				= xml:InitTrackBar			("video_adv:track_particles_distance",	_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+
+if TB3D_Modders.use_sun_advanced then	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_sun_focus",				_st)
+	ctl			= xml:InitCheck					("video_adv:check_r2_sun_focus",				_st)
 	handler.m_preconditions[ctl]		= only_2_mode
 	
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
-	xml:InitStatic								("video_adv:cap_particles_distance",	_st)
-	ctl				= xml:InitTrackBar			("video_adv:track_particles_distance",	_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	xml:InitStatic								("video_adv:cap_r2_sun_near",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_sun_near",		_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_sun_near_border",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_sun_near_border",		_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_sun_tsm",				_st)
+	ctl			= xml:InitCheck					("video_adv:check_r2_sun_tsm",				_st)
+	handler.m_preconditions[ctl]		= only_2_mode
 
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_gi",				_st)
+	ctl			= xml:InitCheck					("video_adv:check_r2_gi",				_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+
+--	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+--	xml:InitStatic								("video_adv:cap_r2_gi_depth",		_st)
+--	xml:InitTrackBar							("video_adv:track_r2_gi_depth",		_st)
+--	handler.m_preconditions[ctl]		= only_2_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_gi_clip",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_gi_clip",		_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+	
+	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+	xml:InitStatic								("video_adv:cap_r2_gi_refl",		_st)
+	xml:InitTrackBar							("video_adv:track_r2_gi_refl",		_st)
+	handler.m_preconditions[ctl]		= only_2_mode
+	
+--	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
+--	xml:InitStatic								("video_adv:cap_r2_gi_photons",		_st)
+--	xml:InitTrackBar							("video_adv:track_r2_gi_photons",		_st)
+--	handler.m_preconditions[ctl]		= only_2_mode
+	
+end	
 	------------------------------ HDR ----------------------------------------------------------------
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_tonemap",		_st)
 	ctl			= xml:InitCheck					("video_adv:check_r2_tonemap",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_tonemap_middlegray",		_st)
 	xml:InitTrackBar							("video_adv:track_r2_tonemap_middlegray",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_tonemap_lowlum",		_st)
 	xml:InitTrackBar							("video_adv:track_r2_tonemap_lowlum",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 	
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_tonemap_amount",		_st)
 	ctl			= xml:InitTrackBar				("video_adv:track_r2_tonemap_amount",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_tonemap_adaptation",		_st)
 	ctl			= xml:InitTrackBar				("video_adv:track_r2_tonemap_adaptation",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_ls_bloom_fast",					_st)
 	xml:InitCheck								("video_adv:check_r2_ls_bloom_fast",				_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_ls_bloom_kernel_scale",		_st)
 	ctl				= xml:InitTrackBar			("video_adv:track_r2_ls_bloom_kernel_scale",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 	
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_ls_bloom_threshold",		_st)
 	ctl				= xml:InitTrackBar			("video_adv:track_r2_ls_bloom_threshold",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 	
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_ls_bloom_speed",		_st)
 	ctl				= xml:InitTrackBar			("video_adv:track_r2_ls_bloom_speed",		_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 if TB3D_Modders.use_soft_effects then	
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_soft_particles",				_st)
 	xml:InitCheck								("video_adv:check_r2_soft_particles",			_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)
 	xml:InitStatic								("video_adv:cap_r2_soft_water",				_st)
 	xml:InitCheck								("video_adv:check_r2_soft_water",			_st)
-	handler.m_preconditions[ctl]		= only_12_mode
+	handler.m_preconditions[ctl]		= only_2_mode
 end
 
 	_st				= xml:InitStatic			("video_adv:templ_item",				self.scroll_v)

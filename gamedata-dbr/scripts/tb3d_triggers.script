@@ -1,13 +1,17 @@
----TB3D 1.0.9.9.8.1 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.8.2 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
--- spawn_enemy_at, random koef
-function my_ver() return "1.0.9.9.8.1" end
+-- spawn_enemy_at, random koef, reduced some spawns, tunnel rat
+function my_ver() return "1.0.9.9.8.2" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random=math.random
+local math_floor = math.floor
+local math_ceil = math.ceil
+local string_find = string.find
+
 local translate = game.translate_string
 
 --[[	TB3D_Services.remove_info("my1")		to be used as modders interface
@@ -98,14 +102,13 @@ function spawn_esc_medkit()
 end
 
 function moroz_sms()	--message about backpacks
-	--taynik_spawn.cs_new_inventory()	--kostya pda
-	spawn_alife_rand("dog_normal",-68.769,-4.010,-86.216,204914,76,12)	--add more fun to the area
-	spawn_alife_rand("boar_normal",-29.255,-11.466,-88.712,247847,111,8)
-	spawn_alife_rand("boar_normal",-88.425,-8.670,-134.431,176700,107,8)
+	spawn_alife_rand("dog_normal",-68.769,-4.010,-86.216,204914,76,8)	--add more fun to the area
+	spawn_alife_rand("boar_normal",-29.255,-11.466,-88.712,247847,111,6)
+	spawn_alife_rand("boar_normal",-88.425,-8.670,-134.431,176700,107,6)
 	spawn_alife_rand("dog_habaruch",-69.532,-12.072,-143.237,203836,107,8)
-	spawn_alife_rand("tarakan_normal",-253.517,-13.797,-13.596,8840,67,18)
-	spawn_alife_rand("tarakan_normal",-247.438,-14.354,-18.323,11500,67,10)
-	spawn_alife_rand("tarakan_normal",-253.517,-13.797,-13.596,8840,67,16)
+	spawn_alife_rand("tarakan_normal",-253.517,-13.797,-13.596,8840,67,8)
+	spawn_alife_rand("tarakan_normal",-247.438,-14.354,-18.323,11500,67,6)
+	spawn_alife_rand("tarakan_normal",-253.517,-13.797,-13.596,8840,67,6)
 end
 
 function sidor_piyn_sms()	--Sid's door, arhara_dialog.script
@@ -119,13 +122,13 @@ function kanal_sms()	--warning about artifacts
 	spawn_alife_rand("flesh_strong",45.923,1.076,319.172,329924,192,8)
 	spawn_alife_rand("dog_habaruch",70.505,0.709,356.311,362035,195,6)
 	spawn_alife_rand("dog_strong",122.305,1.829,365.377,426437,229,6)
-	spawn_alife_rand("bloodsucker_normal",106.758,1.541,459.684,408586,221,3)
-	spawn_alife_rand("tarakan_normal",106.758,1.541,459.684,408586,221,18)
+	spawn_alife_rand("bloodsucker_normal",106.758,1.541,459.684,408586,221,2)
+	spawn_alife_rand("tarakan_normal",106.758,1.541,459.684,408586,221,8)
 end
 
 function esc_fox_quest()
 	news_manager.amk_send_tip_id("sms_being_hunted","sms_tb3d",10,20,"tb3d_master")
-	spawn_alife_rand("dog_strong",122.305,1.829,365.377,426437,229,12)
+	spawn_alife_rand("dog_strong",122.305,1.829,365.377,426437,229,8)
 end
 
 ---------------------------------Garbage ---------------------------------------------------
@@ -138,10 +141,10 @@ function gar_dolg_blokpost_warning()	--entering duty territory, news_manager.scr
 end
 
 function broken_pda_mobs()				--in garbage after returning from cordon with broken pda
-	spawn_alife_rand("dog_strong",37.773,0.412,-287.243,211389,262,12)
+	spawn_alife_rand("dog_strong",37.773,0.412,-287.243,211389,262,8)
 	spawn_alife("bloodsucker_strong",37.222,1.842,-292.221,216694,253,1)
 	spawn_alife("killer_regular",-10.319,-0.927,-178.361,168593,287,1)
-	spawn_alife_rand("dog_strong",93.498,-2.973,-258.185,260603,263,12)
+	spawn_alife_rand("dog_strong",93.498,-2.973,-258.185,260603,263,8)
 	if TB3D_Services.is_night() then
 		spawn_alife("werewolf",69.510,1.919,-36.638,239874,394,1)
 		spawn_alife("werewolf",19.905,0.818,-101.172,192275,290,1)
@@ -188,9 +191,9 @@ end
 ----------------------------------Bar-----------------------------------------------------
 function spawn_burer_bar()	--' couple Burers at the bar, arh_disk_nayty_6 in arhara_dialog.script
 	spawn_alife_rand("tushkano_normal",99.368,1.213,-122.928,45947,1173,8)
-	spawn_alife_rand("tarakan_normal",158.990,4.012,-108.175,45947,1173,16)
-	spawn_alife_rand("rat_normal",99.368,1.213,-122.928,45947,1173,10)
-	spawn_alife_rand("rat_weak",158.990,4.012,-108.175,45947,1173,18)
+	spawn_alife_rand("tarakan_normal",158.990,4.012,-108.175,45947,1173,6)
+	spawn_alife_rand("rat_normal",99.368,1.213,-122.928,45947,1173,6)
+	spawn_alife_rand("rat_weak",158.990,4.012,-108.175,45947,1173,8)
 end
 
 function bloodsucker()	--3 bloodsuckers at bar, freeman desert eagle quest start, braad_test.script
@@ -238,7 +241,7 @@ function fanat_laptop_have()
 	spawn_alife("bloodsucker_strong",-3.341,-10.815,-0.926,2259,1143,1)
 	spawn_alife("bloodsucker_strong",1.212,9.350,-4.252,2983,1109,1)
 	spawn_alife("kontroller_yazva",1.006,4.190,-0.710,2897,1124,1)
-	spawn_alife_rand("zombie_strong",1.006,4.190,-0.710,2897,1124,8)
+	spawn_alife_rand("tb3dm_zombie_strong",1.006,4.190,-0.710,2897,1124,8)
 end
 
 function dark_btr1_sms()
@@ -316,10 +319,10 @@ end
 
 ---------------------------------red forest -------------------------------
 function tunnel_rat()
-	spawn_alife_rand("tarakan_normal",-196.338,3.399,15.292,1271,3240,6)				--chamber 2
-	spawn_alife_rand("tarakan_normal",-146.506,0.780,30.413,7071,3240,6)				--chamber 3
+	spawn_alife_rand("tarakan_normal",-196.338,3.399,15.292,1271,3240,3)				--chamber 2
+	spawn_alife_rand("tarakan_normal",-146.506,0.780,30.413,7071,3240,3)				--chamber 3
 	spawn_alife_rand("rat_normal",-141.767,4.940,14.674,7245,3240,6)					--tunnel opening
-	spawn_alife_rand("rat_normal",-100.433,0.798,28.918,12285,3240,6)					--chamber 1
+	spawn_alife_rand("rat_normal",-100.433,0.798,28.918,12285,3240,3)					--chamber 1
 	spawn_alife_rand("rat_normal",-111.545,-5.984,-57.600,10390,3240,6)					--pit
 	spawn_suit(6,-136.159,0.380,34.015,7478,3240)
 	--intersect1: (-137.315,0.673,24.377),7432,3240)
@@ -331,6 +334,7 @@ function tunnel_rat2()				--grabbed weapon, start sequence here
 	if amk.load_variable("tb3d_ald_weapons", 0) == 2 then
 		spawn_item_rand("ammo_5.56x45_ap", -100.370,0.769,29.004,12285,3240,8)				--tunnel beside chamber
 		spawn_item_rand("ammo_5.56x45_ap", -166.593,1.601,19.635,4582,3240,8)				--dead end
+		spawn_item_rand("ammo_12x70_buck", -166.593,1.601,19.635,4582,3240,12)				--dead end
 		spawn_alife("werewolf",-146.183,0.672,32.542,7074,3240,1)							--dead end
 		db.actor:set_actor_position(vector():set(-108.197,0.609,21.772))					--chamber, spawn following grab gun
 		wolf_howls(false)
@@ -365,7 +369,7 @@ function spawn_aes_stampede()
 end
 
 function spawn_aes_stampede2()
-	if amk.load_variable("level_on_save", "nil") == "k01_darkscape" then
+	if TB3D_Services.level_on_save() == "k01_darkscape" then							--109983
 		TB3D_Mobs.spawn_snorks(350.645,-0.001,-390.844,389488,2400,6)
 	else
 		TB3D_Mobs.spawn_snorks(369.062,0.150,-404.876,389488,2400,3)
@@ -636,12 +640,19 @@ function spawn_alife(name, x, y, z, lv, gv, count)
 	end
 end
 function spawn_alife_rand(name, x, y, z, lv, gv, count)
-	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
-	local cnt = math.floor(math_random(1,count) * flevel)
-	if cnt < 1 then cnt = 1 end
-	--TB3D_Services.packet_alert("tb3d_triggers: spawn alife random koef["..utils.to_str(flevel).."] count["..utils.to_str(cnt).."]")
-	for i=1, cnt do
+	if count == 1 then
 		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+	else
+		local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
+		local min = math_ceil(flevel)+1
+		local cnt = math_ceil(count*flevel)
+		if cnt <= min then cnt = min+1 end
+		cnt = math_floor(math_random(min,cnt))
+		if cnt > count then cnt = count end										--109982, limit spawns
+		--TB3D_Services.packet_alert("tb3d_triggers: spawn alife random koef["..utils.to_str(flevel).."] count["..utils.to_str(cnt).."]")
+		for i=1, cnt do
+			alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+		end
 	end
 end
 
@@ -651,12 +662,17 @@ function spawn_item(name, x, y, z, lv, gv, count)
 	end
 end
 function spawn_item_rand(name, x, y, z, lv, gv, count)
-	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should decrease as koef increases
-	local cnt = math.ceil(math_random(1,count) / flevel)
-	if cnt < 1 then cnt = 1 end
-	--TB3D_Services.packet_alert("tb3d_triggers: spawn item random koef["..utils.to_str(flevel).."] count["..utils.to_str(cnt).."]")
-	for i=1, cnt do
+	if count == 1 then
 		alife():create(name, vector():set(x,y,z),lv,gv)
+	else
+		local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should decrease as koef increases
+		local cnt = math_ceil(math_random(1,count) / flevel)
+		if cnt < 1 then cnt = 1 end
+		if cnt > count then cnt = count end										--109982, limit spawns
+		--TB3D_Services.packet_alert("tb3d_triggers: spawn item random koef["..utils.to_str(flevel).."] count["..utils.to_str(cnt).."]")
+		for i=1, cnt do
+			alife():create(name, vector():set(x,y,z),lv,gv)
+		end
 	end
 end
 
@@ -718,7 +734,7 @@ function look_for_object(object)
 	local obj
 	for a=first_object,last_object,1 do
 		obj = alife():object(a)
-		if obj and obj.name and string.find(obj:name(), utils.to_str(object)) then
+		if obj and obj.name and string_find(obj:name(), utils.to_str(object)) then
 			--TB3D_Services.packet_alert("tb3d trig: found object["..utils.to_str(obj.id).."]")
 			return obj
 		end
@@ -832,6 +848,7 @@ function spawn_sleep_places()
 	alife():create("place_of_sleep",vector():set(-50.014,-0.540,201.961),636203,3717) -- Jup Station
 	alife():create("place_of_sleep_vid",vector():set(-254.878,-3.897,88.693),8119,1382) -- Wild Territory - on boxes in tunnel
 	alife():create("place_of_sleep_vid",vector():set(303.978,-39.390,-22.460),67636,1930) -- Radar - room with Warlab lc
+	alife():create("place_of_sleep",vector():set(-7.731,24.020,243.981),702881,3725) -- jupiter - room in tower
 	-----new levels-------------------------
 	alife():create("place_of_sleep",vector():set(-257.365,20.140,258.838),543291,3938) 		-- waiting room - in cave
 	alife():create("place_of_sleep",vector():set(-285.401,-1.344,343.176),289906,4678)		--dark_forest shed
@@ -1203,4 +1220,204 @@ function spawn_x14_guard()
 	alife():create("ammo_vog-25",vector():set(15.797,9.570,203.948),23746,3798)						--open container before tank
 	alife():create("ammo_vog-25",vector():set(15.797,9.570,203.948),23746,3798)
 	alife():create("ammo_vog-25",vector():set(15.797,9.570,203.948),23746,3798)
+end
+
+function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in empty areas
+	local enemies
+	local qty = 1
+	local rand = amk.load_variable("hunt_last_rnd", 1)
+	amk.save_variable("hunt_last_rnd", rnd)
+	TB3D_Services.packet_alert("tb3d triggers: treasure hunt spawn["..utils.to_str(stash_num).."] rand["..utils.to_str(rand).."]")
+	if stash_num == 2 then			--cordon, on tunnel w/exit to dv
+		--none
+	elseif stash_num == 3 then		--cordon
+		--none, 3 rand
+	elseif stash_num == 4 then		--garbage
+		--TODO, 3 rand
+	elseif stash_num == 5 then		--agro
+		--TODO, 3 rand
+	elseif stash_num == 6 then		--garbage
+		--TODO, 3 rand
+	elseif stash_num == 7 then		--dv
+		--none, 3 rand
+	elseif stash_num == 8 then		--bar
+		--none, 3 rand
+	elseif stash_num == 9 then		--rostok
+		if rand == 1 then
+			TB3D_Mobs.spawn_snorks(-240.717,-0.005,37.312,13510,1423,3)
+			TB3D_Mobs.spawn_snorks(-237.589,-0.000,71.116,15237,1376,3)
+			TB3D_Mobs.spawn_snorks(-207.689,-0.030,86.989,25108,1373,3)
+		--elseif rand == 2 then
+		else
+			TB3D_Mobs.spawn_killer_squad(-145.445,-0.015,144.576,39631,1313,6,4,false)
+			TB3D_Mobs.spawn_killer_squad(-32.389,-0.001,144.550,62406,1417,6,4,false)
+		end
+		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,8)				--wt on hill near yantar exit
+	elseif stash_num == 10 then		--yantar
+		--if rand == 3 then
+			spawn_alife_rand("tb3dm_zombie_strong",116.301,1.523,-70.573,102270,1441,18)		--on the road back
+		--end
+		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,16)			--wt on hill near yantar exit
+	elseif stash_num == 11 then		--rostok
+		if rand == 1 then
+			TB3D_Mobs.spawn_killer_squad(-253.802,-0.002,102.696,8349,1378,6,4,false)
+			TB3D_Mobs.spawn_killer_squad(-246.876,-0.002,61.497,10778,1383,6,4,false)
+		elseif rand == 2 then
+			TB3D_Mobs.spawn_killer_squad(-145.445,-0.015,144.576,39631,1313,6,4,false)
+			TB3D_Mobs.spawn_killer_squad(-32.389,-0.001,144.550,62406,1417,6,4,false)
+		else
+			TB3D_Mobs.spawn_killer_squad(-160.540,0.098,185.461,35929,1329,6,4,false)
+			TB3D_Mobs.spawn_killer_squad(-251.983,0.799,172.561,9149,1342,6,4,false)
+		end
+		if TB3D_Services.get_level_up() == 2 then TB3D_Services.give_info("tb3d_sms_storm_suit") end		--article about storm and geeks
+		
+	---------------------------------------------------------------------------------------------------------	
+	--following are in storm area and may have to wait for storm to end or wear special suit from lanky
+	elseif stash_num == 12 then		--warehouses
+		if has_alife_info("tb3d_harsh_environment") then
+			enemies = "tb3dm_zombie_strong"
+			qty = 20
+		else
+			enemies = "tb3dm_killer_exo_unic"
+			qty = 5
+		end
+		if rand == 1 then
+			spawn_alife_rand(enemies,-26.449,-13.582,335.959,281075,1803, qty)			--chopper
+		elseif rand == 2 then
+			spawn_alife_rand(enemies,-6.784,-6.146,78.494,300362,1580, qty)				--entrance to base
+			spawn_alife_rand(enemies,27.919,-8.876,-47.801,333061,1590, qty)				--inside base
+		else
+			spawn_alife_rand(enemies,-269.732,-6.571,406.570,68860,1851, qty)			--below rocks
+		end
+		spawn_alife_rand(enemies,80.613,-13.523,402.588,378152,1808, qty)				--exit to radar
+		spawn_alife_rand(enemies,615.869,-52.257,-301.292,221303,1882, qty)				--radar camp 1
+		spawn_alife_rand(enemies,583.516,-63.080,-178.223,qty7041,1886, qty)				--radar camp 2
+		spawn_alife_rand(enemies,590.816,-50.166,15.045,210249,1900, qty)				--camp at turn
+		spawn_alife_rand(enemies,376.672,-50.020,9.989,108274,1864, qty)					--prip intersection
+		spawn_alife_rand(enemies,195.515,-12.702,83.415,53913,1936, qty)					--camp on upper road
+	elseif stash_num == 13 then		--radar
+		if rand == 1 then
+			spawn_alife_rand("tb3dm_zombie_strong",204.447,5.769,-14.557,72763,2030, 10)				--all around power lines
+			spawn_alife_rand("tb3dm_zombie_strong",133.932,6.594,-42.438,72759,2030, 10)
+			spawn_alife_rand("tb3dm_zombie_strong",127.306,1.572,-9.984,51093,1975, 10)
+		elseif rand == 2 then
+			--TODO
+		else
+			--TODO
+		end
+		if has_alife_info("tb3d_harsh_environment") then
+			spawn_alife_rand("tb3dm_zombie_babka_strong",382.320,-33.843,145.775,112679,1926, 20)		--exit to pripyat
+		else
+			TB3D_Mobs.spawn_npc(382.320,-33.843,145.775,112679,1926, 2, 10)						--zombied npc below stash
+		end
+	elseif stash_num == 15 then		--npp
+		if rand == 1 then
+			--TODO
+		elseif rand == 2 then
+			--TODO
+		else
+			--TODO
+		end
+		dmx_mod.create_level_changer_npp1_to_radar()
+	elseif stash_num == 16 then		--radar, monster tree
+		--TODO, 1 rand
+	elseif stash_num == 17 then		--radar, final stash for part 1
+		if has_alife_info("tb3d_harsh_environment") then
+			spawn_alife_rand("tb3dm_zombie_strong",590.280,-51.316,-45.751,209879,1898, 6)		--below stash
+			spawn_alife_rand("tb3dm_zombie_strong",590.987,-50.149,15.658,210250,1900, 6)		--camp at corner
+			spawn_alife_rand("tb3dm_zombie_strong",652.157,-43.881,182.037,226763,1912, 6)		--exit to dv
+		else
+			TB3D_Mobs.spawn_npc(590.280,-51.316,-45.751,209879,1898, 2, 6)						--zombied npc below stash
+			TB3D_Mobs.spawn_npc(590.987,-50.149,15.658,210250,1900, 2, 6)						--zombied camp at corner
+			TB3D_Mobs.spawn_npc(652.157,-43.881,182.037,226763,1912, 2, 0)						--zombied npc exit to dv
+		end
+	-----------------------------------------------------------------------------------------------------
+	
+	elseif stash_num == 14 then		--pripyat
+		if rand == 1 then
+			--TODO
+		elseif rand == 2 then
+			--TODO
+		else
+			--TODO
+		end
+	elseif stash_num == 18 then		--atp, nw tree, start of part 2
+			--TODO
+	elseif stash_num == 19 then		--atp, pipe in motorpool
+		if rand == 1 then
+			--TODO
+		elseif rand == 2 then
+			--TODO
+		else
+			--TODO
+		end
+	elseif stash_num == 20 then		--recon
+		if has_alife_info("tb3d_harsh_environment") then
+			enemies = "tb3dm_zombie_strong"
+			qty = 10
+		else
+			enemies = "tb3dm_dog_habaruch"
+			qty = 10
+		end
+		if rand == 1 then
+			--TODO
+		elseif rand == 2 then
+			spawn_alife_rand(enemies,328.834,-6.943,-19.136,1454049,2902, qty)		--center of crater
+			spawn_alife_rand(enemies,383.709,13.251,-103.709,1557659,2907, qty)		--above rock
+		else
+			--TODO
+		end
+	elseif stash_num == 21 then					--swamp
+		if rand == 1 then
+			--TODO
+		elseif rand == 2 then					--water tower
+			TB3D_Dialog.spawn_swmp1_found()
+		else
+			--TODO
+		end
+	end
+end
+
+function remove_brainlab_alife()
+	if not fix_done then
+		local is_fixed
+		local obj_level
+		local level_name
+		for a=first_object,last_object,1 do		--skip actor (0)
+			is_fixed = false
+			obj = alife():object(a)
+			if obj then
+				if game_graph():valid_vertex_id(obj.m_game_vertex_id) then
+					obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
+					level_name = alife():level_name(obj_level)
+					if level_name == "l08u_brainlab" then
+						--if string_find(obj:name(), "x16_stalker_ghost")
+						  if string_find(obj:name(), "x16_m_controller_e") then
+							is_fixed = true
+						end
+						--if obj.alive then is_fixed = true end				--creature or npc so remove
+					end
+				else
+					is_fixed = true
+				end
+				if is_fixed then alife():release(obj, true) end
+			end
+		end
+	end
+end
+
+function spawn_decoder_mob()
+	spawn_alife_rand("burer_strong", -122.711,21.587,-31.473,126,1529,2)			--spawn upto 2 burers in upper brainlab
+	spawn_alife_rand("burer_strong", -7.510,1.116,-12.251,4091,1536,2)				--spawn upto 2 burers in lower brainlab
+end
+
+function spawn_tunnel_zombied()
+	spawn_alife_rand("tb3dm_zombied_eco", -259.461,-17.278,-42.781,12,1458,1)			--spawn upto 2 zombied in tunnel behind lab exit
+	spawn_alife_rand("tb3dm_zombied_eco", -192.189,-19.088,-42.861,553,1499,2)			--spawn upto 2 zombied in tunnel near lab exit
+	spawn_alife_rand("tb3dm_zombied_eco", -80.663,-19.088,-37.183,11300,1495,2)			--spawn upto 2 zombied in tunnel near flame
+	spawn_alife_rand("tb3dm_zombied_eco", -55.936,-19.088,-97.945,19538,1456,2)			--spawn upto 2 zombied in tunnel intersection
+	spawn_alife_rand("tb3dm_zombied_eco", -25.560,-18.439,-90.889,29501,1492,4)			--spawn upto 4 zombied in tunnel dead end
+	spawn_alife_rand("tb3dm_zombied_eco", -87.830,-11.456,-218.146,9013,1485,2)			--spawn upto 2 zombied behind pipe wall
+	spawn_alife_rand("tb3dm_zombied_eco", -55.929,-12.470,-249.126,19369,1454,4)		--spawn upto 4 zombied on island
+	spawn_alife_rand("tb3dm_zombied_eco", -8.698,-11.880,-261.798,35697,1482,2)			--spawn upto 2 zombied by station wall
 end

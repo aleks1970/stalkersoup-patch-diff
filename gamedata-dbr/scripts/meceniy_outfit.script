@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.7.2  removed upd, changed addrs to addx as addrs is a quest item, is_pleer
+--TB3D 1.0.9.9.8.2  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
 -- Localization
-function my_ver() return "1.0.9.9.7.2" end
+function my_ver() return "1.0.9.9.8.2" end
 
 --\\"NanoEkzoSkelet Skat-15M "" .. With the system of life support (SZHP) and upgradeable .. Spot (Shooter)..
 local t_upd = 0
@@ -33,7 +33,14 @@ local suppl_energy = false
 local suppl_anti_rad = false
 local suppl_anti_zombi = false
 
+local last_time
+local full_charge = 700
+local last_charge = full_charge
+
 local translate = game.translate_string
+
+local skat_powersys = translate("skat15_sms_skat_power_system")
+
 local TB3D_text_color_1 = TB3D_Services.get_text_color("alert")
 local TB3D_text_color_2 = TB3D_Services.get_text_color("system")
 local TB3D_text_color_3 = TB3D_Services.get_text_color("money")
@@ -48,67 +55,76 @@ local skat_system = translate("skat15_sms_skat_system_m")
 local lf_admin_supp = translate("skat15_sms_life_adminis_aid_proced_suport")
 
 function on_actor_update()
---	on_sub_actor_update()	
-	local outfit = db.actor:item_in_slot(6)
-	if not is_pleer then
-		player_ogg.start_pleer_post_save()
-		is_pleer = true
-	end
-	if outfit and string.find(outfit:section(), "exo_mil_exoskeleton_") then
+	local outfit = db.actor:get_current_outfit()		--db.actor:item_in_slot(6)
+	if outfit then																--may not be wearing the upgrade
+		local section = outfit:section()
 		local suit_type = 0
-		if flag_skat_1 then		
-			local e_up1 = db.actor:object("exo_mil_exoskeleton_add")
-			if e_up1 then
-				e_up1:set_condition(con_skat_1)
-				suit_type = 1
-			end
-			flag_skat_1 = false
-		elseif flag_skat_2 then		
-			local e_up2 = db.actor:object("exo_mil_exoskeleton_addr")
-			if e_up2 then
-				e_up2:set_condition(con_skat_2)
-				suit_type = 2
-			end
-			flag_skat_2 = false
-		elseif flag_skat_3 then		
-			local e_up3 = db.actor:object("exo_mil_exoskeleton_addx")
-			if e_up3 then
-				e_up3:set_condition(con_skat_3)
-				suit_type = 3
-			end
-			flag_skat_3 = false
-		elseif flag_skat_4 then		-- DMX UPGRADE ON
-			local e_up4 = db.actor:object("exo_mil_exoskeleton_dmx")
-			if e_up4 then
-				e_up4:set_condition(con_skat_4)
-				suit_type = 4
-			end
-			flag_skat_4 = false     -- DMX UPGRADE OFF
+		if not is_pleer then
+			player_ogg.start_pleer_post_save()
+			is_pleer = true
 		end
-		local used = amk.load_variable("tb3d_acumm_use", 0)
-		--TB3D_Services.packet_alert("meceniy outifit: suit type["..utils.to_str(suit_type).."] used["..utils.to_str(used).."]")
-		if used > 0 then
-			if suit_type == 1 then
-				system_outfit()
-			elseif suit_type == 2 then
-				system_outfit()
-				new_system_rad()
-			elseif suit_type == 3 then
+		if string.find(section, "exo_mil_exoskeleton_tb3d") then
+			suit_type = 5
+		elseif string.find(section, "exo_mil_exoskeleton_dmx") then
+			suit_type = 4
+		elseif string.find(section, "exo_mil_exoskeleton_addx") then
+			suit_type = 3
+		elseif string.find(section, "exo_mil_exoskeleton_addr") then
+			suit_type = 2
+		elseif string.find(section, "exo_mil_exoskeleton_add") then
+			suit_type = 1
+		end
+		if suit_type < 5 then
+			--see if an upgrade occured
+			if flag_skat_1 then		
+				local e_up1 = db.actor:object("exo_mil_exoskeleton_add")
+				if e_up1 then
+					e_up1:set_condition(con_skat_1)
+					suit_type = 1
+				end
+				flag_skat_1 = false
+			elseif flag_skat_2 then		
+				local e_up2 = db.actor:object("exo_mil_exoskeleton_addr")
+				if e_up2 then
+					e_up2:set_condition(con_skat_2)
+					suit_type = 2
+				end
+				flag_skat_2 = false
+			elseif flag_skat_3 then		
+				local e_up3 = db.actor:object("exo_mil_exoskeleton_addx")
+				if e_up3 then
+					e_up3:set_condition(con_skat_3)
+					suit_type = 3
+				end
+				flag_skat_3 = false
+			elseif flag_skat_4 then		-- DMX UPGRADE ON
+				local e_up4 = db.actor:object("exo_mil_exoskeleton_dmx")
+				if e_up4 then
+					e_up4:set_condition(con_skat_4)
+					suit_type = 4
+				end
+				flag_skat_4 = false     -- DMX UPGRADE OFF
+			end
+		end
+		--TB3D_Services.packet_alert("meceniy outifit: suit["..utils.to_str(section).."] type["..utils.to_str(suit_type).."] used["..utils.to_str(used).."]")
+		if suit_type == 1 then
+			system_outfit()
+		elseif suit_type == 2 then
+			system_outfit()
+			new_system_rad()
+		elseif suit_type == 3 then
+			if exo_update(outfit) > 0 then
 				system_outfit()
 				new_system_rad()
 				new_system_power()
 				new_anti_dot()
-			elseif suit_type == 4 then
-				system_outfit()
-				new_system_rad()
-				new_system_power()
-				new_anti_dot()                                        -- DMX UPGRADE OFF
-			--else
-				--is_pleer = false
 			end
+		elseif suit_type > 4 then
+			system_outfit()
+			new_system_rad()
+			new_system_power()
+			new_anti_dot()                                        -- DMX UPGRADE OFF
 		end
-	--else
-		--is_pleer = false
 	end
 end
 
@@ -508,4 +524,56 @@ end
 function play_snd(snd)
 	local snd_obj = xr_sound.get_safe_sound_object(snd)
 	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+end
+
+local cntr = 0
+function exo_update(item)
+	local cond = item:condition()
+	local used = amk.load_variable("tb3d_acumm_use", 0)
+	local have_art_accum = db.actor:object("art_acumm")
+	if not last_time then last_time = game.get_game_time() end
+	local tm_diff = game.get_game_time():diffSec(last_time)
+	last_time = game.get_game_time()
+	if used > 0 then
+		used = used - tm_diff * 0.1
+		if used <= 0 then
+			if have_art_accum then
+				meceniy_utils.delete_some_somth("art_acumm", 1)
+				amk.save_variable("tb3d_acumm_use", full_charge)
+				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_3..translate("skat15_sms_power_suit_full"), nil, nil, 30000)
+				cntr = 0
+			else
+				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_4..translate("skat15_sms_power_suit_no_sourc_remain"), nil, nil, 30000)
+				amk.save_variable("tb3d_acumm_use", 0)
+			end
+		else	
+			amk.save_variable("tb3d_acumm_use", used)			--109972
+		end
+	elseif have_art_accum then
+		meceniy_utils.delete_some_somth("art_acumm", 1)
+		amk.save_variable("tb3d_acumm_use", full_charge)
+		news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_3..translate("skat15_sms_power_suit_full"), nil, nil, 30000)
+		cntr = 0
+	else
+		cond = cond * 0.997
+		if cond < 0 then cond = 0 end
+		item:set_condition(cond)
+		if cond > 0.8 then
+			if cntr < 1 then
+				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_4..translate("skat15_sms_power_suit_null_add"), nil, nil, 30000)
+				cntr = 1
+			end
+		elseif cond < 0.5 then
+			if cntr < 100 then
+				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_3..translate("skat15_sms_power_suit_demage_low"), nil, nil, 30000)
+				cntr=100
+			end
+		elseif cond < 0.1 then
+			if cntr < 100 then
+				news_manager.send_tip_txt(db.actor, TB3D_text_color_2..skat_powersys..TB3D_text_color_1..translate("skat15_sms_power_suit_demage_high"), nil, nil, 30000)
+				cntr=100
+			end
+		end
+	end
+	return cond
 end

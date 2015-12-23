@@ -6031,26 +6031,40 @@ $spawn	 				= "outfit\exo_outfit"
 $prefetch	 			= 32
 class					= E_STLK
 cform           		= skeleton
-visual          		= equipments\stalker_nano_suit.ogf
-actor_visual			= actors\nano\stalker_nano.ogf
+visual          		= equipments\stalker_nano_suit_blue.ogf
+actor_visual			= actors\nano\stalker_nano_blue.ogf
 ef_equipment_type		= 5
 cost					= 160000
 inv_name				= nano_outfit_name
 inv_name_short			= nano_outfit_name
 description				= nano_outfit_description
-power_loss 				= 0.01
-power_restore_speed 	= 0.0036
-health_restore_speed 	= 0.0036
-bleeding_restore_speed	= -0.006
-satiety_restore_speed 	= 0.0002
+power_loss 				= 0.036	;0.01
+power_restore_speed 	= 0.1	;0.0036
+health_restore_speed 	= 0.6	;0.0036
+bleeding_restore_speed	= -0.006	;0.014	;-0.006
+satiety_restore_speed 	= 0.02	;0.0002
+
+; monolit black setting
+;health_restore_speed			= 0.0006
+;bleeding_restore_speed			= -0.006
+
+;power_restore_speed     = 0.08
+;power_loss 				= 0.016
+;health_restore_speed 	= 0.0016
+;bleeding_restore_speed	= 0.010
+;satiety_restore_speed 	= 0.003
+
 inv_weight				= 12.0
 slot					= 6
 inv_grid_width			= 2
 inv_grid_height			= 3
-inv_grid_x				= 24
-inv_grid_y				= 22
+inv_grid_x				= 22
+inv_grid_y				= 14
 full_scale_icon			= 24,0
 full_icon_name			= npc_icon_nano_outfit
+
+additional_inventory_weight		= 50
+additional_inventory_weight2	= 50
 
 immunities_sect			= sect_nano_outfit_immunities
 
@@ -6070,21 +6084,21 @@ bones_koeff_protection = nano_helmet_damage
 sprint_allowed = true
 
 [sect_nano_outfit_immunities]
-burn_immunity 			= 0.08
-strike_immunity 		= 0.075
-shock_immunity 			= 0.08
-wound_immunity 			= 0.075
-radiation_immunity 		= 0.08
-telepatic_immunity 		= 0.08
-chemical_burn_immunity 	= 0.08
-explosion_immunity 		= 0.075
-fire_wound_immunity 	= 0.075
+burn_immunity 			= 0.008
+strike_immunity 		= 0.0075
+shock_immunity 			= 0.008
+wound_immunity 			= 0.0075
+radiation_immunity 		= 0.008
+telepatic_immunity 		= 0.008
+chemical_burn_immunity 	= 0.008
+explosion_immunity 		= 0.0075
+fire_wound_immunity 	= 0.0075
 
 [nano_outfit_bad]:nano_outfit
 nightvision_sect					= effector_nightvision_bad
 inv_grid_width			= 2
 inv_grid_height			= 3
-inv_grid_x				= 61
+inv_grid_x				= 57
 inv_grid_y				= 58
 inv_weight			= 12.5
 cost				= 162000
@@ -6093,48 +6107,64 @@ inv_name_short			= nano_outfit_bad_name
 [nano_outfit_good]:nano_outfit
 nightvision_sect					= effector_nightvision_good
 inv_weight			= 12.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 162000
 inv_name			= nano_outfit_good_name
 inv_name_short			= nano_outfit_good_name
 [nano_outfit_default]:nano_outfit
 nightvision_sect					= effector_nightvision_default
 inv_weight			= 12.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 162000
 inv_name			= nano_outfit_default_name
 inv_name_short			= nano_outfit_default_name
 [nano_outfit_static]:nano_outfit
 nightvision_sect					= effector_nightvision_static
 inv_weight			= 12.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 162000
 inv_name			= nano_outfit_static_name
 inv_name_short			= nano_outfit_static_name
 [nano_outfit_kat_eye]:nano_outfit
 nightvision_sect					= effector_nightvision_kat_eye
 inv_weight			= 12.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 162000
 inv_name			= nano_outfit_kat_eye_name
 inv_name_short			= nano_outfit_kat_eye_name
 [nano_outfit_psy]:nano_outfit
 nightvision_sect					= effector_nightvision_psy
 inv_weight			= 12.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 162000
 inv_name			= nano_outfit_psy_name
 inv_name_short			= nano_outfit_psy_name
 [nano_outfit_blackwhite]:nano_outfit
 nightvision_sect					= effector_nightvision_blackwhite
 inv_weight			= 12.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 162000
 inv_name			= nano_outfit_blackwhite_name
 inv_name_short			= nano_outfit_blackwhite_name
 [nano_outfit_bast]:nano_outfit
 nightvision_sect					= effector_nightvision_bast
 inv_weight			= 12.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 162000
 inv_name			= nano_outfit_bast_name
 inv_name_short			= nano_outfit_bast_name
 
 [nano_outfit_plus]:nano_outfit
 inv_weight			= 18.0
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 290000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_plus_name
@@ -6143,6 +6173,8 @@ inv_name_short			= nano_outfit_plus_name
 [nano_outfit_badplus]:nano_outfit
 nightvision_sect					= effector_nightvision_bad
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_badplus_name
@@ -6150,6 +6182,8 @@ inv_name_short			= nano_outfit_badplus_name
 [nano_outfit_goodplus]:nano_outfit
 nightvision_sect					= effector_nightvision_good
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_goodplus_name
@@ -6157,6 +6191,8 @@ inv_name_short			= nano_outfit_goodplus_name
 [nano_outfit_defaultplus]:nano_outfit
 nightvision_sect					= effector_nightvision_default
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_defaultplus_name
@@ -6164,6 +6200,8 @@ inv_name_short			= nano_outfit_defaultplus_name
 [nano_outfit_staticplus]:nano_outfit
 nightvision_sect					= effector_nightvision_static
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_staticplus_name
@@ -6171,6 +6209,8 @@ inv_name_short			= nano_outfit_staticplus_name
 [nano_outfit_kat_eyeplus]:nano_outfit
 nightvision_sect					= effector_nightvision_kat_eye
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_kat_eyeplus_name
@@ -6178,6 +6218,8 @@ inv_name_short			= nano_outfit_kat_eyeplus_name
 [nano_outfit_psyplus]:nano_outfit
 nightvision_sect					= effector_nightvision_psy
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_psyplus_name
@@ -6185,6 +6227,8 @@ inv_name_short			= nano_outfit_psyplus_name
 [nano_outfit_blackwhiteplus]:nano_outfit
 nightvision_sect					= effector_nightvision_blackwhite
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_blackwhiteplus_name
@@ -6192,14 +6236,24 @@ inv_name_short			= nano_outfit_blackwhiteplus_name
 [nano_outfit_bastplus]:nano_outfit
 nightvision_sect					= effector_nightvision_bast
 inv_weight			= 18.5
+inv_grid_x			= 57
+inv_grid_y			= 58
 cost				= 292000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_bastplus_name
 inv_name_short			= nano_outfit_bastplus_name
 
 
-[nano_outfit_addw]:nano_outfit
+[nano_outfit_addw]:outfit_base
+GroupControlSection		= spawn_group
+$spawn	 				= "outfit\exo_outfit"
+$prefetch	 			= 32
+class					= E_STLK
+cform           		= skeleton
+ef_equipment_type		= 5
 cost					= 200000
+visual          		= equipments\nano_suit.ogf
+actor_visual			= actors\nano\nanosuit_new.ogf
 inv_name				= nano_outfit_addw_name
 inv_name_short			= nano_outfit_addw_name
 description				= nano_outfit_addw_description
@@ -6208,60 +6262,119 @@ inv_grid_width			= 2
 inv_grid_height			= 3
 inv_grid_x				= 46
 inv_grid_y				= 49
+
+power_restore_speed     = 0.08
+power_loss 				= 0.00016
+health_restore_speed 	= 0.016
+bleeding_restore_speed	= -0.0010
+satiety_restore_speed 	= 0.003
+full_scale_icon			= 24,0
+full_icon_name			= npc_icon_addw_nano_outfit
+slot					= 6
+
 additional_inventory_weight		= 250
 additional_inventory_weight2	= 250
+
+immunities_sect			= sect_addw_nano_outfit_immunities
+
+; NANO RESISTANCE
+burn_protection 		 = 0.85
+strike_protection 		 = 0.80
+shock_protection 		 = 0.8
+wound_protection 		 = 0.75
+radiation_protection 	 = 0.8
+telepatic_protection 	 = 0.8
+chemical_burn_protection = 0.85
+explosion_protection 	 = 0.80
+fire_wound_protection 	 = 0.75
+
+bones_koeff_protection = nano_helmet_damage
+
+sprint_allowed = true
+
+[sect_addw_nano_outfit_immunities]
+burn_immunity 			= 0.008
+strike_immunity 		= 0.0075
+shock_immunity 			= 0.008
+wound_immunity 			= 0.0075
+radiation_immunity 		= 0.008
+telepatic_immunity 		= 0.008
+chemical_burn_immunity 	= 0.008
+explosion_immunity 		= 0.0075
+fire_wound_immunity 	= 0.0075
 
 [nano_outfit_addw_bad]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_bad
 inv_weight			= 18.5
+inv_grid_width		= 2
+inv_grid_height		= 3
+inv_grid_x			= 59
+inv_grid_y			= 58
+
 cost				= 202000
 inv_name			= nano_outfit_addw_bad_name
 inv_name_short			= nano_outfit_addw_bad_name
 [nano_outfit_addw_good]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_good
 inv_weight			= 18.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 202000
 inv_name			= nano_outfit_addw_good_name
 inv_name_short			= nano_outfit_addw_good_name
 [nano_outfit_addw_default]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_default
 inv_weight			= 18.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 202000
 inv_name			= nano_outfit_addw_default_name
 inv_name_short			= nano_outfit_addw_default_name
 [nano_outfit_addw_static]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_static
 inv_weight			= 18.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 202000
 inv_name			= nano_outfit_addw_static_name
 inv_name_short			= nano_outfit_addw_static_name
 [nano_outfit_addw_kat_eye]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_kat_eye
 inv_weight			= 18.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 202000
 inv_name			= nano_outfit_addw_kat_eye_name
 inv_name_short			= nano_outfit_addw_kat_eye_name
 [nano_outfit_addw_psy]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_psy
 inv_weight			= 18.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 202000
 inv_name			= nano_outfit_addw_psy_name
 inv_name_short			= nano_outfit_addw_psy_name
 [nano_outfit_addw_blackwhite]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_blackwhite
 inv_weight			= 18.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 202000
 inv_name			= nano_outfit_addw_blackwhite_name
 inv_name_short			= nano_outfit_addw_blackwhite_name
 [nano_outfit_addw_bast]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_bast
 inv_weight			= 18.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 202000
 inv_name			= nano_outfit_addw_bast_name
 inv_name_short			= nano_outfit_addw_bast_name
 
 [nano_outfit_addw_plus]:nano_outfit_addw
 inv_weight			= 27.0
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 400000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_plus_name
@@ -6270,6 +6383,8 @@ inv_name_short			= nano_outfit_addw_plus_name
 [nano_outfit_addw_badplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_bad
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_badplus_name
@@ -6277,6 +6392,8 @@ inv_name_short			= nano_outfit_addw_badplus_name
 [nano_outfit_addw_goodplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_good
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_goodplus_name
@@ -6284,6 +6401,8 @@ inv_name_short			= nano_outfit_addw_goodplus_name
 [nano_outfit_addw_defaultplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_default
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_defaultplus_name
@@ -6291,6 +6410,8 @@ inv_name_short			= nano_outfit_addw_defaultplus_name
 [nano_outfit_addw_staticplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_static
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_staticplus_name
@@ -6298,6 +6419,8 @@ inv_name_short			= nano_outfit_addw_staticplus_name
 [nano_outfit_addw_kat_eyeplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_kat_eye
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_kat_eyeplus_name
@@ -6305,6 +6428,8 @@ inv_name_short			= nano_outfit_addw_kat_eyeplus_name
 [nano_outfit_addw_psyplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_psy
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_psyplus_name
@@ -6312,6 +6437,8 @@ inv_name_short			= nano_outfit_addw_psyplus_name
 [nano_outfit_addw_blackwhiteplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_blackwhite
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_blackwhiteplus_name
@@ -6319,21 +6446,224 @@ inv_name_short			= nano_outfit_addw_blackwhiteplus_name
 [nano_outfit_addw_bastplus]:nano_outfit_addw
 nightvision_sect					= effector_nightvision_bast
 inv_weight			= 27.5
+inv_grid_x			= 59
+inv_grid_y			= 58
 cost				= 402000
 immunities_sect			= sect_upgrade_m1_sci_immunities
 inv_name			= nano_outfit_addw_bastplus_name
 inv_name_short			= nano_outfit_addw_bastplus_name
 
 
-[nano_outfit_addh]:nano_outfit
+[nano_outfit_addh]:outfit_base
+GroupControlSection		= spawn_group
+$spawn	 				= "outfit\exo_outfit"
+$prefetch	 			= 32
+class					= E_STLK
+cform           		= skeleton
+ef_equipment_type		= 5
 cost					= 190000
+visual          		= equipments\stalker_nano_suit_dark.ogf
+actor_visual			= actors\nano\stalker_nano_dark.ogf
 inv_name				= nano_outfit_addh_name
 inv_name_short			= nano_outfit_addh_name
 description				= nano_outfit_addh_description
 inv_weight				= 14.5
+inv_grid_width			= 2
+inv_grid_height			= 3
+inv_grid_x				= 24
+inv_grid_y				= 22
+
+full_scale_icon			= 24,0
+full_icon_name			= npc_icon_addh_nano_outfit
+slot					= 6
+
+additional_inventory_weight		= 80
+additional_inventory_weight2	= 100
+
+immunities_sect			= sect_addh_nano_outfit_immunities
+
+; NANO RESISTANCE
+burn_protection 		 = 0.95
+strike_protection 		 = 0.85
+shock_protection 		 = 0.85
+wound_protection 		 = 0.80
+radiation_protection 	 = 0.85
+telepatic_protection 	 = 0.90
+chemical_burn_protection = 0.85
+explosion_protection 	 = 0.80
+fire_wound_protection 	 = 0.85
+
+bones_koeff_protection = nano_helmet_damage
+
+sprint_allowed = true
+
+[sect_addh_nano_outfit_immunities]
+burn_immunity 			= 0.008
+strike_immunity 		= 0.0075
+shock_immunity 			= 0.008
+wound_immunity 			= 0.0075
+radiation_immunity 		= 0.008
+telepatic_immunity 		= 0.008
+chemical_burn_immunity 	= 0.008
+explosion_immunity 		= 0.0075
+fire_wound_immunity 	= 0.0075
 
 power_restore_speed     = 0.1
-power_loss 				= 0.036
+power_loss 				= 0.00036
+health_restore_speed 	= 0.36
+bleeding_restore_speed	= -0.14
+satiety_restore_speed 	= 0.003
+
+[nano_outfit_addh_bad]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_bad
+inv_weight			= 14.5
+inv_grid_width		= 2
+inv_grid_height		= 3
+inv_grid_x			= 61
+inv_grid_y			= 58
+
+cost				= 190000
+inv_name			= nano_outfit_addh_bad_name
+inv_name_short			= nano_outfit_addh_bad_name
+[nano_outfit_addh_good]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_good
+inv_weight			= 14.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 190000
+inv_name			= nano_outfit_addh_good_name
+inv_name_short			= nano_outfit_addh_good_name
+[nano_outfit_addh_default]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_default
+inv_weight			= 14.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 190000
+inv_name			= nano_outfit_addh_default_name
+inv_name_short			= nano_outfit_addh_default_name
+[nano_outfit_addh_static]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_static
+inv_weight			= 14.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 190000
+inv_name			= nano_outfit_addh_static_name
+inv_name_short			= nano_outfit_addh_static_name
+[nano_outfit_addh_kat_eye]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_kat_eye
+inv_weight			= 14.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 190000
+inv_name			= nano_outfit_addh_kat_eye_name
+inv_name_short			= nano_outfit_addh_kat_eye_name
+[nano_outfit_addh_psy]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_psy
+inv_weight			= 14.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 190000
+inv_name			= nano_outfit_addh_psy_name
+inv_name_short			= nano_outfit_addh_psy_name
+[nano_outfit_addh_blackwhite]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_blackwhite
+inv_weight			= 14.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 190000
+inv_name			= nano_outfit_addh_blackwhite_name
+inv_name_short			= nano_outfit_addh_blackwhite_name
+[nano_outfit_addh_bast]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_bast
+inv_weight			= 14.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 190000
+inv_name			= nano_outfit_addh_bast_name
+inv_name_short			= nano_outfit_addh_bast_name
+
+[nano_outfit_addh_plus]:nano_outfit_addh
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_plus_name
+inv_name_short			= nano_outfit_addh_plus_name
+
+[nano_outfit_addh_badplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_bad
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_badplus_name
+inv_name_short			= nano_outfit_addh_badplus_name
+[nano_outfit_addh_goodplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_good
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_goodplus_name
+inv_name_short			= nano_outfit_addh_goodplus_name
+[nano_outfit_addh_defaultplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_default
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_defaultplus_name
+inv_name_short			= nano_outfit_addh_defaultplus_name
+[nano_outfit_addh_staticplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_static
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_staticplus_name
+inv_name_short			= nano_outfit_addh_staticplus_name
+[nano_outfit_addh_kat_eyeplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_kat_eye
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_kat_eyeplus_name
+inv_name_short			= nano_outfit_addh_kat_eyeplus_name
+[nano_outfit_addh_psyplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_psy
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_psyplus_name
+inv_name_short			= nano_outfit_addh_psyplus_name
+[nano_outfit_addh_blackwhiteplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_blackwhite
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_blackwhiteplus_name
+inv_name_short			= nano_outfit_addh_blackwhiteplus_name
+[nano_outfit_addh_bastplus]:nano_outfit_addh
+nightvision_sect					= effector_nightvision_bast
+inv_weight			= 19.5
+inv_grid_x			= 61
+inv_grid_y			= 58
+cost				= 240000
+immunities_sect			= sect_upgrade_m1_sci_immunities
+inv_name			= nano_outfit_addh_bastplus_name
+inv_name_short			= nano_outfit_addh_bastplus_name
+
 
 ;---------------------------------------------------------------------------------------------
 ;		SUIT ARROW  

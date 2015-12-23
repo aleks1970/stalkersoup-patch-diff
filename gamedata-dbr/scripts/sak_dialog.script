@@ -1,4 +1,4 @@
---TB3D 1.0.9.9.3.2 added my_ver, fixed thunder for guide, commented out line 1180
+--TB3D 1.0.9.9.3.2 added my_ver, fixed thunder for guide, commented out line 1180, sherstyk ammo_pkm_box_1 ammunition on line: 185 aleks1970
 function my_ver() return "1.0.9.9.3.2" end
 -------------------------------------------------------------------------------------------------------
 -- Syakovy Dialogues 
@@ -181,6 +181,12 @@ function add_ammo_9x19_ap(first_speaker, second_speaker)
 end
 function add_ammo_762x54r(first_speaker, second_speaker)
 	dialogs.relocate_item_section(first_speaker, "ammo_7.62x54r", "in")
+end
+function add_ammo_pkm_box_1(first_speaker, second_speaker) -- aleks1970
+	dialogs.relocate_item_section(first_speaker, "ammo_pkm_box_1", "in")
+end
+function add_ammo_pkm_box_2(first_speaker, second_speaker) -- aleks1970
+	dialogs.relocate_item_section(first_speaker, "ammo_pkm_box_2", "in")
 end
 function add_ammo_762x54r2(first_speaker, second_speaker)
 	sak.create_items(db.actor,"ammo_7.62x54r",1)

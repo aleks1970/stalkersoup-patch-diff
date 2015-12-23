@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.1 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
--- more content, reduced zat spawns
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.8.2 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+-- more content, reduced zat spawns, more adj
+function my_ver() return "1.0.9.9.8.2" end
 local math_random = math.random
 
 ----- these are set once on load to new level --------------------
@@ -83,7 +83,12 @@ local mob_list_day = {
 	[21] = "tb3dm_gigant_strong",				--large
 	[22] = "tb3dm_biblio",
 	[23] = "tb3dm_gigant",
-	[24] = "tb3dm_bloodsucker_strong"
+	[24] = "tb3dm_bloodsucker_strong",
+	
+	[25] = "tb3dm_izlom",						--harsh
+	[26] = "tb3dm_zombie_strong",
+	[27] = "tb3dm_izlom_swamp",
+	[28] = "tb3dm_zombie_babka_strong"
 }
 
 local mob_list_night = {
@@ -115,7 +120,12 @@ local mob_list_night = {
 	[21] = "tb3dm_gigant_strong",				--large
 	[22] = "tb3dm_biblio",
 	[23] = "tb3dm_gigant",
-	[24] = "tb3dm_bloodsucker_strong"
+	[24] = "tb3dm_bloodsucker_strong",
+	
+	[25] = "tb3dm_izlom",						--harsh
+	[26] = "tb3dm_zombie_strong",
+	[27] = "tb3dm_chimera_x_ray",
+	[28] = "tb3dm_zombie_babka_strong"
 }
 
 -----type = {0=bandit, 1=stalker, 2=zombied, 3=military, 4=ecolog, 5=monolith, 6=killer}
@@ -136,7 +146,7 @@ function spawn_npcs(x, y, z, lv, gv, type, max)
 	end
 end
 
---type= {0=normal, 1=swamp, 2=woods, 3=city, 4=indoor, 5=large}
+--type= {0=normal, 1=swamp, 2=woods, 3=city, 4=indoor, 5=large, 6=harsh}
 function spawn_mob(x, y, z, lv, gv, type, max)
 	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
 	local cnt
@@ -188,6 +198,21 @@ function spawn_snorks(x, y, z, lv, gv, max)
 	end
 end
 
+function spawn_killer_squad(x,y,z,lv,gv,type,cnt,is_signal)
+	if is_signal then TB3D_Triggers.signal_green(x,y+5,z,lv,gv) end				--109978
+	local mob = math_random(4)
+	if type > 0 then
+		mob = mob + (type * 4)
+	end
+	local name = mob_list_npc[mob]
+	if TB3D_Modders.use_mob_messages then
+		TB3D_Services.packet_alert("tb3d mobs: killer squad["..utils.to_str(cnt).."] ["..name.."]")
+	end
+	for i=1, cnt do
+		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important, no smt id
+	end
+end
+
 function increment(type)
 	if type == 0 then bandits = bandits + 1
 	elseif type == 1 then stalker = stalker + 1
@@ -205,6 +230,7 @@ local function get_npc_count()
 	return bandits+stalker+military+ecolog+monolith+killer
 end
 
+--================================ NORMAL LEVEL SPAWNS ===================================
 function check_jupiter_spawns()		--do not use woods (2) here
 	if mobs < 10 then
 		spawn_mob(-192.584,-4.049,170.042,390810,3717,1,2)		--lab area swamp
@@ -291,26 +317,8 @@ function check_jupu_spawns()
 	end
 end
 
-function check_cemetery_spawns()				--not detectable on bioradar
-	if mobs < 5 then
-		alife():create("tb3dm_sceleton", vector():set(-57.880,-0.002,-89.222),3329,5318,expendable_object)			--sw corner
-		alife():create("tb3dm_sceleton", vector():set(-56.243,0.091,-28.432),4094,5322,expendable_object)			--west side
-		alife():create("tb3dm_sceleton", vector():set(-34.151,0.062,8.722),10905,5325,expendable_object)			--near shack
-		alife():create("tb3dm_sceleton", vector():set(-2.030,0.359,14.833),20478,5324,expendable_object)			--w of hill
-		alife():create("tb3dm_sceleton", vector():set(20.094,0.522,19.529),24932,5316,expendable_object)			--tunnel entrance
-		alife():create("tb3dm_sceleton", vector():set(40.163,0.136,10.280),27830,5328,expendable_object)			--e of hill
-		alife():create("tb3dm_sceleton", vector():set(-76.218,-7.115,-117.417),669,5338,expendable_object)			--in tunnel
-		alife():create("tb3dm_sceleton", vector():set(-44.110,0.022,-27.440),7676,5322,expendable_object)
-		alife():create("tb3dm_sceleton", vector():set(-20.911,0.018,-27.324),14924,5323,expendable_object)
-		alife():create("tb3dm_sceleton", vector():set(28.628,0.021,-21.066),26063,5327,expendable_object)
-		alife():create("tb3dm_sceleton", vector():set(60.809,0.763,-23.660),31310,5327,expendable_object)
-		alife():create("tb3dm_sceleton", vector():set(55.598,0.469,-55.530),30284,5329,expendable_object)
-		alife():create("tb3dm_sceleton", vector():set(56.008,0.137,-81.512),30398,5329,expendable_object)
-	end
-end
-
 function check_wasted_spawns()		--every gvid in wasted
-	if mobs < 10 then
+	--if mobs < 10 then
 		spawn_mob(33.848384857178,-1.3214530944824,324.49407958984, 865368, 4659,5,2)
 		spawn_mob(-239.65441894531,-3.952018737793,-204.14546203613, 372848, 4661,2,2)
 		spawn_mob(-120.18039703369,6.4690361022949,-337.2043762207, 588843, 4662,2,2)
@@ -328,7 +336,7 @@ function check_wasted_spawns()		--every gvid in wasted
 		spawn_mob(-225.95307922363,6.1145782470703,-330.16806030273, 396836, 4676,2,2)
 		spawn_mob(-441.2490234375,7.3770446777344,-16.360992431641, 20029, 4677,5,2)
 		spawn_mob(-415.91445922852,0.92167663574219,297.67248535156, 62730, 4678,2,2)
-	end
+	--end
 	TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",420.18264770508,8.5303344726563,-438.32736206055, 1548119, 4666,3)		--109980, se lc bar
 	TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",-367.01409912109,4.7768707275391,-408.25775146484, 145397, 4675,3)		--109980, sw lc swamp
 	alife():create("tb3dm_gigant_strong", vector():set(-85.733406066895,1.2121353149414,-13.570701599121), 652050, 4660)		--109980, by tent
@@ -336,40 +344,32 @@ function check_wasted_spawns()		--every gvid in wasted
 	alife():create("tb3dm_gigant_strong", vector():set(-148.353,-2.635,379.431),539120,4658)									--109980, near old vill exit
 end
 
-function check_eprip_spawns()
-	if mobs < 10 then
-		spawn_mob(-153.966,-0.467,-189.385,51516,3752,3,2)		--playground
-		spawn_mob(-96.738,0.506,-245.988,94442,3756,3,2)		--bookstore
-		spawn_mob(-96.047,-0.425,-350.417,94942,3753,3,2)		--n of playground
-		spawn_mob(19.167,-0.424,-326.185,221806,3756,3,2)		--statue
-		spawn_mob(-21.300,-0.507,-155.657,168813,3756,3,2)		--center
-		spawn_mob(62.658,-0.319,-48.081,280796,3766,3,2)		--theater
-		spawn_mob(144.527,-0.505,-56.168,373652,3766,3,2)		--n exit
-		spawn_mob(163.778,-0.396,194.960,393156,3769,3,2)		--storage bins
-		spawn_mob(287.592,-0.363,213.238,474216,3769,3,2)		--near dock
-		spawn_mob(317.088,-0.078,245.918,483818,3769,3,2)		--patio near dock
-		spawn_mob(316.140,-9.175,293.587,483682,3769,3,2)		--waters edge
-		spawn_mob(171.339,-0.428,409.823,401433,3769,3,2)		--ne exit
+function check_village_spawns()
+	local spawns = amk.load_variable("tb3d_vill_spawns", 0)
+	if spawns == 0 and has_alife_info("started_as_collector") then		--skip spawns first time and uses NS alife
+		spawns = 1
+	else
+		local typ, qty = 0,3					--normal creatures
+		if spawns == 1 then
+			spawns = 2
+		elseif spawns == 2 then
+			qty = 5
+			spawns = 1				--rotate between 1 and 2
+		end
+		spawn_mob(40.816,-0.696,-4.576,25573,3332,typ,qty)			--pit
+		spawn_mob(53.455,1.124,-88.945,29544,3335,typ,qty)			--ditch middle
+		spawn_mob(0.833,5.254,-81.475,13743,3329,typ,qty)			--ditch start
 	end
-	if rats < 10 then
-		spawn_rats(-153.966,-0.467,-189.385,51516,3752,4)
-		spawn_rats(-96.738,0.506,-245.988,94442,3756,4)
-		spawn_rats(-96.047,-0.425,-350.417,94942,3753,4)
-		spawn_rats(19.167,-0.424,-326.185,221806,3756,4)
-		spawn_rats(-21.300,-0.507,-155.657,168813,3756,4)
-		spawn_rats(62.658,-0.319,-48.081,280796,3766,4)
-		spawn_rats(144.527,-0.505,-56.168,373652,3766,4)
-		spawn_rats(317.088,-0.078,245.918,483818,3769,4)
-		spawn_rats(171.339,-0.428,409.823,401433,3769,4)
-	end
+	amk.load_variable("tb3d_vill_spawns", spawns)
 end
 
-function eprip_exit_jupu()
-	spawn_npcs(206.827,-0.415,-279.036,431486,3765,6,2)						--near farrari
-	spawn_npcs(133.216,-0.334,-279.646,360185,3765,6,2)						--other end of bulding
-	spawn_npcs(189.921,-0.509,-217.184,419675,3765,6,2)						--corner accross from exit
-	spawn_npcs(157.848,-0.474,-204.615,386476,3765,6,2)						--courtyard by hdqtrs
-	spawn_npcs(125.283,-0.430,-205.338,351607,3765,6,2)						--container in front of hdqtrs
+function check_limansk_spawns()
+	spawn_npcs(63.980,7.343,271.605,56253,3022,6,2)		--porch facing pond
+	spawn_npcs(88.412,7.343,243.973,59897,3021,6,4)		--in the house
+	spawn_npcs(70.145,7.340,245.540,57824,3021,6,2)		--front porch
+	spawn_npcs(32.660,28.541,191.092,44018,3003,6,8)	--const top floor
+	spawn_npcs(32.944,13.703,190.411,44011,3010,6,6)	--const back room
+	spawn_npcs(-30.016,12.971,207.660,10597,3010,6,8)	--const behind crane
 end
 
 function check_kras_spawns()
@@ -545,10 +545,10 @@ function check_zaton_spawns2()
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",-380.950,-6.705,161.649,230735,3666,8)
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",355.056,29.736,-386.096,1556062,3690,8)
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",-421.886,39.653,-286.658,145153,3664,8)	--outside gate by helicopter
-		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",-303.497,12.418,-160.814,339469,3672,10)	--under twisted tree
+		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",-303.497,12.418,-160.814,339469,3672,8)	--under twisted tree
 		TB3D_Triggers.spawn_alife_rand("tb3dm_bloodsucker_strong",476.758,31.825,-444.329,1741904,3694,2)
-		TB3D_Triggers.spawn_alife_rand("tb3dm_bloodsucker_strong",418.051,36.263,-40.577,1650926,3693,8)	--swamps
-		TB3D_Triggers.spawn_alife_rand("tb3dm_bloodsucker_strong",372.090,25.574,-322.452,1575805,3694,4)
+		TB3D_Triggers.spawn_alife_rand("tb3dm_bloodsucker_strong",418.051,36.263,-40.577,1650926,3693,3)	--swamps
+		TB3D_Triggers.spawn_alife_rand("tb3dm_bloodsucker_strong",372.090,25.574,-322.452,1575805,3694,3)
 		alife():create("tb3dm_bloodsucker_strong",vector():set(-337.085,40.078,-398.498),277234,3664,expendable_object)	--lower left corner near lab
 		TB3D_Triggers.spawn_alife_rand("tb3dm_gigant_strong",298.396,13.289,9.964,1473229,3688,8)
 		TB3D_Triggers.spawn_alife_rand("tb3dm_boar",-486.157,-1.632,173.584,71921,3660,4)
@@ -635,17 +635,356 @@ function spawn_fire_cave(pass)		--109976
 	end
 end
 
-function spawn_killer_squad(x,y,z,lv,gv,type,cnt,is_signal)
-	if is_signal then TB3D_Triggers.signal_green(x,y+5,z,lv,gv) end				--109978
-	local mob = math_random(4)
-	if type > 0 then
-		mob = mob + (type * 4)
+function check_swamp_spawns()
+	local spawns = amk.load_variable("tb3d_swamp_spawns", 0)
+	if spawns == 0 and has_alife_info("started_as_collector") then		--skip spawns first time and uses NS alife
+		spawns = 1
+		alife():create("tb3dm_sceleton", vector():set(332.381,7.695,-77.418),351157,3528)	--center of graveyard to upset vert bandits
+	else
+		local typ, qty = 1,3					--swamp creatures
+		if spawns == 1 then
+			spawns = 2
+		elseif spawns == 2 then
+			qty = 5
+			spawns = 1				--rotate between 1 and 2
+		end
+		spawn_mob(-246.084,0.621,388.167,20645,3361,typ,qty)	--swamp creatures nw shore
+		spawn_mob(-306.759,0.513,113.499,335,3378,typ,qty)		--w shore by campfire
+		spawn_mob(-290.201,0.380,-39.845,4304,3346,typ,qty)		--w shore below signal tower
+		spawn_mob(-288.400,0.504,-181.372,4724,3356,typ,qty)	--sw shore by water crater
+		spawn_mob(117.881,0.822,-154.022,205754,3465,typ,qty)	--below sniper tower
+		spawn_mob(-20.051,1.033,-285.518,130180,3410,typ,qty)	--near cs base portal
+		spawn_mob(-127.857,4.133,-189.327,81257,3380,typ,qty)	--sw against fence
+		spawn_mob(499.206,5.245,155.710,479370,3557,typ,qty)	--crt near cemetary
+		spawn_mob(579.832,2.462,321.717,517424,3562,typ,qty)	--crt near ne village
+		spawn_mob(297.030,1.531,413.851,330023,3488,typ,qty)	--crt n near tracks
+		spawn_mob(165.693,1.353,337.075,234175,3482,typ,qty)	--crt below yantar exit
+		TB3D_Triggers.spawn_alife_rand("tb3dm_sceleton",332.381,7.695,-77.418,351157,3528, 10)			--center of graveyard
+		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",202.447,1.212,165.980,259974,3498, 6)		--dogs near tree nw burnt ranch
+		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",165.480,0.604,50.784,232658,3480, 6)		--dogs nw burnt ranch
+		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",129.780,0.800,35.595,213227,3471, 6)		--dogs w burnt ranch
+		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",136.635,0.243,-57.711,217397,3472, 10)		--dogs near sniper tower
+		spawn_npcs(-81.310,0.218,336.547,97901,3393,0,3)		--bandits around water tower
+		spawn_npcs(-106.984,0.155,330.082,89643,3384,0,2)
+		spawn_npcs(-177.524,2.427,418.153,52730,3361,0,3)
+		spawn_npcs(-207.643,0.779,397.848,37703,3361,0,3)
+		spawn_npcs(-57.155,1.217,286.438,109528,3402,0,3)
+		spawn_npcs(-55.159,0.406,263.040,110915,3399,0,2)
+		spawn_npcs(290.667,0.142,-160.732,324871,3531,0,6)		--bandits in church
+		spawn_npcs(605.458,3.404,438.681,522788,3578,0,8)		--bandits ne village
+		spawn_npcs(465.634,2.030,364.646,451262,3556,0,6)		--bandits at truck
+		spawn_npcs(429.367,3.336,237.896,423827,3546,0,10)		--bandits in carpark
+		spawn_npcs(158.216,5.639,505.106,228982,3485,0,6)		--bandits n yantar exit
 	end
-	local name = mob_list_npc[mob]
-	if TB3D_Modders.use_mob_messages then
-		TB3D_Services.packet_alert("tb3d mobs: killer squad["..utils.to_str(cnt).."] ["..name.."]")
+	amk.save_variable("tb3d_swamp_spawns", spawns)
+end
+
+function check_warlab_spawns()
+	local spawns = amk.load_variable("tb3d_warlab_spawns", 0)
+	if spawns == 0 then
+		spawn_snorks(13.485,-7.240,-0.965,6602,3213,2)
+		spawn_snorks(3.800,1.072,24.402,5068,3183,2)
+		spawn_snorks(-10.727,-15.390,4.702,2295,3160,2)
+		alife():create("tb3dm_bloodsucker_strong", vector():set(-1.695,-19.623,10.207),4225,3180)
+		spawns = 1
+	else
+		spawn_snorks(-13.584,1.001,4.239,1840,3162,2)
+		spawn_snorks(-5.514,-7.088,-11.680,3161,3167,2)
+		spawn_snorks(-16.061,-6.859,-35.183,1268,3170,2)
+		spawn_snorks(8.240,1.011,-2.389,5867,3210,2)
+		alife():create("tb3dm_bloodsucker_strong", vector():set(-4.310,-11.719,-48.491),3502,3161)
+		spawns = 0
 	end
-	for i=1, cnt do
-		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important, no smt id
+	amk.save_variable("tb3d_warlab_spawns", spawns)
+end
+
+function check_yantar_spawns()
+	spawn_snorks(-38.059,-13.397,-242.797,25786,1454,12)		--snorks in lake
+	spawn_mob(-102.536,-11.851,-264.504,5882,1486,6,4)			--zombied near chopper
+	spawn_mob(-74.092,-4.524,-331.396,12842,1487,6,4)			--zombied near chopper
+	spawn_mob(174.426,-7.806,-99.726,133432,1442,6,2)			--zombied by bus
+	spawn_mob(91.474,0.024,-38.288,87459,1515,6,6)				--zombied lab area gate
+	spawn_mob(126.874,-0.444,75.467,109185,1521,6,2)			--zombied radar exit
+end
+
+function check_redf_spawns()
+	--TODO
+end
+
+--============================ HARSH LEVEL SPAWNS ==============================================
+function check_eprip_spawns()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6		--harsh
+		qty = 10
+	else
+		typ = 3		--city
+		qty = 2
+	end
+	if typ == 6 or mobs < 10 then
+		spawn_mob(-153.966,-0.467,-189.385,51516,3752,typ, qty)		--playground
+		spawn_mob(-96.738,0.506,-245.988,94442,3756,typ, qty)		--bookstore
+		spawn_mob(-96.047,-0.425,-350.417,94942,3753,typ, qty)		--n of playground
+		spawn_mob(19.167,-0.424,-326.185,221806,3756,typ, qty)		--statue
+		spawn_mob(-21.300,-0.507,-155.657,168813,3756,typ, qty)		--center
+		spawn_mob(62.658,-0.319,-48.081,280796,3766,typ, qty)		--theater
+		spawn_mob(144.527,-0.505,-56.168,373652,3766,typ, qty)		--n exit
+		spawn_mob(163.778,-0.396,194.960,393156,3769,typ, qty)		--storage bins
+		spawn_mob(287.592,-0.363,213.238,474216,3769,typ, qty)		--near dock
+		spawn_mob(317.088,-0.078,245.918,483818,3769,typ, qty)		--patio near dock
+		spawn_mob(316.140,-9.175,293.587,483682,3769,typ, qty)		--waters edge
+		spawn_mob(171.339,-0.428,409.823,401433,3769,typ, qty)		--ne exit
+	end
+	if typ == 3 and rats < 10 then
+		spawn_rats(-153.966,-0.467,-189.385,51516,3752,4)
+		spawn_rats(-96.738,0.506,-245.988,94442,3756,4)
+		spawn_rats(-96.047,-0.425,-350.417,94942,3753,4)
+		spawn_rats(19.167,-0.424,-326.185,221806,3756,4)
+		spawn_rats(-21.300,-0.507,-155.657,168813,3756,4)
+		spawn_rats(62.658,-0.319,-48.081,280796,3766,4)
+		spawn_rats(144.527,-0.505,-56.168,373652,3766,4)
+		spawn_rats(317.088,-0.078,245.918,483818,3769,4)
+		spawn_rats(171.339,-0.428,409.823,401433,3769,4)
 	end
 end
+
+function eprip_exit_jupu()
+	spawn_npcs(206.827,-0.415,-279.036,431486,3765,6,2)						--near farrari
+	spawn_npcs(133.216,-0.334,-279.646,360185,3765,6,2)						--other end of bulding
+	spawn_npcs(189.921,-0.509,-217.184,419675,3765,6,2)						--corner accross from exit
+	spawn_npcs(157.848,-0.474,-204.615,386476,3765,6,2)						--courtyard by hdqtrs
+	spawn_npcs(125.283,-0.430,-205.338,351607,3765,6,2)						--container in front of hdqtrs
+end
+
+function check_cemetery_spawns()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 6
+		spawn_mob(-57.880,-0.002,-89.222,3329,5318,typ, qty)		--sw corner
+		spawn_mob(-56.243,0.091,-28.432,4094,5322,typ, qty)			--west side
+		spawn_mob(-34.151,0.062,8.722,10905,5325,typ, qty)			--near shack
+		spawn_mob(-2.030,0.359,14.833,20478,5324,typ, qty)			--w of hill
+		spawn_mob(20.094,0.522,19.529,24932,5316,typ, qty)			--tunnel entrance
+		spawn_mob(40.163,0.136,10.280,27830,5328,typ, qty)			--e of hill
+		spawn_mob(-76.218,-7.115,-117.417,669,5338,typ, qty)		--in tunnel
+		spawn_mob(-44.110,0.022,-27.440,7676,5322,typ, qty)
+		spawn_mob(-20.911,0.018,-27.324,14924,5323,typ, qty)
+		spawn_mob(28.628,0.021,-21.066,26063,5327,typ, qty)
+		spawn_mob(60.809,0.763,-23.660,31310,5327,typ, qty)
+		spawn_mob(55.598,0.469,-55.530,30284,5329,typ, qty)
+		spawn_mob(56.008,0.137,-81.512,30398,5329,typ, qty)
+	else
+		if mobs < 5 then				--NOTE: skeletons not detectable on bioradar
+			alife():create("tb3dm_sceleton", vector():set(-57.880,-0.002,-89.222),3329,5318,expendable_object)			--sw corner
+			alife():create("tb3dm_sceleton", vector():set(-56.243,0.091,-28.432),4094,5322,expendable_object)			--west side
+			alife():create("tb3dm_sceleton", vector():set(-34.151,0.062,8.722),10905,5325,expendable_object)			--near shack
+			alife():create("tb3dm_sceleton", vector():set(-2.030,0.359,14.833),20478,5324,expendable_object)			--w of hill
+			alife():create("tb3dm_sceleton", vector():set(20.094,0.522,19.529),24932,5316,expendable_object)			--tunnel entrance
+			alife():create("tb3dm_sceleton", vector():set(40.163,0.136,10.280),27830,5328,expendable_object)			--e of hill
+			alife():create("tb3dm_sceleton", vector():set(-76.218,-7.115,-117.417),669,5338,expendable_object)			--in tunnel
+			alife():create("tb3dm_sceleton", vector():set(-44.110,0.022,-27.440),7676,5322,expendable_object)
+			alife():create("tb3dm_sceleton", vector():set(-20.911,0.018,-27.324),14924,5323,expendable_object)
+			alife():create("tb3dm_sceleton", vector():set(28.628,0.021,-21.066),26063,5327,expendable_object)
+			alife():create("tb3dm_sceleton", vector():set(60.809,0.763,-23.660),31310,5327,expendable_object)
+			alife():create("tb3dm_sceleton", vector():set(55.598,0.469,-55.530),30284,5329,expendable_object)
+			alife():create("tb3dm_sceleton", vector():set(56.008,0.137,-81.512),30398,5329,expendable_object)
+		end
+	end
+end
+
+function spawn_recon_mobs()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 16
+		spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--camp near labrynth
+	else
+		typ = 2				--woods
+		qty = 8
+	end
+	spawn_mob(328.834,-6.943,-19.136,1454049,2902, typ, qty)		--center of crater
+	spawn_mob(-249.262,-3.690,-304.124,442615,2892, typ, qty)		--along path from dv
+	spawn_mob(-129.586,0.776,-293.665,647253,2892, typ, qty)
+	spawn_mob(-129.586,0.776,-293.665,647253,2892, typ, qty)
+	spawn_mob(10.615,-8.424,-168.768,884619,2897, typ, qty)			--big lake
+	spawn_mob(113.098,20.125,30.374,1067786,2902, typ, qty)
+	spawn_mob(213.302,-40.706,273.368,1243909,2901, typ, qty)		--crossroads
+	spawn_mob(145.501,-3.876,-306.348,1122747,2900, typ, qty)		--camp near lake
+	spawn_mob(310.864,-12.753,-261.869,1420659,2903, typ, qty)		--pit with dredge
+	spawn_mob(39.384,-41.680,219.889,936166,2899, typ, qty)			--pond
+	spawn_mob(-248.149,-27.426,127.425,444358,2893, typ, qty)		--road beyond camp near labrynth
+end
+
+function check_radar_spawns()
+	local typ, qty = 2,8				--zombied
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 16
+		spawn_mob(590.280,-51.316,-45.751,209879,1898, typ, qty)		--below stash
+		spawn_mob(590.987,-50.149,15.658,210250,1900, typ, qty)			--camp at corner
+		spawn_mob(652.157,-43.881,182.037,226763,1912, typ, qty)		--exit to dv
+		spawn_mob(119.467,-0.168,-4.368,49639,1951, typ, qty)			--upper road under power lines
+		spawn_mob(382.320,-33.843,145.775,112679,1926, typ, qty)		--exit to pripyat
+		spawn_mob(615.869,-52.257,-301.292,221303,1882, typ, qty)		--radar camp 1
+		spawn_mob(583.562,-63.111,-180.172,207039,1886, typ, qty)		--radar camp 2
+		spawn_mob(590.816,-50.166,15.045,210249,1900, typ, qty)			--camp at turn
+		spawn_mob(-26.449,-13.582,335.959,281075,1803, typ, qty)		--chopper
+		spawn_mob(-6.784,-6.146,78.494,300362,1580, typ, qty)			--entrance to base
+		spawn_mob(27.919,-8.876,-47.801,333061,1590, typ, qty)			--inside base
+		spawn_npcs(460.354,-50.284,-298.618,150653,2063,2,2)			--behind trailor
+	else
+		--typ = 2				--zombied
+		--qty = 8
+		spawn_npcs(590.280,-51.316,-45.751,209879,1898, typ, qty)		--below stash
+		spawn_npcs(590.987,-50.149,15.658,210250,1900, typ, qty)		--camp at corner
+		spawn_npcs(652.157,-43.881,182.037,226763,1912, typ, qty)		--exit to dv
+		spawn_npcs(119.467,-0.168,-4.368,49639,1951, typ, qty)			--upper road under power lines
+		spawn_npcs(382.320,-33.843,145.775,112679,1926, typ, qty)		--exit to pripyat
+		spawn_npcs(615.869,-52.257,-301.292,221303,1882, typ, qty)		--radar camp 1
+		spawn_npcs(583.562,-63.111,-180.172,207039,1886, typ, qty)		--radar camp 2
+		spawn_npcs(590.816,-50.166,15.045,210249,1900, typ, qty)		--camp at turn
+		spawn_npcs(-26.449,-13.582,335.959,281075,1803, typ, qty)		--chopper
+		spawn_npcs(-6.784,-6.146,78.494,300362,1580, typ, qty)			--entrance to base
+		spawn_npcs(27.919,-8.876,-47.801,333061,1590, typ, qty)			--inside base
+		spawn_npcs(460.354,-50.284,-298.618,150653,2063,typ,qty)		--behind trailor
+	end
+end
+
+function check_mil_spawns()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 20
+		spawn_mob(98.938,-9.659,397.161,394282,1808, typ, qty)				--radar exit
+		spawn_mob(58.668,-14.286,392.552,358118,1806, typ, qty)				--fence opening at barrier
+		spawn_mob(40.206,-18.670,348.965,342915,1807, typ, qty)				--camp at barrier
+		spawn_mob(84.738,-10.606,240.932,381978,1739, typ, qty)				--tree near pond
+		spawn_mob(-30.181,-24.239,260.728,277628,1745, typ, qty)			--intersection near barrier
+		spawn_mob(-92.618,-20.690,219.925,222001,1734, typ, qty)			--center camp
+		spawn_mob(-255.276,-22.411,245.292,79846,1786, typ, qty)			--center of vill by outhouse
+		spawn_mob(-335.090,-13.301,397.380,16207,1860, typ, qty)			--camp at warehouse exit
+		spawn_mob(-210.731,-12.723,46.150,117196,1657, typ, qty)			--camp at bar exit
+		spawn_mob(6.862,-7.383,-8.567,314354,1585, typ, qty)				--center of base by tank
+	else
+		typ = 0				--bandits
+		qty = 6
+		spawn_npcs(98.938,-9.659,397.161,394282,1808, typ, qty)				--radar exit
+		spawn_npcs(58.668,-14.286,392.552,358118,1806, typ, qty)			--fence opening at barrier
+		spawn_npcs(40.206,-18.670,348.965,342915,1807, typ, qty)			--camp at barrier
+		spawn_npcs(84.738,-10.606,240.932,381978,1739, typ, qty)			--tree near pond
+		spawn_npcs(-30.181,-24.239,260.728,277628,1745, typ, qty)			--intersection near barrier
+		spawn_npcs(-92.618,-20.690,219.925,222001,1734, typ, qty)			--center camp
+		spawn_npcs(-255.276,-22.411,245.292,79846,1786, typ, qty)			--center of vill by outhouse
+		spawn_npcs(-335.090,-13.301,397.380,16207,1860, typ, qty)			--camp at warehouse exit
+		spawn_npcs(-210.731,-12.723,46.150,117196,1657, typ, qty)			--camp at bar exit
+		spawn_npcs(6.862,-7.383,-8.567,314354,1585, typ, qty)				--center of base by tank
+	end
+end
+
+function check_npp1_spawns()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 20
+		spawn_mob(223.990,4.798,-94.440,94165,2389, typ, qty)			--under tower near radar exit
+		spawn_mob(278.937,-0.001,-220.131,115565,2350, typ, qty)		--camp near gen exit
+		spawn_mob(367.377,-0.104,-104.483,157701,2351, typ, qty)		--U in road in front of sarc
+		spawn_mob(602.926,4.799,-91.748,264559,2391, typ, qty)			--first pond by big pipes
+		spawn_mob(767.866,4.991,-95.018,333074,2322, typ, qty)			--first pond in front
+		spawn_mob(857.899,-0.101,-45.850,373079,2307, typ, qty)			--gate by hole in wall
+		spawn_mob(927.915,-0.013,49.354,411585,2277, typ, qty)			--near statue of head
+		spawn_mob(1049.885,-0.601,-38.601,468261,2394, typ, qty)		--corner of courtyard near train cars
+		spawn_mob(1031.139,-0.001,-130.792,461308,2397, typ, qty)		--under powerline tower at curve
+		spawn_mob(928.612,-0.003,-193.994,411661,2285, typ, qty)		--behind main sign
+		spawn_mob(890.149,-0.066,-309.573,399362,2401, typ, qty)		--main entrance in corner
+	else
+		typ = 5				--monolith
+		qty = 6
+		spawn_npcs(223.990,4.798,-94.440,94165,2389, typ, qty)
+		spawn_npcs(278.937,-0.001,-220.131,115565,2350, typ, qty)
+		spawn_npcs(367.377,-0.104,-104.483,157701,2351, typ, qty)
+		spawn_npcs(602.926,4.799,-91.748,264559,2391, typ, qty)
+		spawn_npcs(767.866,4.991,-95.018,333074,2322, typ, qty)
+		spawn_npcs(857.899,-0.101,-45.850,373079,2307, typ, qty)
+		spawn_npcs(927.915,-0.013,49.354,411585,2277, typ, qty)
+		spawn_npcs(1049.885,-0.601,-38.601,468261,2394, typ, qty)
+		spawn_npcs(1031.139,-0.001,-130.792,461308,2397, typ, qty)
+		spawn_npcs(928.612,-0.003,-193.994,411661,2285, typ, qty)
+		spawn_npcs(890.149,-0.066,-309.573,399362,2401, typ, qty)
+	end
+end
+
+function check_npp2_spawns()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 20
+		spawn_mob(975.748,-0.048,78.427,243783,2635, typ, qty)		--se corner
+		spawn_mob(1040.521,-0.101,192.322,245052,2636, typ, qty)	--e intersection
+		spawn_mob(1048.023,-0.000,380.676,245052,2636, typ, qty)	--ne corner
+		spawn_mob(733.635,-0.104,300.891,212718,2643, typ, qty)		--cooling stacks
+		spawn_mob(565.675,-0.000,208.089,168082,2622, typ, qty)		--under tall chimney
+		spawn_mob(467.079,-0.100,270.656,160942,2622, typ, qty)		--below gens by pipes
+		spawn_mob(370.937,-0.007,386.450,160942,2622, typ, qty)		--below gens between choppers
+		spawn_mob(265.879,-0.065,226.079,112905,2583, typ, qty)		--junction of all roads
+		spawn_mob(147.169,3.930,208.721,68776,2549, typ, qty)		--far w on hill against sarc
+	else
+		typ = 5				--monolith
+		qty = 6
+		spawn_npcs(975.748,-0.048,78.427,243783,2635, typ, qty)
+		spawn_npcs(1040.521,-0.101,192.322,245052,2636, typ, qty)
+		spawn_npcs(1048.023,-0.000,380.676,245052,2636, typ, qty)
+		spawn_npcs(733.635,-0.104,300.891,212718,2643, typ, qty)
+		spawn_npcs(565.675,-0.000,208.089,168082,2622, typ, qty)
+		spawn_npcs(467.079,-0.100,270.656,160942,2622, typ, qty)
+		spawn_npcs(370.937,-0.007,386.450,160942,2622, typ, qty)
+		spawn_npcs(265.879,-0.065,226.079,112905,2583, typ, qty)
+		spawn_npcs(147.169,3.930,208.721,68776,2549, typ, qty)
+	end
+end
+
+function check_dcity_spawns(spawns)
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 16
+	elseif has_alife_info("collector_done_with_dcity") or not has_alife_info("collector_ready_for_dcity") then
+		typ = 2				--woods
+		qty = 8
+	end
+	if typ ~= nil then
+		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
+	end
+end
+
+function check_gen_spawns()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 20
+		spawn_mob(-106.033,38.065,-503.517,212898,3096,typ,qty)		--camp
+		spawn_mob(15.113,38.037,-231.854,353870,3110,typ,qty)		--epicenter
+		spawn_mob(159.415,30.765,-494.264,520602,3131,typ,qty)		--base
+	else
+		typ = 2				--woods
+		qty = 10
+		spawn_npcs(15.113,38.037,-231.854,353870,3110,5,6)		--epicenter
+		spawn_npcs(159.415,30.765,-494.264,520602,3131,5,6)		--base
+		spawn_npcs(-106.033,38.065,-503.517,212898,3096,5,6)	--camp
+	end
+	spawn_mob(-133.617,24.185,-422.130,181734,3097,typ,qty)		--lake
+end
+
+function check_mkt_spawns()
+	local typ, qty
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 20
+	else
+		typ = 2				--woods
+		qty = 10
+	end
+		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
+end
+

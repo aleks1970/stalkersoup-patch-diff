@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.5.2    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem, fast saves
-function my_ver() return "1.0.9.9.5.2" end
+-- TB3D 1.0.9.9.8.2    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem, fast saves, community
+function my_ver() return "1.0.9.9.8.2" end
 local time_open = 22	-- Time (h) the opening of the arena, min = 0, max = 23
 local time_close = 7	-- Time (h) closing, min = 0, max = 23
 local delay_min = 0		-- minimum number of clear days (days) between the opening and closing arena, min = 0
@@ -1144,7 +1144,7 @@ function CArenaext:finish()
 --TB3D_Services.packet_alert("finish arena1")
 	-- HS leaves the ranks of traders
 	--local community = amk.load_variable("aem_cm")
-	TB3D_Services.restore_community(db.actor)
+	TB3D_Services.set_community(db.actor, "actor")
 	--db.actor:set_character_community(community,0,0)
 	--amk.del_variable("aem_cm")
 
