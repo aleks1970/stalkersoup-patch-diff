@@ -1,6 +1,8 @@
 ;<!-- TB3D 1.0.9.9.8.2 skat-15m icon, new suit sytem and visual... aleks1970, exo_mil_exoskeleton_tb3d -->
 ;---------------------------------------------------------------------------------------------
-;		Wt. Bathrobe: Spot (Shooter)
+;		Camouflage: Bullseye (Shooter)
+;		script (s) nanobots
+#include "w_intergral_knife.ltx"	; integrated transparent knife
 ;---------------------------------------------------------------------------------------------
 [meceniy_outfit_new]:outfit_base
 GroupControlSection	= spawn_group
@@ -52,6 +54,61 @@ telepatic_immunity			= 0.00
 chemical_burn_immunity		= 0.04
 explosion_immunity			= 0.04
 fire_wound_immunity			= 0.15
+
+;-----------------------------------------------
+; New invisible outfit "Strelok"
+;-----------------------------------------------
+
+[meceniy_outfit_strelok]:meceniy_outfit_new
+$spawn 			= "outfit\bandit_outfit"
+
+script_binding  = bind_mashalat.init
+
+visual          = equipments\exoskelet_holo       ;equipments\bandit_black_suit
+actor_visual	= actors\bandit\stalker_arhara1.ogf
+
+ef_equipment_type	= 3
+
+inv_name			= mas_outfit_strelok_name
+inv_name_short		= mas_outfit_strelok_name
+description			= mas_outfit_strelok_description
+inv_weight			= 8.5
+inv_grid_width		= 2
+inv_grid_height		= 3
+inv_grid_x			= 45	;47	;49 ;aleks1970
+inv_grid_y			= 60	;60	;60 ;aleks1970
+full_icon_name		= npc_icon_stalker_arhara_outfit
+additional_inventory_weight		= 35
+additional_inventory_weight2	= 35
+
+cost				= 42000
+slot				= 6
+full_scale_icon		= 0,6
+bleeding_restore_speed			= -0.006
+nightvision_sect		= effector_nightvision_good
+
+; NO RESISTANCE
+burn_protection 				= 0.5	; good protection
+strike_protection 				= 0.1
+shock_protection 				= 0.1
+wound_protection				= 0.40
+radiation_protection 			= 0.45
+telepatic_protection 			= 0.55
+chemical_burn_protection 		= 0.5
+explosion_protection 			= 0.25
+fire_wound_protection  			= 0.4
+
+immunities_sect			   	 	= meceniy_outfit_strelok_immunities
+[meceniy_outfit_strelok_immunities]
+burn_immunity				= 0.05	; but very quickly deteriorates
+strike_immunity				= 0.05
+shock_immunity				= 0.01
+wound_immunity				= 0.009
+radiation_immunity			= 0.02
+telepatic_immunity			= 0.02
+chemical_burn_immunity		= 0.03
+explosion_immunity			= 0.01
+fire_wound_immunity			= 0.03
 
 ;-----------------------------------------
 ;New Exoskeleton, Prototype SKAT-15
@@ -279,6 +336,30 @@ chemical_burn_immunity		= 0.001
 explosion_immunity			= 0.001
 fire_wound_immunity			= 0.001
 
+;;;;;;;;;;;;;;;;;;;;;;;- EXOSKELETON - TB3D -;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[exo_mil_exoskeleton_tb3d]:exo_mil_exoskeleton_dmx
+inv_name					= mil_exoskeleton_name_tb3d
+inv_name_short				= mil_exoskeleton_name_tb3d_s
+description					= mil_exoskeleton_description_tb3d
+inv_grid_width     = 3	; new icon - aleks1970
+inv_grid_height    = 3	; new icon - aleks1970
+inv_grid_x         = 66	; new icon - aleks1970
+inv_grid_y         = 49	; new icon - aleks1970
+inv_weight		   = 19.3
+cost			   = 126000
+
+; SKAT15-M_tb3d RESISTANCE ;Almost MAX POWER-UP #FINAL
+burn_protection 		 = 1.0
+strike_protection 		 = 0.92
+shock_protection 		 = 0.83
+wound_protection 		 = 0.88
+radiation_protection 	 = 1.0
+telepatic_protection 	 = 1.0
+chemical_burn_protection = 0.93
+explosion_protection 	 = 0.88
+fire_wound_protection 	 = 1.0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [dmx_skat15_upgrade]:doc_10  ; upgrade block 3
 description		    = dmx_apgreider_3
@@ -291,15 +372,3 @@ inv_grid_y          = 23	;66 ; aleks1970
 cost			    = 0
 inv_weight			= 1.8
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-[exo_mil_exoskeleton_tb3d]:exo_mil_exoskeleton_dmx
-inv_name					= mil_exoskeleton_name_tb3d
-inv_name_short				= mil_exoskeleton_name_tb3d
-description					= mil_exoskeleton_description_tb3d
-inv_grid_width     = 3	; new icon - aleks1970
-inv_grid_height    = 3	; new icon - aleks1970
-inv_grid_x         = 66	; new icon - aleks1970
-inv_grid_y         = 49	; new icon - aleks1970
-inv_weight		   = 19.3
-cost			   = 126000

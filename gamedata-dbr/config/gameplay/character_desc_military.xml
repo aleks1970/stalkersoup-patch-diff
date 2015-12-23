@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.8.0 new inventory and dialogs*************** -->
+<!-- ************ TB3D 1.0.9.9.8.4 new inventory and dialogs, 100% localized*************** -->
 <xml>
 	<!-- ***************SVOBODA PROFILES*************** -->
 	<!-- ***************SVOBODA SPECNAZ*************** -->
@@ -246,8 +246,7 @@
 		<visual>actors\svoboda\stalker_sv_cap</visual>
 #include "inventory\svoboda_items.xml"
 #include "gameplay\character_criticals_5.xml"
-		<actor_dialog>mil_freedom_commander_common2</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\mil_Svoboda_blckpst_leader_dialogs.xml"
 	</specific_character>
 	<!-- ***************SVOBODA MASTER UGRUMIY*************** -->
 	<specific_character id="mil_Svoboda_master_Ugrumiy" team_default="1">
@@ -492,7 +491,6 @@
 		<visual>actors\monolit\stalker_mo_exo</visual>
 #include "inventory\monolith_items.xml"
 #include "gameplay\character_criticals_1.xml"
-		<actor_dialog>esc_stalker_talk_level</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\mil_Monolit_master_dialogs.xml"
   </specific_character>
 </xml>

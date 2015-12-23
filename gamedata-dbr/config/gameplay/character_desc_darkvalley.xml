@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 new inventory and dialogs, reduced money*************** -->
+<!-- ************ TB3D 1.0.9.9.8.4 new inventory and dialogs, reduced money, 100% localized*************** -->
 <xml>
 	<!-- *************** BANDITS *************** -->
 	<!-- *************** BOROV *************** -->
@@ -71,9 +71,7 @@
 		<crouch_type>1</crouch_type>
 #include "inventory\bandit_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-			<actor_dialog>bandit_treasure_4_dialog</actor_dialog>
-		<!-- *************** dmx *************** -->		
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_bt4_dialogs.xml"
 	</specific_character>
 	<specific_character id="val_bandit_novice_default3" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
@@ -90,9 +88,7 @@
 		<crouch_type>1</crouch_type>
 #include "inventory\bandit_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-			<actor_dialog>bandit_treasure_3_dialog</actor_dialog>
-		<!-- *************** dmx *************** -->		
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_bt3_dialogs.xml"
 	</specific_character>
 	<specific_character id="val_bandit_novice_default4" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
@@ -109,9 +105,7 @@
 		<crouch_type>1</crouch_type>
 #include "inventory\bandit_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>bandit_treasure_2_dialog</actor_dialog>
-		<!-- *************** dmx *************** -->			
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_bt2_dialogs.xml"
 	</specific_character>
 	<!-- *************** HALFDEAD *************** -->
 	<specific_character id="val_escort_halfdead" team_default="1">
@@ -129,9 +123,7 @@
 		<crouch_type>1</crouch_type>
 		<supplies/>
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>val_bandit_dialog</actor_dialog>
-		<!-- *************** dmx *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\val_escort_halfdead_dialogs.xml"
 	</specific_character>
 	<specific_character id="val_bandit_trader" team_default="1">
 		<!-- *************** dmx *************** -->
@@ -168,9 +160,7 @@
 		<crouch_type>1</crouch_type>
 #include "inventory\bandit_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>bandit_treasure_1_dialog</actor_dialog>
-		<!-- *************** dmx *************** -->			
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_bt1_dialogs.xml"
 	</specific_character>
 	<specific_character id="val_bandit_general_default2" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
@@ -187,9 +177,7 @@
 		<crouch_type>1</crouch_type>
 #include "inventory\bandit_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>bandit_treasure_2_dialog</actor_dialog>
-		<!-- *************** dmx *************** -->			
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_bt2_dialogs.xml"
 	</specific_character>
 	<specific_character id="val_bandit_general_default3" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
@@ -206,9 +194,7 @@
 		<crouch_type>1</crouch_type>
 #include "inventory\bandit_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>bandit_treasure_4_dialog</actor_dialog>
-		<!-- *************** dmx *************** -->			
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_bt4_dialogs.xml"
 	</specific_character>
 	<specific_character id="val_bandit_general_default4" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
@@ -819,12 +805,7 @@
 		<snd_config>characters_voice\human_02\stalker\</snd_config>
 		<visual>actors\neytral\stalker_2_rozh1</visual>
 		<crouch_type>-1</crouch_type>
-		<supplies>
-			[spawn] \n
-			wpn_ak74 \n
-			ammo_5.45x39_fmj \n
-			device_torch \n
-		</supplies>
+#include "inventory\dar_stalker_expl_items.xml"
 #include "gameplay\character_criticals_4.xml"
 #include "dialogs\darkexp_dv.xml"		
 	</specific_character>

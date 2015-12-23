@@ -1,5 +1,5 @@
-<!-- ************ TB3D 1.0.9.9.8.0 supplies and dialogs now includes, reduced money fake_ to knives, fixed log book,
- vitamin dialog, controller vice comptroller, dsity_rasstrel_items, bunker_last1, foto_monolitovets, boatswain *************** -->
+<!-- ************ TB3D 1.0.9.9.8.4 supplies and dialogs now includes, reduced money fake_ to knives, fixed log book,
+ vitamin dialog, controller vice comptroller, dsity_rasstrel_items, bunker_last1, foto_monolitovets, boatswain, 100% localized *************** -->
 <xml>
 	<!-- ***************<Akim>*************** -->
 	<specific_character id="esc_akim" team_default="1">
@@ -743,7 +743,7 @@ include "inventory\dolg_items.xml"
 		<name>Kalinin_name_gameplay</name>
 		<icon>ui_npc_kalinin</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>val_stalker_general_bio</bio>
 		<class>atp_kalinin</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -827,15 +827,14 @@ include "inventory\dolg_items.xml"
 		<money min="200" max="600" infinitive="0"/>
 #include "inventory\atp_brigada_items.xml"
 #include "gameplay\character_criticals_3.xml"
-          <actor_dialog>atp_vstrecha</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\atp_brigada3_dialogs.xml"
 	</specific_character>
 	<!-- *************** Messenger *************** -->
 	<specific_character id="atp_gonets" team_default="1">
 		<name>Messenger_name_gameplay</name>
 		<icon>ui_npc_u_green_stalker_2</icon>
 		<map_icon x="0" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>atp_gonets</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -847,8 +846,7 @@ include "inventory\dolg_items.xml"
 		<crouch_type>-1</crouch_type>
 #include "inventory\atp_brigada_items.xml"
 #include "gameplay\character_criticals_3.xml"
-          <actor_dialog>gonets_talk</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\atp_gonets_dialogs.xml"
 	</specific_character>
 	<specific_character id="atp_brigada5" team_default="1">
 		<name>Dock_name_gameplay</name>
@@ -891,7 +889,7 @@ include "inventory\dolg_items.xml"
 		<name>Shnyrov_name_gameplay</name>
 		<icon>ui_npc_u_stalker_bandit_master</icon>
 		<map_icon x="3" y="2"/>
-		<bio>Unknown stalker. Dubious reputation. Detailed information is available.</bio>
+		<bio>sim_bandit_master_bio</bio>
 		<class>atp_bandit_shnura</class>
 		<community>bandit</community>
 		<terrain_sect>stalker_bandit_terrain</terrain_sect>
@@ -1639,8 +1637,7 @@ include "inventory\dolg_items.xml"
 		<visual>actors\neytral\stalker_3_gas</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_2.xml"
-          <actor_dialog>master_aver_talk</actor_dialog>
-#include "dialogs\generic_dialogs.xml"						
+#include "dialogs\vert_zimovie_stalker_2_dialogs.xml"						
 	</specific_character>
 	<!-- ***************STALKER MASTER zimovie*************** -->
 	<specific_character id="zimovie_stalker_3" team_default="1">
@@ -1712,8 +1709,7 @@ include "inventory\dolg_items.xml"
 		<visual>new\stalker_astrologer</visual>
 #include "inventory\stargazer_items.xml"
 #include "gameplay\character_criticals_2.xml"
-          <actor_dialog>zvezdochet_aver_talk</actor_dialog>
-#include "dialogs\generic_dialogs.xml"						
+#include "dialogs\land_arhara_zvezdochet_dialogs.xml"						
 	</specific_character>
 	<!-- ***************<Snipery on undiscovered ground the main gulag>*************** -->
 	<!-- ***************<Chimera>*************** -->
@@ -2139,7 +2135,7 @@ include "inventory\dolg_items.xml"
 		<name>Pilgrim_name_gameplay</name>
 		<icon>ui_npc_u_land_arhara_piligrim</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>val_stalker_general_bio</bio>
 		<class>piligrim</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -2157,7 +2153,7 @@ include "inventory\dolg_items.xml"
 		<name>Pilgrim_name_gameplay</name>
 		<icon>ui_npc_u_land_arhara_piligrim_1</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>val_stalker_general_bio</bio>
 		<class>piligrim_1</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -2175,7 +2171,7 @@ include "inventory\dolg_items.xml"
 		<name>Pilgrim_name_gameplay</name>
 		<icon>ui_npc_u_land_arhara_piligrim_1</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>val_stalker_general_bio</bio>
 		<class>piligrim_2</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -2193,7 +2189,7 @@ include "inventory\dolg_items.xml"
 		<name>Pilgrim_name_gameplay</name>
 		<icon>ui_npc_u_land_arhara_piligrim_1</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>val_stalker_general_bio</bio>
 		<class>piligrim_sklad</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -2248,7 +2244,7 @@ include "inventory\dolg_items.xml"
 		<name>Canine_name_gameplay</name>
 		<icon>ui_npc_u_stalker_kluk</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>val_stalker_general_bio</bio>
 		<class>stalk_kluk</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -2268,7 +2264,7 @@ include "inventory\dolg_items.xml"
 		<name>Canine_name_gameplay</name>
 		<icon>ui_npc_u_stalker_kluk</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>val_stalker_general_bio</bio>
 		<class>kluk_sklad</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -4745,8 +4741,7 @@ include "inventory\merc_items.xml"
 		<crouch_type>-1</crouch_type>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>escape_razvod_gg</actor_dialog>		
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\esc_kidalo_dialogs.xml"
 	</specific_character>
 	<!-- *************** injured colliding at Yantar *************** -->
 	<specific_character id="yantar_stalk_ranen" team_default="1">
@@ -4858,7 +4853,7 @@ include "inventory\merc_items.xml"
 		<name>Pilgrim_name_gameplay</name>
 		<icon>ui_npc_u_land_arhara_piligrim</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>village_piligrim</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -4876,7 +4871,7 @@ include "inventory\merc_items.xml"
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_neytral_nauchniy</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>village_plennuy</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -4894,7 +4889,7 @@ include "inventory\merc_items.xml"
 		<name>Kolmogor_name_gameplay</name>
 		<icon>ui_npc_kolmogor</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>kolmogor</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -4945,7 +4940,7 @@ include "inventory\merc_items.xml"
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_neytral_exoskeleton</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>village_nachalo_stalk3</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -4974,8 +4969,7 @@ include "inventory\merc_items.xml"
 		<visual>actors\novice\green_stalker_5</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_3_dialog</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\village_stalk_dead1_dialogs.xml"
 	</specific_character>
 	<specific_character id="village_stalk_dead2" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
@@ -5030,8 +5024,7 @@ include "inventory\merc_items.xml"
 		<crouch_type>-1</crouch_type>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-<actor_dialog>stalk_bar_treasure_3_dialog</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\village_brat_dead_dialogs.xml"
   </specific_character>
 	<!-- ***************Soldiers from the tunnel in the countryside*************** -->
 	<specific_character id="village_kapatel1" team_default="1">
@@ -5684,7 +5677,7 @@ include "inventory\merc_items.xml"
 		<name>Connoisseur_of_Marshes_name_gameplay</name>
 		<icon>ui_npc_boloto_provodnik</icon>
 		<map_icon x="0" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>boloto_provodnik</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -5776,7 +5769,7 @@ include "inventory\merc_items.xml"
 		<name>Countryman_name_gameplay</name>
 		<icon>ui_npc_zemlyk</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>zemlyk</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -5900,7 +5893,7 @@ include "inventory\merc_items.xml"
 		<name>Jerry_name_gameplay</name>
 		<icon>ui_npc_frits</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>frits</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -5918,7 +5911,7 @@ include "inventory\merc_items.xml"
 		<name>Jerry_name_gameplay</name>
 		<icon>ui_npc_frits</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>gener_frits2</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -6386,7 +6379,7 @@ include "inventory\merc_items.xml"
 		<name>Black_Doctor_name_gameplay</name>
 		<icon>ui_npc_u_black_doctor</icon>
 		<map_icon x="1" y="0"/>
-		<bio>The representative of the project Awareness.</bio>
+		<bio>Osoznanie</bio>
 		<class>generators_black_dok</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -6403,7 +6396,7 @@ include "inventory\merc_items.xml"
 		<name>Black_Doctor_name_gameplay</name>
 		<icon>ui_npc_u_black_doctor</icon>
 		<map_icon x="1" y="0"/>
-		<bio>The representative of the project Awareness.</bio>
+		<bio>Osoznanie</bio>
 		<class>gener_bl_doktor1</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -6420,7 +6413,7 @@ include "inventory\merc_items.xml"
 		<name>Black_Doctor_name_gameplay</name>
 		<icon>ui_npc_u_black_doctor</icon>
 		<map_icon x="1" y="0"/>
-		<bio>The representative of the project Awareness.</bio>
+		<bio>Osoznanie</bio>
 		<class>hospital_bl_dok</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -6437,7 +6430,7 @@ include "inventory\merc_items.xml"
 		<name>Black_Doctor_name_gameplay</name>
 		<icon>ui_npc_real_bl_dok</icon>
 		<map_icon x="1" y="0"/>
-		<bio>The representative of the project Awareness.</bio>
+		<bio>Osoznanie</bio>
 		<class>hosp_real_bl_dok</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -6547,7 +6540,7 @@ include "inventory\merc_items.xml"
 		<name>Fyodor_Loviglyuk_name_gameplay</name>
 		<icon>ui_npc_u_green_stalker_2</icon>
 		<map_icon x="0" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>esc_trupak_antenna</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>
@@ -6963,8 +6956,7 @@ include "inventory\merc_items.xml"
 		<crouch_type>0</crouch_type>
 #include "inventory\soldier_regular_items.xml"
 #include "gameplay\character_criticals_5.xml"
-          <actor_dialog>soldier_ranen_say</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\muha_soldat_ranen_dialogs.xml"
   </specific_character>
 	<!-- ***************Panther Generators*************** -->
 	<specific_character id="gen_pantera_life" team_default="1">
@@ -6983,8 +6975,7 @@ include "inventory\merc_items.xml"
 		<panic_treshold>0</panic_treshold>
 #include "inventory\panther_items.xml"
 #include "gameplay\character_criticals_2.xml"
-#include "dialogs\generic_dialogs.xml"						
-         <actor_dialog>gen_pant_say</actor_dialog>
+#include "dialogs\gen_pantera_life_dialogs.xml"						
 	</specific_character>
 	<!-- ***************Panther in hospital*************** -->
 	<specific_character id="hospital_pantera_girl" team_default="1">
@@ -7829,7 +7820,7 @@ include "inventory\merc_items.xml"
 		<name>Forester_name_gameplay</name>
 		<icon>ui_npc_lesnik</icon>
 		<map_icon x="1" y="0"/>
-		<bio>Experienced stalker. Detailed information is available.</bio>
+		<bio>sim_stalker_general_bio</bio>
 		<class>forest_lesnik</class>
 		<community>stalker</community>
 		<terrain_sect>stalker_terrain</terrain_sect>

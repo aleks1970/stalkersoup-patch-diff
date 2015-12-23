@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.8.2 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.8.4 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -8,8 +8,8 @@
 -- sak_book4, tb3d_collector, corrected lighting_val, changed fixer to only be called on level change, sak_book4, news, blowout types, get_obj_level,
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
--- indoor/outdoor spots
-function my_ver() return "1.0.9.9.8.2" end
+-- indoor/outdoor spots, stages of storm
+function my_ver() return "1.0.9.9.8.4" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -312,6 +312,22 @@ function check_spawn()
 				if TB3D_Services.give_info("tb3d_dmx_cars") == true then
 					dmx_cars.car_spawn()
 					dmx_cars.quest_cars_spawn()									--spawn quest cars
+				end
+			end
+			if has_alife_info("tb3d_sms_storm") and not has_alife_info("tb3d_storm_over") then								--109984
+				local strm_strtd = amk.load_variable("tb3d_storm_started", 0)
+				if strm_strtd > 0 then
+					if not has_alife_info("tb3d_block_1") and strm_strtd + 3 > level.get_time_days() then
+						TB3D_Services.give_info("tb3d_block_1")
+					elseif strm_strtd + 5 > level.get_time_days() then
+						TB3D_Services.give_info("tb3d_block_2")						--only NPP areas
+					elseif strm_strtd + 7 > level.get_time_days() then
+						TB3D_Services.give_info("tb3d_storm_over")
+						amk.del_variable("tb3d_storm_started")
+						TB3D_Services.set_new_levelup(3)							--set for process_levels
+					end
+				else
+					amk.save_variable("tb3d_storm_started", level.get_time_days())
 				end
 			end
 			TB3D_Collector.process_levels(lname, sname)

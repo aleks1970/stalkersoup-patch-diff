@@ -1,5 +1,5 @@
-<!-- TB3D 1.0.9.9.8.2 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
- predbannik_barman, zver_taken, more content, articles, suit-->
+<!-- TB3D 1.0.9.9.8.4 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
+ predbannik_barman, zver_taken, more content, articles, suit, storm stages-->
  
 <game_information_portions>
 <info_portion id="tb3d_started_as_collector"></info_portion>	<!-- used to control mob spawns -->
@@ -18,6 +18,9 @@
 <info_portion id="tb3d_cube_garbled_msg"></info_portion>	<!-- triggers garbled msg about cube -->
 <info_portion id="tb3d_sms_storm"></info_portion>			<!-- stops quake -->
 <info_portion id="tb3d_sms_storm_areas"></info_portion>		<!-- start of level_up 2 -->
+<info_portion id="tb3d_block_1"></info_portion>				<!-- storm area 1 -->
+<info_portion id="tb3d_block_2"></info_portion>				<!-- storm area 2 -->
+<info_portion id="tb3d_harsh_spawns"></info_portion>		<!-- toggles horror spawns -->
 <info_portion id="tb3d_give_storm_info">
 	<article>levelup2_desolation</article>
 </info_portion>
@@ -31,7 +34,8 @@
 	<!--article>levelup2_get_suit</article-->
 </info_portion>
 <info_portion id="tb3d_lanky_suit_repairing"></info_portion>	<!-- special suit being repaired -->
-<info_portion id="tb3d_lanky_suit_fixed"></info_portion>	<!-- special suit repaired, ready for pickup -->
+<info_portion id="tb3d_lanky_suit_fixed"></info_portion>		<!-- special suit repaired, ready for pickup -->
+<info_portion id="tb3d_found_in_npp2"></info_portion>			<!-- mushroom art was found in npp2 so spawn another -->
 
 <info_portion id="tb3d_hunt_note2">
 	<article>tb3d_hunt0_info</article>
@@ -216,6 +220,9 @@
 </info_portion>
 <info_portion id="tb3d_zep4_article2">							<!-- after going to wt -->
 	<article>tb3d_zep4_article2_info</article>
+</info_portion>
+<info_portion id="tb3d_mush_arts_quest">						<!-- find mushroom arts in npp -->
+	<article>tb3d_mush_arts_quest_info</article>
 </info_portion>
 
 <!-- Soul Cube  -->

@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 new inventory, reduced money *************** -->
+<!-- ************ TB3D 1.0.9.9.8.4 new inventory, reduced money, agr_stalker_general_default6, 100% localized *************** -->
 <xml>
 	<!-- *************** Unique Structure *************** -->
 	<specific_character id="agr_krot" team_default="1">
@@ -73,9 +73,7 @@
 		<crouch_type>-1</crouch_type>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"       
-	<actor_dialog>stalk_garb_treasure_1_dialog</actor_dialog>
-		<!-- ***************DMX *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt1_dialogs.xml"
   </specific_character>
 	<specific_character id="agr_stalker_general_default2" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
@@ -93,13 +91,11 @@
 		<crouch_type>-1</crouch_type>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"       
-	<actor_dialog>stalk_garb_treasure_4_dialog</actor_dialog>
-		<!-- ***************DMX *************** -->
-#include "dialogs\generic_dialogs.xml"   
+#include "dialogs\generic_sgt4_dialogs.xml"   
 </specific_character>
 	<specific_character id="agr_stalker_general_default3" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
-		<icon>ui_npc_u_stalker_3_rozh2</icon>
+		<icon>ui_npc_u_stalker_neytral_balon_8</icon>	<!--icon>ui_npc_u_stalker_3_rozh2</icon-->
 		<map_icon x="1" y="0"/>
 		<bio>sim_stalker_general_bio</bio>
 		<class>agr_Stalker_general</class>
@@ -108,14 +104,12 @@
 		<rank>482</rank>
 		<reputation>18</reputation>
 		<money min="20" max="800" infinitive="0"/>
-		<visual>actors\neytral\stalker_3_rozh2</visual>
+		<visual>actors\neytral\stalker_neytral_balon_8</visual>	<!--visual>actors\neytral\stalker_3_rozh2</visual-->
 		<snd_config>characters_voice\human_01\stalker\</snd_config>
 		<crouch_type>-1</crouch_type>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-	<actor_dialog>stalk_garb_treasure_3_dialog</actor_dialog>
-		<!-- ***************DMX *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt3_dialogs.xml"
 </specific_character>
 	<specific_character id="agr_stalker_general_default4" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
@@ -133,9 +127,7 @@
 		<crouch_type>-1</crouch_type>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-	<actor_dialog>stalk_garb_treasure_2_dialog</actor_dialog>
-		<!-- ***************DMX *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt2_dialogs.xml"
   </specific_character>
 	<specific_character id="agr_stalker_general_default5" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
@@ -157,7 +149,7 @@
   </specific_character>
 	<specific_character id="agr_stalker_general_default6" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
-		<icon>ui_npc_u_stalker_neytral_rukzak_2</icon>
+		<icon>ui_npc_u_stalker_neytral_balon_8</icon>
 		<map_icon x="1" y="0"/>
 		<bio>sim_stalker_general_bio</bio>
 		<class>agr_Stalker_general</class>
@@ -166,7 +158,7 @@
 		<rank>447</rank>
 		<reputation>33</reputation>
 		<money min="20" max="800" infinitive="0"/>
-		<visual>actors\neytral\stalker_neytral_rukzak_2</visual>
+		<visual>actors\neytral\stalker_neytral_balon_8</visual>  <!--actors\neytral\stalker_neytral_rukzak_2</visual-->
 		<snd_config>characters_voice\human_01\stalker\</snd_config>
 		<crouch_type>-1</crouch_type>
 #include "inventory\stalker_novice_items.xml"

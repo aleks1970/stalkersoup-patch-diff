@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.8.0 tweed in ds, baldy, karin and dd_inform, tractorist, predbannik_barman, more content -->
+<!-- ************ TB3D 1.0.9.9.8.4 tweed in ds, baldy, karin and dd_inform, tractorist, predbannik_barman, more content, barman, sid -->
 <game_dialogs>
 
 	<!--  ZEP - Zone Expansion Project, 24 documents  -->
@@ -200,6 +200,47 @@
 				<text>sid_dialog_zep2_11</text>
 				<give_info>sid_zep2_start</give_info>
 				<action>tb3d_dialog.sid_give_weapon</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="tb3d_sid_storm_dialog">		<!-- during storm -->
+		<has_info>tb3d_sms_storm</has_info>
+		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>tb3d_sid_storm_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>tb3d_sid_storm_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>tb3d_sid_storm_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>tb3d_sid_storm_3</text>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="tb3d_sid_after_dialog">		<!-- after storm -->
+		<has_info>tb3d_sms_storm_over</has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>tb3d_sid_after_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>tb3d_sid_after_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>tb3d_sid_after_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>tb3d_sid_after_3</text>
 			</phrase>
 		</phrase_list>
 	</dialog>
@@ -614,6 +655,87 @@
 			<phrase id="6">
 				<text>barman_zep8_6</text>
 				<!--action>dialogs.break_dialog</action-->
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="barman_dialog_zep9">		<!-- task during the storm -->
+		<has_info>tb3d_sms_storm</has_info>
+		<has_info>tb3d_got_lanky_suit</has_info>
+		<dont_has_info>tb3d_mush_arts_quest</dont_has_info>
+		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>barman_zep9_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>barman_zep9_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>barman_zep9_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>barman_zep9_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>barman_zep9_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>barman_zep9_5</text>
+				<give_info>tb3d_mush_arts_quest</give_info>
+				<action>tb3d_dialog.spawn_mushroom_arts_npp2</action>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>barman_zep9_6</text>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="barman_dialog_zep10">		<!-- has arts -->
+		<has_info>tb3d_mush_arts_quest</has_info>
+		<precondition>tb3d_dialog.mush_art_have</precondition>
+		<phrase_list>
+			<phrase id="0">
+				<text>barman_zep10_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>barman_zep10_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>barman_zep10_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>barman_zep10_3</text>
+				<action>tb3d_dialog.mush_art_done</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="barman_dialog_zep11">		<!-- storm receded -->
+		<has_info>tb3d_sms_storm</has_info>
+		<has_info>tb3d_block_1</has_info>
+		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>barman_zep11_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>barman_zep11_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>barman_zep11_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>barman_zep11_3</text>
 			</phrase>
 		</phrase_list>
 	</dialog>

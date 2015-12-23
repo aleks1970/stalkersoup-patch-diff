@@ -1276,7 +1276,7 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 	elseif stash_num == 12 then		--warehouses
 		if has_alife_info("tb3d_harsh_environment") then
 			enemies = "tb3dm_zombie_strong"
-			qty = 20
+			qty = 10
 		else
 			enemies = "tb3dm_killer_exo_unic"
 			qty = 5
@@ -1285,16 +1285,16 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 			spawn_alife_rand(enemies,-26.449,-13.582,335.959,281075,1803, qty)			--chopper
 		elseif rand == 2 then
 			spawn_alife_rand(enemies,-6.784,-6.146,78.494,300362,1580, qty)				--entrance to base
-			spawn_alife_rand(enemies,27.919,-8.876,-47.801,333061,1590, qty)				--inside base
+			spawn_alife_rand(enemies,27.919,-8.876,-47.801,333061,1590, qty)			--inside base
 		else
 			spawn_alife_rand(enemies,-269.732,-6.571,406.570,68860,1851, qty)			--below rocks
 		end
 		spawn_alife_rand(enemies,80.613,-13.523,402.588,378152,1808, qty)				--exit to radar
 		spawn_alife_rand(enemies,615.869,-52.257,-301.292,221303,1882, qty)				--radar camp 1
-		spawn_alife_rand(enemies,583.516,-63.080,-178.223,qty7041,1886, qty)				--radar camp 2
+		spawn_alife_rand(enemies,583.710,-63.105,-179.654,207039,1886, qty)				--109984, radar camp 2 with tank
 		spawn_alife_rand(enemies,590.816,-50.166,15.045,210249,1900, qty)				--camp at turn
-		spawn_alife_rand(enemies,376.672,-50.020,9.989,108274,1864, qty)					--prip intersection
-		spawn_alife_rand(enemies,195.515,-12.702,83.415,53913,1936, qty)					--camp on upper road
+		spawn_alife_rand(enemies,376.672,-50.020,9.989,108274,1864, qty)				--prip intersection
+		spawn_alife_rand(enemies,195.515,-12.702,83.415,53913,1936, qty)				--camp on upper road
 	elseif stash_num == 13 then		--radar
 		if rand == 1 then
 			spawn_alife_rand("tb3dm_zombie_strong",204.447,5.769,-14.557,72763,2030, 10)				--all around power lines
@@ -1392,9 +1392,10 @@ function remove_brainlab_alife()
 					level_name = alife():level_name(obj_level)
 					if level_name == "l08u_brainlab" then
 						--if string_find(obj:name(), "x16_stalker_ghost")
-						  if string_find(obj:name(), "x16_m_controller_e") then
+						if string_find(obj:name(), "x16_m_controller_e") then
 							is_fixed = true
 						end
+						--TB3D_Services.remove_info("yan_controller_respawn_01")
 						--if obj.alive then is_fixed = true end				--creature or npc so remove
 					end
 				else

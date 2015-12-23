@@ -281,7 +281,7 @@ end
 function calculate_predicate(npc, tbl, settings)
 	local is_report = false
 	local sname = npc:name()
-	if TB3D_Modders.use_state_message and string_find(sname, TB3D_Modders.npc_to_log) then is_report = true end
+	if TB3D_Modders.use_state_message and string.find(sname, TB3D_Modders.npc_to_log) then is_report = true end
 	if is_report then
 		TB3D_Services.packet_alert("dialog_manager: calc predicate["..sname.."]")
 	end

@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.1 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
--- dav update 16Apr14, item 17, send_tip_id optimization, fixed send_tip_id to amk_send_tip_id, debug, save now
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.8.4 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+-- dav update 16Apr14, item 17, send_tip_id optimization, fixed send_tip_id to amk_send_tip_id, debug, save now, moved triggers and added debug
+function my_ver() return "1.0.9.9.8.4" end
 -- randomly caches Collector treasures and provides base for bind_stalker services
 
 local string_sub = string.sub
@@ -49,7 +49,6 @@ function spawn_next(n)
 			rnd = math.random(3)
 			a = (treasure[n-1]..tostring(rnd))
 		end
-		TB3D_Triggers.treasure_hunt_spawn(n,rnd)							--109982, add content in some areas
 		if ini:section_exist(a) then
 			if ini:line_exist(a,"x") then
 				 x=ini:r_float(a,"x")
@@ -84,8 +83,10 @@ function spawn_next(n)
 			if reslt == true then
 				amk.save_variable("val_descr",desc)
 				local nobj = alife():create("val_taynik_"..tostring(n), vector():set(x,y,z),lv,gv)
-				if nobj and TB3D_Modders.coll_spots then level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", "val_taynik_"..tostring(n)) end
-				--TB3D_Services.packet_alert("Collector: found stash ["..desc.."]")
+				if nobj and TB3D_Modders.coll_spots then
+					level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", "val_taynik_"..tostring(n))
+					TB3D_Services.packet_alert("Collector: spawn stash["..utils.to_str(x)..","..utils.to_str(y)..","..utils.to_str(z).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."] desc["..desc.."]")
+				end
 				if TB3D_Modders.use_spawn_message then 
 					news_manager.send_tip(db.actor,"Collector Hunt Spawned: ["..desc.."]") 
 				end
@@ -98,6 +99,7 @@ function spawn_next(n)
 		spawn_shrooms(n)
 		--TB3D_Services.packet_alert("Collector Hunt spawned shroom ["..tostring(n).."]")
 		ini = ""
+		TB3D_Triggers.treasure_hunt_spawn(n,rnd)							--109984, add content in some areas
 	end
 end
 

@@ -1,10 +1,10 @@
---TB3D 1.0.9.9.8.1 removed item number function, removed set_npc_health(), 
+--TB3D 1.0.9.9.8.4 removed item number function, removed set_npc_health(), 
 -- devil to Bes, added breaks, cons pkt srvcs, fixed item reloc and item out functions, 
 -- glowworm fixes, removed ratcatcher check from used item, 'to the swamp' vice cave, petrushka to petruha,
 -- dmx135, hit styles, doc in pripyat, chgd nepis_umer, trasure to treasure, delta display,
 -- delta display to slice mult, add_tail, removed make_kill_task_failed, levchn ids changed in all.spawn, garb - cave
--- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug
-function my_ver() return "1.0.9.9.8.1" end
+-- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box
+function my_ver() return "1.0.9.9.8.4" end
 
 ---------------------------------------------------------------------
 -- Hi from Syaka 
@@ -953,9 +953,9 @@ function show_time(scopeused, slice_base)
 end
 
 function switch_timer_stancia()
-local obj
-local params={}
-	for a=2000,2100,1 do
+	local obj
+	local params={}
+	for a=first_object,last_object,1 do			--109984
 		obj=alife():object(a)
 		if (obj and obj.name and obj:name() == "aes_space_restrictor_timer") then
 			params=amk.get_restrictor_data(obj)
@@ -968,17 +968,17 @@ local params={}
 end
 
 function switch_mil_matugalnik()
-local obj
-local params={}
-	for a=10500,11500,1 do
+	local obj
+	local params={}
+	for a=first_object,last_object,1 do				--109984
 		obj=alife():object(a)
 		if (obj and obj.name and obj:name() == "mil_physic_destroyable_object_0046") then
-		params=amk.get_destroyable_data(obj)
-		--dbglog("Entered: "..params.custom)
-		if TB3D_Modders.use_sak_message then TB3D_Services.info_alert("Entered: ["..obj:name().."] id["..a.."] sid["..obj.m_story_id.."]") end --id~11017
-		params.custom="[logic]\ncfg = scripts\\mil\\matugalnik.ltx"
-		--dbglog("Entered: "..params.custom)
-		amk.set_destroyable_data(params,obj)
+			params=amk.get_destroyable_data(obj)
+			--dbglog("Entered: "..params.custom)
+			if TB3D_Modders.use_sak_message then TB3D_Services.info_alert("Entered: ["..obj:name().."] id["..a.."] sid["..obj.m_story_id.."]") end --id~11017
+			params.custom="[logic]\ncfg = scripts\\mil\\matugalnik.ltx"
+			--dbglog("Entered: "..params.custom)
+			amk.set_destroyable_data(params,obj)
 			break	--!!!!TB3D
 		end
 	end
@@ -986,49 +986,44 @@ end
 
 local rep_percent=0.1
 function repair_box_outfit(obj)
-	local dir=device().cam_dir
-	local a=vector() a.y=math_atan2(dir.x,dir.z)
-	local xdelta=math_sin(a.y)
-	local zdelta=math_cos(a.y)
-	local act_pos=db.actor:position()
-	local lvid=db.actor:level_vertex_id()
-	local gvid=db.actor:game_vertex_id()
-	local robjd
-	local repiout =amk.load_variable("repair_item_outfit", 0)
-	local repiweap =amk.load_variable("repair_item_weapon", 0)
 	local enemy=false 
 	local objg
-		for a=first_object,last_object do
-			objg=level.object_by_id(a)
-			if objg then
-				if (objg and (( IAmAStalker[objg:clsid()] and amk.get_npc_relation(objg,db.actor)=="enemy" )
-				or IAmAMonster[objg:clsid()]) and objg:position():distance_to(db.actor:position())<40 and objg:see(db.actor)) then 
-					enemy=true 
-					break
-				end 
+	for a=first_object,last_object, 1 do		--109984
+		objg=level.object_by_id(a)
+		if objg then
+			if (objg and (( IAmAStalker[objg:clsid()] and amk.get_npc_relation(objg,db.actor)=="enemy" )
+			or IAmAMonster[objg:clsid()]) and objg:position():distance_to(db.actor:position())<40 and objg:see(db.actor)) then 
+				enemy=true 
+				break
 			end 
-		end
-		if enemy==true then 
-			news_manager.amk_send_tip_id("kit_enemies",nil,nil,nil,5) 
-		else
-			if obj:section()=="repair_box_outfit" then 
-				if (repiout~=0 or repiweap~=0) and (repiout or repiweap) then
-					amk.remove_item(obj)
-					robjd=amk.spawn_item("m_repair_box_outfit",vector():set((act_pos.x+xdelta),(act_pos.y+0.5),(act_pos.z+zdelta)),gvid,lvid)
-					if repiout~=0 then
-						se_respawn.create_ammo("repair_item_outfit", robjd.position, robjd.level_vertex_id, robjd.game_vertex_id, robjd.id,repiout)
-					end
-					if repiweap~=0 then
-						se_respawn.create_ammo("repair_item_weapon", robjd.position, robjd.level_vertex_id, robjd.game_vertex_id, robjd.id,repiweap)
-					end
-					amk.save_variable("repair_box", robjd.id)
-				else
-					amk.remove_item(obj)
-					amk.spawn_item("repair_box_outfit",vector():set((act_pos.x+xdelta),(act_pos.y+0.5),(act_pos.z+zdelta)),gvid,lvid)
-				end
+		end 
+	end
+	if enemy==true then 
+		news_manager.amk_send_tip_id("kit_enemies",nil,nil,nil,5) 
+	else
+		local dir=device().cam_dir
+		local a=vector() a.y=math_atan2(dir.x,dir.z)
+		local xdelta=math_sin(a.y)
+		local zdelta=math_cos(a.y)
+		local act_pos=db.actor:position()
+		local lvid=db.actor:level_vertex_id()
+		local gvid=db.actor:game_vertex_id()
+		local robjd
+		local repiout =amk.load_variable("repair_item_outfit", 0)
+		local repiweap =amk.load_variable("repair_item_weapon", 0)
+		amk.remove_item(obj)
+		robjd=amk.spawn_item("m_repair_box_outfit",vector():set((act_pos.x+xdelta),(act_pos.y+0.5),(act_pos.z+zdelta)),gvid,lvid)
+		if (repiout and repiout~=0) or (repiweap and repiweap~=0) then
+			if repiout and repiout~=0 then
+				se_respawn.create_ammo("repair_item_outfit", robjd.position, robjd.level_vertex_id, robjd.game_vertex_id, robjd.id,repiout)
+			end
+			if repiweap and repiweap~=0 then
+				se_respawn.create_ammo("repair_item_weapon", robjd.position, robjd.level_vertex_id, robjd.game_vertex_id, robjd.id,repiweap)
 			end
 		end
-		if TB3D_Modders.use_sak_message == true then TB3D_Services.info_alert("repairbox outfit") end 
+		amk.save_variable("repair_box", robjd.id)
+	end
+	if TB3D_Modders.use_sak_message == true then TB3D_Services.info_alert("repairbox outfit") end 
 end
 
 function repair_box_close(obj)
@@ -1114,16 +1109,13 @@ function repair_box_close(obj)
 	end
 end
 
-function repair_box_closed(obj)
+function repair_box_closed(obj)			--109984, put straight into inventory
 	local robjd = alife():object(obj)
-	local pos=robjd.position
-	local lvid=robjd.level_vertex_id
-	local gvid=robjd.game_vertex_id
-		if robjd then
-			alife():release(alife():object(obj), true)
-		end
+	if robjd then
+		alife():release(alife():object(obj), true)
+	end
 	amk.del_variable("repair_box")
-	amk.spawn_item("repair_box_outfit",pos,gvid,lvid)
+	alife():create("repair_box_outfit",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
 end
 
 function add_3repair_item_outfit()

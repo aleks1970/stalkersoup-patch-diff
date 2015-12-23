@@ -1,9 +1,9 @@
---' TB3D 1.0.9.9.8.1 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.0.9.9.8.4 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
--- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2
-function my_ver() return "1.0.9.9.8.1" end
+-- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art
+function my_ver() return "1.0.9.9.8.4" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -2749,7 +2749,7 @@ function lysyi_sms()
 	end
 end
 function art_negoden_sms()
-	if TB3D_Services.is_collector(4000) == false then
+	if TB3D_Services.is_collector(4000) == false and not has_alife_info("tb3d_skip_group3") then					--109984
 		news_manager.amk_send_tip_id("sms_art_negoden","sms_strelok",1,20,"actor_sms")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leaves\leaves_42]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
@@ -7576,33 +7576,37 @@ local tabl_art_v_buliz = {
     }
 local art_v_buliz_virogdeno_count = 0 -- number of degenerate artifacts
 
---' Radar arts had deteriorated
+--' Radar, marsh or generators arts had deteriorated
 function radar_udalyem_art()
-    art_v_buliz_virogdeno_count = 0
-    for a,v in pairs(tabl_art_v_buliz) do
-        --if the probability of extinction "worked"
-        if math_random() < v then
-            --but how many of these HS artov then ?
-            aCount = 0
-            db.actor:iterate_inventory(function (dummy, vItem)
-                if vItem:section() == a then
-                    aCount = aCount + 1 
-                end 
-            end, nil)
-              --there are arts
-            if aCount >= 1 then 
-                sak.out_item_namber(a, 1, true)
-                art_v_buliz_virogdeno_count = art_v_buliz_virogdeno_count + 1
-            end
-        end
-    end
+	if TB3D_Services.is_collector(4000) == false and not has_alife_info("tb3d_skip_group3") then					--109984
+		art_v_buliz_virogdeno_count = 0
+		for a,v in pairs(tabl_art_v_buliz) do
+			--if the probability of extinction "worked"
+			if math_random() < v then
+				--but how many of these HS artov then ?
+				aCount = 0
+				db.actor:iterate_inventory(function (dummy, vItem)
+					if vItem:section() == a then
+						aCount = aCount + 1 
+					end 
+				end, nil)
+				  --there are arts
+				if aCount >= 1 then 
+					sak.out_item_namber(a, 1, true)
+					art_v_buliz_virogdeno_count = art_v_buliz_virogdeno_count + 1
+				end
+			end
+		end
+	end
 end
 
 --' obtain the cobblestones
 function taik_bul(first_speaker, second_speaker) 
-    for i=1,art_v_buliz_virogdeno_count,1 do
-        dialogs.relocate_item_section(second_speaker, "af_buliz","in",true)
-    end
+	if TB3D_Services.is_collector(4000) == false and not has_alife_info("tb3d_skip_group3") then					--109984
+		for i=1,art_v_buliz_virogdeno_count,1 do
+			dialogs.relocate_item_section(second_speaker, "af_buliz","in",true)
+		end
+	end
 end
 ------------------------------------------------------------------------------------------------------------------
 --' drink vodka

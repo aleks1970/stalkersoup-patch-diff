@@ -121,6 +121,7 @@ function drop_manager:check_dead_items()
 	--TB3D_Services.packet_alert("death mgr: check dead items["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
 	local npc_id = self.npc:id()
 	local has_ammo = {}								--109981, used to store types of ammo
+	local has_box = {}								--109984, set to 1 when a box has been kept
 	local ammo_count = math_random(1,TB3D_Modders.loadout_ammo_loot)
 	if ammo_count > 100 then ammo_count = 100 end
 	function clear_pda(npc, item, rnd)
@@ -140,14 +141,37 @@ function drop_manager:check_dead_items()
 						npc:drop_item(item)
 						amk.remove_item(item)
 					elseif string_find(sect, "ammo_") then				--109983, optimized ammo method
-						if has_ammo[sect] == nil then					--keep first one found
-							has_ammo[sect] = 1
-						elseif has_ammo[sect] > ammo_count then
-							npc:drop_item(item)
-							amk.remove_item(item)						--causes 'not found on server' errors (non fatal)
-							--TB3D_Services.packet_alert("death mgr: check dead items ammo["..name.."] removed")
+						local ini = system_ini()
+						local num_in_box = ini:r_u32(sect, "box_size")
+						if num_in_box and num_in_box > 1 then				--109984, causes 'not found on server' errors (non fatal)
+							if has_ammo[sect] == nil then					--start box count
+								--TB3D_Services.packet_alert("death mgr: check dead items ammo["..sect.."] box["..utils.to_str(num_in_box).."] started")
+								has_ammo[sect] = 1
+							elseif has_ammo[sect] == num_in_box then		--check if has a full box
+								if has_box[sect] ~= nil then				--already saved one box
+									npc:drop_item(item)
+									amk.remove_item(item)
+									has_ammo[sect] = nil
+									--TB3D_Services.packet_alert("death mgr: check dead items ammo["..sect.."] box["..utils.to_str(num_in_box).."] removed")
+								else										--keep first one found
+									--TB3D_Services.packet_alert("death mgr: check dead items ammo["..sect.."] box["..utils.to_str(num_in_box).."] start next box")
+									has_box[sect] = 1
+								end
+							else
+								has_ammo[sect] = has_ammo[sect] + 1
+								--TB3D_Services.packet_alert("death mgr: check dead items ammo["..sect.."] =["..utils.to_str(has_ammo[sect]).."]")
+							end
 						else
-							has_ammo[sect] = has_ammo[sect] + 1
+							if has_ammo[sect] == nil then					--keep first one found
+								has_ammo[sect] = 1
+							elseif has_ammo[sect] > ammo_count then
+								npc:drop_item(item)
+								amk.remove_item(item)
+								--TB3D_Services.packet_alert("death mgr: check dead items ammo["..sect.."] removed")
+							else
+								has_ammo[sect] = has_ammo[sect] + 1
+								--TB3D_Services.packet_alert("death mgr: check dead items ammo["..sect.."] =["..utils.to_str(has_ammo[sect]).."]")
+							end
 						end
 					end
 				end
@@ -156,6 +180,7 @@ function drop_manager:check_dead_items()
 		return true
 	end
 	self.npc:iterate_inventory(clear_pda, self.npc)					--removes old pda and bad_psy_helmet, spawns mil_pda 30% of the time, also some clutter removed
+	TB3D_Services.packet_alert("death mgr: check dead items clear pda done")
 	local spawn_rate = TB3D_Modders.pda_spawn_rate or 30				--109981
 	if spawn_rate > 80 then spawn_rate = 80 end
 	local community = self.npc:character_community()
@@ -167,14 +192,16 @@ function drop_manager:check_dead_items()
 					self.npc:game_vertex_id(),
 					self.npc:id())
 		end
-	elseif math_random(100) < spawn_rate then 							--109981
-		alife():create("device_pda",
-					self.npc:position(),
-					self.npc:level_vertex_id(),
-					self.npc:game_vertex_id(),
-					self.npc:id())
+	elseif community and community ~= "zombied" and community ~= "bandit" then	--109984
+		if math_random(100) < spawn_rate then 							--109981
+			alife():create("device_pda",
+						self.npc:position(),
+						self.npc:level_vertex_id(),
+						self.npc:game_vertex_id(),
+						self.npc:id())
+		end
 	end
-	if community == "zombied" then
+	if community and community == "zombied" then
 		if math_random(100) > 50 then
 			give_some_stuff(self.npc, "bread_a", 1)
 		--else
@@ -208,10 +235,13 @@ function drop_manager:check_dead_items()
 			end
 			self.npc:iterate_inventory(check_loot_items, self.npc)						--returns counter
 			--TB3D_Services.packet_alert("death mgr: check_dead_items["..utils.to_str(self.npc:name()).."] count["..utils.to_str(counter).."]")
-			if counter < 2 then spawn_random_loot(self.npc) end			--109981
+			if counter < 3 then spawn_random_loot(self.npc) end			--109981
+			if community and community == "bandit" then
+				create_ammo(self.npc, "ammo_12x70_buck", math_random(1, ammo_count))
+			end
 		end
 	end
-	--TB3D_Services.packet_alert("death mgr: check dead items done["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	TB3D_Services.packet_alert("death mgr: check dead items done["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
 end
 
 --109981, removed levels, just community now

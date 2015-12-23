@@ -53,6 +53,7 @@ local commands = {
 	"cube",
 	"soul",
 	"reset"
+	--"set"
 }
 -------------- based on command, use one of the following ----------------------------
 local blowout_question = {
@@ -290,6 +291,8 @@ function pda_dialogs(text)
 			end
 		elseif command == 23 then
 			process_reset_command(text)
+		--elseif command == 24 then
+			--process_set_command(text)
 		elseif lname == "l01_escape" then
 			------------------
 			-- Military attack
@@ -504,3 +507,49 @@ function sensorship(type)
 		amk.save_variable("has_fines", fines)
 	end
 end
+--[[							does not set in engine
+local set_command = {
+	"switch"
+}
+
+local set_response = {
+	"Did not understand, SET what: switch n?",
+	"SWITCH DISTANCE"
+}
+
+function process_set_command(text)
+	local pname = 0
+	local s_pname, val
+	local spc = string_find(text, " ", 1, true)
+	TB3D_Services.packet_alert("dmx pda dialogs: text["..utils.to_str(text).."] space["..utils.to_str(spc).."]")
+	if spc and spc > 3 then
+		s_pname = amk.trim(string_sub(text, 1, spc))
+		if s_pname then
+			spc = string_find(text, " ", spc+1, true)
+			if spc and spc > 0 then
+				val = amk.trim(string_sub(text, spc, -1))
+			end
+		end
+	else
+		return											--no message so ignore
+	end
+	TB3D_Services.packet_alert("dmx pda dialogs: val["..utils.to_str(val).."] space["..utils.to_str(spc).."]")
+	for i = 1, #set_command do
+		if string_find(text, set_command[i]) then
+			pname = i
+			break
+		end
+	end
+	--TB3D_Services.packet_alert("dmx pda dialogs: command["..utils.to_str(s_pname).."] id["..utils.to_str(pname).."]")
+	--------------------------------IF PNAME THEN PROCESS------------------------------------
+	local msg = 1							--start with 'not understood' message
+	local num = tonumber(val)
+	if pname == 1 and (num and num > 0) then						--switch distance
+		msg = 2
+	end
+	news_manager.amk_send_tip(set_response[msg].." from: "..utils.to_str(alife():switch_distance()).." to: "..val, "Potap", 1, 1, "common_channel")
+	if msg == 2 then
+		alife():switch_distance(num)
+	end
+end
+]]--

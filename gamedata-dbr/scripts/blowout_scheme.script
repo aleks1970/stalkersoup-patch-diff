@@ -1,5 +1,5 @@
---<!-- TB3D 1.0.9.9.8.0   added scheme alert, optimized, removed npc hit, hit_callback, blow(), blowout_type(), optimized
-function my_ver() return "1.0.9.9.8.0" end
+--<!-- TB3D 1.0.9.9.8.4   added scheme alert, optimized, removed npc hit, hit_callback, blow(), blowout_type(), optimized, gar_sniper_bandit
+function my_ver() return "1.0.9.9.8.4" end
 -----------------------------------------------------------------------------------
 -- first created: 2007 Dmitri 'Red75' Roschin, Blowout hide v0.25 Behavioral scheme 
 -----------------------------------------------------------------------------------
@@ -549,7 +549,8 @@ local npcNameBlowoutIgnore = {
     ["bar_bar_guard"]           = true, --Garik in the bar
     ["bar_bar_osvedomitel"]     = true, --The informant in the bar
     ["bar_bar_guard_2"]         = true,  --Zhorik in the bar
-    ["brat_luis"]         		= true  --in the marsh
+    ["brat_luis"]         		= true,  --in the marsh
+	["gar_sniper_bandit"]		= true	--109984, can cause path error after blowout
 }
 local npcCommunityBlowoutIgnore = {
     ["zombied"]     = true,

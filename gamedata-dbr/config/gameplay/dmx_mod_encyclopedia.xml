@@ -1,61 +1,61 @@
-<!-- TB3D 1.0.9.9.7.6 new levels, chgd locations- to locations_, moved "books" into new file - aleks1970 -->
+<!-- TB3D 1.0.9.9.8.4 new levels, chgd locations- to locations_, moved "books" into new file, new location photo - aleks1970, moved books include, removed minigames -->
 <encyclopedia>
-#include "gameplay\dmx_mod_enc_books.xml"
 	<!-- *******************  DMX ****************** -->
 	<!-- *******************  MOD ****************** -->
 	<!-- *******************  Deadcity ****************** -->
 	<article id="zone_locations_deadcity" name="zone_locations_deadcity" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_dead_city</texture>
 		<text>enc_zone_locations_deadcity</text>
 	</article>
 	<!-- *******************  Limansk ****************** -->
 	<article id="zone_locations_limansk" name="zone_locations_limansk" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_limansk</texture>
 		<text>enc_zone_locations_limansk</text>
 	</article>
 	<!-- ******************* Generators ****************** -->
 	<article id="zone_locations_generators" name="zone_locations_generators" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_generators</texture>
 		<text>enc_zone_locations_generators</text>
 	</article>
 	<!-- ******************* darklab ****************** -->
 	<article id="zone_locations_darklab" name="zone_locations_darklab" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_x18</texture>
 		<text>enc_zone_locations_darklab</text>
 	</article>
 	<!-- ******************* brainlab ****************** -->
 	<article id="zone_locations_brainlab" name="zone_locations_brainlab" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_x16</texture>
 		<text>enc_zone_locations_brainlab</text>
 	</article>
 	<!-- ******************* labx10 ****************** -->
 	<article id="zone_locations_labx10" name="zone_locations_labx10" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_x10</texture>
 		<text>enc_zone_locations_labx10</text>
 	</article>
 	<!-- ******************* warlab ****************** -->
 	<article id="zone_locations_warlab" name="zone_locations_warlab" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<!-- texture>ui_locations_warlab</texture -->
+		<texture>ui_locations_x8</texture>
 		<text>enc_zone_locations_warlab</text>
 	</article>
 	<!-- ******************* secretlab ****************** -->
 	<article id="zone_locations_secretlab" name="zone_locations_secretlab" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_secret_lab</texture>
 		<text>enc_zone_locations_secretlab</text>
 	</article>
 	<!-- ******************* Zaton *********** !!!!TB3D  new 134 ******** -->
 	<article id="zone_locations_zaton" name="zone_locations_zaton" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_zaton</texture>
 		<text>enc_zone_locations_zaton</text>
 	</article>
 	<!-- ******************* Jupiter *********** !!!!TB3D  new 134 ******** -->
 	<article id="zone_locations_jupiter" name="zone_locations_jupiter" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_jupiter</texture>
 		<text>enc_zone_locations_jupiter</text>
 	</article>
 	<!-- ******************* Predbannik *********** !!!!TB3D  new 134 ******** -->
 	<article id="zone_locations_predbannik" name="zone_locations_predbannik" group="Locations">
-		<texture x="500" y="150" width="100" height="100">ui\ui_icon_photo</texture>
+		<texture>ui_locations_waiting_room</texture>
 		<text>enc_zone_locations_predbannik</text>
 	</article>
 	<!-- ******************************************************** -->
@@ -198,8 +198,8 @@
 		<text>enc_vehicles_tb3d_atv</text>
 	</article>
 	<!-- **************************************************** -->
-	<!-- ******************* - Minigames - ********************** -->
-	<!-- **************************************************** -->
+	<!-- ****************** - Minigames - ******************* -->
+	<!-- **************************************************** -- >
 	<article id="zone_bulldozer_game" name="bulldozer_game" group="Minigames">
 		<text>bulldozer_game_enc</text>
 	</article>
@@ -208,5 +208,6 @@
 	</article>
 	<article id="zone_saper_game" name="saper_game" group="Minigames">
 		<text>saper_game_enc</text>
-	</article>
+	</article>	-->
+#include "gameplay\dmx_mod_enc_books.xml"
 </encyclopedia>

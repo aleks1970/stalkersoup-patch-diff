@@ -1,151 +1,6 @@
---TB3D 1.0.9.9.8.2 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
--- bridge_pass_on, eprip_to_prip, more content, reduced station spawns
-function my_ver() return "1.0.9.9.8.2" end
-
---============ IMPORTANT NOTES ==========================================
--- remove treasure hunt infos so they can be reused in future levels
--- val_x18_exit_base_bandit_0006 winds up in wt bandit camp, might be the quest one
--- mismatch in visual type causes error in visual ctd
-
--- function switch_distance() const;   if works, use for generators
--- function switch_distance(number);
-
--- tb3d_respawn_toggle  unused att
--- tb3d_respawn_level2
--- tb3d_respawn_block
-	
--- tb3d_dyn_info_0 		to be used in dlc content
--- tb3d_dyn_info_1
--- tb3d_dyn_info_2
--- tb3d_dyn_info_3
--- tb3d_dyn_info_4
--- tb3d_dyn_info_5
--- tb3d_dyn_info_6
--- tb3d_dyn_info_7
--- tb3d_dyn_info_8
--- tb3d_dyn_info_9
-
---============ active issues level 0 STALKER/NS =========================
--- no bandits in wt or carpark to eliminate.
--- Kruglov and Profesor need more work.
--- Kept dieing during forced sleep when turning in HIV package from courier in Radar to eco trader, no matter how much food I ate.
--- Boatswain does not return from the base. <<Need to perfect 'stay on line' and use timers>> OR TEST switch_distance function.
--- Fly did not offer quest to get doll from house in Radar, infoportion required to enable her dialogue.
--- Half the time I drop the Repair Kit, it disappears immediately after use; forcing the necessity to save before deploying it.
--- Exit x16 prolog crash
--- Ivantsov hint says Kruglov
--- some npc have dialog about the level which does not change when they migrate
---Has anyone pointed out that in the Inventory, 9x39 SP-5, SP-6 and PAB-9 ammo have the wrong images for their description
---dav_wpn_xp1 
---in the Swamps, where the map ident shows where Dan is, he's not there... 
---psychiatrist's suit not protecting from contollers
---The SEVA suit and the PSZ-9MD suit have exactly the same weight and stats, but the latter costs 5.000Ru more
---two key characters in the game named 'Max'. One at the Army Warehouses ("Come over here, let's have a little chat..."), and the trader at Radar should be called `Syak'
-
---============================ LEVEL UP 1 Collector ================================
---============ ACTIVE ISSUES ============================================
--- exit waiting room prolog crash
---DONE: [promzone]: (155.659,12.644,-382.917),468134,4995)		--generator lc needs move to here
---DONE: [promzone]: (144.654,15.087,-383.299),456690,4995)		--return from generators
-
---============ PENDING TASKS ============================================
-
---------------- garbage ---------------------------------------------
--- spawn_gar_found()
---------------- darkscape ---------------------------------------------
--- spawn_ds_found()
---------------- dead marshes ---------------------------------------------
--- complete karina trade dialogs: tb3d_karina_trade
--- spawn_dead_marshes()
--- DONE: (-196.062,2.827,63.715),726096,4386)		--gravi anom under floating blocks
---------------- generators ------------------------------------------------------
--- generators_neutral_stalk1 thru 6 can be used for dialogs about ax
---------------- black mkt ------------------------------------------------------------
--- DONE: when find doc 7, send sms to help stalkers in cemetery
---------------- x10 after jup under ---------------------------------------------
--- DONE: send sms from trader about soul cube
--- DONE: [l10u_bunker]: (7.162,-23.572,15.393),7695,2773)	--x10 lower door portal m_teleport_tb3d2
--- DONE: to (-21.551,-17.683,58.486),2724,2744)				--catwalk
--- DONE: [l10u_bunker]: (-59.914,-21.214,16.735),267,2723)	--midway portal _tb3d3
--- DONE: to (-0.418,-8.837,0.849),5743,2691)				--elevator
--- DONE: [l10u_bunker]: (-21.673,-8.990,5.378),3159,2674)	--upper room portal _tb3d4
--- DONE: to (3.201,-7.454,-55.374),6871,2663)				--exit
---------------- radar after x10 -----------------------------------------------------
--- DONE: talk to trader in radar about the soul cube and about the firing range
---------------- firing range --------------------------------------------------------
--- DONE: first visit you find a black energy which triggers an sos from the secret lab,
--- DONE: gives tb3d_start_x14 and opens teleport npp2 to x14
---------------- npp2 ------------------------------------------------------------
--- DONE: the teleport is heavely guarded by npc and tanks
--- DONE: once you enter the teleport you go to the secret lab and encounter more resistance
--- DONE: [l12_stancia_2]: (200.798,-0.101,383.703),50137,2538)		--teleport to secret lab
--- DONE: (206.838,-0.100,377.046),50137,2538)		--return
---------------- x14 ------------------------------------------------------------
--- DONE: you meet glavny and he tells you how to block the generator
--- DONE: [lab_x14]: if player drops black energy and
--- DONE: is within n distance of device then destroy device
--- DONE: 16.1000003814697,-34.4000015258789,27.5289993286133
--- DONE: on destroying the strange device you are transported to jup under
---------------- jup under ----------------------------------------------------------
--- DONE: a huge blowout occurs and above ground becomes too harsh to stay out long.
--- DONE: you are forced to use underground to underground to get around in some areas.
--- DONE: after getting to the jup under you get an sms about the storm
-
---============================ LEVEL UP 2 Desolation ===============================
---============ ACTIVE ISSUES ============================================
-
---============ PENDING TASKS ============================================
--- DONE: add harsh env and blowouts to bioradar
--- above ground has creatures overrunning the fringe territories forcing most underground.
--- south of radar things are more normal although creatures keep comming from the north in hoards.
-
---------------- jupiter portals --------------------------------------------
---(311.083,29.030,-141.033),1217531,3741)		--trailer left portal to radar complex under S
---(302.991,29.062,-139.740),1207252,3741)		--trailer right portal to tower by table
---(307.207,29.042,-140.083),1213018,3741)		--trailer entrance, return from both under N and tower corner
---(-385.477,2.640,16.145),66146,3708)			--radar complex under S, from left portal
---(-414.609,2.641,16.106),25032,3708)			--radar complex under N, portal to trailer
---(-9.515,23.104,246.076),699554,3725)			--tower by table, from right portal
---(-13.944,23.072,254.754),692829,3725)			--tower in corner, portal to trailer
-
---(-200.200,3.494,-439.801),377350,3710)		--N. rail tunnel, not used yet
-
----------------- soul cube ------------------------------------------
---TODO: meet the stranger in FR and learn about the artifacts and spawn soul cube
-	
---TODO: rover_bot_spawn after x14 open, use in some way
-
---finish soul cube in F1
-
---------------- broken road ----------------------------------------
-function spawn_br2()							--TODO: broken road around east fence and back, cool towers!
---(-323.359,15.767,-153.183),29971,4404)	--br - stash in small tower far east
---(-243.733,19.489,-201.408),91880,4412)	--br - stash in tower, spawns:
-	--(-281.983,13.655,-182.244),57495,4410)	--br - bsucker near towers
-	--(-289.388,11.955,-225.782),51840,4410)	--br - gigant near tower
-end
---(-248.335,12.008,-201.989),86684,4412)	--br - base of east tower behind fence (cool spawn point)
-
---TODO: br lc in garage tunnel to ??  (259.334,-12.643,119.142),877613,4564)
-	--br lc return point (267.152,-12.744,96.983),891400,4563)
-	
---------------- firing range ----------------------------------------
--- second visit create a trader with special weapons to try out
--- the trader deserted from the special forces that were dispatched there stealing the
--- special weapons he has for sale/trade so they are after him
-
---============================ LEVEL UP 3 Reclamation ===========================
---============ ACTIVE ISSUES ============================================
-
---============ PENDING TASKS ============================================
---TODO: send sms' that storm is over from all factions, stating their intent to reclaim the center
-
---============================ LEVEL UP 4 and beyond ============================
---------------- use in companions ----------------------------------------
--- mil_dolg_stalker0001, hangs out at dv to garbage exit
--- generators_neutral_stalk1 thru 6
-
---===============================================================================
+--TB3D 1.0.9.9.8.4 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+-- bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art
+function my_ver() return "1.0.9.9.8.4" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -836,6 +691,13 @@ function broken_spawns()
 	alife():create("zep_doc_23", vector():set(-49.565,30.564,-119.482),237861,4679)	--lab
 end
 
+function spawn_br2()							--TODO: broken road around east fence and back, cool towers!
+--(-323.359,15.767,-153.183),29971,4404)	--br - stash in small tower far east
+--(-243.733,19.489,-201.408),91880,4412)	--br - stash in tower, spawns:
+	--(-281.983,13.655,-182.244),57495,4410)	--br - bsucker near towers
+	--(-289.388,11.955,-225.782),51840,4410)	--br - gigant near tower
+end
+
 ---------------------------- ZEP Facility F1 ----------------------------
 function f1_spawns()
 	dmx_mod.create_f1_level_changers()			--6004, 98009, 98004
@@ -999,13 +861,17 @@ function spawn_around_dist()											--note 2
 end
 
 function spawn_around_barracks()										--note 3 bandits, they will travel to rostok
-	TB3D_Mobs.spawn_npcs(51.665,-8.873,2.262,351886,1570,0,4)			--barracks
-	TB3D_Mobs.spawn_npcs(81.596,-12.568,60.539,379104,1558,0,2)			--guard house at tunnel
-	TB3D_Mobs.spawn_npcs(78.219,-0.992,-62.733,375448,1567,0,6)			--hill above warehouse
-	TB3D_Mobs.spawn_npcs(-19.268,-4.114,-24.097,287478,1593,0,2)		--hdqtrs upstairs
-	TB3D_Mobs.spawn_npcs(114.521,-6.423,20.555,406328,1561,0,6)			--behind tunnel
-	TB3D_Mobs.spawn_npcs(89.906,-6.764,369.474,387754,1808,0,6)			--bandits at exit to radar
-	TB3D_Mobs.spawn_mob(109.737,-10.038,409.014,403514,1811,3,6)		--mob at exit to radar
+	local typ = 0		--bandits
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 2			--zombied
+	end
+	TB3D_Mobs.spawn_npcs(51.665,-8.873,2.262,351886,1570,typ,4)			--barracks
+	TB3D_Mobs.spawn_npcs(81.596,-12.568,60.539,379104,1558,typ,2)		--guard house at tunnel
+	TB3D_Mobs.spawn_npcs(78.219,-0.992,-62.733,375448,1567,typ,3)		--hill above warehouse
+	TB3D_Mobs.spawn_npcs(-19.268,-4.114,-24.097,287478,1593,typ,2)		--hdqtrs upstairs
+	TB3D_Mobs.spawn_npcs(114.521,-6.423,20.555,406328,1561,typ,3)		--behind tunnel
+	TB3D_Mobs.spawn_npcs(89.906,-6.764,369.474,387754,1808,typ,6)		--exit to radar
+	TB3D_Mobs.spawn_mob(109.737,-10.038,409.014,403514,1811,typ,6)		--exit to radar
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", 303.735,-39.126,-27.214,67636,1930,6)	--ammo in radar exit to warlab
 	alife():create("zep_note_rad1", vector():set(303.858,-39.203,-23.502),67636,1930)		--note in radar exit to warlab
 	dmx_mod.create_level_changer_mil_to_npp1()		--98019
@@ -1172,9 +1038,6 @@ function spawn_accum_npp2()
 	alife():create("art_acumm", vector():set(490.540,17.100,372.640),137926,2586)	--acumm in npp2
 	alife():create("art_acumm", vector():set(490.709,17.102,412.743),137926,2586)	--acumm in npp2
 	alife():create("art_acumm", vector():set(490.895,17.099,331.450),137926,2586)	--acumm in npp2
-	TB3D_Mobs.spawn_snorks(500.189,11.748,392.186,136487,2586,4)
-	TB3D_Mobs.spawn_snorks(449.500,10.461,416.788,136487,2586,4)
-	TB3D_Mobs.spawn_snorks(334.972,-0.001,378.348,123988,2586,4)
 end
 
 function bridge_pass_on()											--use for article and mob spawns
@@ -1193,12 +1056,17 @@ function lanky_arts_not_have(first_speaker, second_speaker)
 end
 
 function lanky_arts_done(first_speaker, second_speaker)
-	dialogs.relocate_item_section(second_speaker, "af_dummy_mushroom","out")
+	--dialogs.relocate_item_section(second_speaker, "af_dummy_mushroom","out")
+	local obj = db.actor:object("af_dummy_mushroom")
+	if obj then
+		db.actor:drop_item(obj)
+		amk.remove_item(obj)
+	end
 	amk.spawn_in_inv("exo_mil_exoskeleton_tb3d", 1)											--give suit
 end
 
 function lanky_suit_have(first_speaker, second_speaker)				--has special suit
- 	return first_speaker:object("af_dummy_mushroom") ~= nil
+ 	return first_speaker:object("exo_mil_exoskeleton_tb3d") ~= nil
 end
 
 function lanky_repair_start(first_speaker, second_speaker)
@@ -1216,4 +1084,36 @@ function lanky_repair_done(first_speaker, second_speaker)
 	amk.spawn_in_inv("exo_mil_exoskeleton_tb3d", 1)											--give suit
 	TB3D_Services.remove_info("tb3d_lanky_suit_repairng")
 	TB3D_Services.remove_info("tb3d_lanky_suit_fixed")
+	if TB3D_Services.remove_info("tb3d_found_in_npp2") then
+		spawn_mushroom_arts_npp2()
+	end
 end
+
+function mush_art_have(first_speaker, second_speaker)
+ 	return first_speaker:object("af_dummy_mushroom") ~= nil
+end
+
+function mush_art_done(first_speaker, second_speaker)
+	local obj = db.actor:object("af_dummy_mushroom")
+	if obj then
+		db.actor:drop_item(obj)
+		amk.remove_item(obj)
+	end
+	db.actor:give_money(10000)
+	news_manager.relocate_money(db.actor, "in", 10000)
+	if TB3D_Services.remove_info("tb3d_found_in_npp2") then
+		spawn_mushroom_arts_npp2()
+	end
+end
+
+function spawn_mushroom_arts_npp2()
+	local rndm = math_random(1,3)
+	if rndm == 1 then
+		alife():create("af_dummy_mushroom", vector():set(490.540,17.100,372.640),137926,2586)	--in npp2
+	elseif rndm == 2 then
+		alife():create("af_dummy_mushroom", vector():set(490.709,17.102,412.743),137926,2586)	--in npp2
+	else
+		alife():create("af_dummy_mushroom", vector():set(490.895,17.099,331.450),137926,2586)	--in npp2
+	end
+end
+

@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 temporary support of level spawns in new levels*************** -->
+<!-- ************ TB3D 1.0.9.9.8.4 temporary support of level spawns in new levels, vet_research_bio, 100% localized*************** -->
 <xml>
 	<!-- ***************BANDITS PROFILES*************** -->
 	<!-- ***************BANDIT NOVICE*************** -->
@@ -155,8 +155,7 @@
 		<crouch_type>1</crouch_type>
 #include "inventory\bandit_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>esc_stalker_talk_level</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\esc_talk_level_dialogs.xml"
 	</specific_character>
 	<specific_character id="sim_bandit_veteran_default2" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
@@ -1235,7 +1234,7 @@
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_ecolog_military</icon>
 		<map_icon x="1" y="6"/>
-		<bio>Researcher. Detailed information is not available.</bio>
+		<bio>vet_research_bio</bio>
 		<class>sim_Ecolog</class>
 		<community>ecolog</community>
 		<terrain_sect>stalker_ecolog_terrain</terrain_sect>
@@ -1752,8 +1751,7 @@
 		<visual>actors\militari\stalker_militari_antigas_2</visual>		
 #include "inventory\soldier_master_items.xml"
 #include "gameplay\character_criticals_5.xml"	
-		<actor_dialog>esc_stalker_talk_level</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\sim_Soldier_master_dialogs.xml"
 	</specific_character>
 	<!-- ***************Stalkers Quest Profiles************** -->
 	<!-- ***************Oleg Gusarov*************** -->

@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 new inventory and dialogs, reduced money*************** -->
+<!-- ************ TB3D 1.0.9.9.8.4 new inventory and dialogs, reduced money, 100% localized*************** -->
 <xml>
 
 	<specific_character id="gar_seriy" team_default = "1">
@@ -211,8 +211,7 @@
 		<visual>actors\neytral\stalker_neytral_hood_uzor</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>stalk_garb_treasure_4_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->			
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt4_dialogs.xml"
 	</specific_character>
 
 	<specific_character id="gar_stalker_general_default2" team_default = "1">
@@ -230,8 +229,7 @@
 		<visual>actors\neytral\stalker_2_ochki</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>stalk_garb_treasure_3_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->		
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt3_dialogs.xml"
 	</specific_character>
 
 	<specific_character id="gar_stalker_general_default3" team_default = "1">
@@ -249,8 +247,7 @@
 		<visual>actors\neytral\stalker_4_rozh3</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>stalk_garb_treasure_2_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt2_dialogs.xml"
 	</specific_character>
 
 	<specific_character id="gar_stalker_general_default4" team_default = "1">
@@ -268,8 +265,7 @@
 		<visual>actors\neytral\stalker_2_rozh1</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>stalk_garb_treasure_1_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt1_dialogs.xml"
 	</specific_character>
 	
 	<specific_character id="gar_stalker_general_default5" team_default = "1">
@@ -287,8 +283,7 @@
 		<visual>actors\neytral\stalker_neytral_balon_8</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_4.xml"
-		<actor_dialog>stalk_garb_treasure_4_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt4_dialogs.xml"
 	</specific_character>
 	
 	<specific_character id="gar_wounded_bandit" team_default = "1">
@@ -324,8 +319,7 @@
 		<visual>actors\dolg\stalker_do_mask_1</visual>
 #include "inventory\dolg_items.xml"
 #include "gameplay\character_criticals_6.xml"
-		<actor_dialog>dolg_garb_treasure_2_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt2_dialogs.xml"
 	</specific_character>
 
 	<specific_character id="gar_dolg_blokpost_default2" team_default = "1">
@@ -343,8 +337,7 @@
 		<visual>actors\dolg\stalker_do_balon_8</visual>
 #include "inventory\dolg_items.xml"
 #include "gameplay\character_criticals_6.xml"
-<actor_dialog>dolg_garb_treasure_3_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt3_dialogs.xml"
 	</specific_character>
 
 	<specific_character id="gar_dolg_blokpost_default3" team_default = "1">
@@ -362,8 +355,7 @@
 		<visual>actors\dolg\stalker_do_balon_8</visual>
 #include "inventory\dolg_items.xml"
 #include "gameplay\character_criticals_6.xml"
-<actor_dialog>dolg_garb_treasure_4_dialog</actor_dialog>  <!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt4_dialogs.xml"
 	</specific_character>
 	
   <!-- *************** !!!!TB3D 134 *************** -->	
@@ -382,8 +374,7 @@
 		<visual>actors\dolg\stalker_do_mask_1</visual>
 #include "inventory\dolg_items.xml"
 #include "gameplay\character_criticals_6.xml"
-<actor_dialog>dolg_garb_treasure_1_dialog</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt1_dialogs.xml"
 	</specific_character>
 	
 	<specific_character id="gar_dolg_blokpost_default5" team_default = "1">
@@ -401,8 +392,7 @@
 		<visual>actors\dolg\stalker_do_balon_1</visual>
 #include "inventory\dolg_items.xml"
 #include "gameplay\character_criticals_6.xml"
-<actor_dialog>dolg_garb_treasure_2_dialog</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt2_dialogs.xml"
 	</specific_character>
 	
 	<specific_character id="gar_dolg_blokpost_default6" team_default = "1">
@@ -420,8 +410,7 @@
 		<visual>actors\dolg\stalker_do_balon_5</visual>
 #include "inventory\dolg_items.xml"
 #include "gameplay\character_criticals_6.xml"
-<actor_dialog>dolg_garb_treasure_3_dialog</actor_dialog>
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_sgt3_dialogs.xml"
 	</specific_character>
   <!-- *************** -->
   

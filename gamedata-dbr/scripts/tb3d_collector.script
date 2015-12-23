@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.2 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.8.4 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
---zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave
-function my_ver() return "1.0.9.9.8.2" end
+--zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started
+function my_ver() return "1.0.9.9.8.4" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -460,6 +460,10 @@ function on_item_take(obj)
 				TB3D_Mobs.spawn_npcs(-20.985,0.007,-20.771,7980,5312,0,6)				--bandits at dist exit side of big hall
 				TB3D_Mobs.spawn_npcs(-20.926,1.248,19.393,8035,5309,0,6)				--bandits other side of big hall
 			end
+		elseif sect == "af_dummy_mushroom" then
+			if ln == "l12_stancia_2" then
+				TB3D_Services.give_info("tb3d_found_in_npp2")
+			end
 		end
 		--if sect == "tb3d_pri_document" then
 			--if ln == "l11_pripyat" and amk.load_variable("tb3d_suits", 0) < 3 then
@@ -493,6 +497,9 @@ function on_info(info_id)
 		--else
 			--TB3D_Services.give_info("esc_prison")
 		--end
+	elseif info_id == "tb3d_harsh_spawns" then								--109984, player stays out too long then kick up the jams
+		meceniy_in_hell.horrorspawn(level.name())
+		TB3D_Services.remove_info("tb3d_harsh_spawns")
 	elseif info_id == "tb3d_harsh_environment" then
 		news_manager.amk_send_tip_id("harsh_environment_msg","harsh_environment_title",10,40,"pda_icon")
 	elseif info_id == "mil_fblockpost_actor_outside" then					--going in and out of the warehouse compound
@@ -560,6 +567,7 @@ function on_info(info_id)
 			TB3D_Services.delayed_action(1, "tb3d_sms_storm_areas", 10)
 			dmx_mod.create_level_changer_jupu_tunnels()
 			dmx_mod.create_level_changer_tunnels_to_red_forest()
+			amk.save_variable("tb3d_storm_started", level.get_time_days())
 		elseif info_id == "tb3d_sms_storm_areas" then
 			news_manager.amk_send_tip_id("tb3d_sms_storm_areas","sms_incomming",10,40,"common_channel")		--send sms from stalkers
 			TB3D_Services.delayed_action(1, "tb3d_give_storm_info", 10)
@@ -966,10 +974,14 @@ function process_levels(lname, sname)
 				TB3D_Mobs.check_dcity_spawns(spawns)
 			end
 		elseif lname == "l07_military" then
-			if sname == "l06_rostok" then
-				TB3D_Dialog.killers_in_camp()
+			local spawns = amk.load_variable("mil_spawns", 0)
+			if spawns == 0 then
+				if sname == "l06_rostok" then
+					TB3D_Dialog.killers_in_camp()
+					spawns = 1
+				end
 			end
-			TB3D_Mobs.check_mil_spawns()
+			TB3D_Mobs.check_mil_spawns(spawns)
 		elseif lname == "l12_stancia_2" then
 			if sname == "l12_stancia" then
 				TB3D_Dialog.npp2_killers_npp1()
@@ -1051,7 +1063,7 @@ function process_levels(lname, sname)
 			TB3D_Services.give_info("tb3d_pred_trader")
 		elseif lname == "level_f-1" then
 			if not has_alife_info("zep22_have") then
-				TB3D_Services.give_info("tb3d_harsh_environment")
+				TB3D_Services.set_harsh_environment(1)					--109984
 			else
 				TB3D_Mobs.check_f1_spawns()
 			end
@@ -1094,7 +1106,7 @@ function process_levels(lname, sname)
 		--TB3D_Services.packet_alert("tb3d collector: level up["..utils.to_str(level_up).."]")
 		if level_up == 1 then																				--collector
 			if sname == "level_f-1" then
-				TB3D_Services.remove_info("tb3d_harsh_environment")											--visits prior to BR
+				TB3D_Services.clear_harsh_environment()											--109984, visits prior to BR
 			end
 		elseif level_up == 3 then																			--LIVE LINK
 			TB3D_Services.give_info("tb3d_spawn_oman")														--oman occupies waiting room helipad

@@ -408,9 +408,8 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 				s_date = AddTextDigit(s_date, level.get_time_hours())
 				s_date = s_date.."-"
 				s_date = AddTextDigit(s_date, level.get_time_minutes())
-				local s_level = level.name()
 				console:execute("main_menu off")
-				console:execute("save ".."tb3d "..s_level..s_date)
+				console:execute("save tb3d -fp lvl"..utils.to_str(TB3D_Services.get_level_up()).."- "..level.name()..s_date)
 			end
 		elseif dik == DIK_keys.DIK_Q then
 			self:OnMessageQuitWin()

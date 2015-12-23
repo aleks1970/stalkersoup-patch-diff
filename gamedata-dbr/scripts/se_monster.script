@@ -87,6 +87,9 @@ end
 --------------------
 function se_monster:can_switch_offline()
 	if self and self.name then
+		if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+			TB3D_Services.packet_alert("se monster: can switch offline["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
+		end
 		local jbo = (self.get_job_online and self:get_job_online())
 		if jbo ~= nil then
 			--TB3D_Services.packet_alert("SE MONSTER: csoff["..self:name().."] jbo["..utils.to_str(jbo).."]")
@@ -114,7 +117,7 @@ function se_monster:can_switch_online()
 				local r=need_be_online[self.id]
 				need_be_online[self.id]=nil
 				if is_report then
-					TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] need_be_online ["..tostring(r).."]")
+					TB3D_Services.packet_alert("SE MONSTER: can switch online["..self:name().."] need_be_online ["..tostring(r).."]")
 				end
 				if (r) and r == true then
 					return save_state(self, true)
@@ -207,6 +210,9 @@ end
 --------------------
 
 function se_monster:STATE_Write(packet)
+	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+		TB3D_Services.packet_alert("se monster: write packet["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
+	end
 	cse_alife_monster_base.STATE_Write (self, packet)
 	local st = 0
 	if self.state == true then
@@ -227,6 +233,9 @@ function se_monster:STATE_Write(packet)
 end
 --------------------
 function se_monster:STATE_Read(packet, size)
+	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+		TB3D_Services.packet_alert("se monster: read packet["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
+	end
 	cse_alife_monster_base.STATE_Read (self, packet, size)
 	if self.script_version >= 4 then
 		local t = packet:r_u8()
@@ -265,6 +274,9 @@ end
 --------------------
 function se_monster:on_unregister()
 	--TB3D_Services.packet_alert("SE_monster: on unregister id["..utils.to_str(self:name()).."] unregistered")
+	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+		TB3D_Services.packet_alert("se monster: on unregister["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
+	end
 	cse_alife_monster_base.on_unregister( self )
 end
 --------------------

@@ -215,7 +215,7 @@ function se_smart_terrain:get_se_objs()
     obj = sim:object( id )
     if obj == nil then	--!!!!TB3D after blowout save ctd
 		--if TB3D_Modders.pop_spawn_message then
-			--TB3D_Services.info_alert("Smart Terrain: npc["..utils.to_str(self:name()).."] unregistering se_obj id["..utils.to_str(id).."]")
+			TB3D_Services.packet_alert("Smart Terrain: get se objs npc["..utils.to_str(self:name()).."] unregistering se_obj id["..utils.to_str(self.id).."]")
 		--end
 		self:unregister_npc_id( id )
 	else
@@ -349,7 +349,7 @@ function se_smart_terrain:read_params()
   self.population_locked = false
   self.gulag = xr_gulag.gulag( self, self.gparams.type, self.gparams.squad, self.gparams.groups, self.npc_info, self.gparams.capacity )
   self.gulag_working = false
-	if TB3D_Modders.use_smt_message and string_find(self:name(), TB3D_Modders.npc_to_log) then
+	if TB3D_Modders.use_smt_message or TB3D_Modders.use_setup_message and string_find(self:name(), TB3D_Modders.npc_to_log) then
 		TB3D_Services.packet_alert("Smart terrain:["..self:name().."] preset name["..utils.to_str(gp.preset_name).."] type["..utils.to_str(gp.type).."]")
 		--TB3D_Services.packet_alert("groups:")
 		--if gp.groups then show_tables(gp.groups, nil, "smart terrain") end
@@ -463,7 +463,7 @@ function se_smart_terrain:smart_terrain_accepts_obj(obj, obj_agreement)
 		if TB3D_Modders.use_smh1_message == true or (TB3D_Modders.use_setup_message and string_find(oname, TB3D_Modders.npc_to_log))
 		  or (TB3D_Modders.use_smt_message and sname == TB3D_Modders.smt_to_log) then is_report = true end
 		if obj_agreement == disagreed then
-			if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] = [disagreed]") end
+			--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] = [disagreed]") end
 			return false
 		end
 		--' if obj:name() == "esc_wolf" then
@@ -479,11 +479,11 @@ function se_smart_terrain:smart_terrain_accepts_obj(obj, obj_agreement)
 			--'    printf("smart=%s stalker=%s", tostring(smart_level_group), tostring(npc_level_group))
 			--' end
 			if smart_level_group == nil or npc_level_group == nil then
-				if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] nil level["..utils.to_str(smart_level_group).."]["..utils.to_str(npc_level_group).."] !!!!") end
+				--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] nil level["..utils.to_str(smart_level_group).."]["..utils.to_str(npc_level_group).."] !!!!") end
 				return false
 			end
 			if smart_level_group == "" or npc_level_group == "" then
-				if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] no group["..utils.to_str(smart_level_group).."]["..utils.to_str(npc_level_group).."] !!!!") end
+				--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] no group["..utils.to_str(smart_level_group).."]["..utils.to_str(npc_level_group).."] !!!!") end
 				return false
 			end
 			if smart_level_group == "level_f-1" then smart_level_group = "level_f1" end			--f-1 causes compiler error
@@ -491,32 +491,32 @@ function se_smart_terrain:smart_terrain_accepts_obj(obj, obj_agreement)
 			local sgroup = level_groups[smart_level_group]
 			local ngroup = level_groups[npc_level_group]
 			if sgroup == nil or ngroup == nil then
-				if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] nil group["..utils.to_str(sgroup).."]["..utils.to_str(ngroup).."] !!!!") end
+				--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] nil group["..utils.to_str(sgroup).."]["..utils.to_str(ngroup).."] !!!!") end
 				return false
 			end
 			if sgroup ~= ngroup then
-				if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] wrong group["..utils.to_str(level_groups[sgroup]).."]["..utils.to_str(level_groups[ngroup]).."] !!!!") end
+				--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] wrong group["..utils.to_str(level_groups[sgroup]).."]["..utils.to_str(level_groups[ngroup]).."] !!!!") end
 				return false
 			end
 			--' if obj:name() == "esc_wolf" then
 			--'   printf( "comm=%s is_stalker=%s", community, tostring( is_stalker ) )
 			--' end
 			if self.accepted_communities and not self.accepted_communities[community] then
-				if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] not accepted community["..utils.to_str(community).."]") end
+				--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] not accepted community["..utils.to_str(community).."]") end
 				return false
 			end
 			--'   if obj:name() == "esc_wolf" then
 			--'     printf( "community=%s rank=%d reputation=%d", community, obj:rank(), obj:reputation() )
 			--'   end
 			if not self:check_preset( community, obj:rank(), self.gparams.preset_name ) then
-				if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] preset for["..oname.."] is not ok, not accepted") end
+				--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] preset for["..oname.."] is not ok, not accepted") end
 				return false
 			end
 			--'   if obj:name() == "esc_wolf" then
 			--'     printf( "check_preset ok" )
 			--'   end
 			if not xr_gulag.checkNpc( community, is_stalker, self.gparams.type, obj:rank(), obj ) then
-				if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] not accepted") end
+				--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] not accepted") end
 				return false
 			end
 			--' if obj:name() == "esc_wolf" then
@@ -526,7 +526,7 @@ function se_smart_terrain:smart_terrain_accepts_obj(obj, obj_agreement)
 			local hdr_obj = string_sub(oname, 1, 5)
 			if hdr_smt == "promz" or hdr_smt == "pred_" then
 				if hdr_smt ~= hdr_obj then
-					if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] blocked!!!!") end
+					--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] blocked!!!!") end
 					return false
 				end
 			end
@@ -534,7 +534,7 @@ function se_smart_terrain:smart_terrain_accepts_obj(obj, obj_agreement)
 			if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] job["..utils.to_str(is_job).."] = [agreed_exclusive]") end
 			return is_job
 		else
-			if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] no jobs") end
+			--if is_report then TB3D_Services.packet_alert("smt: smart_terrain_accepts_obj smt["..sname.."] npc["..oname.."] no jobs") end
 			return false
 		end
 	end
@@ -566,7 +566,7 @@ function se_smart_terrain:obj_accepts_smart_terrain( obj )
 			for name, condlist in pairs(obj.smart_terrain_conditions) do
 				if name then
 					if name == "none" then        
-						if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] name[none] = [disagreed]") end
+						--if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] name[none] = [disagreed]") end
 						return disagreed
 					end
 					s = nil
@@ -577,7 +577,7 @@ function se_smart_terrain:obj_accepts_smart_terrain( obj )
 							return agreed_exclusive
 						end
 					elseif name == sname then					--' If the current smart is exclusive and not available
-						if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] not available["..name.."] = [disagreed]") end
+						--if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] not available["..name.."] = [disagreed]") end
 						return disagreed
 					end
 				end
@@ -587,7 +587,7 @@ function se_smart_terrain:obj_accepts_smart_terrain( obj )
 			--' the transfer of disabled before (or after) the specified event
 			--' humans and mutants in other non-exclusive Smart.
 			if (obj.can_switch_online) and obj:can_switch_online() == false then
-				if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] non exclusive cso[false] = [disagreed]") end
+				--if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] non exclusive cso[false] = [disagreed]") end
 				return disagreed
 			end
 			--' It is necessary to ensure that exclusive smart is available before blocking others
@@ -602,9 +602,9 @@ function se_smart_terrain:obj_accepts_smart_terrain( obj )
 			if hdr_obj == "promz" or hdr_obj == "pred_" then
 				--if not string_find(sname, oname) then
 					if hdr_smt ~= hdr_obj then
-						if is_report then
-							TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] non exclusive cso[true] = [disagreed]")
-						end
+						--if is_report then
+							--TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] non exclusive cso[true] = [disagreed]")
+						--end
 						return disagreed
 					end
 				--end
@@ -619,7 +619,7 @@ function se_smart_terrain:obj_accepts_smart_terrain( obj )
 			if string_find(oname, "barier_respawn") then return agreed else return disagreed end
 		end
 		--' otherwise block them from using it
-		if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] no smart cond = [disagreed]") end
+		--if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj["..oname.."] no smart cond = [disagreed]") end
 		return disagreed
 	end
 	if is_report then TB3D_Services.packet_alert("smt: obj_accepts_smt["..sname.."] obj[nil] no object = [disagreed] !!!!") end

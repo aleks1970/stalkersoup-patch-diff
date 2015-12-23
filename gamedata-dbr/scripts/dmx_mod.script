@@ -1,9 +1,10 @@
--- TB3D 1.0.9.9.8.1   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
+-- TB3D 1.0.9.9.8.4   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
 -- zaton to red forest, dmx135, using dmx blood instead of amk, fixed soul cube, tp news removed, chg redeffect call,
 -- drop item to inv, dose_asses removed, frogs and cooling moved to services, dav update 16Apr14, hud, gen to dm,
--- hosp to agro, tip_id, send_tip_id optimization, 97104, 98975,6, _ds_to_poli target, sticks
--- changed "exo_mil_exoskeleton_addrs" to "exo_mil_exoskeleton_addx" aleks1970, npp2 to x14, eprip to prip, , removed blowout_wave
-function my_ver() return "1.0.9.9.8.1" end
+-- hosp to agro, tip_id, send_tip_id optimization, 97104, 98975,6, _ds_to_poli target, sticks,
+-- changed "exo_mil_exoskeleton_addrs" to "exo_mil_exoskeleton_addx" aleks1970, npp2 to x14, eprip to prip, removed blowout_wave,
+-- switched targets; hosp and red forest to tunnels
+function my_ver() return "1.0.9.9.8.4" end
 --[[- max.script, centralized create_level_changer, uncommtd line 48 (11/21/11)------------
  File         : dmx_mod.script
  Description  : The main script fashion, contain quest function, spawn, etc.
@@ -1940,14 +1941,14 @@ function create_level_changer_gen_to_rs()
 	end
 end
 
-function create_level_changer_hosp_to_tunnels()
+function create_level_changer_hosp_to_tunnels(is_silent)		--109984, fixed target
 	local obj = alife():story_object(6022)
 	if not obj then
 		create_level_changer(6022, vector():set(-63.3486709594727,19.2402877807617,561.971435546875),7863,3075, 	
-			1538,3868, vector():set(80.971,-20.407,-180.973), 							
+			1258,3857, vector():set(71.726,-16.127,96.718),
 			vector():set(0.0,0.0,-1.0), 												
 			"cs_agroprom_underground",0,0,"to_tunnels") 													
-		news_manager.amk_send_tip_id("path_hosp_tunnels", "path_new", 2, 25, "pda_icon")
+		if not is_silent then news_manager.amk_send_tip_id("path_hosp_tunnels", "path_new", 2, 25, "pda_icon") end
 	end
 end
 
@@ -2487,11 +2488,11 @@ function create_level_changer_jupu_tunnels()		--109982, when x14 done
 	end
 end
 
-function create_level_changer_tunnels_to_red_forest(is_silent)		--109982, better target points
+function create_level_changer_tunnels_to_red_forest(is_silent)		--109984, fixed target
 	local obj = alife():story_object(99040)
 	if not obj then
 		create_level_changer(99040, vector():set(-99.792,0.761,29.000),12285,3240,				--tunnel by camp
-			1579,3868, vector():set(83.660,-20.232,-186.914),
+			1536,3868, vector():set(81.072,-20.404,-181.405), 							
 		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
 			"cs_agroprom_underground",0,0,"to_tunnels") 													
 		if not is_silent then news_manager.amk_send_tip_id("path_redf_tunnels", "path_new", 2, 25, "pda_icon") end

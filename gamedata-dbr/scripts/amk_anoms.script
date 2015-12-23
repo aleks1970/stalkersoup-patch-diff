@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.8.1  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug
-function my_ver() return "1.0.9.9.8.1" end
+-- TB3D 1.0.9.9.8.4  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms
+function my_ver() return "1.0.9.9.8.4" end
 
 --[[-------------------------- variable and table --------------------------]]
 local table_sort=table.sort
@@ -186,7 +186,7 @@ level_anoms={
 	l02_garbage={100,160,800,{mosquito_bald=12, mincer=12, smallrain=2, zavesa=3, electra=15, gravi=10, buzz=12, sakbuzz=3, sphere=3, fountain=2}}, 
 	l03_agroprom={100,140,800,{mosquito_bald=12, mincer=8, smallrain=1, fountain=2, zavesa=2, electra=12, buzz=12, gravi=10, sakbuzz=3, sphere=3}},
 	l04_darkvalley={110,150,1000,{mincer=8, mosquito_bald=12, fountain=2, zavesa=3, smallrain=2, electra=12, buzz=10, zharka_static=8, gravi=8, sakbuzz=5, sphere=4}}, 
-	l05_bar={70,90,300,{mosquito_bald=8, mincer=10, zavesa=3, fountain=1, smallrain=1, electra=10, buzz=5, gravi=8, sakbuzz=2, zharka_static=4, sphere=2}}, 
+	l05_bar={20,70,300,{mosquito_bald=8, mincer=10, zavesa=3, fountain=1, smallrain=1, electra=10, buzz=5, gravi=8, sakbuzz=2, zharka_static=4, sphere=2}}, 
 	l06_rostok={70,100,800,{mincer=7, mosquito_bald=7, smallrain=1, electra=10, zavesa=2, zharka_static=25, gravi=7, buzz=10, sphere=2, fountain=1}}, 
 	l08_yantar={80,110,400,{mosquito_bald=8, mincer=8, fountain=1, smallrain=1, zavesa=3, electra=10, buzz=8, zharka_static=5, gravi=8, sakbuzz=3, sphere=3}},
 	l07_military={110,150,1000,{mincer=12 , mosquito_bald=15, fountain=2, smallrain=2, zavesa=3, electra=12, zharka_static=8, gravi=10, sakbuzz=3, buzz=10, sphere=4}}, 
@@ -227,7 +227,7 @@ level_anoms_easy={
 	l02_garbage={100,160,800,{mincer=12, smallrain=2, gravi=10, buzz=12, sakbuzz=3, sphere=3}}, 
 	l03_agroprom={100,140,800,{mincer=8, smallrain=1, buzz=12, gravi=10, sakbuzz=3, sphere=3}},
 	l04_darkvalley={110,150,1000,{mincer=8, smallrain=2, buzz=10, zharka_static=8, gravi=8, sakbuzz=5, sphere=4}}, 
-	l05_bar={70,90,300,{mincer=10, smallrain=1, buzz=5, gravi=8, sakbuzz=2, zharka_static=4, sphere=2}}, 
+	l05_bar={20,70,300,{mincer=10, smallrain=1, buzz=5, gravi=8, sakbuzz=2, zharka_static=4, sphere=2}}, 
 	l06_rostok={70,100,800,{mincer=7, smallrain=1, zharka_static=25, gravi=7, buzz=10, sphere=2}}, 
 	l08_yantar={80,110,400,{mincer=8, smallrain=1, buzz=8, zharka_static=5, gravi=8, sakbuzz=3, sphere=3}},
 	l07_military={110,150,1000,{mincer=12, smallrain=2, zharka_static=8, gravi=10, sakbuzz=3, buzz=10, sphere=4}}, 
@@ -238,7 +238,7 @@ level_anoms_easy={
 	aver={180,190,750,{mincer=12, smallrain=5, buzz=15, zharka_static=5, gravi=15, sakbuzz=4, sphere=5}},
 	marsh={140,180,900,{mincer=13, smallrain=4, zharka_static=12, gravi=10, buzz=13, sakbuzz=5, sphere=5}},
 	limansk={50,60,300,{mincer=10, smallrain=1, gravi=10, buzz=10, sakbuzz=2, zharka_static=8, sphere=3}},
-	hospital={10,20,200,{mincer=8, buzz=8, gravi=5, sakbuzz=2, zharka_static=5, sphere=2}},
+	hospital={5,20,200,{mincer=8, buzz=8, gravi=5, sakbuzz=2, zharka_static=5, sphere=2}},
 	red_forest={110,150,400,{mincer=15, smallrain=3, zharka_static=8, gravi=10, buzz=10, sakbuzz=4, sphere=5}},
 	lost_village={80,100,250,{mincer=8, smallrain=1, zharka_static=5, gravi=5, buzz=5, sakbuzz=2, sphere=3}},
 	generators={160,190,350,{mincer=15, smallrain=2, zharka_static=5, gravi=10, buzz=16, sakbuzz=6, sphere=4}},
@@ -359,7 +359,7 @@ function pre_blow_off()
 			end
 		end
 	end
-	--TB3D_Services.packet_alert("amk anoms: removed["..utils.to_str(cnt).."] anoms")
+	if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("amk anoms: removed["..utils.to_str(cnt).."] anoms") end
 end
 
 local arts_amk={
@@ -436,9 +436,10 @@ function generate_anoms()
 		if TB3D_Modders.least_anomolies then
 			mxx = v[1]
 		else
-			local koef = math.ceil(TB3D_Services.global_koef(flevel, forced_rank))
-			mxx = math_random(v[1],v[2]) * koef
-			if mxx < v[1] then mxx = v[1] elseif mxx > v[2] then mxx = v[2] end
+			local koef = TB3D_Services.global_koef(flevel, forced_rank)
+			local min = math.floor(koef * v[1])
+			local max = math.floor(koef * v[2])
+			mxx = math_random(min,max)
 		end
 		local cnt = 0
 		while cnt < mxx do

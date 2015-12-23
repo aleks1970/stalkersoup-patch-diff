@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.7 new inventory and dialogs, reduced money, Max to Syak aleks1970 *************** -->
+<!-- ************ TB3D 1.0.9.9.8.4 new inventory and dialogs, reduced money, Max to Syak aleks1970, treasure dilogs to includes *************** -->
 <xml>
 	<specific_character id="escape_trader" no_random="1">
 		<name>escape_trader_name</name>
@@ -308,9 +308,7 @@
 		<visual>actors\novice\green_stalker_2</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_1_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"		
+#include "dialogs\generic_nt1_dialogs.xml"		
 	</specific_character>
 	<!-- *************** -->
 	<specific_character id="esc_stalker_novice_default2" team_default="1">
@@ -328,9 +326,7 @@
 		<visual>actors\novice\green_stalker_2</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_2_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_nt2_dialogs.xml"
 	</specific_character>
 	<!-- *************** -->
 	<specific_character id="esc_stalker_novice_default3" team_default="1">
@@ -348,9 +344,7 @@
 		<visual>actors\novice\green_stalker_3</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_3_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_nt3_dialogs.xml"
 	</specific_character>
 	<!-- *************** -->
 	<specific_character id="esc_stalker_novice_default4" team_default="1">
@@ -368,9 +362,7 @@
 		<visual>actors\novice\green_stalker_3</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_4_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_nt4_dialogs.xml"
 	</specific_character>
 	<!-- *************** -->
 	<specific_character id="esc_stalker_novice_default5" team_default="1">
@@ -388,9 +380,7 @@
 		<visual>actors\novice\green_stalker_4</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_1_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_nt1_dialogs.xml"
 	</specific_character>
 	<!-- *************** -->
 	<specific_character id="esc_stalker_novice_default6" team_default="1">
@@ -408,9 +398,7 @@
 		<visual>actors\novice\green_stalker_4</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_2_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_nt2_dialogs.xml"
 	</specific_character>
 	<!-- *************** -->
 	<specific_character id="esc_stalker_novice_default9" team_default="1">
@@ -428,9 +416,7 @@
 		<visual>actors\novice\green_stalker_5</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_3_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_nt3_dialogs.xml"
 	</specific_character>
 	<!-- *************** -->
 	<specific_character id="esc_stalker_novice_default10" team_default="1">
@@ -448,9 +434,7 @@
 		<visual>actors\novice\green_stalker_5</visual>
 #include "inventory\stalker_novice_items.xml"
 #include "gameplay\character_criticals_3.xml"
-		<actor_dialog>neitral_treasure_4_dialog</actor_dialog>
-		<!-- *************** !!!!TB3D 134 *************** -->
-#include "dialogs\generic_dialogs.xml"
+#include "dialogs\generic_nt4_dialogs.xml"
 	</specific_character>
 	<!-- ***************ranger*************** -->
 	<specific_character id="esc_ranger" team_default="1">

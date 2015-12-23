@@ -1,16 +1,16 @@
----TB3D 1.0.9.9.8.3 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.8.4 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
--- removed lastrepreward, rain_factor
-function my_ver() return "1.0.9.9.8.3" end	--modders append with initials and rev.
+-- removed lastrepreward, rain_factor, storm stages, horror spawns
+function my_ver() return "1.0.9.9.8.4" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.3}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.8.4}" end
 
-major_version = 109983							--used in saves
+major_version = 109984							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -247,7 +247,7 @@ function inc_gulags(cnt)
 	end
 end
 function report_gulags()
-	packet_alert("TB3D: Gulags loaded["..utils.to_str(gulag_cnt).."]")
+	packet_alert("TB3D: Gulags loaded["..utils.to_str(gulag_cnt).."] switch distance["..utils.to_str(alife():switch_distance()).."]")
 end
 
 function report_plug_ins()
@@ -1832,19 +1832,22 @@ function is_night()
 end
 
 function is_instorm(level_name)											--109978, check if outdoors in the storm area
+	local result = false
 	if level_name == "l12_stancia"
-	  or level_name == "l12_stancia_2"
-	  or level_name == "l10_radar"
+	  or level_name == "l12_stancia_2" then										--109984, epicenter always storm
+		result = true
+	elseif level_name == "l10_radar"
 	  or level_name == "l04_pogost"					--cemetery
 	  or level_name == "l03_rinok"					--black market
 	  or level_name == "l07_military"
-	  or level_name == "aver"						--recon
-	  or level_name == "pripyat"					--east pripyat
+	  or level_name == "aver" then						--recon
+		if not has_alife_info("tb3d_block_1") then result = true end			--109984, storm area 1
+	elseif level_name == "pripyat"					--east pripyat
 	  or level_name == "dead_city"
 	  or level_name == "generators" then
-		return true
+		if not has_alife_info("tb3d_block_2") then result = true end			--109984, storm area 2
 	end
-	return false
+	return result
 end
 
 local harsh_snd
@@ -1855,6 +1858,7 @@ function set_harsh_environment(type)											--109980
 		give_info("tb3d_harsh_environment")											--gear starts to deteriorate from environment, also starts storm effect
 		if not has_alife_info("tb3d_bad_torch") then delayed_action(1, "tb3d_bad_torch", 10) end
 		amk.save_variable("torch_state", 1)
+		delayed_action(2, "tb3d_harsh_spawns", 200)									--109984, if stays out too long
 	elseif type == 2 then															--jupu after x14
 		level.add_pp_effector("dead_zone.ppe", 77777771, false)
 		level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
@@ -2762,33 +2766,36 @@ function adjust_for_level(lname)
 	get_console():execute("r2_ls_squality "..utils.to_str(shadow_qlty))				--shadows
 end
 
-function check_prior_version(lname, sname)												--109972
+function check_prior_version(lname, sname)											--109972
 	local obj
 	local stage = amk.load_variable("tb3d_fixer_stage", 0)		--returns 0 if not created yet
-	--local tb3d_ver = amk.load_variable("tb3d_version",0)
+	local tb3d_ver = amk.load_variable("tb3d_version",0)
 	local started = amk.load_variable("first_started", 0)
-	if started < 109983 then						--109982, redo fixes
-		stage = 0
-	end
+	if started < 109984 and stage < 6 then stage = 0 end				--109984, redo fixes
+	packet_alert("tb3d services: prior version["..utils.to_str(tb3d_ver).."] started["..utils.to_str(started).."] stage["..utils.to_str(stage).."]")
 	if stage < 1 then
-		obj = alife():story_object(14091)																		--radar to red forest (wrong target point)
-		if obj then alife():release(obj) end
-		obj = alife():story_object(6014)																		--tunnels to red forest
-		if obj then alife():release(obj) end
 		obj = alife():story_object(99200)																		--old ds lc, actually in wasted wood
 		if obj then alife():release(obj) end
 		obj = alife():story_object(99201)																		--old ds lc, actually in wasted wood
 		if obj then alife():release(obj) end
-		dmx_mod.create_level_changer_ww_vill()
+		obj = alife():story_object(14091)																		--radar to red forest (wrong target point)
+		if obj then alife():release(obj) end
+		if has_alife_info("info_way_arhara_radar_forest") then dmx_mod.create_level_changer_rad_red() end		--14091 - fixes target location
+		obj = alife():story_object(6014)																		--tunnels to red forest
+		if obj then alife():release(obj) end
+		obj = alife():story_object(6022)																		--red forest to tunnels
+		if obj then alife():release(obj) end
 		obj = alife():story_object(97104)																		--missing reject way in all.spawn
 		if obj then alife():release(obj) end
-		if has_alife_info("tb3d_sms_storm") then dmx_mod.create_level_changer_tunnels_to_red_forest(true) end
-		if has_alife_info("info_way_arhara_radar_forest") then dmx_mod.create_level_changer_rad_red() end		--14091 - fixes target location
-		if has_alife_info("info_way_arhara_hospital_agroprom") and not has_alife_info("tb3d_final_start") then	--respawn if active
-			dmx_mod.create_level_changer_hospital_agroprom()													--hospital to agro final
-		elseif has_alife_info("tb3d_final_start") then
-			dmx_mod.create_level_changer_hosp_to_tunnels()
+		obj = alife():story_object(99040)																		--red forest to tunnels
+		if obj then alife():release(obj) end
+		if has_alife_info("tb3d_sms_storm") then
+			dmx_mod.create_level_changer_tunnels_to_red_forest(true)											--6014, 99040
+			dmx_mod.create_level_changer_hosp_to_tunnels(true)													--6022
+		elseif has_alife_info("info_way_arhara_hospital_agroprom") then
+			dmx_mod.create_level_changer_hospital_agroprom()													--97104, hospital to agro final
 		end
+		dmx_mod.create_level_changer_ww_vill()																	--200, 201
 		stage = 1
 	end
 	if stage < 2 then								--remove runaway rad zones
@@ -2832,6 +2839,9 @@ function check_prior_version(lname, sname)												--109972
 	if stage < 5 then
 		if is_collector() then TB3D_Services.set_player_relations(5) end	--109981, fixed relations: killer, lastday and mono -500, all others 0
 		stage = 5
+	end
+	if stage < 6 then
+		stage = 6			--109984, reset the above
 	end
 	amk.save_variable("tb3d_fixer_stage", stage)
 end

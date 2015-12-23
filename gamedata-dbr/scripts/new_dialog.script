@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.4.0 chgd >0.95 to >0.94, dmx135, fixed act_upgreid_ suit order, sveeblov_ferma_have, formatting and debug,
--- add_man health, kalmyak, prizrak_finalzver_done, treasure_ecolog_have
-function my_ver() return "1.0.9.9.4.0" end
+--TB3D 1.0.9.9.8.4 chgd >0.95 to >0.94, dmx135, fixed act_upgreid_ suit order, sveeblov_ferma_have, formatting and debug,
+-- add_man health, kalmyak, prizrak_finalzver_done, treasure_ecolog_have, out_item_much
+function my_ver() return "1.0.9.9.8.4" end
 
 local nagrad = {
   level_1 = {
@@ -395,28 +395,27 @@ function cheking_item(actor,item)
 end
 
 function create_items(npc,section,number)
+	if npc and section and number and number > 0 then
         for i=1,number do
 			alife():create(section, 
             npc:position(),
             npc:level_vertex_id(),  
             npc:game_vertex_id(),
             npc:id())
-        end 
+        end
+	end
 end
 
-local reloc_params={}
-local stalk
-
+local reloc_params={}											--109984
 function out_item_much(itm_section,need_number)
 	reloc_params.itm_section=itm_section
 	reloc_params.itm_cnt=need_number
 	reloc_params.itm_cnt_found=0
 	db.actor:iterate_inventory(checkout_items_count,db.actor)
-	reloc_params.itm_cnt_found=0
-	if reloc_params.itm_cnt_found<=reloc_params.itm_cnt then
+	if reloc_params.itm_cnt_found > 0 then
 		db.actor:iterate_inventory(out_items_count,db.actor)
 	end
-	news_manager.relocate_item(db.actor, "out", itm_section)
+	news_manager.relocate_item(db.actor, "out", itm_section, reloc_params.itm_cnt_found)
 	reloc_params={}
 end
 
@@ -427,9 +426,10 @@ function checkout_items_count(actor,item)
 end
 
 function out_items_count(actor,item)
-	if item.section and item:section()==reloc_params.itm_section and reloc_params.itm_cnt_found<reloc_params.itm_cnt then
-		amk.remove_item_from_inventory(item, actor)
-		reloc_params.itm_cnt_found = reloc_params.itm_cnt_found + 1
+	if item.section and item:section()==reloc_params.itm_section then
+		if reloc_params.itm_cnt_found <= reloc_params.itm_cnt then
+			amk.remove_item_from_inventory(item, actor)
+		end
 	end
 end
 
