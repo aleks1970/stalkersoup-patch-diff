@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.4 prizrak_finalzver_done, cleanup
-function my_ver() return "1.0.9.9.7.4" end
+--TB3D 1.0.9.9.8.5 prizrak_finalzver_done, cleanup, relocate_n_items_section, flamethrower_quest_complete_parts
+function my_ver() return "1.0.9.9.8.5" end
 local math_random = math.random
 
 --Options for the quest for a flamethrower.
@@ -8,19 +8,23 @@ local min_fuel = 150
 local max_fuel = 300
 
 function on_item_take(obj)
-	have_a_fire_kolobok()
-	have_a_trubki()
-	have_a_manometr()
-	have_a_vodko()
-	have_a_gorelka()
+    if db.actor and has_alife_info("flamethrower_quest_start") and not has_alife_info("flamethrower_quest_complete_parts") then		--109985
+		have_a_fire_kolobok()
+		have_a_trubki()
+		have_a_manometr()
+		have_a_vodko()
+		have_a_gorelka()
+	end
 end
 
 function on_item_drop(obj)
-	have_a_fire_kolobok()
-	have_a_trubki()
-	have_a_manometr()
-	have_a_vodko()
-	have_a_gorelka()
+    if db.actor and has_alife_info("flamethrower_quest_start") and not has_alife_info("flamethrower_quest_complete_parts") then		--109985
+		have_a_fire_kolobok()
+		have_a_trubki()
+		have_a_manometr()
+		have_a_vodko()
+		have_a_gorelka()
+	end
 end
 
 function remove_spot()
@@ -115,6 +119,7 @@ function clear_parts(first_speaker, second_speaker)
 	if obj ~= nil then
 		alife():release(alife():object(obj:id()), true)
 	end
+	TB3D_Services.give_info("flamethrower_quest_complete_parts")			--109985
 end
 
 function clear_fuel(first_speaker, second_speaker)	
@@ -189,7 +194,7 @@ end
 
 
 function have_a_fire_kolobok()
-    if db.actor ~= nil and db.actor:object("af_fireball") ~= nil and not has_alife_info("flamethrower_quest_fireball") and has_alife_info("flamethrower_quest_start") then
+    if db.actor ~= nil and db.actor:object("af_fireball") ~= nil and not has_alife_info("flamethrower_quest_fireball") then
 		TB3D_Services.give_info("flamethrower_quest_fireball")
     end
 end
@@ -207,13 +212,11 @@ function have_a_manometr()
 end
 
 function have_a_vodko()
-    if db.actor and has_alife_info("flamethrower_quest_start") then
-		if amk_utils.inventory_search("vodka", 10) then
-            TB3D_Services.give_info("flamethrower_quest_vodka")
-		else
-            TB3D_Services.remove_info("flamethrower_quest_vodka")
-		end
-    end
+	if amk_utils.inventory_search("vodka", 10) then
+		TB3D_Services.give_info("flamethrower_quest_vodka")
+	else
+		TB3D_Services.remove_info("flamethrower_quest_vodka")
+	end
 end
 
 function have_a_gorelka()
@@ -420,7 +423,7 @@ function relocate_n_items_section(victim, section, Type, count)
 				if TB3D_Modders.use_inventory_message == true then TB3D_Services.packet_alert("flamethrower: relocate ["..utils.to_str(cnt).."] items iterate inventory") end
 				db.actor:iterate_inventory(function (dummy,item) if item and item:section() == section and cnt > 0 then db.actor:transfer_item(item, victim) cnt = cnt - 1 end end, nil)
 			end
-			news_manager.relocate_item(db.actor, Type, section, cnt)
+			news_manager.relocate_item(db.actor, Type, section, count)	--109985
 		end
     end
 end

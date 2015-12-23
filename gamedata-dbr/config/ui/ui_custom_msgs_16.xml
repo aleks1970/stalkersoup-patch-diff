@@ -1,9 +1,9 @@
-<!-- ************ TB3D 1.0.9.9.7.1  HUD for STALKERSOUP NS DMX135  widescrn, compass and delta, btr, adjusted timer*************** -->
+<!-- ************ TB3D 1.0.9.9.7.1  HUD for STALKERSOUP NS DMX135  widescrn, compass and delta, btr, adjusted timer, new HUD's aleks1970 *************** -->
 <header>
 	<hud_coord x="0" y="15" width="1024" height="128">
 		<text x="0" y="0" font="graffiti19" r="238" g="238" b="23" a="255" align="r" complex_mode="1"/>
 	</hud_coord>
-	<!-- *************** *********************** targeting ***************************************** -->
+	<!-- ************************** targeting ******************************** -->
 	<hud_target1 x="0" y="0" width="64" height="64" stretch="1">
 		<texture>amk\targetpointer</texture>
 		<text x="0" y="-5" width="200" font="arial_14" r="50" g="200" b="50" a="255" align="r" complex_mode="1"/>
@@ -110,11 +110,11 @@
 	<target_dot_100 x="-10" y="-10" width="3" height="3" stretch="1"/>
 	<target_dot_101 x="-10" y="-10" width="3" height="3" stretch="1"/>
 	
-	<!-- *************** ****** BIOMAP !!!!TB3D made local textures in hud map ******* *************** -->
+	<!-- ************** BIOMAP !!!!TB3D made local textures in hud map ***************** -->
 	<biomap_mess x="0" y="0" width="288" height="256" stretch="1">
 		<texture>ui\mess</texture>
 	</biomap_mess>
-	<!-- *************** ***************************** targeting ******************************* *************** -->
+	<!-- ************************** targeting ************************* -->
 	<hud_target2 x="0" y="0" width="64" height="64" stretch="1">
 		<texture>amk\targetpointer</texture>
 		<text x="0" y="-5" width="200" font="arial_14" r="50" g="200" b="50" a="255" align="r" complex_mode="1"/>
@@ -127,17 +127,17 @@
 		<texture>amk\targetpointer</texture>
 		<text x="0" y="-5" width="200" font="arial_14" r="50" g="200" b="50" a="255" align="r" complex_mode="1"/>
 	</hud_target4>
-	<!-- *************** ************ BIOMAP !!!!TB3D made local textures in hud map ********* *************** -->
+	<!-- ************** BIOMAP !!!!TB3D made local textures in hud map ******************** -->
 	<biomap x="0" y="0" width="256" height="256" stretch="1">
 		<texture x="1792" y="0" width="256" height="256">ui\ui_hud</texture>
 	</biomap>
 	<biomap_sweep x="0" y="0" width="256" height="256" stretch="1">
 		<texture x="1792" y="264" width="256" height="256">ui\ui_hud</texture>
 	</biomap_sweep>
-	<!-- *************** ****************************************************************************
+	<!-- ********************************************************************************
 Selected timers such as the Chernobyl nuclear power plant, top center
- ******************************************************************************** *************** -->
-	<!-- *************** ************  mid top - so not to collide with bioradar ***************** *************** -->
+****************************************************************************************** -->
+	<!-- *****************  mid top - so not to collide with bioradar ******************** -->
 	<hud_timer x="436" y="20" width="157" height="67">
 		<text x="-15" y="23" font="graffiti32" r="238" g="155" b="23" a="255" align="r"/>
 		<texture>ui_hud_frame_clock</texture>
@@ -196,7 +196,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<not_enough_money_other x="100" y="100" width="800" height="60">
 		<text font="graffiti19" r="240" g="217" b="182" a="155" align="c">st_not_enough_money_npc</text>
 	</not_enough_money_other>
-	<!-- *************** ******************** warning indicators ******************** *************** -->
+	<!-- ************************** warning indicators *************************** -->
 	<hud_save_warning x="256" y="200" width="512" height="200" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
 		<text x="0" y="0" font="graffiti19" r="255" g="0" b="0" a="255" align="c" complex_mode="1"/>
 	</hud_save_warning>
@@ -206,7 +206,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<hud_rad_level x="0" y="0" width="1" height="1" stretch="1" complex_mode="1" la_cyclic="1" la_texture="1" la_alpha="1">
 		<texture/>
 	</hud_rad_level>
-	<!-- *************** TIME *************** -->
+	<!-- *************** HUD TIME  *************** -->
 	<hud_show_time x="014" y="010" width="52" height="52">
 		<text x="0" y="0" font="letterica16" r="0" g="255" b="255" a="255" align="l"/>
 	</hud_show_time>
@@ -219,7 +219,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<cs_demo_play x="165" y="735" width="600" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
 		<text font="letterica18" r="240" g="217" b="182" a="255" align="l"/>
 	</cs_demo_play>
-	<!-- *************** ************************ INV and MASKS ************************* *************** -->
+	<!-- ************************** INV and MASKS ****************************** -->
 	<helmet_hud_static x="0" y="0" width="1024" height="768" stretch="1">
 		<texture>hud\gazmask</texture>
 	</helmet_hud_static>
@@ -229,7 +229,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<inv_weight_static x="965" y="470" width="48" height="48" stretch="1">
 		<texture x="363" y="299" width="49" height="49">ui\ui_hud</texture>
 	</inv_weight_static>
-	<!-- *************** ******************** Dynamic HUD	******************** *************** -->
+	<!-- ************************* Dynamic HUD ************************* -->
 	<hud_blood1 x="0" y="0" width="1024" height="768" stretch="1">
 		<texture>abc\blood1</texture>
 	</hud_blood1>
@@ -245,7 +245,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<hud_blood5 x="0" y="0" width="1024" height="768" stretch="1">
 		<texture>abc\blood5</texture>
 	</hud_blood5>
-	<!-- *************** ******************** AMK ADDAPTATION ******************** *************** -->
+	<!-- *********************** AMK ADDAPTATION *********************** -->
 	<hud_blur1 x="0" y="0" width="1024" height="768" stretch="1">
 		<texture>amk\breath1</texture>
 	</hud_blur1>
@@ -276,7 +276,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<hud_exo x="0" y="0" width="1024" height="768" stretch="1">
 		<texture>amk\hud_exo</texture>
 	</hud_exo>
-	<!-- *************** ****************************************************************************** *************** -->
+	<!-- *********************** Nano outfit Hud ********************** -->
 	<hud_nano_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
 		<texture>abc\hud_nano1</texture>
 	</hud_nano_blue>
@@ -295,8 +295,28 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<hud_nano_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
 		<texture>abc\hud_nano6</texture>
 	</hud_nano_red3>
-	<cs_inviz x="100" y="700" width="800" height="30">
-		<text font="graffiti19" r="255" g="215" b="0" a="155" align="c"/>
+	<!-- *********************** nano_addw outfit Hud ********************** -->
+	<hud_nano_addw_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\hud_gazmask1</texture>
+	</hud_nano_addw_blue>
+	<hud_nano_addw_green x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\hud_gazmask2</texture>
+	</hud_nano_addw_green>
+	<hud_nano_addw_yellow x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\hud_gazmask3</texture>
+	</hud_nano_addw_yellow>
+	<hud_nano_addw_red x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\hud_gazmask4</texture>
+	</hud_nano_addw_red>
+	<hud_nano_addw_red2 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\hud_gazmask5</texture>
+	</hud_nano_addw_red2>
+	<hud_nano_addw_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\hud_gazmask6</texture>
+	</hud_nano_addw_red3>
+	<!-- ******** meceniy_outfit_new text position ******** -->
+	<cs_inviz x="0" y="30" width="1024" height="30">
+		<text font="graffiti22" r="255" g="215" b="0" a="155" align="c"/>
 	</cs_inviz>
 	<hud_gaz_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
 		<texture>abc\hud_gas1</texture>
@@ -406,11 +426,33 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<hud_exo_military_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
 		<texture>hud\mil_exoskeleton</texture>
 	</hud_exo_military_red3>
+	<!-- ************** Hud for invisible outfit *************** -->
+	<hud_exo_military_strelok x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\mil_exoskeleton_strelok</texture>
+	</hud_exo_military_strelok>
+	<hud_exo_military_strelok_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\mil_exoskeleton_strelok</texture>
+	</hud_exo_military_strelok_blue>
+	<hud_exo_military_strelok_green x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\mil_exoskeleton_strelok</texture>
+	</hud_exo_military_strelok_green>
+	<hud_exo_military_strelok_yellow x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\mil_exoskeleton_strelok</texture>
+	</hud_exo_military_strelok_yellow>
+	<hud_exo_military_strelok_red x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\mil_exoskeleton_strelok</texture>
+	</hud_exo_military_strelok_red>
+	<hud_exo_military_strelok_red2 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\mil_exoskeleton_strelok</texture>
+	</hud_exo_military_strelok_red2>
+	<hud_exo_military_strelok_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<texture>hud\mil_exoskeleton_strelok</texture>
+	</hud_exo_military_strelok_red3>
 	<!-- *************** ogse usable btrs 109950 *************** -->
 	<periscope x="0" y="0" width="1024" height="768" stretch="1">
 		<texture>hud\periscope</texture>
 	</periscope>
-	<!-- *************** ******************** COP BUTTONS and CAPTIONS ******************** *************** -->
+	<!-- ********************* COP BUTTONS and CAPTIONS ********************* -->
 	<hud_show_medkits x="2000" y="2000" width="800" height="300" complex_mode="1">
 		<text font="graffiti22" r="255" g="255" b="255" a="95" align="l"/>
 	</hud_show_medkits>
@@ -441,7 +483,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<caption_value_4 x="202" y="716">
 		<texture x="1042" y="355" width="29" height="16">ui\ui_hud</texture>
 	</caption_value_4>
-	<!-- *************** ******************** network mp ping services ******************** *************** -->
+	<!-- *********************** network mp ping services ************************** -->
 	<max_ping_warn_1 x="512" y="300" width="360" height="64" alignment="c" ttl="8">
 		<texture x="0" y="0" width="360" height="64" a="30">ui\ui_cm_connection_error</texture>
 		<text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
@@ -512,7 +554,7 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 		<texture x="1057" y="553" width="33" height="43">ui\ui_common</texture>
 	</medkit_static>
 	<blood_hud_static x="0" y="0" width="1024" height="768" stretch="1"/>
-	<!-- *************** BTR HUD ogse usable btrs 109950*************** -->
+	<!-- *************** BTR HUD ogse usable btrs 109950 *************** -->
 	<btr_target x="360" y="280" width="300" height="100" light_anim="ui_slow_blinking_alpha" stretch="1" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
 		<text x="0" y="0" font="letterica18" r="0" g="255" b="117" a="200" align="c"/>
 	</btr_target>

@@ -1,9 +1,10 @@
 -- TB3D 1.0.9.9.8.2 added more new quest weapons and ammo - fixed spawn npc,added ump45, fake_ to knives, ara_pda,
 -- added m82, rpd , ald weapons , saiga taktik 1 and 2, fss, m1892, removed unused yantar info,
 -- changed addrs to addx as addrs is a quest item, dmx_skat15_upgrade, removed obsolete infos, added specnaz_m1 in quest items,
--- removed dups and added glowsticks, removed bad spawns
--- removed unnecessary: "flame_parts", "exo_mil_exoskeleton_addrs", duplicated "stco" and added "wpn_flame_modern" weapon,
--- new glow grenades - aleks1970, vehicles, wpn_laser, Nano: line 1765 and below, wpn_fn2000_comp line 1152, ammo_5.56x45r, ammo_pkm_box_1, ammo_pkm_box_2 line: 1152, wpn_m249 line: 1191
+-- removed dups and added glowsticks, removed bad spawns, removed unnecessary: "flame_parts", "exo_mil_exoskeleton_addrs",
+-- duplicated "stco" and added "wpn_flame_modern" weapon, new glow grenades - aleks1970, vehicles, wpn_laser,
+-- Nano: line 1765 and below, wpn_fn2000_comp line 1152, ammo_5.56x45r, ammo_pkm_box_1, ammo_pkm_box_2 line: 1152,
+-- wpn_m249 line: 1191, new meceniy_outfit_strelok - aleks1970
 function my_ver() return "1.0.9.9.8.2" end
 --"**Original Author: S.T.A.L.K.E.R. RAZOR995 DOLG **",
 spawn_type = nil
@@ -1430,6 +1431,7 @@ local outf_table = {
 			"exo_mil_exoskeleton_addx",
 			"exo_mil_exoskeleton_dmx",
 			"exo_mil_exoskeleton_tb3d",
+			"meceniy_outfit_strelok",
 			"***OutFItS***",
 			"scientist_suit_white",
 			"fire_outfit",

@@ -8,7 +8,7 @@
 -- sak_book4, tb3d_collector, corrected lighting_val, changed fixer to only be called on level change, sak_book4, news, blowout types, get_obj_level,
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
--- indoor/outdoor spots, stages of storm
+-- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970
 function my_ver() return "1.0.9.9.8.4" end
 --[[
 File:  amk_mod .script
@@ -2420,6 +2420,7 @@ local suitHudName_wotType = {
 	["outfit_specnaz_"]					= "hud_mil",
 	["specops_outfit"]					= "hud_mil",
 	["nano_outfit"]						= "hud_nano",
+	["nano_outfit_addw"]				= "hud_nano_addw",	--aleks1970
 	["broken_exoskeleton"]				= "hud_exo",
 	["dolg_black_exoskeleton"]			= "hud_exo",
 	["exo_bandit_outfit"]				= "hud_exo",
@@ -2431,7 +2432,9 @@ local suitHudName_wotType = {
 	["outfit_exo_"]						= "hud_exo",
 	["svoboda_exoskeleton"]				= "hud_exo",
 	["svoboda_yellow_exo_outfit_"]		= "hud_exo",
-	["exo_mil_exoskeleton_"]			= "hud_exo_military"
+	["meceniy_outfit_new"]				= "hud_exo_military_strelok",	--aleks1970
+	["exo_mil_exoskeleton_"]			= "hud_exo_military",
+	["meceniy_outfit_strelok"]			= "hud_exo_military_strelok"	--aleks1970
 }
 --called by amk.script user function
 local freemem = 0

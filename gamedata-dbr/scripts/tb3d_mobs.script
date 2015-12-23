@@ -1,7 +1,8 @@
---TB3D 1.0.9.9.8.4 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
--- more content, reduced zat spawns, more adj, check_mil_spawns
-function my_ver() return "1.0.9.9.8.4" end
+--TB3D 1.0.9.9.8.5 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+-- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod
+function my_ver() return "1.0.9.9.8.5" end
 local math_random = math.random
+local math_fmod = math.fmod
 
 ----- these are set once on load to new level --------------------
 ----- used to respawn npc in empty levels ------------------------
@@ -868,7 +869,7 @@ function check_mil_spawns(spawns)				--109984
 		spawn_mob(6.862,-7.383,-8.567,314354,1585, typ, qty)				--center of base by tank
 	else
 		local cnt, rmndr = math_fmod(spawns, 2) 
-		if rmndr > 0 then
+		if rmndr and rmndr > 0 then		--109985
 			typ = 5				--monolith, 109984
 			qty = 3
 			spawn_npcs(98.938,-9.659,397.161,394282,1808, typ, qty)				--radar exit

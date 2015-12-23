@@ -1,7 +1,8 @@
----TB3D 1.0.9.9.8.2 new - creates objects that get removed on level load prior to alloc then creates new objects,
+---TB3D 1.0.9.9.8.5 new - creates objects that get removed on level load prior to alloc then creates new objects,
 -- tb3d_esc_spawns, dyn_rad, get_monster_spot, marsh zones, cooling zones, new levels, rats back, marsh, hiding_road,
--- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector, x14
-function my_ver() return "1.0.9.9.8.2" end
+-- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector, x14,
+-- spawn_sarc_pack
+function my_ver() return "1.0.9.9.8.5" end
 
 --============= non-dynamic vehicles only spawned once ============================================================
 --	vehicle_tb3d_atv				- quad atvs
@@ -679,7 +680,7 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
     elseif lname == "l12u_sarcofag" then
 		TB3D_Services.give_info("tb3d_cooling_zones")											--ventillator sounds
 		if amk.load_variable("tb3d_ald_weapons", 0) == 6 then
-			spawn_sarc_pack(4)
+			TB3D_Triggers.spawn_sarc_pack(4)						--109985
 			amk.save_variable("tb3d_ald_weapons", 7)
 		end
 		if TB3D_Modders.use_smoke == true then
