@@ -1,4 +1,4 @@
---- TB3D 1.0.9.9.9.0 BETA release of the Modders Mega Mod, changed dyn suit options,
+--- TB3D 1.0.9.9.9.1 BETA release of the Modders Mega Mod, changed dyn suit options,
 -- bio radar pulse option, logic debug option, dmx135, death_hit, expanded hit styles,
 -- added cave_no_big_electros, pump_it_up to in game menu, alife tweaks, cleaner, dist coef,
 -- population control, max_phantoms, radiation_factor, adjusted populations, start_alife_option,
@@ -11,13 +11,17 @@
 -- loadout_min_cond, loadout_ammo_loot, loadout_ammo_count, dyn_arts_always, npc_default_armor, pda_spawn_rate,
 -- advanced graphics, chgd daytime, volume_on_pause, blowout_rad_val from 1.0 to 0.05, arena lights,
 -- turn info message back off, adjusted loot ammo, force_r2_hw, coefficient_factor, show_story_ids, slice thresholds,
--- show_removed_items, coef
+-- show_removed_items, coef, DX11
 
-function my_ver() return "1.0.9.9.9.0" end
+function my_ver() return "1.0.9.9.9.1" end
 --// Modders resource central for script options
 --// certain function calls from script files in the gamedata\scripts dir redirected here
 --// for mod testing and game play options, not compatible with non-TB3D mods
 --// those options that can reduce memory/cpu load when off are indicated with --!M!...  in comment
+
+-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DirectX 11 Support<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+--// If you are using the new Meltac DX11 Shaders then set this to true 
+use_DX11 = false			-- (false) !M! default uses DX9/DX10 shaders (use ONLY if DX11 bin and gamedata are being used)
 
 -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>GAME START OPTIONS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ----------------------!!!!!!!-REQUIRES NEW GAME IF CHANGED-!!!!!-----------------------------
@@ -362,6 +366,7 @@ advanced_nightvision = false	-- (false)!M! Not active yet, colored reticles in s
 
 -----------------------------DDOF and MBLUR-------------------------------------------------------
 ------------ initial mode set here, now an option in game menu
+--// ignored if use_DX11 = true
 ddof_mode			= 0		-- (0) [startup] dynamic depth of field: 0=off, 1=Motion Blur, 2=classic, 3=Gaussian
 ddof_kernel_C		= 0.5	-- (0.5) density of the blur samples, classic, range = 0.3 to 0.6
 ddof_kernel_G		= 0.7	-- (0.7) density of the blur samples, Gaussian, range = 0.7 to 1.0
@@ -528,6 +533,7 @@ verify_script_versions	= false		--(false) special script version verifier used b
 display_delta			= false		--(false) displays the actor slice multiplier on the minimap (1 thru 5, 5 = critical)
 show_spot_sid			= false		--(false) displays LC SID instead of target name
 show_removed_items		= false		--(false) Logs the items removed using ESC F5 removal tool, 109989
+use_child_message		= false		--(false) Logs ALL child objects and their parent ID
 
 ------------------------STAY OFFLINE-------------------------------------------------------------------------
 test_without_npc		= false		--(false) npc will not go on line except for key traders and vehicles

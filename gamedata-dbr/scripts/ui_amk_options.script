@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.6  Radio, takes place of hud while open, chgd/added options, added ddof and alife, news, cop, weather option in place of alife
-function my_ver() return "1.0.9.9.7.6" end
+--TB3D 1.0.9.9.9.1  Radio, takes place of hud while open, chgd/added options, added ddof and alife, news, cop, weather option in place of alife, DX11
+function my_ver() return "1.0.9.9.9.1" end
 --/amk_rel_1/
 -- initialization
 
@@ -54,8 +54,11 @@ function amk_options:InitControls()
 	local radio_ddof = xml:InitTab("form:radio_amk_ddof", self.form)
 	self:Register(radio_ddof, "radio_amk_ddof")	
 	self.radio_ddof = radio_ddof
-	radio_ddof:SetNewActiveTab(amk.load_variable("option_ddof",3))
-
+	if TB3D_Modders.use_DX11 then					--109991, interferes with Meltac shaders
+		radio_ddof:SetNewActiveTab(0)
+	else
+		radio_ddof:SetNewActiveTab(amk.load_variable("option_ddof",3))
+	end
 	local radio_weather = xml:InitTab("form:radio_amk_weather", self.form)
 	self:Register(radio_weather, "radio_amk_weather")	
 	self.radio_weather = radio_weather
@@ -111,7 +114,7 @@ function amk_options:on_okay()
 	amk.save_variable("option_mus", radio_mus:GetActiveIndex() )
 	amk.save_variable("option_hud", radio_hud:GetActiveIndex() )
 	amk.save_variable("option_treasure", radio_treasure:GetActiveIndex() )
-	amk.save_variable("option_ddof", radio_ddof:GetActiveIndex() )
+	if not TB3D_Modders.use_DX11 then amk.save_variable("option_ddof", radio_ddof:GetActiveIndex() ) end		--109991
 	TB3D_Shaders.set_dof(radio_ddof:GetActiveIndex())
 	amk.save_variable("option_weather", radio_weather:GetActiveIndex() )
 	amk.save_variable("option_news", radio_news:GetActiveIndex() )

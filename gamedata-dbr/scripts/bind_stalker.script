@@ -214,7 +214,7 @@ function actor_binder:net_spawn(data)
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("BSTALK: actor net spawn7")
 	end
-	--if TB3D_bstalk_spawn then TB3D_bstalk_spawn.init() end			--if exists then load and execute
+	--if TB3D_bstalk_spawn then TB3D_bstalk_spawn.init() end			--if exists then load and execute, for moving actor
 	TB3D_spots.set_spots()
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("BSTALK: actor net spawn8")
@@ -770,13 +770,13 @@ function actor_binder:update(delta)
 		--if sdate then TB3D_Services.packet_alert("net recieve: ["..sdate.."_"..stime.."_"..newpacket.."]") end
 	end
 	if upd_timeTSK < time_now then
-		amk.oau_watchdog=890												-----------------890
+		amk.oau_watchdog=890												-----------------890, 889
 		upd_timeTSK = time_now + (upd_time_TSK * slice_base)
 		if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - TSK["..utils.to_str(upd_timeTSK).."]") end
 		task_manager.actor_update()
 	end
 	if self.next_restrictors_update_time < time_now then
-		amk.oau_watchdog=886												-----------------886
+		amk.oau_watchdog=886												-----------------886, 887, 888
 		bind_restrictor.actor_update(delta)
 		self.next_restrictors_update_time = time_now + upd_time_RST			--109983
 	end

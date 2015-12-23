@@ -954,8 +954,9 @@ function ratcatcher_food_have_check()
 	and amk_utils.inventory_search("conserva",20) ~= false
 	and amk_utils.inventory_search("vodka",5) ~= false
 	and amk_utils.inventory_search("kolbasa",20) ~= false then
-		TB3D_Services.give_info("mil_Svoboda_trader_plan_check")
+		return true			--109991
 	end
+	return false
 end
 function ratcatcher_food_have()
 	return has_alife_info("mil_Svoboda_trader_plan_check")

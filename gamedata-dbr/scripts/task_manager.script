@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.8.0 new rep system, give talk message, restored breaks, kill stalker, atp, debug
-function my_ver() return "1.0.9.9.8.0" end
+-- TB3D 1.0.9.9.9.1 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog
+function my_ver() return "1.0.9.9.9.1" end
 
 local table_remove = table.remove
 local string_len = string.len
@@ -843,14 +843,14 @@ function CRandomTask:actor_update()
 			if self.task_info[v].enabled_props == true and
 				self.task_info[v].enabled == true and
 				xr_logic.pick_section_from_condlist(db.actor, db.actor, self.task_info[v].init_condition) ~= nil then
-				amk.oau_watchdog=888
+				--amk.oau_watchdog=888
 				--' You want to automatically give the quest
 				if TB3D_Modders.use_task_message == true then TB3D_Services.packet_alert("TASK MGR: actor update self init task ["..utils.to_str(v).."]") end
 				self:action_give_task(db.actor, nil, nil, self.task_info[v].yes_phrase_id)
 			end
 		end
 	end
-	amk.oau_watchdog=887
+	--amk.oau_watchdog=887
 	--if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: Actor update end") end
 end
 

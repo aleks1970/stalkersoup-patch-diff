@@ -1,7 +1,7 @@
---<!-- TB3D 1.0.9.9.9.0 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.1 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
---cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska
-function my_ver() return "1.0.9.9.9.0" end
+--cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends()
+function my_ver() return "1.0.9.9.9.1" end
 
 local upd_pos = 0
 local fix_done = false
@@ -17,6 +17,10 @@ function on_info(info_id)
 		TB3D_Triggers.fanat_laptop_have()
 	elseif info_id=="tutorial_wounded_start" then
 		TB3D_Triggers.spawn_esc_medkit()
+	elseif info_id == "tutorial_end" then
+		if has_alife_info("esc_kill_bandits_quest_kill") and not has_alife_info("esc_shustryi_dead") then
+			TB3D_Triggers.make_camp_friends()						--109991, camp should be friends after saving nimble
+		end
 	--elseif info_id=="brat_luis_have" then
 		--TB3D_Triggers.spawn_marmor()
 	elseif info_id=="yan_has_ghost_pda" then
@@ -432,17 +436,25 @@ function on_item_take(obj)
 	if info_given == true then amk_dialogs.info_received() end
 	--109990, move multiple item quests to here to reduce loop load
 	if has_alife_info("shadows_cube_dialog_start") and not has_alife_info("shadows_cube_prov_check") then
-		dmx_mod.shadows_cube_prov()
+		if dmx_mod.shadows_cube_prov() == true then
+			TB3D_Services.give_info("shadows_cube_prov_check")
+		end
 	end
 	if has_alife_info("mil_Svoboda_trader_plan_start") and (not has_alife_info("mil_Svoboda_trader_plan_check")
 	  and not has_alife_info("mil_freedom_member0021_umer")) then
-		sak_dialog.ratcatcher_food_have_check()
+		if sak_dialog.ratcatcher_food_have_check() == true then 
+			TB3D_Services.give_info("mil_Svoboda_trader_plan_check")		--109991
+		end
 	end
 	if has_alife_info("starshoy_say_one_start") and not has_alife_info("starshoy_say_one_check") then
-		arhara_dialog.starshoy_say_one_check()
+		if arhara_dialog.starshoy_say_one_check() == true then
+			TB3D_Services.give_info("starshoy_say_one_check")				--109991
+		end
 	end
 	if has_alife_info("started_doc_tvar") and not has_alife_info("have_doc_tvar_check") then
-		arhara_dialog.have_doc_tvar()
+		if arhara_dialog.have_doc_tvar() == true then
+			TB3D_Services.give_info("have_doc_tvar_check")					--109991
+		end
 	end
 	return is_remove_obj
 end

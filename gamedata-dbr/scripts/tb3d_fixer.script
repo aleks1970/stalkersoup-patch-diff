@@ -1,12 +1,12 @@
--- TB3D 1.0.9.9.9.0 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.0.9.9.9.1 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
 -- atp_brigada1, dead removal, travka, val bloodsucker, rad_curve, val_sniper3, turret, labx18 bad ameba,
 -- redone for new 'can go on line', sak_book4, f1 to dyn content, hog, dark_btr2_restrictor, af_ameba_slug to af_ameba_,
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
--- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object
-function my_ver() return "1.0.9.9.9.0" end
+-- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count
+function my_ver() return "1.0.9.9.9.1" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -28,6 +28,9 @@ local fixed_count = 0
 local respawn_count = 0
 local dyn_count = 0
 local arts_count = 0
+local child_count = 0				--109991
+local accum_count = 0				--109991
+local mushroom_count = 0			--109991
 local contrlr = false
 
 function force_fixes()
@@ -47,30 +50,37 @@ function force_fixes()
 			if obj.name then obj_name = obj:name() else obj_name = "NIL" end
 			if obj.section_name then sect = obj:section_name() else sect = "NIL" end
 			local has_parent = TB3D_Services.check_has_parent(obj)
-			if game_graph():valid_vertex_id(obj.m_game_vertex_id) then
+			if has_parent then
+				if TB3D_Modders.use_child_message then
+					TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] name["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] has parent ID["..utils.to_str(has_parent).."]")
+				end
+				child_count = child_count + 1
+				skip_count = skip_count - 1							--remove self from skip count
+				is_skip = true
+			elseif game_graph():valid_vertex_id(obj.m_game_vertex_id) then
 				--TB3D_Services.packet_alert("tb3d fixer: object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] has parent["..utils.to_str(has_parent).."]")
 				is_skip, is_fixed = check_object(obj, obj_name, sect, is_collector)				--first check if object is specific
 				if not is_skip and not is_fixed then
 					obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
 					level_name = alife():level_name(obj_level)	
-					if sect == "art_acumm" or string_find(obj_name, "mushroom") then				--suit/minigun energy source, black energy, 109982 af_mushroom
+					if sect == "art_acumm" then									--109991, suit/minigun energy source, black energy
+						accum_count = accum_count + 1
+						skip_count = skip_count - 1							--remove self from skip count
+						is_skip = true
+					elseif string_find(obj_name, "mushroom") or string_find(obj_name, "_mushy_") then			--109991, af_mushroom, dav mushroom
+						mushroom_count = mushroom_count + 1
+						skip_count = skip_count - 1							--remove self from skip count
 						is_skip = true
 					elseif string.sub(sect, 1, 3) == "af_" or string.sub(sect, 1, 7) == "amk_af_" then			--109976 remove all dynamic arts from level for respawning
-						if has_parent then
+						if string_find(obj_name, "_shield_") then												--109991, ldk shields
 							is_skip = true
-						elseif string_find(obj_name, "shield_") then					--ldk shields
-							is_skip = true
-						elseif is_collector and amk_anoms.dynamic_art(obj_name, level_name, sect) == true then			--109988
+						elseif amk_anoms.dynamic_art(obj_name, level_name, sect) == false then					--109991
 							--TB3D_Services.packet_alert("tb3d fixer: art["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."]["..utils.to_str(level_name).."] removed")
 							arts_count = arts_count + 1
 							is_fixed = true
 						end
 					elseif string_find(obj_name, "glow_stick_")	then		--remove used ones
-						if has_parent then
-							is_skip = true
-						else
-							is_fixed = true
-						end
+						is_fixed = true
 					elseif string_find(obj_name, "_horror") then
 						is_fixed = true										--109984, hell hour spawns always remove
 					elseif string.sub(obj_name, 1, 6) == "tb3dm_" then			--109989
@@ -109,8 +119,6 @@ function force_fixes()
 				respawn_count = respawn_count + 1
 			elseif sect == "stalker" or sect == "stalker_monolith" or sect == "m_trader" then					--now done in motivator
 				skip_count = skip_count + 1
-			elseif has_parent then
-				skip_count = skip_count + 1
 			elseif sect == "breakable_object" or sect == "climable_object"
 				or sect == "level_changer" or sect == "device_pda"
 				or sect == "explosive_barrel" or sect == "explosive_barrel_low"
@@ -135,6 +143,9 @@ function force_fixes()
 	end --loop
 	TB3D_Services.packet_alert("tb3d fixer: fixed objects["..utils.to_str(fixed_count).."]")
 	TB3D_Services.packet_alert("tb3d fixer: skipped objects["..utils.to_str(skip_count).."]")
+	TB3D_Services.packet_alert("tb3d fixer: skipped child objects["..utils.to_str(child_count).."]")		--109991
+	TB3D_Services.packet_alert("tb3d fixer: skipped accumulators["..utils.to_str(accum_count).."]")			--109991
+	TB3D_Services.packet_alert("tb3d fixer: skipped mushrooms["..utils.to_str(mushroom_count).."]")			--109991
 	TB3D_Services.packet_alert("tb3d fixer: respawn objects["..utils.to_str(respawn_count).."]")
 	TB3D_Services.packet_alert("tb3d fixer: dynamic objects["..utils.to_str(dyn_count).."]")
 	TB3D_Services.packet_alert("tb3d fixer: empty story objs["..utils.to_str(snil_count).."]")

@@ -407,6 +407,7 @@ function dynamic_art(obj_name, lname, sect)
 				end
 			end
 		else
+			TB3D_Services.packet_alert("amk anoms: dynamic_art["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(lname).."] bad vert. removed")
 			result = false  														--bad vert so remove
 		end
 	end

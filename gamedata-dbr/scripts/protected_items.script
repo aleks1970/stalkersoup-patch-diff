@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.8.9 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
+--TB3D 1.0.9.9.9.1 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
 -- bandranen_pda, get protected item, _fss, merged death_generic keep items, tb3d_gspot, zep, redone for exact only,
--- ckts and flasks, pushka_fotik, m_car, explosive_barrel
+-- ckts and flasks, pushka_fotik, m_car, explosive_barrel, wpn_gungauss
 
-function my_ver() return "1.0.9.9.8.9" end
+function my_ver() return "1.0.9.9.9.1" end
 local string_find = string.find
 local string_sub = string.sub
 
@@ -166,11 +166,14 @@ local items_protected = {
 	["kluk_karta"] = true,					--109975, map
 	["kluk_karta_kopiy"] = true,			--109975, map
 	["kluch_dell_teleport1"] = true,		--109975
-	["kolba_pustay"] = true,					--109975, flasks
-	["wpn_sledgehammer"] = true,				--109975, sledgehammer
+	["kolba_pustay"] = true,				--109975, flasks
+	["wpn_sledgehammer"] = true,			--109975, sledgehammer
 	["kuvalda"] = true,						--109975, sledgehammer
-	["pushka_fotik"] = true,					--foto pistol in red forest
-	["explosive_barrel"] = true			--109989
+	["pushka_fotik"] = true,				--foto pistol in red forest
+	["explosive_barrel"] = true,			--109989
+	["wpn_gungauss"] = true,				--109991, in DV
+	["land_disketka"] = true,				--109991, disk in Labrynth
+	["art_acumm"] = true					--109991
 	}
 	
 -- Obtain the name of the section object to check

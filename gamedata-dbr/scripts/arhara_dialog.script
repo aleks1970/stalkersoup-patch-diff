@@ -959,8 +959,9 @@ function have_doc_tvar()
 	new_dialog.item_much("mutant_snork_leg",1) ~= false and
 	new_dialog.item_much("mutant_fracture_hand",1) ~= false and
 	new_dialog.item_much("mutant_spleen_rat",1) ~= false then
-		TB3D_Services.give_info("have_doc_tvar_check")
+		return true
 	end
+	return false
 end
 function have_doc_tvar_check()
 	return has_alife_info("have_doc_tvar_check")
@@ -9445,8 +9446,9 @@ function starshoy_say_one_check()
 		new_dialog.item_much("vodka",5) ~= false and
 		new_dialog.item_much("ammo_5.45x39_ap",10) ~= false and
 		new_dialog.item_much("conserva",20) ~= false then
-		TB3D_Services.give_info("starshoy_say_one_check")
+		return true
 	end
+	return false
 end
 function starshoy_say_one_have() 
 	return has_alife_info("starshoy_say_one_check")

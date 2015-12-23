@@ -288,7 +288,7 @@ function spawn_sc_outfit()
 end
 
 function shadows_cube_prov()
-	--local rslt = false														--109990, only called by item take
+	local rslt = false														--109991
 	--if TB3D_Services.is_collector(902) == false then
 	if amk_utils.inventory_search("nemiroff_vodka",5) ~= false and
 		amk_utils.inventory_search("irp-b",2) ~= false and
@@ -298,10 +298,10 @@ function shadows_cube_prov()
 		amk_utils.inventory_search("energy_ad_rush",5) ~= false and
 		amk_utils.inventory_search("merc_scientific_outfit",1) ~= false and
 		amk_utils.inventory_search("wpn_rpd",1) ~= false then
-		TB3D_Services.give_info("shadows_cube_prov_check")
+		rslt = true
 	end
 	--TB3D_Services.packet_alert("cube prov["..utils.to_str(rslt).."]")
-	--return rslt
+	return rslt
 end
 function shadows_cube_prov_check()
 	return has_alife_info("shadows_cube_prov_check")

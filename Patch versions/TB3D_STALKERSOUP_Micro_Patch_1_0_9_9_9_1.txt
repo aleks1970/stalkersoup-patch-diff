@@ -1,0 +1,199 @@
+STALKERSOUP: Micro Patch 1.0.9.9.9.1 - FREE PLAY BETA RELEASE - June 27, 2015
+Patches 109950 thru 109990 to 109991.
+Replaces files: .dbo, .dbp, .dbq, .dbr
+New game NOT required.
+
+All users should update.
+109991: (requires 109991 bare gamedata folder as modders script has changed)
+Fixes several multi item quests that would not update.
+Blockpost alarm crash.
+Adds DX11 support in the modders script, shaders script and shadersettings.txt.
+
+109990: (requires 109990 bare gamedata folder as modders script has changed)
+Fixed Blockpost crash.
+Optimized several tasks with multiple items by moving them to item_take instead of the task manager.
+Minor quest fixes/tweaks.
+
+109989: (requires 109989 bare gamedata folder as modders script has changed)
+Tweaked coefficient system and added option in modders script.
+Improved the population controller.
+Fixed min/max collision values in bullet manager.
+Improved watcher_act (looting) and added more key npc to restricted list.
+Fixed several quest issues.
+
+109988: (requires 109988 bare gamedata folder as modders script has changed)
+Fixed dynamic fixer to properly remove zombied stalkers on level change.
+Adjusted some treasure hunt teleports and portals.
+Improved two of Yakut's quests.
+Corrected several missing icons in Collector.
+Some dialog fixes and improvements.
+
+109987: (requires 109987 bare gamedata folder as modders script has changed)
+Fixed Kostya stashes 100%.
+Fixed and improved Arena lighting.
+Removed Strelok weapon from load outs.
+Corrected load outs with non existant items.
+Added portals in Bar, Jupiter and Backwater in collector mode.
+
+109986: (requires 109986 bare gamedata folder as modders script has changed)
+Fixed Kostya stashes.
+Fixed Treasure Hunt stash 11/12.
+Improved inventory sorter.
+Adjusted anomolies and spawn coeficients.
+Some new dialogs in Collector.
+
+109985: (requires 109983 bare gamedata folder )
+New Exo HUDs to try out.
+Several ctd fixes caused by the final localization pass.
+Removed non-existing AK74m and u from Dolg load outs.
+A couple new weapon HUDs.
+
+109984: (requires 109983 bare gamedata folder )
+Gameplay folder 100% localized.
+Several fixes.
+More level 2 content.
+
+109983: (requires 109983 bare gamedata folder )
+Fixed actor factions.
+More quest fixes and tweaks.
+Added several more articles and PDA descriptions.
+Fixed parent check for artifacts and weapons.
+More localization and dialog improvements.
+Added and improved icons and some HUD textures (thanks aleks1970).
+Added more content to level-up 2.
+
+109981: (requires 109982 bare gamedata folder )
+Blowouts further improved and expanded to better support the outer areas.
+More fixes to quests and storyline.
+New active community system properly managing the actor community.
+Additional HDR control and PDA 'reset all' sets advanced graphics to engine default.
+New indoor/outdoor HDR control to protect indoor mood lighting.
+Improved trader scheme control.
+New artefact system that keeps the original SOC arts until level-up 1.
+Improved coefficient system that smoothly increases with difficulty/rank/level-up.
+
+109980: (requires 109980 bare gamdata folder)
+Blowouts improved, also 40% increase in loop speed.
+Several more fixes to quests and storyline.
+Collector, treasure hunt and ZEP now articles in journal.
+More new characters in the new levels.
+Completion of level-up 1 (Collector) and start of level-up 2 (Desolation).
+
+109977: (Collector needs new start for new characters in the all.spawn)
+Several fixes
+Fixed anoms from overrunning
+Corpse checked turns corpse dot on biomap to black
+Better logic on start code to prevent update errors
+More refinements to looting system
+Wild Territory lc off until actor gets x16 quest to prevent player from going too soon (new start only)
+Added player and kruglov to the Hell Hour ignore list
+Additional content in Collector level up 1 and 2
+
+109976: (new bare gamedata folder 109977, users should migrate to it)
+More fixes
+Redesigned arts to spawn per level vice per zone
+Fixed runaway sorter boxes on inventory open
+Added more content and restored more respawns
+Minor adjustments to some weapons
+Minor adjustments to blood, details and bump textures
+
+109975: (new bare gamedata folder, users should migrate to it)
+More fixes
+New advanced graphics menu and adjusted sun/hdr
+Redesigned xr_spawner
+Better integrated cleaner in watcher
+Restored missing respawns in warehouses
+
+109974: (new TB3D_Modders.script, users should migrate to it)
+Several quest fixes and improvements
+More localization
+New plug ins manager
+
+109973: (new tb3d_modders.script just adds force_garbage_collect)
+Fixes glow sticks (my bad).
+Completion of 'Creatures of the Night' spawns.
+Some icons for new items in stashes.
+Some portals to make travelling easier.
+
+109972: (still uses 109970 Bare gamedata folder)
+Fixes two treasure hunt crashes.
+Fixes tunnel exit ctd in Yantar.
+Fixes several errors in new localization submissions.
+More dynamic content.
+One new key character (Barman in waiting Room).
+Several improvements to ui and pda.
+
+109971: (still uses 109970 Bare gamedata folder)
+Kruglov at tunnel fixed.
+Transmutator fixed.
+Sleep messages fixed.
+Cyrillic removed from weapons descriptions.
+Shadows Cube quest rewritten.
+Autosave prevention during menu pause.
+More dynamic spawns.
+More dynamic mobs.
+Ghost PDA audio fixed (prolog error on exit to yantar still exists).
+X16 photo of Brain fixed so glass won't break.
+More tweaks in performance and memory handling.
+
+109970:
+Collector Treasure Hunt now two parts and has an ending.
+ZEP and Gold Bars done up to the final transition to level-up 2 (Desolation).
+PDA message system revamped.
+HUD Timer returned to top center but renders over HUD now.
+Several additions to the invulnerable list.
+Several quest fixes and Cube quest redone with better control over broken flashlight.
+More localization and some dialog/name fixes.
+Corrected some level changers.
+Added lots more dynamic content and some more toys to play with.
+
+109960:
+New smart terrain system
+Improved respawner
+many quest/spawn fixes
+Final all.spawn
+Skip teleports for testers (skip_to_mil, skip_to_sar, skip_monolith and skip_oso)
+
+109950:
+Fixed/added content in the all.spawn.
+Redesigned media player with new station: Zone Underground.
+Many fixes to STALKER NS game play.
+New content from dAVROs for the Collector Treasure Hunt.
+Massive amount of added content by me (TecnoBacon).
+Active turrets in many levels as Collector.
+Drivable ARMED tanks in Collector levels.
+Adjusted/added several level changers.
+More localization and names/dialog improvements.
+
+109944:
+New media player that supports plug-ins and operates 100%.
+Completely localized arhara_dialog.script (sms messages).
+More added to the population controller.
+Fixed NV in Yantar and Chaes.
+
+109943:
+Identifies and corrects bad sak teleports.
+Localization of arhara_dialog.script.
+Eliminates ctd after helping Fox.
+Eliminates random ctd in Garbage.
+Improves SMS messages and displays them on screen.
+
+109942:
+Fixes all spawns/respawns.
+Isolates extended levels during STALKER/NS game play.
+Fixes several items.
+Improved SMS system.
+Actor.ltx jump speed changed to 8.5 from 11 (collector Hunt Requirement)
+New game recommended but not required.
+
+109941:
+New game required: This is my fault; I failed to change the SAK teleport references
+to the new all.spawn. As you play and get those teleports strange things happen to your save.
+If you want all the alife and npc back then you really do need to start over.
+
+INSTALLATION: Visit www.tecnobacon.com for the latest installation instructions.
+
+Patch Info: Will now be posted on the web site as they are too numerous to post here.
+
+MAILTO: STALKERSOUP@tecnobacon.com						Facebook: STALKERSOUP
+			Steam Group: S.T.A.L.K.E.R. Poormans Soup (STALKERSOUP)

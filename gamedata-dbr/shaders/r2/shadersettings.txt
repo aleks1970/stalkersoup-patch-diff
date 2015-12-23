@@ -5,6 +5,9 @@
 // Base shaders: STALKER Shaders MAX 1.02 - By Kingo64
 #ifndef SSM_Mount
 #define SSM_Mount
+// Set used DirectX version - use only when running Meltac's custom DirectX binaries!
+#define DX11	
+
 //////////////////////////////////////////////////////////////////
 //== NOTE: <<< >>> indicates a warning message - options are for advanced users ==//
 //==========================  TB3D easy options ==================================//
@@ -30,12 +33,18 @@
 //== shadow map size default = 960, <<<larger maps tend to become blockish>>>
 //== best if half of screen resolution, engine default usually best
 
-	//#define CUSTOM_SHADOW_RESOLUTION int(960) 	// 1920/2 = 960
+	// MM2.0 Shadow resolution:   NOTE:  You will STILL have to use the -smapXXXX switch on your shortcut to the game executable, where XXXX = CUSTOM_SHADOW_RESOLUTION!!!	
+	#define KERNEL float(1.6) 					// IMPORTANT For custom shadow resolution... Minimum recommended values: 1024 = .6, 2048 = 1.2, 4096 = 2.4, etc... Higher values produce softer shadows.
+	#define XKERNEL float(1.6) 					// Probably should be same as KERNEL!	
+	#define CUSTOM_SHADOW_RESOLUTION int(2048) 	// M2.0
 
 //== Depth of Field default = DDOF <<<use only one, DDOF auto switches between classic and gauss via TB3D_Shaders.script>>>
+	#define DDOF					// (blurring coefficient = MAXCOF) - uses r2_aa_kernel to adjust the mix, 0.3 = full classic; 0.7 = full gaussian
 	//#define DOF_CLASSIC			// Use classic blur algorithm, as implemented by Sky4Ace
 	//#define DOF_GAUSSIAN			// Use simple gaussian blur algorithm (blurs stronger with same MAXCOF value)
-	#define DDOF					// (blurring coefficient = MAXCOF) - uses r2_aa_kernel to adjust the mix, 0.3 = full classic; 0.7 = full gaussian
+	//#define DOF_CLASSIC_ZOOM					//M2.0  Same as above but for zoom mode
+	#define DOF_CORRECTION float (2.0)			//M2.0  Factor to equalize the amount of gaussian to classic blur. Default is 2.0.
+	//#define DOF_CRYSIS						//M2.0  Enables modified/simplied blur effect ported from Crysis 2. CAUTION: Highly computationally expensive! Default is disabled.
 
 //== NON - STANDARD MOTION BLUR ===================================================//
 	// Blur methods - USE_MBLUR must be on to use improved or sky4ce methods
@@ -49,7 +58,8 @@
 //== <<<Only noticable on Full Dynamic Lighting>>> <<<causes poor performance on some computers>>>
 //== supposed to make the environment much brighter and natural, does not in my tests.
 
-	//#define SUN_SHAFTS			// Enables Sun Shafts (god rays) - <<<breaks sun shadows>>>
+	//#define SUN_SHAFTS		// Enables Sun Shafts (god rays) - <<<breaks sun shadows>>>
+	#define SSH					// Enable/disable Meltac's 2.0 Sun shafts 
 
 //==!!!!! legacy graphics card support, see end of file for more h/w options !!!!!!!!//
 //== use on old pre DX10.1 cards only, <<<may cause excess heat in newer cards>>>
@@ -74,6 +84,8 @@
 	#define PARALLAX_OCCLUSION	// Enables Parallax Occlusion Mapping  # Makes surfaces look bumpy and 3d at the cost of fps. Worth it
 	#define USE_SUNMASK			// Enables sun shadow masking, smooths shadows but darkens world overall.
 	//#define USE_SJITTER			// Uses shadow jittering, smooths shadows of flashlight <<<causes grainy textures>>>
+	#define USE_SJITTER_SUN		// M2.0 Uses shadow jittering for shadows created by the sun/moon, a modern method of smoothing out shadow edges. Highly recommended.
+	#define USE_SJITTER_OTHER   // M2.0 Enables shadow jittering (4 samples) for dynamic lights (e.g. flashlight/campfires).  Recommended.
 	//#define SATURATION_FILTER	// Enables Saturation Filter, giving a grey like appearance to areas which are "unsafe" <<<dims colors>>>.
 	//#define CONTRAST_FILTER		// Enables Contrast Filter, giving a grey like appearance to areas which are "unsafe" <<<dims world>>>.
 #endif
@@ -95,9 +107,9 @@
 #endif
 
 	//Distance Options:
-	#define MINDIST float(0.6)				// Minimum distance DOF starts. Default is 0.4.  // TWILIGHT KET USES 15
-	#define MAXDIST float(375)				// Distance at which DOF stops rendering. Default is 375
-	#define MAXCOF	float(4.0)				// Blur amount - if using DDOF, <<<this should not differ too much from DDOF_MAXCOF>>> (I use same value)
+	#define MINDIST float(15.0)				// M2.0 was 0.6 Minimum distance DOF starts. Default is 0.4.  // TWILIGHT KET USES 15
+	#define MAXDIST float(275)				// M2.0 was 375 Distance at which DOF stops rendering. Default is 375
+	#define MAXCOF	float(2.5)				// M2.0 was 4.0 Blur amount - if using DDOF, <<<this should not differ too much from DDOF_MAXCOF>>> (I use same value)
 	
 	#define DOF_CORRECTION float (6.0)		// Factor to equalize the amount of gaussian to classic blur. Don't change this unless you know what you're doing.
 	

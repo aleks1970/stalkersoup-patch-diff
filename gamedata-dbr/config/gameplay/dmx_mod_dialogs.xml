@@ -471,11 +471,12 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
-	<!-- ***************CONTINUATION OF CUBA IN SHADOW*************** -->
+	<!-- ***************CONTINUATION OF CUBA IN SHADOW**********109991 -->
 	<dialog id="syslov_shadows_cube">
-		<precondition>dmx_mod.shadows_cube_prov</precondition>
 		<has_info>shadows_cube_dialog_start</has_info>
+		<has_info>shadows_cube_prov_check</has_info>
 		<dont_has_info>syslov_shadows_cube_off</dont_has_info>
+		<precondition>dmx_mod.shadows_cube_prov</precondition>
 		<phrase_list>
 			<phrase id="0">
 				<text>shadows_cube_prines</text>

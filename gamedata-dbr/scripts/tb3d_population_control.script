@@ -1,8 +1,9 @@
--- TB3D 1.0.9.9.8.9 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.0.9.9.9.1 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
--- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized
-function my_ver() return "1.0.9.9.8.9" end
+-- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized,
+-- pri_monolith_10, vampire
+function my_ver() return "1.0.9.9.9.1" end
 					
 -----over population control----
 local string_find = string.find
@@ -745,7 +746,11 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 							result = true
 						end
 					elseif string_find(obj_name, "stalker_0007") then					--109989, Vampire
-						dont_spawn_online = true
+						if has_alife_info("agroprom_military_case_done") and not has_alife_info("sniper_begin_vosem") then		--109991
+							result = true
+						else
+							dont_spawn_online = true
+						end
 					elseif string_find(obj_name, "wounded_bandit") then								--stole the pda
 						if extended_levels then
 							dont_spawn_online = true
@@ -832,7 +837,11 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 							result = true
 						end
 					elseif string_find(obj_name, "stalker_0007") then					--109989, Vampire
-						dont_spawn_online = true
+						if has_alife_info("agroprom_military_case_done") and not has_alife_info("sniper_begin_vosem") then		--109991
+							result = true
+						else
+							dont_spawn_online = true
+						end
 					else
 						result = true
 					end
@@ -887,7 +896,11 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					result = true					--mil trader
 				elseif hdr4 == "gar_" then
 					if string_find(obj_name, "stalker_0007") then					--109989, Vampire
-						dont_spawn_online = true
+						if has_alife_info("agroprom_military_case_done") and not has_alife_info("sniper_begin_vosem") then		--109991
+							result = true
+						else
+							dont_spawn_online = true
+						end
 					else
 						result = true
 					end
@@ -1716,6 +1729,8 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 								result = true
 							end
 						--end
+					elseif string_find(obj_name, "monolith_10") then									--109991, pri_monolith_10 gets innaccesable vertex errors
+						dont_spawn_online = true
 					else
 						result = true
 					end

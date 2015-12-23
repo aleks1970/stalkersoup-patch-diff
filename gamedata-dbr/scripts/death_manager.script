@@ -1,14 +1,15 @@
---TB3D 1.0.9.9.9.0 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.0.9.9.9.1 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
---has_ammo, reorganized, optimized loot ammo, check dead items, ldk
-function my_ver() return "1.0.9.9.9.0" end
+--has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi
+function my_ver() return "1.0.9.9.9.1" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
 local string_find = string.find
 
 local names_info = {
+	["esc_shustryi"] = "esc_shustryi_dead",				--109991
 	["brat_luis"] = "brat_luis_dead",
 	["snip_esc1"] = "snip_esc1_dead",
 	["snip_esc2"] = "snip_esc2_dead",

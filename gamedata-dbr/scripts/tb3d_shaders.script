@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.7.0  new 02/26/12, chgd scopeUsed, ddof to ingame menu, corrected indoor NV, mblur removed
-function my_ver() return "1.0.9.9.7.0" end
+-- TB3D 1.0.9.9.9.1  new 02/26/12, chgd scopeUsed, ddof to ingame menu, corrected indoor NV, mblur removed, DX11
+function my_ver() return "1.0.9.9.9.1" end
 ----------------------------------------------------------------------------
 -- digital zoom, DDOF shaders
 -- using Meltac shaders, based on MAX 1.02 by Kingo64 and Sky4Ace
@@ -14,6 +14,7 @@ local last_fov = nil
 local dnvUsed = false
 local scopeUsed = dnvUsed
 local ddof_kernal = 0
+local using_DX9 = not TB3D_Modders.use_DX11
 
 local digital_weapons =
 {
@@ -204,62 +205,68 @@ end
 
 --- called by AMK_MOD.check_spawn for initial settings
 function on_spawn()
-	enabled = amk.load_variable("option_ddof", 0)
-	if enabled == 3 then
-		ddof_kernal = TB3D_Modders.ddof_kernel_G										--on gaussian blur
-		--get_console():execute("r2_mblur 0.0")											--must be off for effect to work
-		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on gaussian blur
-		get_console():execute("r2_aa on")	
-	elseif enabled == 2 then
-		ddof_kernal = TB3D_Modders.ddof_kernel_C										--on classic blur
-		--get_console():execute("r2_mblur 0.0")	
-		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on classic
-		get_console():execute("r2_aa on")	
-	elseif enabled == 1 then
-		ddof_kernal = 0																	--no blur
-		--get_console():execute("r2_mblur "..tostring(TB3D_Modders.motion_blur))			--restore user setting
-		get_console():execute("r2_aa off")	
+	if using_DX9 then
+		enabled = amk.load_variable("option_ddof", 0)
+		if enabled == 3 then
+			ddof_kernal = TB3D_Modders.ddof_kernel_G										--on gaussian blur
+			--get_console():execute("r2_mblur 0.0")											--must be off for effect to work
+			get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on gaussian blur
+			get_console():execute("r2_aa on")	
+		elseif enabled == 2 then
+			ddof_kernal = TB3D_Modders.ddof_kernel_C										--on classic blur
+			--get_console():execute("r2_mblur 0.0")	
+			get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on classic
+			get_console():execute("r2_aa on")	
+		elseif enabled == 1 then
+			ddof_kernal = 0																	--no blur
+			--get_console():execute("r2_mblur "..tostring(TB3D_Modders.motion_blur))			--restore user setting
+			get_console():execute("r2_aa off")	
+		else
+			ddof_kernal = 0																	--no blur
+			--get_console():execute("r2_mblur 0.0")											--off
+			get_console():execute("r2_aa off")	
+			enabled = 0
+		end
+		get_console():execute("r2_aa_weight 0.25,0.25,0.0")	
+		get_console():execute("r2_aa_break 0.8,0.5,0.0")
 	else
-		ddof_kernal = 0																	--no blur
-		--get_console():execute("r2_mblur 0.0")											--off
-		get_console():execute("r2_aa off")	
-		enabled = 0
+		enabled = 0				--109991, interferes with Meltac shaders
 	end
-	get_console():execute("r2_aa_weight 0.25,0.25,0.0")	
-	get_console():execute("r2_aa_break 0.8,0.5,0.0")	
 end
 
 -- Enables or disables the DDOF modes. in Modders Options menu
 function set_dof(mode)
-	if enabled == mode then return end
-	if mode == 1 then	--mblur only
-		ddof_kernal = 0																	--no blur
-		get_console():execute("r2_aa off")	
-		--get_console():execute("r2_mblur "..tostring(TB3D_Modders.motion_blur))			--restore user setting
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Motion Blur enabled")
-		enabled = 1
-	elseif mode == 2 then	--classic
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Classsic DDOF enabled")
-		enabled = 2
-		ddof_kernal = TB3D_Modders.ddof_kernel_C										--on classic blur
-		--get_console():execute("r2_mblur 0.0")	
-		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on classic
-		get_console():execute("r2_aa on")	
-	elseif mode == 3 then	--gauss
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]gaussian DDOF enabled")
-		enabled = 3
-		ddof_kernal = TB3D_Modders.ddof_kernel_G										--on gaussian blur
-		--get_console():execute("r2_mblur 0.0")	
-		get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on gaussian blur
-		get_console():execute("r2_aa on")	
-	else		--off
-		news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]DOF/Mblur disabled")
-		enabled = 0
-		ddof_kernal = 0																	--no blur
-		get_console():execute("r2_aa off")	
-		--get_console():execute("r2_mblur 0.0")
-		--get_console():execute("r2_aa_weight 0.25,0.25,0.0")	
-		--get_console():execute("r2_aa_break 0.8,0.5,0.0")	
+	if using_DX9 then
+		if enabled == mode then return end
+		if mode == 1 then	--mblur only
+			ddof_kernal = 0																	--no blur
+			get_console():execute("r2_aa off")	
+			--get_console():execute("r2_mblur "..tostring(TB3D_Modders.motion_blur))			--restore user setting
+			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Motion Blur enabled")
+			enabled = 1
+		elseif mode == 2 then	--classic
+			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]Classsic DDOF enabled")
+			enabled = 2
+			ddof_kernal = TB3D_Modders.ddof_kernel_C										--on classic blur
+			--get_console():execute("r2_mblur 0.0")	
+			get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on classic
+			get_console():execute("r2_aa on")	
+		elseif mode == 3 then	--gauss
+			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]gaussian DDOF enabled")
+			enabled = 3
+			ddof_kernal = TB3D_Modders.ddof_kernel_G										--on gaussian blur
+			--get_console():execute("r2_mblur 0.0")	
+			get_console():execute("r2_aa_kernel "..tostring(ddof_kernal))	--on gaussian blur
+			get_console():execute("r2_aa on")	
+		else		--off
+			news_manager.send_tip_txt(db.actor, TB3D_Services.get_text_color("tip").."TB3D:\\n  %c[default]DOF/Mblur disabled")
+			enabled = 0
+			ddof_kernal = 0																	--no blur
+			get_console():execute("r2_aa off")	
+			--get_console():execute("r2_mblur 0.0")
+			--get_console():execute("r2_aa_weight 0.25,0.25,0.0")	
+			--get_console():execute("r2_aa_break 0.8,0.5,0.0")	
+		end
 	end
 end
 
@@ -268,7 +275,7 @@ function table_contains(array_or_table, element)
   for k, value in pairs(array_or_table) do
     if	value == element or string.find(value, element) then
 		return true
-	else
+	--else
     end
   end  
   return false

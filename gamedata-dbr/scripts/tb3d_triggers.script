@@ -1,11 +1,11 @@
----TB3D 1.0.9.9.9.0 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.9.1 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
--- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals
-function my_ver() return "1.0.9.9.9.0" end
+-- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends()
+function my_ver() return "1.0.9.9.9.1" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random=math.random
 local math_floor = math.floor
@@ -1452,4 +1452,10 @@ function check_coll_portals()												--109987
 		spawned = 1
 	end
 	amk.save_variable("tb3d_coll_ports", spawned)
+end
+
+function make_camp_friends()			--109991, make rookie camp your friends
+	xr_gulag.setGulagRelation("esc_lager", game_object.friend, db.actor)
+	xr_gulag.setGulagRelation("esc_shustryi", game_object.friend, db.actor)
+	xr_gulag.setGulagRelation("esc_wolf", game_object.friend, db.actor)
 end
