@@ -9733,6 +9733,7 @@ end
 
 --' verify the presence of masking ekzy
 function dok_ekza_est()
+--TB3D_Services.packet_alert("arhara dialog: dok_ekza_est")
 	return new_dialog.item_much("meceniy_outfit_new",1) ~= false and
 		new_dialog.item_much("wpn_m16a2_sk12",1) ~= false
 end

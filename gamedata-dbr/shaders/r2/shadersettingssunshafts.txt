@@ -1,0 +1,97 @@
+// TB3D 1.0.9.9.9.3 tweaked shaft density, weight, sun color
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Dynamic Shaders 2.0 Alpha Default Preset - By Meltac, Ketxxx
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Feature Enable/Disable: Comment a feature (Add the //) to disable, or uncomment (Remove the //) to enable.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifndef SSH_Mount
+#define SSH_Mount
+
+// Basic settings
+#define SSH_NUM_SAMPLES float(160)					// In shafts.h: Quality. Higher is better. 32 is accebtable, 128 high quality (254 = max)
+#define SSH_EXPOSURES   float2(0.0613,0.0513)		// In shafts.h: Maximum intensity of sun shafts
+//#define SSH_EXPOSUREIN float(3) 		            // NOT USED: Correction factor for indoor sun shafts. Use only with SSH_INDOORDETECTION enabled
+
+// Advanced settings
+#define SSH_WEIGHTS float2(0.4,0.4) 	// 0.01		// In shafts.h: Relative "weight" of the light rays
+#define SSH_DENSITYS float2(0.5,0.5) 	// 0.9,0.6	// In shafts.h: 109991 Density of the light rays
+#define SSH_DECAYS float2(1.002,0.95) // 1.012		// In shafts.h: Fall-Off (Decay) of the light rays
+#define SSH_BLUR float(1.0)			                // In shafts.h: Blur effect and sets radius of blur applied to sunshafts
+#define SSH_COMPHI float(1.2)  //(0.9)			    // In shafts.h: Sets exposure compression of high-luminance rays ("low-pass"). Brighter rays will be toned down with less contrast 
+#define SSH_COMPHISOFT float(0.5)  // 0.5		    // In shafts.h: 109991 Softness of low-pass exposure compression. 0=no compression, 0.25 very soft, 0.75 rather hard, 1=limiting
+#define SSH_COMPLO float(0.8)		// 2.0	        // In shafts.h: Sets exposure compression of low-luminance rays ("high-pass"). Less bright rays will be pronounced with less contrast 
+#define SSH_COMPLOSOFT float(0.50) 		            // In shafts.h: Softness of high-pass exposure compression. 0=no compression, 0.25 very soft, 0.75 rather hard, 1=limiting
+#define SSH_SUNHEIGHTHI  float(1.0) 		        // In shafts.h: Sun shafts are only visible if the sun is not higher than this value
+#define SSH_SUNHEIGHTMAX float(0.800)				// In shafts.h: Sun shafts are most intense at this sun height (intensity peak)
+#define SSH_SUNHEIGHTLO  float(0.100) 	        	// In shafts.h: Sun Shafts are only visible if the sun is not lower than this value
+#define SSH_SUNCOL	float(0.1)		//0.3			// In shafts.h: 109991 Amount of sun color as declared in weather settings adopted by sun shafts. 
+#define SSH_NATURAL									// In shafts.h: Use "natural" sampling (=default). If disabled, a more "technical" sampling is used. Disable to lessen flickering / film effect, but adjust SSH_EXPOSURES and SSH_SUNCOL, too.
+
+// Additional sun streaks
+#ifdef SSH_ADD_STREAKS
+	#define SSH_STREAKS float(0.75)					// In halo.h and shafts.h: Enables/disables sun streaks in addition to sun shafts and sets their intensity. Lowers FPS a little.
+#endif
+#define SSH_STREAKSWIDTH float(4.5) //(2.475)		// In halo.h: Width of the primary streaks effect.
+#define SSH_STREAKSWIDTH2 float(3.0) // (2.075)		// In halo.h: Width of the secondary streaks effect.
+#define SSH_STREAKSLUMDIFF float(0.0)				// In halo.h: Difference of brightness for streaks to appear. Better leave untouched if unaware of effect.
+#define SSH_STREAKSROTX float(-10.0)	// 10		// In halo.h: Rotation speed of streaks around the X-axis when turning head.
+#define SSH_STREAKSROTY float(-10.0)	// 10		// In halo.h: Rotation speed of streaks around the Y-axis when turning head.
+#define SSH_STREAKSSUNNEARMIN float (0.025)			// In halo.h: Distance to the sun at which the streaks start to get rendered (not noticeable below this value, getting brighter above).
+#define SSH_STREAKSSUNNEARMAX float (0.15)			// In halo.h: Distance to the sun at which the streaks have reached their full intensity / brightness.
+#define SSH_STREAKSSUNDISTMIN float (0.25)			// In halo.h: Distance to the sun at which the streaks start to get less intense. Decrease if experiencing glitches.
+#define SSH_STREAKSSUNDISTMAX float (0.5)			// In halo.h: Distance to the sun at which the streaks are no more visible. Decrease if experiencing glitches.
+#define SSH_STREAKSSUNCOL	float(0.1)				// In halo.h: Amount of sun color as declared in weather settings adopted by sun streaks. 
+#define SSH_STREAKSMINALPHA float(0.0)				// In shafts.h: Alpha level above which streaks will be visible.
+
+//#define SSH_DUST									// NOT USED: Should add some dust but not working yet. Leave disabled.
+
+// Pro setting - Change only if experiencing issues!
+#define SSH_FARPLANE float(180.0)					// In shafts.h
+//#define SHH_ADP float(0.75)			            // NOT USED: Alternative ray marching algorithm for distance-based sampling. 0=none/classic ,1=adaptive
+//#define SSH_ADPKERNEL float(0.37)		            // NOT USED: Distance kernel factor when adaptive sampling is enabled (see line above)
+#define SSH_MINLUMDIFF  float(0.0)		            // In shafts.h: but needs fix: Required to prevent shader artifacts on walls and objects. Prone to creating "sky blob" artifacts. See also SSH_MINLUMCOF.
+#define SSH_MINLUMCOF float(0.5)					// In shafts.h: Amount of prevention of shader artifacts on walls and objects. 0.0=none, 1.0=max. Decrease if experiencing "sky blob" artifacts. See SSH_MINLUMDIFF.
+#define SSH_MINALPHA float(0.1) 		            // In shafts.h: Required to prevent ghosting in the sky and indoor sunshafts. Best 0.10, max 0.45
+//#define SSH_MAXALPHA float(0.95) 		            // NOT USED: Required to prevent ghosting in the sky and indoor sunshafts. Best 0.95, min 0.65
+#define SSH_MINALPHA2 float(0.0)		            // In shafts.h: Like MINALPHA but for INDOORDETECTION2
+#define SSH_MAXALPHA2 float(2.0)		            // In shafts.h: Like MAXALPHA but for INDOORDETECTION2
+//#define SSH_MAXALPHAPART1 float(0.00001)	      	// NOT USED: Required to prevent indoor sunshafts 
+//#define SSH_MAXALPHAPART2 float(0.000011)	      	// NOT USED: Required to prevent indoor sunshafts 
+//#define SSH_MAXALPHARAY float(0.79)		          	// In shafts.h but NOT USED: Required to prevent indoor sunshafts
+//#define SSH_MINSOLID float(0.30)		            // NOT USED: Required to prevent indoor sunshafts
+//#define SSH_MINSKIES float(0.0001)		          	// NOT USED: Required to prevent indoor sunshafts
+//#define SSH_MINRAY float(4.f) //float(0.000001)		// NOT USED: Required to prevent indoor sunshafts
+//#define SSH_MINDEPTH float(5.0)
+
+// Alpha Correction - Prevention of dark smear effects
+#define SSH_ALPHA float(0.2)					// In shafts.h: Enables/disables alpha correction, and, if enabled, sets the alpha amount at which correction comes in.
+#define SSH_ALPHACORR float(0.4)				// In shafts.h: Amount of alpha correction, if enabled.
+
+// Fading - according to sun distance, height, exposure - Also: Prevention of "film" effects
+#define SSH_SUNFADEMINX float(1.2) // 2.0	    // In shafts.h: Angle between sun and view direction at which the light rays start to get less intense
+#define SSH_SUNFADEMAXX float(3.0) // 3.0	    // In shafts.h: Angle between sun and view direction at which the light rays are no more visible
+#define SSH_SUNNEARMIN float (0.0)				// In shafts.h: Distance to the sun at which the light rays start to get rendered (not noticeable below this value, getting brighter above).
+#define SSH_SUNNEARMAX float (1.0)				// In shafts.h: Distance to the sun at which the light rays have reached their full intensity / brightness.
+#define SSH_SUNDISTMIN float (4.4) // 4.5		// In shafts.h: Distance to the sun at which the light rays start to get less intense. Decrease if experiencing flickering / film effect.
+#define SSH_SUNDISTMAX float (5.5) // 5.5		// In shafts.h: Distance to the sun at which the light rays are no more visible. Decrease if experiencing flickering / film effect.
+#define SSH_SUNEXPOMIN float (0.0)				// In shafts.h: used to create fad exponent
+#define SSH_SUNEXPOMAX float (1.0)				// In shafts.h: used to create fad exponent
+
+// Sun position correction - probably not anymore needed - left for legacy purposes
+//#define SSH_POSCORRX   float(0.15)		        // NOT USED: Sun position correction factor at x-axis
+//#define SSH_POSCORRYHI float(0.2)		        // NOT USED: Sun position correction factor at y-axis above screen center
+//#define SSH_POSCORRYLO float(1.2)		        // NOT USED: Sun position correction factor at y-axis below screen center
+#define SSH_POSHEIGHT float(0.573)		        // In shafts.h: BUT NOT USED: Sun reference height for sun height adjustments
+//#define SSH_POSHEIGHTCORRX float(-1.5)		    // NOT USED: Sun height adjustment/correction at x-axis
+//#define SSH_POSHEIGHTCORRY float(0.5)		    // NOT USED: Sun height adjustment/correction at y-axis
+//#define SSH_DEBUGSUNHEIGHT			        // NOT USED: Enables/disables sun height debug mode
+
+// Indoor detection - Prevention of rays beam through solid walls
+//#define SSH_INDOORDETECTION			        // In shafts.h: Image-based indoor/particles detection (experimental)
+#define SSH_INDOORDETECTION2			        // In shafts.h: Enables/disables another indoor detection (experimental)
+//#define SSH_PREVENT float(0.5)			        // NOT USED: Heuristic indoor/particle godrays prevention. 0=show godrays, 1=no godrays when possibly indoors. 0.5=half intensity when possibly indoors.
+//#define SSH_SOLIDCHECK							// NOT USED: Enables/disables solid walls check for indoor/particle sun shafts prevention (see line above). Causes minor FPS lost but normally enhances outdoor sunshafts.
+//#define SSH_ADVLIGHT							// NOT USED: Enables/disables advanced lighting control. Eats a few FPS with minor visual improvement if enabled.
+
+#endif

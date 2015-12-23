@@ -81,6 +81,8 @@ function force_fixes()
 							arts_count = arts_count + 1
 							is_fixed = true
 						end
+					elseif string_find(obj_name, "^val_zapis_")	then		--109992, hunt stashes
+						is_skip = true
 					elseif string_find(obj_name, "glow_stick_")	then		--remove used ones
 						is_fixed = true
 					elseif string_find(obj_name, "_horror") then
@@ -679,7 +681,7 @@ function check_dyn_spawns(obj, obj_name, sect, obj_level)
 			--or (string_find(obj_name, "vehicle_tb3d_btr") and dmx_cars.actor_inside_btr() == false)				--usable tanks: btr, btr_80, btr_80camo, btr_80uniq, btr_90
 			or string_find(sect, "turret_")	then																	--fixed turrets: army, nato, mgun, kptv
 				is_fixed = true
-				if TB3D_Modders.use_cleaner_message == true then TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] removed") end
+				if TB3D_Modders.use_cleaner_message == true then TB3D_Services.packet_alert("tb3d fixer: dyn object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]") end
 				dyn_count = dyn_count + 1
 		elseif string_find(obj_name, "testsak")	then			--old arts marker obsolete
 			if TB3D_Modders.use_cleaner_message == true then

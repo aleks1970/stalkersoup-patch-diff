@@ -1,0 +1,23 @@
+//TB3D 109993 Adapted from Meltac 2.0 DX11 shaders
+#include "common.h"
+
+#ifdef DX11
+float4 main(v_shadow_direct I):COLOR {
+#ifdef USE_HWSMAP
+return 0;
+#else
+return I.depth;
+#endif
+}
+
+#else
+
+half4 main(v_shadow_direct I):COLOR {
+#ifdef USE_HWSMAP
+return 0;
+#else
+return I.depth;
+#endif
+}
+
+#endif

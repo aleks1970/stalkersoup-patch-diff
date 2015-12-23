@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.0 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.0.9.9.9.3 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
--- use_rat_infests, moved hardcore_mobs
-function my_ver() return "1.0.9.9.9.0" end
+-- use_rat_infests, moved hardcore_mobs, more spawns
+function my_ver() return "1.0.9.9.9.3" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -364,21 +364,34 @@ function check_pripyat_spawns()
 	TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",-37.983,8.458,423.394,61294,2266,4)			--factory snorks
 end
 
-function check_jupu_spawns()
-	if rats < 10 then
-		spawn_rats(19.211,9.570,194.655,25281,3804,3)						--cannister
+function check_jupu_spawns(level_up)											--109993
+	if level_up == 1 then
+		if rats < 10 then
+			spawn_rats(19.211,9.570,194.655,25281,3804,3)						--cannister
+			spawn_rats(19.211,9.570,194.655,25281,3804,3)
+			spawn_rats(55.919,1.786,-11.531,33940,3807,3)						--container
+			spawn_rats(55.919,1.786,-11.531,33940,3807,3)
+			spawn_rats(45.001,11.564,-2.450,39736,3808,3)						--booth
+			spawn_rats(36.340,4.703,185.147,31553,3814,3)
+			spawn_rats(36.340,4.703,185.147,31553,3814,3)
+			spawn_rats(3.221,8.047,330.552,15728,3785,3)
+			spawn_rats(3.221,8.047,330.552,15728,3785,3)
+			spawn_rats(16.546,9.406,438.568,24527,3791,3)
+			spawn_rats(16.546,9.406,438.568,24527,3791,3)
+			spawn_rats(-25.386,9.551,418.179,4713,3773,3)
+			spawn_rats(-25.386,9.551,418.179,4713,3773,3)
+		end
+	elseif level_up == 2 then
+		spawn_snorks(-46.644,8.036,441.673,1219,3772,10)			--elevator
+		spawn_snorks(-53.615,3.208,-0.186,395,3775,6)				--main room behind cannisters
+		spawn_snorks(-2.122,0.077,60.598,12021,3784,6)				--main room dead end tunnel
+		spawn_snorks(71.413,5.032,-227.727,40106,3827,10)			--eprip exit
 		spawn_rats(19.211,9.570,194.655,25281,3804,3)
-		spawn_rats(55.919,1.786,-11.531,33940,3807,3)						--container
-		spawn_rats(55.919,1.786,-11.531,33940,3807,3)
-		spawn_rats(45.001,11.564,-2.450,39736,3808,3)						--booth
+	else
+		dav_ldk.spawn_rand_jupu_ldk(0, math_random(1,6))
+		dav_ldk.spawn_rand_jupu_ldk(1, math_random(1,6))
 		spawn_rats(36.340,4.703,185.147,31553,3814,3)
-		spawn_rats(36.340,4.703,185.147,31553,3814,3)
-		spawn_rats(3.221,8.047,330.552,15728,3785,3)
-		spawn_rats(3.221,8.047,330.552,15728,3785,3)
 		spawn_rats(16.546,9.406,438.568,24527,3791,3)
-		spawn_rats(16.546,9.406,438.568,24527,3791,3)
-		spawn_rats(-25.386,9.551,418.179,4713,3773,3)
-		spawn_rats(-25.386,9.551,418.179,4713,3773,3)
 	end
 end
 
@@ -744,7 +757,7 @@ function check_swamp_spawns()
 	amk.save_variable("tb3d_swamp_spawns", spawns)
 end
 
-function check_warlab_spawns()
+function check_warlab_spawns(level_up)
 	local spawns = amk.load_variable("tb3d_warlab_spawns", 0)
 	if spawns == 0 then
 		spawn_snorks(13.485,-7.240,-0.965,6602,3213,2)
@@ -752,13 +765,24 @@ function check_warlab_spawns()
 		spawn_snorks(-10.727,-15.390,4.702,2295,3160,2)
 		alife():create("tb3dm_bloodsucker_strong", vector():set(-1.695,-19.623,10.207),4225,3180)
 		spawns = 1
-	else
+	elseif spawns == 1 then
 		spawn_snorks(-13.584,1.001,4.239,1840,3162,2)
 		spawn_snorks(-5.514,-7.088,-11.680,3161,3167,2)
 		spawn_snorks(-16.061,-6.859,-35.183,1268,3170,2)
 		spawn_snorks(8.240,1.011,-2.389,5867,3210,2)
 		alife():create("tb3dm_bloodsucker_strong", vector():set(-4.310,-11.719,-48.491),3502,3161)
 		spawns = 0
+	end
+	local qty = 2
+	if has_alife_info("zep10_have") then
+		if level_up > 3 then
+			qty = 4
+		elseif level_up > 1 then
+			qty = 3
+		end
+		spawn_killer_squad(-13.479,-15.391,5.341,1848,3160,6,qty,false)		--large sleep area
+		spawn_killer_squad(-13.479,-15.391,5.341,1848,3160,6,qty,false)
+		spawn_killer_squad(2.574,-7.310,10.291,4917,3185,6,qty,false)		--pool table room
 	end
 	amk.save_variable("tb3d_warlab_spawns", spawns)
 end
@@ -1013,7 +1037,7 @@ function check_dcity_spawns(spawns)
 	end
 end
 
-function check_gen_spawns()
+function check_gen_spawns(level_up)
 	local typ, qty = 2,8			--woods
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
@@ -1025,6 +1049,9 @@ function check_gen_spawns()
 		spawn_npcs(15.113,38.037,-231.854,353870,3110,5,6)		--epicenter
 		spawn_npcs(159.415,30.765,-494.264,520602,3131,5,6)		--base
 		spawn_npcs(-106.033,38.065,-503.517,212898,3096,5,6)	--camp
+	end
+	if level_up > 1 then
+		TB3D_Triggers.warlab_spawns(level_up)					--109993
 	end
 	spawn_mob(-133.617,24.185,-422.130,181734,3097,typ,qty)		--lake
 end
@@ -1038,3 +1065,41 @@ function check_mkt_spawns()
 		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
 end
 
+function spawn_gen_north(level_up)			--109993
+	local typ, qty = 2,2					--woods
+	if has_alife_info("tb3d_harsh_environment") then
+		typ = 6				--harsh
+		qty = 20
+	elseif level_up > 1 then
+		if math_random(10) > 4 then
+			typ = 5
+		else
+			qty = 4
+		end
+	elseif level_up > 4 then
+		if math_random(10) > 4 then
+			typ = 5
+		else
+			qty = 6
+		end
+	end
+	spawn_mob(199.394,28.800,-70.647,566928,3144, typ, qty)			--w of research exit
+	spawn_mob(234.480,25.177,-151.202,607386,3147, typ, qty)		--e of research exit
+	spawn_mob(188.704,27.720,-204.581,554956,3148, typ, qty)		--s of research exit
+	spawn_mob(131.880,28.597,-191.110,489984,3126, typ, qty)		--near center
+end
+
+function check_tunnels_spawns(level_up)				--109993
+	local qty = 2
+	if level_up > 3 then
+		qty = 4
+	elseif level_up > 2 then
+		qty = 3
+	end
+	spawn_rats(127.083,-19.291,-62.401,4673,3868,qty)		--west end
+	spawn_rats(67.120,-19.292,-178.588,1190,3868,qty)		--east end
+	spawn_rats(113.766,-19.292,-132.074,3760,3868,qty)	--middle
+	spawn_rats(108.668,-7.732,37.993,3159,3865,qty)		--upper rooms
+	spawn_rats(99.830,-7.731,12.355,2454,3867,qty)
+	spawn_rats(113.939,-7.726,-62.645,3765,3868,qty)
+end

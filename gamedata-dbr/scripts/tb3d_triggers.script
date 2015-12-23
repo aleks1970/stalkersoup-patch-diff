@@ -1,11 +1,12 @@
----TB3D 1.0.9.9.9.1 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.9.3 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
--- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends()
-function my_ver() return "1.0.9.9.9.1" end
+-- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
+-- old_research_send
+function my_ver() return "1.0.9.9.9.3" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random=math.random
 local math_floor = math.floor
@@ -1055,11 +1056,15 @@ function hr_spawns(idx)			--109978
 	if is_save then amk.save_variable("hr_spawns", idx+1) end
 end
 
-function warlab_spawns(idx)			--109978
-	if idx == 0 then
+function warlab_spawns(level_up)			--109978
+	if level_up == 1 then
 		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,1,false)			--around lab entrance
 		TB3D_Mobs.spawn_killer_squad(158.189,30.681,-499.143,518915,3131,6,1,false)
 		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,1,false)
+	elseif level_up > 2 then
+		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,2,false)			--around lab entrance
+		TB3D_Mobs.spawn_killer_squad(158.189,30.681,-499.143,518915,3131,6,2,false)
+		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,2,false)
 	end
 end
 
@@ -1458,4 +1463,19 @@ function make_camp_friends()			--109991, make rookie camp your friends
 	xr_gulag.setGulagRelation("esc_lager", game_object.friend, db.actor)
 	xr_gulag.setGulagRelation("esc_shustryi", game_object.friend, db.actor)
 	xr_gulag.setGulagRelation("esc_wolf", game_object.friend, db.actor)
+end
+
+function old_research_send()				--109993, from basements without ladders
+	local spot = math_random(5)
+	if spot == 1 then
+		TB3D_Services.move_actor(225.906,9.046,-193.022)		--,535639,4379)		--toilet
+	elseif spot == 2 then
+		TB3D_Services.move_actor(242.455,5.762,-118.937)		--,555935,4380)		--celler
+	elseif spot == 3 then
+		TB3D_Services.move_actor(209.135,13.619,-59.065)		--,519562,4384)		--platform
+	elseif spot == 4 then
+		TB3D_Services.move_actor(196.056,8.467,-12.389)			--,504521,4378)		--trailor w/tree
+	else
+		TB3D_Services.move_actor(76.826,18.205,-39.850)			--,369589,4384)		--comm ctr roof
+	end
 end

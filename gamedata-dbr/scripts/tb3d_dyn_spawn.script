@@ -1,8 +1,8 @@
----TB3D 1.0.9.9.8.9 new - creates objects that get removed on level load prior to alloc then creates new objects,
+---TB3D 1.0.9.9.9.3 new - creates objects that get removed on level load prior to alloc then creates new objects,
 -- tb3d_esc_spawns, dyn_rad, get_monster_spot, marsh zones, cooling zones, new levels, rats back, marsh, hiding_road,
 -- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector, x14,
 -- spawn_sarc_pack, bar
-function my_ver() return "1.0.9.9.8.9" end
+function my_ver() return "1.0.9.9.9.3" end
 
 --============= non-dynamic vehicles only spawned once ============================================================
 --	vehicle_tb3d_atv				- quad atvs
@@ -204,8 +204,8 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		--if TB3D_Modders.use_random_tanks and TB3D_Services.is_collector() then
 			--if has_alife_info("barman_zep4_start") then turret_spawn.bar_turret() end
 		--end
-		if not has_alife_info("info_way_bar_wild_territory") then
-			spawn_anomoly("zone_emi_tb3d",43.424,-0.467,141.811,22175,1247)		--109989, entrance to wild territory
+		if not has_alife_info("tb3d_collector") and not has_alife_info("info_way_bar_wild_territory") then
+			spawn_anomoly("zone_emi_tb3d",43.424,-0.467,141.811,22175,1247)		--109993, entrance to wild territory
 		end
 	elseif lname == "l04_darkvalley" then
 		TB3D_Services.give_info("tb3d_marsh_zones")

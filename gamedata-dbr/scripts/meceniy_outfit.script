@@ -1,8 +1,10 @@
---TB3D 1.0.9.9.8.2  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
+--TB3D 1.0.9.9.9.3  removed upd, changed addrs to addx as addrs is a quest item, is_pleer, exo tb3d
 -- Localization
-function my_ver() return "1.0.9.9.8.2" end
+function my_ver() return "1.0.9.9.9.3" end
 
 --\\"NanoEkzoSkelet Skat-15M "" .. With the system of life support (SZHP) and upgradeable .. Spot (Shooter)..
+local string_find = string.find
+
 local t_upd = 0
 local f_1 = false
 local f_1_end = false
@@ -63,15 +65,15 @@ function on_actor_update()
 			player_ogg.start_pleer_post_save()
 			is_pleer = true
 		end
-		if string.find(section, "exo_mil_exoskeleton_tb3d") then
+		if string_find(section, "exo_mil_exoskeleton_tb3d") then
 			suit_type = 5
-		elseif string.find(section, "exo_mil_exoskeleton_dmx") then
+		elseif string_find(section, "exo_mil_exoskeleton_dmx") then
 			suit_type = 4
-		elseif string.find(section, "exo_mil_exoskeleton_addx") then
+		elseif string_find(section, "exo_mil_exoskeleton_addx") then
 			suit_type = 3
-		elseif string.find(section, "exo_mil_exoskeleton_addr") then
+		elseif string_find(section, "exo_mil_exoskeleton_addr") then
 			suit_type = 2
-		elseif string.find(section, "exo_mil_exoskeleton_add") then
+		elseif string_find(section, "exo_mil_exoskeleton_add") then
 			suit_type = 1
 		end
 		if suit_type < 5 then
@@ -119,11 +121,18 @@ function on_actor_update()
 				new_system_power()
 				new_anti_dot()
 			end
-		elseif suit_type > 4 then
+		elseif suit_type == 4 then			--109993
+			--if exo_update(outfit) > 0 then
+				system_outfit()
+				new_system_rad()
+				new_system_power()
+				new_anti_dot()
+			--end
+		elseif suit_type == 5 then
 			system_outfit()
 			new_system_rad()
 			new_system_power()
-			new_anti_dot()                                        -- DMX UPGRADE OFF
+			new_anti_dot()
 		end
 	end
 end

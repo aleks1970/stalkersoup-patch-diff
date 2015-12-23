@@ -1,7 +1,8 @@
---<!-- TB3D 1.0.9.9.9.2 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.3 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
---cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start
-function my_ver() return "1.0.9.9.9.2" end
+--cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
+--item take
+function my_ver() return "1.0.9.9.9.3" end
 
 local upd_pos = 0
 local fix_done = false
@@ -280,8 +281,13 @@ function on_item_take(obj)
 		if ln=="lost_village" then TB3D_Services.give_info("pda_bazar") end
 	elseif sect=="dosye_zvez" then
 		if ln=="generators" then TB3D_Services.give_info("idu_na_nz") end
-	elseif sect=="disk_adren" then
-		if ln=="atp_for_test22" then TB3D_Services.give_info("atp_banda_disk_spawn") end
+	elseif sect == "disk_adren" then													--109993
+		if has_alife_info("arh_disk_start") and not has_alife_info("arh_disk_have") then
+			if arhara_dialog.arh_disk_have() == true then
+				TB3D_Services.give_info("arh_disk_have")
+				if ln=="atp_for_test22" then TB3D_Services.give_info("atp_banda_disk_spawn") end
+			end
+		end
 	elseif sect=="bandranen_pda" then
 		TB3D_Services.give_info("bandranen_pda_est")
 		is_remove_obj = true
@@ -388,17 +394,39 @@ function on_item_take(obj)
 		end
 	elseif sect=="item_delete1" then
 		spawn_teleport.delete_1(obj)
-	elseif sect=="tisku_arhara" then
-		if not has_alife_info("xvatit_spawn17") then  spawn_zombi.spawn_pipec_gg1(obj) end
-	elseif sect=="doc_medal" then
-		if not has_alife_info("xvatit_spawn18") then spawn_zombi.spawn_pizdec_gg(obj) end
+	elseif sect == "tisku_arhara" then													--109993
+		if has_alife_info("atp_propusk_shurup_start") and not has_alife_info("atp_propusk_shurup_have") then
+			if arhara_dialog.atp_propusk_shurup_have() == true then
+				TB3D_Services.give_info("atp_propusk_shurup_have")
+				if not has_alife_info("xvatit_spawn17") then spawn_zombi.spawn_pipec_gg1(obj) end
+			end
+		end
+	elseif sect=="doc_medal" then													--109993
+		if has_alife_info("med_dok_start") and not has_alife_info("med_dok_have") then
+			if arhara_dialog.med_dok_have() == true then
+				TB3D_Services.give_info("med_dok_have")
+				if not has_alife_info("xvatit_spawn18") then spawn_zombi.spawn_pizdec_gg(obj) end
+			end
+		end
 	elseif sect=="book_xabarych" then
 		if not has_alife_info("xvatit_spawn18") then spawn_zombi.spawn_zapadlo_gg(obj) end
 	elseif sect=="3d_raziy" then
 		if not has_alife_info("xvatit_spawn18") then spawn_zombi.spawn_o_o_gg(obj) end
 	elseif sect=="pribor" then
 		if not has_alife_info("xvatit_spawn18") then spawn_zombi.spawn_ept_gg(obj) end
-	elseif sect=="video_kasseta" then arhara_dialog.delete_dt_zone_zvuk(obj)
+	elseif sect=="video_kasseta" then						--109993
+		arhara_dialog.delete_dt_zone_zvuk(obj)
+		if has_alife_info("baty_zadanie_start") and not has_alife_info("baty_zadanie_have") then
+			if arhara_dialog.baty_zadanie_have() == true then
+				TB3D_Services.give_info("baty_zadanie_have")
+			end
+		end
+	elseif sect == "detektor_baty" then						--109993
+		if has_alife_info("baty_zadanie_start") and not has_alife_info("baty_zadanie_have") then
+			if arhara_dialog.baty_zadanie_have() == true then
+				TB3D_Services.give_info("baty_zadanie_have")
+			end
+		end
 	elseif sect=="amulet" then arhara_dialog.join_monolith(obj)
 	elseif sect=="kluch_dell_teleport" then arhara_dialog.delete_teleport_baza_vxod(obj)
 	elseif sect=="kluch_dell_teleport1" then arhara_dialog.delete_teleport_baza_vuxod(obj)
@@ -430,6 +458,42 @@ function on_item_take(obj)
 		if ln == "l02_garbage" then
 			if has_alife_info("mil_volk_resiver_1have") then
 				TB3D_Services.give_info("mil_volk_resiver_have")
+			end
+		end
+	elseif sect == "mozg" then													--109993
+		if has_alife_info("svoboda_lukash_start") and not has_alife_info("svoboda_lukash_have") then
+			if arhara1_dialog1.anarh_mozg_have() == true then
+				TB3D_Services.give_info("svoboda_lukash_have")
+			end
+		end
+	elseif sect == "antizombie" then													--109993
+		if has_alife_info("chaes_perexod_start") and not has_alife_info("chaes_perexod_have") then
+			if arhara_dialog.chaes_perexod_have() == true then
+				TB3D_Services.give_info("chaes_perexod_have")
+			end
+		end
+	elseif sect == "wpn_m_134" then														--109993
+		if has_alife_info("atp_propusk_start") and not has_alife_info("atp_propusk_have") then
+			if arhara_dialog.atp_propusk_have() == true then
+				TB3D_Services.give_info("atp_propusk_have")
+			end
+		end
+	elseif sect == "meceniy_outfit_new" then											--109993
+		if has_alife_info("arhara_ekza_start") and not has_alife_info("arhara_ekza_have") then
+			if arhara_dialog.baty_zadanie_have() == true then
+				TB3D_Services.give_info("arhara_ekza_have")
+			end
+		end
+	elseif sect == "sumka_arhara" then													--109993
+		if has_alife_info("sahar_sumka_start") and not has_alife_info("sahar_sumka_have") then
+			if arhara_dialog.sahar_sumka_have() == true then
+				TB3D_Services.give_info("sahar_sumka_have")
+			end
+		end
+	elseif sect == "money" or sect == "money1" or sect == "money2" or sect == "money3" then		--109993
+		if has_alife_info("lysyi_klad_nayti_start") and not has_alife_info("lysyi_klad_nayti_have") then
+			if arhara_dialog.lysyi_klad_nayti_have() == true then
+				TB3D_Services.give_info("lysyi_klad_nayti_have")
 			end
 		end
 	end

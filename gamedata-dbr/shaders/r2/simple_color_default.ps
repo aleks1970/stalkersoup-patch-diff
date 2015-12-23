@@ -1,0 +1,23 @@
+//TB3D 109993 Adapted from Meltac 2.0 DX11 shaders
+#include "common.h"
+
+uniform float4 e_barrier;
+
+float4 main(float4 C:COLOR0):COLOR {
+	C.a = 1.0;
+	return C;
+	/*
+	if (e_barrier.z > -10) // 0.8)
+		C = float4(0.0,0.0,3.0 * e_barrier.z,0.6);	
+	else
+	{
+		if (C.r > 0.7 && C.g < 0.3 && C.b < 0.3)
+			C = float4(2.5,1.7,2.0,0.5);	
+		else if (C.g > 0.7 && C.r < 0.3 && C.b < 0.3)
+			C = float4(1.5,0.7,1.0,1.0);
+		else
+			C = float4(1.5,1.7,2.0,0.4);	
+	}
+	return C;
+	*/
+}

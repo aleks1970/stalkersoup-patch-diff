@@ -1,7 +1,8 @@
---TB3D 1.0.9.9.9.0 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.3 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
---zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started
-function my_ver() return "1.0.9.9.9.0" end
+--zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started,
+--ldk trigger, old_research_send, generators
+function my_ver() return "1.0.9.9.9.3" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -244,15 +245,16 @@ amk.oau_watchdog=680
 							end
 						end
 					end
-				elseif ln == "l01_krasivay" then						--construcion site top level ambush
+				elseif ln == "l01_krasivay" then						--109993, construcion site top level ambush
 					amk.oau_watchdog=669
 					local spawns = amk.load_variable("dist_spawns", 0)
 					if spawns == 0 then
-						if pos.y > 17 then
-							if pos.x < -6 and pos.x > -44
-							  and pos.z < 174 and pos.z > 134 then
-								TB3D_Triggers.dist_center_ambush()
-								amk.save_variable("dist_spawns", 1)
+						if pos.y > 17 then								--on stairs or (climbing crain -12.932,24.026,122.353)
+							if pos.x < -6 and pos.x > -44 then			--in construction area
+								if pos.z < 174 and pos.z > 120 then
+									TB3D_Triggers.dist_center_ambush()
+									amk.save_variable("dist_spawns", 1)
+								end
 							end
 						end
 					elseif spawns == 1 then
@@ -368,6 +370,12 @@ amk.oau_watchdog=680
 							end
 						end
 					end
+				elseif ln == "yantar_old" then								--109993
+					if actor_in_range(vector():set(-151.652,1.866,-181.755), 10) then					--basement no ladder
+						TB3D_Triggers.old_research_send()
+					elseif actor_in_range(vector():set(-167.746,2.116,-214.804), 10) then				--basement no ladder
+						TB3D_Triggers.old_research_send()
+					end
 				end
 			end
 		end
@@ -383,7 +391,7 @@ amk.oau_watchdog=680
 			if TB3D_DLC_005 then TB3D_DLC_005.update(time_now, slice_base, ln) end								--109978, optional dlc content				
 		elseif level_up == 9 then
 			if TB3D_DLC_006 then TB3D_DLC_006.update(time_now, slice_base, ln) end								--109978, optional dlc content				
-		else
+		elseif level_up > 9 then
 			if TB3D_DLC_007 then TB3D_DLC_007.update(time_now, slice_base, ln) end								--109978, optional dlc content				
 		end
 	----------------------------------------------------------------------------------------------end main loop
@@ -481,7 +489,7 @@ function on_item_take(obj)
 		if TB3D_DLC_005 then is_remove_item = TB3D_DLC_005.on_item_take(obj) end								--109978, optional dlc content				
 	elseif level_up == 9 then
 		if TB3D_DLC_006 then is_remove_item = TB3D_DLC_006.on_item_take(obj) end								--109978, optional dlc content				
-	else
+	elseif level_up > 9 then
 		if TB3D_DLC_007 then is_remove_item = TB3D_DLC_007.on_item_take(obj) end								--109978, optional dlc content				
 	end
 	return is_remove_item
@@ -636,7 +644,7 @@ function on_info(info_id)
 			if TB3D_DLC_005 then TB3D_DLC_005.on_info(info_id) end								--109978, optional dlc content				
 		elseif level_up == 9 then
 			if TB3D_DLC_006 then TB3D_DLC_006.on_info(info_id) end								--109978, optional dlc content				
-		else
+		elseif level_up > 9 then
 			if TB3D_DLC_007 then TB3D_DLC_007.on_info(info_id) end								--109978, optional dlc content	
 		end
 	end
@@ -677,7 +685,7 @@ function from_box(box, item)
 		if TB3D_DLC_005 then do_transfer = TB3D_DLC_005.from_box(box, item) end								--109978, optional dlc content				
 	elseif level_up == 9 then
 		if TB3D_DLC_006 then do_transfer = TB3D_DLC_006.from_box(box, item) end								--109978, optional dlc content				
-	else
+	elseif level_up > 9 then
 		if TB3D_DLC_007 then do_transfer = TB3D_DLC_007.from_box(box, item) end								--109978, optional dlc content
 	end
 	return do_transfer
@@ -762,7 +770,7 @@ function item_drop(obj)
 			if TB3D_DLC_005 then TB3D_DLC_005.item_drop(obj) end								--109978, optional dlc content				
 		elseif level_up == 9 then
 			if TB3D_DLC_006 then TB3D_DLC_006.item_drop(obj) end								--109978, optional dlc content				
-		else
+		elseif level_up > 9 then
 			if TB3D_DLC_007 then TB3D_DLC_007.item_drop(obj) end								--109978, optional dlc content				
 		end
 	end
@@ -788,7 +796,7 @@ function on_use_object(obj)
 		if TB3D_DLC_005 then TB3D_DLC_005.on_use_object(obj) end								--109978, optional dlc content				
 	elseif level_up == 9 then
 		if TB3D_DLC_006 then TB3D_DLC_006.on_use_object(obj) end								--109978, optional dlc content				
-	else
+	elseif level_up > 9 then
 		if TB3D_DLC_007 then TB3D_DLC_007.on_use_object(obj) end								--109978, optional dlc content				
 	end
 end
@@ -808,7 +816,7 @@ function check_usable_item(obj)		--VICTIM ONLY, actor checks these directly in b
 		if TB3D_DLC_005 then TB3D_DLC_005.check_usable_item(obj) end								--109978, optional dlc content				
 	elseif level_up == 9 then
 		if TB3D_DLC_006 then TB3D_DLC_006.check_usable_item(obj) end								--109978, optional dlc content				
-	else
+	elseif level_up > 9 then
 		if TB3D_DLC_007 then TB3D_DLC_007.check_usable_item(obj) end								--109978, optional dlc content				
 	end
 end
@@ -828,7 +836,7 @@ function process_levels(lname, sname)
 		if TB3D_DLC_005 then TB3D_DLC_005.process_levels(lname, sname) end								--109978, optional dlc content				
 	elseif level_up == 9 then
 		if TB3D_DLC_006 then TB3D_DLC_006.process_levels(lname, sname) end								--109978, optional dlc content				
-	else
+	elseif level_up > 9 then
 		if TB3D_DLC_007 then TB3D_DLC_007.process_levels(lname, sname) end								--109978, optional dlc content				
 	end
 	if lname ~= sname then
@@ -935,7 +943,7 @@ function process_levels(lname, sname)
 			if has_alife_info("tb3d_note_00") then TB3D_Services.give_info("yan_bunker_door_1_open") end
 		elseif lname == "jupiter_underground" then
 			if has_alife_info("collector_done_with_jupund") or not has_alife_info("collector_ready_for_jupund") then
-				TB3D_Mobs.check_jupu_spawns()
+				TB3D_Mobs.check_jupu_spawns(level_up)			--109993, moved spawns to here
 				if level_up == 1 then
 					local spawns = amk.load_variable("tb3d_jupu_spawns", 0)
 					if spawns == 0 then		--tech packs are NOT dynamic and should only spawn once
@@ -950,14 +958,6 @@ function process_levels(lname, sname)
 						TB3D_Triggers.spawn_suit(11,19.211,9.570,194.655,25281,3804)									--cannister
 						amk.save_variable("tb3d_jupu_spawns", 3)
 					end
-				elseif level_up == 2 then													--109978
-					TB3D_Mobs.spawn_snorks(-46.644,8.036,441.673,1219,3772,10)			--elevator
-					TB3D_Mobs.spawn_snorks(-53.615,3.208,-0.186,395,3775,6)				--main room behind cannisters
-					TB3D_Mobs.spawn_snorks(-2.122,0.077,60.598,12021,3784,6)			--main room dead end tunnel
-					TB3D_Mobs.spawn_snorks(71.413,5.032,-227.727,40106,3827,10)			--eprip exit
-				elseif level_up > 2 then												--109978
-					dav_ldk.spawn_rand_jupu_ldk(0, math_random(1,6))
-					dav_ldk.spawn_rand_jupu_ldk(1, math_random(1,6))
 				end
 			end
 		elseif lname == "zaton" then
@@ -1080,9 +1080,11 @@ function process_levels(lname, sname)
 			if sname == "l04_pogost" then
 				TB3D_Mobs.spawn_gen_skelets()
 			elseif sname == "warlab" then
-				TB3D_Triggers.warlab_spawns(0)														--109978, need add more
+				TB3D_Triggers.warlab_spawns(level_up)													--109978, need add more
+			elseif sname == "yantar_old" then
+				TB3D_Mobs.spawn_gen_north(level_up)							--109993
 			end
-			TB3D_Mobs.check_gen_spawns()
+			TB3D_Mobs.check_gen_spawns(level_up)
 		elseif lname == "swamp_old" then
 			TB3D_Mobs.spawn_deadm_mobs()																--dogs, dogs, dogs
 			TB3D_Services.rotate_actor(180)
@@ -1095,13 +1097,15 @@ function process_levels(lname, sname)
 		elseif lname == "limansk" then
 			TB3D_Mobs.check_limansk_spawns()
 		elseif lname == "warlab" then
-			TB3D_Mobs.check_warlab_spawns()
+			TB3D_Mobs.check_warlab_spawns(level_up)
 		elseif lname == "red_forest" then
 			if not has_alife_info("collector_ready_for_redf") or has_alife_info("collector_done_with_redf") then
 				TB3D_Mobs.check_redf_spawns()
 			end
 		elseif lname == "cs_agroprom_underground" then
-			--rats?
+			if has_alife_info("tb3d_gb1_done") then
+				TB3D_Mobs.check_tunnels_spawns(level_up)					--109993
+			end
 		end
 		if sname == "jupiter" then
 			TB3D_Services.remove_info("yan_bunker_door_1_open")											--reset bunker doors

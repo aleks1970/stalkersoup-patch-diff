@@ -1,5 +1,5 @@
-<!-- ************ TB3D 1.0.9.9.8.0 removed func comp for kalinin_zadan_have and btr_ataka_have, controller vice comptroller,
-miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
+<!-- ************ TB3D 1.0.9.9.9.3 removed func comp for kalinin_zadan_have and btr_ataka_have, controller vice comptroller,
+miser to skinflint, muha_kukl, minor edits, boatswain, reduced func calls *************** -->
 <!-- ***************<For snipers at Adrenalin>*************** -->
 <game_task id="atp_propusk">
 	<title>Bring_minigun_for_Adrenalin_gameplay_titles</title>
@@ -13,7 +13,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_minigun_for_Adrenalin_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.atp_propusk_have</function_complete>
+		<!--function_complete>arhara_dialog.atp_propusk_have</function_complete	109993-->
 		<infoportion_set_complete>atp_propusk_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -36,7 +36,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_military_subject_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.baty_zadanie_have</function_complete>
+		<!--function_complete>arhara_dialog.baty_zadanie_have</function_complete		109993-->
 		<infoportion_set_complete>baty_zadanie_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -58,7 +58,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_Camouflage_Exoskeleton_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.arhara_ekza_have</function_complete>
+		<!--function_complete>arhara_dialog.arhara_ekza_have</function_complete		109993-->
 		<infoportion_set_complete>arhara_ekza_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -80,7 +80,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_vise_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.atp_propusk_shurup_have</function_complete>
+		<!--function_complete>arhara_dialog.atp_propusk_shurup_have</function_complete		109993-->
 		<infoportion_set_complete>atp_propusk_shurup_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -102,7 +102,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Discover_Antizombin_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.chaes_perexod_have</function_complete>
+		<!--function_complete>arhara_dialog.chaes_perexod_have</function_complete	109993-->
 		<infoportion_set_complete>chaes_perexod_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -124,7 +124,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_Controller_brain_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara1_dialog1.anarh_mozg_have</function_complete>
+		<!--function_complete>arhara1_dialog1.anarh_mozg_have</function_complete	109993-->
 		<infoportion_set_complete>svoboda_lukash_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -146,7 +146,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_the_computer_disk_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.arh_disk_have</function_complete>
+		<!--function_complete>arhara_dialog.arh_disk_have</function_complete		109993-->
 		<infoportion_set_complete>arh_disk_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -168,7 +168,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_the_bag_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.sahar_sumka_have</function_complete>
+		<!--function_complete>arhara_dialog.sahar_sumka_have</function_complete		109993-->
 		<infoportion_set_complete>sahar_sumka_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -190,7 +190,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_Medallion_for_Dr_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.med_dok_have</function_complete>
+		<!--function_complete>arhara_dialog.med_dok_have</function_complete		109993-->
 		<infoportion_set_complete>med_dok_have</infoportion_set_complete>
 	</objective>
 	<objective>
@@ -322,7 +322,7 @@ miser to skinflint, muha_kukl, minor edits, boatswain *************** -->
 	<objective>
 		<text>Find_the_treasure_Cave_gameplay_descriptions</text>
 		<icon height="50" width="50" x="100" y="50">ui\ui_icons_task</icon>
-		<function_complete>arhara_dialog.lysyi_klad_nayti_have</function_complete>
+		<!--function_complete>arhara_dialog.lysyi_klad_nayti_have</function_complete		109993-->
 		<infoportion_set_complete>lysyi_klad_nayti_have</infoportion_set_complete>
 	</objective>
 	<objective>

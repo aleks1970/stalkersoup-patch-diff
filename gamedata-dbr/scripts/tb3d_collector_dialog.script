@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.1
-function my_ver() return "1.0.9.9.1" end
+--TB3D 1.0.9.9.9.3 debug
+function my_ver() return "1.0.9.9.9.3" end
 
 --'spawn teleporter on the radar
 function spawn_tel()
@@ -18,6 +18,10 @@ end
 
 --'spawns a note and stash in the cordon
 function spawn_zap_coll()
-	alife():create("val_zapis_1",vector():set(-199.6027,-19.8969,-164.5164),52949,51)
+	local nobj = alife():create("val_zapis_1",vector():set(-199.6027,-19.8969,-164.5164),52949,51)
 	alife():create("af_dummy_mushy_small",vector():set(-199.5027,-19.8969,-164.0164),52949,51)
+	if nobj and TB3D_Modders.coll_spots then
+		level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", "First Note")
+		TB3D_Services.packet_alert("Collector: spawn stash 1 in Cordon")
+	end
 end

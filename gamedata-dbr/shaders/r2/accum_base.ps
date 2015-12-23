@@ -1,0 +1,151 @@
+//TB3D 109993 Adapted from Meltac 2.0 DX11 shaders
+#include "common.h"
+#ifdef DX11
+
+#include "lmodel.h"
+#include "shadow.h"
+uniform float4 m_lmap [2];
+
+#ifndef USE_F32
+	float4 main (float4 tc:TEXCOORD0,float4 tcJ:TEXCOORD1):COLOR 
+	{
+		
+		float4 _P=tex2Dproj(s_position,tc);
+		# ifndef USE_R2_STATIC_SUN
+			float m = _P.w;
+		#else
+			float m = xmaterial;
+		# endif
+					
+		float4 P4=float4(_P.x,_P.y,_P.z,1);
+		float4 PS=mul(m_shadow,P4);
+		
+		#ifdef USE_SHADOW 					
+			#ifdef USE_SJITTER_OTHER
+				#ifdef ADDITIONAL_SHADOW_PASS
+					float s=shadowtest(PS,tcJ)*shadow(PS);
+				#else
+					float s=shadowtest(PS,tcJ);
+					//float s=shadow(PS);
+				#endif
+			#else
+				float s=shadow(PS);
+			#endif
+		#else
+			float s = 1.h;
+		#endif
+
+		#ifdef USE_LMAP 
+			#ifdef USE_LMAPXFORM 
+				PS.x=dot(P4,m_lmap[0]);
+				PS.y=dot(P4,m_lmap[1]);				
+			#endif
+			float rsqr;
+			return blendp(Ldynamic_color*plight_local(m,_P,tex2Dproj(s_normal,tc),Ldynamic_pos,Ldynamic_pos.w,rsqr)*s*tex2Dproj(s_lmap,PS),tc);
+		#else
+			float rsqr;
+			return blendp(Ldynamic_color*plight_local(m,_P,tex2Dproj(s_normal,tc),Ldynamic_pos,Ldynamic_pos.w,rsqr)*s,tc);
+		#endif
+	}
+#else
+float4 main (float4 tc:TEXCOORD0,float4 tcJ:TEXCOORD1,float3 X:TANGENT,float4 C0:COLOR):COLOR {
+float4 _P=tex2Dproj (s_position,tc);
+float4 _N=tex2Dproj (s_normal,tc);
+float3 XT=tan(_N.xyz);
+float m	=xmaterial;
+# ifndef USE_R2_STATIC_SUN
+m=_P.w;
+# endif
+float rsqr;
+float4 light=plight_local2(m,_P,_N,Ldynamic_pos,Ldynamic_pos.w,rsqr,XT,C0);
+float4 P4=float4(_P.x,_P.y,_P.z,1);
+float4 PS=mul(m_shadow,P4);
+float s	=1.h;
+#ifdef USE_SHADOW
+#ifdef USE_SJITTER_OTHER
+s=shadowtest(PS,tcJ);
+#else
+s=shadow(PS);
+#endif
+#endif
+float4 lightmap=1.h;
+#ifdef USE_LMAP
+#ifdef USE_LMAPXFORM
+PS.x=dot(P4,m_lmap[0]);
+PS.y=dot(P4,m_lmap[1]);
+#endif
+lightmap=tex2Dproj(s_lmap,PS);
+#endif
+return blendp(Ldynamic_color*light*s*lightmap,tc);
+}
+#endif
+
+#else
+
+#include "lmodel.h"
+#include "shadow.h"
+uniform float4 m_lmap [2];
+#ifndef USE_F32
+float4 main (float4 tc:TEXCOORD0,float4 tcJ:TEXCOORD1):COLOR {
+float4 _P=tex2Dproj(s_position,tc);
+half4 _N=tex2Dproj(s_normal,tc);
+half m	=xmaterial;
+# ifndef USE_R2_STATIC_SUN
+m=_P.w;
+# endif
+half rsqr;
+half4 light=plight_local(m,_P,_N,Ldynamic_pos,Ldynamic_pos.w,rsqr);
+half4 P4=half4(_P.x,_P.y,_P.z,1);
+float4 PS=mul(m_shadow,P4);
+half s	=1.h;
+#ifdef USE_SHADOW
+#ifdef USE_SJITTER
+s=shadowtest(PS,tcJ);
+#else
+s=shadow(PS);
+#endif
+#endif
+half4 lightmap=1.h;
+#ifdef USE_LMAP
+#ifdef USE_LMAPXFORM
+PS.x=dot(P4,m_lmap[0]);
+PS.y=dot(P4,m_lmap[1]);
+#endif
+lightmap=tex2Dproj(s_lmap,PS);
+#endif
+return blendp(Ldynamic_color*light*s*lightmap,tc);
+}
+#else
+float4 main (float4 tc:TEXCOORD0,float4 tcJ:TEXCOORD1,float3 X:TANGENT,float4 C0:COLOR):COLOR {
+float4 _P=tex2Dproj (s_position,tc);
+half4 _N=tex2Dproj (s_normal,tc);
+float3 XT=tan(_N.xyz);
+half m	=xmaterial;
+# ifndef USE_R2_STATIC_SUN
+m=_P.w;
+# endif
+half rsqr;
+half4 light=plight_local2(m,_P,_N,Ldynamic_pos,Ldynamic_pos.w,rsqr,XT,C0);
+half4 P4=half4(_P.x,_P.y,_P.z,1);
+float4 PS=mul(m_shadow,P4);
+half s	=1.h;
+#ifdef USE_SHADOW
+#ifdef USE_SJITTER
+s=shadowtest(PS,tcJ);
+#else
+s=shadow(PS);
+#endif
+#endif
+half4 lightmap=1.h;
+#ifdef USE_LMAP
+#ifdef USE_LMAPXFORM
+PS.x=dot(P4,m_lmap[0]);
+PS.y=dot(P4,m_lmap[1]);
+#endif
+lightmap=tex2Dproj(s_lmap,PS);
+#endif
+return blendp(Ldynamic_color*light*s*lightmap,tc);
+}
+#endif
+
+#endif

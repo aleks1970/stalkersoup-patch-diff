@@ -1,4 +1,4 @@
-// TB3D 1.0.9.9.9.2 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
+// TB3D 1.0.9.9.9.3 balanced for in-game HDR controls and DDOF, simple optimization options, redefined, ddof, in game mblur slider,
 // adj sun and now default to standard smap, f32, sun saturation, Meltac DX11, removed MELTAC20, some tweaks
 //////////////////////////////////////////////////////////////////
 // Adapted from: DYNAMIC DEPTH OF FIELD SHADERS 1.02 - By Meltac
@@ -89,7 +89,7 @@
 	#define NV						// Enable Adaptive Night Vision
 	
 	//////// Advanced Shadow Jitter - Meltac and Daemonjax
-	//#define HIGH_QUALITY_JITTER			// Uses a more expensive method for jittering shadows cast by the sun/moon -- but looks way better!  Set JITTER_SAMPLES below.  Be sure to set KERNEL value above to something sensible!
+	#define HIGH_QUALITY_JITTER			// Uses a more expensive method for jittering shadows cast by the sun/moon -- but looks way better!  Set JITTER_SAMPLES below.  Be sure to set KERNEL value above to something sensible!
 	//#define HIGH_QUALITY_JITTER_LEGACY	// Enable old jitter implementation 
 
 	///////// Advanced Features - By Meltac
@@ -104,7 +104,7 @@
 #endif
 	
 	///////// Diffuse Lighting Contrast
-	#define TEX_CONT				// 109992, Increase texture contrast for diffuse lighting. Vals set in Misc. Lighting. (makes shadows darker)
+	//#define TEX_CONT				// 109992, Increase texture contrast for diffuse lighting. Vals set in Misc. Lighting. (makes shadows darker)
 	
 	#ifdef SSAO
 		//////////////////////////////////////////////////////////////
@@ -411,7 +411,7 @@
 		#define FINAL_INTERSECTION_LOOPS int(5)	//Amount of additional samples to increase accuracy.
 	//== Performance Options:
 	#ifndef optimized
-		//#define PARALLAX_FADE			//Parllax textures fade back to regular normals with distance; increases FPS and fixes anisotropic filtering. #Disabling this strangely gave me a much higher FPS.
+		#define PARALLAX_FADE			//Parllax textures fade back to regular normals with distance; increases FPS and fixes anisotropic filtering. <<Disabling this strangely gave me a much higher FPS>>
 	#endif
 		#define START_FADE float(0.0003)	//Distance the fading starts
 		#define STOP_FADE float(0.0004)   //Distance the fading stops, and the texture returns to just using normals.

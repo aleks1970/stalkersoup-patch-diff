@@ -1,0 +1,15 @@
+//TB3D 109993 Adapted from Meltac 2.0 DX11 shaders, #elif fixed
+#include "common.h"
+#ifdef DX11
+
+float4 main(float4 tc:TEXCOORD0):COLOR {
+return tex2Dproj(s_base,tc);
+}
+
+#else
+
+half4 main(float4 tc:TEXCOORD0):COLOR {
+return tex2Dproj(s_base,tc);
+}
+
+#endif

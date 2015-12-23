@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.4 removed from god mode as 0 in radiation_factor = god mode, minor changes, final delta to actor, tb3d_harsh_environment, added bread, exo tb3d
-function my_ver() return "1.0.9.9.8.4" end
+--TB3D 1.0.9.9.9.3 removed from god mode as 0 in radiation_factor = god mode, minor changes, final delta to actor, tb3d_harsh_environment, added bread, exo tb3d, removed mushroom
+function my_ver() return "1.0.9.9.9.3" end
 ------------------------------------------------------------------------------------------------
 -- actor.radiation also changed by:
 -- soul_cube_binder:slash_target and dmx_medicines.radioprotector_update
@@ -34,10 +34,10 @@ function apply_radiation(time)
 		  delta_radiation =  delta_radiation + 0.0001
 			--TB3D_Services.packet_alert("arc rad: delta["..utils.to_str(delta_radiation).."] rad bread")
 		end
-		if db.actor:object("mushroom") then
-		  delta_radiation =  delta_radiation + 0.001
+		--if db.actor:object("mushroom") then			109993, too many of them to be radioactive
+		 -- delta_radiation =  delta_radiation + 0.001
 			--TB3D_Services.packet_alert("arc rad: delta["..utils.to_str(delta_radiation).."] mushroom")
-		end
+		--end
 		if db.actor:object("case_nebo") then
 		  delta_radiation =  delta_radiation + 0.003
 		  spawn_telepatic()

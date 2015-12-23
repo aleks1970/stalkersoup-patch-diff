@@ -1,0 +1,27 @@
+//TB3D 109993 Adapted from Meltac 2.0 DX11 shaders
+#include "common.h"
+
+#ifdef DX11
+struct v2p {
+float2 tc0:TEXCOORD0;
+float4 c:COLOR0;
+};
+float4 main(v2p I):COLOR {
+float4 c=I.c*tex2D(s_base,I.tc0);
+float4 result = float4(c.xyz,1);
+result.a = round(result.a*100.f)/100.f+0.00001f;
+return result;
+}
+
+#else
+
+struct v2p {
+float2 tc0:TEXCOORD0;
+half4 c:COLOR0;
+};
+half4 main(v2p I):COLOR {
+half4 c=I.c*tex2D(s_base,I.tc0);
+return half4(c.xyz,1);
+}
+
+#endif

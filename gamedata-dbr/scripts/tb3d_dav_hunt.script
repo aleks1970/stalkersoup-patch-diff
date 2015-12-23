@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.1 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.0.9.9.9.3 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 -- dav update 16Apr14, item 17, send_tip_id optimization, fixed send_tip_id to amk_send_tip_id, debug, save now, moved triggers and added debug,
--- af gold on roof in eprip, stash 14 lc to npp1
-function my_ver() return "1.0.9.9.9.1" end
+-- af gold on roof in eprip, stash 14 lc to npp1, spawn_tel
+function my_ver() return "1.0.9.9.9.3" end
 -- randomly caches Collector treasures and provides base for bind_stalker services
 
 local string_sub = string.sub
@@ -151,6 +151,7 @@ function spawn_shrooms(n)
 		get_item("stepup1")
 		get_item("stepup1")
 	elseif n == 16 then
+		TB3D_collector_dialog.spawn_tel()					--109993, portals
 		get_item("radar_t1")
 		get_item("radar_t2")
 		get_item("radar_t3")

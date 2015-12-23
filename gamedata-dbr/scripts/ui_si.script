@@ -1,11 +1,12 @@
--- TB3D 1.0.9.9.9.2 added more new quest weapons and ammo - fixed spawn npc,added ump45, fake_ to knives, ara_pda,
+-- TB3D 1.0.9.9.9.3 added more new quest weapons and ammo - fixed spawn npc,added ump45, fake_ to knives, ara_pda,
 -- added m82, rpd , ald weapons , saiga taktik 1 and 2, fss, m1892, removed unused yantar info,
 -- changed addrs to addx as addrs is a quest item, dmx_skat15_upgrade, removed obsolete infos, added specnaz_m1 in quest items,
 -- removed dups and added glowsticks, removed bad spawns, removed unnecessary: "flame_parts", "exo_mil_exoskeleton_addrs",
 -- duplicated "stco" and added "wpn_flame_modern" weapon, new glow grenades - aleks1970, vehicles, wpn_laser,
 -- Nano: line 1765 and below, wpn_fn2000_comp line 1152, ammo_5.56x45r, ammo_pkm_box_1, ammo_pkm_box_2 line: 1152,
--- wpn_m249 line: 1191, new meceniy_outfit_strelok - aleks1970, treasure hunt weapons, mushroom arts
-function my_ver() return "1.0.9.9.9.2" end
+-- wpn_m249 line: 1191, new meceniy_outfit_strelok - aleks1970, treasure hunt weapons, mushroom arts, wpn_ak75
+
+function my_ver() return "1.0.9.9.9.3" end
 --"**Original Author: S.T.A.L.K.E.R. RAZOR995 DOLG **",
 spawn_type = nil
 
@@ -1002,6 +1003,7 @@ local item_table = {
 	"wpn_rk95",
 	"wpn_ak47_sk1",
 	"wpn_m4_taktik",
+	"wpn_ak75",
 	"wpn_ognemet",
 	"wpn_soulcube",
 	"hand_radio_f",
@@ -1187,6 +1189,7 @@ local wpn_table = {
 	"wpn_ak74",
 	"wpn_ak74u",
 	"wpn_aks74m",
+	"wpn_ak75",
 	"wpn_abakan",
 	"wpn_abakan_m1",
 	"wpn_abakan_m2",

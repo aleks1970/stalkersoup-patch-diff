@@ -1,4 +1,4 @@
-;;;TB3D 1.0.9.9.7.5 added cordon ambients, in game weather options
+;;;TB3D 1.0.9.9.9.1 added cordon ambients, in game weather options, Meltac DX11 shaders (nothing used att)
 
 #include "env_ambient.ltx"
 ;;	#include "env_ambient_ext.ltx"
@@ -19,6 +19,7 @@
 ;#include "weather_cloudy_light_rain.ltx"
 #include "weather_dynamic.ltx"     ; Generated
 #include "weather_dynamic_ext.ltx" ; Generated
+;#include "weather_lq.ltx"			;109991, Meltac
 
 #include "ambient_effects.ltx"
 ;;	#include "env_ambient_defaults.ltx"
@@ -42,6 +43,7 @@ test            = sect_test
 default         = sect_default_weather
 default1         = sect_default1_weather
 indoor          = sect_indoor
+;indoor_x18      = sect_indoor_x18		;109991, Meltac
 cordon			= sect_rain
 garbage			= sect_default1_weather
 bar				= sect_default1_weather
@@ -62,6 +64,7 @@ pre_blow        = sect_stancia
 chernobyl       = sect_stancia
 mrachno			= sect_rain
 boloto			= sect_boloto
+;lq				= sect_lq			;109991, Meltac
 
 agr_ugrnd	= sect_ugrnd_agro
 x18_ugrnd	= sect_ugrnd_x18
