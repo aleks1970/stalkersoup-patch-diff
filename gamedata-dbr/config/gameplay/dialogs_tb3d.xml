@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.9.4 tweed in ds, baldy, karin and dd_inform, tractorist, predbannik_barman, more content, barman, sid -->
+<!-- ************ TB3D 1.0.9.9.9.8 tweed in ds, baldy, karin and dd_inform, tractorist, predbannik_barman, more content, barman, sid -->
 <game_dialogs>
 
 	<!--  ZEP - Zone Expansion Project, 24 documents  -->
@@ -559,6 +559,7 @@
 		<has_info>tb3d_sms_storm</has_info>
 		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
 		<dont_has_info>tb3d_got_lanky_suit</dont_has_info>
+		<dont_has_info>tb3d_lanky_suit_talk</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
 				<text>barman_zep6_0</text>
@@ -2208,6 +2209,7 @@
 		<has_info>tb3d_sms_storm</has_info>
 		<dont_has_info>tb3d_sms_storm_over</dont_has_info>
 		<dont_has_info>tb3d_got_lanky_suit</dont_has_info>
+		<dont_has_info>tb3d_lanky_suit_talk</dont_has_info>
 		<precondition>tb3d_dialog.lanky_arts_not_have</precondition>
 		<phrase_list>
 			<phrase id="0">
@@ -2237,6 +2239,7 @@
 			<phrase id="6">
 				<text>lanky_suit_6</text>
 				<action>tb3d_dialog.spawn_f1_mushart</action>
+				<give_info>tb3d_lanky_suit_talk</give_info>
 			</phrase>
 		</phrase_list>
 	</dialog>
@@ -2274,7 +2277,7 @@
 				<next>6</next>
 			</phrase>
 			<phrase id="6">
-				<text>lanky_suit_6</text>
+				<text>lanky_suit2_6</text>
 				<action>dialogs.break_dialog</action>
 			</phrase>
 		</phrase_list>

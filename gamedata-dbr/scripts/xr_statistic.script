@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.5, new rep system, sim_getNpcType, get_monster_spot, pda_is_blocked, "NIL" to "nil"
-function my_ver() return "1.0.9.9.9.5" end
+--TB3D 1.0.9.9.9.8, new rep system, sim_getNpcType, get_monster_spot, pda_is_blocked, "NIL" to "nil"
+function my_ver() return "1.0.9.9.9.8" end
 
 local killCountProps = {
 	neutral_novice = 1, 	neutral_experienced = 2, 	neutral_veteran = 3, 	neutral_master = 4,
@@ -63,7 +63,8 @@ local sect_alias = {
 	rat_normal = "rat_normal",
 	rat_strong = "rat_normal",
 	fracture_normal = "fracture_normal",
-	fracture_strong = "fracture_strong"
+	fracture_strong = "fracture_strong",
+	tb3dm_snork_jumper = "snork_strong"
 
 }
 
@@ -90,6 +91,7 @@ monster_classes = {
 
 function addKillCount(victim)
 	if (victim) then
+		--TB3D_Services.packet_alert("xr statistic: addKillCount["..victim:name().."]")
 		local props, sect = getNpcType(victim)
 		if (props == nil or sect == nil) then return end
 		local sect_name
@@ -106,6 +108,7 @@ function addKillCount(victim)
 			if killCountProps[sect_name] == nil then
 				if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("Statistics: -ERROR- KillCountprops["..tostring(sect_name).."] is NIL after add_points!") end
 			else
+				--TB3D_Services.packet_alert("xr statistic: addKillCount change actor rank["..killCountProps[sect_name].."] section name["..sect_name.."]")
 				TB3D_Services.change_rank(db.actor, killCountProps[sect_name])
 				--db.actor:set_character_rank(db.actor:character_rank() + killCountProps[sect_name])
 			end
@@ -126,9 +129,15 @@ local communityByCommunity = {
 	["zombied"] = "zombied",
 	["nebo"] = "nebo",
 	["lastday"] = "lastday"
+	--["tb3dm_mon_regular"] = "monolith",
+	--["tb3dm_mon_monster"] = "monolith",
+	--["tb3dm_mon_robot"] = "monolith",
+	--["tb3dm_mon_nauch"] = "monolith",
+	--["tb3dm_mon_regular"] = "monolith"
 }
 
 function getNpcType(npc)
+	--TB3D_Services.abort_alert("Statistic: getNPCType["..npc:name().."]")
 	if (npc) and (npc.clsid) then
 		if IAmAStalker[npc:clsid()] then
 			local community = communityByCommunity[npc:character_community()]
@@ -148,6 +157,7 @@ function getNpcType(npc)
 end
 
 function sim_getNpcType(npc)
+	--TB3D_Services.abort_alert("Statistic: sim_getNPCType["..npc:name().."]")
 	if (npc) and (npc.clsid) then
 		local cls = npc:clsid()
 		if cls == clsid.script_stalker then

@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.8.9 chgd >0.95 to >0.94, dmx135, fixed act_upgreid_ suit order, sveeblov_ferma_have, formatting and debug,
+--TB3D 1.0.9.9.9.8 chgd >0.95 to >0.94, dmx135, fixed act_upgreid_ suit order, sveeblov_ferma_have, formatting and debug,
 -- add_man health, kalmyak, prizrak_finalzver_done, treasure_ecolog_have, out_item_much, mutant parts for dan, can_start_dan,
 -- can_start_arhara, out_items_count
-function my_ver() return "1.0.9.9.8.9" end
+function my_ver() return "1.0.9.9.9.8" end
 
 local nagrad = {
   level_1 = {
@@ -526,6 +526,7 @@ function yakut_help_done(first_speaker, second_speaker)
 end
 
 function yakut_treasure_have(task, objective) 
+	--TB3D_Services.packet_alert("new dialog: yakut treasure have")
 	if db.actor ~= nil then
 		return db.actor:object("notebook_new") ~= nil
 	end

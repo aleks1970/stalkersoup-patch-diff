@@ -1,12 +1,13 @@
--- TB3D 1.0.9.9.9.6 added more new quest weapons and ammo - fixed spawn npc,added ump45, fake_ to knives, ara_pda,
+-- TB3D 1.0.9.9.9.8 added more new quest weapons and ammo - fixed spawn npc,added ump45, fake_ to knives, ara_pda,
 -- added m82, rpd , ald weapons , saiga taktik 1 and 2, fss, m1892, removed unused yantar info,
 -- changed addrs to addx as addrs is a quest item, dmx_skat15_upgrade, removed obsolete infos, added specnaz_m1 in quest items,
 -- removed dups and added glowsticks, removed bad spawns, removed unnecessary: "flame_parts", "exo_mil_exoskeleton_addrs",
 -- duplicated "stco" and added "wpn_flame_modern" weapon, new glow grenades - aleks1970, vehicles, wpn_laser,
 -- Nano: line 1765 and below, wpn_fn2000_comp line 1152, ammo_5.56x45r, ammo_pkm_box_1, ammo_pkm_box_2 line: 1152,
--- wpn_m249 line: 1191, new meceniy_outfit_strelok - aleks1970, treasure hunt weapons, mushroom arts, wpn_ak75, translate
+-- wpn_m249 line: 1191, new meceniy_outfit_strelok - aleks1970, treasure hunt weapons, mushroom arts, wpn_ak75, translate, repair_kit,
+-- tb3d_gbars_chp2, is_spawner
 
-function my_ver() return "1.0.9.9.9.6" end
+function my_ver() return "1.0.9.9.9.8" end
 --"**Original Author: S.T.A.L.K.E.R. RAZOR995 DOLG **",
 local translate = game.translate_string
 spawn_type = nil
@@ -58,6 +59,10 @@ local stalker_table = {
 		"tb3dm_killer_exo_unic",
 		"tb3dm_killer_last_day",
 		"tb3dm_killer_last_day_nauc",
+		"tb3dm_mon_regular",
+		"tb3dm_mon_nauch",
+		"tb3dm_mon_robot",
+		"tb3dm_mon_monster",
 		"************************* ARSENAL MOD *************",
 		"aem_military_t1_1_1",
 		"aem_military_t1_2_1",
@@ -137,8 +142,52 @@ local stalker_table = {
 		"aem_bandit_t2_3_1",
 		"aem_bandit_t2_3_2",
 		"aem_bandit_t2_3_3",
-		"***************Last Day Killers*******************",
-		"lastday_master"
+		"*************** Last Day Killers by dAVROs *******************",
+		"lastday_master",
+		"ldk1_master",
+		"ldk2_master",
+		"ldk3_master",
+		"ldk4_master",
+		"ldk5_master",
+		"ldk6_master",
+		"ldk7_master",
+		"ldk8_master",
+		"ldk9_master",
+		"ldk1_troop",
+		"ldk1_nano",
+		"ldk2_nano",
+		"ldk3_nano",
+		"ldk4_nano",
+		"sim_nano_master",
+--[[		"sim_nano_master2",
+		"sim_nano_master3",
+		"sim_nano_master4",]]--
+		"sim_troop_master",
+		"ldk_commander1",
+		"ldk_commander2",
+		"ldk_commander3",
+		"ldk_commander4",
+		"ldk_commander5",
+		"ldk_commander6",
+		"dav_ldk_veteran_respawn1",		
+		"dav_ldk_veteran_respawn2",		
+--[[		"dav_ldk_veteran_respawn3",		
+		"dav_ldk_veteran_respawn4",		
+		"dav_ldk_veteran_respawn5",		
+		"dav_ldk_veteran_respawn6",		
+		"dav_ldk_veteran_respawn7",		
+		"dav_ldk_veteran_respawn8",]]--
+		"dav_ldk_master_respawn1",
+		"dav_ldk_master_respawn2",
+--[[		"dav_ldk_master_respawn3",
+		"dav_ldk_master_respawn4",
+		"dav_ldk_master_respawn5",
+		"dav_ldk_master_respawn6",
+		"dav_ldk_master_respawn7",
+		"dav_ldk_master_respawn8",
+		"dav_ldk_master_respawn9",
+		"dav_ldk_master_respawn10",
+		"dav_ldk_master_respawn11"]]--
 		}
 
 local mob_table = {
@@ -565,12 +614,14 @@ local item_table = {
 	"device_torch",
 	"device_torch_bad",
 	"amk_metka",
-	"repair_box_outfit",
-	"repair_item_outfit",
-	"repair_item_weapon",
+	"repair_kit",
 	"device_pda_npc",
 	"pda_art_mod",
 	"stco",
+	"*********** - Revamped Repair kit - *************",
+	"repair_kit",
+	--"spare_parts",
+	--"spare_parts_small",
 	"******ALIFE DETECTOR********",
 	"bioradar",
 	"******RADIATION DETECTOR****",
@@ -1142,6 +1193,7 @@ local wpn_table = {
 	"wpn_fort_m1",
 	"wpn_beretta",
 	"wpn_beretta_m1",
+	"wpn_beretta_stars",
 	"wpn_hpsa",
 	"wpn_walther",
 	"wpn_walther_m1",
@@ -1218,6 +1270,8 @@ local wpn_table = {
 	"wpn_bizon1",
 	"wpn_m4",
 	"wpn_tavor",
+	"wpn_bizon_pp19",
+	"wpn_bizon_pp19_kol",
 	"wpn_famas_p3_sk1",
 	"wpn_m16a2_sk1",
 	"wpn_m16a2_sk12",
@@ -1326,9 +1380,11 @@ local wpn_table = {
 	"wpn_addon_silencer_pistol",
 	"wpn_addon_grenade_launcher",
 	"wpn_addon_grenade_launcher_m203",
+	"wpn_tulip_scope",
 	"wpn_addon_sil_9_p",		
 	"wpn_addon_acog",
 	"wpn_addon_scope1",
+	"wpn_addon_sil_tmp",
 	"wpn_addon_sil_556_ar",
 	"wpn_addon_sil_762_ar",
 	"***Terrorism modes, explosive***",
@@ -2125,6 +2181,13 @@ local info_portion_table = {
 	"pogost_oxranik_helpmutant",
 	"pogost_help",
 	"pogost_haker_find",
+	"tb3d_lanky_suit_talk",
+	"tb3d_sms_storm_suit",
+	"tb3d_got_lanky_suit",
+	"tb3d_sms_storm",
+	"tb3d_sms_storm_areas",
+	"tb3d_give_storm_info",
+	"tb3d_gbars_chp2",
 	"tb3d_block_1",
 	"tb3d_block_2",
 	"storyline_actor_start",
@@ -5992,7 +6055,8 @@ local info_portion_table = {
 	"norman_psi_off",
 	"norman_walk2",
 	"spawn_vstreca_zaton",
-	"zaton_put_gruppu"
+	"zaton_put_gruppu",
+	"start_cop_prip_info_lab"
 }
 
 local page_size = 1000
@@ -6236,9 +6300,13 @@ function spawn_item_dialog:OnButton_create_clicked()
 			alife():create(item, pos, 0, 0, db.actor:id())
 		end
      elseif spawn_type=="stalker" then
+		is_spawner = true
 		pos = pos:add(dir:mul(3))
-		TB3D_Services.packet_alert(string.format("TB3D_Spawn: alife():create(\"%s\",vector():set(%.3f,%.3f,%.3f),%d,%d,expendable_object)",item,pos.x,pos.y,pos.z,db.actor:level_vertex_id(),db.actor:game_vertex_id()))
- 		alife():create(item, pos, db.actor:level_vertex_id(), db.actor:game_vertex_id(),expendable_object)
+ 		if alife():create(item, pos, db.actor:level_vertex_id(), db.actor:game_vertex_id(),expendable_object) == nil then
+			TB3D_Services.abort_alert(string.format("TB3D_Spawn: alife():create failrd(\"%s\",vector():set(%.3f,%.3f,%.3f),%d,%d,expendable_object) !!!!",item,pos.x,pos.y,pos.z,db.actor:level_vertex_id(),db.actor:game_vertex_id()))
+		else
+			TB3D_Services.packet_alert(string.format("TB3D_Spawn: alife():create(\"%s\",vector():set(%.3f,%.3f,%.3f),%d,%d,expendable_object)",item,pos.x,pos.y,pos.z,db.actor:level_vertex_id(),db.actor:game_vertex_id()))
+		end
       elseif spawn_type=="anom" then
 		pos = pos:add(dir:mul(3))
  		spawn_anom(item,pos)

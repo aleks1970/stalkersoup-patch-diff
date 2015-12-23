@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.0 new 10/15/12
-function my_ver() return "1.0.9.9.7.0" end
+--TB3D 1.0.9.9.9.8 new 10/15/12
+function my_ver() return "1.0.9.9.9.8" end
 
 -- -i -noprefetch -ltx user_andy.ltx -external -start server(andy_test_switch/single) client(localhost)
 --client entity
@@ -64,9 +64,11 @@ function ce_switcher:net_Spawn(se_object)
 end
 
 function ce_switcher:net_Destroy()
+	--TB3D_Services.packet_alert("ce switcher: net destroy")
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("ce switcher: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	CGameObject.net_Destroy(self)
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("ce switcher: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("ce switcher: net destroy done")
 end
 
 function ce_switcher:OnStateChanged(old_state, new_state)

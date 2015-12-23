@@ -1,5 +1,5 @@
-<!-- ************ TB3D 1.0.9.9.8.9 supplies and dialogs now includes, reduced money fake_ to knives, fixed log book,
- vitamin dialog, controller vice comptroller, dsity_rasstrel_items, bunker_last1, foto_monolitovets, boatswain, 100% localized *************** -->
+<!-- ************ TB3D 1.0.9.9.9.8 supplies and dialogs now includes, reduced money fake_ to knives, fixed log book,
+ vitamin dialog, controller vice comptroller, dsity_rasstrel_items, bunker_last1, foto_monolitovets, boatswain, 100% localized, generators_prizrak *************** -->
 <xml>
 	<!-- ***************<Akim>*************** -->
 	<specific_character id="esc_akim" team_default="1">
@@ -6442,9 +6442,10 @@ include "inventory\merc_items.xml"
 #include "gameplay\character_criticals_2.xml"
 #include "dialogs\bdoc3_arhara.xml"
 	</specific_character>
-	<!-- ***************Boatswain on generators*************** 109980 -->
+	<!-- ***************Ghost on generators*************** 109998 -->
 	<specific_character id="generators_prizrak" team_default="1">
-		<name>Boatswain_name_gameplay</name>
+		<!--name>Boatswain_name_gameplay</name-->
+		<name>Ghost_name_gameplay</name>
 		<icon>ui_npc_gener_prizrak</icon>
 		<map_icon x="0" y="6"/>
 		<bio>sim_stalker_veteran_bio</bio>

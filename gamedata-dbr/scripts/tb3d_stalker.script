@@ -1,8 +1,8 @@
---<!-- TB3D 1.0.9.9.9.7 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.0.9.9.9.8 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
---item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals
-function my_ver() return "1.0.9.9.9.7" end
+--item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals, lukash brains
+function my_ver() return "1.0.9.9.9.8" end
 
 local translate = game.translate_string
 local text_color_tip = TB3D_Services.get_text_color("tip")
@@ -215,16 +215,6 @@ function on_item_take(obj)
 			end
 		end
 		is_remove_obj = true
-	elseif sect=="item_doc_x8" then							--109970 pick up a notebook in the apartment and spawns Librarian
-		if ln=="pripyat" and not has_alife_info("cop_prip_info_take_doc") then
-			TB3D_Services.give_info("cop_prip_info_take_doc")
-			news_manager.amk_send_tip_id("sms_x8_doc1", "bullseye_private", 10, 20, "actor_sms")
-			news_manager.amk_send_tip_id("sms_x8_doc2", "shadows_private", 30, 30)
-			alife():create("bibliotekar",vector():set(140.922,-0.367,220.575),370139,3769)
-			TB3D_Triggers.spawn_alife("werewolf",-49.974,-0.507,-71.471,139443,3759, 2)
-			TB3D_Triggers.spawn_alife("werewolf",140.922,-0.367,220.575,370139,3769, 2)
-			dmx_mod.pripyat_base_spawn()
-		end
 	elseif sect=="sak_document" then
 		if ln=="l10_radar" then
 			sak.add_new_radar_106()
@@ -467,9 +457,9 @@ function on_item_take(obj)
 		end
 	elseif sect == "mozg" then													--109993
 		if has_alife_info("svoboda_lukash_start") and not has_alife_info("svoboda_lukash_done") then
-			--if arhara1_dialog1.anarh_mozg_have() == true then
+			if arhara1_dialog1.anarh_mozg_have() == true then					--109998
 				TB3D_Services.give_info("svoboda_lukash_have")
-			--end
+			end
 		end
 	elseif sect == "antizombie" then													--109995
 		if has_alife_info("chaes_perexod_start") and not has_alife_info("chaes_perexod_done") then
@@ -509,6 +499,16 @@ function on_item_take(obj)
 		if has_alife_info("doktor_teleport_12_faze1") and not has_alife_info("doktor_teleport_12_done") then
 			TB3D_Services.give_info("doktor_teleport_12_have")
 		end
+	elseif sect == "pisma_stalka" then		--109998
+		if has_alife_info("plot_dialog_say_start") and not has_alife_info("plot_dialog_say_done") then
+			TB3D_Services.give_info("plot_dialog_say_have")
+		end
+	elseif sect == "outfit_specnaz_m1" then		--109998, found in first trip to yantar
+		if ln == "l08_yantar" then
+			TB3D_Services.give_info("mil_lukash_heal_reward")
+		end
+	elseif sect == "notebook_new" then
+		TB3D_Services.give_info("yakut_treasure_have")
 	end
 	if info_given == true then amk_dialogs.info_received() end
 	--109990, move multiple item quests to here to reduce loop load

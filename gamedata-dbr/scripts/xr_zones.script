@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.0 destroy message, cleanup
-function my_ver() return "1.0.9.9.7.0" end
+--TB3D 1.0.9.9.9.8 destroy message, cleanup
+function my_ver() return "1.0.9.9.9.8" end
 --'------------------------------------------------------------------------------------------------------------------
 --' Binder скриптовых зон
 --' Используется только в одном месте в игре, на арене для того чтобы удалять "отработанные" предметы.
@@ -37,11 +37,13 @@ function arena_zone_binder:net_spawn(server_object)
 end
 
 function arena_zone_binder:net_destroy()
+	--TB3D_Services.packet_alert("xr zones: net destroy")
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("xr zones: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	self.object:set_callback(callback.zone_enter, nil)
 	self.object:set_callback(callback.zone_exit, nil)
 	object_binder.net_destroy(self)
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("xr zones: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("xr zones: net destroy done")
 end
 
 function arena_zone_binder:purge_items()

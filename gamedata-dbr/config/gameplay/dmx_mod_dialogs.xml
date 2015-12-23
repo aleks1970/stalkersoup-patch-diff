@@ -1,4 +1,4 @@
-<!-- ***** TB3D 1.0.9.9.7.2 updated to 135, fixed soul cube, removed "�" aleks1970 ***** -->
+<!-- ***** TB3D 1.0.9.9.9.8 updated to 135, fixed soul cube, removed "�" aleks1970 ***** -->
 <game_dialogs>
 	<!-- ***************RyLiosha spawn - modified-by-phobos2077*************** -->
 	<dialog id="rul_sidor_cars">
@@ -566,7 +566,7 @@
 				<text>start_shadows_dialog4_bad</text>
 				<action>dmx_mod.shadows_enemy</action>
 				<give_info>start_shadows_dialog_off</give_info>
-				<action>dialogs.break_dialog</action>
+				<next>9</next>
 			</phrase>
 			<phrase id="6">
 				<text>start_shadows_dialog5</text>
@@ -581,6 +581,29 @@
 				<action>dmx_mod.fake_cube_dal</action>
 				<give_info>start_shadows_dialog_off</give_info>
 				<give_info>shadows_friend</give_info>
+				<next>10</next>
+			</phrase>
+			<phrase id="9">
+				<text>start_shadows_dialog9_bad</text>
+				<next>10</next>
+			</phrase>
+			<phrase id="10">
+				<text></text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="start_shadows_dialog_bad">
+		<has_info>start_shadows_dialog_off</has_info>
+		<dont_has_info>shadows_friend</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>shadows_quest_cube_bad0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>shadows_quest_cube_bad1</text>
+				<action>dialogs.break_dialog</action>
 			</phrase>
 		</phrase_list>
 	</dialog>

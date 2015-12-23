@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.8.9 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
+<!-- ************ TB3D 1.0.9.9.9.8 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
   can_start_dan, treasure_ecolog_have, ghost diary, preds after info checks *************** -->
 <game_dialogs>
 	<dialog id="prinesi_hvost">
@@ -812,8 +812,10 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="yakut_done_notebook">
+		<has_info>yakut_treasure_start</has_info>			<!-- 109998 -->
 		<has_info>yakut_treasure_have</has_info>
-		<dont_has_info>yakut_treasure_done</dont_has_info>
+		<precondition>new_dialog.yakut_treasure_have</precondition>
+		<!--dont_has_info>yakut_treasure_done</dont_has_info-->
 		<phrase_list>
 			<phrase id="0">
 				<text>yakut_done_notebook_0</text>
@@ -832,7 +834,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="dan_nauch_flash">
-		<has_info>yakut_treasure_start</has_info>
+		<has_info>yakut_treasure_done</has_info>			<!-- 109998 -->
 		<dont_has_info>dan_flash_start</dont_has_info>
 		<phrase_list>
 			<phrase id="0">

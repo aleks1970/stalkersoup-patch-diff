@@ -1,6 +1,6 @@
-;<!-- TB3D 1.0.9.9.7.4 edits by glowworm, adjusted torch position, argali to arhara, device_pda -->    
+;<!-- TB3D 1.0.9.9.9.8 edits by glowworm, adjusted torch position, argali to arhara, device_pda -->    
 ;<!-- aleks1970; excluded duplicates section and commented out "discovery_dependency" aleks1970 --> 
-;added testsak_l12_stancia_2, car_key_2, bread_a and vodka_a consumable
+;added testsak_l12_stancia_2, car_key_2, bread_a and vodka_a consumable, added Repair Kit Revamped - aleks1970
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;	FOOD		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1509,3 +1509,38 @@ cost				= 1000
 description			= enc_item_btr_key_descr
 inv_name			= item_btr_key
 inv_name_short		= item_btr_key_s
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;109998							 - Repair Kit Revamped Start - 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[repair_kit]:identity_immunities
+GroupControlSection	= spawn_group
+;discovery_dependency	=
+$spawn				= "devices\quest_items\repair_kit"
+$prefetch			= 32
+class				= II_ANTIR
+cform				= skeleton
+visual				= equipments\revamped_repair_box.ogf
+radius				= 1
+description			= enc_equipment_repair_kit
+inv_name			= revamped_repair_kit
+inv_name_short		= revamped_repair_kit
+inv_weight			= 2.50
+quest_item			= false	;true	;aleks1970
+inv_grid_width		= 2
+inv_grid_height		= 2
+inv_grid_x			= 57
+inv_grid_y			= 17
+cost				= 12500
+eat_health			= 0
+eat_satiety			= 0
+eat_power			= 0
+eat_radiation		= 0
+eat_alcohol			= 0
+wounds_heal_perc	= 0
+eat_portions_num	= 1
+animation_slot		= 4
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;							 - Repair Kit Revamped End - 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

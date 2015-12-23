@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.6 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.0.9.9.9.8 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
 --has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts, last_day
-function my_ver() return "1.0.9.9.9.6" end
+function my_ver() return "1.0.9.9.9.8" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
@@ -54,7 +54,8 @@ local names_info = {
 	["xalyava_naem6"] = "xalyava_naem6_dead",
 	["xalyava_naem7"] = "xalyava_naem7_dead",
 	["xalyava_naem8"] = "xalyava_naem8_dead",
-	["pri_followers_leader"] = "pri_aes_mapspot"--,
+	["pri_followers_leader"] = "pri_aes_mapspot",
+	["val_lager_bandits_borov"] = "val_borov_dead"
 	--["pri_followers_bomber"] = "pri_bomber_dead"
 }
 local coll_names_info = {
@@ -94,33 +95,32 @@ function drop_manager:check_dead_weapons()
 			if string_find(npc_name, "charactercommander") then return end
 			--if lname == "red_forest" or lname == "dead_city" then return end
 		end
-		local min_cond = TB3D_Modders.loadout_weapon_cond									--109981
+		local is_rand = TB3D_Modders.loadout_rand_cond
+		local min_cond = TB3D_Modders.loadout_min_cond									--109981
 		if min_cond == nil or min_cond < 0 or min_cond > 99 then min_cond = 80 end
 		local item_in_slot = self.npc:item_in_slot(1)
 		if item_in_slot then
 			item_in_slot:unload_magazine()													--remove ammo to prevent child ctd
-			item_in_slot:set_condition(math_random(min_cond, 100)/100)
+			if is_rand then item_in_slot:set_condition(math_random(min_cond, 100)/100) end
 		end
 		item_in_slot = self.npc:item_in_slot(2)
 		if item_in_slot then
 			item_in_slot:unload_magazine()													--remove ammo to prevent child ctd
-			item_in_slot:set_condition(math_random(min_cond, 100)/100)
+			if is_rand then item_in_slot:set_condition(math_random(min_cond, 100)/100) end
 		end
 		function check_weapon(npc, item)																	--109981
 			if npc and item and alife():object(item:id()) then
 				if IAmAWeapon[item:clsid()] then
 					item:unload_magazine()																	--109981, pm still causes error with 9x18_fmj
 					if protected_items.obj_is_protected(item) == false then
-						local min_cond = TB3D_Modders.loadout_weapon_cond									--109981
-						if min_cond == nil or min_cond < 0 or min_cond > 99 then min_cond = 80 end
-						item:set_condition(math_random(min_cond, 100)/100)
+						if is_rand then item:set_condition(math_random(min_cond, 100)/100) end
 						return true
 					end
 				end
 			end
 			return false
 		end
-		self.npc:iterate_inventory(check_weapon, self.npc)
+		--self.npc:iterate_inventory(check_weapon, self.npc)
 	end
 end
 
@@ -323,6 +323,7 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 				  and not string_find(item:name(), "grenade")
 				  and not string_find(item:name(), "_addon")) then
 					counter = counter + 1
+					return true
 				end
 			end
 			return true
@@ -330,6 +331,7 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 		if counter == 0 then self.npc:iterate_inventory(has_weapons, self.npc) end
 	end
 	if counter == 0 then 													--109996, no weapon so dynamically assign loadout
+--[[
 		local min_cond = TB3D_Modders.min_weapon_cond								--109981
 		if min_cond == nil or min_cond > 99 or min_cond < 0 then min_cond = 80 end
 		--if TB3D_Modders.use_loadout_message == true then
@@ -354,6 +356,7 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 				if suit_id then suit_id:set_condition(math_random(min_cond, 100)/100) end
 			end
 		end
+]]--
 		local ammo_cnt = TB3D_Modders.loadout_ammo_count or 200				--109981, excess will be removed when npc dies
 		if commun == "zombied" then
 			--TB3D_Services.packet_alert("death mgr: ["..utils.to_str(npc_name).."] has loadout[zombied]")

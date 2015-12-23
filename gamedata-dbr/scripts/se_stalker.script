@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.8 replaced debug flags, added my_ver, switch online, companion, brain update, companion moved, generators_udav
-function my_ver() return "1.0.9.9.8.8" end
+--TB3D 1.0.9.9.9.8 replaced debug flags, added my_ver, switch online, companion, brain update, companion moved, generators_udav
+function my_ver() return "1.0.9.9.9.8" end
 --[[
 Changes script_version:
   3 - conservation field job_online
@@ -83,34 +83,37 @@ end
 --------------------
 function se_stalker:can_switch_online()
 	local result = false								--assume no
-	if TB3D_Modders.test_without_npc and not self.dont_spawn_online then
-		TB3D_Services.packet_alert("SE STALKER: cso["..self:name().."] blocked!!!!")
-		self.dont_spawn_online = true
-	elseif not self.dont_spawn_online and TB3D_Population_Control.can_go_online(self) then
-		--TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online")
-		-- local ecolog=string.find(self:name(),"bar_ecolog")
-		-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
-		-- if ecolog then amk.dump_table(self.spawner) end
-		if amk.convert_npc[self.id]==true then
+	if not self.dont_spawn_online then
+		if TB3D_Population_Control.can_go_online(self) then
+			--TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online")
+			-- local ecolog=string.find(self:name(),"bar_ecolog")
+			-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
+			-- if ecolog then amk.dump_table(self.spawner) end
+			if amk.convert_npc[self.id]==true then
+				result = false
+			--dc-- elseif amk.convert_npc[self.id]==false then
+				-- result = true
+			elseif self.job_online_condlist ~= nil then
+				result = xr_logic.pick_section_from_condlist(db.actor, self, self.job_online) ~= nil
+			elseif self.job_online ~= nil then
+				result = self.job_online
+			elseif self.ini == nil or self.spawner == nil then
+				result = cse_alife_human_stalker.can_switch_online(self)
+			elseif db.actor and db.actor:alive() == false then
+				result = self.online
+			elseif self.online == false then
+				result = (xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
+			elseif xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil then 
+				result = true
+			end
+		end
+		if result and TB3D_Modders.test_without_npc then
+			TB3D_Services.packet_alert("SE STALKER: cso["..self:name().."] blocked!!!!")
+			self.dont_spawn_online = true
 			result = false
-		--dc-- elseif amk.convert_npc[self.id]==false then
-			-- result = true
-		elseif self.job_online_condlist ~= nil then
-			result = xr_logic.pick_section_from_condlist(db.actor, self, self.job_online) ~= nil
-		elseif self.job_online ~= nil then
-			result = self.job_online
-		elseif self.ini == nil or self.spawner == nil then
-			result = cse_alife_human_stalker.can_switch_online(self)
-		elseif db.actor and db.actor:alive() == false then
-			result = self.online
-		elseif self.online == false then
-			result = (xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
-		elseif xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil then 
-			result = true
-		end  
-	end
-	if TB3D_Modders.use_setup_message and string_find(self:name(), TB3D_Modders.npc_to_log) then
-		TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online["..utils.to_str(result).."]")
+		elseif TB3D_Modders.use_setup_message and string_find(self:name(), TB3D_Modders.npc_to_log) then
+			TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online["..utils.to_str(result).."]")
+		end
 	end
 	return result
 end
@@ -201,6 +204,7 @@ end
 
 --------------------
 function se_stalker:on_unregister()
+	--TB3D_Services.packet_alert("se stalker: net destroy")
 	if _g.is_disconnecting == false then			--109980
 		if TB3D_Modders.use_destroy_message == true then TB3D_Services.packet_alert("se stalker: on unregister["..utils.to_str(self:name()).."]") end
 		cse_alife_human_stalker.on_unregister(self)									--unregister in task manager
@@ -228,6 +232,7 @@ function se_stalker:on_unregister()
 		end
 		if TB3D_Modders.use_destroy_message == true then TB3D_Services.packet_alert("se stalker:  on unregister["..utils.to_str(self:name()).."] done") end
 	end
+	--TB3D_Services.packet_alert("se stalker: net destroy done")
 end
 
 --------------------

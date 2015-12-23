@@ -1,0 +1,837 @@
+-- TB3D 1.0.9.9.9.8 new
+function my_ver() return "1.0.9.9.9.8" end
+--[[--------------------------------------------------------------------------------------------------------------------------------
+ File         : repair_salvage.script
+ Description  : Repair Kit Revamped: - allows you to salvage parts from weapons and armor and use them to repair your equipment...
+ Copyright    : barak1001, StalkerSoup
+ Author       : barak1001 (Moddb)
+ Rewritten	  : for StalkerSoup by aleks1970 08/22/2015
+ LastUpdate   : 06.09.2015 by aleks1970
+--]]--------------------------------------------------------------------------------------------------------------------------------
+local base_script = nil
+local current_script = nil
+local salvage_stage = nil
+local salvage_clicked = nil
+local translate = game.translate_string
+class "select_type" (CUIScriptWnd)
+
+function select_type:__init() super()
+end
+
+function select_type:__finalize()
+end
+
+function select_type:InitControls(x, y, xml, handler)
+	base_script = handler
+	current_script = self
+	self:Init(0,0,1024,768)
+	local btn
+	btn = xml:InitStatic("repair_header", self)
+	self:Register(btn,"repair_header")
+	
+	btn = xml:InitStatic("salvage_header", self)
+	self:Register(btn,"salvage_header")
+	
+	btn = xml:InitButton("salvage_pistol", self)
+	name = translate("repair_str_pistols")
+	btn:SetText("0 " .. name)
+	btn:SetTextY(-1)
+	self:Register(btn,"salvage_pistol")
+	
+	btn = xml:InitButton("salvage_rifle", self)
+	name = translate("repair_str_rifles")
+	btn:SetText("0 " .. name)
+	btn:SetTextY(-1)
+	self:Register(btn,"salvage_rifle")
+
+	btn = xml:InitButton("salvage_armor", self)
+	name = translate("repair_str_armor")
+	btn:SetText("0 " .. name)
+	btn:SetTextY(-1)
+	self:Register(btn,"salvage_armor")
+
+	for x=1,4 do
+		local item = "pistol_" .. x
+		btn = xml:InitButton(item, self)
+		self:Register(btn,item)
+	end
+	for x=1,4 do
+		local item = "rifle_" .. x
+		btn = xml:InitButton(item, self)
+		self:Register(btn,item)
+	end
+	for x=1,4 do
+		local item = "armor_" .. x
+		btn = xml:InitButton(item, self)
+		self:Register(btn,item)
+	end
+	for x=1,4 do
+		local item = "salvage_wpn_bk_" .. x
+		btn = xml:InitButton(item, self)
+		self:Register(btn,item)
+	end
+	for x=1,4 do
+		local item = "salvage_wpn_prog_" .. x
+		btn = xml:InitProgressBar(item, self)
+		self:Register(btn,item)
+	end
+	for x=1,4 do
+		local item = "salvage_arm_bk_" .. x
+		btn = xml:InitButton(item, self)
+		self:Register(btn,item)
+	end
+	for x=1,4 do
+		local item = "salvage_arm_prog_" .. x
+		btn = xml:InitProgressBar(item, self)
+		self:Register(btn,item)
+	end
+	for x=1,4 do
+		local item = "icon_" .. x
+		btn = xml:InitStatic(item, self)
+		self:Register(btn,item)
+	end	
+	for x=1,4 do
+		for a=1,3 do
+			local item = "addon_".. x .. a
+			btn = xml:InitButton(item, self)
+			self:Register(btn,item)
+		end
+	end
+	salvage_stage = "loaded"
+	salvage_clicked = "none"
+	self:InitCallBacks()
+	set_stage()
+end
+
+function set_stage()
+	local name = nil
+	local type1 = current_script:GetButton("salvage_pistol")
+	local type2 = current_script:GetButton("salvage_rifle")
+	local type3 = current_script:GetButton("salvage_armor")
+	local pistol_btn = {}
+	local rifle_btn = {}
+	local armor_btn = {}
+	local salvage_wpn_prog = {}
+	local salvage_wpn_bk = {}
+	local salvage_arm_prog = {}
+	local salvage_arm_bk = {}
+	local icon_btn = {}
+	local addon_btn = {}
+	local header = current_script:GetStatic("salvage_header")
+	for x=1,4 do
+		pistol_btn[x] = current_script:GetButton("pistol_" .. x)
+		pistol_btn[x]:Show(false)
+		rifle_btn[x] = current_script:GetButton("rifle_" .. x)
+		rifle_btn[x]:Show(false)
+		armor_btn[x] = current_script:GetButton("armor_" .. x)
+		armor_btn[x]:Show(false)
+		icon_btn[x] = current_script:GetStatic("icon_" .. x)
+		icon_btn[x]:Show(false)
+		salvage_wpn_prog[x] = current_script:GetProgressBar("salvage_wpn_prog_" .. x)
+		salvage_wpn_prog[x]:Show(false)
+		salvage_wpn_bk[x] = current_script:GetStatic("salvage_wpn_bk_" .. x)
+		salvage_wpn_bk[x]:Show(false)
+		salvage_arm_prog[x] = current_script:GetProgressBar("salvage_arm_prog_" .. x)
+		salvage_arm_prog[x]:Show(false)
+		salvage_arm_bk[x] = current_script:GetStatic("salvage_arm_bk_" .. x)
+		salvage_arm_bk[x]:Show(false)
+		for a=1,3 do
+			addon_btn[x..a] = current_script:GetStatic("addon_" .. x .. a)
+			addon_btn[x..a]:Show(false)
+		end
+	end
+
+	type1:Show(false)
+	type2:Show(false)
+	type3:Show(false)
+	local pistols = {}
+	local rifles = {}
+	local armor = {}
+	pistols = base_script.slot1.items
+	rifles = base_script.slot2.items
+	armor = base_script.slot3.items
+	local pistol_count = count_items(pistols)
+	local rifle_count = count_items(rifles)
+	local armor_count = count_items(armor)
+	if pistol_count > 0 then
+		local temp = {}
+		temp = sort_table(pistols)
+		base_script.slot1.items = temp
+	end
+	local temp = base_script.slot1.items
+	if rifle_count > 0 then
+		local temp = {}
+		temp = sort_table(rifles)
+		base_script.slot2.items = temp
+	end
+	if armor_count > 0 then
+		local temp = {}
+		temp = sort_table(armor)
+		base_script.slot3.items = temp
+	end
+	name = translate("repair_str_pistols")
+	type1:SetText(pistol_count .. " " .. name)
+	type1:SetTextY(-3)	--SetTextY(-1) - aleks1970
+	name = translate("repair_str_rifles")
+	type2:SetText(rifle_count .. " " .. name)
+	type2:SetTextY(-3)	--SetTextY(-1) - aleks1970
+	name = translate("repair_str_armor")
+	type3:SetText(armor_count .. " " .. name)
+	type3:SetTextY(-3)	--SetTextY(-1) - aleks1970
+	if pistol_count == 0 then
+		type1:Enable(false)
+		if salvage_stage == "salvage_pistol" then
+			salvage_stage = "loaded"
+			salvage_clicked = "home"
+		end
+	end
+	if rifle_count == 0 then
+		type2:Enable(false)
+		if salvage_stage == "salvage_rifle" then
+			salvage_stage = "loaded"
+			salvage_clicked = "home"
+		end
+	end
+	if armor_count == 0 then
+		type3:Enable(false)
+		if salvage_stage == "salvage_armor" then
+			salvage_stage = "loaded"
+			salvage_clicked = "home"
+		end
+	end
+	
+		if salvage_stage == "loaded" then
+			name = translate("repair_str_salvage_choose")
+			header:SetText(name)
+			header:SetTextAlign(CGameFont.alCenter)
+			type1:Show(true)
+			type2:Show(true)
+			type3:Show(true)
+			current_script.page = 1
+		else
+			name = translate("repair_str_salvage_click")
+			header:SetText(name)
+			header:SetTextAlign(CGameFont.alCenter)
+			type1:Show(false)
+			type2:Show(false)
+			type3:Show(false)
+		end
+	
+	if salvage_clicked == "home" then
+		base_script.prev_btn:Enable(false)
+		base_script.next_btn:Enable(false)
+	end
+	
+	local button_info = {}
+	button_info[1] = {x = 250,y = 155}
+	button_info[2] = {x = 250,y = 270}
+	button_info[3] = {x = 250,y = 385}
+	button_info[4] = {x = 250,y = 500}
+
+	if salvage_stage == "salvage_pistol" then
+		local divided = pistol_count/4
+		local numfloor = math.floor(divided)
+		local numceil = math.ceil(divided)
+		local remainder = divided - numfloor
+		if current_script.page > numceil then
+			current_script.page = numceil
+		end
+		if remainder == 0 then
+			remainder = 1
+		end
+		local numbertouse = remainder * 4
+		if numceil ~= 1 then
+			if current_script.page == 1 then
+				base_script.prev_btn:Enable(false)
+				base_script.next_btn:Enable(true)
+			end
+			if salvage_clicked == "next" and current_script.page < numceil -1 then
+				current_script.page = current_script.page + 1
+				base_script.prev_btn:Enable(true)
+			elseif salvage_clicked == "next" and current_script.page < numceil then
+				current_script.page = current_script.page + 1
+				base_script.prev_btn:Enable(true)
+				base_script.next_btn:Enable(false)
+			elseif current_script.page > 2 and salvage_clicked == "prev" then
+				current_script.page = current_script.page - 1
+			elseif current_script.page == 2 and salvage_clicked == "prev" then
+				current_script.page = current_script.page - 1
+				base_script.prev_btn:Enable(false)
+				base_script.next_btn:Enable(true)
+			end
+		else
+			base_script.next_btn:Enable(false)
+		end
+		local first_item = current_script.page * 4 - 4 + 1
+		local last_item = first_item + 3
+		if current_script.page == 1 then
+			first_item = 1
+			if numceil == 1 then
+				last_item = first_item + numbertouse - 1
+			end
+		end
+		if current_script.page ~= 1 and current_script.page == numceil then
+			last_item = first_item + numbertouse - 1
+		end
+		local count = 0
+		for x = first_item,last_item do
+			count = count + 1
+			pistol_btn[count]:Show(true)
+			local item_num = current_script.page * 4 - 4 + count
+			local item_stats = {}
+			local item_name = nil
+			item_stats = getstats_item(item_num,"pistol")
+			item_name = translate(item_stats.inv_name_short)
+			pistol_btn[count]:SetText(item_name)
+			pistol_btn[count]:SetTextY(-43)
+			item_stats = getstats_item(item_num,"pistol")
+			local iconx = item_stats.inv_grid_x * 50
+			local icony = item_stats.inv_grid_y * 50
+			local pagex = button_info[count].x - item_stats.inv_grid_width*50/2
+			local pagey = button_info[count].y - item_stats.inv_grid_height*50/2
+			local iconw = item_stats.inv_grid_width*50
+			local iconh = item_stats.inv_grid_height*50
+			pagex = pagex + 10
+			pagey = pagey + 16
+			icon_btn[count]:Show(true)
+			icon_btn[count]:Init("ui\\ui_icon_equipment",pagex,pagey,iconw,iconh)
+			icon_btn[count]:SetOriginalRect(iconx,icony,iconw,iconh)
+			icon_btn[count]:SetWndRect(pagex,pagey,iconw,iconh)
+			local ltx = system_ini()
+			local item = get_item(item_num,"pistol")
+			local weap_cond = math.ceil(item:condition()*1000)
+			salvage_wpn_prog[count]:Show(true)
+			salvage_wpn_bk[count]:Show(true)
+			salvage_wpn_prog[count]:SetProgressPos(weap_cond)
+			local section_name = item:section()
+			local equipped_addons = {}
+			equipped_addons = repair.get_addons(item)
+			for k,v in ipairs(equipped_addons) do
+				if v then
+					local variable, value, lines = "", "", ltx:line_count(section_name)
+					local addon_stats = {}
+					addon_stats = repair.addon_icon_stats(v)
+					for current_line = 0, lines - 1 do
+						result, variable, value = ltx:r_line(section_name, current_line, "", "")
+						if value == v then
+							local icon_x,icon_y,items_x,items_y,items_h,items_w = nil,nil,nil,nil,nil,nil
+							if variable == "scope_name" then
+								icon_x = ltx:r_string(section_name, "scope_x")
+								icon_y = ltx:r_string(section_name, "scope_y")
+								icon_x = icon_x + 10
+								icon_y = icon_y + 16
+							elseif variable == "silencer_name" then
+								icon_x = ltx:r_string(section_name, "silencer_x")
+								icon_y = ltx:r_string(section_name, "silencer_y")
+								icon_x = icon_x + 10
+								icon_y = icon_y + 16
+							elseif variable == "grenade_launcher_name" then
+								icon_x = ltx:r_string(section_name, "grenade_launcher_x")
+								icon_y = ltx:r_string(section_name, "grenade_launcher_y")
+								icon_x = icon_x + 10
+								icon_y = icon_y + 16
+							end
+							for a,b in pairs(addon_stats) do
+								if a == "inv_grid_width" then
+									items_w = b * 50
+								end
+								if a == "inv_grid_height" then
+									items_h = b * 50
+								end
+								if a == "inv_grid_x" then
+									items_x = b * 50
+								end
+								if a == "inv_grid_y" then
+									items_y = b * 50
+								end
+							end
+						btn = addon_btn[count .. k]
+						btn:Show(true)
+						btn.x = button_info[count].x - iconw/2 + icon_x
+						btn.y = button_info[count].y - iconh/2 + icon_y
+						btn:Init("ui\\ui_icon_equipment",btn.x,btn.y,items_w,items_h)
+						btn:SetOriginalRect(items_x,items_y,items_w,items_h)
+						btn:SetWndRect(btn.x, btn.y,items_w,items_h)
+						end
+					end
+				end
+			end
+		end
+	end
+	if salvage_stage == "salvage_rifle" then
+		local divided = rifle_count/4
+		local numfloor = math.floor(divided)
+		local numceil = math.ceil(divided)
+		local remainder = divided - numfloor
+		if current_script.page > numceil then
+			current_script.page = numceil
+		end
+		if remainder == 0 then
+			remainder = 1
+		end
+		local numbertouse = remainder * 4
+		if numceil ~= 1 then
+			if current_script.page == 1 then
+				base_script.prev_btn:Enable(false)
+				base_script.next_btn:Enable(true)
+			end
+			if salvage_clicked == "next" and current_script.page < numceil -1 then
+				current_script.page = current_script.page + 1
+				base_script.prev_btn:Enable(true)
+			elseif salvage_clicked == "next" and current_script.page < numceil then
+				current_script.page = current_script.page + 1
+				base_script.prev_btn:Enable(true)
+				base_script.next_btn:Enable(false)
+			elseif current_script.page > 2 and salvage_clicked == "prev" then
+				current_script.page = current_script.page - 1
+			elseif current_script.page == 2 and salvage_clicked == "prev" then
+				current_script.page = current_script.page - 1
+				base_script.prev_btn:Enable(false)
+				base_script.next_btn:Enable(true)
+			end
+		else
+			base_script.next_btn:Enable(false)
+		end
+		local first_item = current_script.page * 4 - 4 + 1
+		local last_item = first_item + 3
+		if current_script.page == 1 then
+			first_item = 1
+			if numceil == 1 then
+				last_item = first_item + numbertouse - 1
+			end
+		end
+		if current_script.page ~= 1 and current_script.page == numceil then
+			last_item = first_item + numbertouse - 1
+		end
+		local count = 0
+		for x = first_item,last_item do
+			count = count + 1
+			rifle_btn[count]:Show(true)
+			local item_num = current_script.page * 4 - 4 + count
+			local item_stats = {}
+			local item_name = nil
+			item_stats = getstats_item(item_num,"rifle")
+			item_name = translate(item_stats.inv_name_short)
+			rifle_btn[count]:SetText(item_name)
+			rifle_btn[count]:SetTextY(-47)	--SetTextY(-43) - aleks1970
+			item_stats = getstats_item(item_num,"rifle")
+			local iconx = item_stats.inv_grid_x*50
+			local icony = item_stats.inv_grid_y*50
+			local pagex = button_info[count].x - item_stats.inv_grid_width*50/2
+			local pagey = button_info[count].y - item_stats.inv_grid_height*50/2
+			local iconw = item_stats.inv_grid_width*50
+			local iconh = item_stats.inv_grid_height*50
+			pagex = pagex + 10
+			pagey = pagey + 16
+			icon_btn[count]:Show(true)
+			icon_btn[count]:Init("ui\\ui_icon_equipment",pagex,pagey,iconw,iconh)
+			icon_btn[count]:SetOriginalRect(iconx,icony,iconw,iconh)
+			icon_btn[count]:SetWndRect(pagex,pagey,iconw,iconh)
+			local ltx = system_ini()
+			local item_num = current_script.page * 4 - 4 + count
+			local item = get_item(item_num,"rifle")
+			local weap_cond = math.ceil(item:condition()*1000)
+			salvage_wpn_prog[count]:Show(true)
+			salvage_wpn_bk[count]:Show(true)
+			salvage_wpn_prog[count]:SetProgressPos(weap_cond)
+			local section_name = item:section()
+			local equipped_addons = {}
+			equipped_addons = repair.get_addons(item)
+			for k,v in ipairs(equipped_addons) do
+				if v then
+					local variable, value, lines = "", "", ltx:line_count(section_name)
+					local addon_stats = {}
+					addon_stats = repair.addon_icon_stats(v)
+					for current_line = 0, lines - 1 do
+						result, variable, value = ltx:r_line(section_name, current_line, "", "")
+						if value == v then
+							local icon_x,icon_y,items_x,items_y,items_h,items_w = nil,nil,nil,nil,nil,nil
+							if variable == "scope_name" then
+								icon_x = ltx:r_string(section_name, "scope_x")
+								icon_y = ltx:r_string(section_name, "scope_y")
+								icon_x = icon_x + 10
+								icon_y = icon_y + 16
+							elseif variable == "silencer_name" then
+								icon_x = ltx:r_string(section_name, "silencer_x")
+								icon_y = ltx:r_string(section_name, "silencer_y")
+								icon_x = icon_x + 10
+								icon_y = icon_y + 16
+							elseif variable == "grenade_launcher_name" then
+								icon_x = ltx:r_string(section_name, "grenade_launcher_x")
+								icon_y = ltx:r_string(section_name, "grenade_launcher_y")
+								icon_x = icon_x + 10
+								icon_y = icon_y + 16
+							end
+							for a,b in pairs(addon_stats) do
+								if a == "inv_grid_width" then
+									items_w = b * 50
+								end
+								if a == "inv_grid_height" then
+									items_h = b * 50
+								end
+								if a == "inv_grid_x" then
+									items_x = b * 50
+								end
+								if a == "inv_grid_y" then
+									items_y = b * 50
+								end
+							end
+						btn = addon_btn[count .. k]
+						btn:Show(true)
+						btn.x = button_info[count].x - iconw/2 + icon_x
+						btn.y = button_info[count].y - iconh/2 + icon_y
+						btn:Init("ui\\ui_icon_equipment",btn.x,btn.y,items_w,items_h)
+						btn:SetOriginalRect(items_x,items_y,items_w,items_h)
+						btn:SetWndRect(btn.x, btn.y,items_w,items_h)
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	if salvage_stage == "salvage_armor" then
+		button_info[1] = {x = 162,y = 212}	--x = 162,y = 212 - aleks1970
+		button_info[2] = {x = 337,y = 212}	--x = 337,y = 212 - aleks1970
+		button_info[3] = {x = 162,y = 442}	--x = 162,y = 442 - aleks1970
+		button_info[4] = {x = 337,y = 442}	--x = 337,y = 442 - aleks1970
+		local divided = armor_count/4
+		local numfloor = math.floor(divided)
+		local numceil = math.ceil(divided)
+		local remainder = divided - numfloor
+		if current_script.page > numceil then
+			current_script.page = numceil
+		end
+		if remainder == 0 then
+			remainder = 1
+		end
+		local numbertouse = remainder * 4
+		if numceil ~= 1 then
+			if current_script.page == 1 then
+				base_script.prev_btn:Enable(false)
+				base_script.next_btn:Enable(true)
+			end
+			if salvage_clicked == "next" and current_script.page < numceil -1 then
+				current_script.page = current_script.page + 1
+				base_script.prev_btn:Enable(true)
+			elseif salvage_clicked == "next" and current_script.page < numceil then
+				current_script.page = current_script.page + 1
+				base_script.prev_btn:Enable(true)
+				base_script.next_btn:Enable(false)
+			elseif current_script.page > 2 and salvage_clicked == "prev" then
+				current_script.page = current_script.page - 1
+			elseif current_script.page == 2 and salvage_clicked == "prev" then
+				current_script.page = current_script.page - 1
+				base_script.prev_btn:Enable(false)
+				base_script.next_btn:Enable(true)
+			end
+		else
+			base_script.next_btn:Enable(false)
+		end
+		local first_item = current_script.page * 4 - 4 + 1
+		local last_item = first_item + 3
+		if current_script.page == 1 then
+			first_item = 1
+			if numceil == 1 then
+				last_item = first_item + numbertouse - 1
+			end
+		end
+		if current_script.page ~= 1 and current_script.page == numceil then
+			last_item = first_item + numbertouse - 1
+		end
+		local count = 0
+		for x = first_item,last_item do
+			count = count + 1
+			armor_btn[count]:Show(true)
+			local item_num = current_script.page * 4 - 4 + count
+			local item = get_item(item_num,"armor")
+			local item_stats = {}
+			local item_name = nil
+			local weap_cond = math.ceil(item:condition()*1000)
+			salvage_arm_prog[count]:Show(true)
+			salvage_arm_bk[count]:Show(true)
+			salvage_arm_prog[count]:SetProgressPos(weap_cond)
+			item_stats = getstats_item(item_num,"armor")
+			item_name = translate(item_stats.inv_name_short)
+			armor_btn[count]:SetText(item_name)
+			armor_btn[count]:SetTextY(-98)	--SetTextY(-101) -aleks1970
+			item_stats = getstats_item(item_num,"armor")
+			local iconx = item_stats.inv_grid_x*50
+			local icony = item_stats.inv_grid_y*50
+			local pagex = button_info[count].x - item_stats.inv_grid_width*50/2
+			local pagey = button_info[count].y - item_stats.inv_grid_height*50/2
+			local iconw = item_stats.inv_grid_width*50
+			local iconh = item_stats.inv_grid_height*50
+			pagex = pagex + 15
+			pagey = pagey + 10
+			icon_btn[count]:Show(true)
+			icon_btn[count]:Init("ui\\ui_icon_equipment",pagex,pagey,iconw,iconh)
+			icon_btn[count]:SetOriginalRect(iconx,icony,iconw,iconh)
+			icon_btn[count]:SetWndRect(pagex,pagey,iconw,iconh)
+		end
+	end
+end
+function select_type:reload()
+	salvage_stage = "loaded"
+	salvage_clicked = "home"
+	set_stage()
+end
+
+function select_type:InitCallBacks()
+	self:AddCallback("salvage_pistol", ui_events.BUTTON_CLICKED, self.pistol_on_clicked, self)
+	self:AddCallback("salvage_rifle", ui_events.BUTTON_CLICKED, self.rifle_on_clicked, self)
+	self:AddCallback("salvage_armor", ui_events.BUTTON_CLICKED, self.armor_on_clicked, self)
+	self:AddCallback("pistol_1", ui_events.BUTTON_CLICKED, self.pistol1_on_clicked, self)
+	self:AddCallback("pistol_2", ui_events.BUTTON_CLICKED, self.pistol2_on_clicked, self)
+	self:AddCallback("pistol_3", ui_events.BUTTON_CLICKED, self.pistol3_on_clicked, self)
+	self:AddCallback("pistol_4", ui_events.BUTTON_CLICKED, self.pistol4_on_clicked, self)
+	self:AddCallback("rifle_1", ui_events.BUTTON_CLICKED, self.rifle1_on_clicked, self)
+	self:AddCallback("rifle_2", ui_events.BUTTON_CLICKED, self.rifle2_on_clicked, self)
+	self:AddCallback("rifle_3", ui_events.BUTTON_CLICKED, self.rifle3_on_clicked, self)
+	self:AddCallback("rifle_4", ui_events.BUTTON_CLICKED, self.rifle4_on_clicked, self)
+	self:AddCallback("armor_1", ui_events.BUTTON_CLICKED, self.armor1_on_clicked, self)
+	self:AddCallback("armor_2", ui_events.BUTTON_CLICKED, self.armor2_on_clicked, self)
+	self:AddCallback("armor_3", ui_events.BUTTON_CLICKED, self.armor3_on_clicked, self)
+	self:AddCallback("armor_4", ui_events.BUTTON_CLICKED, self.armor4_on_clicked, self)
+end
+
+function select_type:pistol_on_clicked()
+	salvage_stage = "salvage_pistol"
+	salvage_clicked = "none"
+	set_stage()
+end
+
+function select_type:rifle_on_clicked()
+	salvage_stage = "salvage_rifle"
+	salvage_clicked = "none"
+	set_stage()
+end
+
+function select_type:armor_on_clicked()
+	salvage_stage = "salvage_armor"
+	salvage_clicked = "none"
+	set_stage()
+end
+
+function select_type.pistol1_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 1
+	salvage_item("pistol",item_num)
+end
+
+function select_type.pistol2_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 2
+	salvage_item("pistol",item_num)
+end
+
+function select_type.pistol3_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 3
+	salvage_item("pistol",item_num)
+end
+
+function select_type.pistol4_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 4
+	salvage_item("pistol",item_num)
+end
+
+function select_type.rifle1_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 1
+	salvage_item("rifle",item_num)
+end
+
+function select_type.rifle2_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 2
+	salvage_item("rifle",item_num)
+end
+
+function select_type.rifle3_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 3
+	salvage_item("rifle",item_num)
+end
+
+function select_type.rifle4_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 4
+	salvage_item("rifle",item_num)
+end
+
+function select_type.armor1_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 1
+	salvage_item("armor",item_num)
+end
+
+function select_type.armor2_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 2
+	salvage_item("armor",item_num)
+end
+
+function select_type.armor3_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 3
+	salvage_item("armor",item_num)
+end
+
+function select_type.armor4_on_clicked()
+	local item_num = current_script.page * 4 - 4 + 4
+	salvage_item("armor",item_num)
+end
+
+function home_clicked()
+	salvage_stage = "loaded"
+	salvage_clicked = "home"
+	set_stage()
+end
+
+function prev_clicked()
+	salvage_clicked = "prev"
+	set_stage()
+end
+
+function next_clicked()
+	salvage_clicked = "next"
+	set_stage()
+end
+
+function count_items(item)
+	local count = 0
+	for k,v in pairs(item) do
+		if v ~= "empty" then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+function sort_table(wpntbl)
+	local obj,cond = nil,nil
+	local cond_table = {}
+	local copy = {}
+	for a,b in ipairs(wpntbl) do
+		obj = level.object_by_id(b)
+		cond = obj:condition()
+		cond_table[a] = cond
+		copy[a] = b
+	end
+	table.sort(cond_table, function(a,b) return a<b end)
+	for k,v in ipairs(cond_table) do
+		local found = nil
+		for x,y in ipairs(copy) do
+			obj = level.object_by_id(y)
+			cond = obj:condition()
+			if not found then
+				if v == cond then
+					wpntbl[k] = y
+					table.remove(copy,x)
+					found = "true"
+				end
+			end
+		end
+	end
+	return wpntbl
+end
+
+function getstats_item(number,container)
+	local found = nil
+	local item_table = {}
+	local new_table = {}
+	if container == "pistol" then
+		item_table = base_script.slot1.items
+	end
+	if container == "rifle" then
+		item_table = base_script.slot2.items
+	end
+	if container == "armor" then
+		item_table = base_script.slot3.items
+	end
+	for k,v in ipairs(item_table) do
+		if not found then
+			if k == number then
+				local item = level.object_by_id(v)
+				new_table = repair.packet_sniff(item)
+				found = "true"
+			end
+		end
+	end
+	return new_table
+end
+
+function get_item(number,container)
+	local found = nil
+	local item = nil
+	if container == "pistol" then
+		item_table = base_script.slot1.items
+	end
+	if container == "rifle" then
+		item_table = base_script.slot2.items
+	end
+	if container == "armor" then
+		item_table = base_script.slot3.items
+	end
+	for k,v in pairs(item_table) do
+		if not found then
+			if k == number then
+				item = level.object_by_id(v)
+				found = "true"
+			end
+		end
+	end
+	return item
+end
+
+function salvage_item(container,weapon)
+	local found = nil
+	if container == "pistol" then
+		local item_table = base_script.slot1.items
+		for k,v in ipairs(item_table) do
+			if not found then
+				if k == weapon then
+					local item = level.object_by_id(v)
+					local undamaged,parts = nil,nil
+					undamaged,parts = repair.calculate_parts(item)
+					--repair.copy_addons(item)
+					if parts > TB3D_Modders.max_small_parts then parts = TB3D_Modders.max_small_parts end
+					amk.save_variable("spare_pistol", parts)
+					repair.set_counter()
+					table.remove(base_script.slot1.items,k)
+					alife():release(alife():object(v), true)
+					found = "true"
+				end
+			end
+		end
+	end
+	if container == "rifle" then
+		local item_table = base_script.slot2.items
+		for k,v in ipairs(item_table) do
+			if not found then
+				if k == weapon then
+					local item = level.object_by_id(v)
+					local undamaged,parts = nil,nil
+					undamaged,parts = repair.calculate_parts(item)
+					--repair.copy_addons(item)
+					if parts > TB3D_Modders.max_large_parts then parts = TB3D_Modders.max_large_parts end
+					amk.save_variable("spare_rifle", parts)
+					repair.set_counter()
+					table.remove(base_script.slot2.items,k)
+					alife():release(alife():object(v), true)
+					found = "true"
+				end
+			end
+		end
+	end
+	if container == "armor" then
+		local item_table = base_script.slot3.items
+		for k,v in ipairs(item_table) do
+			if not found then
+				if k == weapon then
+					local item = level.object_by_id(v)
+					local undamaged,parts = nil,nil
+					undamaged,parts = repair.calculate_parts(item)
+					if parts > TB3D_Modders.max_armor_parts then parts = TB3D_Modders.max_armor_parts end
+					amk.save_variable("spare_armor", parts)
+					repair.set_counter()
+					table.remove(base_script.slot3.items,k)
+					alife():release(alife():object(v), true)
+					found = "true"
+				end
+			end
+		end
+	end
+	set_stage()
+end

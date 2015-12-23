@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.5 fixed wounded, optimized, func check, pstor item count reporting, added checks,
+--TB3D 1.0.9.9.9.8 fixed wounded, optimized, func check, pstor item count reporting, added checks,
 -- debug, state control, obj level, localized string funcs, determine_section_to_activate,
---  added "nil" to switch_to_section
-function my_ver() return "1.0.9.9.9.5" end
+--  added "nil" to switch_to_section, pstor cleanup
+function my_ver() return "1.0.9.9.9.8" end
 prefetch("xr_conditions")
 local string_find = string.find
 local string_sub = string.sub
@@ -473,12 +473,14 @@ function issue_event(npc, st, event_fn, ...)
   if not st or not st.actions then
     return
   end
-  local activation_count = 0
+  --local activation_count = 0
   local action_ptr, is_active = 0, 0
+    --TB3D_Services.packet_alert("xr logic: issue_event: npc["..utils.to_str(npc:name()).."] issue event")
   for action_ptr, is_active in pairs(st.actions) do
     if is_active and action_ptr[event_fn] then
       action_ptr[event_fn](action_ptr, ...)
-      activation_count = activation_count + 1
+      --activation_count = activation_count + 1
+    --TB3D_Services.packet_alert("xr logic: issue_event: npc["..utils.to_str(npc:name()).."] action ptr["..event_fn.."]")
     end
   end
 --  if activation_count == 0 and
@@ -1229,14 +1231,7 @@ end
 
 function pstor_retrieve(obj, varname, defval)
 	if obj then
-		local npc_id -- = db.actor:id()
-		--if tabl_netpda_varnames[varname] == true then
-			-- npc_id = get_pda_id(varname,"get")
-			--npc_id = netpacket_pda_create.create_pda()
-			--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_retrieve:["..utils.to_str(npc_id).."] created new netpacket") end
-		--else
-			npc_id = obj:id()
-		--end
+		local npc_id = obj:id()
 		--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_retrieve:["..utils.to_str(npc_id).."] ["..utils.to_str(varname).."] default ["..utils.to_str(defval).."]") end
 		if npc_id == nil then
 			if db.actor then npc_id = db.actor:id() else npc_id = 0 end	--!!!!TB3D    for startup
@@ -1250,7 +1245,7 @@ function pstor_retrieve(obj, varname, defval)
 		else
 			--TB3D_Services.packet_alert("xr logic: pstor_retrieve:["..utils.to_str(varname).."] no storgae for npcid["..utils.to_str(npc_id).."]")
 		end
-			--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_retrieve: variable ["..utils.to_str(varname).."] does not exist") end
+		--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("xr logic: pstor_retrieve: variable ["..utils.to_str(varname).."] does not exist") end
 	end
 	return defval
 end
@@ -1261,12 +1256,10 @@ function pstor_get_custom(obj, classname, varname)
 		if npc_id then
 			if db.storage and db.storage[npc_id] then
 				if db.storage[npc_id].pstor == nil then
-					--db.storage[npc_id].pstor = {}
 					db.init_my_pstor(obj)
 				end
 				local val = db.storage[npc_id].pstor[varname]
 				if val == nil then
-					--db.storage[npc_id].pstor[varname] = pstor_custom_impl[classname]()
 					db.set_pstor(obj, varname, pstor_custom_impl[classname]())
 					val = db.storage[npc_id].pstor[varname]
 				end
@@ -1287,12 +1280,9 @@ function pstor_get_custom(obj, classname, varname)
 end
 
 function pstor_save_all(obj, packet)
-  --local i, np_varname
   local npc_id = obj:id()
   local pstor = db.storage[npc_id].pstor
   if not pstor then
-    --pstor = {}
-    --db.storage[npc_id].pstor = pstor
 	db.init_my_pstor(obj)
 	pstor = db.storage[npc_id].pstor
   end
@@ -1300,7 +1290,13 @@ function pstor_save_all(obj, packet)
   for k, v in pairs(pstor) do
     ctr = ctr + 1
   end
-  packet:w_u32(ctr)
+	if tostring(obj:name()) == "single_player" or npc_id == db.actor:id() then --or npc_id == netpacket_pda_create.create_pda() then
+		TB3D_Services.packet_alert("xr logic: pstor_save_all["..utils.to_str(ctr).."] for["..utils.to_str(obj:name()).."]")
+	elseif ctr > 10 then
+		TB3D_Services.packet_alert("XR LOGIC: pstor save count error["..utils.to_str(ctr).."] items for["..utils.to_str(obj:name()).."] !!!!")
+		ctr = 0
+	end
+	packet:w_u32(ctr)
   if ctr > 0 then
 	--TB3D_Services.packet_alert("XR LOGIC: pstor saving["..utils.to_str(ctr).."] items for["..utils.to_str(obj:name()).."]")
 	  local tv
@@ -1313,13 +1309,8 @@ function pstor_save_all(obj, packet)
 		elseif tv == "string" then
 			packet:w_u8(pstor_string)
 			if v then
-				--if string_len(v)>208 then
-					--v = string_sub(v,1,208)
-				--end
-				--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."]") end -- string = ["..utils.to_str(v).."]") end
 				packet:w_stringZ(v)
 			else
-				--if TB3D_Modders.use_packet_message then TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] string = [nil]") end
 				packet:w_stringZ("")
 			end
 		elseif tv == "boolean" then
@@ -1341,13 +1332,10 @@ function pstor_save_all(obj, packet)
 end
 
 function pstor_save_all_report(obj, packet)
-	--local i, np_varname
 	TB3D_Services.packet_alert("XR LOGIC: pstor save all for ["..utils.to_str(obj:name()).."]")
 	local npc_id = obj:id()
 	local pstor = db.storage[npc_id].pstor
 	if not pstor then
-		--pstor = {}
-		--db.storage[npc_id].pstor = pstor
 		db.init_my_pstor(obj)
 		pstor = db.storage[npc_id].pstor
 		TB3D_Services.packet_alert("XR LOGIC: pstor save all new packet created")
@@ -1356,8 +1344,15 @@ function pstor_save_all_report(obj, packet)
 	for k, v in pairs(pstor) do
 		ctr = ctr + 1
 	end
+	if tostring(obj:name()) == "single_player" or npc_id == db.actor:id() then --or npc_id == netpacket_pda_create.create_pda() then
+		TB3D_Services.packet_alert("xr logic: pstor_save_all["..utils.to_str(ctr).."] for["..utils.to_str(obj:name()).."]")
+	elseif ctr > 10 then
+		TB3D_Services.packet_alert("XR LOGIC: pstor count error["..utils.to_str(ctr).."] items for["..utils.to_str(obj:name()).."] !!!!")
+		ctr = 0
+	else
+		TB3D_Services.packet_alert("XR LOGIC: pstor saving ["..utils.to_str(ctr).."] items for["..utils.to_str(obj:name()).."]")
+	end
 	packet:w_u32(ctr)
-	TB3D_Services.packet_alert("XR LOGIC: pstor saving ["..utils.to_str(ctr).."] items")
 	ctr = 0
 	local tv
 	for k, v in pairs(pstor) do
@@ -1374,10 +1369,6 @@ function pstor_save_all_report(obj, packet)
 			end
 			TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] len["..utils.to_str(string_len(v)).."]") -- string = ["..utils.to_str(v).."]")
 			packet:w_u8(pstor_string)
-			--if string_len(v)>208 then
-				--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(ctr).."]["..utils.to_str(k).."] len["..utils.to_str(string_len(v)).."] removed")
-				--v = ""
-			--end
 			packet:w_stringZ(v)
 		elseif tv == "boolean" then
 			TB3D_Services.packet_alert("XR LOGIC: pstor saving item ["..utils.to_str(ctr).."] ["..utils.to_str(k).."] bool = ["..utils.to_str(v).."]")
@@ -1404,18 +1395,18 @@ function pstor_load_all(obj, reader)
 	local npc_id = obj:id()
 	local pstor = db.storage[npc_id].pstor
 	if not pstor then
-		--pstor = {}
-		--db.storage[npc_id].pstor = pstor
 		db.init_my_pstor(obj)
 		pstor = db.storage[npc_id].pstor
 	end
 	local ctr = reader:r_u32()
-	if tonumber(ctr) > 10 and tostring(obj:name()) ~= "single_player" and npc_id ~= db.actor:id() and npc_id~=netpacket_pda_create.create_pda() then
-		TB3D_Services.packet_alert("xr logic: pstor_load_all too many items["..utils.to_str(ctr).."] for["..utils.to_str(obj:name()).."] !!!!")
+	if utils.to_str(obj:name()) == "single_player" or npc_id == db.actor:id() then --or npc_id == netpacket_pda_create.create_pda() then
+		--TB3D_Services.packet_alert("xr logic: pstor_load_all["..utils.to_str(ctr).."] for["..utils.to_str(obj:name()).."]")
+	elseif tonumber(ctr) > 10 then
+		--TB3D_Services.packet_alert("xr logic: pstor_load_all too many items["..utils.to_str(ctr).."] for["..utils.to_str(obj:name()).."] !!!!")
 		-- maximum of 10 iterations - in NPCs written 5 variables, the technique - 7, even 10 would be
 		-- If you have pstor something of their own written, guided by their values
 		-- and be sure to remove the check from actor - he has a very thick pstor, and also
-		-- if so will it hurt pstor, then there just is no help
+		-- if so will it hurt pstor, then there just is no help, this happens most often with physic objects
 		remove_zavis.remove_obj(obj)
 		ctr = 0
 	end
@@ -1442,9 +1433,6 @@ function pstor_load_all(obj, reader)
 			if strng == nil then
 				strng = ""
 			end
-			--if string_len(strng)>200 then
-				--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."] removed")
-			--end
 			pstor[varname] = strng
 		elseif tn == pstor_boolean then
 			pstor[varname] = reader:r_bool()
@@ -1484,8 +1472,6 @@ function pstor_load_all_report(obj, reader)
 	local pstor = db.storage[npc_id].pstor
 	TB3D_Services.packet_alert("XR LOGIC: pstor load all for["..utils.to_str(obj:name()).."]")
 	if not pstor then
-		--pstor = {}
-		--db.storage[npc_id].pstor = pstor
 		db.init_my_pstor(obj)
 		pstor = db.storage[npc_id].pstor
 		TB3D_Services.packet_alert("XR LOGIC: pstor load all[created new pstor]")
@@ -1527,9 +1513,6 @@ function pstor_load_all_report(obj, reader)
 				strng = ""
 			end
 			TB3D_Services.packet_alert("XR LOGIC: pstor loading item ["..utils.to_str(i).."] ["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."]") -- string = ["..utils.to_str(v).."]")
-			--if string_len(strng)>200 then
-				--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."] removed")
-			--end
 			pstor[varname] = strng
 			--TB3D_Services.packet_alert("XR LOGIC: pstor["..utils.to_str(i).."]["..utils.to_str(varname).."] len["..utils.to_str(string_len(strng)).."] = stringz["..strng.."]")
 		elseif tn == pstor_boolean then

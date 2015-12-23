@@ -1,17 +1,17 @@
----TB3D 1.0.9.9.9.7 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.0.9.9.9.8 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
 -- send_tip_id optimization, task color, check_prior_version, give/remove info, skip group1b, adjust_for_level, plug ins, killed by actor,
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
 -- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed,
--- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over, zat lost, grib_respawn
-function my_ver() return "1.0.9.9.9.7" end	--modders append with initials and rev.
+-- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over, zat lost, grib_respawn, tb3d_storm_started, killed by actor, yan_specnaz_dead
+function my_ver() return "1.0.9.9.9.8" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.7}" end
+function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.8}" end
 
-major_version = 109997							--used in saves
+major_version = 109998							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -20,6 +20,7 @@ local isnight									--flag is set based on day_start and day_end in modders sc
 local ismidnight, isnoon						--major day cycle event points, true for 5 game minutes after 0 or 12 hour change 
 local string_find = string.find					--create a local pointer for faster lookups
 local math_random = math.random
+local math_trunc = math.floor
 local translate = game.translate_string
 local medkit,antirad,bandage,vodka = 0,0,0,0         -- counters items
 local medkit_wnd,antirad_wnd,bandage_wnd,vodka_wnd   -- static window
@@ -80,15 +81,15 @@ function is_collector(idx)
 	if is_freeplay > 0 then return true else return false end
 end
 function init_level_up()						--109980
-	level_up = amk.load_variable("freeplay", nil)
-	return level_up or -1
+	level_up = amk.load_variable("freeplay", -1)
+	return level_up
 end
 function get_level_up()							--109980
 	if level_up == nil then level_up = amk.load_variable("freeplay", -1) end
 	return level_up
 end
 function set_new_levelup(levelup)				--109980
-	--level_up = levelup
+	level_up = levelup							--109998, needed for new level up
 	local ntext = translate("services_stalkersoup_level")
 	amk.save_variable("freeplay",levelup)
 	if levelup > 0 then news_manager.send_tip_txt(db.actor, ntext.." "..utils.to_str(levelup).." "..translate("services_Achieved_level"), 1, "tb3d_master", 40) end
@@ -104,16 +105,23 @@ function fell_through_level(pos)
 	end
 end
 
-function killed_by_actor(idx)		--109976
+function killed_by_actor(idx)		--109998
 	local was_actor = false
 	local idx0, idx1, idx2, idx3, idx4, idx5
 	local result = amk.load_variable("killed_by_actor", 0)
-	if result > 10000 then idx5 = true result = result - 100000 end			--first decompose flags
-	if result > 1000 then idx4 = true result = result - 10000 end
-	if result > 100 then idx3 = true result = result - 1000 end
-	if result > 10 then idx2 = true result = result - 100 end
-	if result > 1 then idx1 = true result = result - 10 end
-	if result > 0 then idx0 = true result = result - 1 end
+	local slot = math_trunc(result / 100000)
+	if slot > 0 then idx5 = true result = result - slot*100000 end
+	slot = math_trunc(result / 10000)
+	if slot > 0 then idx4 = true result = result - slot*10000 end
+	slot = math_trunc(result / 1000)
+	if slot > 0 then idx3 = true result = result - slot*1000 end
+	slot = math_trunc(result / 100)
+	if slot > 0 then idx2 = true result = result - slot*100 end
+	slot = result / 10
+	if slot > 0 then idx1 = true result = result - slot*10 end
+	slot = result / 1
+	if slot > 0 then idx0 = true end
+	--packet_alert("was killed by actor? shnura["..utils.to_str(idx0).."] atp bandit["..utils.to_str(idx1).."] hump["..utils.to_str(idx2).."] atp stlkr["..utils.to_str(idx3).."] dcty ras2["..utils.to_str(idx4).."] dcty ras1["..utils.to_str(idx5).."]")
 	if idx == 0 then														--next see who is being checked
 		if idx0 then was_actor = true end						--atp_bandit_shnura
 	elseif idx == 1 then
@@ -130,15 +138,21 @@ function killed_by_actor(idx)		--109976
 	return was_actor
 end
 
-function clear_killed_by_actor(idx)		--109976
+function clear_killed_by_actor(idx)		--109998
 	local idx0, idx1, idx2, idx3, idx4, idx5
 	local result = amk.load_variable("killed_by_actor", 0)
-	if result > 10000 then idx5 = true result = result - 100000 end			--first decompose flags
-	if result > 1000 then idx4 = true result = result - 10000 end
-	if result > 100 then idx3 = true result = result - 1000 end
-	if result > 10 then idx2 = true result = result - 100 end
-	if result > 1 then idx1 = true result = result - 10 end
-	if result > 0 then idx0 = true result = result - 1 end
+	local slot = math_trunc(result / 100000)
+	if slot > 0 then idx5 = true result = result - slot*100000 end
+	slot = math_trunc(result / 10000)
+	if slot > 0 then idx4 = true result = result - slot*10000 end
+	slot = math_trunc(result / 1000)
+	if slot > 0 then idx3 = true result = result - slot*1000 end
+	slot = math_trunc(result / 100)
+	if slot > 0 then idx2 = true result = result - slot*100 end
+	slot = result / 10
+	if slot > 0 then idx1 = true result = result - slot*10 end
+	slot = result / 1
+	if slot > 0 then idx0 = true end
 	if idx == 0 then														--next see who is being cleared
 		idx0 = false						--atp_bandit_shnura
 	elseif idx == 1 then
@@ -164,7 +178,6 @@ function clear_killed_by_actor(idx)		--109976
 	else
 		amk.del_variable("killed_by_actor")									--no flags left so remove the var
 	end
-	return was_actor
 end
 
 function crash_alert()	--amk watchdog
@@ -1228,7 +1241,6 @@ function get_all_quests()
 	get_info_portions("sak")
 	get_info_portions("prapor")
 	get_info_portions("docent")
-	get_info_portions("lifeheart")
 	get_info_portions("doctor")
 	get_info_portions("limansk_done")
 	get_info_portions("limansk_start")
@@ -1237,6 +1249,7 @@ function get_all_quests()
 	get_info_portions("zaton_misc")			--109940---------------------
 	get_info_portions("end")
 	get_info_portions("quests_done")
+	get_info_portions("lifeheart")
 	--get_info_portions("quests_misc")
 	get_info_portions("quests_start")
 	get_info_portions("cocoons")
@@ -1257,7 +1270,7 @@ function get_all_quests()
 	get_collector_items("meds",4)
 	get_collector_items("ammo",6)
 	get_collector_items("player",1)
-	--db.actor:activate_slot(2)
+	--db.actor:activate_slot(0)
 end
 
 -- communities ------------------------------------------------------------------
@@ -1543,6 +1556,7 @@ function get_names()
 		sname = ini:r_string("names",tostring(math_random(300)))
 	end
 	ini = nil
+	--packet_alert("tb3d services get names: name["..utils.to_str(name).."] sname["..utils.to_str(sname).."]")
 	return name, sname
 end
 
@@ -1933,11 +1947,11 @@ function clear_harsh_environment()											--109980
 	end
 end
 
-function check_storm_over()					--109996
-	local strm_strtd = amk.load_variable("tb3d_storm_started", 0)
-	local days = level.get_time_days()
-	if strm_strtd > 0 then
-		if not has_alife_info("tb3d_block_1") and strm_strtd + 3 > days then
+function check_storm_over()					--109998
+	local strm_strtd = amk.load_variable("tb3d_storm_started", nil)
+	if strm_strtd then											--has talked to lanky
+		local days = level.get_time_days()
+		if strm_strtd + 3 > days then
 			give_info("tb3d_block_1")
 		elseif strm_strtd + 5 > days then
 			give_info("tb3d_block_2")						--only NPP areas
@@ -1946,8 +1960,6 @@ function check_storm_over()					--109996
 			amk.del_variable("tb3d_storm_started")
 			give_info("tb3d_game_end") --set_new_levelup(3)		--set for process_levels
 		end
-	else
-		amk.save_variable("tb3d_storm_started", days)
 	end
 end
 
@@ -2419,8 +2431,13 @@ function can_remove_dead(lname, npc_name)
 	elseif lname == "l05_bar" then
 		if has_alife_info("bar_deactivate_radar_done") then result = true end
 	elseif lname == "l04_darkvalley" then
-		if string_find(npc_name, "dead_korchagin_military") then if is_collector(0) then result = true end
-		elseif has_alife_info("bar_darklab_document_done") then result = true end
+		if string_find(npc_name, "dead_korchagin_military") then
+			if is_collector(0) then result = true end
+		elseif string_find(obj_name, "ecolog_respawn_2") then						--2 dead scientists by chopper in dv
+			if is_collector(0) then result = true end
+		elseif has_alife_info("bar_darklab_document_done") then
+			result = true
+		end
 	elseif lname == "l07_military" then
 		if has_alife_info("rad_after_antenna_turned_off") then result = true end
 	elseif lname == "l03_agroprom" then
@@ -2430,13 +2447,22 @@ function can_remove_dead(lname, npc_name)
 	elseif lname == "l06_rostok" then
 		if has_alife_info("yan_kill_brain_done") then result = true end
 	elseif lname == "l08_yantar" then
-		if string_find(npc_name, "yan_ecolog_respawn_2") then if is_collector(0) then result = true end
-		elseif has_alife_info("bar_x16_documents_done") then result = true end
+		if string_find(npc_name, "yan_ecolog_respawn_2") then
+			if is_collector(0) then result = true end
+		elseif string_find(npc_name, "yan_specnaz_dead") then
+			if has_alife_info("mil_lukash_heal_reward") then result = true end
+		elseif has_alife_info("bar_x16_documents_done") then
+			result = true
+		end
 	elseif lname == "l10_radar" then
 		if string_find(npc_name, "radar_monolit_dead") then if is_collector(0) then result = true end
 		elseif has_alife_info("rad_after_antenna_turned_off") then result = true end
 	elseif lname == "l11_pripyat" then
-		if has_alife_info("pri_wave7_end") or has_alife_info("pri_followers_all_dead") then result = true end
+		if string_find(obj_name, "ecolog_respawn_2") then						--dead scientist with usb
+			if is_collector(0) then result = true end
+		elseif has_alife_info("pri_wave7_end") or has_alife_info("pri_followers_all_dead") then
+			result = true
+		end
 	elseif lname == "l12_stancia" then
 		if string_find(npc_name, "aes_Soldier_commander") then if is_collector(0) then result = true end
 		elseif has_alife_info("aes_found_sarcofag") then result = true end
@@ -2485,7 +2511,8 @@ function can_remove_dead(lname, npc_name)
     elseif lname == "l12u_control_monolith" then
 		if has_alife_info("zep24_have") then result = true end
 	elseif lname == "peshera" then
-		if string_find(npc_name, "peshera_stalker_dead") then if is_collector(0) then result = true end
+		if string_find(npc_name, "peshera_stalker_dead") then
+			if is_collector(0) then result = true end
 		else
 		--result = false
 		end
@@ -2921,6 +2948,21 @@ function check_prior_version(tb3d_ver)											--109972
 	if stage < 6 then
 		stage = 6			--109984, reset the above
 	end
+	if stage < 7 then			--109998, bad task
+		if give_info("plot_dialog_say_done") then
+			for a=first_object,last_object,1 do		--skip actor (0)
+				obj = alife():object(a)
+				if obj then
+					if obj.name then obj_name = obj:name() else obj_name = "NIL" end
+					if obj.section_name then sect = obj:section_name() else sect = "NIL" end
+					if string_find(obj_name, "flesh_strong") and sect == "flesh_strong" then
+						alife():release(obj, true)
+						--cnt = cnt + 1
+					end
+				end
+			end
+		end
+	end
 	amk.save_variable("tb3d_fixer_stage", stage)
 end
 
@@ -3003,4 +3045,8 @@ function clear_targets()
 	targets[3] = targets[1]
 	targets[4] = targets[1]
 	targets[5] = targets[1]
+end
+
+function check_kill_target_spawned(selected_target)
+	packet_alert("tb3d services: check kill target[..utils.to_str(selected_target)..}")
 end

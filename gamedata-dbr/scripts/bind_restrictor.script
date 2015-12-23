@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.7.0 db calls, use_binder_message
-function my_ver() return "1.0.9.9.7.0" end
+-- TB3D 1.0.9.9.9.8 db calls, use_binder_message
+function my_ver() return "1.0.9.9.9.8" end
 --[[------------------------------------------------------------------------------------------------
 Space restrictor binder
 Chugai Alexander
@@ -107,6 +107,7 @@ function restrictor_binder:net_destroy()
 	end
 	object_binder.net_destroy(self)
 	if is_report then TB3D_Services.packet_alert("bind restrictor: net destroy["..utils.to_str(sname).."] section["..utils.to_str(sect).."] done") end
+	--TB3D_Services.packet_alert("bind restrictor: net destroy done")
 end
 
 -- called locally

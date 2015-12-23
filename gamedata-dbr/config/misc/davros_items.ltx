@@ -1,4 +1,4 @@
-;-- TB3D 1.0.9.9.8.2 edits by glowworm,  excluded duplicates sections aleks1970, dav update 16Apr14, attach_bone_name must exist, adjustments -->
+;-- TB3D 1.0.9.9.9.8 edits by glowworm,  excluded duplicates sections aleks1970, dav update 16Apr14, attach_bone_name must exist, adjustments -->
 ;  dAVROs weapons and other items for the Collector CS134 extended                   Rev 1         Aug 2011
 ;==================================================================================================
 
@@ -1095,7 +1095,7 @@ holder_range_modifier	= 1.0		       ; eye_range
 holder_fov_modifier		= 0.7              ; eye_fov
 ;-----------------------------------------------------------------------------------
 
-cost					= 4000
+cost					= 14000
 weapon_class			= assault_rifle		
 	
 ammo_limit				= 210
@@ -1104,7 +1104,7 @@ ammo_elapsed			= 64
 ammo_mag_size			= 64	
 fire_modes				= 1, 3, -1
 
-ammo_class				= ammo_9x18_fmj, ammo_9x18_pmm
+ammo_class				= ammo_9x19_fmj, ammo_9x19_pbp, ammo_9x19_super
 
 hand_dependence			= 1
 single_handed			= 0
@@ -1201,16 +1201,16 @@ ph_mass						= 5
 
 ;addons
 scope_status				= 2
-silencer_status				= 2
+silencer_status				= 1
 grenade_launcher_status		= 0
 
 zoom_enabled				= true						; (on,off)zoom mode (right mouse button)
 scope_zoom_factor	    	= 50						; fov for zoom mode
 
-scope_name 					= wpn_tulip_scope			; section name for the attachable scope
-scope_x 					= 79						; offset in inventory icon
-scope_y 					= 10
-silencer_name  				= wpn_addon_silencer		; section name for the attachable silencer
+scope_name 					= wpn_tulip_cs_scope			; section name for the attachable scope
+scope_x 					= 132						; offset in inventory icon
+scope_y 					= -5
+silencer_name  				= wpn_addon_sil_9_p		; section name for the attachable silencer
 silencer_x 					= 205						; offset in inventory icon
 silencer_y 					= 16					
 
@@ -1223,7 +1223,7 @@ snd_empty					= weapons\gen_empty, 0.5
 snd_reload					= weapons-new\bizon\reload, 0.4
 snd_silncer_shot			      	= weapons-new\bizon\bizon_sil_shot
 
-;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_flame_particles 	= weapons\generic_weapon01	;aleks1970
 silencer_smoke_particles 	= weapons\generic_shoot_00
 
 silencer_light_color		= 0.6,0.5,0.3
@@ -1251,13 +1251,13 @@ position                	= 0.1,-0.04,-0.01
 
 visual                  	= dav\bizon\wpn_bizon_cs_hud.ogf
 
- anim_idle           = idle
- anim_idle_aim       = idle_aim
- anim_reload         = reload
- anim_draw           = draw
- anim_holster        = holster
- anim_shoot          = shoot
- anim_idle_sprint    = idle_sprint
+anim_idle           = idle
+anim_idle_aim       = idle_aim
+anim_reload         = reload
+anim_draw           = draw
+anim_holster        = holster
+anim_shoot          = shoot
+anim_idle_sprint    = idle_sprint
 
 
 zoom_offset			= -0.10,0.023,-0.1
@@ -1273,7 +1273,7 @@ condition_shot_dec 					= 0.0000007
 ;----------------------------------------------------------------------------
 ;----------------------------------------------------------------------------
 
-[wpn_bizon_cs_kol]:wpn_bizon
+[wpn_bizon_cs_kol]:wpn_bizon_cs	;;;;wpn_bizon ;109998, aleks1970
 
 ammo_mag_size				= 60
 ammo_class					= ammo_9x19_fmj, ammo_9x19_pbp, ammo_9x19_super
@@ -1290,6 +1290,7 @@ description					= enc_wpn_wpn_bizon_kol_dav_descr
 
 fire_modes					= 1, 3, 5
 
+cost						= 18500			;109998
 hit_power                	=  2	;0.65
 hit_impulse					= 80	;50	
 fire_distance            	 = 200	;120
@@ -1298,7 +1299,7 @@ rpm                      	= 1500	;750
 hud                      	= wpn_bizon_cs_kol_hud
 visual                  	= dav\bizon\wpn_bizon_cs_kol.ogf
 
-scope_status				= 0
+;scope_status				= 0	;109998, aleks1970
 silencer_status				= 1
 
 snd_shoot					=weapons\bizon\bizon_shot_sil
@@ -1323,7 +1324,7 @@ GroupControlSection			= spawn_group
 $spawn						= "weapons\addons\scope" ; option for Level Editor
 class						= WP_SCOPE
 cform           			= skeleton
-visual          			= dav\upgrades\wpn_scope2.ogf		;aleks1970
+visual          			= dav\upgrades\upg_1p29.ogf		;aleks1970
 $prefetch 					= 32
 description					= desc_tulip_cs_scope
 cost						= 200
@@ -1337,8 +1338,8 @@ inv_weight					= .8
 
 inv_grid_width				= 1
 inv_grid_height				= 1
-inv_grid_x					= 51
-inv_grid_y					= 49
+inv_grid_x					= 54
+inv_grid_y					= 29
 scope_texture				= wpn\wpn_crosshair_1p21
 scope_zoom_factor			= 20		
 

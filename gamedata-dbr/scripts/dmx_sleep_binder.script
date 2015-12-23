@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.0, optimized db.actor, hit styles, send_tip_id optimization, clear callbacks
-function my_ver() return "1.0.9.9.9.0" end
+-- TB3D 1.0.9.9.9.8, optimized db.actor, hit styles, send_tip_id optimization, clear callbacks
+function my_ver() return "1.0.9.9.9.8" end
 --[[----------------------------------------------------
  File         : dmx_sleep_binder.script
  Description  : Binder bed
@@ -45,11 +45,13 @@ function BSleep:net_spawn(data)
 end
 
 function BSleep:net_destroy()
+	--TB3D_Services.packet_alert("sleep binder: net destroy")
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bsleep: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
    self.object:set_callback(callback.use_object, nil) 				--109990
     level.map_remove_object_spot(self.object:id(), "sleep_place")
     object_binder.net_destroy(self)
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bsleep: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("sleep binder: net destroy done")
 end
 
 function BSleep:net_save_relevant()

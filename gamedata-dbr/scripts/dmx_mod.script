@@ -1,10 +1,10 @@
--- TB3D 1.0.9.9.9.5   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
+-- TB3D 1.0.9.9.9.8   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
 -- zaton to red forest, dmx135, using dmx blood instead of amk, fixed soul cube, tp news removed, chg redeffect call,
 -- drop item to inv, dose_asses removed, frogs and cooling moved to services, dav update 16Apr14, hud, gen to dm,
 -- hosp to agro, tip_id, send_tip_id optimization, 97104, 98975,6, _ds_to_poli target, sticks,
 -- changed "exo_mil_exoskeleton_addrs" to "exo_mil_exoskeleton_addx" aleks1970, npp2 to x14, eprip to prip, removed blowout_wave,
--- switched targets; hosp and red forest to tunnels, jup to eprip, shadows_cube_prov_check, allow cube quest in collector
-function my_ver() return "1.0.9.9.9.5" end
+-- switched targets; hosp and red forest to tunnels, jup to eprip, shadows_cube_prov_check, allow cube quest in collector, rsch_to_wait, 99043
+function my_ver() return "1.0.9.9.9.8" end
 --[[- max.script, centralized create_level_changer, uncommtd line 48 (11/21/11)------------
  File         : dmx_mod.script
  Description  : The main script fashion, contain quest function, spawn, etc.
@@ -340,6 +340,7 @@ end
 -- Shadows - enemy
 function shadows_enemy(first_speaker, second_speaker)
 	second_speaker:set_relation(game_object.enemy, first_speaker)
+	--TB3D_hit_styles.hit_companion(second_speaker, first_speaker, 100.0)
 	TB3D_Services.change_reputation(db.actor, -40)
 end
 
@@ -374,7 +375,7 @@ function cube_pripyat_spawn() 		--109995
 		alife():create("glow_stick_blue",vector():set(133.024,28.908,239.756),364239,3769)
 		alife():create("glow_stick_blue",vector():set(133.024,28.908,239.756),364239,3769)
 		alife():create("glow_stick_blue",vector():set(133.024,28.908,239.756),364239,3769)
-		monolith_kbo_spawn()
+		--monolith_kbo_spawn()
 	--end
 end
 
@@ -462,7 +463,7 @@ function next_labx8()			--109995
 		amk.save_variable("torch_state", 1)		--109970
 		labx8_cube_spawn()						--109970
 		labx8_spawn_trup_ps()					--109970
-		pripyat_cop_to_lab_x8()
+		--pripyat_cop_to_lab_x8()				--109998, use elevator button
 		alife():create("werewolf",vector():set(295.981,-0.193,119.076),477049,3770)	--hospital roof
 		TB3D_Triggers.wolf_howls()
 	--end
@@ -1364,7 +1365,7 @@ function pripyat_cop_to_pripyat_2()
 	end
 end
 
---DMX MOD From east to Pripyat X-8
+--[[DMX MOD From east to Pripyat X-8, 109998 use button
 function pripyat_cop_to_lab_x8(is_silent)
 	local obj = alife():story_object(97118)
 	if not obj then
@@ -1379,14 +1380,14 @@ function pripyat_cop_to_lab_x8(is_silent)
 			news_manager.amk_send_tip_id("path_ep_x8", "path_new", 2, 25, "pda_icon")
 		end
 	end
-end
+end]]--
 
---/AMK MOD From X-8 in eastern Pripyat
+--/AMK MOD From X-8 in eastern Pripyat, 109998 moved slightly
 function lab_x8_to_pripyat_cop()
 	local obj = alife():story_object(97119)
 	if not obj then
 		--TB3D_Services.info_alert("DMX mod: labx8-cp spawn")
-		create_level_changer(97119, vector():set(-78.048,-7.902,99.385),3764,3838, -- where the transition
+		create_level_changer(97119, vector():set(-77.880,-7.896,101.591),3766,3838, -- where the transition
 		112273,3754, vector():set(-77.719,0.400,96.113), -- to move
 		vector():set(0.0,0.0,-1.0), -- line of sight with the appearance of
 		"pripyat",0,0,"to_eprip") -- at any locus and the request (0 - will issue, 1 - automatic transition)
@@ -1395,7 +1396,7 @@ end
 
 -------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------
---  dAVROs level changers for the Collector
+--  dAVROs level changers for the treasure hunt
 
 --/dAVROs Red Forest to Dead City
 function create_level_changer_redforest_to_dcity()
@@ -1493,7 +1494,7 @@ function create_level_changer_jupunder_to_limansk()
 	end
 end
 
---/NOT USED  Jupiter Oasis to Yantar lake
+--/dAVROs or storm  Jupiter Oasis to Yantar lake
 function create_level_changer_jup_to_yantar()
 	local obj = alife():story_object(98008)
 	if not obj then
@@ -1688,7 +1689,7 @@ function create_digger_level_changers_1()
 	local obj = alife():story_object(209)
 	if not obj then
 		create_level_changer(209, vector():set(-32.285,-2.392,-184.010),66792,2134, 	
-			9723,5342, vector():set(10.787,-3.197,52.618), 							
+			9882,5340, vector():set(10.885,-7.377,61.225), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"l05_vokzal",0,0,"to_vokzal") 													
 		news_manager.amk_send_tip_id("path_prip_vok", "path_new", 2, 25, "pda_icon")
@@ -1974,7 +1975,7 @@ function create_level_changer_rsch_to_wait()
 	local obj = alife():story_object(98012)
 	if not obj then
 		create_level_changer(98012, vector():set(195.106,4.276,279.122),504124,4375, 	
-			142,5360, vector():set(153.528,8.561,-21.516), 							
+			1171263,4027, vector():set(153.528,8.561,-21.516), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"predbannik",0,0,"to_pred") 													
 		news_manager.amk_send_tip_id("path_rsch_wait", "path_new", 2, 25, "pda_icon")
@@ -2456,6 +2457,13 @@ function create_level_changer_npp2_x14()
 			386473,2400, vector():set(-89.656,-0.000,-168.756),
 		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 												
 		"l12_stancia",0,0,"to_aes")
+	end
+	obj = alife():story_object(99043)															--109998, west gate npp1 to npp2
+	if not obj then
+		create_level_changer(99043, vector():set(-43.049,-0.101,-69.817),10377,2371,
+			10118,2517, vector():set(-41.458,-0.038,68.393),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
+			"l12_stancia_2",0,0,"to_north_aes") 													
 	end
 end
 

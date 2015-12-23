@@ -1,4 +1,4 @@
---- TB3D 1.0.9.9.9.6 BETA release of the Modders Mega Mod, changed dyn suit options,
+--- TB3D 1.0.9.9.9.8 BETA release of the Modders Mega Mod, changed dyn suit options,
 -- bio radar pulse option, logic debug option, dmx135, death_hit, expanded hit styles,
 -- added cave_no_big_electros, pump_it_up to in game menu, alife tweaks, cleaner, dist coef,
 -- population control, max_phantoms, radiation_factor, adjusted populations, start_alife_option,
@@ -11,9 +11,9 @@
 -- loadout_min_cond, loadout_ammo_loot, loadout_ammo_count, dyn_arts_always, npc_default_armor, pda_spawn_rate,
 -- advanced graphics, chgd daytime, volume_on_pause, blowout_rad_val from 1.0 to 0.05, arena lights,
 -- turn info message back off, adjusted loot ammo, force_r2_hw, coefficient_factor, show_story_ids, slice thresholds,
--- show_removed_items, coef, DX11, DX11 graphics settings
+-- show_removed_items, coef, DX11, DX11 graphics settings, packet_limit, repair kit
 
-function my_ver() return "1.0.9.9.9.6" end
+function my_ver() return "1.0.9.9.9.8" end
 --// Modders resource central for script options
 --// certain function calls from script files in the gamedata\scripts dir redirected here
 --// for mod testing and game play options, not compatible with non-TB3D mods
@@ -209,7 +209,7 @@ loadout_rand_cond	= true		-- (true) randomly set the npc load out weapons/suit c
 loadout_min_cond	= 80		-- (80) The minimum condition allowed if above is true, range: 0 - 99  									--109980
 loadout_ammo_count	= 200		-- (200) Rounds of ammo to give from loadout, excess rounds removed when npc dies						--109981
 loadout_ammo_loot	= 20		-- (20) Max rounds of ammo of each type to leave when npc dies (random) range: 0 to 100					--109989
-radiation_factor	= 1.0		-- (1.0) multiplier for radiation delta, 0.0 same as god mode, higher the number, faster the rise
+radiation_factor	= 1.0		-- (1.0) multiplier for radiation delta, 0.0 same as invulnerable mode, higher the number, faster the rise
 zombie				= true		-- (true)  Player can be Zombied (true - on, false - off)
 invisible			= true		-- (true)  Use of Invisible Suits (true - on, false - off)
 teleporter_use		= true 		-- (true)  Using Smart Hand Escape (true - on, false - off)
@@ -222,6 +222,13 @@ hardcore_mobs		= false		-- (false) Increases the number of creatures in a dynami
 hardcore_mobs_mult	= 2.0		-- (2.0) If hardcore_mobs is true then multiply spawn result by this value	--109996
 spawn_esc_dog_rush	= false		-- (false) causes CTD on going off line in low memory, solution pending
 spawn_thermos_inside = false	-- (false) spawns big Thermos inside base instead of outside
+
+---------------------------------REPAIR KIT---------------------------------------------------
+max_small_parts = 20			-- (20) 109998, small arms salvaged repair parts count
+max_large_parts = 12			-- (12) 109998, big arms salvaged repair parts count
+max_armor_parts = 10			-- (10) 109998, armor salvaged repair parts count
+min_to_repair = 0.05			-- (0.05) 109998, needs to be at least this condition to be repairable
+max_to_repair = 0.95			-- (0.95) 109998, needs be less than this condition to be repairable
 
 ---------------------------------MONEY OPTIONS------------------------------------------------
 --// for decoder and loot items on corpses
@@ -364,6 +371,7 @@ force_garbage_collect	= true	-- (true) forces a garbage collection on level init
 --// use 'ESC N' to toggle between night time only and any time NV
 fov_nv				 = 35		-- (35) start of night vision in digital binocs/weapons (max 35, min 10)
 advanced_nightvision = false	-- (false)!M! Not active yet, colored reticles in shaders still WIP
+packet_limit		 = 15000	-- (15000) !M! Player packet limit: packet_limit-1000=critical warning, packet_limit-2000=high warning
 
 -----------------------------DDOF and MBLUR-------------------------------------------------------
 ------------ initial mode set here, now an option in game menu
@@ -533,6 +541,7 @@ use_vehicle_message		= false		--(false) logs events from ph_car.script
 use_livelink_message	= false		--(false) 109980 - future use
 use_companion_message	= false		--(false) 109980 - future use
 use_coop_message		= false		--(false) 109980 - future use
+use_outfit_debug		= false		--(false) shows meceniy outfit actions in log
 
 --===============TESTING ONLY == USE WITH EXTREME CAUTION===================================================
 

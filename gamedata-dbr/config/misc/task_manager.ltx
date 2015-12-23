@@ -1,4 +1,4 @@
-;<!-- TB3D 1.0.9.9.9.4 new ranks, blocked barmen_eliminate_camp_2, missing "," and correct link for green_artefact task (Zahar 1666-1680 lines) aleks1970,
+;<!-- TB3D 1.0.9.9.9.8 new ranks, blocked barmen_eliminate_camp_2, missing "," and correct link for green_artefact task (Zahar 1666-1680 lines) aleks1970,
 ; tm_kill_stalker_2, mil_lukash_heal_reward, yan snork lair, agroprom_military_case_done, barmen eliminate camp 2 fixed, sim_stalker_gusarov, esc2-->
 [list]
 
@@ -425,7 +425,7 @@ condlist = {+agroprom_military_case_done}
 text = tm_kill_stalker_2_text
 description = tm_kill_stalker_2_descr
 parent = trader
-target = brat_luis ;;sim_stalker_general
+target = snip_marsh4 ;;sim_stalker_general
 ;;reward_money = 1500
 reward_reputation = -15
 reward_item = af_gravi
@@ -1568,6 +1568,7 @@ type = find_item
 community = actor
 text = freedom_find_item_3_text
 description = freedom_find_item_3_descr
+condlist = {-mil_lukash_heal_reward}			;;109998, is found on first visit to yantar
 parent = freedom
 target = outfit_specnaz_m1
 reward_item = svoboda_heavy_outfit

@@ -1,0 +1,710 @@
+-- TB3D 1.0.9.9.9.8 new
+function my_ver() return "1.0.9.9.9.8" end
+--[[--------------------------------------------------------------------------------------------------------------------------------
+ File         : repair_repair.script
+ Description  : Repair Kit Revamped: - allows you to salvage parts from weapons and armor and use them to repair your equipment...
+ Copyright    : barak1001, StalkerSoup
+ Author       : barak1001 (Moddb)
+ Rewritten	  : for StalkerSoup by aleks1970 08/22/2015
+ LastUpdate   : 06.09.2015 by aleks1970
+--]]--------------------------------------------------------------------------------------------------------------------------------
+local item_vers
+local act = db.actor
+local base_script = nil
+local min_to_repair = TB3D_Modders.min_to_repair
+local max_to_repair = TB3D_Modders.max_to_repair
+local current_script = nil
+local string_find = string.find
+local StalkerSoup_comp = true --/false for the other mods! - aleks1970
+local translate = game.translate_string
+
+class "choose_slot" (CUIScriptWnd)
+
+function choose_slot:__init() super()
+end
+
+function choose_slot:__finalize() end
+
+function choose_slot:InitControls(x,y,xml,handler)
+	base_script = handler
+	current_script = self
+	self:Init(0,0,1024,768)
+	local btn
+	local pistol_text = xml:InitStatic("pistol_bkgrnd", self)
+	self:Register(pistol_text,"pistol_bkgrnd")
+	local rifle_text = xml:InitStatic("rifle_bkgrnd", self)
+	self:Register(rifle_text,"rifle_bkgrnd")
+	local armor_text = xml:InitStatic("armor_bkgrnd", self)
+	self:Register(armor_text,"armor_bkgrnd")
+		if handler.slot1.id then
+		local name = nil
+		local item = act:item_in_slot(1)
+		local icon = {}
+		icon.x = handler.slot1.inv_grid_x * 50
+		icon.y = handler.slot1.inv_grid_y * 50
+		icon.w = handler.slot1.inv_grid_width * 50
+		icon.h = handler.slot1.inv_grid_height * 50
+
+		local equ_pistol = CUIStatic()
+		equ_pistol:SetAutoDelete(true)
+		equ_pistol:SetWindowName("equ_pistol")
+
+		equ_pistol.w = 175
+		equ_pistol.h = 50
+		equ_pistol.x = 255
+		equ_pistol.y = 133	--120 --aleks1970
+	
+		equ_pistol:Init("ui\\ui_icon_equipment",equ_pistol.x - icon.w/2,equ_pistol.y - icon.h/2,icon.w,icon.h)
+		equ_pistol:SetOriginalRect(icon.x,icon.y,icon.w,icon.h)
+		equ_pistol:SetWndRect(equ_pistol.x - icon.w/2,equ_pistol.y - icon.h/2,icon.w,icon.h)
+	
+		self:AttachChild(equ_pistol)	
+	
+		self.short_name1 = translate(handler.slot1.inv_name_short)
+		pistol_text:SetText(self.short_name1)
+		pistol_text:SetTextY(10)
+		pistol_text:SetTextX(15)
+		pistol_text:SetTextAlign(CGameFont.alCenter)
+
+		local pistol_cond = item:condition()*1000
+	
+		btn = xml:InitStatic("slot1_back", self)
+		btn = xml:InitProgressBar("slot1_prog", self)
+		btn:SetWindowName("slot1_prog")
+		btn:SetProgressPos(pistol_cond)
+	
+		local use1 = xml:Init3tButton("pistol_use1", self)
+		self:Register(use1,"pistol_use1")
+		name = translate("repair_str_use1")
+		use1:SetText(name)
+	
+		local use5 = xml:Init3tButton("pistol_use5", self)
+		self:Register(use5,"pistol_use5")
+		name = translate("repair_str_use5")
+		use5:SetText(name)
+	
+		local usefull = xml:Init3tButton("pistol_usefull", self)
+		self:Register(usefull,"pistol_usefull")
+		name = translate("repair_str_usefull")
+		usefull:SetText(name)
+		local section_name = item:section()
+		local ltx = system_ini()
+		local equipped_addons = {}
+		equipped_addons = repair.get_addons(item)
+		for k,v in ipairs(equipped_addons) do
+			if v then
+				local variable, value, lines = "", "", ltx:line_count(section_name)
+				local addon_stats = {}
+				addon_stats = repair.addon_icon_stats(v)
+				for current_line = 0, lines - 1 do
+					result, variable, value = ltx:r_line(section_name, current_line, "", "")
+					if value == v then
+						local icon_x,icon_y,items_x,items_y,items_h,items_w = nil,nil,nil,nil,nil,nil
+						if variable == "scope_name" then
+							icon_x = ltx:r_string(section_name, "scope_x")
+							icon_y = ltx:r_string(section_name, "scope_y")
+							icon_x = icon_x + 6
+							icon_y = icon_y + 12
+						elseif variable == "silencer_name" then
+							icon_x = ltx:r_string(section_name, "silencer_x")
+							icon_y = ltx:r_string(section_name, "silencer_y")
+							icon_x = icon_x + 6
+							icon_y = icon_y + 12
+						elseif variable == "grenade_launcher_name" then
+							icon_x = ltx:r_string(section_name, "grenade_launcher_x")
+							icon_y = ltx:r_string(section_name, "grenade_launcher_y")
+							icon_x = icon_x + 6
+							icon_y = icon_y + 12
+						end
+						for a,b in pairs(addon_stats) do
+							if a == "inv_grid_width" then
+								items_w = b * 50
+							end
+							if a == "inv_grid_height" then
+								items_h = b * 50
+							end
+							if a == "inv_grid_x" then
+								items_x = b * 50
+							end
+							if a == "inv_grid_y" then
+								items_y = b * 50
+							end
+						end
+					btn = CUIStatic()
+					btn:SetAutoDelete(true)
+					btn:SetWindowName(variable .. "_1")
+					btn.w = 175
+					btn.h = 50
+					btn.x = 75 + btn.w - icon.w/2 + icon_x
+					btn.y = 70 + btn.h - icon.h/2 + icon_y
+					btn:Init("ui\\ui_icon_equipment",btn.x,btn.y,items_w,items_h)
+					btn:SetOriginalRect(items_x,items_y,items_w,items_h)
+					btn:SetWndRect(btn.x, btn.y,items_w,items_h)
+					self:AttachChild(btn)	
+					end
+				end
+			end
+		end
+	end
+	if handler.slot2.id then
+		local name = nil
+		local item = act:item_in_slot(2)
+		local icon = {}
+		icon.x = handler.slot2.inv_grid_x * 50
+		icon.y = handler.slot2.inv_grid_y * 50
+		icon.w = handler.slot2.inv_grid_width * 50
+		icon.h = handler.slot2.inv_grid_height * 50
+
+		local equ_rifle = CUIStatic()
+		equ_rifle:SetAutoDelete(true)
+		equ_rifle:SetWindowName("equ_rifle")
+
+		equ_rifle.w = 175
+		equ_rifle.h = 50
+		equ_rifle.x = 255
+		equ_rifle.y = 279	--267	--aleks1970
+	
+		equ_rifle:Init("ui\\ui_icon_equipment",equ_rifle.x - icon.w/2,equ_rifle.y - icon.h/2,icon.w,icon.h)
+		equ_rifle:SetOriginalRect(icon.x,icon.y,icon.w,icon.h)
+		equ_rifle:SetWndRect(equ_rifle.x - icon.w/2,equ_rifle.y - icon.h/2,icon.w,icon.h)
+	
+		self:AttachChild(equ_rifle)	
+	
+		self.short_name2 = translate(handler.slot2.inv_name_short)
+		rifle_text:SetText(self.short_name2)
+		rifle_text:SetTextY(10)
+		rifle_text:SetTextX(15)
+		rifle_text:SetTextAlign(CGameFont.alCenter)
+
+		local rifle_cond = item:condition()*1000
+	
+		btn = xml:InitStatic("slot2_back", self)
+		btn = xml:InitProgressBar("slot2_prog", self)
+		btn:SetWindowName("slot2_prog")
+		btn:SetProgressPos(rifle_cond)
+	
+		local use1 = xml:Init3tButton("rifle_use1", self)
+		self:Register(use1,"rifle_use1")
+		name = translate("repair_str_use1")
+		use1:SetText(name)
+	
+		local use5 = xml:Init3tButton("rifle_use5", self)
+		self:Register(use5,"rifle_use5")
+		name = translate("repair_str_use5")
+		use5:SetText(name)
+	
+		local usefull = xml:Init3tButton("rifle_usefull", self)
+		self:Register(usefull,"rifle_usefull")
+		name = translate("repair_str_usefull")
+		usefull:SetText(name)
+		local section_name = item:section()
+		local ltx = system_ini()
+		local equipped_addons = {}
+		equipped_addons = repair.get_addons(item)
+		for k,v in ipairs(equipped_addons) do
+			if v then
+				local variable, value, lines = "", "", ltx:line_count(section_name)
+				local addon_stats = {}
+				addon_stats = repair.addon_icon_stats(v)
+				for current_line = 0, lines - 1 do
+					result, variable, value = ltx:r_line(section_name, current_line, "", "")
+					if value == v then
+						local icon_x,icon_y,items_x,items_y,items_h,items_w = nil,nil,nil,nil,nil,nil
+						if variable == "scope_name" then
+							icon_x = ltx:r_string(section_name, "scope_x")
+							icon_y = ltx:r_string(section_name, "scope_y")
+							icon_x = icon_x + 6
+							icon_y = icon_y + 12
+						elseif variable == "silencer_name" then
+							icon_x = ltx:r_string(section_name, "silencer_x")
+							icon_y = ltx:r_string(section_name, "silencer_y")
+							icon_x = icon_x + 6
+							icon_y = icon_y + 12
+						elseif variable == "grenade_launcher_name" then
+							icon_x = ltx:r_string(section_name, "grenade_launcher_x")
+							icon_y = ltx:r_string(section_name, "grenade_launcher_y")
+							icon_x = icon_x + 6
+							icon_y = icon_y + 12
+						end
+						for a,b in pairs(addon_stats) do
+							if a == "inv_grid_width" then
+								items_w = b * 50
+							end
+							if a == "inv_grid_height" then
+								items_h = b * 50
+							end
+							if a == "inv_grid_x" then
+								items_x = b * 50
+							end
+							if a == "inv_grid_y" then
+								items_y = b * 50
+							end
+						end
+					btn = CUIStatic()
+					btn:SetAutoDelete(true)
+					btn:SetWindowName(variable .. "_2")
+					btn.w = 175
+					btn.h = 50
+					btn.x = 75 + btn.w - icon.w/2 + icon_x
+					btn.y = 217 + btn.h - icon.h/2 + icon_y
+					btn:Init("ui\\ui_icon_equipment",btn.x,btn.y,items_w,items_h)
+					btn:SetOriginalRect(items_x,items_y,items_w,items_h)
+					btn:SetWndRect(btn.x, btn.y,items_w,items_h)
+					self:AttachChild(btn)	
+					end
+				end
+			end
+		end
+	end
+	if handler.slot3.id then
+		local name = nil
+		local item = act:get_current_outfit()  --act:item_in_slot(6) - aleks1970
+		local icon = {}
+		icon.x = handler.slot3.inv_grid_x * 50
+		icon.y = handler.slot3.inv_grid_y * 50
+		icon.w = handler.slot3.inv_grid_width * 50
+		icon.h = handler.slot3.inv_grid_height * 50
+
+		local equ_armor = CUIStatic()
+		equ_armor:SetAutoDelete(true)
+		equ_armor:SetWindowName("equ_armor")
+
+		equ_armor.w = 175
+		equ_armor.h = 50
+		equ_armor.x = 265	--250
+		equ_armor.y = 469	--439	aleks1970
+
+		equ_armor:Init("ui\\ui_icon_equipment",equ_armor.x - icon.w/2,equ_armor.y - icon.h/2,icon.w,icon.h)
+		equ_armor:SetOriginalRect(icon.x,icon.y,icon.w,icon.h)
+		equ_armor:SetWndRect(equ_armor.x - icon.w/2,equ_armor.y - icon.h/2,icon.w,icon.h)
+
+		self:AttachChild(equ_armor)	
+
+		self.short_name3 = translate(handler.slot3.inv_name_short)
+		armor_text:SetText(self.short_name3)
+		armor_text:SetTextY(17)
+		armor_text:SetTextX(15)
+		armor_text:SetTextAlign(CGameFont.alCenter)
+
+		local armor_cond = item:condition()*1000
+
+		btn = xml:InitStatic("slot3_back", self)
+		btn = xml:InitProgressBar("slot3_prog", self)
+		btn:SetWindowName("slot3_prog")
+		btn:SetProgressPos(armor_cond)
+
+		local use1 = xml:Init3tButton("armor_use1", self)
+		self:Register(use1,"armor_use1")
+		name = translate("repair_str_use1")
+		use1:SetText(name)
+
+		local use5 = xml:Init3tButton("armor_use5", self)
+		self:Register(use5,"armor_use5")
+		name = translate("repair_str_use5")
+		use5:SetText(name)
+
+		local usefull = xml:Init3tButton("armor_usefull", self)
+		self:Register(usefull,"armor_usefull")
+		name = translate("repair_str_usefull")
+		usefull:SetText(name)
+	end
+	self:InitCallBacks()
+end
+
+
+function choose_slot:set_buttons()
+	--local spare_parts = repair.count_parts()
+	--local minus1 = spare_parts - 1
+	--local minus5 = spare_parts - 5
+	local item1 = act:item_in_slot(1)
+	local item2 = act:item_in_slot(2)
+	local item3 = act:get_current_outfit()  --act:item_in_slot(6) - aleks1970
+
+	if item1 then
+		local name = nil
+		local item1_cond = item1:condition()
+		local icon = current_script:GetStatic("equ_pistol")
+		local use1 = current_script:GetButton("pistol_use1")
+		local use5 = current_script:GetButton("pistol_use5")
+		local usefull = current_script:GetButton("pistol_usefull")
+		use1:Enable(true)
+		use5:Enable(true)
+		usefull:Enable(true)
+		local header = current_script:GetStatic("pistol_bkgrnd")
+		header:SetText(current_script.short_name1)
+		header:SetTextColor(255,238,153,26)
+		icon:SetColor(GetARGB(255,255,255,255))
+
+		local parts = nil
+		local undamaged = nil
+		local spare_parts = amk.load_variable("spare_pistol", 0)
+		local minus1 = spare_parts - 1
+		local minus5 = spare_parts - 5
+		undamaged,parts = repair.calculate_parts(item1)
+		local partsneeded = undamaged - parts
+		local partsfull = spare_parts - (undamaged - parts)
+		
+		if item1_cond <= min_to_repair then
+			use1:Enable(false)
+			use5:Enable(false)
+			usefull:Enable(false)
+			header:SetTextColor(255,128,0,0)
+			name = translate("repair_str_fulldamage")
+			header:SetText(name)
+			icon:SetColor(GetARGB(255,128,128,128))
+			header:SetTextX(16)	-- aleks1970
+			header:SetTextY(20)
+		elseif item1_cond >= max_to_repair then
+			use1:Enable(false)
+			use5:Enable(false)
+			usefull:Enable(false)
+			header:SetTextColor(255,135,123,116)
+			name = translate("repair_str_nodamage")
+			header:SetText(name)
+			icon:SetColor(GetARGB(255,128,128,128))
+			header:SetTextX(16)	-- aleks1970
+			header:SetTextY(20)
+		else
+			if minus1 < 0 then
+				use1:Enable(false)
+				header:SetTextColor(255,128,0,0)
+				name = translate("repair_str_noparts")
+				header:SetText(name)
+				icon:SetColor(GetARGB(255,128,128,128))
+				header:SetTextX(16)	-- aleks1970
+				header:SetTextY(20)
+			end
+			if minus5 < 0 then
+				use5:Enable(false)
+			end
+			if partsneeded < 1 then
+				use1:Enable(false)
+				header:SetTextColor(255,135,123,116)
+				name = translate("repair_str_nodamage")
+				header:SetText(name)
+				icon:SetColor(GetARGB(255,128,128,128))
+				header:SetTextX(16)	-- aleks1970
+				header:SetTextY(20)
+			end
+			if partsneeded < 5 then
+				use5:Enable(false)
+				usefull:Enable(false)
+			end
+			if partsfull < 0 then
+				usefull:Enable(false)
+			end
+		end
+	end
+	
+	if item2 then
+		local name = nil
+		local item2_cond = item2:condition()
+		local icon = current_script:GetStatic("equ_rifle")
+		local use1 = current_script:GetButton("rifle_use1")
+		local use5 = current_script:GetButton("rifle_use5")
+		local usefull = current_script:GetButton("rifle_usefull")
+		use1:Enable(true)
+		use5:Enable(true)
+		usefull:Enable(true)
+
+		local header = current_script:GetStatic("rifle_bkgrnd")
+		header:SetText(current_script.short_name2)
+		header:SetTextColor(255,238,153,26)
+		icon:SetColor(GetARGB(255,255,255,255))
+		local spare_parts = amk.load_variable("spare_rifle", 0)
+		local minus1 = spare_parts - 1
+		local minus5 = spare_parts - 5
+		local parts = nil
+		local undamaged = nil
+		undamaged,parts = repair.calculate_parts(item2)
+		local partsneeded = undamaged - parts
+		local partsfull = spare_parts - (undamaged - parts)
+		
+		if item2_cond <= min_to_repair then
+			use1:Enable(false)
+			use5:Enable(false)
+			usefull:Enable(false)
+			header:SetTextColor(255,128,0,0)
+			name = translate("repair_str_fulldamage")
+			header:SetText(name)
+			icon:SetColor(GetARGB(255,128,128,128))
+			header:SetTextX(16)	-- aleks1970
+			header:SetTextY(20)
+		elseif item2_cond >= max_to_repair then
+			use1:Enable(false)
+			use5:Enable(false)
+			usefull:Enable(false)
+			header:SetTextColor(255,135,123,116)
+			name = translate("repair_str_nodamage")
+			header:SetText(name)
+			icon:SetColor(GetARGB(255,128,128,128))
+			header:SetTextX(16)	-- aleks1970
+			header:SetTextY(20)
+		else
+			if minus1 < 0 then
+				use1:Enable(false)
+				header:SetTextColor(255,128,0,0)
+				name = translate("repair_str_noparts")
+				header:SetText(name)
+				icon:SetColor(GetARGB(255,128,128,128))
+				header:SetTextX(16)	-- aleks1970
+				header:SetTextY(-5)
+			end
+			if minus5 < 0 then
+				use5:Enable(false)
+			end
+			if partsneeded < 1 then
+				use1:Enable(false)
+				header:SetTextColor(255,135,123,116)
+				name = translate("repair_str_nodamage")
+				header:SetText(name)
+				icon:SetColor(GetARGB(255,128,128,128))
+				header:SetTextX(16)	-- aleks1970
+				header:SetTextY(-5)
+			end
+			if partsneeded < 5 then
+				use5:Enable(false)
+				usefull:Enable(false)
+			end
+			if partsfull < 0 then
+				usefull:Enable(false)
+			end
+		end
+	end
+	
+	if item3 then
+		local name = nil
+		local item3_cond = item3:condition()
+		local icon = current_script:GetStatic("equ_armor")
+		local use1 = current_script:GetButton("armor_use1")
+		local use5 = current_script:GetButton("armor_use5")
+		local usefull = current_script:GetButton("armor_usefull")
+		use1:Enable(true)
+		use5:Enable(true)
+		usefull:Enable(true)
+
+		local header = current_script:GetStatic("armor_bkgrnd")
+		header:SetText(current_script.short_name3)
+		header:SetTextColor(255,238,153,26)
+		icon:SetColor(GetARGB(255,255,255,255))
+		local spare_parts = amk.load_variable("spare_armor", 0)
+		local minus1 = spare_parts - 1
+		local minus5 = spare_parts - 5
+		local parts = nil
+		local undamaged = nil
+		undamaged,parts = repair.calculate_parts(item3)
+		local partsneeded = undamaged - parts
+		local partsfull = spare_parts - (undamaged - parts)
+		
+		if item3_cond <= min_to_repair then
+			use1:Enable(false)
+			use5:Enable(false)
+			usefull:Enable(false)
+			header:SetTextColor(255,128,0,0)
+			name = translate("repair_str_fulldamage")
+			header:SetText(name)
+			icon:SetColor(GetARGB(255,128,128,128))
+			header:SetTextX(16)	-- aleks1970
+			header:SetTextY(20)
+		elseif item3_cond >= max_to_repair then
+			use1:Enable(false)
+			use5:Enable(false)
+			usefull:Enable(false)
+			header:SetTextColor(255,135,123,116)
+			name = translate("repair_str_nodamage")
+			header:SetText(name)
+			icon:SetColor(GetARGB(255,128,128,128))
+			header:SetTextX(16)	-- aleks1970
+			header:SetTextY(20)
+		else
+			if minus1 < 0 then
+				use1:Enable(false)
+				header:SetTextColor(255,128,0,0)
+				name = translate("repair_str_noparts")
+				header:SetText(name)
+				icon:SetColor(GetARGB(255,128,128,128))
+				header:SetTextX(16)	-- aleks1970
+				header:SetTextY(15)
+			end
+			if minus5 < 0 then
+				use5:Enable(false)
+			end
+			if partsneeded < 1 then
+				use1:Enable(false)
+				header:SetTextColor(255,135,123,116)
+				name = translate("repair_str_nodamage")
+				header:SetText(name)
+				icon:SetColor(GetARGB(255,128,128,128))
+				header:SetTextX(16)	-- aleks1970
+				header:SetTextY(15)
+			end
+			if partsneeded < 5 then
+				use5:Enable(false)
+				usefull:Enable(false)
+			end
+			if partsfull < 0 then
+				usefull:Enable(false)
+			end
+		end
+	end
+end
+
+function choose_slot:InitCallBacks()
+	self:AddCallback("pistol_use1", ui_events.BUTTON_CLICKED, self.pistol1_on_clicked, self)
+	self:AddCallback("pistol_use5", ui_events.BUTTON_CLICKED, self.pistol5_on_clicked, self)
+	self:AddCallback("pistol_usefull", ui_events.BUTTON_CLICKED, self.pistolfull_on_clicked, self)
+	self:AddCallback("rifle_use1", ui_events.BUTTON_CLICKED, self.rifle1_on_clicked, self)
+	self:AddCallback("rifle_use5", ui_events.BUTTON_CLICKED, self.rifle5_on_clicked, self)
+	self:AddCallback("rifle_usefull", ui_events.BUTTON_CLICKED, self.riflefull_on_clicked, self)
+	self:AddCallback("armor_use1", ui_events.BUTTON_CLICKED, self.armor1_on_clicked, self)
+	self:AddCallback("armor_use5", ui_events.BUTTON_CLICKED, self.armor5_on_clicked, self)
+	self:AddCallback("armor_usefull", ui_events.BUTTON_CLICKED, self.armorfull_on_clicked, self)
+end
+
+function choose_slot:pistol1_on_clicked()
+	local pbar = self:GetProgressBar("slot1_prog")
+	local item = act:item_in_slot(1)
+	item_vers = 1
+	self:use_buttons(pbar,item,1)
+end
+
+function choose_slot:rifle1_on_clicked()
+	local pbar = self:GetProgressBar("slot2_prog")
+	local item = act:item_in_slot(2)
+	item_vers = 2
+	self:use_buttons(pbar,item,1)
+end
+
+function choose_slot:armor1_on_clicked()
+	local pbar = self:GetProgressBar("slot3_prog")
+	local item = act:get_current_outfit()  --act:item_in_slot(6) - aleks1970
+	item_vers = 3
+	self:use_buttons(pbar,item,1)
+end
+
+function choose_slot:pistol5_on_clicked()
+	local pbar = self:GetProgressBar("slot1_prog")
+	local item = act:item_in_slot(1)
+	item_vers = 1
+	self:use_buttons(pbar,item,5)
+end
+
+function choose_slot:rifle5_on_clicked()
+	local pbar = self:GetProgressBar("slot2_prog")
+	local item = act:item_in_slot(2)
+	item_vers = 2
+	self:use_buttons(pbar,item,5)
+end
+
+function choose_slot:armor5_on_clicked()
+	local pbar = self:GetProgressBar("slot3_prog")
+	local item = act:get_current_outfit()  --act:item_in_slot(6) - aleks1970
+	item_vers = 3
+	self:use_buttons(pbar,item,5)
+end
+
+function choose_slot:pistolfull_on_clicked()
+	local pbar = self:GetProgressBar("slot1_prog")
+	local item = act:item_in_slot(1)
+	local parts,undamaged = nil,nil
+	undamaged,parts = repair.calculate_parts(item)
+	local partsneeded = undamaged - parts
+	item_vers = 1
+	self:use_buttons(pbar,item,partsneeded)
+end
+
+function choose_slot:riflefull_on_clicked()
+	local pbar = self:GetProgressBar("slot2_prog")
+	local item = act:item_in_slot(2)
+	local parts,undamaged = nil,nil
+	undamaged,parts = repair.calculate_parts(item)
+	local partsneeded = undamaged - parts
+	item_vers = 2
+	self:use_buttons(pbar,item,partsneeded)
+end
+
+function choose_slot:armorfull_on_clicked()
+	local pbar = self:GetProgressBar("slot3_prog")
+	local item = act:get_current_outfit()  --act:item_in_slot(6) - aleks1970
+	local parts,undamaged = nil,nil
+	undamaged,parts = repair.calculate_parts(item)
+	local partsneeded = undamaged - parts
+	item_vers = 3
+	self:use_buttons(pbar,item,partsneeded)
+end
+
+function choose_slot:use_buttons(pbar,item,number)
+	local parts,undamaged = nil,nil
+	undamaged,parts = repair.calculate_parts(item)
+	local item_cond = item:condition()
+	local new_cond = ((1/undamaged) * number) + item_cond
+	if new_cond > 1 then
+		new_cond = 1
+	end
+--	item:set_condition(new_cond)
+	pbar:SetProgressPos(new_cond * 1000)
+	repair.delete_parts(pbar, number)
+	self.set_buttons()
+	if StalkerSoup_comp then	-- for StalkerSoup mod - aleks1970
+		local amk_repair_armor = amk_mod.repair_armor
+		if item_vers == 3 then
+			amk_repair_armor(new_cond)
+		else
+			item:set_condition(new_cond)
+		end
+	else
+		item:set_condition(new_cond)
+	end
+end
+
+function set_cond(upd)
+	local new_cond
+	local main_item
+	local main_cond
+	local new_vcond = upd
+	local amk_repair_armor = amk_mod.repair_armor
+	if (item_vers == nil) then return end
+	if item_vers == 1 then
+		main_item = act:item_in_slot(1)
+		main_cond = main_item:condition()
+	elseif item_vers == 2 then
+		main_item = act:item_in_slot(2)
+		main_cond = main_item:condition()
+	elseif item_vers == 3 then
+		main_item = act:get_current_outfit()
+		main_cond = main_item:condition()
+	end
+	new_cond = main_cond + new_vcond
+	if new_cond > 1 then
+		new_cond = 1
+	end
+	if item_vers == 3 then
+		amk_repair_armor(new_cond)
+	else
+		main_item:set_condition(new_cond)
+	end
+end
+-- ----------------------------- test --------------------------------
+--[[
+function repair_ui:armor_on_clicked()
+	local main_item = db.actor:item_in_slot(6)
+	local main_cond = main_item:condition()
+	local new_cond = main_cond + 0.5
+	if new_cond > 1 then
+		new_cond = 1
+	end
+main_item:set_condition(new_cond)
+	use_kit()
+	self:on_quit()
+end
+
+function repair_ui:on_quit()
+	self:GetHolder():start_stop_menu (self,true)
+end
+
+	equ_rifle:SetWndPos(equ_rifle.x - icon.w/2,equ_rifle.y - icon.h/2)
+	equ_rifle:SetTextureOffset(-icon.x,-icon.y)
+	
+	amk_mod.repair_armor(val)	--repair armor StalkerSoup - aleks1970
+]]--
+-- -------------------------------------------------------------------

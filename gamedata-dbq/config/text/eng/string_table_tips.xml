@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<!-- TB3D 1.0.9.9.9.6 text from the script files, added 326 to 334 line - aleks1970 -->
-	<!-- <string_table> -->
+<!-- TB3D 1.0.9.9.9.8 text from the script files, added 326 to 334 line - aleks1970, pred messages, includes -->
+<string_table>
+#include "text\eng\amk_flame_dialogs.xml"
+#include "text\eng\amk_escape_dialogs.xml"
+#include "text\eng\string_table_timer.xml"
+#include "text\eng\stable_dialogs_amk.xml"
+#include "text\eng\meceniy_st_dialogs.xml"
+#include "text\eng\amk_reload_dialogs.xml"
+#include "text\eng\string_table_amk_metka.xml"
+#include "text\eng\string_table_amk_matras.xml"
+#include "text\eng\string_table_enc_sigaret.xml"
+#include "text\eng\stable_statistic_caption.xml"
+#include "text\eng\stable_miniquest_dialogs.xml"
+#include "text\eng\stable_dialog_manager_uni.xml"
 	<string id="car_use">
 		<text>ENTER</text>
 	</string>
@@ -332,4 +344,108 @@
 	<string id="repair_check_txt13">
 		<text>diminishing returns</text>
 	</string>
-<!-- </string_table> -->
+	<!--109998 New repair strings - aleks1970 -->
+	<string id="revamped_repair_kit">
+		<text>Repair Kit</text>
+	</string>
+	<!--string id="spare_parts_bag">
+		<text>Spare Parts Bag</text>
+	</string>
+	<string id="spare_parts_small">
+		<text>Spare Parts</text>
+	</string-->
+	<string id="repair_str_repair">
+		<text>Repair</text>
+	</string>
+	<string id="repair_str_salvage">
+		<text>Salvage</text>
+	</string>
+	<string id="repair_str_spareparts_s">
+		<text>Small</text>
+	</string>
+	<string id="repair_str_spareparts_l">
+		<text>Large</text>
+	</string>
+	<string id="repair_str_spareparts_a">
+		<text>Armor</text>
+	</string>
+	<string id="repair_str_use1">
+		<text>Use 1</text>
+	</string>
+	<string id="repair_str_use5">
+		<text>Use 5</text>
+	</string>
+	<string id="repair_str_usefull">
+		<text>Full Repair</text>
+	</string>
+	<string id="repair_str_noparts">
+		<text>Out of Spare Parts</text>
+	</string>
+	<string id="repair_str_nodamage">
+		<text>Not Damaged</text>
+	</string>
+	<string id="repair_str_fulldamage">
+		<text>~ Broken ~</text>
+	</string>
+	<string id="repair_str_pistols">
+		<text>Pistols in Inventory</text>
+	</string>
+	<string id="repair_str_rifles">
+		<text>Rifle in Inventory</text>
+	</string>
+	<string id="repair_str_armor">
+		<text>Armor in Inventory</text>
+	</string>
+	<string id="repair_str_salvage_choose">
+		<text>Choose Section to Salvage</text>
+	</string>
+	<string id="repair_str_salvage_click">
+		<text>Click Item to Salvage</text>
+	</string>
+	<string id="repair_str_button_choose">
+		<text>Click Item button to repair</text>
+	</string>
+	<string id="enc_equipment_repair_kit">
+		<text>Repair Kit. Weight: 2.5kg.\nA small toolkit containing fine tools used in repairing weapons and armors.  Double click to open repair/salvage menu.</text>
+	</string>
+	<!--string id="enc_equipment_parts_bag">
+		<text>Spare Parts Bag. Weight: 0.14kg.\nA bag containing all of the spare parts that you've aquired from salvaging weapons and armor.  Double click to open repair/salvage menu.</text>
+	</string>
+	<string id="enc_equipment_parts_small">
+		<text>Spare Parts. Weight: 0.14kg.\nSpare parts that you've aquired from salvaging weapons and armor.</text>
+	</string-->
+	<string id="repair_salv_error_1">
+		<text>Error!!! ..</text>
+	</string>
+	<string id="repair_salv_error_2">
+		<text>\n .. Remove the unsupported object from the first weapon slot ...</text>
+	</string>
+	<string id="repair_salv_enemy_1">
+		<text>Enemy is near!!! ..</text>
+	</string>
+	<string id="repair_salv_enemy_2">
+		<text>\n .. An enemy is nearby! You can not use the kit for repairs ...</text>
+	</string>
+	<string id="revamped_cerror_window">
+		<text>Close error window</text>
+	</string>
+	<string id="repair_button_info">
+		<text>.. Choose weapon or outfit to repair ..</text>
+	</string>
+	<string id="salvage_button_info">
+		<text>.. Choose damaged weapons or outfits for disassembling into the repair parts ..</text>
+	</string>
+	<!-- 109998 pred text -->
+	<string id="teleport_art_not_found_title">
+		<text>Scientist Teleport</text>
+	</string>
+	<string id="teleport_art_not_found">
+		<text>Required Artifact not found..</text>
+	</string>
+	<string id="tb3d_pred1_message">
+		<text>Checkpoint Romeo to base..    all secure.</text>
+	</string>
+	<string id="tb3d_pred2_message">
+		<text>Commander..  the base has been attacked, all dead..   will start a search party to find attackers..</text>
+	</string>
+</string_table>

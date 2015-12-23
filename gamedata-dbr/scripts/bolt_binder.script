@@ -1,5 +1,5 @@
---<!-- TB3D 1.0.9.9.9.0 added my_ver, clear callbacks
-function my_ver() return "1.0.9.9.9.0" end
+--<!-- TB3D 1.0.9.9.9.8 added my_ver, clear callbacks
+function my_ver() return "1.0.9.9.9.8" end
 -- Binder Bolts
 -- Author: Charsi
 
@@ -44,10 +44,12 @@ function BBolt:net_spawn(data)
 end
 
 function BBolt:net_destroy()
+	--TB3D_Services.packet_alert("bolt binder: net destroy")
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bolt binder: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	self.object:set_callback(callback.use_object, nil)				--109990
 	object_binder.net_destroy(self)
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bolt binder: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("bolt binder: net destroy done")
 end
 
 function BBolt:use_callback(obj, who)

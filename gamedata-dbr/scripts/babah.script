@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.6.0  added old pda sound option, optimized, hit styles, loc give game news, localized, obj level, update
-function my_ver() return "1.0.9.9.6.0" end
+-- TB3D 1.0.9.9.9.8  added old pda sound option, optimized, hit styles, loc give game news, localized, obj level, update
+function my_ver() return "1.0.9.9.9.8" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -169,8 +169,10 @@ function li(ob)
 		local f = funcBySect[sect]
 		if f then
 			f(id, sect)
+			return true
 		end
 	end
+	return false
 end
 
 function useDetonator(sect)

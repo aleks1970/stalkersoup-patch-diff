@@ -1,10 +1,9 @@
--- TB3D 1.0.9.9.9.4 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.0.9.9.9.8 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized,
--- pri_monolith_10, vampire, specnaz_dead, generators, esc2_ respawns
-function my_ver() return "1.0.9.9.9.4" end
-					
+-- pri_monolith_10, vampire, specnaz_dead, generators, esc2_ respawns, is_spawner
+function my_ver() return "1.0.9.9.9.8" end
 -----over population control----
 local string_find = string.find
 local string_sub = string.sub
@@ -345,6 +344,7 @@ function can_start_respawn(obj)			--called by se_respawn, creatures only from am
 		else
 			result = true
 		end
+		TB3D_Services.packet_alert("tb3d pop control: can_start_respawn["..utils.to_str(obj:name()).."] ["..utils.to_str(obj.m_game_vertex_id).."] ["..utils.to_str(result).."]")
 	end
 	return result
 end
@@ -356,39 +356,36 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 	local extended_levels = TB3D_Services.is_collector(81)
 	local result = false
 	local dont_spawn_online = false
-	if obj_name and db.actor then
+	if obj_name then
 		local is_report = false
 		if TB3D_Modders.use_setup_message and string_find(obj_name, TB3D_Modders.npc_to_log) then is_report = true end
 		--TB3D_Services.packet_alert("tb3d pop control: can go online["..obj_name.."] ?")
-		if has_alife_info("tb3d_harsh_environment") and TB3D_Services.is_instorm(lname) then
-			if string_sub(obj_name, 1, 6) == "tb3dm_"
-			  or string_sub(obj_name, 1, 4) == "amk_"
-			  or string_find(obj_name, "turret")
-			  or string_find(obj_name, "zombie")
-			  or string_find(obj_name, "poltergeist")
-			  or string_find(obj_name, "snork")
-			  or string_find(obj_name, "pseudodog")
-			  or string_find(obj_name, "psy_dog") then
-				return true
-			elseif lname == "dead_city" then
-				if string_find(obj_name, "ldk") then return true end
-			else
-				return result																		--109978, uninhabited
-			end
-		end
-		if can_start_respawn(obj) == false then
-			dont_spawn_online = true
-		else
+		--if can_start_respawn(obj) == false then
+			--dont_spawn_online = true
+		--else
 			local sect = obj:section_name() or ""
 			local hdr6 = string_sub(obj_name, 1, 6)
 			local hdr5 = string_sub(hdr6, 1, 5)
 			local hdr4 = string_sub(hdr5, 1, 4)
 			local hdr3 = string_sub(hdr4, 1, 3)
-			if string_sub(sect, 1, 5) == "zone_" or sect == "inventory_box" then
-				return true
+			if has_alife_info("tb3d_harsh_environment") and TB3D_Services.is_instorm(lname) then
+				if hdr6 == "tb3dm_"
+				  or hdr4 == "amk_"
+				  or string_find(obj_name, "turret")
+				  or string_find(obj_name, "zombie")
+				  or string_find(obj_name, "poltergeist")
+				  or string_find(obj_name, "snork")
+				  or string_find(obj_name, "pseudodog")
+				  or string_find(obj_name, "psy_dog") then
+					result = true
+				elseif lname == "dead_city" then
+					if hdr3 == "ldk" then result = true end
+				end
+			elseif string_sub(sect, 1, 5) == "zone_" or sect == "inventory_box" then
+				result = true
 			elseif hdr4 == "amk_" or hdr5 == "tb3d_" or hdr6 == "tb3dm_" or hdr6 == "dogfre" or hdr6 == "turret" then		--all levels
 				result = true
-			elseif hdr3 == "ldk" and hdr4 ~= "ldk_" then							--dav unique ldk1_ thru ldk9_
+			elseif hdr3 == "ldk" and hdr4 ~= "ldk_" then								--dav unique ldk1_ thru ldk9_
 				if string_sub(hdr5, 5, 1) == "_" then
 					if extended_levels then
 						result = true
@@ -406,33 +403,15 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						dont_spawn_online = true
 					end
 				end
+			elseif hdr4 == "dav_" or hdr4 == "ldk_" then								--new ldk
+				if extended_levels then
+					result = true
+				else
+					dont_spawn_online = true
+				end
 			---------------------------------- RESPAWNS ------------------------------------------
 			elseif sect == "respawn" or string_find(obj_name, "respawn") then			--respawners in the all.spawn
-				if hdr4 == "dav_" then													--new ldk
-					if extended_levels then
-						result = true
-					else
-						dont_spawn_online = true
-					end
-				elseif hdr3 == "ldk" and hdr4 ~= "ldk_" then							--dav unique ldk1_ thru ldk9_
-					if string_sub(hdr5, 5, 1) == "_" then
-						if extended_levels then
-							result = true
-						else
-							dont_spawn_online = true
-						end
-					else
-						if extended_levels then
-							if has_alife_info("tb3d_dm_deserters") then					--109954 old ldk respawns to be used in levelup 3
-								result = true
-							else
-								dont_spawn_online = true
-							end
-						else
-							dont_spawn_online = true
-						end
-					end
-				elseif hdr4 == "esc_" then
+				if hdr4 == "esc_" then
 					if lname == "l01_escape" then
 						if has_alife_info("dark_btr1_spawn") then result = true else dont_spawn_online = true end
 					else
@@ -912,7 +891,13 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					dont_spawn_online = true
 				elseif hdr5 == "agro_"
 				  or hdr4 == "agr_" then
-					if string_find(obj_name, "_adrenalin")							--keep the trader
+					if string_find(obj_name, "piyn_") then							--clash with gek and chuck
+						if extended_levels or has_alife_info("kuzy_artmodifikator_done") then
+							dont_spawn_online = true
+						else
+							result = true
+						end
+					elseif string_find(obj_name, "_adrenalin")							--keep the trader
 					  or string_find(obj_name, "_military")
 					  or string_find(obj_name, "road_patrol")
 					  or string_find(obj_name, "_krot")								--109975, mole
@@ -947,10 +932,20 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						result = true
 					end
 				elseif hdr3 == "gek"
-				  or hdr4 == "chuk"
-				  or hdr5 == "mono_"
-				  or hdr6 == "sniper"
-				  or hdr6 == "trezv_"
+				  or hdr4 == "chuk" then
+					if extended_levels or (has_alife_info("kuzy_artmodifikator_start") and not has_alife_info("kuzy_artmodifikator_done")) then
+						dont_spawn_online = true
+					else
+						result = true
+					end
+				elseif hdr6 == "trezv_"
+				  or hdr6 == "mono_a" then
+					if extended_levels or has_alife_info("kuzy_artmodifikator_done") then
+						dont_spawn_online = true
+					else
+						result = true
+					end
+				elseif hdr6 == "sniper"
 				  or hdr6 == "yakut_"								--arhara
 				  or hdr6 == "piyan_"
 				  or hdr6 == "kapita"
@@ -1092,7 +1087,13 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					result = true
 				end
 			elseif lname == "l05_bar" then
-				if hdr4 == "bar_" then									--bar_stalker_0005 = arena fight 1, _0006 = fight 2, 7 & 8 = 3, 9 - 13 = 4, 14 & 15 = 5, 16 - 21 = 6, 22 = 7, 23 - 26 = 8
+				if hdr6 == "bar_m_" then			--bar_m_dog_
+					if has_alife_info("naemn_shturm_poluch_start") and not has_alife_info("gorb_ubit") then			--109998, reduce population during hump quest
+						dont_spawn_online = true
+					else
+						result = true
+					end
+				elseif hdr4 == "bar_" then									--bar_stalker_0005 = arena fight 1, _0006 = fight 2, 7 & 8 = 3, 9 - 13 = 4, 14 & 15 = 5, 16 - 21 = 6, 22 = 7, 23 - 26 = 8
 					if string_find(obj_name, "^bar_visitor_") then		--109989, bar_visitor_2,3,4,5,7,8,10,12,13,15	around campfires
 						if TB3D_Modders.reduce_bar_visitors then
 							if string_find(obj_name, "visitor_2")
@@ -1131,7 +1132,11 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						result = true
 					end
 				elseif hdr4 == "rat_" then
-					result = true
+					if has_alife_info("naemn_shturm_poluch_start") and not has_alife_info("gorb_ubit") then			--109998, reduce population during hump quest
+						dont_spawn_online = true
+					else
+						result = true
+					end
 				elseif hdr6 == "esc_fo" or hdr6 == "esc_ko" then		--fox and kostya
 						result = true
 				elseif hdr6 == "stalke" then
@@ -1151,6 +1156,12 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					  or string_find(obj_name, "_prapor")
 					  or string_find(obj_name, "_stalker_novice")
 					  then result = true end
+				elseif hdr6 == "fractu" then
+					if has_alife_info("naemn_shturm_poluch_start") and not has_alife_info("gorb_ubit") then			--109998, reduce population during hump quest
+						dont_spawn_online = true
+					else
+						result = true
+					end
 				elseif hdr6 == "m_cont" then
 						if has_alife_info("bar_deactivate_radar_done") then			--too soon for actor to take on
 							result = true
@@ -1337,7 +1348,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 							result = true
 						end
 					elseif string_find(obj_name, "specnaz_dead") then				--109992, wait for task from mil
-						if has_alife_info("mil_lukash_dolg_task") then
+						if has_alife_info("mil_lukash_dolg_task") and not has_alife_info("mil_lukash_heal_reward") then
 							result = true
 						end
 					elseif string_find(obj_name, "home_snork_") then				--clear the snorks mini quest
@@ -1794,12 +1805,27 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					else
 						result = true
 					end
+				elseif hdr6 == "chaes1" then								--109998, ghost
+					if string_find(obj_name, "_prizrak") then
+						if extended_levels then
+							dont_spawn_online = true
+						else
+							result = true
+						end
+					end
 				else
 					result = true
 				end
 			elseif lname == "l12u_sarcofag" then
-				if hdr4 == "sar_"			--short circuit known spawns
-				  or hdr4 == "sak_" then
+				if hdr5 == "sarc_" then			--109998, short circuit known spawns
+						result = true			--zombied monolith
+				elseif hdr4 == "sar_" then		--monolith and sklad, NS storyline
+					if extended_levels and not has_alife_info("tb3d_started_as_collector") then				--109998, might as well use them otherwise
+						dont_spawn_online = true
+					else
+						result = true
+					end
+				elseif hdr6 == "nevid_" then	--monolit, NS storyline
 					if extended_levels then
 						dont_spawn_online = true
 					else
@@ -1841,6 +1867,14 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 							result = true
 						else
 							dont_spawn_online = true
+						end
+					else
+						result = true
+					end
+				elseif hdr5 == "aes2_" then
+					if string_find(obj_name, "monolit_stalker") then
+						if not has_alife_info("tb3d_chaes_done") then
+							result = true
 						end
 					else
 						result = true
@@ -2042,9 +2076,9 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						  --or string_find(obj_name, "boar_strong")			--gener_boar_strong1 - 3
 						  --or string_find(obj_name, "tushkano")
 						  --or string_find(obj_name, "snork_strong")		--gener_snork_strong1 - 3, froze
-						  or string_find(obj_name, "neutral_stalk1")		--just stand around
-						  or string_find(obj_name, "neutral_stalk3")
-						  or string_find(obj_name, "neutral_stalk5")
+						  --or string_find(obj_name, "neutral_stalk1")		--just stand around
+						  --or string_find(obj_name, "neutral_stalk3")
+						  --or string_find(obj_name, "neutral_stalk5")
 						  or string_find(obj_name, "_bloodsucker_strong1")
 						  or string_find(obj_name, "bloodsucker_na_krushe")
 						  or string_find(obj_name, "_chim") then
@@ -2231,12 +2265,11 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						end
 					end
 				elseif hdr4 == "sim_" then										--see if allowed simulation
-					if string_find(obj_name, "stalker_general")
+					if string_find(obj_name, "stalker_general")					--kill trader task
 					  or string_find(obj_name, "stalker_veteran")				--kill the stalker
 					  or string_find(obj_name, "marsh_")
 					  or string_find(obj_name, "bandit_general")
 					  or string_find(obj_name, "bandit_veteran")
-					  or string_find(obj_name, "stalker_general")
 					  or string_find(obj_name, "stalker_novice")
 					  then
 						result = true
@@ -2350,42 +2383,70 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					result = true
 				end
 			elseif lname == "predbannik" then
-				if hdr5 == "pred_"												--109986
-				  and (
-				  string_find(obj_name, "smoker")								--causes ctd on exit
-				  or string_find(obj_name, "ohrana")
-				  or string_find(obj_name, "karatel")
-				  or string_find(obj_name, "obmorok")
-				  or string_find(obj_name, "_loc")
-				  or string_find(obj_name, "seriy")									--also seriywff
-				  or string_find(obj_name, "ivancov")
-				  ) then
-					--TB3D_Services.packet_alert("blocked: ["..obj_name.."] !!!!")
-					dont_spawn_online = true
+				if hdr5 == "pred_" then											--109998, redone
+					if string_find(obj_name, "karatel") then						--109998, friendly (possible quest target)
+					  if has_alife_info("predbannik_obmorok_dead") then
+						result = true
+					  else
+						dont_spawn_online = true
+					  end
+					elseif string_find(obj_name, "smoker")
+					  or string_find(obj_name, "ohrana")
+					  or string_find(obj_name, "obmorok")						--tent above cave
+					  or string_find(obj_name, "gory_bandit_0002")				--two exo'd bandits with him
+					  or string_find(obj_name, "gory_bandit_0003")
+					  or string_find(obj_name, "_loc")
+					  or string_find(obj_name, "seriy")									--also seriywff
+					  or string_find(obj_name, "ivancov") then
+						if has_alife_info("cigan_kill_obmorok_start") then
+							result = true
+						else
+							--TB3D_Services.packet_alert("blocked: ["..obj_name.."] !!!!")
+							dont_spawn_online = true
+						end
+					elseif string_find(obj_name, "baza_com_") then						--freedom (nuetral) comm ctr operators
+						if has_alife_info("tb3d_pred_comm") then
+							result = true
+						else
+							dont_spawn_online = true
+						end
+					elseif string_find(obj_name, "baza_vdv_smart") then				--helipad ant. guard and bar/camp
+							result = true
+					elseif string_find(obj_name, "baza_kpp_smart6") then				--helipad guard post, military
+						if has_alife_info("tb3d_pred_comm") then
+							result = true
+						else
+							dont_spawn_online = true
+						end
+					elseif string_find(obj_name, "baza_omon_smart") then
+						if has_alife_info("tb3d_spawn_omon") then
+							result = true
+						else
+							--dont_spawn_online = true
+						end
+					elseif string_find(obj_name, "baza_army_smart") then
+						if has_alife_info("tb3d_spawn_army") then
+							result = true
+						else
+							--dont_spawn_online = true
+						end
+					else
+						result = true
+					end
 				elseif hdr4 == "pred"			--short circuit known spawns
 				  or hdr4 == "sak_"
 				  or hdr4 == "pre_"
 				  or hdr6 == "esc_st"
 				  or hdr6 == "soldie" then
 					if string_find(obj_name, "bloodsucker_strong") then
-						dont_spawn_online = true
+						if has_alife_info("predbannik_obmorok_dead") then
+							result = true
+						else
+							dont_spawn_online = true
+						end
 					elseif string_find(obj_name, "killers_baza_killer_guard")
 					  or string_find(obj_name, "pre_killers_baza_killer_walk_") then
 						if has_alife_info("tb3d_pred_attack") then
-							result = true
-						else
-							dont_spawn_online = true
-						end
-					elseif string_find(obj_name, "pred_baza_com_") then						--freedom (nuetral) comm ctr operators
-						if has_alife_info("tb3d_pred_comm") then
-							result = true
-						else
-							dont_spawn_online = true
-						end
-					elseif string_find(obj_name, "pred_baza_vdv_smart") then				--helipad ant. guard and bar/camp
-							result = true
-					elseif string_find(obj_name, "pred_baza_kpp_smart6") then				--helipad guard post, military
-						if has_alife_info("tb3d_pred_comm") then
 							result = true
 						else
 							dont_spawn_online = true
@@ -2394,18 +2455,6 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 							result = true
 					elseif string_find(obj_name, "predbannik_blokpost_soldier") then
 						if has_alife_info("tb3d_pred_attack") then
-							result = true
-						else
-							--dont_spawn_online = true
-						end
-					elseif string_find(obj_name, "pred_baza_omon_smart") then
-						if has_alife_info("tb3d_spawn_omon") then
-							result = true
-						else
-							--dont_spawn_online = true
-						end
-					elseif string_find(obj_name, "pred_baza_army_smart") then
-						if has_alife_info("tb3d_spawn_army") then
 							result = true
 						else
 							--dont_spawn_online = true
@@ -2512,7 +2561,8 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 						result = true
 					--end
 				elseif hdr6 == "darsk_" then										--ctd on going offline
-					dont_spawn_online = true
+					result = true
+					--dont_spawn_online = true
 				elseif hdr6 == "fallin" then										--add to fix
 					db.add_car_to_fix(obj)
 				elseif hdr4 == "sim_" then										--see if allowed simulation
@@ -2554,7 +2604,7 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 				  or hdr6 == "soldie" then
 					if string_find(obj_name, "zombied") then		--_1 thru _15
 						result = true
-					elseif string_find(obj_name, "zombie4")			--100, 10_1
+					--elseif string_find(obj_name, "zombie4")			--100, 10_1
 					  --or string_find(obj_name, "zombie2")			--21_2, 21_4
 					  --or string_find(obj_name, "zombie1")			--4_1 
 					  --or string_find(obj_name, "zombie9")			--9_2, 9_4
@@ -2565,8 +2615,8 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					  --or string_find(obj_name, "snork")
 					  --or string_find(obj_name, "flesh")
 					  --or string_find(obj_name, "tushkano")
-					  then
-						dont_spawn_online = true
+					  --then
+						--dont_spawn_online = true
 					else
 						result = true
 					end
@@ -2667,9 +2717,20 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 			elseif lname == "lab_x14" then
 				if hdr4 == "x14_"			--short circuit known spawns
 				  or hdr4 == "sak_"
-				  or hdr4 == "sim_"
-				  then
-					result = true
+				  or hdr4 == "sim_" then
+					if string_find(obj_name, "monolith_1") then
+						if has_alife_info("x14_glavny_death") then
+							result = true
+						else
+							dont_spawn_online = true
+						end
+					else
+						result = true
+					end
+				elseif hdr6 =="glavny" then
+					if TB3D_Services.targets_killed(2) > 19 then
+						result = true
+					end
 				else
 					result = true
 				end
@@ -2684,14 +2745,14 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 				end
 			end
 			--------------------------------------------- level spawns end -----------------------------------
-		end
-		if dont_spawn_online then					--collector levels
+		--end
+		if not is_spawner and dont_spawn_online then					--collector levels
 			obj.dont_spawn_online = true
 			result = false
 			if is_report or TB3D_Modders.pop_spawn_message then
 				TB3D_Services.packet_alert("population control: can go online["..obj_name.."] dont spawn online!!!!")
 			end
-		elseif is_report then
+		elseif not is_spawner and is_report then
 			if result == true then
 				--TB3D_Services.packet_alert("population control: can go online["..obj_name.."] [true]")
 			else
@@ -2708,5 +2769,6 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 		TB3D_Services.packet_alert("population control: can go online[nil] [false] no name, no actor")
 		result = false
 	end
+	is_spawner = false
 	return result
 end

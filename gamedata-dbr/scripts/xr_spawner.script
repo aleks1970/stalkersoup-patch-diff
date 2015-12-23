@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.5 fixed spawn conditions check for hardcore alife option, debug, list_count, redone
-function my_ver() return "1.0.9.9.7.5" end
+--TB3D 1.0.9.9.9.8 fixed spawn conditions check for hardcore alife option, debug, list_count, redone
+function my_ver() return "1.0.9.9.9.8" end
 --------------------------------------------------------------------------------------------------------------------
 -- Author: TecnoBacon 
 -- Checks for a condition list and if exists then return result(true/false) else return nil
@@ -12,7 +12,7 @@ local string_find = string.find
 function check_spawn(s_object)
 	local is_report = false
 	local sname = s_object:name()
-	if TB3D_Modders.use_spawn_message == true or (TB3D_Modders.use_setup_message and string_find(sname, TB3D_Modders.npc_to_log)) then is_report = true end
+	if (TB3D_Modders.use_setup_message and string_find(sname, TB3D_Modders.npc_to_log)) then is_report = true end
 	local cond = xr_logic.cfg_get_condlist(s_object:spawn_ini(), "spawner", "cond", s_object)
 	local npc = nil
 	if cond ~= nil then

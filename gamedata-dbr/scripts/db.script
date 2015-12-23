@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.1 added my_ver, counts, spawn and destroy, removed creatures and added corpses, reporting,
+--TB3D 1.0.9.9.9.8 added my_ver, counts, spawn and destroy, removed creatures and added corpses, reporting,
 -- car fix, optimized, state_mgr, trade
-function my_ver() return "1.0.9.9.8.1" end
+function my_ver() return "1.0.9.9.9.8" end
 --[[------------------------------------------------------------------------------------------------
 Database live online sites, zones, and actor restrictor
 Chugai Alexander
@@ -196,6 +196,7 @@ function add_respawner(obj)
 	if not respawners[obj:name()] then
 		respawners[obj:name()] = obj
 		respawners_count = respawners_count + 1
+		--TB3D_Services.packet_alert("added respawner["..utils.to_str(obj:name()).."]")
 	end
 end
 

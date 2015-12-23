@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.1 centralized create_level_changer, new Collector 12/05/11
-function my_ver() return "1.0.9.9.1" end
+--TB3D 1.0.9.9.9.8 centralized create_level_changer, new Collector 12/05/11, optimized
+function my_ver() return "1.0.9.9.9.8" end
 
 -- Table teleports
 -- art - art required for teleportation (if specified - will take away HS)
@@ -8,7 +8,7 @@ function my_ver() return "1.0.9.9.1" end
 local teleports = {
 	["device_teleport"] = {
 		art = "af_electra_moonlight",
-		sjedobniy = true,
+		can_eat = true,
 		goto_func = {
 			"exit_agroprom",
 			"exit_agroprom2",
@@ -88,7 +88,7 @@ local teleports = {
 	},
 	["science_teleport3"] = {
 		art = "af_electra_moonlight",
-		sjedobniy = true,
+		can_eat = true,
 		goto_func = {
 			"exit_yantar1",
 			"exit_yantar2",
@@ -105,7 +105,7 @@ local teleports = {
 	},
 	["science_teleport2"] = {
 		art = "af_electra_moonlight",
-		sjedobniy = true,
+		can_eat = true,
 		goto_func = {
 			"exit_bar",
 			"exit_bar2",
@@ -118,7 +118,7 @@ local teleports = {
 	},
 	["science_teleport"] = {
 		art = "af_electra_moonlight",
-		sjedobniy = true,
+		can_eat = true,
 		goto_func = {
 			"exit_kordon",
 			"exit_kordon2",
@@ -139,51 +139,51 @@ local teleports = {
 	},
 	["arhara_tele"] = {
 		--keep = true,
-		sjedobniy = true,
+		can_eat = true,
 		goto_func = {
 			"exit_to_stancia21"
 		}
 	},
 	["snotvornoe_tele"] = {
 		--keep = true,
-		sjedobniy = true,
+		can_eat = true,
 		goto_func = {
 			"exit_peshera"
 		}
 	},
 	["shaxter_tele"] = {
 		--keep = true,
-		sjedobniy = true,
+		can_eat = true,
 		goto_func = {
 			"exit_peshera1"
 		}
 	},
 	--new Collector -------------------------
 ["dav_htd_rft"] = {
-		keep = true,
-		sjedobniy = true,
+		--keep = true,
+		can_eat = false,
 		goto_func = {
 			"exit_redf_htd"
 		}
 	},
 	["dav_htd_npp"] = {
-		keep = true,
-		sjedobniy = true,
+		--keep = true,
+		can_eat = false,
 		goto_func = {
 			"exit_nppt_htd"
 		}
 	},
 	["dav_htd_lmk"] = {
-		keep = true,
-		sjedobniy = true,
+		--keep = true,
+		can_eat = false,
 		goto_func = {
 			"exit_limk_htd"
 		}
 	},	
 	-- end new -----------------------------------
 	["arhara_obman"] = {
-		keep = true,
-		sjedobniy = true,
+		--keep = true,
+		can_eat = false,
 		goto_func = {
 			"exit_as21"
 		}
@@ -191,60 +191,52 @@ local teleports = {
 }
 
 function checking_droped_obj(obj)
-	local actor = db.actor
 	local obj_sect = obj:section()
-	if not teleports[obj_sect] then return end -- not our "client"
-	-- If art is not needed or it is at the HS
-	if not teleports[obj_sect].art or actor:object(teleports[obj_sect].art) then
-		-- send a teleport to the examination
-		-- know not whether he ate or put in nychku
-		local tbl		= {}
-		tbl.obj_id		= obj:id()
-		tbl.obj_sect	= obj_sect
-		-- amk.start_timer("timer_drop_obj_teleport", 0.2, amk.pack_array_to_string(tbl))
-		amk.start_timer("timer_drop_obj_teleport", 0.2, tbl)
-	end
-	--[[checking_droped_item(obj)
-	checking_droped_item2(obj)
-	checking_droped_item3(obj)
-	checking_droped_item4(obj)
-	checking_droped_item5(obj)
-	checking_droped_item6(obj)
-	checking_droped_item7(obj)
-	checking_droped_item8(obj)
-	checking_droped_item11(obj)
-	checking_droped_item12(obj)
-	checking_droped_item13(obj)
-	checking_droped_item14(obj)
-	checking_droped_item10(obj)]]
-end
-
-function teleport_start(obj_sect, obj_id, sjeli)
-	local sim = alife()
-	local actor = db.actor
-	if sjeli and teleports[obj_sect].sjedobniy or 
-		not sjeli and not teleports[obj_sect].sjedobniy then
-	-- call a random function for the teleport
-	-- teleports[obj_sect].goto_func[math.random(#(teleports[obj_sect].goto_func))]()
-		TB3D_Services.teleportate(teleports[obj_sect].goto_func[math.random(#(teleports[obj_sect].goto_func))])
-	-- we select the art in HS, if you want to select
-		if teleports[obj_sect].art then
-			local art = actor:object(teleports[obj_sect].art)
+	if teleports[obj_sect] then					-- our teleport
+		local sim = alife()
+		local actor = db.actor
+		local obj_id = obj:id()
+		local is_go = false
+		--TB3D_Services.packet_alert("spawn level changer: droped["..utils.to_str(obj_sect).."]")
+		if teleports[obj_sect].art and actor:object(teleports[obj_sect].art) then
+			--TB3D_Services.packet_alert("spawn level changer: droped["..utils.to_str(obj_sect).."] 1")
+			local art = actor:object(teleports[obj_sect].art)	-- we select the art in HS, if you want to select
 			if art then
 				local se_art = sim:object(art:id())
 				if se_art then
 					sim:release(se_art)
 				end
+				 is_go = true
 			end
+		elseif teleports[obj_sect].art then
+			--TB3D_Services.packet_alert("spawn level changer: droped["..utils.to_str(obj_sect).."] 2")
+			news_manager.amk_send_tip_id("teleport_art_not_found","teleport_art_not_found_title",1,20,"pda_icon")
+		else
+			is_go = true
 		end
-	
-		-- remove teleport, unless told to leave or have not eaten / used
-		if not teleports[obj_sect].keep and not teleports[obj_sect].sjedobniy then
-			sim:release(sim:object(obj_id))
-		elseif teleports[obj_sect].keep and teleports[obj_sect].sjedobniy then -- Teleport back to the pack
-			amk.spawn_item_in_inv(obj_sect)
+		if is_go then
+			--TB3D_Services.packet_alert("spawn level changer: droped["..utils.to_str(obj_sect).."] 3")
+			if obj_id then
+				local sobj_id = sim:object(obj_id)
+				if sobj_id then sim:release(sobj_id) end	--if dropped
+			end
+			if teleports[obj_sect].can_eat == false then
+				amk.spawn_item_in_inv(obj_sect)
+			end
+			local tbl		= {}
+			tbl.obj_id		= obj_id
+			tbl.obj_sect	= obj_sect
+			amk.start_timer("timer_drop_obj_teleport", 0.2, tbl)
 		end
+		return true
 	end
+	return false
+end
+
+function teleport_start(obj_sect, obj_id, ate_it)
+	local actor = db.actor
+	-- call a random function for the teleport
+	TB3D_Services.teleportate(teleports[obj_sect].goto_func[math.random(#(teleports[obj_sect].goto_func))])
 end
 
 

@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.9.5 chgd line 2072 to _Services, contains calls to TB3D_modders.script, kalinin_otvet,
+<!-- ************ TB3D 1.0.9.9.9.8 chgd line 2072 to _Services, contains calls to TB3D_modders.script, kalinin_otvet,
   land_oxot_prines_3, final_agro_arhara_ok_start, chernomor_stalk, pantera_fone_nayti_done, humpback, can_start_arhara
   chaes_perexod_start  *************** -->
 <game_dialogs>
@@ -6048,30 +6048,34 @@
 				<next>1</next>
 			</phrase>
 			<phrase id="1">
-				<text>zemlyk_zadanie_1</text>
+				<text>zemlyk_zadanie_00</text>
 				<next>2</next>
 			</phrase>
 			<phrase id="2">
-				<text>zemlyk_zadanie_2</text>
+				<text>zemlyk_zadanie_1</text>
 				<next>3</next>
 			</phrase>
 			<phrase id="3">
-				<text>zemlyk_zadanie_3</text>
+				<text>zemlyk_zadanie_2</text>
 				<next>4</next>
-				<next>6</next>
 			</phrase>
 			<phrase id="4">
+				<text>zemlyk_zadanie_3</text>
+				<next>5</next>
+				<next>7</next>
+			</phrase>
+			<phrase id="5">
 				<precondition>arhara_dialog.sto_shtuk</precondition>
 				<text>zemlyk_zadanie_4</text>
 				<action>arhara_dialog.zemlyk_take_money</action>
-				<next>5</next>
+				<next>6</next>
 			</phrase>
-			<phrase id="5">
+			<phrase id="6">
 				<text>zemlyk_zadanie_5</text>
 				<give_info>zemlyk_vert_svyznoy</give_info>
 				<give_info>frits_prohodi</give_info>
 			</phrase>
-			<phrase id="6">
+			<phrase id="7">
 				<text>zemlyk_zadanie_6</text>
 				<give_info>zemlyk_zadanie1_start</give_info>
 				<give_info>zemlyk_vert_svyznoy</give_info>
@@ -6089,30 +6093,34 @@
 				<next>1</next>
 			</phrase>
 			<phrase id="1">
-				<text>zemlyk_zadanie1_1</text>
+				<text>zemlyk_zadanie_00</text>
 				<next>2</next>
 			</phrase>
 			<phrase id="2">
-				<text>zemlyk_zadanie1_2</text>
+				<text>zemlyk_zadanie1_1</text>
 				<next>3</next>
 			</phrase>
 			<phrase id="3">
-				<text>zemlyk_zadanie1_3</text>
+				<text>zemlyk_zadanie1_2</text>
 				<next>4</next>
-				<next>6</next>
 			</phrase>
 			<phrase id="4">
+				<text>zemlyk_zadanie1_3</text>
+				<next>5</next>
+				<next>7</next>
+			</phrase>
+			<phrase id="5">
 				<precondition>arhara_dialog.sto_shtuk</precondition>
 				<text>zemlyk_zadanie1_4</text>
 				<action>arhara_dialog.zemlyk_take_money</action>
-				<next>5</next>
+				<next>6</next>
 			</phrase>
-			<phrase id="5">
+			<phrase id="6">
 				<text>zemlyk_zadanie1_5</text>
 				<give_info>zemlyk_vert_svyznoy</give_info>
 				<give_info>frits_prohodi</give_info>
 			</phrase>
-			<phrase id="6">
+			<phrase id="7">
 				<text>zemlyk_zadanie1_6</text>
 				<give_info>zemlyk_zadanie1_start</give_info>
 				<give_info>zemlyk_vert_svyznoy</give_info>
@@ -9896,6 +9904,7 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<!-- 109998, need create new task that does not involve eagle -->
 	<dialog id="plot_dialog_say">
 		<dont_has_info>plot_dialog_say_start</dont_has_info>
 		<phrase_list>
@@ -9950,7 +9959,7 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
-	<dialog id="plot_dial_ok">
+	<dialog id="plot_dial_ok">			
 		<precondition>arhara_dialog.plot_dialog_say_have</precondition>
 		<has_info>plot_dialog_say_have</has_info>
 		<dont_has_info>plot_dialog_say_done</dont_has_info>

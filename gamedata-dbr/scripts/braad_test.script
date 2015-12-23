@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.7 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
+--TB3D 1.0.9.9.9.8 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
 -- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
 -- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info,
 -- translate and text color - aleks1970, grib_respawn
-function my_ver() return "1.0.9.9.9.7" end
+function my_ver() return "1.0.9.9.9.8" end
 
 local string_find = string.find
 local math_random = math.random
@@ -124,14 +124,16 @@ function spawn_marsh_band()
 end
 
 function check_info()		--109983
-	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking info") end
+	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking info") end
 	local ln = level.name()
 	if ln == "marsh" then
-		if has_alife_info("brat_luis_start") and not has_alife_info("brat_luis_dead") then
-			if has_alife_info("brat_luis_have") then
-				if TB3D_Services.give_info("brat_luis_killself") == true then amk.start_timer("luis_killself",math_random(10,15)) end
-			else	--if has_alife_info("brat_luis_start") then			--109983
-				TB3D_Services.give_info("brat_luis_spawn")
+		if has_alife_info("brat_luis_start") then
+			if not has_alife_info("brat_luis_dead") then
+				if has_alife_info("brat_luis_have") then
+					if TB3D_Services.give_info("brat_luis_killself") == true then amk.start_timer("luis_killself",math_random(10,15)) end
+				else	--if has_alife_info("brat_luis_start") then			--109983
+					TB3D_Services.give_info("brat_luis_spawn")
+				end
 			end
 		end
 		--[[if (has_alife_info("xalyava_naem1_see") or

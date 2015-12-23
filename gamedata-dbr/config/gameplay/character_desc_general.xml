@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.8.4 new inventory and bio strings, reduced money, 100% localized*************** -->
+<!-- ************ TB3D 1.0.9.9.9.8 new inventory and bio strings, reduced money, 100% localized, aes_soldier_commander, localized all bios*************** -->
 
 <xml>
 	#include "gameplay\amk_characters.xml"
@@ -103,7 +103,7 @@
     <name>GENERATE_NAME_stalker</name>
     <icon>ui_npc_u_stalker_mo_hood_9</icon>
     <map_icon x="3" y="0"></map_icon>
-    <bio>Member of the Monolith Faction. Extremely well equipped : no_info_bio</bio>
+    <bio>bio_Monolit_specnaz_rg6</bio>
     <class>cit_doctor</class>
     <community>zombied</community><panic_threshold>0.0</panic_threshold>
     <rank>700</rank>
@@ -270,7 +270,7 @@
 		<name>GENERATE_NAME_private</name>
 		<icon>ui_npc_u_stalker_militari_antigas_1</icon>
 		<map_icon x="1" y="2"></map_icon>
-		<bio>Ordinary Soldier : no_info_bio</bio>
+		<bio>bio_aes_ordinary_soldier</bio>
 		<team>Soldier_sniper</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold> <terrain_sect>stalker_military_terrain</terrain_sect>
@@ -308,7 +308,7 @@
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_mo_mask</icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Member of the Monolith Faction : no_info_bio</bio>
+		<bio>bio_Monolit_specnaz_rg6</bio>
 		<team>Monolit_rpg</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -2623,7 +2623,7 @@
 		<name>Jack_name_gameplay</name>
 		<icon x="8" y="0"></icon>
 		<map_icon x="0" y="0"></map_icon>
-		<bio>Skilled S.T.A.L.K.E.R. : Armed, and Dangerous</bio>
+		<bio>cit_vp_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>90</rank>
@@ -2651,7 +2651,7 @@
 		<name>Unknown_Corpse_name_gameplay</name>
 		<icon x="0" y="8"></icon>
 		<map_icon x="0" y="0"></map_icon>
-		<bio>no information available</bio>
+		<bio>dar_corpse_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>90</rank>
@@ -3810,7 +3810,7 @@
 		<name>Duty_Member_name_gameplay</name>
 		<icon x="8" y="2"></icon>
 		<map_icon x="4" y="0"></map_icon>
-		<bio>Member of the Duty Faction : no_info_bio</bio>
+		<bio>val_dolg_common_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>40</rank>
@@ -3824,7 +3824,7 @@
 		<name>Duty_Member_name_gameplay</name>
 		<icon x="28" y="4"></icon>
 		<map_icon x="4" y="0"></map_icon>
-		<bio>Member of the Duty Faction : no_info_bio</bio>
+		<bio>val_dolg_common_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>40</rank>
@@ -3838,7 +3838,7 @@
 		<name>Duty_Member_name_gameplay</name>
 		<icon x="28" y="4"></icon>
 		<map_icon x="4" y="0"></map_icon>
-		<bio>Member of the Duty Faction : no_info_bio</bio>
+		<bio>val_dolg_common_bio</bio>
 		<team>Dolg_regular</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -3854,7 +3854,7 @@
 		<name>Duty_Sniper_name_gameplay</name>
 		<icon x="28" y="4"></icon>
 		<map_icon x="4" y="0"></map_icon>
-		<bio>Member of the Duty Faction : no_info_bio</bio>
+		<bio>mil_Dolg_specnaz_silence_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>50</rank>
@@ -3868,7 +3868,7 @@
 		<name>Duty_Sniper_name_gameplay</name>
 		<icon x="8" y="2"></icon>
 		<map_icon x="4" y="0"></map_icon>
-		<bio>Member of the Duty Faction : no_info_bio</bio>
+		<bio>mil_Dolg_specnaz_silence_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>50</rank>
@@ -3882,7 +3882,7 @@
 		<name>Duty_Sniper_name_gameplay</name>
 		<icon x="28" y="4"></icon>
 		<map_icon x="4" y="0"></map_icon>
-		<bio>Member of the Duty Faction : no_info_bio</bio>
+		<bio>mil_Dolg_specnaz_silence_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>50</rank>
@@ -4003,7 +4003,7 @@
 		<name>Duty_Member_name_gameplay</name>
 		<icon x="8" y="2"></icon>
 		<map_icon x="4" y="0"></map_icon>
-		<bio>Member of the Duty Faction : no_info_bio</bio>
+		<bio>mil_Dolg_specnaz_silence_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>70</rank>
@@ -4018,7 +4018,7 @@
 		<name>Unknown_Scientist_name_gameplay</name>
 		<icon x="10" y="4"></icon>
 		<map_icon x="1" y="6"></map_icon>
-		<bio>Unknown Scientist : no_info_bio</bio>
+		<bio>rad_ecolog_bio</bio>
 		<team>Ecolog_general</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -4033,7 +4033,7 @@
 		<name>Unknown_Scientist_name_gameplay</name>
 		<icon x="10" y="4"></icon>
 		<map_icon x="1" y="6"></map_icon>
-		<bio>Unknown Scientist : no_info_bio</bio>
+		<bio>rad_ecolog_bio</bio>
 		<team>Ecolog_general</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -4049,7 +4049,7 @@
 		<name>Scientific_Guard_name_gameplay</name>
 		<icon x="8" y="4"></icon>
 		<map_icon x="0" y="6"></map_icon>
-		<bio>Scientific Faction Guard : no_info_bio</bio>
+		<bio>rad_ecolog_guard_bio</bio>
 		<team>Ecolog_guard</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -4064,7 +4064,7 @@
 		<name>Scientific_Guard_name_gameplay</name>
 		<icon x="10" y="4"></icon>
 		<map_icon x="1" y="6"></map_icon>
-		<bio>Scientific Faction Guard : no_info_bio</bio>
+		<bio>rad_ecolog_guard_bio</bio>
 		<team>Ecolog_general</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -5139,7 +5139,7 @@
 		<name>Unknown_Mercenary_name_gameplay</name>
 		<icon x="18" y="4"></icon>
 		<map_icon x="2" y="0"></map_icon>
-		<bio>Unidentified Mercenary : just recently arrived in the Zone : no_info_bio</bio>
+		<bio>sim_killer_veteran_bio</bio>
 		<team>Killer_regular</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -5154,7 +5154,7 @@
 		<name>Unknown_Mercenary_name_gameplay</name>
 		<icon x="18" y="6"></icon>
 		<map_icon x="2" y="0"></map_icon>
-		<bio>Unidentified Mercenary : just recently arrived in the Zone : no_info_bio</bio>
+		<bio>sim_killer_veteran_bio</bio>
 		<team>Killer_regular</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -5169,7 +5169,7 @@
 		<name>Unknown_Mercenary_name_gameplay</name>
 		<icon x="18" y="2"></icon>
 		<map_icon x="2" y="0"></map_icon>
-		<bio>Unidentified Mercenary : just recently arrived in the Zone : no_info_bio</bio>
+		<bio>sim_killer_veteran_bio</bio>
 		<team>Killer_regular</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -7053,7 +7053,7 @@
 		<name>Monolith_Leader_name_gameplay</name>
 		<icon x="30" y="8"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>The Leader of the Monolith Faction : Detailed information: CLASSIFIED</bio>
+		<bio>bio_aes_Monolit_master</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>95</rank>
@@ -7067,7 +7067,7 @@
 		<name>Second_Command_name_gameplay</name>
 		<icon x="24" y="10"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Second-in-Command of the Monolith Faction : Detailed information: CLASSIFIED</bio>
+		<bio>bio_aes_Monolit_master</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>90</rank>
@@ -7081,7 +7081,7 @@
 		<name>Third_Command_name_gameplay</name>
 		<icon x="26" y="10"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Third-in-Command of the Monolith Faction : Detailed information: CLASSIFIED</bio>
+		<bio>bio_aes_Monolit_master</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>90</rank>
@@ -7096,7 +7096,7 @@
 		<name>Unknown_Monolith_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>40</rank>
@@ -7110,7 +7110,7 @@
 		<name>Unknown_Monolith_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>40</rank>
@@ -7125,7 +7125,7 @@
 		<name>Monolith_Sniper_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>50</rank>
@@ -7139,7 +7139,7 @@
 		<name>Monolith_Sniper_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>50</rank>
@@ -7154,7 +7154,7 @@
 		<name>Monolith_Gauss_Sniper_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>50</rank>
@@ -7169,7 +7169,7 @@
 		<name>Monolith_Elite_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>70</rank>
@@ -7183,7 +7183,7 @@
 		<name>Monolith_Elite_name_gameplay</name>
 		<icon x="22" y="10"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>70</rank>
@@ -7197,7 +7197,7 @@
 		<name>Monolith_Elite_name_gameplay</name>
 		<icon x="22" y="10"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>70</rank>
@@ -7211,7 +7211,7 @@
 		<name>Monolith_Elite_name_gameplay</name>
 		<icon x="28" y="8"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>70</rank>
@@ -7226,7 +7226,7 @@
 		<name>Monolith_Master_name_gameplay</name>
 		<icon x="28" y="8"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified : Very Dangerous Individual</bio>
+		<bio>bio_classified_dangerous</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>90</rank>
@@ -7240,7 +7240,7 @@
 		<name>Monolith_Master_name_gameplay</name>
 		<icon x="0" y="4"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified : Very Dangerous Individual</bio>
+		<bio>bio_classified_dangerous</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
 		<rank>90</rank>
@@ -7255,7 +7255,7 @@
 		<name>Unknown_Monolith_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<team>Monolit_rpg</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -7270,7 +7270,7 @@
 		<name>Unknown_Monolith_name_gameplay</name>
 		<icon x="4" y="2"></icon>
 		<map_icon x="3" y="0"></map_icon>
-		<bio>Information:Classified</bio>
+		<bio>bio_classified</bio>
 		<team>Monolit_rpg</team>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold>
@@ -10522,7 +10522,7 @@
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_ecolog</icon>
 		<map_icon x="0" y="6"></map_icon>
-		<bio>Scientific Faction Guard : no_info_bio</bio>
+		<bio>rad_ecolog_guard_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold> <terrain_sect>stalker_ecolog_terrain</terrain_sect>
 		<rank>800</rank>
@@ -10539,7 +10539,7 @@
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_ecolog_military</icon>
 		<map_icon x="1" y="6"></map_icon>
-		<bio>Scientific Faction Guard : no_info_bio</bio>
+		<bio>rad_ecolog_guard_bio</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold> <terrain_sect>stalker_ecolog_terrain</terrain_sect>
 		<rank>789</rank>
@@ -10992,7 +10992,7 @@
 		<name>GENERATE_NAME_sergeant</name>
 		<icon>ui_npc_u_soldier_obichniy</icon>
 		<map_icon x="1" y="2"></map_icon>
-		<bio>Ordinary Soldier : no_info_bio</bio>
+		<bio>"bio_aes_ordinary_soldier</bio>
 		<class>cit_doctor</class>
 		<community>zombied</community><panic_threshold>0.0</panic_threshold> <terrain_sect>stalker_military_terrain</terrain_sect>
 		<rank>600</rank>

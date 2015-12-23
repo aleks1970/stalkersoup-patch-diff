@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.6  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init
-function my_ver() return "1.0.9.9.9.6" end
+-- TB3D 1.0.9.9.9.8  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init
+function my_ver() return "1.0.9.9.9.8" end
 
 --[[-------------------------- variable and table --------------------------]]
 local table_sort=table.sort
@@ -615,7 +615,12 @@ function check_exclusion(obj,map)
 	local obj_name=obj:name()
 	if string_find(obj_name,"amk_") or string_find(obj_name,"zone_ice") then return false end
 	if not level_vertexes[map] then return true end
-	return string_find(obj_name,"esc_zone_witches") or string_find(obj_name,"zone_topolinypuh") or string_find(obj_name,"red_zone_acidic") or string_find(obj_name,"podval_tornado_strong") or string_find(obj_name,"dcity_fontan_fountain_average") or string_find(obj_name,"rostok_zone_witches") or string_find(obj_name,"rostok_zone_zharka_static") or string_find(obj_name,"tutorial") or string_find(obj_name,"zone_solynka") or (string_find(obj_name,"_mincer") and map~="l11_pripyat")
+	return string_find(obj_name,"esc_zone_witches") or string_find(obj_name,"zone_topolinypuh")
+		or string_find(obj_name,"red_zone_acidic") or string_find(obj_name,"podval_tornado_strong")
+		or string_find(obj_name,"dcity_fontan_fountain_average") or string_find(obj_name,"rostok_zone_witches")
+		or string_find(obj_name,"rostok_zone_zharka_static") or string_find(obj_name,"tutorial")
+		or string_find(obj_name,"zone_solynka") or string_find(obj_name,"tb3d")
+		or (string_find(obj_name,"_mincer") and map~="l11_pripyat")
 end
 
 function anom_suffix(suffix_num)
@@ -879,10 +884,16 @@ function anom_binder:net_spawn(sobj)
 end
 
 function anom_binder:net_destroy()
-	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
-	amk_anoms.remove_anomaly(self.object:id())
-	object_binder.net_destroy(self)
-	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(self.object:name()).."] done") end
+	if self then
+		if TB3D_Modders.use_destroy_message then
+			TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]")
+		end
+		if self.object then remove_anomaly(self.object:id()) end
+		object_binder.net_destroy(self)
+		if TB3D_Modders.use_destroy_message then
+			TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(self.object:name()).."] done")
+		end
+	end
 end
 
 local anom_list={}
@@ -897,7 +908,7 @@ function add_anomaly(id,pos,radius)
 end
 
 function remove_anomaly(id)
-	if anom_list then anom_list[id]=nil end
+	if id and anom_list and anom_list[id] then anom_list[id]=nil end
 end
 
 function get_nearest_anomaly(npc)

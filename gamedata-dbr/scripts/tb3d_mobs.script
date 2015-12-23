@@ -1,7 +1,8 @@
---TB3D 1.0.9.9.9.7 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.0.9.9.9.8 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
--- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns, spawn quest bandits
-function my_ver() return "1.0.9.9.9.7" end
+-- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns, spawn quest bandits,
+-- spawn_mob, spawn_tushkanos, promzone
+function my_ver() return "1.0.9.9.9.8" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -176,7 +177,7 @@ function spawn_mob(x, y, z, lv, gv, type, max)
 	end
 	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
 	local min = 1
-	if max > 9 then min = 4 end
+	if max < min then max = min+1 elseif max > 9 then min = 4 end				--109998
 	local cnt = math_floor(math_random(min, max) * flevel)
 	if cnt < 1 then cnt = 1 end
 	if TB3D_Modders.hardcore_mobs then
@@ -237,6 +238,23 @@ function spawn_snorks(x, y, z, lv, gv, max)
 	end
 	for i=1, cnt do
 		alife():create("tb3dm_snork_jumper", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
+	end
+end
+
+function spawn_tushkanos(x, y, z, lv, gv, max)										--109998
+	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())
+	local min = 1
+	if max > 9 then min = 4 end
+	local cnt = math_floor(math_random(min, max) * flevel)
+	if cnt < 1 then cnt = 1 end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	end
+	if TB3D_Modders.use_mob_messages then
+		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tushkano_normal]")
+	end
+	for i=1, cnt do
+		alife():create("tushkano_normal", vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
 	end
 end
 
@@ -515,8 +533,8 @@ end
 function check_ds_spawns()
 	if mobs < 10 then
 		if has_alife_info("falling_car") then
-			spawn_mob(-404.782,4.001,550.287,47525,4599,5,2)												--entrance from dv
-			spawn_mob(-417.484,3.712,554.045,42890,4599,2,2)												--entrance from dv
+			spawn_mob(-404.782,4.001,550.287,47525,4599,2,4)												--entrance from dv
+			spawn_mob(-417.484,3.712,554.045,42890,4599,2,4)												--entrance from dv
 			alife():create("tb3dm_bloodsucker_strong", vector():set(-194.143,3.435,611.382),168891,4609)	--near road block 1
 			alife():create("tb3dm_bloodsucker_strong", vector():set(-176.072,3.218,617.460),186082,4609)	--near road block 1
 			alife():create("tb3dm_bloodsucker_strong", vector():set(-218.537,5.630,469.783),145498,4607)	--near road block 2
@@ -1074,9 +1092,7 @@ function check_dcity_spawns(spawns)
 	elseif has_alife_info("collector_done_with_dcity") or not has_alife_info("collector_ready_for_dcity") then
 		--TODO
 	end
-	if typ ~= nil then
-		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
-	end
+	--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
 end
 
 function check_gen_spawns(level_up)
@@ -1144,4 +1160,35 @@ function check_tunnels_spawns(level_up)				--109993
 	spawn_rats(108.668,-7.732,37.993,3159,3865,qty)			--upper rooms
 	spawn_rats(99.830,-7.731,12.355,2454,3867,qty)
 	spawn_rats(113.939,-7.726,-62.645,3765,3868,qty)
+end
+
+function check_promzone_spawns(level_up, grp)				--109998
+	local qty = 4
+	if level_up > 3 then
+		qty = 8
+	elseif level_up > 2 then
+		qty = 6
+	end
+	if grp == 1 then
+		spawn_snorks(-36.579,14.500,-246.244,129081,4768,qty)		--ditch
+		spawn_mob(628.904,25.531,-261.214,252199,4868,6,qty)		--tower
+	end
+	spawn_tushkanos(48.325,24.724,-295.138,294376,4891,qty)		--garbage pile
+end
+
+function check_diggers_spawns(level_up)							--109998
+	local qty = 4
+	if level_up > 3 then
+		qty = 8
+	elseif level_up > 2 then
+		qty = 6
+	end
+	spawn_rats(-5.046,-8.173,2.592,100,5355,qty)				--below crane
+	spawn_rats(628.904,25.531,-261.214,252199,4868,6,qty)		--main chamber
+end
+
+function eprip_exit_labx8()										--109998, ambush after gold bar found
+	spawn_npcs(-49.891,0.398,94.517,139638,3755,5,4)			--first floor end of hall
+	spawn_npcs(-80.131,4.502,95.582,110299,3754,5,4)			--second floor above elevator
+	spawn_npcs(-80.582,8.601,95.559,109644,3754,5,4)			--third floor above elevator
 end

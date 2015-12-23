@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.0 use_binder_message
-function my_ver() return "1.0.9.9.7.0" end
+--TB3D 1.0.9.9.9.8 use_binder_message
+function my_ver() return "1.0.9.9.9.8" end
 --[[------------------------------------------------------------------------------------------------------------------
 Respawn binder
 --------------------------------------------------------------------------------------------------------------------]]
@@ -35,9 +35,11 @@ function respawn_binder:net_spawn( server_object )
 end
 
 function respawn_binder:net_destroy()
+	--TB3D_Services.packet_alert("bind respawn: net destroy")
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind respawn: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	object_binder.net_destroy( self )
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind respawn: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("bind respawn: net destroy done")
 end
 
 function respawn_binder:update( delta )

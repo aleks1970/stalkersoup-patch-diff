@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.5 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
--- bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art
-function my_ver() return "1.0.9.9.9.5" end
+--TB3D 1.0.9.9.9.8 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+-- bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom, tb3d_gbars_chp2
+function my_ver() return "1.0.9.9.9.8" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -150,6 +150,9 @@ function found_zep_document(doc_nmbr)
 		end
 	end
 end
+function drop_zep_document(doc_nmbr)
+	--maybe future use
+end
 
 --=================== gold bars quests ========================================================
 function found_zep_note(sect)
@@ -167,28 +170,56 @@ function found_zep_note(sect)
 	elseif sect == "broke1" then																	--first note in gold bars quests
 		if TB3D_Services.give_info("tb3d_note_05") then	spawn_broke1_found() end					--note in attic about bar1 location
 	elseif sect == "tech1" then																		--old house in tech
-		if TB3D_Services.give_info("tb3d_note_06") then spawn_pipes_end() end
+		if TB3D_Services.give_info("tb3d_note_06") then spawn_pipes_end() end		--chp1
 	elseif sect == "src1" then
 		if TB3D_Services.give_info("tb3d_note_07") then spawn_down_road() end
 	elseif sect == "deadm1" then
 		if TB3D_Services.give_info("tb3d_note_08") then spawn_dead_marshes() end
 	elseif sect == "wlab1" then
-		if TB3D_Services.give_info("tb3d_note_09") then spawn_warlab_found() end
+		if TB3D_Services.give_info("tb3d_note_09") then spawn_warlab_found() end		--ch2
 	elseif sect =="cem2" then
 		if TB3D_Services.give_info("tb3d_note_10") then spawn_cem2_found() end
 	elseif sect =="swamp" then
-		if TB3D_Services.give_info("tb3d_note_11") then spawn_swamp_found() end
+		if TB3D_Services.give_info("tb3d_note_11") then spawn_swamp_found() end			--chp3
 	elseif sect =="deadm2" then
 		if TB3D_Services.give_info("tb3d_note_12") then spawn_deadm2_found() end
 	elseif sect =="tunnels" then
-		if TB3D_Services.give_info("tb3d_note_13") then spawn_tunnels_found() end
+		if TB3D_Services.give_info("tb3d_note_13") then spawn_tunnels_found() end		--chp1
 	elseif sect =="tunnels2" then
-		if TB3D_Services.give_info("tb3d_note_15") then spawn_tunnels2_found() end
+		if TB3D_Services.give_info("tb3d_note_15") then spawn_tunnels2_found() end		--chp1
 	elseif sect == "dist2" then
 		if TB3D_Services.give_info("tb3d_note_14") then spawn_dist2_found() end
 	elseif sect == "suicide1" then		--109976
 		TB3D_Mobs.spawn_killer_squad(228.152,6.892,-25.611,1354149,3688,6,4,true)
 	end
+end
+function drop_zep_note(sect)
+	local result = false
+	if sect == "tower"
+	or sect == "tent"
+	or sect == "dist1"
+	or sect == "wh1"
+	or sect == "npp2"
+	or sect == "broke1" then													--first note in gold bars quests
+		if has_alife_info("tb3d_note_05") then result = true end
+	elseif sect == "tech1" then
+		result = true
+	elseif sect == "src1"
+	or sect == "deadm1"
+	or sect == "wlab1" then
+		if has_alife_info("tb3d_note_09") then result = true end
+	elseif sect =="cem2"
+	or sect =="swamp" then
+		if has_alife_info("tb3d_note_11") then result = true end
+	elseif sect =="deadm2" then
+	elseif sect =="tunnels" then
+	elseif sect =="tunnels2" then
+	elseif sect == "dist2" then
+		if has_alife_info("tb3d_gb1_done") then result = true end
+	elseif sect == "suicide1" then
+		result = true
+	end
+	return result
 end
 
 function spawn_gold_bars(chapter)
@@ -761,11 +792,13 @@ function spawn_juptent_found()											--bar4
 end
 
 function spawn_ds_found()												--bar5
-	--TODO: 109954
+	TB3D_Mobs.spawn_npcs(-137.440,-1.455,524.168,225126,4613,6,4)			--109998 killers on the road south
+	TB3D_Mobs.spawn_npcs(-243.548,-0.006,543.434,125952,4606,6,4)			--109998 killers on the road north
 end
 
 function spawn_gar_found()												--bar6
 	TB3D_Mobs.spawn_snorks(264.002,1.147,145.613,374663,380,4)			--109986, snorks at ds exit
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",223.025,-0.688,157.264,356764,381,4)	--109998, ldk at ds exit
 end
 
 function spawn_ros_found()												--bar7
@@ -985,6 +1018,7 @@ function check_bar_group(num)
 		  and has_alife_info("tb3d_goldbar_03")
 		  and has_alife_info("tb3d_goldbar_04") then
 			spawn_gold_bars(2)
+			TB3D_Services.give_info("tb3d_gbars_chp2")
 		end
 	elseif num == 2 then
 		if has_alife_info("tb3d_goldbar_05")
@@ -1155,6 +1189,7 @@ function npp2_mushroom_take()
 	else
 		TB3D_Services.move_actor(444.933,10.101,177.676, true)		--),148554,2599)		--suspended platform
 	end
+	if amk.load_variable("tb3d_storm_started", nil) == nil then amk.save_variable("tb3d_storm_started", level.get_time_days()) end
 end
 
 function spawn_f1_mushart()

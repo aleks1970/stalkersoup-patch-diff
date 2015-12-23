@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.6  dmx135, backpack spot, obj level, net spawn, obj_is_protected
-function my_ver() return "1.0.9.9.7.6" end
+--TB3D 1.0.9.9.9.8  dmx135, backpack spot, obj level, net spawn, obj_is_protected, teleports
+function my_ver() return "1.0.9.9.9.8" end
 --[[-----------------------------------------------------------------------------------------------
  File         : dmx_treasure.script
  Description  : Adding to the inventory reset button stuff
@@ -7,11 +7,13 @@ function my_ver() return "1.0.9.9.7.6" end
  Author       : Charsi
  Date         : 07.03.2011 
 --]]-----------------------------------------------------------------------------------------------
+--local string_find = string.find
 local items_in_slots={}
 local drop_items={}
 
 -- These items do not throw down
-local no_drop_items = {["separator"]=true, ["remontnyi_box"]=true, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true, ["amk_metka"]=true, ["amk_transmutator"]=true}
+local no_drop_items = {["separator"]=true, ["remontnyi_box"]=true, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true, ["amk_metka"]=true, ["amk_transmutator"]=true, ["wpn_soulcube"]=true, ["science_teleport"]=true, ["science_teleport2"]=true,
+["hand_teleporter"]=true, ["mine_detector"]=true, ["radioprotector"]=true, ["psy_blockade"]=true, ["bioradar"]=true}
 
 function on_btn_drop_ckliked() -- it hangs on the button
 	local actor = db.actor
@@ -33,7 +35,7 @@ function on_btn_drop_ckliked() -- it hangs on the button
 		end
 		-- Consider that you can throw
 		actor:iterate_inventory(function (dummy,item)
-			if items_in_slots[item:id()]~=true and no_drop_items[item:section()]~=true and protected_items.obj_is_protected(item)~=true
+			if items_in_slots[item:id()] ~= true and no_drop_items[item:section()] ~= true and protected_items.obj_is_protected(item) ~= true --and string_find(item:section(), "teleport") ~= true
 			then drop_items[item:id()]=true cnt=cnt+1 end
 		end,nil)
 		if cnt>0 then

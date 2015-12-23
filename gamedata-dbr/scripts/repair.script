@@ -1,0 +1,665 @@
+-- TB3D 1.0.9.9.9.8 new
+function my_ver() return "1.0.9.9.9.8" end
+--[[--------------------------------------------------------------------------------------------------------------------------------
+ File         : repair.script
+ Description  : Repair Kit Revamped: - allows you to salvage parts from weapons and armor and use them to repair your equipment...
+ Copyright    : barak1001, StalkerSoup
+ Author       : barak1001 (Moddb)
+ Rewritten	  : for StalkerSoup by aleks1970 08/22/2015
+ LastUpdate   : 06.09.2015 by aleks1970
+--]]--------------------------------------------------------------------------------------------------------------------------------
+local act = db.actor
+local slot1_item
+local repair_enemy
+local dont_run = nil
+--local parts_table = {}
+local sparep_static = nil
+local sparer_static = nil
+local sparea_static = nil
+local repair_enemy_enable = true	--(true) enable/disable enemy check function - aleks1970
+local table_insert = table.insert
+local string_find = string.find
+local translate = game.translate_string
+local text_color_system = TB3D_Services.get_text_color("system")
+local repair_kit_id
+
+function give_repair_kit()							--109998
+	local have_kit = have_revamped_kit()
+	if not have_kit then	--Repair Kit Revamped - aleks1970
+		amk.spawn_in_inv("repair_kit", 1)
+	end
+end
+
+function update()
+	local c_gtime = time_global()
+	local found = nil
+	local slot1_w = act:item_in_slot(1)
+	if has_alife_info("ui_inventory") then
+		rep_enemy_detect()
+		if repair_enemy ~= nil and repair_enemy==false then
+			if slot1_w ~= nil then	-- exclude detectors and pictures for viewing when they attached in the first slot - aleks1970
+				local section = slot1_w:section()
+				if string_find(section, "wpn_fuck") then
+					slot1_item = false
+				elseif string_find(section, "fake_wpn_crowbar") then
+					slot1_item = false
+				elseif string_find(section, "stco") then
+					slot1_item = false
+				elseif string_find(section, "wpn_") then
+					slot1_item = true
+				else
+					slot1_item = false
+				end
+			else
+				slot1_item = true
+			end
+		end
+	end
+end
+
+function have_revamped_kit()
+	return amk_utils.inventory_search("repair_kit",1) ~= false
+end
+
+function repair_used(obj)
+	local text
+	if obj then
+		local sect = obj:section()
+		if has_alife_info("ui_inventory") then
+			if repair_enemy ~= nil and repair_enemy==false then
+				text = text_color_system..translate("repair_salv_error_1")..translate("repair_salv_error_2")
+				if sect == "repair_kit" then
+					if slot1_item then
+						if dont_run == nil then
+							load_menu("repair_kit")
+							dont_run = true
+						end
+					else
+						news_manager.send_tip_txt(act,text,1,"default",20000)
+						create_kit("repair_kit")
+					end
+				end
+			else
+				text = text_color_system..translate("repair_salv_enemy_1")..translate("repair_salv_enemy_2")
+				news_manager.send_tip_txt(act,text,1,"default",20000)
+				create_kit("repair_kit")
+			end
+		end
+	end
+end
+
+function on_item_drop(obj)
+	if obj then
+		local sect = obj:section()	-- 109998 - aleks1970
+		if has_alife_info("ui_inventory") then
+			if sect == "repair_kit" then
+				if dont_run == nil then
+					repair_kit_id = obj:id()
+				end
+			end
+		end
+	end
+end
+
+function packet_sniff(wpn)
+	local item = {}
+	local tbl = {}
+	wpn = alife():object(wpn:id())
+	item[1] = "inv_grid_x"
+	item[2] = "inv_grid_y"
+	item[3] = "inv_grid_width"
+	item[4] = "inv_grid_height"
+	item[5] = "inv_name_short"
+	item[6] = "cost"
+	local list = system_ini():r_string(wpn:section_name(), "slot")
+	if list then
+		for str in string.gfind(list, "%s*([^%,]+)%s*") do
+			if str == "1" then	--and slot1_item==true
+				item[7] = "ef_weapon_type"	-- has to be checked -aleks1970
+			elseif str == "2" then
+				item[7] = "ef_weapon_type"
+			elseif str == "6" then
+				item[7] = "ef_equipment_type"
+			else
+				break
+			end
+			for i=1,7 do
+				local name = item[i]
+				local list2 = system_ini():r_string(wpn:section_name(), name)
+				if list2 then
+					for str in string.gfind(list2, "%s*([^%,]+)%s*") do
+						tbl[name] = str
+					end
+				end
+			end
+		end
+		return tbl
+	end
+end
+
+function load_menu(item)
+	local gui_win = repair_ui(get_hud())
+	level.start_stop_menu(gui_win, true)
+	--create_kit(item)
+end
+
+class "repair_ui" (CUIScriptWnd)
+
+function repair_ui:__init(owner) super()
+	self.owner = owner
+	self:init_variables()
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function repair_ui:__finalize() end
+
+function check_weapons()
+	local one = act:item_in_slot(1)
+	local two = act:item_in_slot(2)
+	local three = act:get_current_outfit()  --act:item_in_slot(6) - aleks1970
+	return one,two,three
+end
+
+function repair_ui:InitControls()
+	self.main_button = {}
+	self:Init(0,0,1024,768)
+	local xml = CScriptXmlInit()
+	local text = nil
+	
+	xml:ParseFile("ui_repair_main.xml")
+	xml:InitStatic("background", self)
+--	xml:InitStatic("background_error", self)
+	
+	btn = xml:InitStatic("repair_header", self)
+	self:Register(btn,"repair_header")
+	
+	btn = xml:InitStatic("l_tab_up",self)
+	self:Register(btn,"l_tab_up")
+	text = translate("repair_str_repair")
+	btn:SetText(text)
+	btn:Show(true)
+	
+	btn = xml:InitStatic("r_tab_up",self)
+	self:Register(btn,"r_tab_up")
+	text = translate("repair_str_salvage")
+	btn:SetText(text)
+	btn:Show(false)	
+	
+	btn = xml:InitButton("l_tab_button",self)
+	self:Register(btn,"l_tab_button")
+	text = translate("repair_str_repair")
+	btn:SetText(text)
+	btn:Show(false)	
+	
+	btn = xml:InitButton("r_tab_button",self)
+	self:Register(btn,"r_tab_button")
+	text = translate("repair_str_salvage")
+	btn:SetText(text)
+	btn:Show(true)
+
+	self.dlg_repair		= repair_repair.choose_slot()
+	self.dlg_repair:InitControls(0,0,xml,self)
+	self.dlg_repair:set_buttons()
+	self:AttachChild	(self.dlg_repair)
+
+	self.dlg_salvage		= repair_salvage.select_type()
+	self.dlg_salvage:InitControls(60,60, xml, self)
+	self:AttachChild	(self.dlg_salvage)
+
+	btn = xml:Init3tButton("prev_btn", self)
+	self:Register(btn,"prev_btn")
+	btn:Enable(false)
+	self.prev_btn = btn
+	
+	btn = xml:Init3tButton("exit_btn", self)
+	self:Register(btn,"exit_btn")
+	
+	btn = xml:Init3tButton("home_btn", self)
+	self:Register(btn,"home_btn")
+	btn:Enable(false)
+	self.home_btn = btn
+	
+	btn = xml:Init3tButton("next_btn", self)
+	self:Register(btn,"next_btn")
+	btn:Enable(false)
+	self.next_btn = btn
+
+	self.dlg_salvage:Show(false)
+	self.dlg_repair:Show(true)
+	self.tab_clicked = nil
+
+	
+	btn = xml:InitStatic("sparesp_text", self)
+	self:Register(btn,"sparesp_text")
+	sparep_static = btn
+	sparep_static:SetText(amk.load_variable("spare_pistol", 0))
+	sparep_static:SetTextY(20)
+	
+	btn = xml:InitStatic("sparesr_text", self)
+	self:Register(btn,"sparesr_text")
+	sparer_static = btn
+	sparer_static:SetText(amk.load_variable("spare_rifle", 0))
+	sparer_static:SetTextY(20)
+	
+	btn = xml:InitStatic("sparesa_text", self)
+	self:Register(btn,"sparesa_text")
+	sparea_static = btn
+	sparea_static:SetText(amk.load_variable("spare_armor", 0))
+	sparea_static:SetTextY(20)
+	
+	btn = xml:InitStatic("sparesp_title", self)
+	self:Register(btn,"sparesp_title")
+	text = translate("repair_str_spareparts_s")
+	btn:SetText(text)
+
+	btn = xml:InitStatic("sparesr_title", self)
+	self:Register(btn,"sparesr_title")
+	text = translate("repair_str_spareparts_l")
+	btn:SetText(text)
+
+	btn = xml:InitStatic("sparesa_title", self)
+	self:Register(btn,"sparesa_title")
+	text = translate("repair_str_spareparts_a")
+	btn:SetText(text)
+end
+
+function repair_ui:InitCallBacks()
+	self:AddCallback("l_tab_button", ui_events.BUTTON_CLICKED, self.tab_on_clicked, self)
+	self:AddCallback("r_tab_button", ui_events.BUTTON_CLICKED, self.tab_on_clicked, self)
+	self:AddCallback("exit_btn", ui_events.BUTTON_CLICKED, self.exit_on_clicked, self)
+	self:AddCallback("home_btn", ui_events.BUTTON_CLICKED, self.home_on_clicked, self)
+	self:AddCallback("prev_btn", ui_events.BUTTON_CLICKED, self.prev_on_clicked, self)
+	self:AddCallback("next_btn", ui_events.BUTTON_CLICKED, self.next_on_clicked, self)
+end
+
+function repair_ui:tab_on_clicked()
+	local repair_tab = self:GetStatic("l_tab_up")
+	local repair_button = self:GetButton("l_tab_button")
+	local salvage_tab = self:GetStatic("r_tab_up")
+	local salvage_button = self:GetButton("r_tab_button")
+--	local header_r = self:GetStatic("repair_header")
+	if self.tab_clicked == nil then
+		salvage_tab:Show(true)
+		repair_button:Show(true)
+		repair_tab:Show(false)
+		salvage_button:Show(false)
+		self.dlg_repair:Show(false)
+		self.dlg_salvage:Show(true)
+		self.home_btn:Enable(true)
+		self.tab_clicked = "true"
+--		name = translate("repair_str_salvage_choose")
+--		header_r:SetText(name)
+--		header_r:SetTextAlign(CGameFont.alCenter)
+	else
+		salvage_tab:Show(false)
+		repair_button:Show(false)
+		repair_tab:Show(true)
+		salvage_button:Show(true)
+		self.dlg_salvage:Show(false)
+		self.dlg_repair:Show(true)
+		self.home_btn:Enable(false)
+		self.tab_clicked = nil
+		self.dlg_repair:set_buttons()
+	end
+end
+
+function repair_ui:exit_on_clicked()
+	self:on_quit()
+end
+
+function repair_ui:on_quit()
+	self:GetHolder():start_stop_menu (self,true)
+	dont_run = nil
+	give_repair_kit()
+end
+
+function repair_ui:home_on_clicked()
+	repair_salvage.home_clicked()
+end
+
+function repair_ui:prev_on_clicked()
+	repair_salvage.prev_clicked()
+end
+
+function repair_ui:next_on_clicked()
+	repair_salvage.next_clicked()
+end
+
+function use_kit()
+	local new_kit = nil
+	local found = nil
+	for index = 0, act:object_count() - 1 do
+		local inv_item = act:object(index)
+		if found == nil then
+			if inv_item then
+			local inv_name = inv_item:name()
+				if (string_find(inv_name, "repair_kit")) then
+					alife():release(alife():object(inv_item:id()), true)
+					found = "true"
+					dont_run = "true"
+				end
+			end
+		end
+	end
+end
+
+function create_kit(item)
+	local pos = device().cam_pos
+	pos.x = pos.x + 1
+	repair_kit_id = alife():create(item, pos, act:level_vertex_id(), act:game_vertex_id())
+end
+
+function copy_addons(item)
+	local pos = device().cam_pos
+	pos.x = pos.x + 1
+	local addon_list = {[1] = "scope_name",[2] = "grenade_launcher_name",[3] = "silencer_name"}
+	local section = item:section()
+	local item_id = item:id()
+	if string_find(section, "wpn_",1,true) then
+		local alife_weapon = alife():object(item_id)
+		local packet = net_packet()
+		alife_weapon:STATE_Write(packet)
+		packet:r_seek(packet:w_tell() - 2)
+		local addon_flags = packet:r_u8()
+		if addon_flags ~= 0 then
+			for n=1,3 do
+				local ndx = addon_flags % (n*2)
+				if ndx > 0 then -- we have an addon
+					local addon_section = system_ini():r_string(alife_weapon:section_name(), addon_list[n])
+					if addon_section ~= nil then
+						local sobj = alife():create(addon_section, pos, act:level_vertex_id(), act:game_vertex_id())
+						table_insert(kit_cont,sobj.id)
+--					else
+--						dbglog("unrecognized addon for "..section)
+					end
+					addon_flags = addon_flags - n --only valid for first two iterations
+				end
+			end
+		end
+	end
+end
+
+function repair_ui:init_variables()
+	self.slot1 = {}
+	self.slot2 = {}
+	self.slot3 = {}
+	self.slot1.items = {}
+	self.slot2.items = {}
+	self.slot3.items = {}
+	--parts_table = {}
+	--self:make_spares_table()
+	self:load_spare_parts()
+	local item1,item2,item3 = nil,nil,nil
+	item1,item2,item3 = check_weapons()
+	if item1 then
+		local weap_cond = item1:condition()
+		self.slot1 = packet_sniff(item1)
+		self.slot1["id"] = item1:id()
+		self.slot1.items = self:init_tables(item1:id(),"1")
+	else
+		self.slot1.items = self:init_tables("empty","1")
+	end
+	
+	if item2 then
+		local weap_cond = item2:condition()
+		self.slot2 = packet_sniff(item2)
+		self.slot2["id"] = item2:id()
+		self.slot2.items = self:init_tables(item2:id(),"2")
+	else
+		self.slot2.items = self:init_tables("empty","2")
+	end
+	
+	if item3 then
+		local weap_cond = item3:condition()
+		self.slot3 = packet_sniff(item3)
+		self.slot3["id"] = item3:id()
+		self.slot3.items = self:init_tables(item3:id(),"6")
+	else
+		self.slot3.items = self:init_tables("empty","6")
+	end
+end
+
+function repair_ui:init_tables(obj,obj_slot)
+local ltx = system_ini()
+local array = {}
+local count = 0
+	for index = 0, act:object_count() - 1 do
+		local inv_item = act:object(index)
+		if inv_item then
+			local inv_section = inv_item:section()
+			local inv_id = inv_item:id()
+			if inv_id ~= obj then
+				if ltx:line_exist(inv_section, "slot") then
+					local item_slot = ltx:r_string(inv_section, "slot")
+					if item_slot == obj_slot then
+						if (string_find(inv_section, "wpn_")) then
+							table_insert(array,inv_id)
+							count = count + 1
+						elseif item_slot == "6" then
+							if ltx:line_exist(inv_section, "class") then
+								local item_class = ltx:r_string(inv_section, "class")
+								if item_class == "E_STLK" then
+									table_insert(array,inv_id)
+									count = count + 1
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	if count == 0 then
+		array[1] = "empty"
+	end
+	return array
+end
+
+function repair_ui:load_spare_parts()
+	--set_counter()
+end
+
+--[[function repair_ui:make_spares_table()
+	for index = 0, act:object_count() - 1 do
+		local inv_item = act:object(index)
+		local inv_section = inv_item:section()
+		if inv_item then
+			local inv_id = inv_item:id()
+			if inv_section == "spare_parts" then
+				table_insert(parts_table,inv_id)
+			end
+		end
+	end
+end]]--
+
+--[[function count_parts()
+	local count = amk.load_variable("spare_pistol", 0) + amk.load_variable("spare_rifle", 0) + amk.load_variable("spare_armor", 0)
+	return count
+end]]--
+
+function delete_parts(slot, number)
+		local parts = amk.load_variable("type", 0)
+		parts = parts - number
+		if parts < 0 then parts = 0 end
+		if slot == 1 then type = "spare_pistol"
+		elseif slot == 2 then type = "spare_rifle"
+		else type = "spare_armor" end
+		amk.save_variable("type", parts)
+		set_counter()
+end
+
+function set_counter()
+	local count = amk.load_variable("spare_pistol", 0)
+	if count > 99 then count = 99 end
+	sparep_static:SetText(count)
+	sparep_static:SetTextY(20)	
+	count = amk.load_variable("spare_rifle", 0)
+	if count > 99 then count = 99 end
+	sparer_static:SetText(count)
+	sparer_static:SetTextY(20)	
+	count = amk.load_variable("spare_armor", 0)
+	if count > 99 then count = 99 end
+	sparea_static:SetText(count)
+	sparea_static:SetTextY(20)	
+end
+
+function calculate_parts(wpn)
+	local ltx = system_ini()
+	local section_name = wpn:section()
+	local weap_ceil = math.ceil(wpn:condition()*100)
+	local weap_cond = weap_ceil/100
+	local weap_weight
+	if ltx:line_exist(section_name, "inv_weight") then
+		weap_weight = ltx:r_string(section_name, "inv_weight")
+	end
+	local parts = math.floor(weap_weight * 7 * weap_cond)
+	local undamaged = math.floor(weap_weight * 7)
+	--local weap_name = wpn:name()
+	return undamaged,parts
+end
+
+function get_addon_location(item,name)
+	local array = {}
+	local ltx = system_ini()
+	local section_name = item:section()
+	if ltx:section_exist(section_name) then
+		if ltx:line_exist(section_name, name) then
+			local cls = ltx:r_string(section_name, name)
+			array[name] = cls
+		end
+	end
+	return array
+end
+
+function get_addons(item)
+	local array = {}
+	local addon_list = {[1] = "scope_name",[2] = "grenade_launcher_name",[3] = "silencer_name"}
+	local section = item:section()
+	local item_id = item:id()
+	if string_find(section, "wpn_",1,true) then
+		local alife_weapon = alife():object(item_id)
+		local packet = net_packet()
+		alife_weapon:STATE_Write(packet)
+		packet:r_seek(packet:w_tell() - 2)
+		local addon_flags = packet:r_u8()
+		if addon_flags ~= 0 then
+			for n=1,3 do
+				local ndx = addon_flags % (n*2)
+				if ndx > 0 then -- we have an addon
+					local addon_section = system_ini():r_string(alife_weapon:section_name(), addon_list[n])
+					if addon_section ~= nil then
+						table_insert(array,addon_section)
+--					else
+--						dbglog("unrecognized addon for "..section)
+					end
+					addon_flags = addon_flags - n --only valid for first two iterations
+				end
+			end
+		end
+	end
+	return array
+end
+
+function addon_icon_stats(section_name)
+	local array = {}
+	local stats = {}
+	local ltx = system_ini()
+	stats[1] = "inv_grid_width"
+	stats[2] = "inv_grid_height"
+	stats[3] = "inv_grid_x"
+	stats[4] = "inv_grid_y"
+	if ltx:section_exist(section_name) then
+		for x =1,4 do
+			local name = stats[x]
+			if ltx:line_exist(section_name, name) then
+				local cls = ltx:r_string(section_name, name)
+				if cls then
+					array[name] = cls
+				end
+			end
+		end
+	end
+	return array
+end
+
+function repair_ui:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then		
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_quit()
+		end
+	end
+	return true
+end
+
+-- --------------------------------------- addon - enemy - aleks1970 ---------------------------------
+function rep_enemy_detect()
+	repair_enemy=false
+	if not repair_enemy_enable then return end	--aleks1970
+	local obj
+	local stalker
+	local monster
+	local actor = db.actor
+	local actorPos = actor:position()
+	local lvo_id = level.object_by_id
+	local objPos
+	local dist
+	if has_alife_info("ui_inventory") then
+		IAmAMonster_rInit()
+		for npcId, npc in pairs(db.storage) do
+			obj = lvo_id(npcId)
+			if obj then
+				stalker = IAmAStalker[obj:clsid()]
+				monster = IAmAMonster_r[obj:clsid()]
+				if (stalker or monster) and (obj.alive and obj:alive() == true) then
+					objPos = obj:position()
+					dist = actorPos:distance_to(objPos)
+					if dist < 120 then
+						if monster and obj:section() ~= "dogfrend" then
+							if dist < 20 then	--40 - aleks1970
+								repair_enemy=true
+							elseif obj:see(db.actor) then
+								repair_enemy=true
+							else
+								repair_enemy = false
+							end
+						elseif stalker and amk.get_npc_relation(obj,actor)=="enemy" then
+							if dist < 20 then	--40 - aleks1970
+								repair_enemy=true
+							end
+						end
+						if (repair_enemy==true) then break end
+					end
+				end
+			end
+		end
+	end
+	if (repair_enemy==true) then
+		return true
+	else
+		return false
+	end
+end
+
+IAmAMonster_r = {}
+function IAmAMonster_rInit()
+    IAmAMonster_r = {
+       [clsid.boar_s] = true,
+       [clsid.bloodsucker_s] = true,
+       [clsid.dog_s] = true,
+       [clsid.flesh_s] = true,
+       [clsid.pseudodog_s] = true,
+       [clsid.psy_dog_s] = true,
+       [clsid.burer_s] = true,
+       [clsid.cat_s] = true,
+       [clsid.chimera_s] = true,
+       [clsid.controller_s] = true,
+       [clsid.poltergeist_s] = true,
+       [clsid.gigant_s] = true,
+       [clsid.zombie_s] = true,
+       [clsid.snork_s] = true,
+		[clsid.psy_dog_phantom_s] = true
+    }
+end
+-- --------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-<!-- TB3D 1.0.9.9.7.2 added sid medkits, radiotolik_pomer_dialog, enable Nano upgrade on line 2030 and below - aleks1970 -->
+<!-- TB3D 1.0.9.9.9.8 added sid medkits, radiotolik_pomer_dialog, enable Nano upgrade on line 2030 and below - aleks1970, repair kit -->
 <game_dialogs>
 	<dialog id="mosinka">
 		<phrase_list>
@@ -1691,7 +1691,7 @@
 			</phrase>
 			<phrase id="1">
 				<text>start_update_outfit_sidor_1</text>
-				<action>sak.add_3repair_item_outfit</action>
+				<!--action>sak.add_3repair_item_outfit</action-->
 				<next>2</next>
 			</phrase>
 			<phrase id="2">

@@ -1,10 +1,10 @@
---TB3D 1.0.9.9.9.0 removed item number function, removed set_npc_health(), 
+--TB3D 1.0.9.9.9.8 removed item number function, removed set_npc_health(), 
 -- devil to Bes, added breaks, cons pkt srvcs, fixed item reloc and item out functions, 
 -- glowworm fixes, removed ratcatcher check from used item, 'to the swamp' vice cave, petrushka to petruha,
 -- dmx135, hit styles, doc in pripyat, chgd nepis_umer, trasure to treasure, delta display,
 -- delta display to slice mult, add_tail, removed make_kill_task_failed, levchn ids changed in all.spawn, garb - cave
--- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box, translate
-function my_ver() return "1.0.9.9.9.0" end
+-- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box, translate, repair kit
+function my_ver() return "1.0.9.9.9.8" end
 
 ---------------------------------------------------------------------
 -- Hi from Syaka 
@@ -1146,7 +1146,7 @@ function add_repair_item_weapon()
 end
 
 function add_repair_box()
-	--amk.spawn_item("repair_box_outfit",vector():set(301.11,13.31,276.43),246,565356)
+	--amk.spawn_item("repair_kit",vector():set(301.11,13.31,276.43),246,565356)
 end
 
 function add_medkit(first_speaker, second_speaker)
@@ -1222,49 +1222,6 @@ function add_spot_of_docent(a)
 	amk.save_variable("spot_of_nps", old_spot)
 	end
 end
---[[
-local levelsIgnoreArts = {
-    ["l03u_agr_underground"]    = true,
-    ["l04u_labx18"]             = true,
-    ["l08u_brainlab"]           = true,
-    ["l10u_bunker"]             = true,
-    ["l12u_control_monolith"]   = true,
-    ["l12u_sarcofag"]           = true,
-    ["l12_stancia_2"]           = true,
-    ["av_peshera"]              = true,
-    ["warlab"]                  = true,
-    ["peshera"]                 = true,
-    --["jupiter_underground"]     = true,
-    ["labx8"]                   = true
-}
-function add_tail(levelName)
-	local testobj=0
-    local sim = alife()
-    local obj
-    for a = first_object, last_object do
-        obj = sim:object(a)
-    	if obj and string_find(obj:name(),"testsak_"..levelName) then
-			--dbglog("Vot on: "..obj:name())
-			testobj=1
-			break
-		end
-	end
-	if testobj==0 and not levelsIgnoreArts[level.name()] then
-		amk_anoms.generate_arts()
-	end
-end
-
-function off_testobj() --!!!!TB3D verify 64k boundary
-	local obj
-	for a=10,last_object,1 do
-		obj=alife():object(a)
-		if obj and string_find(obj:name(),"testsak_") then
-		alife():release(obj,true)
-		break	--!!!!TB3D
-		end
-	end
-end
-]]--
 
 function off_repair_box() --!!!!TB3D verify 64k boundary
 	local obj

@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.1  new reporting 12/07/11, tweed
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.9.8  new reporting 12/07/11, tweed
+function my_ver() return "1.0.9.9.9.8" end
 ---- Rulix aka Bak --- 25.3.2009
 --------------------------------------utils------------------------------------------
 
@@ -110,8 +110,9 @@ function npc_death(npc,who)
 		--if rx_gl then
 			rx_gl.death(npc)
 		--end
---		issue_event(npc,"death_callback",who)
+		--issue_event(npc,"death_callback",who)
 		unsubscribe_from_events(npc)
+		xr_logic.disable_generic_schemes(npc, db.storage[npc:id()].stype)			--109998
 	end
 end
 

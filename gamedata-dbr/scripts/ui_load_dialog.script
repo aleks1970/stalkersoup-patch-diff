@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.6  disconnecting, translate
-function my_ver() return "1.0.9.9.7.6" end
+--TB3D 1.0.9.9.9.8  disconnecting, translate, item == nil
+function my_ver() return "1.0.9.9.9.8" end
 -- File:        UI_LOAD_DIALOG.SCRIPT
 -- Description: Load Dialog for STALKER
 -- Created:     28.10.2004
@@ -294,6 +294,12 @@ function load_dialog:OnButton_load_clicked()
 	if index == -1 then return end
 
 	local item		= list:GetItem(index)
+	if item == nil then		--109998
+		self.msgbox_id			= 0
+		self.message_box:Init			("message_box_invalid_saved_game")		
+		self:GetHolder():start_stop_menu(self.message_box, true)
+		return
+	end
 	local fname		= item.fn:GetText()
 
 	if (alife() == nil) then

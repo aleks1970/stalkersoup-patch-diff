@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.8.1 added tables to debug, new rep system, optimized, cleanup, db calls, added intervals, show_tables, generic_m_story_id, post process
-function my_ver() return "1.0.9.9.8.1" end
+-- TB3D 1.0.9.9.9.8 added tables to debug, new rep system, optimized, cleanup, db calls, added intervals, show_tables, generic_m_story_id, post process, is_spawner
+function my_ver() return "1.0.9.9.9.8" end
 
 if (jit == nil) then
   profiler.setup_hook ()
@@ -28,6 +28,7 @@ get_nervous = 0 --1												--109981, blow_phase to react to
 run_hide = 1 --2
 huddle_up = 3
 can_leave = 6
+is_spawner = false									--109998, bypass pop control if from spawn menu
 
 -- Loads the schema from a file on the disk and activates a motivator.
 -- Here:
@@ -63,6 +64,7 @@ function getIniValueFloat(sect, line, default, iniFileName)
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
         end
+		--TB3D_Services.info_alert("_g  getinivalueFloat")
         if iniCaching and (iniSections[sect] or iniSectionsCount == 0) then
             if iniFileName and (not iniOtherLines[iniFileName] or not iniOtherLines[iniFileName]["float"]
 			or not iniOtherLines[iniFileName]["float"][sect]
@@ -97,6 +99,7 @@ function getIniValueU32(sect, line, default, iniFileName)
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
         end
+		--TB3D_Services.info_alert("_g  getinivalueU32")
         if iniCaching and (iniSections[sect] or iniSectionsCount == 0) then
             if iniFileName and (not iniOtherLines[iniFileName]
 			or not iniOtherLines[iniFileName]["u32"]
@@ -131,6 +134,7 @@ function getIniValueString(sect, line, default, iniFileName)
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
         end
+		--TB3D_Services.info_alert("_g  getinivaluestring")
         if iniCaching and (iniSections[sect] or iniSectionsCount == 0) then
             if iniFileName and (not iniOtherLines[iniFileName] or not iniOtherLines[iniFileName]["string"]
 			or not iniOtherLines[iniFileName]["string"][sect]
@@ -165,7 +169,7 @@ function getIniValueStringWQ(sect, line, default, iniFileName)
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
         end
-        --TB3D_Services.info_alert("_g  getinivaluestringwq")
+       --TB3D_Services.info_alert("_g  getinivaluestringwq")
         if iniCaching and (iniSections[sect] or iniSectionsCount == 0) then
             if iniFileName and (not iniOtherLines[iniFileName] or not iniOtherLines[iniFileName]["string_wq"] or not iniOtherLines[iniFileName]["string_wq"][sect] or not iniOtherLines[iniFileName]["string_wq"][sect][line]) or
                 (not iniLines["string_wq"] or not iniLines["string_wq"][sect] or not iniLines["string_wq"][sect][line]) then
@@ -198,6 +202,7 @@ function getIniValueBool(sect, line, default, iniFileName)
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
         end
+		--TB3D_Services.info_alert("_g  getinivalueBool")
         if iniCaching and (iniSections[sect] or iniSectionsCount == 0) then
             if iniFileName and (not iniOtherLines[iniFileName]
 			or not iniOtherLines[iniFileName]["boolean"]
@@ -230,6 +235,7 @@ end
 
 function iniLinesCount(sect, iniFileName)
     if sect then
+		--TB3D_Services.info_alert("_g  iniLinesCount")
         if iniCaching and (iniSections[sect] or iniSectionsCount == 0) then
             if iniFileName and (not iniOtherLines[iniFileName]
 			or not iniOtherLines[iniFileName]["line"]

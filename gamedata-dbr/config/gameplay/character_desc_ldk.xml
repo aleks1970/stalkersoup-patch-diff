@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 new inventory, dav updates, inventories *************** -->
+<!-- ************ TB3D 1.0.9.9.9.8 new inventory, dav updates, inventories *************** -->
 <xml>
 <!-- *************** -->
 <!-- ***************Last Day Killers by dAVROs*************** -->
@@ -283,7 +283,7 @@
 	<!-- *************** -->
 	
 	<!-- *************** Grey Nano 1 bodysuit with orange trim*************** -->
-		<specific_character id="sim_nano_master1" team_default="1">
+		<specific_character id="sim_nano_master" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_nano_master1</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -302,7 +302,7 @@
 		#include "dialogs\bandit_dialogs.xml"
 	</specific_character>
 	
-<!-- *************** Grey Nano 2 bodysuit with orange trim*************** -->
+<!-- *************** Grey Nano 2 bodysuit with orange trim*************** -- >
 		<specific_character id="sim_nano_master2" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_nano_master2</icon>
@@ -323,7 +323,7 @@
 	</specific_character>
 	
 	<!-- *************** -->
-	<!-- *************** Black Nano bodysuit 3 with grey trim*************** -->
+	<!-- *************** Black Nano bodysuit 3 with grey trim*************** -- >
 		<specific_character id="sim_nano_master3" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_nano_master3</icon>
@@ -343,7 +343,7 @@
 		#include "dialogs\bandit_dialogs.xml"
 	</specific_character>
 	
-	<!-- *************** Black Nano bodysuit 4 with grey trim*************** -->
+	<!-- *************** Black Nano bodysuit 4 with grey trim*************** -- >
 		<specific_character id="sim_nano_master4" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_nano_master4</icon>
@@ -364,7 +364,7 @@
 	</specific_character>
 	
 <!-- *************** CS old style body armor and Helmet*************** -->
-	<specific_character id="sim_troop_master1" team_default="1">
+	<specific_character id="sim_troop_master" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_troop_master1</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -388,7 +388,7 @@
 <!-- *************** -->
 	
 <!-- ***************LDK Commander 1*************** -->             
-	<specific_character id="charactercommander1" team_default = "1">
+	<specific_character id="ldk_commander1" team_default = "1">
 		<name>Commander_Demogorgon_name_gameplay</name>
 		<icon>ui_npc_ldk_commander</icon>
 		<map_icon x="1" y="0"></map_icon>
@@ -407,7 +407,7 @@
 	
 <!-- *************** -->             
 <!-- ***************LDK Commander 2*************** -->             
-	<specific_character id="charactercommander2" team_default = "1">
+	<specific_character id="ldk_commander2" team_default = "1">
 		<name>Commander_Chernobog_name_gameplay</name>
 		<icon>ui_npc_ldk_commander</icon>
 		<map_icon x="1" y="0"></map_icon>
@@ -425,7 +425,7 @@
 	</specific_character>
 
 <!-- ***************LDK Commander 3*************** -->             
-	<specific_character id="charactercommander3" team_default = "1">
+	<specific_character id="ldk_commander3" team_default = "1">
 		<name>Commander_Diabolos_name_gameplay</name>
 		<icon>ui_npc_ldk_commander</icon>
 		<map_icon x="1" y="0"></map_icon>
@@ -443,7 +443,7 @@
 	</specific_character>
 
 <!-- ***************LDK Commander 4*************** -->             
-	<specific_character id="charactercommander4" team_default = "1">
+	<specific_character id="ldk_commander4" team_default = "1">
 		<name>Commander_Sutekh_name_gameplay</name>
 		<icon>ui_npc_ldk_commander</icon>
 		<map_icon x="1" y="0"></map_icon>
@@ -461,7 +461,7 @@
 	</specific_character>
 	
 <!-- ***************LDK Commander 5*************** -->             
-	<specific_character id="charactercommander5" team_default = "1">
+	<specific_character id="ldk_commander5" team_default = "1">
 		<name>Commander_Crnobog_name_gameplay</name>
 		<icon>ui_npc_ldk_commander</icon>
 		<map_icon x="1" y="0"></map_icon>
@@ -479,7 +479,7 @@
 	</specific_character>
 	
 <!-- ***************LDK Supreme Commander *************** -->             
-	<specific_character id="charactercommander6" team_default = "1">
+	<specific_character id="ldk_commander6" team_default = "1">
 		<name>Commander_Ahriman_name_gameplay</name>
 		<icon>ui_npc_ldk_commander</icon>
 		<map_icon x="1" y="0"></map_icon>
@@ -502,7 +502,7 @@
 	
 <!-- *************** LDK respawn Veterans - pretty easy kills *************** -->
 
-	<specific_character id="dav_ldk_veteran1" team_default="1">
+	<specific_character id="dav_ldk_veteran_respawn1" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_lastday_wayt_polumaska</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -522,7 +522,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_veteran2" team_default="1">
+	<specific_character id="dav_ldk_veteran_respawn2" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_lastday_wayt_polumaska</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -542,7 +542,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_veteran3" team_default="1">
+	<!--specific_character id="dav_ldk_veteran_respawn3" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_lastday_wayt_maska</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -562,7 +562,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_veteran4" team_default = "1">
+	<specific_character id="dav_ldk_veteran_respawn4" team_default = "1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_ki_nauchniy</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -581,7 +581,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_veteran5" team_default = "1">
+	<specific_character id="dav_ldk_veteran_respawn5" team_default = "1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_ki_nauchniy</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -600,7 +600,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_veteran6" team_default="1">
+	<specific_character id="dav_ldk_veteran_respawn6" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_lastday_wayt_polumaska</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -620,7 +620,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_veteran7" team_default = "1">
+	<specific_character id="dav_ldk_veteran_respawn7" team_default = "1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_ki_nauchniy</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -639,7 +639,7 @@
 	</specific_character>
 
     
-	<specific_character id="dav_ldk_veteran8" team_default="1">
+	<specific_character id="dav_ldk_veteran_respawn8" team_default="1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_lastday_wayt_maska</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -656,11 +656,11 @@
 		#include "inventory\lastday_killer8_items.xml"
 		#include "gameplay\character_criticals_4.xml"
 		#include "dialogs\generic_dialogs.xml"
-	</specific_character>
+	</specific_character-->
 	
 <!-- *************** LDK respawn Masters - not so easy kills *************** -->
 	
-	<specific_character id="dav_ldk_master1" team_default="1">
+	<specific_character id="dav_ldk_master_respawn1" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_lastday_helmet</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -680,7 +680,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_master2" team_default="1">
+	<specific_character id="dav_ldk_master_respawn2" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_lastday_helmet</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -700,7 +700,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_master3" team_default="1">
+	<!--specific_character id="dav_ldk_master_respawn3" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_lastday_helmet</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -717,7 +717,7 @@
 		#include "inventory\lastday_killer3_items.xml"
 		#include "gameplay\character_criticals_4.xml"
 		#include "dialogs\generic_dialogs.xml"
-	</specific_character>
+	</specific_character-->
 
 	
 	<specific_character id="dav_ldk_master4" team_default="1">
@@ -758,7 +758,7 @@
     </specific_character>
 
 	
-    <specific_character id="dav_ldk_master6" team_default = "1">
+    <!--specific_character id="dav_ldk_master_respawn6" team_default = "1">
         <name>GENERATE_NAME_bandit</name>
         <icon>ui_npc_u_stalker_mo_exo</icon>
         <map_icon x="3" y="0"></map_icon>
@@ -776,7 +776,7 @@
     </specific_character>
 
 	
-    <specific_character id="dav_ldk_master7" team_default = "1">
+    <specific_character id="dav_ldk_master_respawn7" team_default = "1">
         <name>GENERATE_NAME_bandit</name>
         <icon>ui_npc_u_stalker_mo_exo</icon>
         <map_icon x="3" y="0"></map_icon>
@@ -794,7 +794,7 @@
     </specific_character>
 
 	
-	<specific_character id="dav_ldk_master8" team_default="1">
+	<specific_character id="dav_ldk_master_respawn8" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_lastday_helmet</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -811,7 +811,7 @@
 		#include "inventory\lastday_killer8_items.xml"
 		#include "gameplay\character_criticals_4.xml"
 		#include "dialogs\generic_dialogs.xml"
-	</specific_character>
+	</specific_character-->
 
 	
 	<specific_character id="dav_ldk_master9" team_default="1">
@@ -834,7 +834,7 @@
 	</specific_character>
 
 	
-	<specific_character id="dav_ldk_master10" team_default="1">
+	<!--specific_character id="dav_ldk_master_respawn10" team_default="1">
 		<name>GENERATE_NAME_bandit</name>
 		<icon>ui_npc_lastday_helmet</icon>
 		<map_icon x="2" y="0"></map_icon>
@@ -851,7 +851,7 @@
 		#include "inventory\lastday_killer_nano1_items.xml"
 		#include "gameplay\character_criticals_4.xml"
 		#include "dialogs\generic_dialogs.xml"
-	</specific_character>
+	</specific_character-->
 
 	
     <specific_character id="dav_ldk_master11" team_default = "1">
@@ -871,4 +871,22 @@
 		#include "dialogs\generic_dialogs.xml"
     </specific_character>
 	
-</xml>
+<!-- ***************LDK legacy spawns *************** -->             
+	<specific_character id="charactercommander4" team_default = "1">
+		<name>Commander_Ahriman_name_gameplay</name>
+		<icon>ui_npc_ldk_commander</icon>
+		<map_icon x="1" y="0"></map_icon>
+		<bio>ldk_cmdr_bio</bio>
+		<class>ldk6_commander</class>
+		<community>lastday</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<rank>999</rank>
+		<reputation>-999</reputation>
+        <snd_config>characters_voice\ldk\</snd_config>
+  		<crouch_type>-1</crouch_type>
+		<visual>actors\LDK\ldk_beast</visual>
+		#include "gameplay\characterc6_items.xml"
+		#include "gameplay\character_criticals_4.xml"
+		#include "dialogs\bandit_dialogs.xml"
+	</specific_character>
+
+	</xml>

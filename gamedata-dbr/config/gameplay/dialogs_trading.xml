@@ -1,4 +1,4 @@
-<!-- ****** TB3D 1.0.9.9.8.9 trasure to sake.take/have_treasure, sherstyk exchange in line: 4438 aleks1970, sidor_repair_dialog -->
+<!-- ****** TB3D 1.0.9.9.9.8 trasure to sake.take/have_treasure, sherstyk exchange in line: 4438 aleks1970, sidor_repair_dialog, give_repair_kit -->
 <game_dialogs>
 	<dialog id="about_repair_box_dialog">
 		<precondition>sak_dialog.repair_box_not_have</precondition>
@@ -136,21 +136,20 @@
 			</phrase>
 			<phrase id="1">
 				<text>sidor_repair_dialog_1</text>
-				<next>2</next>
+				<next>4</next>
 			</phrase>
-			<phrase id="2">
+			<!--phrase id="2">
 				<text>sidor_repair_dialog_2</text>
 				<next>3</next>
 			</phrase>
 			<phrase id="3">
 				<text>sidor_repair_dialog_3</text>
 				<next>4</next>
-			</phrase>
+			</phrase-->
 			<phrase id="4">
 				<text>sidor_repair_dialog_4</text>
 				<give_info>news_repair</give_info>
-				<action>sak_dialog.add_repair_box</action>
-				<action>sak.add_repair_item_outfit</action>
+				<action>repair.give_repair_kit</action>
 			</phrase>
 		</phrase_list>
 	</dialog>

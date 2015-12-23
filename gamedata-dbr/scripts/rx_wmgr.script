@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.9   added new reporting 12/07/11, removed empty calls to utils, game news, npc checks, protection, rain factor, output, debug, get_dmg
-function my_ver() return "1.0.9.9.8.9" end
+--TB3D 1.0.9.9.9.8   added new reporting 12/07/11, removed empty calls to utils, game news, npc checks, protection, rain factor, output, debug, get_dmg
+function my_ver() return "1.0.9.9.9.8" end
 ---- Rulix aka Bak --- 1.7.2009
 
 local table_sort = table.sort
@@ -63,7 +63,7 @@ wm_modes = {sect = {custom = {}, default = {}}, -- data from the config
 		min_cond = read_from_ini(iniFileName,"main","min_condition",0.2),
 		wpn_minmax = read_from_ini(iniFileName,"main","weapon_minmaxr",false,0)}
 
-function net_destroy()
+function net_destroy()		--from bind stalker
 	wm_modes = {}
 	weapon_params = {}	
 	wms = {}
@@ -116,8 +116,8 @@ end
 
 class "weapon_manager"
 function weapon_manager:__init(npc)
-	if npc and npc.name and npc.alive and npc:alive() == true then
-		if self then
+	if self then
+		if npc and npc.name and npc.alive and npc:alive() == true then
 			if TB3D_Modders.use_wmgr_messages then TB3D_Services.packet_alert("rx wmgr: __init["..utils.to_str(npc:name()).."] initializing") end
 			self.npc = npc
 			self.npc_id = npc:id()
@@ -125,9 +125,9 @@ function weapon_manager:__init(npc)
 			self.wpns_prstor = {}
 			self.priors_mem = {}
 			--	rx_ai.subscribe_for_events(npc,self)
-		else
-			TB3D_Services.packet_alert("rx wmgr: __init["..utils.to_str(npc:name()).."] no self!!!!")
 		end
+	else
+		TB3D_Services.packet_alert("rx wmgr: __init["..utils.to_str(npc:name()).."] no self!!!!")
 	end
 end
 
@@ -891,7 +891,7 @@ function return_all()
 	end
 end
 
-function kill_wm(obj)
+function kill_wm(obj)				--rx_ai.npc_death
 	local st = db.storage[obj:id()]
 	if st and st.wm ~= nil then
 		get_wm(obj):return_items()

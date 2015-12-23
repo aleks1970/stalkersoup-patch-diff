@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.7 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.0.9.9.9.8 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
@@ -7,7 +7,7 @@
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
 -- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
 -- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin, missing scientist in pripyat
-function my_ver() return "1.0.9.9.9.7" end
+function my_ver() return "1.0.9.9.9.8" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -53,7 +53,7 @@ function force_fixes()
 		if obj then
 			if obj.name then obj_name = obj:name() else obj_name = "NIL" end
 			if obj.section_name then sect = obj:section_name() else sect = "NIL" end
-			if string_find(obj_name, "sea-urchin") then			--109996, remove names with '-'
+			if string_find(obj_name, "sea-urchin") or string_find(obj_name, "charactercommander") then			--109996, remove names with '-' and bad ldk spawns
 				--if TB3D_Modders.use_cleaner_message == true then
 					TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] removed")
 				--end
@@ -234,12 +234,14 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 			else
 				is_skip = true
 			end
-		--elseif string_find(obj_name,"x16_physic_destroyable_object_0000") then				--grate can fall shut in an explosion
+		elseif string_find(obj_name,"x16_physic_destroyable_object_0000") then				--109998, grate can fall shut in an explosion
 			--if has_alife_info("yantar_tunnel_finish") then
-				--is_fixed = true
+				is_fixed = true
 			--else
 				--is_skip = true
 			--end
+		--predbannik_physic_destroyable_object						--first gate
+		--predbannik_physic_destroyable_object_0039					--gate at heliport
 		elseif string_find(obj_name, "monolith_generator_000") then
 			if is_collector then
 				is_fixed = true
@@ -252,8 +254,8 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 			else
 				is_skip = true
 			end
-		--elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--inner door of upper room
-			--is_fixed = true
+		elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--inner door of upper room
+			is_fixed = true
 		else
 			is_skip = true
 		end

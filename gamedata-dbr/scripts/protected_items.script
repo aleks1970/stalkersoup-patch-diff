@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.3 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
+--TB3D 1.0.9.9.9.8 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
 -- bandranen_pda, get protected item, _fss, merged death_generic keep items, tb3d_gspot, zep, redone for exact only,
--- ckts and flasks, pushka_fotik, m_car, explosive_barrel, wpn_gungauss, optimized using tags
+-- ckts and flasks, pushka_fotik, m_car, explosive_barrel, wpn_gungauss, optimized using tags, debug, has_protected_item
 
-function my_ver() return "1.0.9.9.9.3" end
+function my_ver() return "1.0.9.9.9.8" end
 local string_find = string.find
 local string_sub = string.sub
 
@@ -128,7 +128,6 @@ local tag11_prot = {
 	["amk_transmu"] = true,
 	["amk_zapiska"] = true,
 	["rad_documen"] = true,
-	["rad_documen"] = true,
 	["ammo_igl_ne"] = true,
 	["wpn_svd_fot"] = true,
 	["wpn_fort_m1"] = true,
@@ -165,14 +164,14 @@ function obj_is_protected(sobj)
 				else						--section empty
 					result = true			--physic or breakable object
 				end
+				if TB3D_Modders.use_inventory_message == true and result == true then
+					TB3D_Services.packet_alert("protected items: found protected item["..item_section.."] ["..utils.to_str(result).."]")
+				end
 			else							--no section
 				result = true				--physic or breakable object
 			end
 		else								--sobj nil
 			result = true
-		end
-		if TB3D_Modders.use_inventory_message == true and result == true then
-			TB3D_Services.packet_alert("protected items: found protected item["..item_section.."]")
 		end
 	end
 	return result
@@ -182,8 +181,8 @@ function obj_has_protected_item(obj)
 	local item
 	for i=first_object,last_object,1 do
 		item = alife():object(i)
-		if item and item.parent_id and item.parent_id == obj.id then
-			if obj_is_protected(obj) == true then
+		if item and item.parent_id and obj.id and item.parent_id == obj:id() then		--109998
+			if obj_is_protected(item) == true then
 				return true
 			end
 		end
@@ -195,7 +194,7 @@ function obj_has_items(obj)
 	local item
 	for i=first_object,last_object,1 do
 		item = alife():object(i)
-		if item and item.parent_id and item.parent_id == obj.id then
+		if item and item.parent_id and obj.id and item.parent_id == obj:id() then		--109998
 			return true
 		end
 	end

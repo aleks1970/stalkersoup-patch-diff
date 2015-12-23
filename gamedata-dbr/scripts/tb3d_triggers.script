@@ -1,12 +1,12 @@
----TB3D 1.0.9.9.9.7 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.9.8 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
 -- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
--- old_research_send, spawn_sewer_stuff, zat lost
-function my_ver() return "1.0.9.9.9.7" end
+-- old_research_send, spawn_sewer_stuff, zat lost, night creatures
+function my_ver() return "1.0.9.9.9.8" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random = math.random
 local math_floor = math.floor
@@ -559,7 +559,7 @@ function creatures_of_the_night()	--only called once after midnight
 				is_pack = true
 		elseif ln == "yantar_old" then
 				spawn_alife_rand("werewolf",231.216,8.801,65.287,543778,4382,4)	--east woods
-				spawn_alife_rand("werewolf",188.130,13.851,202.517,496024,4381,4)	--top of bunker
+				spawn_alife_rand("werewolf",188.130,13.851,202.517,496024,4381,2)	--top of bunker
 				is_pack = true
 		elseif ln == "swamp_old" then
 				spawn_alife_rand("werewolf",283.068,5.104,-278.998,1762433,4395,2)	--sw road gate
@@ -569,8 +569,8 @@ function creatures_of_the_night()	--only called once after midnight
 				spawn_alife_rand("werewolf",-270.456,-0.077,107.009,67606,4409,4)	--west train tunnel
 				is_pack = true
 		elseif ln == "k01_darkscape" then
-				spawn_alife_rand("werewolf",364.145,26.607,220.181,875143,4646,4)	--sw side of rail tunnel
-				spawn_alife_rand("werewolf",442.302,29.191,385.688,944682,4649,4)	--ne side
+				spawn_alife_rand("werewolf",364.145,26.607,220.181,875143,4646,2)	--sw side of rail tunnel
+				spawn_alife_rand("werewolf",442.302,29.191,385.688,944682,4649,2)	--ne side
 				is_pack = true
 		elseif ln == "dark_forest" then
 		elseif ln == "level_f-1" then
@@ -592,22 +592,29 @@ function creatures_of_the_night()	--only called once after midnight
 	return true	--sets TB3D_Services.spawned
 end
 
-function eprip_spawns()	--called when Shadows spawns in the swamp
-	--undergrounds in shop area with tools
-  	spawn_item_rand("ammo_5.56x45_ap",-132.733,-11.074,-224.099,66013,3752,2)
-  	spawn_item_rand("ammo_12x70_buck",-135.834,-11.177,-225.825,63897,3752,2)
-  	spawn_item_rand("ammo_5.56x45_ap",-115.729,-11.154,-229.668,78936,3752,2)
-	alife():create("af_cristall_flower",vector():set(-108.143,-3.408,-238.140),85071,3752)
-  	spawn_item_rand("ammo_12x70_buck",-135.834,-11.177,-225.825,63897,3752,2)
-	alife():create("af_fireball",vector():set(-120.424,0.488,-254.691),75244,3752)
-  	spawn_item_rand("ammo_12x70_buck",-31.836,8.036,-276.651,156332,3756,2)
-	alife():create("af_cristall_flower",vector():set(-31.836,8.036,-276.651),156332,3756)
-	alife():create("zone_cockroach",vector():set(-124.223,0.600,-264.911),71235,3752)	--in the toilet
-  	spawn_item_rand("ammo_11.43x23_hydro",-124.223,0.600,-264.911,71235,3752,2)			--in the toilet
-  	spawn_item_rand("ammo_5.56x45_ss190",-124.223,0.600,-264.911,71235,3752,4)			--in the toilet
-  	spawn_item_rand("grenade_f1",-124.223,0.600,-264.911,71235,3752,4)					--in the toilet
-	alife():create("wpn_fw900k",vector():set(-103.962,-2.652,-233.178),87982,3752)		--on table under light
-	------
+function eprip_spawns(spawns)	--called when Shadows spawns in the swamp
+	local spawned = false
+	if spawns == 0 then
+		--undergrounds in shop area with tools
+		spawn_item_rand("ammo_5.56x45_ap",-132.733,-11.074,-224.099,66013,3752,2)
+		spawn_item_rand("ammo_12x70_buck",-135.834,-11.177,-225.825,63897,3752,2)
+		spawn_item_rand("ammo_5.56x45_ap",-115.729,-11.154,-229.668,78936,3752,2)
+		alife():create("af_cristall_flower",vector():set(-108.143,-3.408,-238.140),85071,3752)
+		spawn_item_rand("ammo_12x70_buck",-135.834,-11.177,-225.825,63897,3752,2)
+		alife():create("af_fireball",vector():set(-120.424,0.488,-254.691),75244,3752)
+		spawn_item_rand("ammo_12x70_buck",-31.836,8.036,-276.651,156332,3756,2)
+		alife():create("af_cristall_flower",vector():set(-31.836,8.036,-276.651),156332,3756)
+		alife():create("zone_cockroach",vector():set(-124.223,0.600,-264.911),71235,3752)	--in the toilet
+		spawn_item_rand("ammo_11.43x23_hydro",-124.223,0.600,-264.911,71235,3752,2)			--in the toilet
+		spawn_item_rand("ammo_5.56x45_ss190",-124.223,0.600,-264.911,71235,3752,4)			--in the toilet
+		spawn_item_rand("grenade_f1",-124.223,0.600,-264.911,71235,3752,4)					--in the toilet
+		alife():create("wpn_fw900k",vector():set(-103.962,-2.652,-233.178),87982,3752)		--on table under light
+		------
+		spawned = true
+	else
+		--TODO
+	end
+	return spawned
 end
 
 function dist_center_ambush()						--top of construction site

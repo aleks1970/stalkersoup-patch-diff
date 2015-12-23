@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.7 chgd horror spawns: 50% chance collector, 20% novice to 50% master, spawn check for bad phantoms,
--- rewrote hellhour, level_info, agro and agro_u, actor and kruglov in ignore list, get_level_up, harsh env
-function my_ver() return "1.0.9.9.9.7" end
+--TB3D 1.0.9.9.9.8 chgd horror spawns: 50% chance collector, 20% novice to 50% master, spawn check for bad phantoms,
+-- rewrote hellhour, level_info, agro and agro_u, actor and kruglov in ignore list, get_level_up, harsh env, have_info
+function my_ver() return "1.0.9.9.9.8" end
 --------------------------------------------------------------------------------------------------
 --*Module "Time of Terror" .. Spot (Shooter)
 --podrihtovano by sapsan
@@ -503,7 +503,7 @@ function horrortime()
 	if TB3D_Services.is_instorm(lname) == true or		--109996
 	(not tabl_horror_by_level[level.name()]) or
 	((lname == "l03_agroprom" or lname == "l03u_agr_underground")			--109975
-	  and not have_alife_info("agroprom_military_case_done")) then
+	  and not has_alife_info("agroprom_military_case_done")) then
 		return
 	end
 	local timeh =level.get_time_hours()

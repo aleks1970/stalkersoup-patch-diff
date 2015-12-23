@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.7 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.0.9.9.9.8 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -10,7 +10,7 @@
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
 -- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over
-function my_ver() return "1.0.9.9.9.7" end
+function my_ver() return "1.0.9.9.9.8" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -233,6 +233,8 @@ function check_spawn()
 			end
 		end
 	end
+	obj = alife():story_object(97118)																--109998, now use elevator button
+	if obj then alife():release(obj) end
 	if level_weathers.is_indoor(sname) then
 		TB3D_Spots.clear_under_spots(sname)
 	end
@@ -266,6 +268,7 @@ function check_spawn()
 				db.actor:set_character_rank(600)									--minimum for full arena access
 				TB3D_Services.set_new_levelup(levelup)								--109978
 			end
+			--TB3D_Services.packet_alert("AMK MOD: Collector levelup["..utils.to_str(levelup).."]["..utils.to_str(TB3D_Services.is_collector(11)).."]")
 			if levelup == 1 then																	--109972
 				if startup > 0 then
 					--amk.changeStartTime()
@@ -274,7 +277,7 @@ function check_spawn()
 					amk.del_variable("temp_intro")
 					db.actor:give_money(math_random(1000,5000))
 				else
-					TB3D_Services.packet_alert("AMK MOD: Collector level-up 1")
+					--TB3D_Services.packet_alert("AMK MOD: Collector level-up 1")
 					--amk.save_variable("freeplay",1)								--109978, do in services
 					TB3D_Services.give_info("tb3d_collector")
 					TB3D_Services.give_info("tb3d_collector_start")
@@ -305,8 +308,8 @@ function check_spawn()
 				obj = alife():story_object(832)										--remove lc to npp
 				if obj then alife():release(obj) end
 				dmx_mod.create_level_changer_prip_to_zat()							--6009 - replaces prip to npp
-				dmx_mod.pripyat_cop_to_lab_x8(true)									--open if started as collector, no news
-				local money = db.actor:money()
+				--dmx_mod.pripyat_cop_to_lab_x8(true)								--109998, open if started as collector, no news
+				--local money = db.actor:money()
 				amk.g_start_timer("blow_shift", 0, 0, 2)							-- give time for guards to go online
 				news_main.next_blow(4)
 				TB3D_Services.give_info("agr_nii_rupor_off")						--109996, make sure speaker is off
@@ -320,8 +323,8 @@ function check_spawn()
 			elseif levelup == 4 then												--109996, free play and DLC
 				TB3D_Services.set_player_relations(5)								--109996, killer, lastday and mono -500, all others 0
 			end
-			TB3D_Collector.process_levels(lname, sname)
 		else
+			--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
 			--TB3D_Triggers.treasure_hunt_ending()								--creates final portals for testing
 			if blow then
 				check_blowout(blow)
@@ -334,10 +337,9 @@ function check_spawn()
 					dmx_cars.quest_cars_spawn()									--spawn quest cars
 				end
 			end
-		--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
-			TB3D_Collector.process_levels(lname, sname)
-			TB3D_Services.update()												--!!!!TB3D start task update timer
 		end
+		TB3D_Collector.process_levels(lname, sname)			--109998
+		TB3D_Services.update()												--!!!!TB3D start task update timer
 		--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("AMK MOD: check spawn c6") end
 	-------------------------------------------------------------------------------------------
 	else						-- STALKER START
@@ -1930,6 +1932,7 @@ function check_blowout(phase)
 			--amk.start_timer("blowout",5,5)
 			--TB3D_Services.set_blow(phase)							--109980
 		else						--just ending
+			tb3d_services.packet_alert("blowout done")
 			if bt ~= 2 then
 				if level_weathers.is_indoor(level.name()) == false then
 					level_weathers.set_new_weather("stormy")
@@ -1937,6 +1940,7 @@ function check_blowout(phase)
 				end
 			end
 			if TB3D_Services.is_collector(11) then
+				tb3d_services.packet_alert("blowout done: collector")
 				TB3D_Services.give_info("tb3d_blowout_done")
 			end
 		end
@@ -2084,10 +2088,10 @@ end
 --' phase 6 = was in a blowout and changed to non blowout level
 ---------------------------------------------------
 function Blowout_pp(phase)
-	if TB3D_Modders.Global_Debug then 
-		TB3D_Services.packet_alert("AMK MOD: blowout ["..phase.."]") 
-	end
 	local bt=TB3D_Services.blowout_type()
+	if TB3D_Modders.Global_Debug then 
+		TB3D_Services.packet_alert("AMK MOD: blowout ["..phase.."]["..bt.."]") 
+	end
 	if bt == 0 or bt == 2 or bt == 3 then 
 		local results = TB3D_Modders.blow_phase_basis + (math_random()*TB3D_Modders.blow_phase_shift) - (TB3D_Modders.blow_phase_shift/2)
 		if results < TB3D_Modders.blow_phase_basis then
@@ -2169,6 +2173,7 @@ function Blowout_pp(phase)
 			--collectgarbage("collect")										-- force memory cleanup
 		end
 	elseif phase == 7 then													--indoor from outdoor?
+		--TB3D_Services.packet_alert("AMK MOD: blowout ["..phase.."]")
 		level.remove_cam_effector(2002)
 		TB3D_Services.stop_blow()							--109980
 		TB3D_Services.time_resync()											--resync time of day
@@ -2374,7 +2379,15 @@ function check_usable_item(obj)		--VICTIM ONLY, actor checks these directly in b
 			comm = "nil"
 		end
 		local lname = level.name()
-		if obj:section()=="vehicle_btr" then		--use a btr and die???
+		if lname == "pripyat" and obj:name() == "pri_b306_ph_button" then		--109998, use elevator button
+			if has_alife_info("start_cop_prip_info_lab") then
+				dmx_mod.play_sound([[ambient\switch_1]])
+				TB3D_Services.check_box_closed()
+				TB3D_Services.teleportate("labx8_elev")
+			else
+				dmx_mod.play_sound([[ambient\switch_2]])
+			end
+		elseif obj:section()=="vehicle_btr" then		--use a btr and die???
 			--db.actor:kill(db.actor)
 		elseif TB3D_Services.is_collector(13) then
 			TB3D_Collector.check_usable_item(obj)

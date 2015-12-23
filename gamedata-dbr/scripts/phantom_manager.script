@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.0
-function my_ver() return "1.0.9.9.7.0" end
+--TB3D 1.0.9.9.9.8
+function my_ver() return "1.0.9.9.9.8" end
 
 class "PhantomManager"
 function PhantomManager:__init()
@@ -22,9 +22,11 @@ function Phantom:__init(obj) super(obj)
 	g_PhantomManager:add_phantom();
 end
 function Phantom:net_destroy()
+	--TB3D_Services.packet_alert("phantom manager: net destroy")
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("phantom manager: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	g_PhantomManager:remove_phantom();
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("phantom manager: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("phantom manager: net destroy done")
 end
 function bind(obj)
 	obj:bind_object	(Phantom(obj))

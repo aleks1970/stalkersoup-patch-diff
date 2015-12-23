@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.6  optimized, respawner check, read/write packet fix, execute, presets, offline update fix, removed freedom_barier_respawn, pop_spawn_message, debug
-function my_ver() return "1.0.9.9.7.6" end
+--TB3D 1.0.9.9.9.8  optimized, respawner check, read/write packet fix, execute, presets, offline update fix, removed freedom_barier_respawn, pop_spawn_message, debug
+function my_ver() return "1.0.9.9.9.8" end
 --[[------------------------------------------------------------------------------------------------------------------
 Respawner. Scheme updates the population of all of the simulation.
 by Stohe (Ruslan Didenko)
@@ -334,7 +334,7 @@ function se_respawn:spawn()
 			end
 		end 
 	end
-	--if TB3D_Population_Control.can_start_respawn(self) == false then return end
+	--if TB3D_Population_Control.can_start_respawn(self) == false then return end				--109998, best spot for this
 	if xr_logic.pick_section_from_condlist(db.actor, self, self.conditions) == "0" then
 		if is_report then TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(self:name()).."] spawn cond[0]") end
 		return
@@ -444,24 +444,20 @@ function se_respawn:update_online()
 		end
 		if db.actor:position():distance_to(self.position) > spawn_distance then
 			if is_report then TB3D_Services.packet_alert("se RESPAWN: update online["..utils.to_str(self:name()).."] dist["..utils.to_str(spawn_distance).."]") end
-			--if TB3D_Population_Control.can_start_respawn(self) == true then
-				self:execute()
-			--end
+			self:execute()
 		end
-	--else
-		--if is_report then TB3D_Services.packet_alert("se RESPAWN: update online["..utils.to_str(self:name()).."] radius["..utils.to_str(self.respawn_radius).."]") end
 	end
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("se RESPAWN: update_online["..utils.to_str(self:name()).."]["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")
 	end
 end
 
-function spawn(name)
+function spawn(name)			--called from smart terrain and xr_logic
 	local is_report = false
 	if TB3D_Modders.use_respawn_message == true or (TB3D_Modders.use_setup_message and string_find(name, TB3D_Modders.npc_to_log)) then is_report = true end
 	if is_report then TB3D_Services.packet_alert("se RESPAWN: spawn["..utils.to_str(name).."] from respawners table") end
 	local spawner = db.respawners[name]
-	if spawner and spawner.max_count > 0 then
+	if spawner and spawner.max_count > 0 and TB3D_Population_Control.can_start_respawn(spawner) then				--109998, best spot for this
 		local cnt = spawner.max_count - #spawner.spawned_obj
 		if cnt > 0 then
 			if is_report or TB3D_Modders.pop_spawn_message == true then TB3D_Services.packet_alert("se respawn: spawning["..utils.to_str(cnt).."] ["..utils.to_str(spawner:name()).."]") end

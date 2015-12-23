@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.5 npc_info and job checks, actor checks, lager, db, exclusives, gulag_generators, gulag_aver, "nil"
-function my_ver() return "1.0.9.9.9.5" end
+--TB3D 1.0.9.9.9.8 npc_info and job checks, actor checks, lager, db, exclusives, gulag_generators, gulag_aver, "nil"
+function my_ver() return "1.0.9.9.9.8" end
 -- (Stohe), (Chugai)
 local table_sort = table.sort
 local math_min = math.min
@@ -355,6 +355,7 @@ end
 -- вызывается только из se_smart_terrain:unregister_npc() !
 -- если объект жив и он в онлайне, то переинициализировать логику.
 function gulag:removeObject( obj_id )
+	--TB3D_Services.packet_alert("xr gulag: net destroy")
 	if obj_id then
 		if TB3D_Modders.use_setup_message and string_find(self.name, TB3D_Modders.npc_to_log) then TB3D_Services.packet_alert("XR GULAG: remove object["..utils.to_str(obj_id).."]") end
 		local strn_n = ""
@@ -393,6 +394,7 @@ function gulag:removeObject( obj_id )
 			--if TB3D_Modders.use_smh2_message then TB3D_Services.packet_alert("XR GULAG: <<err<< remove object, no NPC info") end
 		end
 	end
+	--TB3D_Services.packet_alert("xr gulag: net destroy done")
 end
 
 -- Обновление гулага.

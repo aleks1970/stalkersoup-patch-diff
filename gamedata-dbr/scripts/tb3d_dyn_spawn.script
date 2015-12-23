@@ -1,8 +1,8 @@
----TB3D 1.0.9.9.9.3 new - creates objects that get removed on level load prior to alloc then creates new objects,
+---TB3D 1.0.9.9.9.8 new - creates objects that get removed on level load prior to alloc then creates new objects,
 -- tb3d_esc_spawns, dyn_rad, get_monster_spot, marsh zones, cooling zones, new levels, rats back, marsh, hiding_road,
 -- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector, x14,
 -- spawn_sarc_pack, bar
-function my_ver() return "1.0.9.9.9.3" end
+function my_ver() return "1.0.9.9.9.8" end
 
 --============= non-dynamic vehicles only spawned once ============================================================
 --	vehicle_tb3d_atv				- quad atvs
@@ -292,11 +292,13 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		end
 	elseif lname == "l08_yantar" then
 		TB3D_Services.give_info("tb3d_marsh_zones")
+		
 	elseif lname == "l10_radar" then
 		meceniy_dinrad.spawn_rad_zone(vector():set(367.796,-50.155,18.379),102449,1864,0.5) --power pole
 		meceniy_dinrad.spawn_rad_zone(vector():set(365.105,-50.083,-0.829),101298,1864,0.5) --power pole
 	elseif lname == "l11_pripyat" then
 		--TODO: 109980
+		
 	elseif lname == "l12_stancia" then
 		if TB3D_Services.is_collector(703) then
 			alife():create("tb3dm_gigant_strong", vector():set(-17.809,-0.001,-478.704),386832,2400)
@@ -335,6 +337,8 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		end
 		alife():create("zone_fog_cigarette",vector():set(-226.322,-0.04,549.829),139006,4608)			--crack in road
 	elseif lname == "pripyat" then				--east
+	
+	
 	elseif lname == "limansk" then
 		turret_mgun.create_turret("turret_tb3d_barrier", "limansk", vector():set(275.377,11.280,293.981), "killer", "", 100, 80, 0)		--invincible, long range
 		turret_mgun.create_turret("turret_tb3d_barrier", "limansk", vector():set(264.191,9.397,147.576), "killer", "", 100, 80, 0)
@@ -353,11 +357,21 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(149.622,8.226,52.019), "killer", "", 50, 80)		--n between houses
 		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(194.732,7.634,28.505), "killer", "", 50, 80)		--n between houses
 	elseif lname == "lost_village" then
+	
+	
 	elseif lname == "generators" then
+	
+	
 	elseif lname == "red_forest" then
+	
+	
 	elseif lname == "aver" then				--recon
 		--TB3D_Services.give_info("tb3d_marsh_zones")
+		
+		
 	elseif lname == "puzir" then			--forgotten forest
+	
+	
 	elseif lname == "hospital" then
 		if TB3D_Services.is_collector(704) then															--fog areas that send actor places
 			alife():create("zone_fog_cigarette",vector():set(-86.397,40.580,766.351),3792,3052)			--back of cave roof around tree, sends to ledge
@@ -587,6 +601,8 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			TB3D_Services.remove_info("tb3d_dcity_rads")
 		end
 	elseif lname == "dark_forest" then
+	
+	
 	elseif lname == "yantar_old" then
 		spawn_anomoly("zone_burning_tb3d",135.328,-1.409,59.732,435242,4372)
 		spawn_anomoly("zone_burning_tb3d",135.242,-1.243,65.743,435261,4372)
@@ -611,12 +627,18 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(204.252,9.679,30.939), "killer", "", 40, 60)
 		--end
 	elseif lname == "l01_poligon" then
+	
+	
 	elseif lname == "l04_pogost" then
 		turret_mgun.create_turret("turret_tb3d_barrier", "l04_pogost", vector():set(91.919,4.386,-92.657), "killer", "", 60, 40, 0)		--invincible, long range
 		turret_mgun.create_turret("turret_tb3d_barrier", "l04_pogost", vector():set(79.504,1.267,-179.665), "killer", "", 60, 40, 0)
 		--turret_mgun.create_turret("turret_tb3d_barrier", "l04_pogost", vector():set(33.141,0.984,-187.568), "killer", "", 60, 40, 0)
 	elseif lname == "l05_vokzal" then
+	
+	
 	elseif lname == "l03_rinok" then
+	
+	
 	elseif lname == "l02_dd" then
 		alife():create("zone_large_heat_distort_tb3d",vector():set(104.586,11.486,194.202),19922,5303)		--road at bend
 		alife():create("zone_large_heat_distort_tb3d",vector():set(105.040,10.745,183.225),20097,5302)
@@ -628,7 +650,11 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		meceniy_dinrad.spawn_rad_zone(vector():set(98.607,16.504,238.573),18786,5303,0.1)
 		meceniy_dinrad.spawn_rad_zone(vector():set(93.578,20.021,310.116),17699,5284,0.1)
 	elseif lname == "promzone" then
+	
+	
 	elseif lname == "predbannik" then
+	
+	
 	elseif lname == "swamp_old" then
 		TB3D_Services.give_info("tb3d_marsh_zones")
 		spawn_anomoly("zone_radioactive_tb3d",204.625,3.716,6.886,1593070,4397)	--near scientist hut
@@ -637,6 +663,8 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		spawn_fire(vector():set(202.624,2.096,-44.856),1594528,4394)
 		spawn_anomoly("zone_no_gravity_tb3d",-196.062,2.827,63.715,726096,4386)		--109980, floating blocks on bridge
 	elseif lname == "hiding_road" then
+	
+	
 	elseif lname == "level_f-1" then
 		spawn_anomoly("zone_no_gravity_tb3d",-148.421,14.752,180.150,131171,4680)		--floating islands
 		spawn_anomoly("zone_no_gravity_tb3d",-152.246,12.923,186.362,127362,4680)		--floating islands
@@ -766,6 +794,8 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		end
 		spawn_fire(vector():set(-58.446,3.107,32.602),26638,2870) --snork lair
     elseif lname == "av_peshera" then
+	
+	
     elseif lname == "cs_agroprom_underground" then
 		TB3D_Services.give_info("tb3d_cooling_zones")											--ventillator sounds
 		meceniy_dinrad.spawn_rad_zone(vector():set(95.477,-7.109,-11.058),2226,3867,1)		--radioactive holding tanks
@@ -774,6 +804,8 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		meceniy_dinrad.spawn_rad_zone(vector():set(123.319,-7.122,-9.228),4715,3867,1)
 		if amk.load_variable("tb3d_bar_seq", 0) > 10 then spawn_tunnels_markers() end		--heat waves in slots with teleports
 	elseif lname == "digger_stash" then
+	
+	
     elseif lname == "lab_x14" then
 		TB3D_Services.give_info("tb3d_cooling_zones")											--ventillator sounds
 		if has_alife_info("tb3d_x14_done") then

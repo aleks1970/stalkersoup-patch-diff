@@ -1,5 +1,5 @@
-<!-- TB3D 1.0.9.9.9.7 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
- predbannik_barman, zver_taken, more content, articles, suit, storm stages, storm_over-->
+<!-- TB3D 1.0.9.9.9.8 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
+ predbannik_barman, zver_taken, more content, articles, suit, storm stages, storm_over, lanky suit, tb3d_gbars_chp2-->
  
 <game_information_portions>
 <info_portion id="tb3d_started_as_collector"></info_portion>	<!-- used to control mob spawns -->
@@ -31,8 +31,9 @@
 <info_portion id="tb3d_sms_storm_suit">						<!-- treasure hunt for storm areas -->
 	<article>levelup2_get_suit</article>
 </info_portion>
+<info_portion id="tb3d_lanky_suit_talk">					<!-- find mushroom art for suit -->
+</info_portion>
 <info_portion id="tb3d_got_lanky_suit">						<!-- special suit for storm areas -->
-	<!--article>levelup2_get_suit</article-->
 </info_portion>
 <info_portion id="tb3d_lanky_suit_repairing"></info_portion>	<!-- special suit being repaired -->
 <info_portion id="tb3d_lanky_suit_fixed"></info_portion>		<!-- special suit repaired, ready for pickup -->
@@ -138,8 +139,6 @@
 <info_portion id="tb3d_note_03"></info_portion>				<!-- wrhses bed in barracks -->
 <info_portion id="tb3d_note_04"></info_portion>				<!-- npp2 rooftop camp -->
 <info_portion id="tb3d_note_05">							<!-- attic of dead village -->
-	<give_info>tb3d_pred_attack</give_info>					<!-- capt. and guards in nw. gaurd post -->
-	<give_info>tb3d_spawn_army</give_info>					<!-- army occupies waiting room helipad -->
 	<article>tb3d_gbar1_info</article>
 </info_portion>
 <info_portion id="tb3d_note_06">							<!-- tech in house, pipes end  -->
@@ -175,6 +174,9 @@
 <info_portion id="tb3d_goldbar_13"></info_portion>			<!-- es6 - research in village tower -->
 <info_portion id="tb3d_goldbar_14"></info_portion>			<!-- labx8 in water -->
 <info_portion id="tb3d_goldbar_15"></info_portion>			<!-- n0s0 - sarc lowest cells -->
+<info_portion id="tb3d_gbars_chp2">							<!--109998 start chapter 2  -->
+	<article>tb3d_warlab_info</article>
+</info_portion>								
 <info_portion id="tb3d_ready_for_tunnel">					<!-- has all the needed bars  -->
 	<article>tb3d_tunnels_info</article>
 </info_portion>								
@@ -229,7 +231,7 @@
 <info_portion id="tb3d_zep4_article2">							<!-- after going to wt -->
 	<article>tb3d_zep4_article2_info</article>
 </info_portion>
-<info_portion id="tb3d_mush_arts_quest">						<!-- find mushroom arts in npp -->
+<info_portion id="tb3d_mush_arts_quest">						<!-- find mushroom arts in npp for barman -->
 	<article>tb3d_mush_arts_quest_info</article>
 </info_portion>
 
@@ -354,6 +356,11 @@
 <info_portion id="pogost_help"></info_portion>					<!-- l04_stalker, l04_stalker_0002, _0003, _0004, l04_zombie_weak, l04_zombie_weak_0000 thru _0006, l04_zombie_normal, l04_zombie_normal_0000 thru _0003, l04_zombie_strong, l04_zombie_strong_0000, _0001 -->
 <info_portion id="zep_sms_from_cemetery"></info_portion>		<!-- distress call from stalkers -->
 
+<!-- predbannik -->
+<info_portion id="pred_karatel_deat"></info_portion>			<!-- stalker:karatel, if killed by actor #-->
+<info_portion id="cigan_kill_obmorok_start"></info_portion>		<!-- spawns stalker:obmorok stalker:smoker, stalker:pesh_bandit_kamp111,112,113,114 -->
+<info_portion id="predbannik_obmorok_dead"></info_portion>		<!-- on obmorok death - spawns predbannik_bloodsucker_strong_0001, predbannik_psy_dog_radar_0001, predbannik_pseudodog_strong, predbannik_pseudodog_strong_0000, predbannik_snork_strong, predbannik_snork_strong_0000, predbannik_snork_strong_0001, _002 -->
+
 <!-- STILL UNUSED from all.spawn ======================================================= #=changed in all.spawn -->
 <!-- Courtyards, cemetery and dist ctr --->
 <info_portion id="pogost_militlager_kill"></info_portion>		<!-- dist center spawns dd_trader -->
@@ -363,11 +370,6 @@
 <!-- techniques -->
 <info_portion id="promz_mil_death"></info_portion>				<!-- tech first enter -->
 <info_portion id="promz_contr_death"></info_portion>			<!-- tech facility tunnel -->
-
-<!-- predbannik -->
-<info_portion id="pred_karatel_deat"></info_portion>			<!-- stalker:karatel, if killed by actor #-->
-<info_portion id="cigan_kill_obmorok_start"></info_portion>		<!-- spawns stalker:obmorok stalker:smoker, stalker:pesh_bandit_kamp111,112,113,114 -->
-<info_portion id="predbannik_obmorok_dead"></info_portion>		<!-- on obmorok death - spawns predbannik_bloodsucker_strong_0001, predbannik_psy_dog_radar_0001, predbannik_pseudodog_strong, predbannik_pseudodog_strong_0000, predbannik_snork_strong, predbannik_snork_strong_0000, predbannik_snork_strong_0001, _002 -->
 
 <!-- rinok -->
 <info_portion id="rinok_dram_start"></info_portion>				<!-- black market -->

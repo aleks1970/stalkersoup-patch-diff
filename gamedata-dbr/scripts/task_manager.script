@@ -1,6 +1,6 @@
--- TB3D 1.0.9.9.9.7 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric,
+-- TB3D 1.0.9.9.9.8 new rep system, give talk message, restored breaks, kill stalker, atp, debug, oau_watchdog, esc2_st_fabric,
 -- targets_killed, translate, task complete
-function my_ver() return "1.0.9.9.9.7" end
+function my_ver() return "1.0.9.9.9.8" end
 
 local table_remove = table.remove
 local string_len = string.len
@@ -488,6 +488,7 @@ function CRandomTask:action_give_task(actor, npc, p1, p2)
     -- Add id stalker in the list of targets
     if task_desc.target_dialog then
       amk_add_target_id_to_kill_targets(task_desc.selected_target,task_desc.target_dialog,task_id)
+	  TB3D_Services.check_kill_target_spawned(task_desc.selected_target)			--109998, make sure target spawns
     end
     -------------------------------------
   elseif task_desc.type == "find_item" then
@@ -1156,7 +1157,7 @@ end
 function CRandomTask:register_target(obj)
 if obj then
 	local rstring = "NONE"
-	if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: NAME["..utils.to_str(obj:name()).."] sect["..utils.to_str(obj:section_name()).."]") end
+	if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: register target NAME["..utils.to_str(obj:name()).."] sect["..utils.to_str(obj:section_name()).."]") end
 	if IAmAStalker[obj:clsid()] then
 		rstring = "STALKER"
 		--' Probably recorded goal for the quest to kill the stalker "

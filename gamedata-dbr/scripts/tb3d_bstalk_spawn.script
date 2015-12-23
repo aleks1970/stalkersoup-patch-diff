@@ -1,9 +1,10 @@
---TB3D 1.0.9.9.7.5
+--TB3D 1.0.9.9.9.8
+function my_ver() return "1.0.9.9.9.8" end
 --optional file presently used for testing
 
 function init()			--called  from bind_stalker.net_spawn()
 	-------------------------------------test setcion-------------------------------------------
-	--TB3D_Services.move_actor(-40.398349761963,-21.837560653687,56.543983459473)
+	--TB3D_Services.move_actor(-44.533,20.47,2.048)
 	--tb3d_net_manager.network_send("test")
 	--------------------------------------------------------------------------------------------
 end

@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.6 use_binder_message, removal if collector 
-function my_ver() return "1.0.9.9.9.6" end
+-- TB3D 1.0.9.9.9.8 use_binder_message, removal if collector 
+function my_ver() return "1.0.9.9.9.8" end
 -- ************************************************
 -- **                    Imp                     **
 -- **         Binder improvised teleports        **
@@ -159,11 +159,13 @@ end
 
 function restrictor_teleport:net_destroy()
 	-- Remove our teleport
+	--TB3D_Services.packet_alert("restrictor tele: net destroy")
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind mteleport: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	teleport_binders[self.object:id()] = nil
 	self.parametrs = nil
 	object_binder.net_destroy(self)
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind mteleport: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("restrictor tele: net destroy done")
 end
 
 function restrictor_teleport:reload(section)

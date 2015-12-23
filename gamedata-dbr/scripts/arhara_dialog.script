@@ -1,10 +1,11 @@
---' TB3D 1.0.9.9.9.5 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.0.9.9.9.8 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
--- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, text color - aleks1970
-function my_ver() return "1.0.9.9.9.5" end
+-- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, repair_kit
+-- text color, give repair_kit and spare_parts Revamped - aleks1970
+function my_ver() return "1.0.9.9.9.8" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -691,90 +692,90 @@ end
 --' remove unnecessary Environmentalists
 function delete_nps_ecolog()
 	if TB3D_Services.is_collector(4010) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_nps_ecolog")
-  local se_obj = alife():object("bar_ecolog_crush_1")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  se_obj = alife():object("bar_ecolog_crush_3")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  se_obj = alife():object("bar_ecolog_crush_2")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  se_obj = alife():object("bar_ecolog_crush_4")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		TB3D_Services.packet_alert("arh dialog: delete_nps_ecolog")
+		local se_obj = alife():object("bar_ecolog_crush_1")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+		se_obj = alife():object("bar_ecolog_crush_3")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+		se_obj = alife():object("bar_ecolog_crush_2")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+		se_obj = alife():object("bar_ecolog_crush_4")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' remove the corpse Korchagin
 function delete_korchagin()
 	if TB3D_Services.is_collector(4011) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_korchagin")
-  local se_obj = alife():object("dead_korchagin_military")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		TB3D_Services.packet_alert("arh dialog: delete_korchagin")
+		local se_obj = alife():object("dead_korchagin_military")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' remove the dead warriors from the URT
 function delete_voen_urt()
 	if TB3D_Services.is_collector(4012) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_voen_urt")
-  local se_obj = alife():object("dead_military_qvest_crest")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		TB3D_Services.packet_alert("arh dialog: delete_voen_urt")
+		local se_obj = alife():object("dead_military_qvest_crest")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' remove the corpse of Andrew
 function delete_voen_andrey()
 	if TB3D_Services.is_collector(4013) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_voen_andrey")
-  local se_obj = alife():object("dead_military_esc")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		TB3D_Services.packet_alert("arh dialog: delete_voen_andrey")
+		local se_obj = alife():object("dead_military_esc")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' remove the prisoners from the Maze
 function delete_labirint_shahter()
 	if TB3D_Services.is_collector(4014) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_labirint_shahter")
-  local se_obj = alife():object("labirint_monolit_shahter")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		TB3D_Services.packet_alert("arh dialog: delete_labirint_shahter")
+		local se_obj = alife():object("labirint_monolit_shahter")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' Astrologer remove the cordon !!!!TB3D
 function delete_zvezd()
 	if TB3D_Services.is_collector(4015) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_zvezd")
-  local se_obj = alife():object("esc_zvezdochet")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		TB3D_Services.packet_alert("arh dialog: delete_zvezd")
+		local se_obj = alife():object("esc_zvezdochet")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' removes the first Bolotny Doctors
 function delete_doktor1()
 	if TB3D_Services.is_collector(4016) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_doktor1")
-  local se_obj = alife():object("doktor1")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		TB3D_Services.packet_alert("arh dialog: delete_doktor1")
+		local se_obj = alife():object("doktor1")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' check availability artov for Cross
@@ -801,7 +802,8 @@ end
 --' give up the buffalo were baptized and received the award
 function delete_bizon(first_speaker, second_speaker)
 	sak.out_item_namber("wpn_bizon1",6)
-	dialogs.relocate_item_section(second_speaker, "arc_art_box_8basic","in")
+	dialogs.relocate_money(second_speaker, 40000, "in")
+	--dialogs.relocate_item_section(second_speaker, "arc_art_box_8basic","in")			--109998, should be money, not box
 	dialogs.relocate_item_section(second_speaker, "af_dummy_battery","in")
 end
 
@@ -817,17 +819,17 @@ end
 function inform_20_pda(first_speaker, second_speaker)
     local item = ""
     local count = math_random(2,3)
- local actor, trader
- if db.actor and db.actor:id() == first_speaker:id() then
-  actor = first_speaker
-  trader = second_speaker
- else
-  actor = second_speaker
-  trader = first_speaker
- end
- item = nagrad.level_7[math_random(#nagrad.level_7)]
- flamethrower.relocate_n_items_section(trader, "device_pda_npc", "out", 20)
- flamethrower.relocate_n_items_section(actor, item , "in", count)
+	local actor, trader
+	if db.actor and db.actor:id() == first_speaker:id() then
+		actor = first_speaker
+		trader = second_speaker
+	else
+		actor = second_speaker
+		trader = first_speaker
+	end
+	item = nagrad.level_7[math_random(#nagrad.level_7)]
+	flamethrower.relocate_n_items_section(trader, "device_pda_npc", "out", 20)
+	flamethrower.relocate_n_items_section(actor, item , "in", count)
 end
 
 function inform_40_pda(first_speaker, second_speaker)
@@ -904,10 +906,10 @@ end
 --' spawns 3 document Mayor in x18 in backpacks, 4 - y Pavel
 function spawn_old()
 	if TB3D_Services.is_collector(4019) == false then
-		alife():create("m_inventory_box24", vector():set(-8.440,1.893,11.780),1907,1125)
-		alife():create("m_inventory_box25", vector():set(-41.247,-10.908,13.351),328,1148)
-		alife():create("m_inventory_box26", vector():set(-37.379,-13.006,-14.669),315,1153)
-		--alife():create ("old_doc_3_3", vector():set(29.782,-10.464,42.185),6521,1161)
+		alife():create("m_inventory_box24", vector():set(-8.440,1.893,11.780),1907,1125)	--old_doc_3_1
+		alife():create("m_inventory_box25", vector():set(-41.247,-10.908,13.351),328,1148)	--old_doc_3_2
+		alife():create("m_inventory_box26", vector():set(-37.379,-13.006,-14.669),315,1153)	--old_doc_3_4
+		--alife():create ("old_doc_3_3", vector():set(29.782,-10.464,42.185),6521,1161)		--found on dead_korchagin_military in DV
 	end
 end
 
@@ -960,7 +962,7 @@ end
 --' spawns 4 Document for Mayor
 function spawn_new_dok()
 	if TB3D_Services.is_collector(4020) == false then
-		alife():create("old_doc_4",vector():set(-44.533,20.47,2.048),2377,1530)
+		alife():create("old_doc_4",vector():set(-44.533,20.47,2.048),2377,1530)		--in X18
 		alife():create("pda_info",vector():set(55.847,8.710,-20.499),250905,990)
 	end
 end
@@ -6725,11 +6727,13 @@ end
 
 --' check availability dolls
 function muha_kukla_have()
+	--TB3D_Services.packet_alert("arhara dialog: has doll["..utils.to_str(amk_utils.inventory_search("kukla_1",1)).."]")
 	return amk_utils.inventory_search("kukla_1",1) ~= false
 end
 
 --' give up the doll and photo Fly
 function muha_kukla_done(first_speaker, second_speaker)
+	--TB3D_Services.packet_alert("arhara dialog: doll done")
 	sak.out_item_namber("kukla_1",1)
 	sak.out_item_namber("foto_kukla",1)
 	second_speaker:set_relation(game_object.friend, first_speaker)

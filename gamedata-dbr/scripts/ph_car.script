@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.1 car.update ctds w/nil ref at line 932, loop = nil fix
-function my_ver() return "1.0.9.9.8.1" end
+--TB3D 1.0.9.9.9.8 car.update ctds w/nil ref at line 932, loop = nil fix
+function my_ver() return "1.0.9.9.9.8" end
 ----------------------------------------------------------------------------------------------------
 -- Physic vehicle control
 ----------------------------------------------------------------------------------------------------
@@ -1115,6 +1115,7 @@ function action_car:car_explode()
 end
 
 function action_car:net_destroy()
+	--TB3D_Services.packet_alert("ph car: net destroy")
 	if TB3D_Modders.use_vehicle_message or TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("ph car: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	--self:destroy_car()
 	if self.object and xr_logic.mob_captured(self.object) then
@@ -1125,6 +1126,7 @@ function action_car:net_destroy()
 	    end
 	end
 	if TB3D_Modders.use_vehicle_message or TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("ph car: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("ph car: net destroy done")
 end
 
 function action_car:check_friends_on_fire_line()

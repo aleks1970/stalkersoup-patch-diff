@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.6   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
-function my_ver() return "1.0.9.9.9.6" end
+-- TB3D 1.0.9.9.9.8   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
+function my_ver() return "1.0.9.9.9.8" end
 ----------------------------------------------------------------------------------------------------
 -- Physic objects binding
 ----------------------------------------------------------------------------------------------------
@@ -122,17 +122,17 @@ function generic_physics_binder:net_spawn(data)
 		local obj_name
 		if sobj.name then obj_name = sobj:name() else obj_name = "nil" end
 		--TB3D_Services.packet_alert("bind physic object: net spawn["..obj_name.."]")
-		if string_find(obj_name,"x16_physic_destroyable_object_0000") then						--109996
+--[[		if string_find(obj_name,"x16_physic_destroyable_object_0000") then						--109996
 			if has_alife_info("yantar_tunnel_finish") then										--grate can fall shut in an explosion
 				--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] not spawned")
 				alife():release(sobj, true)
 				return true
 			end
-		elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--109996, inner door of upper room
+		--elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--109996, inner door of upper room
 			--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] not spawned")
-			alife():release(sobj, true)
-			return true
-		end
+			--alife():release(sobj, true)
+			--return true
+		end]]--
 		if sobj:clsid() == clsid.projector then
 			db.add_sl(sobj)
 		end
@@ -167,6 +167,7 @@ function generic_physics_binder:net_destroy()
 		object_binder.net_destroy(self)
 	end
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy done") end
+	--TB3D_Services.packet_alert("bind physic object: net destroy done")
 end
 
 function generic_physics_binder:net_save_relevant()

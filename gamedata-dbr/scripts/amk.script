@@ -1,8 +1,8 @@
--- TB3D 1.0.9.9.8.9   fixed rucksack, added old pda sound option, TB3D_Update, amk style hit (gg_kick), consolidated packet srvcs,
+-- TB3D 1.0.9.9.9.8   fixed rucksack, added old pda sound option, TB3D_Update, amk style hit (gg_kick), consolidated packet srvcs,
 -- removed tips, removed ^ from can see actor, updated to 135, hit styles, added collector start to pause menu, amk hit replaced,
 -- db calls, send_tip, game_start, npc_spawner, tb3d_delay, hud_weap, ogse timers, ghost_strong_timer, skip groups, send_tip_id optimization,
 -- pause autosave prevention, timer, restore_community, removed ver and get_ver(), remove_item_from_inventory
-function my_ver() return "1.0.9.9.8.9" end
+function my_ver() return "1.0.9.9.9.8" end
 -- Idler: file from the mod 'People halophyte 2.0'. Adapted for fashion 'label with swag 2.1.2' 30.09.2008 0:08:52
 -- Added fenechka by TAG
 
@@ -298,6 +298,7 @@ function check_timers()
 			break
 		end
 	end
+	oau_watchdog=658
 	if #timersToStart > 0 then -- some timers have worked and were removed from the table
 		--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("AMK: clear_timers:["..utils.to_str(game_milliseconds()).."]") end
 		--dump_table(timers)
@@ -518,12 +519,12 @@ local func_by_string = {}
 			-- ate
 			--send_tip("ate","ate",0,15,"gen_info")
 			spawn_level_changer.teleport_start(tbl.obj_sect, tbl.obj_id, true)
-		elseif sobj.parent_id == expendable_object then
+		else --if not sobj.parent_id or sobj.parent_id == expendable_object then
 			-- thrown
 			--send_tip("thrown","thrown",0,15,"gen_info")
 			-- start Teleport
 			spawn_level_changer.teleport_start(tbl.obj_sect, tbl.obj_id, false)
-		else
+		--else
 			-- shifted
 			--send_tip("shifted","shifted",0,15,"gen_info")
 		end
@@ -761,22 +762,10 @@ local func_by_string = {}
 	end
 	
 function __do_timer_action(select_string,params_string)
-  --TB3D_Services.info_alert("amk: do timer["..utils.to_str(select_string).."]["..utils.to_str(params_string).."]")
-  --[[
-	Here we describe the challenges in the form oformyalyat
-
-	if select_string=="title conditions" then
-		<Third-party call functions>
-		-- npc can pass as a parameter
+	TB3D_Services.info_alert("amk: do timer["..utils.to_str(select_string).."]") --["..utils.to_str(params_string).."]")
+	if func_by_string[select_string] then
+		func_by_string[select_string](params_string)
 	end
-  
-  ]]
---user area
-	--if _g.is_disconnecting == false then
-		if func_by_string[select_string] then
-			func_by_string[select_string](params_string)
-		end
-	--end
 end
 --------------------------------------------------------------------------------------------------------------------
 
@@ -1313,9 +1302,9 @@ function on_actor_update(delta)
 	--oau_watchdog=658
 	--mod_call("blowout_phantoms")		--to bstalk 109950
 	--mod_call("check_radar_off")			--removed killactor and just reduce health by 0.01  --to bstalk 109950
-	oau_watchdog=656
-	mod_call("check_metka")				--gps spots
 	oau_watchdog=657
+	mod_call("check_metka")				--gps spots
+	oau_watchdog=656
 	mod_call("doabcevents")				--hud breath, blood...
 	dmx_cars.check_btr()				--ogse usable btrs 109950
 	antirad_update()					--ogse usable btrs 109950

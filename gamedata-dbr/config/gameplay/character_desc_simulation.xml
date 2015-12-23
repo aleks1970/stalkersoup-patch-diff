@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.8.8 temporary support of level spawns in new levels, vet_research_bio, 100% localized, specnaz_default_2*************** -->
+<!-- ************ TB3D 1.0.9.9.9.8 temporary support of level spawns in new levels, vet_research_bio, 100% localized, specnaz_default_2*************** -->
 <xml>
 	<!-- ***************BANDITS PROFILES*************** -->
 	<!-- ***************BANDIT NOVICE*************** -->
@@ -1187,6 +1187,70 @@
 		<community>monolith</community>
 		<rank>936</rank>
 		<reputation>-957</reputation>
+		<visual>actors\monolit\stalker_mo_exo</visual>
+		<snd_config>characters_voice\human_03\monolith\</snd_config>
+		<crouch_type>0</crouch_type>
+#include "inventory\monolith_items.xml"
+#include "gameplay\character_criticals_1.xml"
+#include "dialogs\generic_dialogs.xml"
+    </specific_character>
+	<specific_character id="tb3dm_mon_monster" team_default="1">
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_npc_u_stalker_mo_exo</icon>
+		<map_icon x="3" y="0"/>
+		<bio>sim_monolith_master_bio</bio>
+		<class>sim_monolith_master</class>
+		<community>monolith</community>
+		<rank>912</rank>
+		<reputation>-864</reputation>
+		<visual>actors\monolit\stalker_mo_exo</visual>
+		<snd_config>characters_voice\human_03\monolith\</snd_config>
+		<crouch_type>0</crouch_type>
+#include "inventory\monolith_items.xml"
+#include "gameplay\character_criticals_1.xml"
+#include "dialogs\generic_dialogs.xml"
+    </specific_character>
+	<specific_character id="tb3dm_mon_robot" team_default="1">
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_npc_u_stalker_mo_exo</icon>
+		<map_icon x="3" y="0"/>
+		<bio>sim_monolith_master_bio</bio>
+		<class>sim_monolith_master</class>
+		<community>monolith</community>
+		<rank>912</rank>
+		<reputation>-864</reputation>
+		<visual>actors\monolit\stalker_mo_exo</visual>
+		<snd_config>characters_voice\human_03\monolith\</snd_config>
+		<crouch_type>0</crouch_type>
+#include "inventory\monolith_items.xml"
+#include "gameplay\character_criticals_1.xml"
+#include "dialogs\generic_dialogs.xml"
+    </specific_character>
+	<specific_character id="tb3dm_mon_nauch" team_default="1">
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_npc_u_stalker_mo_exo</icon>
+		<map_icon x="3" y="0"/>
+		<bio>sim_monolith_master_bio</bio>
+		<class>sim_monolith_master</class>
+		<community>monolith</community>
+		<rank>912</rank>
+		<reputation>-864</reputation>
+		<visual>actors\monolit\stalker_mo_exo</visual>
+		<snd_config>characters_voice\human_03\monolith\</snd_config>
+		<crouch_type>0</crouch_type>
+#include "inventory\monolith_items.xml"
+#include "gameplay\character_criticals_1.xml"
+#include "dialogs\generic_dialogs.xml"
+    </specific_character>
+	<specific_character id="tb3dm_mon_regular" team_default="1">
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_npc_u_stalker_mo_exo</icon>
+		<map_icon x="3" y="0"/>
+		<bio>sim_monolith_master_bio</bio>
+		<class>sim_monolith_master</class>
+		<community>monolith</community>
+		<rank>912</rank>
+		<reputation>-864</reputation>
 		<visual>actors\monolit\stalker_mo_exo</visual>
 		<snd_config>characters_voice\human_03\monolith\</snd_config>
 		<crouch_type>0</crouch_type>

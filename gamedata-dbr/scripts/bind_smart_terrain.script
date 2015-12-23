@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.0 use_binder_message
-function my_ver() return "1.0.9.9.7.0" end
+--TB3D 1.0.9.9.9.8 use_binder_message
+function my_ver() return "1.0.9.9.9.8" end
 --[[------------------------------------------------------------------------------------------------------------------
 Smart terrain binder
 Нужен для того, чтобы серверный объект smart terrain получал обновления.
@@ -44,6 +44,7 @@ function smart_terrain_binder:net_spawn( server_object )
 end
 
 function smart_terrain_binder:net_destroy()
+	--TB3D_Services.packet_alert("smart terrain binder: net destroy")
 	if self.object then
 		if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind smart terrain: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 		db.del_zone( self.object )
@@ -51,6 +52,7 @@ function smart_terrain_binder:net_destroy()
 	if self.se_smart_terrain then db.del_smart_terrain( self.se_smart_terrain ) end
 	object_binder.net_destroy( self )
 	if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind smart terrain: net destroy["..utils.to_str(self.object:name()).."] done") end
+	--TB3D_Services.packet_alert("smart terrain binder: net destroy done")
 end
 
 function smart_terrain_binder:net_Relcase( obj )

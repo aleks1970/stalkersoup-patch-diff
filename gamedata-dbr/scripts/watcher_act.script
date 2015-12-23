@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.3 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
--- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list dcity doc
-function my_ver() return "1.0.9.9.9.3" end
+--TB3D 1.0.9.9.9.8 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
+-- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list dcity doc, glavny
+function my_ver() return "1.0.9.9.9.8" end
 -- Red75 (c) 2008
 -- Marauder scheme v 1.1
 -- Part of AMK MOD
@@ -646,6 +646,9 @@ function npc_no_looting(npc)
 		or name =="yantar_ecolog_general" 							-- mad at the Military and Sakharov
 		or name =="mil_freedom_member0021" 							-- Miser into a zombie!
 		or name =="dcity_dok_bolot"									-- 109993, dcity doctor
+		or name =="andersen"
+		or name =="zemlyk"
+		or name == "glavny"											-- 109998, lab x14
 		or string_find(name,"marsh_nebo_")							-- 109989, tend to pick up everything in swamp
 		or string_find(name,"agr_factory_")							-- 109989, messes with battle
 		or string_find(name,"bar_stalker_")							-- 109989, get too far away from buildings
@@ -655,8 +658,6 @@ function npc_no_looting(npc)
 		or string_find(name, "esc_blokpost")						-- 109989, moved from evaluator
 		or string_find(name, "esc_bridge_soldier")
 		or string_find(name, "amk_embankment_soldat")
-		or string_find(name, "andersen")
-		or string_find(name, "zemlyk")
 		or string_find(name, "gar_bandit_stroyka")
 		)
 end
