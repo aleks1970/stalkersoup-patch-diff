@@ -1,8 +1,8 @@
--- TB3D 1.0.9.9.8.1 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.0.9.9.8.6 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment
-function my_ver() return "1.0.9.9.8.1" end
+function my_ver() return "1.0.9.9.8.6" end
 					
 -----over population control----
 local string_find = string.find
@@ -2535,22 +2535,24 @@ function can_go_online(obj)		--called by se_stalker and se_monster
 					result = true
 				end
 			elseif lname == "predbannik" then
-				if hdr4 == "pred"			--short circuit known spawns
+				if hdr5 == "pred_"												--109986
+				  and (
+				  string_find(obj_name, "smoker")								--causes ctd on exit
+				  or string_find(obj_name, "ohrana")
+				  or string_find(obj_name, "karatel")
+				  or string_find(obj_name, "obmorok")
+				  or string_find(obj_name, "_loc")
+				  or string_find(obj_name, "seriy")									--also seriywff
+				  or string_find(obj_name, "ivancov")
+				  ) then
+					--TB3D_Services.packet_alert("blocked: ["..obj_name.."] !!!!")
+					dont_spawn_online = true
+				elseif hdr4 == "pred"			--short circuit known spawns
 				  or hdr4 == "sak_"
 				  or hdr4 == "pre_"
 				  or hdr6 == "esc_st"
 				  or hdr6 == "soldie" then
-					if string_find(obj_name, "ohrana")
-					  or string_find(obj_name, "smoker")
-					  or string_find(obj_name, "karatel")
-					  or string_find(obj_name, "obmorok")
-					  or string_find(obj_name, "pred_loc")
-					  or string_find(obj_name, "seriy")
-					  or string_find(obj_name, "ivancov") then
-						dont_spawn_online = true
-					elseif  string_find(obj_name, "bloodsucker_strong") then
-					  --or string_find(obj_name, "predbannik_m_trader")			--109980, predbannik_m_trader  now uses new_trader.ogf renamed
-					  --or string_find(obj_name, "predbannik_barman")			--109980, bar_barman renamed
+					if string_find(obj_name, "bloodsucker_strong") then
 						dont_spawn_online = true
 					elseif string_find(obj_name, "killers_baza_killer_guard")
 					  or string_find(obj_name, "pre_killers_baza_killer_walk_") then

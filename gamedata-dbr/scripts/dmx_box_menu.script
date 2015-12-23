@@ -1,51 +1,107 @@
-----<!-- TB3D 1.0.9.9.7.6  on_info, dmx_box_sorter
-function my_ver() return "1.0.9.9.7.6" end
+----<!-- TB3D 1.0.9.9.8.6  on_info, dmx_box_sorter
+function my_ver() return "1.0.9.9.8.6" end
 --[[---------------------------------------------------------
  File         : dmx_box_menu.script
  Description  : Button to sort items in their class when you move the box
  Copyright    : DMX MOD
  Author       : Charsi (Thanks: Malandrinus, Erlik)
- LastUpdate   : 28.03.2011
+ LastUpdate   : 03.05.2015 by aleks1970
 --]]-----------------------------------------------------------------------------------------
 
 local debug = false	 -- system placement of buttons (true - incl. \ false - off).
 local rec_wnd        = nil
 local initial        = false
 local TBtn           = {}
-local slots          = {{46,230},{101,230},{156,230},{211,230},{266,230}}
-local box_id,box,pm
-local items_in_box   = {["weapon"]={},["ammo"]={},["outfit"]={},["other"]={}}
+local slots          = {{42,230},{89,230},{136,230},{183,230},{230,230},{277,230},{324,230},{0,738},{687,230},{734,230},{781,230},{828,230},{875,230},{922,230},{968,230}} -- extra buttons - aleks1970
+local box_id1,box_id2
+local items_in_box1  = {["weapon"]={},["ammo"]={},["outfit"]={},["artifact"]={},["meds"]={},["other"]={},["dummy_button_section"]={}} --,["act_slots"]={}}
+local items_in_box2  = {["weapon"]={},["ammo"]={},["outfit"]={},["artifact"]={},["meds"]={},["other"]={},["dummy_button_section"]={}}
 local items_in_slots = {}
-local timer          = 0
+local timer1, timer2  = 0,0
 local time_shift     = 1000
-local no_drop_items  = {["separator"]=true, ["remontnyi_box"]=true, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true, ["amk_metka"]=true, ["fake_bolt"]=true}
+local no_drop_items  = {["separator"]=true, ["fake_bolt"]=true} --, ["remontnyi_box"]=true, ["helmet_gasmask_gp5"]=true, ["helmet_gasmask_gp8b"]=true, ["helmet_respirator"]=true, ["helmet_hardhat"]=true, ["helmet_protective"]=true, ["helmet_tactic"]=true, ["good_psy_helmet"]=true, ["bad_psy_helmet"]=true, ["amk_metka"]=true}
 
 class "BkgrWnd" (CUIScriptWnd)
-
+function clear_items_in_box(num)
+	if num == 0 then
+		items_in_box1={["weapon"]={},["ammo"]={},["outfit"]={},["artifact"]={},["meds"]={},["other"]={},["dummy_button_section"]={}}	--,["act_slots"]={}}
+	else
+		--items_in_box2={["weapon"]={},["ammo"]={},["outfit"]={},["artifact"]={},["meds"]={},["other"]={},["dummy_button_section"]={}}
+	end
+end
 function BkgrWnd:__init(owner) super()
    self.owner = owner
    self:Init(0, 0, 1024, 768)
 	self:SetAutoDelete(true)		--109975
    self.ClickBtn={}
 
+self.ClickBtn[0]=function() -- invisible button
+	if timer1<time_global() then timer1=time_global() + time_shift action_transfer("dummy_button_section") end
+end
+
 self.ClickBtn[1]=function() -- weapon
-	if timer<time_global() then timer=time_global() + time_shift action_transfer("weapon") end
+	if timer1<time_global() then timer1=time_global() + time_shift action_transfer("weapon") end
 end
 
 self.ClickBtn[2]=function() -- Ammunition
-	if timer<time_global() then timer=time_global() + time_shift action_transfer("ammo") end
+	if timer1<time_global() then timer1=time_global() + time_shift action_transfer("ammo") end
 end
 
-self.ClickBtn[3]=function() -- first aid kits and artefacts
-	if timer<time_global() then timer=time_global() + time_shift action_transfer("other") end
+self.ClickBtn[3]=function() -- first aid kits
+	if timer1<time_global() then timer1=time_global() + time_shift action_transfer("meds") end
 end
 
-self.ClickBtn[4]=function() -- Bronicas
-	if timer<time_global() then timer=time_global() + time_shift action_transfer("outfit") end
+self.ClickBtn[4]=function() -- Outfits
+	if timer1<time_global() then timer1=time_global() + time_shift action_transfer("outfit") end
 end
 
-self.ClickBtn[5]=function() -- show all
-	if timer<time_global() then timer=time_global() + time_shift return_items() items_in_box={["weapon"]={},["ammo"]={},["outfit"]={},["other"]={}} end
+self.ClickBtn[5]=function() -- Artifact - 109986
+	if timer1<time_global() then timer1=time_global() + time_shift action_transfer("artifact") end
+end
+
+self.ClickBtn[6]=function() -- misc - aleks1970
+	if timer1<time_global() then timer1=time_global() + time_shift action_transfer("other") end
+end
+
+self.ClickBtn[7]=function() -- show all
+	if timer1<time_global() then
+		timer1=time_global() + time_shift return_items(0)
+		clear_items_in_box(0)
+	end
+end
+self.ClickBtn[8]=function() -- invisible button
+	if timer2<time_global() then timer2=time_global() + time_shift action_transfer2("dummy_button_section") end
+end
+
+self.ClickBtn[9]=function() -- weapon
+	if timer2<time_global() then timer2=time_global() + time_shift action_transfer2("weapon") end
+end
+
+self.ClickBtn[10]=function() -- Ammunition
+	if timer2<time_global() then timer2=time_global() + time_shift action_transfer2("ammo") end
+end
+
+self.ClickBtn[11]=function() -- first aid kits
+	if timer2<time_global() then timer2=time_global() + time_shift action_transfer2("meds") end
+end
+
+self.ClickBtn[12]=function() -- Outfits
+	if timer2<time_global() then timer2=time_global() + time_shift action_transfer2("outfit") end
+end
+
+self.ClickBtn[13]=function() -- Artifact - 109986
+	if timer2<time_global() then timer2=time_global() + time_shift action_transfer2("artifact") end
+end
+
+self.ClickBtn[14]=function() -- misc - aleks1970
+	if timer2<time_global() then timer2=time_global() + time_shift action_transfer2("other") end
+end
+
+self.ClickBtn[15]=function() -- show all
+	if timer2<time_global() then
+		timer2=time_global() + time_shift return_items(1)
+		clear_items_in_box(1)
+	end
 end
     self:InitControls()
 end
@@ -207,7 +263,7 @@ function BkgrWnd:ClickBtnRt()
 end
 
 function init_btn(num)
-    local xywh={{1054,7},{1154,7},{1054,107},{1154,107},{1254,7}}
+    local xywh={{1054,7},{1154,7},{1054,107},{1154,107},{1254,107},{1610,7},{1254,7},{1225,406},{1054,7},{1154,7},{1054,107},{1154,107},{1254,107},{1610,7},{1254,7},{1225,406}}	--109986
     local btn=TBtn["check_button_"..num]
     btn:InitTexture("ui\\ui_common")
     btn:SetOriginalRect(xywh[num][1],xywh[num][2],92,89)
@@ -245,70 +301,159 @@ function on_info(info_id)
 			rec_wnd:ShowWnd()
 		end
 		local sobj = alife():create("dmx_box_sorter",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-		--pm=alife():create("wpn_pm",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(),sobj.id)
-		box_id=sobj.id
-		items_in_box={["weapon"]={},["ammo"]={},["outfit"]={},["other"]={}}
+		box_id1=sobj.id
+		clear_items_in_box(0)
+	--[[
+		sobj = alife():create("dmx_box_sorter",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+		box_id2=sobj.id
+		clear_items_in_box(1)
+	]]--
 	elseif info_id == "ui_car_body_hide" then	
 		if rec_wnd then
        		rec_wnd:DetachWnd()
 		end
-		if box_id then
-			--remove_pm()
-			return_items()
+		if box_id1 then
+			return_items(0)
 			clear_table(items_in_slots)
-			clear_table(items_in_box)
-			alife():release(alife():object(box_id), true)
-			--alife():release(level.object_by_id(box_id, true))
+			clear_table(items_in_box1)
+			alife():release(alife():object(box_id1), true)
 		end
+	--[[
+		if box_id2 then
+			return_items(1)
+			clear_table(items_in_box2)
+			alife():release(alife():object(box_id2), true)
+		end
+	]]--
  	end
 end
 
-function return_items()
-    box=level.object_by_id(box_id)
+function return_items(num)
     local level_object_by_id=level.object_by_id
     local actor=db.actor
-    for k,id in ipairs (items_in_box["other"]) do box:transfer_item(level_object_by_id(id),actor) end	--TB3D chg _ to k
-    for k,id in ipairs (items_in_box["weapon"]) do box:transfer_item(level_object_by_id(id),actor) end
-    for k,id in ipairs (items_in_box["ammo"]) do box:transfer_item(level_object_by_id(id),actor) end
-    for k,id in ipairs (items_in_box["outfit"]) do box:transfer_item(level_object_by_id(id),actor) end
+	local box
+	if num == 0 then
+		box=level.object_by_id(box_id1)
+		--for k,id in ipairs (items_in_box1["act_slots"]) do box:transfer_item(level_object_by_id(id),actor) end	--109986
+		for k,id in ipairs (items_in_box1["dummy_button_section"]) do box:transfer_item(level_object_by_id(id),actor) end --aleks1970
+		for k,id in ipairs (items_in_box1["other"]) do box:transfer_item(level_object_by_id(id),actor) end	--TB3D chg _ to k
+		for k,id in ipairs (items_in_box1["weapon"]) do box:transfer_item(level_object_by_id(id),actor) end
+		for k,id in ipairs (items_in_box1["ammo"]) do box:transfer_item(level_object_by_id(id),actor) end
+		for k,id in ipairs (items_in_box1["meds"]) do box:transfer_item(level_object_by_id(id),actor) end
+		for k,id in ipairs (items_in_box1["outfit"]) do box:transfer_item(level_object_by_id(id),actor) end
+		for k,id in ipairs (items_in_box1["artifact"]) do box:transfer_item(level_object_by_id(id),actor) end --aleks1970
+	else
+	--[[
+		local bx_wnd=level.main_input_receiver()
+		if bx_wnd then
+			box=level.object_by_id(box_id2)
+			for k,id in ipairs (items_in_box2["dummy_button_section"]) do box:transfer_item(level_object_by_id(id),bx_wnd) end --aleks1970
+			for k,id in ipairs (items_in_box2["other"]) do box:transfer_item(level_object_by_id(id),bx_wnd) end	--TB3D chg _ to k
+			for k,id in ipairs (items_in_box2["weapon"]) do box:transfer_item(level_object_by_id(id),bx_wnd) end
+			for k,id in ipairs (items_in_box2["ammo"]) do box:transfer_item(level_object_by_id(id),bx_wnd) end
+			for k,id in ipairs (items_in_box2["meds"]) do box:transfer_item(level_object_by_id(id),bx_wnd) end
+			for k,id in ipairs (items_in_box2["outfit"]) do box:transfer_item(level_object_by_id(id),bx_wnd) end
+			for k,id in ipairs (items_in_box2["artifact"]) do box:transfer_item(level_object_by_id(id),bx_wnd) end --aleks1970
+		end
+	]]--
+	end
 end
 
-function init_items_in_slots()
-	box=level.object_by_id(box_id)
-	items_in_slots={}
-	local slots={0,1,2,4,5,6}
+--slots: 0=knife, 1=handgun, 2=rifle, 3=grenade, 4=binoc, 5=bolt, 6=outfit, 7=PDA, 8=bolt_fix, 9=torch, 10-12 empty
+function init_items_in_slots()		--109986
+	--local box=level.object_by_id(box_id1)
+	--items_in_slots={}
+--	local slots={0,1,2,3,4,5,6,7,8,9,10,11,12} --aleks1970, additional slots to be used in future, 109986
+	local slots={0,1,2,4,6,9}
 	local item
 	for k,i in ipairs (slots) do	--TB3D chg _ to k
 		item = db.actor:item_in_slot(i)
-		if item then items_in_slots[item:id()]=true end
+		if item then items_in_slots[item:id()] = true end
+		--if item then
+			--db.actor:transfer_item(level.object_by_id(item:id()),box)
+			--table.insert(items_in_box["act_slots"],item:id())
+		--end
 	end
 end
 
 function action_transfer(type)
     init_items_in_slots()
 	local ti={}
+	local box=level.object_by_id(box_id1)
     db.actor:iterate_inventory(function (dummy,item)
 		ti=test_items(item)
-		if ti~=type and items_in_slots[item:id()]~=true and inventory.belt_id[item:id()]~=true and no_drop_items[item:section()]~=true and protected_items.obj_is_protected(item,"items_protected","exactly")~=true then
+		if ti and ti~=type and no_drop_items[item:section()]~=true and items_in_slots[item:id()]~=true and inventory.belt_id[item:id()]~=true then --and protected_items.obj_is_protected(item,"items_protected","exactly")~=true then
 			db.actor:transfer_item(item,box) --get_console():execute("load ~~~portable "..ti)
-			table.insert(items_in_box[ti],item:id())
+			table.insert(items_in_box1[ti],item:id())
 		end
     end,nil)
-    for k,id in ipairs (items_in_box[type]) do	--TB3D chg _ to k
+    for k,id in ipairs (items_in_box1[type]) do	--TB3D chg _ to k
 	    box:transfer_item(level.object_by_id(id),db.actor)
     end
-    items_in_box[type]={}
+    items_in_box1[type]={}
+end
+
+function action_transfer2(type)
+--[[
+	local ti={}
+	local box=level.object_by_id(box_id2)
+	local bx_wnd=level.main_input_receiver()
+	if bx_wnd and box then
+		for k,id in ipairs (items_in_box2[type]) do	--TB3D chg _ to k
+			box:transfer_item(level.object_by_id(id),bx_wnd)
+		end
+	end
+    items_in_box2[type]={}
+]]--
 end
 
 function test_items(item)
-    local res="other"
-    if ammo_section[item:section()]==true then res="ammo"
-        elseif isWeapon(item) then res="weapon"
-        elseif system_ini():r_string(item:section(),"class")=="E_STLK" then res="outfit"
+--local suit_items  = {["E_STLK"]=true, ["EQU_MLTR"]=true}
+--local ammo_items  = {["G_RPG7"]=true, ["AMMO"]=true, ["G_RGD5"]=true, ["D_SIMDET"]=true, ["G_F1"]=true, ["A_OG7B"]=true, ["O_PHYS_S"]=true, ["A_M209"]=true, ["II_EXPLO"]=true, ["A_VOG25"]=true}
+--local other_items  = {["II_ANTIR"]=true, ["O_INVBOX"]=true, ["WP_SCOPE"]=true, ["WP_BINOC"]=true, ["II_MEDKI"]=true, ["II_BANDG"]=true, ["W_SILENC"]=true, ["W_GLAUNC"]=true, ["W_SILENC"]=true}
+--local weapons_items  = {["WP_AK74"]=true, ["WP_LR300"]=true, ["WP_BM165"]=true, ["WP_KNIFE"]=true, ["WP_VINT"]=true, ["W_PM"]=true, ["W_HPSA"]=true, ["W_WALTHR"]=true, ["W_FORT"]=true, ["W_USP45"]=true, ["W_BM16"]=true, ["W_SHOTGN"]=true, ["W_GROZA"]=true, ["W_VAL"]=true, ["W_SVD"]=true, ["W_SVU"]=true, ["W_RG6"]=true, ["W_RPG7"]=true, ["WP_WALTH"]=true}
+--local artifact_food_items  = {["ARTEFACT"]=true, ["II_ATTCH"]=true, ["II_FOOD"]=true, ["II_BOTTL"]=true, ["SCRPTART"]=true, ["D_PDA"]=true, ["TORCH_S"]=true, ["D_SIMDET"]=true, ["II_DOC"]=true, ["Z_RADIO"]=true}
+    local res="dummy_button_section" -- invisible button aleks1970
+    if (ammo_section[item:section()]==true)
+			or (system_ini():r_string(item:section(),"class")=="AMMO")
+			or (system_ini():r_string(item:section(),"class")=="G_RPG7")
+			or (system_ini():r_string(item:section(),"class")=="G_RGD5")
+			or (system_ini():r_string(item:section(),"class")=="G_F1")
+			or (system_ini():r_string(item:section(),"class")=="A_OG7B")
+			or (system_ini():r_string(item:section(),"class")=="O_PHYS_S")
+			or (system_ini():r_string(item:section(),"class")=="A_M209")
+			or (system_ini():r_string(item:section(),"class")=="A_VOG25") then res="ammo"
+		elseif (isWeapon(item)==true)
+			or (system_ini():r_string(item:section(),"class")=="W_GLAUNC")
+			or (system_ini():r_string(item:section(),"class")=="WP_SCOPE") 
+			or (system_ini():r_string(item:section(),"class")=="W_SILENC") 
+			or (system_ini():r_string(item:section(),"class")=="W_PM") 
+			or (system_ini():r_string(item:section(),"class")=="WP_KNIFE") 
+			or (system_ini():r_string(item:section(),"class")=="WP_VINT") 
+			or (system_ini():r_string(item:section(),"class")=="WP_LR300") 
+			or (system_ini():r_string(item:section(),"class")=="W_BM16") 
+			or (system_ini():r_string(item:section(),"class")=="W_VAL") 
+			or (system_ini():r_string(item:section(),"class")=="W_HPSA") 
+			or (system_ini():r_string(item:section(),"class")=="W_FORT") 
+			or (system_ini():r_string(item:section(),"class")=="W_USP45") 
+			or (system_ini():r_string(item:section(),"class")=="W_SHOTGN") then res="weapon"
+        elseif (system_ini():r_string(item:section(),"class")=="E_STLK")
+			or (system_ini():r_string(item:section(),"class")=="EQU_MLTR") then res="outfit"
+		elseif (system_ini():r_string(item:section(),"class")=="ARTEFACT")
+			or (system_ini():r_string(item:section(),"class")=="SCRPTART")	then res="artifact"	
+		elseif (system_ini():r_string(item:section(),"class")=="II_MEDKI")
+			or (system_ini():r_string(item:section(),"class")=="II_BANDG") 
+			or (system_ini():r_string(item:section(),"class")=="II_ANTIR") then res="meds"
+		elseif (system_ini():r_string(item:section(),"class")=="O_INVBOX")
+			or (system_ini():r_string(item:section(),"class")=="WP_BINOC") 
+			or (system_ini():r_string(item:section(),"class")=="D_PDA")
+			or (system_ini():r_string(item:section(),"class")=="D_SIMDET")
+			or (system_ini():r_string(item:section(),"class")=="II_DOC") then res="other"
+		elseif (system_ini():r_string(item:section(),"class")=="II_ATTCH") 
+			or (system_ini():r_string(item:section(),"class")=="II_FOOD") 
+			or (system_ini():r_string(item:section(),"class")=="II_BOTTL") then
+				TB3D_Services.packet_alert("dmx_box_menu: type["..item:name().."] needs sorting")
+				res="other"
     end
     return res
-end
-
-function remove_pm()
-	if pm then alife():release(pm, true) end
 end

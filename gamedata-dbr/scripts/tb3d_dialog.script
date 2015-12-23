@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.4 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+--TB3D 1.0.9.9.8.6 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
 -- bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art
-function my_ver() return "1.0.9.9.8.4" end
+function my_ver() return "1.0.9.9.8.6" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -756,7 +756,7 @@ function spawn_ds_found()												--bar5
 end
 
 function spawn_gar_found()												--bar6
-	--TODO: 109954
+	TB3D_Mobs.spawn_snorks(264.002,1.147,145.613,374663,380,4)			--109986, snorks at ds exit
 end
 
 function spawn_ros_found()												--bar7

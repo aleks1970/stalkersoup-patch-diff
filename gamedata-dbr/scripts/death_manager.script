@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.8.3 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.0.9.9.8.6 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
 --has_ammo, reorganized, optimized loot ammo
-function my_ver() return "1.0.9.9.8.3" end
+function my_ver() return "1.0.9.9.8.6" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
@@ -180,7 +180,7 @@ function drop_manager:check_dead_items()
 		return true
 	end
 	self.npc:iterate_inventory(clear_pda, self.npc)					--removes old pda and bad_psy_helmet, spawns mil_pda 30% of the time, also some clutter removed
-	TB3D_Services.packet_alert("death mgr: check dead items clear pda done")
+	--TB3D_Services.packet_alert("death mgr: check dead items clear pda done")
 	local spawn_rate = TB3D_Modders.pda_spawn_rate or 30				--109981
 	if spawn_rate > 80 then spawn_rate = 80 end
 	local community = self.npc:character_community()
@@ -241,7 +241,7 @@ function drop_manager:check_dead_items()
 			end
 		end
 	end
-	TB3D_Services.packet_alert("death mgr: check dead items done["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
+	--TB3D_Services.packet_alert("death mgr: check dead items done["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]")
 end
 
 --109981, removed levels, just community now
@@ -371,9 +371,9 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 			--end
 		else
 			local rank = self.npc:character_rank()
-			local actor_koef = TB3D_Services.global_koef()							--based on actor rank and game difficulty
-			local npc_koef = TB3D_Services.global_koef(0, rank+1)					--npc rank and level 0
-			local result_intregal = math.floor((actor_koef * npc_koef) * 1000)		--quantize both and put in range
+			local actor_koef = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109986, based on actor rank and game difficulty/fp level
+			local npc_koef = TB3D_Services.global_koef(0, rank+1)							--npc rank and level 0
+			local result_intregal = math.floor((actor_koef * npc_koef) * 1000)				--quantize both and put in range
 			local quant_factor = 0
 			if result_intregal > 1000 then
 				rank = 1000

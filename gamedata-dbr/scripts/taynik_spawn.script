@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.7.7   removed table.getn(), changed points2, give talk message
-function my_ver() return "1.0.9.9.7.7" end
+--TB3D 1.0.9.9.8.6   removed table.getn(), changed points2, give talk message, new_inventory
+function my_ver() return "1.0.9.9.8.6" end
 
 local translate = game.translate_string
 
@@ -42,28 +42,28 @@ local points={
         gv=81,
         lv=158594,
 		desc="kostya_p1_1",
-		tag="kostya_tag_les"
+		tag="_les"		--109986
         },
     {
         position={x=212.46,y=7.62,z=105.02},
         gv=152,
         lv=505646,
 		desc="kostya_p1_2",
-		tag="kostya_tag_lager"
+		tag="_lager"		--109986
         },
     {
         position={x=2.71,y=-18.06,z=-153.95},
         gv=108,
         lv=280621,
 		desc="kostya_p1_3",
-		tag="kostya_tag_atr"
+		tag="_atr"		--109986
         }
 }
 
 function new_inventory(actor,npc,p1,p2)
     local a = points[math.random(1,3)] --table.getn(points))]
     local se_obj = alife():create("m_inventory_box_new", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
-	TB3D_Services.give_info("escape_kostya_taynik1_start"..translate(a.tag))
+	TB3D_Services.give_info("escape_kostya_taynik1_start"..a.tag)		--109986
 	news_manager.upload_message_id(a.desc, kostya_generic, "ui\\ui_iconstotal", Frect():set(0,0,10,10), "simple_answer_item")
 -- Soundtrack
 	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_5]])
@@ -72,7 +72,7 @@ end
 function cs_new_inventory()
     local a = points[math.random(1,3)] --table.getn(points))]
     local se_obj = alife():create("m_inventory_box_new", vector():set(a.position.x,a.position.y,a.position.z), a.lv, a.gv)
-	TB3D_Services.give_info("escape_kostya_taynik1_start"..translate(a.tag))
+	TB3D_Services.give_info("escape_kostya_taynik1_start"..a.tag)		--109986
 	news_manager.send_tip_txt(db.actor,  TB3D_Services.get_text_color("name").."Kostya:  %c[default]Marked One.. please help me find my PDA "..m_where.." it is stashed with valuables that you can keep .. it is there somewhere ... I know what I'm talking about .. trust me... I'll be in the Garbage if you find it...\\n", nil, nil, 20000)
 end
 

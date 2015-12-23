@@ -1,7 +1,8 @@
----TB3D 1.0.9.9.8.1 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
+---TB3D 1.0.9.9.8.6 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
 -- removed din_rad and added use_rad_fields, TB3D_net_manager, added items, tb3d_dav_hunt, debug, gulag_deadcity,
--- gulag_generators, gulag_aver, new vars and reorg, loadout_min_cond, loadout_ammo_count, loadout_ammo_loot, hdr
-local vers = "1.0.9.9.8.1"
+-- gulag_generators, gulag_aver, new vars and reorg, loadout_min_cond, loadout_ammo_count, loadout_ammo_loot, hdr,
+-- hardcore_mobs_mult
+local vers = "1.0.9.9.8.6"
 -- following removed from the mod ------------------------------------------------------------------------------------------------------------------------
 	--if valerich_dialog then TB3D_Services.packet_alert("valerich_dialog ok") else TB3D_Services.packet_alert("valerich_dialog failed!!!!") is_failed = true end
 	--if valerich_treasures then TB3D_Services.packet_alert("valerich_treasures ok") else TB3D_Services.packet_alert("valerich_treasures failed!!!!") is_failed = true end
@@ -480,8 +481,8 @@ function verify_files()
 		..utils.to_str(TB3D_Modders.teleporter_use).."]["..utils.to_str(TB3D_Modders.effector_spawn).."]["
 		..utils.to_str(TB3D_Modders.night_creatures).."]["..utils.to_str(TB3D_Modders.hits_to_kill_invuln).."]["
 		..utils.to_str(TB3D_Modders.hits_to_head_invuln).."]["..utils.to_str(TB3D_Modders.check_bad_weapons).."]["
-		..utils.to_str(TB3D_Modders.hardcore_mobs).."]["..utils.to_str(TB3D_Modders.spawn_esc_dog_rush).."]["
-		..utils.to_str(TB3D_Modders.spawn_thermos_inside).."]")
+		..utils.to_str(TB3D_Modders.hardcore_mobs).."]["..utils.to_str(TB3D_Modders.hardcore_mobs_mult).."]["
+		..utils.to_str(TB3D_Modders.spawn_esc_dog_rush).."]["..utils.to_str(TB3D_Modders.spawn_thermos_inside).."]")
 
 		TB3D_Services.packet_alert("opt_loot["..utils.to_str(TB3D_Modders.money_decoder).."]["
 		..utils.to_str(TB3D_Modders.money_scarce).."]["..utils.to_str(TB3D_Modders.loot_option).."]")

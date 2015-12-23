@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.8.2 dav updates, ldk3_master fixed, final from dav, updated to new levels,
+--TB3D 1.0.9.9.8.6 dav updates, ldk3_master fixed, final from dav, updated to new levels,
 -- changed for level-ups (109961), localized, added spawn groups, adj hardcore spawns
-function my_ver() return "1.0.9.9.8.2" end
+function my_ver() return "1.0.9.9.8.6" end
 
 -----------------------------------------------------------------------------------------------------------
 --dAVROs Lastday killers v1_1  last contributed: April 2014
@@ -329,7 +329,7 @@ function spawn_ldk1(ln, pos)						--called from tb3d_collector update
 	elseif ln == "zaton" then																		
 		if has_alife_info("collector_ready_for_zaton") then
 			if TB3D_Services.give_info("zaton_ldk_warning") then
-				news_manager.send_tip(db.actor, translate("hunt_bkwtr_warning"), nil, nil, 120000)
+				--news_manager.send_tip(db.actor, translate("hunt_bkwtr_warning"), nil, nil, 120000)
 			end
 			-- SAWMILL LDK
 			if not has_alife_info("zat_ldk_spawn1") then

@@ -1,8 +1,9 @@
---TB3D 1.0.9.9.8.5 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
--- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod
-function my_ver() return "1.0.9.9.8.5" end
+--TB3D 1.0.9.9.8.6 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+-- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult
+function my_ver() return "1.0.9.9.8.6" end
 local math_random = math.random
 local math_fmod = math.fmod
+local math_floor = math.floor
 
 ----- these are set once on load to new level --------------------
 ----- used to respawn npc in empty levels ------------------------
@@ -129,16 +130,22 @@ local mob_list_night = {
 	[28] = "tb3dm_zombie_babka_strong"
 }
 
------type = {0=bandit, 1=stalker, 2=zombied, 3=military, 4=ecolog, 5=monolith, 6=killer}
+--type = {0=bandit, 1=stalker, 2=zombied, 3=military, 4=ecolog, 5=monolith, 6=killer}
 function spawn_npcs(x, y, z, lv, gv, type, max)
-	local min = 1
-	if max > 6 then min = 4 end
-	local cnt = math_random(min, max)
 	local mob = math_random(4)
 	if type > 0 then
 		mob = mob + (type * 4)
 	end
 	local name = mob_list_npc[mob]
+	local min = 1
+	if max > 6 then min = 4 end
+	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
+	local cnt = math_floor(math_random(min, max) * flevel)
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	else
+		if cnt > max then cnt = max end
+	end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] ["..name.."]")
 	end
@@ -149,14 +156,6 @@ end
 
 --type= {0=normal, 1=swamp, 2=woods, 3=city, 4=indoor, 5=large, 6=harsh}
 function spawn_mob(x, y, z, lv, gv, type, max)
-	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
-	local cnt
-	if TB3D_Modders.hardcore_mobs then
-		cnt = math.ceil(math_random(max, max + max) * flevel)
-	else
-		cnt = math.floor(math_random(1, max) * flevel)
-	end
-	if cnt < 1 then cnt = 1 end
 	local mob = math_random(4)		--pick one of the four in the group
 	local name
 	if type > 0 then
@@ -166,6 +165,14 @@ function spawn_mob(x, y, z, lv, gv, type, max)
 		name = mob_list_night[mob]
 	else
 		name = mob_list_day[mob]
+	end
+	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
+	local cnt = math_floor(math_random(1, max) * flevel)
+	if cnt < 1 then cnt = 1 end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	else
+		if cnt > max then cnt = max end
 	end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] ["..name.."]")
@@ -177,8 +184,13 @@ end
 
 function spawn_rats(x, y, z, lv, gv, max)
 	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
-	local cnt = math.floor(math_random(1,max) * flevel)
+	local cnt = math_floor(math_random(1, max) * flevel)
 	if cnt < 1 then cnt = 1 end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	else
+		if cnt > max then cnt = max end
+	end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_rat]")
 	end
@@ -189,8 +201,13 @@ end
 
 function spawn_snorks(x, y, z, lv, gv, max)
 	local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
-	local cnt = math.floor(math_random(1,max) * flevel)
+	local cnt = math_floor(math_random(1, max) * flevel)
 	if cnt < 1 then cnt = 1 end
+	if TB3D_Modders.hardcore_mobs then
+		cnt = math_floor(cnt * TB3D_Modders.hardcore_mobs_mult)
+	else
+		if cnt > max then cnt = max end
+	end
 	if TB3D_Modders.use_mob_messages then
 		TB3D_Services.packet_alert("tb3d mobs: spawning ["..utils.to_str(cnt).."] [tb3dm_snork_jumper]")
 	end
@@ -642,11 +659,24 @@ function check_swamp_spawns()
 		spawns = 1
 		alife():create("tb3dm_sceleton", vector():set(332.381,7.695,-77.418),351157,3528)	--center of graveyard to upset vert bandits
 	else
-		local typ, qty = 1,3					--swamp creatures
+		local typ, qty = 1,1					--swamp creatures
 		if spawns == 1 then
+			spawn_npcs(290.667,0.142,-160.732,324871,3531,0,6)		--bandits in church
+			TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",202.447,1.212,165.980,259974,3498, 6)		--dogs near tree nw burnt ranch
+			spawn_npcs(429.367,3.336,237.896,423827,3546,0,10)		--bandits in carpark
+			spawn_npcs(-57.155,1.217,286.438,109528,3402,0,3)
+			spawn_npcs(-207.643,0.779,397.848,37703,3361,0,3)
+			spawn_npcs(-106.984,0.155,330.082,89643,3384,0,2)
 			spawns = 2
 		elseif spawns == 2 then
-			qty = 5
+			qty = 3
+			TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",165.480,0.604,50.784,232658,3480, 6)		--dogs nw burnt ranch
+			spawn_npcs(465.634,2.030,364.646,451262,3556,0,6)		--bandits at truck
+			spawn_npcs(158.216,5.639,505.106,228982,3485,0,6)		--bandits n yantar exit
+			spawn_npcs(605.458,3.404,438.681,522788,3578,0,8)		--bandits ne village
+			spawn_npcs(-81.310,0.218,336.547,97901,3393,0,3)		--bandits around water tower
+			spawn_npcs(-55.159,0.406,263.040,110915,3399,0,2)
+			spawn_npcs(-177.524,2.427,418.153,52730,3361,0,3)
 			spawns = 1				--rotate between 1 and 2
 		end
 		spawn_mob(-246.084,0.621,388.167,20645,3361,typ,qty)	--swamp creatures nw shore
@@ -661,21 +691,8 @@ function check_swamp_spawns()
 		spawn_mob(297.030,1.531,413.851,330023,3488,typ,qty)	--crt n near tracks
 		spawn_mob(165.693,1.353,337.075,234175,3482,typ,qty)	--crt below yantar exit
 		TB3D_Triggers.spawn_alife_rand("tb3dm_sceleton",332.381,7.695,-77.418,351157,3528, 10)			--center of graveyard
-		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",202.447,1.212,165.980,259974,3498, 6)		--dogs near tree nw burnt ranch
-		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",165.480,0.604,50.784,232658,3480, 6)		--dogs nw burnt ranch
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",129.780,0.800,35.595,213227,3471, 6)		--dogs w burnt ranch
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",136.635,0.243,-57.711,217397,3472, 10)		--dogs near sniper tower
-		spawn_npcs(-81.310,0.218,336.547,97901,3393,0,3)		--bandits around water tower
-		spawn_npcs(-106.984,0.155,330.082,89643,3384,0,2)
-		spawn_npcs(-177.524,2.427,418.153,52730,3361,0,3)
-		spawn_npcs(-207.643,0.779,397.848,37703,3361,0,3)
-		spawn_npcs(-57.155,1.217,286.438,109528,3402,0,3)
-		spawn_npcs(-55.159,0.406,263.040,110915,3399,0,2)
-		spawn_npcs(290.667,0.142,-160.732,324871,3531,0,6)		--bandits in church
-		spawn_npcs(605.458,3.404,438.681,522788,3578,0,8)		--bandits ne village
-		spawn_npcs(465.634,2.030,364.646,451262,3556,0,6)		--bandits at truck
-		spawn_npcs(429.367,3.336,237.896,423827,3546,0,10)		--bandits in carpark
-		spawn_npcs(158.216,5.639,505.106,228982,3485,0,6)		--bandits n yantar exit
 	end
 	amk.save_variable("tb3d_swamp_spawns", spawns)
 end
@@ -721,32 +738,28 @@ function check_eprip_spawns()
 	else
 		typ = 3		--city
 		qty = 2
+		spawn_rats(-153.966,-0.467,-189.385,51516,3752,qty)
+		spawn_rats(-96.738,0.506,-245.988,94442,3756,qty)
+		spawn_rats(-96.047,-0.425,-350.417,94942,3753,qty)
+		spawn_rats(19.167,-0.424,-326.185,221806,3756,qty)
+		spawn_rats(-21.300,-0.507,-155.657,168813,3756,qty)
+		spawn_rats(62.658,-0.319,-48.081,280796,3766,qty)
+		spawn_rats(144.527,-0.505,-56.168,373652,3766,qty)
+		spawn_rats(317.088,-0.078,245.918,483818,3769,qty)
+		spawn_rats(171.339,-0.428,409.823,401433,3769,qty)
 	end
-	if typ == 6 or mobs < 10 then
-		spawn_mob(-153.966,-0.467,-189.385,51516,3752,typ, qty)		--playground
-		spawn_mob(-96.738,0.506,-245.988,94442,3756,typ, qty)		--bookstore
-		spawn_mob(-96.047,-0.425,-350.417,94942,3753,typ, qty)		--n of playground
-		spawn_mob(19.167,-0.424,-326.185,221806,3756,typ, qty)		--statue
-		spawn_mob(-21.300,-0.507,-155.657,168813,3756,typ, qty)		--center
-		spawn_mob(62.658,-0.319,-48.081,280796,3766,typ, qty)		--theater
-		spawn_mob(144.527,-0.505,-56.168,373652,3766,typ, qty)		--n exit
-		spawn_mob(163.778,-0.396,194.960,393156,3769,typ, qty)		--storage bins
-		spawn_mob(287.592,-0.363,213.238,474216,3769,typ, qty)		--near dock
-		spawn_mob(317.088,-0.078,245.918,483818,3769,typ, qty)		--patio near dock
-		spawn_mob(316.140,-9.175,293.587,483682,3769,typ, qty)		--waters edge
-		spawn_mob(171.339,-0.428,409.823,401433,3769,typ, qty)		--ne exit
-	end
-	if typ == 3 and rats < 10 then
-		spawn_rats(-153.966,-0.467,-189.385,51516,3752,4)
-		spawn_rats(-96.738,0.506,-245.988,94442,3756,4)
-		spawn_rats(-96.047,-0.425,-350.417,94942,3753,4)
-		spawn_rats(19.167,-0.424,-326.185,221806,3756,4)
-		spawn_rats(-21.300,-0.507,-155.657,168813,3756,4)
-		spawn_rats(62.658,-0.319,-48.081,280796,3766,4)
-		spawn_rats(144.527,-0.505,-56.168,373652,3766,4)
-		spawn_rats(317.088,-0.078,245.918,483818,3769,4)
-		spawn_rats(171.339,-0.428,409.823,401433,3769,4)
-	end
+	spawn_mob(-153.966,-0.467,-189.385,51516,3752,typ, qty)		--playground
+	spawn_mob(-96.738,0.506,-245.988,94442,3756,typ, qty)		--bookstore
+	spawn_mob(-96.047,-0.425,-350.417,94942,3753,typ, qty)		--n of playground
+	spawn_mob(19.167,-0.424,-326.185,221806,3756,typ, qty)		--statue
+	spawn_mob(-21.300,-0.507,-155.657,168813,3756,typ, qty)		--center
+	spawn_mob(62.658,-0.319,-48.081,280796,3766,typ, qty)		--theater
+	spawn_mob(144.527,-0.505,-56.168,373652,3766,typ, qty)		--n exit
+	spawn_mob(163.778,-0.396,194.960,393156,3769,typ, qty)		--storage bins
+	spawn_mob(287.592,-0.363,213.238,474216,3769,typ, qty)		--near dock
+	spawn_mob(317.088,-0.078,245.918,483818,3769,typ, qty)		--patio near dock
+	spawn_mob(316.140,-9.175,293.587,483682,3769,typ, qty)		--waters edge
+	spawn_mob(171.339,-0.428,409.823,401433,3769,typ, qty)		--ne exit
 end
 
 function eprip_exit_jupu()
@@ -758,10 +771,8 @@ function eprip_exit_jupu()
 end
 
 function check_cemetery_spawns()
-	local typ, qty
 	if has_alife_info("tb3d_harsh_environment") then
-		typ = 6				--harsh
-		qty = 6
+		local typ, qty = 6,6			-harsh
 		spawn_mob(-57.880,-0.002,-89.222,3329,5318,typ, qty)		--sw corner
 		spawn_mob(-56.243,0.091,-28.432,4094,5322,typ, qty)			--west side
 		spawn_mob(-34.151,0.062,8.722,10905,5325,typ, qty)			--near shack
@@ -795,14 +806,11 @@ function check_cemetery_spawns()
 end
 
 function spawn_recon_mobs()
-	local typ, qty
+	local typ, qty = 2,4		--woods
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
-		qty = 16
-		spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--camp near labrynth
-	else
-		typ = 2				--woods
 		qty = 8
+		spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--camp near labrynth
 	end
 	spawn_mob(328.834,-6.943,-19.136,1454049,2902, typ, qty)		--center of crater
 	spawn_mob(-249.262,-3.690,-304.124,442615,2892, typ, qty)		--along path from dv
@@ -821,7 +829,6 @@ function check_radar_spawns()
 	local typ, qty = 2,8				--zombied
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
-		qty = 16
 		spawn_mob(590.280,-51.316,-45.751,209879,1898, typ, qty)		--below stash
 		spawn_mob(590.987,-50.149,15.658,210250,1900, typ, qty)			--camp at corner
 		spawn_mob(652.157,-43.881,182.037,226763,1912, typ, qty)		--exit to dv
@@ -833,10 +840,8 @@ function check_radar_spawns()
 		spawn_mob(-26.449,-13.582,335.959,281075,1803, typ, qty)		--chopper
 		spawn_mob(-6.784,-6.146,78.494,300362,1580, typ, qty)			--entrance to base
 		spawn_mob(27.919,-8.876,-47.801,333061,1590, typ, qty)			--inside base
-		spawn_npcs(460.354,-50.284,-298.618,150653,2063,2,2)			--behind trailor
+		spawn_npcs(460.354,-50.284,-298.618,150653,2063,2,2)			--zombied behind trailor
 	else
-		--typ = 2				--zombied
-		--qty = 8
 		spawn_npcs(590.280,-51.316,-45.751,209879,1898, typ, qty)		--below stash
 		spawn_npcs(590.987,-50.149,15.658,210250,1900, typ, qty)		--camp at corner
 		spawn_npcs(652.157,-43.881,182.037,226763,1912, typ, qty)		--exit to dv
@@ -848,15 +853,15 @@ function check_radar_spawns()
 		spawn_npcs(-26.449,-13.582,335.959,281075,1803, typ, qty)		--chopper
 		spawn_npcs(-6.784,-6.146,78.494,300362,1580, typ, qty)			--entrance to base
 		spawn_npcs(27.919,-8.876,-47.801,333061,1590, typ, qty)			--inside base
-		spawn_npcs(460.354,-50.284,-298.618,150653,2063,typ,qty)		--behind trailor
+		spawn_npcs(460.354,-50.284,-298.618,150653,2063,typ, qty)		--behind trailor
 	end
 end
 
 function check_mil_spawns(spawns)				--109984
-	local typ, qty
+	local typ, qty = 5,3			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
-		qty = 10
+		qty = 3
 		spawn_mob(98.938,-9.659,397.161,394282,1808, typ, qty)				--radar exit
 		spawn_mob(58.668,-14.286,392.552,358118,1806, typ, qty)				--fence opening at barrier
 		spawn_mob(40.206,-18.670,348.965,342915,1807, typ, qty)				--camp at barrier
@@ -870,8 +875,6 @@ function check_mil_spawns(spawns)				--109984
 	else
 		local cnt, rmndr = math_fmod(spawns, 2) 
 		if rmndr and rmndr > 0 then		--109985
-			typ = 5				--monolith, 109984
-			qty = 3
 			spawn_npcs(98.938,-9.659,397.161,394282,1808, typ, qty)				--radar exit
 			spawn_npcs(58.668,-14.286,392.552,358118,1806, typ, qty)			--fence opening at barrier
 			spawn_npcs(-30.181,-24.239,260.728,277628,1745, typ, qty)			--intersection near barrier
@@ -891,7 +894,7 @@ function check_mil_spawns(spawns)				--109984
 end
 
 function check_npp1_spawns()
-	local typ, qty
+	local typ, qty = 5,6			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 20
@@ -907,8 +910,6 @@ function check_npp1_spawns()
 		spawn_mob(928.612,-0.003,-193.994,411661,2285, typ, qty)		--behind main sign
 		spawn_mob(890.149,-0.066,-309.573,399362,2401, typ, qty)		--main entrance in corner
 	else
-		typ = 5				--monolith
-		qty = 6
 		spawn_npcs(223.990,4.798,-94.440,94165,2389, typ, qty)
 		spawn_npcs(278.937,-0.001,-220.131,115565,2350, typ, qty)
 		spawn_npcs(367.377,-0.104,-104.483,157701,2351, typ, qty)
@@ -924,7 +925,7 @@ function check_npp1_spawns()
 end
 
 function check_npp2_spawns()
-	local typ, qty
+	local typ, qty = 5,6			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 20
@@ -938,8 +939,6 @@ function check_npp2_spawns()
 		spawn_mob(265.879,-0.065,226.079,112905,2583, typ, qty)		--junction of all roads
 		spawn_mob(147.169,3.930,208.721,68776,2549, typ, qty)		--far w on hill against sarc
 	else
-		typ = 5				--monolith
-		qty = 6
 		spawn_npcs(975.748,-0.048,78.427,243783,2635, typ, qty)
 		spawn_npcs(1040.521,-0.101,192.322,245052,2636, typ, qty)
 		spawn_npcs(1048.023,-0.000,380.676,245052,2636, typ, qty)
@@ -956,13 +955,12 @@ function check_npp2_spawns()
 end
 
 function check_dcity_spawns(spawns)
-	local typ, qty
+	local typ, qty = 2,8			--woods
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 16
 	elseif has_alife_info("collector_done_with_dcity") or not has_alife_info("collector_ready_for_dcity") then
-		typ = 2				--woods
-		qty = 8
+		--TODO
 	end
 	if typ ~= nil then
 		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
@@ -970,7 +968,7 @@ function check_dcity_spawns(spawns)
 end
 
 function check_gen_spawns()
-	local typ, qty
+	local typ, qty = 2,8			--woods
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 20
@@ -978,8 +976,6 @@ function check_gen_spawns()
 		spawn_mob(15.113,38.037,-231.854,353870,3110,typ,qty)		--epicenter
 		spawn_mob(159.415,30.765,-494.264,520602,3131,typ,qty)		--base
 	else
-		typ = 2				--woods
-		qty = 10
 		spawn_npcs(15.113,38.037,-231.854,353870,3110,5,6)		--epicenter
 		spawn_npcs(159.415,30.765,-494.264,520602,3131,5,6)		--base
 		spawn_npcs(-106.033,38.065,-503.517,212898,3096,5,6)	--camp
@@ -988,13 +984,10 @@ function check_gen_spawns()
 end
 
 function check_mkt_spawns()
-	local typ, qty
+	local typ, qty = 2,8			--woods
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 20
-	else
-		typ = 2				--woods
-		qty = 10
 	end
 		--spawn_mob(-346.326,-8.980,6.173,273720,2889, typ, qty)		--
 end

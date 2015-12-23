@@ -1,4 +1,4 @@
---- TB3D 1.0.9.9.8.4 BETA relrease of the Modders Mega Mod, changed dyn suit options,
+--- TB3D 1.0.9.9.8.6 BETA relrease of the Modders Mega Mod, changed dyn suit options,
 -- bio radar pulse option, logic debug option, dmx135, death_hit, expanded hit styles,
 -- added cave_no_big_electros, pump_it_up to ingame menu, alife tweaks, cleaner, dist coef,
 -- population control, max_phantoms, radiation_factor, adjusted populations, start_alife_option,
@@ -11,7 +11,7 @@
 -- loadout_min_cond, loadout_ammo_loot, loadout_ammo_count, dyn_arts_always, npc_default_armor, pda_spawn_rate,
 -- advanced graphics, chgd daytime, volume_on_pause, blowout_rad_val from 1.0 to 0.05
 
-function my_ver() return "1.0.9.9.8.4" end
+function my_ver() return "1.0.9.9.8.6" end
 --// Modders resource central for script options
 --// certain function calls from script files in the gamedata\scripts dir redirected here
 --// for mod testing and gameplay options, not compatible with non-TB3D mods
@@ -206,7 +206,8 @@ night_creatures		= true		-- (true) turns random 'Creatures of the Night' on/off,
 hits_to_kill_invuln	= 20		-- (20) hit threshold to kill invulnerable if he becomes mortal by quest conditions
 hits_to_head_invuln	= 1			-- (1) hits_to_kill_invuln/hits_to_head_invuln = number of hits awarded for a head shot, (5/1=5) = 1 to 2 head shots
 check_bad_weapons	= true		-- (true) check quest weapons for condition before npc accepts it
-hardcore_mobs		= false		-- (false) Doubles the number of creatures in a dynamic mob of creatures
+hardcore_mobs		= false		-- (false) Increases the number of creatures in a dynamic mob by hardcore_mobs_mult
+hardcore_mobs_mult	= 2.0		-- (2.0) Applied to the random max value if hardcore_mobs is true, range: 1.0 to 4.0			--109986
 spawn_esc_dog_rush	= false		-- (false) causes ctd on going offline in low memory, solution pending
 spawn_thermos_inside = false	-- (false) spawns big thermos inside base instead of outside
 
@@ -483,7 +484,7 @@ use_coop_message		= false		--(false) 109980 - future use
 use_state_message		= false		--(false) logs the transition states of the state manager, can be a restrictor
 use_setup_message		= false		--(false) logs the initial smart terrain setup logic on spawn and gulag jobs
 use_smt_message			= false		--(false) logs the condition for filling a smart
-npc_to_log				= "x16_m_controller_e"
+npc_to_log				= "generators_prizrak"
 smt_to_log				= "esc2_dogs_zamost"
 
 ------------------------VERIFICATION TOOLS------------------------------------------------------------------

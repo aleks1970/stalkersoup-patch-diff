@@ -1,11 +1,11 @@
----TB3D 1.0.9.9.8.5 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.0.9.9.8.6 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
--- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs
-function my_ver() return "1.0.9.9.8.5" end
+-- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop
+function my_ver() return "1.0.9.9.8.6" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random=math.random
 local math_floor = math.floor
@@ -644,10 +644,11 @@ function spawn_alife_rand(name, x, y, z, lv, gv, count)
 		alife():create(name, vector():set(x,y,z),lv,gv,expendable_object)	--65535 treated as non-important
 	else
 		local flevel = TB3D_Services.global_koef(TB3D_Services.get_level_up())		--109981, should increase as koef increases
-		local min = math_ceil(flevel)+1
+		local min = math_floor(flevel)
+		if min < 1 then min = 1 end
 		local cnt = math_ceil(count*flevel)
 		if cnt <= min then cnt = min+1 end
-		cnt = math_floor(math_random(min,cnt))
+		cnt = math_random(min,cnt)
 		if cnt > count then cnt = count end										--109982, limit spawns
 		--TB3D_Services.packet_alert("tb3d_triggers: spawn alife random koef["..utils.to_str(flevel).."] count["..utils.to_str(cnt).."]")
 		for i=1, cnt do
@@ -863,6 +864,7 @@ function spawn_sleep_places()
 	alife():create("place_of_sleep",vector():set(-90.449,4.926,-1.491),134,5312)			--market
 	alife():create("place_of_sleep",vector():set(-2.859,-8.126,2.400),117,5355)				--hole
 	alife():create("place_of_sleep",vector():set(-430.777,12.411,-142.672),282924,3908)		--waiting room hq top floor
+	alife():create("place_of_sleep",vector():set(-40.353,-0.547,332.464),879755,3985)		--waiting room next to N. trader
 	TB3D_Services.packet_alert("tb3d triggers: spawn sleep places done")
 end
 
@@ -937,15 +939,13 @@ function check_bar_drop(barnum)
 	end
 	if dropped == true then
 		if barnum == 15 then
-			--local snd_obj = xr_sound.get_safe_sound_object( [[tb3d\\bar_dropped]] )
-			--if snd_obj then
-				--snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 2.0)
-			--end
 			create_tunnel_ports()
 			tb3d_dyn_spawn.spawn_tunnels_markers()
 			TB3D_Services.give_info("tb3d_gb1_done")
 		end
-		xr_effects.aes_earthshake(db.actor)
+		local snd_obj = xr_sound.get_safe_sound_object([[ambient\earthquake]])
+		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+		level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
 		amk.save_variable("tb3d_bar_seq", seq + 1)
 		return true
 	end
@@ -960,65 +960,65 @@ function create_tunnel_ports()
 			vector():set(0.0,0.0,-1.0), 												
 			"marsh",1,1,"to_swamp") 													
 	end
-	obj = alife():story_object(1999979)				--wn5	room in old compound
+	obj = alife():story_object(1999979)				--wn5	f1 room in old compound
 	if not obj then
 		dmx_mod.create_level_changer(1999979, vector():set(76.439,-19.294,-165.031),1426,3868, 	
 			216009,4679, vector():set(-69.871,30.352,-62.691), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"level_f-1",1,1,"to_f1") 													
 	end
-	obj = alife():story_object(1999980)				--ws3	box on train car
+	obj = alife():story_object(1999980)				--ws3	cordon box on train car
 	if not obj then
 		dmx_mod.create_level_changer(1999980, vector():set(102.585,-19.291,-166.463),2501,3868, 	
 			274024,95, vector():set(-2.880,21.937,156.883), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"l01_escape",1,1,"to_cordon") 													
 	end
-	obj = alife():story_object(1999981)				--wn2	strange hut
+	obj = alife():story_object(1999981)				--wn2	broken road strange hut
 	if not obj then
 		dmx_mod.create_level_changer(1999981, vector():set(101.998,-19.294,-148.729),2626,3868, 	
 			91881,4412, vector():set(-243.896,24.862,-201.748), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"hiding_road",1,1,"to_broken") 													
 	end
-	obj = alife():story_object(1999982)				--n0	top of the hill
+	obj = alife():story_object(1999982)				--w0	waiting room top of the hill
 	if not obj then
 		dmx_mod.create_level_changer(1999982, vector():set(112.343,-19.292,-131.400),3760,3868, 	
 			539987,4024, vector():set(-260.011,46.838,243.201), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"predbannik",1,1,"to_waiting") 													
 	end
-	obj = alife():story_object(1999983)				--s0	tree by the lake
+	obj = alife():story_object(1999983)				--e0	recon tree by the lake
 	if not obj then
 		dmx_mod.create_level_changer(1999983, vector():set(124.621,-19.291,-135.644),4148,3868, 	
 			1002308,2902, vector():set(69.502,14.894,-71.124), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"aver",1,1,"to_ff") 													
 	end
-	obj = alife():story_object(1999984)				--es2	between the globes
+	obj = alife():story_object(1999984)				--es2	npp2 between the globes
 	if not obj then
 		dmx_mod.create_level_changer(1999984, vector():set(128.237,-19.200,-110.850),4793,3868, 	
 			189412,2619, vector():set(490.354,17.102,365.571), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"l12_stancia_2",1,1,"to_npp2") 													
 	end
-	obj = alife():story_object(1999985)				--en3	center
+	obj = alife():story_object(1999985)				--en3	generators center
 	if not obj then
 		dmx_mod.create_level_changer(1999985, vector():set(114.846,-19.291,-98.598),4245,3868, 	
 			350468,3110, vector():set(12.485,38.105,-231.626), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"generators",1,1,"to_generators") 													
 	end
-	obj = alife():story_object(1999986)				--es4	top of the stairs
+	obj = alife():story_object(1999986)				--es4	black market top of the stairs
 	if not obj then
 		dmx_mod.create_level_changer(1999986, vector():set(128.183,-19.293,-86.628),4638,3868, 	
 			13655,5309, vector():set(23.628,4.225,0.825), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"l03_rinok",1,1,"to_market") 													
 	end
-	obj = alife():story_object(1999987)				--es6	tunnel near station
+	obj = alife():story_object(1999987)				--es6	darkscape tunnel near station
 	if not obj then
-		dmx_mod.create_level_changer(1999987, vector():set(128.180,-19.291,-62.492),4673,3868, 	
+		dmx_mod.create_level_changer(1999987, vector():set(127.311,-19.291,-62.485),4673,3868, 	
 			969226,4653, vector():set(493.525,-1.866,-424.212), 							
 			vector():set(0.0,0.0,-1.0), 												
 			"k01_darkscape",1,1,"to_darkscape") 													
@@ -1252,12 +1252,12 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 			TB3D_Mobs.spawn_killer_squad(-145.445,-0.015,144.576,39631,1313,6,4,false)
 			TB3D_Mobs.spawn_killer_squad(-32.389,-0.001,144.550,62406,1417,6,4,false)
 		end
-		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,8)				--wt on hill near yantar exit
+		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,6)				--wt on hill near yantar exit
 	elseif stash_num == 10 then		--yantar
 		--if rand == 3 then
-			spawn_alife_rand("tb3dm_zombie_strong",116.301,1.523,-70.573,102270,1441,18)		--on the road back
+			spawn_alife_rand("tb3dm_zombie_strong",116.301,1.523,-70.573,102270,1441,9)		--on the road back
 		--end
-		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,16)			--wt on hill near yantar exit
+		spawn_alife_rand("dog_strong",-25.368,-1.347,-168.590,63723,1432,8)			--wt on hill near yantar exit
 	elseif stash_num == 11 then		--rostok
 		if rand == 1 then
 			TB3D_Mobs.spawn_killer_squad(-253.802,-0.002,102.696,8349,1378,6,4,false)
@@ -1327,9 +1327,9 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 			spawn_alife_rand("tb3dm_zombie_strong",590.987,-50.149,15.658,210250,1900, 6)		--camp at corner
 			spawn_alife_rand("tb3dm_zombie_strong",652.157,-43.881,182.037,226763,1912, 6)		--exit to dv
 		else
-			TB3D_Mobs.spawn_npc(590.280,-51.316,-45.751,209879,1898, 2, 6)						--zombied npc below stash
-			TB3D_Mobs.spawn_npc(590.987,-50.149,15.658,210250,1900, 2, 6)						--zombied camp at corner
-			TB3D_Mobs.spawn_npc(652.157,-43.881,182.037,226763,1912, 2, 0)						--zombied npc exit to dv
+			TB3D_Mobs.spawn_npcs(590.280,-51.316,-45.751,209879,1898, 2, 6)						--zombied npc below stash
+			TB3D_Mobs.spawn_npcs(590.987,-50.149,15.658,210250,1900, 2, 6)						--zombied camp at corner
+			TB3D_Mobs.spawn_npcs(652.157,-43.881,182.037,226763,1912, 2, 4)						--zombied npc exit to dv
 		end
 	-----------------------------------------------------------------------------------------------------
 	

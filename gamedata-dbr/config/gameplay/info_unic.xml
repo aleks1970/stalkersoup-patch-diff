@@ -1,4 +1,4 @@
-<!-- TB3D 1.0.9.9.8.4 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
+<!-- TB3D 1.0.9.9.8.6 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
  predbannik_barman, zver_taken, more content, articles, suit, storm stages-->
  
 <game_information_portions>
@@ -273,18 +273,6 @@
 <info_portion id="dd_inform_zep2_start"></info_portion>			<!-- WR Barman talked to about informer, second dialog with informer -->
 <info_portion id="dd_informant_dead"></info_portion>			<!-- Informant dies in dd, give kras_el_razvnavokz_return -->
 
-<!-- Courtyards, cemetery and dist ctr ----------------------------- NOT USED YET-------------------->
-<info_portion id="pogost_militlager_kill"></info_portion>		<!-- dist center spawns dd_trader -->
-<info_portion id="pogost_militlager_kill_done"></info_portion>	<!-- dist center given if pogost_mil_tcex inactive, spawns l04_stalker_nh1 - 16 -->
-<info_portion id="pogost_militlager_kill_return"></info_portion>	<!-- not given yet -->
-
-<!-- research ------------------------------------------------------- NOT USED YET----------->
-<info_portion id="yanold_restrictor_contr"></info_portion>		<!-- research station -->
-
-<!-- techniques ---------------------------------------------------- NOT USED YET-------------->
-<info_portion id="promz_mil_death"></info_portion>				<!-- tech first enter -->
-<info_portion id="promz_contr_death"></info_portion>			<!-- tech facility tunnel -->
-
 <!-- waiting room ------------------------------------------------------------------>
 <info_portion id="pred_heli1_restrictor"></info_portion>		<!-- wr main base heli1 attack when actor in zone -->
 <info_portion id="pred_heli2_restrictor"></info_portion>		<!-- wr heli pad heli2 attack when actor in zone -->
@@ -319,15 +307,6 @@
 <info_portion id="afanasyev_pribor_ok"></info_portion>			<!-- all.spawn restr: ds_heli_spot_lost, triggers sound: heli_spot_lost -->
 <info_portion id="otshelnik_dialog_sestra_start"></info_portion>	<!-- all.spawn spawns: df_masha, df_stalker_1,2,3 in center camp -->
 <info_portion id="ds_heli2"></info_portion>						<!-- falling_car -->
-
-<!-- hole in the ground ------------------------------------------------------------------>
-<info_portion id="killer_strag_spawn"></info_portion>			<!-- hole in the ground NOT USED YET -->
-
-<!-- black market --------------------------------------------------------- NOT USED YET--------->
-<info_portion id="rinok_dram_start"></info_portion>				<!-- black market -->
-<info_portion id="rinok_dram_attack"></info_portion>			<!-- black market -->
-<info_portion id="rinok_dram_bandit_hit"></info_portion>		<!-- black market -->
-<info_portion id="rinok_dram_bandit1_dead"></info_portion>		<!-- black market -->
 
 <!-- level_F-1-->
 <info_portion id="tractorist_zep1_done"></info_portion>			<!-- br -->
@@ -365,12 +344,25 @@
 <info_portion id="zep_sms_from_cemetery"></info_portion>		<!-- distress call from stalkers -->
 
 <!-- STILL UNUSED from all.spawn ======================================================= #=changed in all.spawn -->
+<!-- Courtyards, cemetery and dist ctr --->
+<info_portion id="pogost_militlager_kill"></info_portion>		<!-- dist center spawns dd_trader -->
+<info_portion id="pogost_militlager_kill_done"></info_portion>	<!-- dist center given if pogost_mil_tcex inactive, spawns l04_stalker_nh1 - 16 -->
+<info_portion id="pogost_militlager_kill_return"></info_portion>	<!-- not given yet -->
+
+<!-- techniques -->
+<info_portion id="promz_mil_death"></info_portion>				<!-- tech first enter -->
+<info_portion id="promz_contr_death"></info_portion>			<!-- tech facility tunnel -->
+
 <!-- predbannik -->
 <info_portion id="pred_karatel_deat"></info_portion>			<!-- stalker:karatel, if killed by actor #-->
 <info_portion id="cigan_kill_obmorok_start"></info_portion>		<!-- spawns stalker:obmorok stalker:smoker, stalker:pesh_bandit_kamp111,112,113,114 -->
 <info_portion id="predbannik_obmorok_dead"></info_portion>		<!-- on obmorok death - spawns predbannik_bloodsucker_strong_0001, predbannik_psy_dog_radar_0001, predbannik_pseudodog_strong, predbannik_pseudodog_strong_0000, predbannik_snork_strong, predbannik_snork_strong_0000, predbannik_snork_strong_0001, _002 -->
 
 <!-- rinok -->
+<info_portion id="rinok_dram_start"></info_portion>				<!-- black market -->
+<info_portion id="rinok_dram_attack"></info_portion>			<!-- black market -->
+<info_portion id="rinok_dram_bandit_hit"></info_portion>		<!-- black market -->
+<info_portion id="rinok_dram_bandit1_dead"></info_portion>		<!-- black market -->
 <info_portion id="rinok_koresh_help"></info_portion>			<!-- spawns stalker:l03_stalker, _0000, _0001 -->
 <info_portion id="rinok_koresh_dead"></info_portion>			<!-- on l03_stalker_0001 dead - kras stalker:kras_suhoi_0000 spawn condition, stalker:l03_stalker, _0000 logic cond -->
 <info_portion id="rinok_dram_bandit0_dead"></info_portion>		<!-- on l03_stalker_0000 death - l03_stalker_0001 logic cond -->
@@ -398,6 +390,7 @@
 <info_portion id="dd_svdkill_done"></info_portion>				<!-- spawns l05_stalker_0008_vok_end, l05_stalker_0010_vok_end, l05_stalker_0011_vok_end, l05_stalker_0012_vok_end, l05_stalker_0013_vok_end, l05_stalker_0014_vok_end, l05_stalker_0015_vok_end, l05_stalker_0016_vok_end, l05_stalker_0017_vok_end, l05_stalker_0018_vok_end, l05_stalker_0019_vok_end, l05_stalker_0020_vok_end, l05_stalker_0021_vok_end, l05_stalker_0022_vok_end, l05_stalker_0023_vok_end, l05_stalker_0024_vok_end, l05_stalker_0025_vok_end, l05_stalker_0026_vok_end, l05_stalker_0031_vok_end, l05_stalker_vok_end_h38, l05_stalker_vok_end_h39, l05_stalker_vok_end_h43, l05_stalker_vok_end_h44,l05_stalker_vok_end_h40, l05_stalker_vok_end_h41, l05_stalker_vok_end_h42, l05_stalker_vok_end_h42 -->
 
 <!-- research -->
+<info_portion id="yanold_restrictor_contr"></info_portion>		<!-- research station -->
 <info_portion id="kira_zadan_art_start"></info_portion>			<!-- spawns yan_old_smart_sv_1, _2, _3, _4, _5, bunker -->
 <info_portion id="bunker_zadan_art_ok"></info_portion>			<!-- spawns bloodsucker_bunker_atac1, _atac2, _atac3, _atac4, _atac5, _atac6 -->
 <info_portion id="jdanov_zadan_nout_start"></info_portion>		<!-- spawns bloodsucker_bunker_atac2, _atac3, _atac4, _atac5, _ata6 -->
@@ -408,5 +401,6 @@
 
 <!-- hole in ground -->
 <info_portion id="datchik_dialog_start"></info_portion>			<!-- spawns digger_stash_killer_1, _2, _3 -->
+<info_portion id="killer_strag_spawn"></info_portion>			<!-- hole in the ground -->
 
 </game_information_portions>
