@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.9 new 10/31/13 to support new levels, moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+--TB3D 1.1.0.0.0.0 moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
 --bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom, tb3d_gbars_chp2, deathclaw
-function my_ver() return "1.0.9.9.9.9" end
+function my_ver() return "1.1.0.0.0.0" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -322,6 +322,170 @@ function found_zep_gold(nmbr)
 end
 
 --==============================- ZEP start ===================================
+function create_zep_document(idx)					--110000
+	local zep_doc = "zep_doc_"..utils.to_str(idx)
+	local vx, vy, vz
+	local lv, gv
+	if idx == 0 then						--[k01_darkscape] gas station 
+		vx=425.558
+		vy=-1.812
+		vz=-361.289
+		lv=911789
+		gv=4644
+	elseif idx == 1 then					--[dark_forest] in shack on shelf
+		vx=-285.294
+		vy=0.398
+		vz=341.440
+		lv=292422
+		gv=4678
+	elseif idx == 2 then					--[lost_village] note on table in barn
+		vx=92.190
+		vy=5.220
+		vz=-44.498
+		lv=41184
+		gv=3334
+	elseif idx == 3 then					--[zaton] note behind crate in cave
+		vx=22.741
+		vy=4.723
+		vz=361.262
+		lv=991318
+		gv=3682
+	elseif idx == 4 then					--[l11_pripyat] drawer near doc's book
+		vx=-2.818
+		vy=-4.087
+		vz=193.281
+		lv=97951
+		gv=2195
+	elseif idx == 5 then					--[jupiter] hqtrs on desk
+		vx=-47.988
+		vy=3.568
+		vz=216.910
+		lv=640899
+		gv=3717
+	elseif idx == 6 then					--[pripyat] commanders office
+		vx=134.630
+		vy=5.812
+		vz=-191.321
+		lv=362015
+		gv=3765
+	elseif idx == 7 then					--[l01_krasivay] dist ctr bus stop
+		vx=2.434
+		vy=1.118
+		vz=83.699
+		lv=29426
+		gv=5257
+	elseif idx == 8 then					--[l04_pogost] cemetery on toilet
+		vx=-39.371
+		vy=0.648
+		vz=-116.937
+		lv=9376
+		gv=5335
+	elseif idx == 9 then					--[dead_city] hdqtrs desk
+		vx=-59.756
+		vy=7.176
+		vz=-34.437
+		lv=288342
+		gv=3620
+	elseif idx == 10 then					--[warlab] lab in wreck room
+		vx=7.347
+		vy=-6.507
+		vz=14.564
+		lv=5689
+		gv=3197
+	elseif idx == 11 then					--[swamp_old] dm in old bus in tunnel
+		vx=-329.473
+		vy=3.366
+		vz=67.421
+		lv=431778
+		gv=4386
+	elseif idx == 12 then					--[yantar_old] rsch computer desk
+		vx=79.323
+		vy=14.134
+		vz=-38.940
+		lv=372865
+		gv=4384
+	elseif idx == 13 then					--[l06_rostok] wt by bed in tunnel
+		vx=-255.855
+		vy=-3.886
+		vz=87.460
+		lv=7909
+		gv=1382
+	elseif idx == 14 then					--[l12_stancia] npps camp near gen exit
+		vx=274.140
+		vy=0.814
+		vz=-216.411
+		lv=113734
+		gv=2350
+	elseif idx == 15 then					--[yantar_old] rsch trailer on wheels
+		vx=-68.866
+		vy=14.353
+		vz=201.048
+		lv=212623
+		gv=4356
+	elseif idx == 16 then					--[promzone] tech cann in tunnel w/controller
+		vx=-128.211
+		vy=6.148
+		vz=267.880
+		lv=5457
+		gv=4718
+	elseif idx == 17 then					--[predbannik] wr helipad control
+		vx=-275.788
+		vy=33.601
+		vz=-159.478
+		lv=513242
+		gv=3934
+	elseif idx == 18 then					--[digger_stash] hole on shelf
+		vx=-5.084
+		vy=-6.941
+		vz=3.256
+		lv=100
+		gv=5355
+	elseif idx == 19 then					--[l05_vokzal] end st in office
+		vx=17.566
+		vy=-0.600
+		vz=-1.732
+		lv=10775
+		gv=5342
+	elseif idx == 20 then					--[l02_dd] crty on desk
+		vx=101.349
+		vy=16.482
+		vz=263.760
+		lv=19340
+		gv=5303
+	elseif idx == 21 then					--[l03_rinok] bm on bed
+		vx=-90.802
+		vy=4.395
+		vz=-2.974
+		lv=132
+		gv=5312
+	elseif idx == 22 then					--[hiding_road] br on desk
+		vx=240.262
+		vy=1.180
+		vz=22.658
+		lv=849537
+		gv=4554
+	elseif idx == 23 then					--[level_f-1] lab
+		vx=-49.565
+		vy=30.564
+		vz=-119.482
+		lv=237861
+		gv=4679
+	elseif idx == 24 then					--[jupiter_underground] desk in office below booth
+		vx=55.450
+		vy=2.802
+		vz=12.076
+		lv=33426
+		gv=3808
+	else
+		return
+	end
+	local nobj = alife():create(zep_doc, vector():set(vx,vy,vz),lv,gv)
+	if nobj and TB3D_Modders.zep_spots then
+		TB3D_Services.packet_alert("tb3d dialog: spawn zep doc["..utils.to_str(vx)..","..utils.to_str(vy)..","..utils.to_str(vz).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."] doc["..zep_doc.."]")
+		level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", zep_doc)
+	end
+end
+
 function spawn_zep_0()																--path from ds to esc and tweed's book
 	dmx_mod.create_level_changer_ds_to_esc()										--266
 	alife():create("tweed_book", vector():set(84.474,-1.486,73.706),1075481,4005)	--[predbannik]: old bar behind couch
@@ -352,7 +516,7 @@ end
 
 function open_dv_to_ds()															--opens ds and spawns the first document
 	dmx_mod.create_level_changer_dv_to_ds()											--481
-	alife():create("zep_doc_0", vector():set(425.558,-1.812,-361.289),911789,4644)	--[k01_darkscape] gas station 
+	create_zep_document(0)				--110000
 end
 
 function open_ds_to_fr()
@@ -422,7 +586,7 @@ end
 ---------------------------------- ZEP Rostok ---------------------------------------
 function open_bar_to_ww()
 	dmx_mod.create_level_changer_bar_to_ww()		--609,203
-	alife():create("zep_doc_1", vector():set(-285.294,0.398,341.440),292422,4678)					--[dark_forest] in shack on shelf
+	create_zep_document(1)				--110000
 	alife():create("zep_note_tower", vector():set(-7.641,24.058,247.803),702885,3725)				--bw extra note on table in tower
 	alife():create("zep_note_tent", vector():set(-42.289,10.602,-85.264),729659,4660)				--ww extra note on bed in tent
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -284.266,-1.000,341.897,292422,4678,6)			--shack in barrel
@@ -432,7 +596,7 @@ end
 function wasted_spawns()
 	TB3D_Mobs.spawn_mob(-268.511,-2.405,350.192,320304,4678,2,4)									-- behind shack, type woods
 	TB3D_Mobs.spawn_mob(-264.847,-1.485,329.079,327844,4678,2,4)									-- front of shack, type woods
-	alife():create("zep_doc_2", vector():set(92.190,5.220,-44.498),41184,3334)						--[lost_village] note on table in barn
+	create_zep_document(2)				--110000
 end
 
 ---------------------------- ZEP Lost Village --------------------------------------
@@ -440,7 +604,7 @@ function village_spawns()
 	dmx_mod.create_level_changer_vil_to_zat()		--12504,6006
 	TB3D_Mobs.spawn_mob(70.471,4.218,-24.985,34913,3334,0,3)										--creature spawns when note taken
 	TB3D_Mobs.spawn_mob(52.696,2.469,12.691,29440,3332,0,4)											--creature spawns when note taken
-	alife():create("zep_doc_3", vector():set(22.741,4.723,361.262),991318,3682)						--note behind crate in cave
+	create_zep_document(3)				--110000
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", 28.521,5.288,365.527,1002741,3682,6)			--table top
 	alife():create("zep_note_suicide1", vector():set(238.307,8.990,-8.160),1373226,3684)  			--note in suicide shack
 end
@@ -461,7 +625,7 @@ function zaton_spawns()
 	alife():create("medkit_scientic", vector():set(-162.519,26.764,-195.518),616464,3673)			--109999, roof of gas station
 	alife():create("bandage_dmx", vector():set(-162.519,26.764,-195.518),616464,3673)				--roof of gas station
 	TB3D_Mobs.spawn_npcs(13.977,9.857,-386.316,971861,3678,2,8)										--109999, zombies in pit near hill w/chopper
-	alife():create("zep_doc_4", vector():set(-2.818,-4.087,193.281),97951,2195)						--drawer near doc's book
+	create_zep_document(4)				--110000
 	TB3D_Triggers.spawn_suit(10,-8.428,-3.287,203.374,90744,2195)									--mono exo on lockers
 end
 
@@ -473,7 +637,7 @@ function pripyat_spawns()
 	TB3D_Mobs.spawn_mob(5.064,3.941,202.012,107272,2198,3,3)
 	TB3D_Mobs.spawn_mob(30.721,1.569,274.544,140897,2150,3,2)
 	TB3D_Mobs.spawn_mob(-36.099,-0.681,211.228,62514,2194,3,2)									--[l11_pripyat]: just outside, type city
-	alife():create("zep_doc_5", vector():set(-47.988,3.568,216.910),640899,3717)				--hqtrs on desk
+	create_zep_document(5)				--110000
 	TB3D_Triggers.spawn_alife_rand("snork_indoor",421.177,31.214,-359.977,1381465,3745,4)		--factory snorks
 	TB3D_Triggers.spawn_alife_rand("snork_indoor",345.066,27.543,-405.548,1266343,3745,4)		--factory snorks
 end
@@ -486,7 +650,7 @@ function jupiter_spawns()
 	TB3D_Mobs.spawn_mob(129.835,2.228,200.761,937291,3732,1,3)							--camp by pit
 	TB3D_Mobs.spawn_mob(-28.968,4.308,-2.044,669834,3722,0,3)							--bridge behind lab
 	TB3D_Mobs.spawn_mob(-334.732,1.141,148.615,150051,3707,1,3)							--tracks before village
-	alife():create("zep_doc_6", vector():set(134.630,5.812,-191.321),362015,3765)		--commanders office
+	create_zep_document(6)				--110000
 end
 
 ---------------------------- ZEP East Pripyat -----------------------------------
@@ -498,7 +662,7 @@ function eprip_spawns()		--killers
 	TB3D_Mobs.spawn_npcs(223.861,-0.401,319.043,446564,3769,6,2)						--near docks
 	TB3D_Mobs.spawn_npcs(270.969,12.346,308.756,468403,3769,6,2)						--near docks on roof
 	TB3D_Mobs.spawn_npcs(161.338,-0.708,345.223,390373,3760,6,2)						--statue
-	alife():create("zep_doc_7", vector():set(2.434,1.118,83.699),29426,5257)			--bus stop
+	create_zep_document(7)				--110000
 	alife():create("zep_note_dist1", vector():set(43.799,1.790,-54.469),52514,5247)		--extra note in store
 	alife():create("zep_note_dist2", vector():set(147.939,7.230,5.424),86370,5271)		--extra note in checkpoint
 end
@@ -515,7 +679,7 @@ function dist_spawns()		--killers
 	TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",46.437,2.211,62.241,54555,5257,2)			--accross road from construction
 	alife():create("zep_note_cem2", vector():set(-45.198,1.152,14.871),7268,5325)					--note in far shack to spawn skelets
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -12.817,4.270,-116.514,17421,5335,6)			--stash in blocked room with stairs to roof
-	alife():create("zep_doc_8", vector():set(-39.371,0.648,-116.937),9376,5335)						--cemetery on toilet
+	create_zep_document(8)				--110000
 	news_manager.amk_send_tip_id("zep_sms_from_geek","sms_associate",10,40,"saharov")
 	TB3D_Services.delayed_action(1,"zep_sms_from_cemetery", 20)										--distress call
 end
@@ -523,13 +687,13 @@ end
 ---------------------------- ZEP Cemetery -----------------------------------
 function cemetery_spawns()
 	dmx_mod.create_level_changer_dc_to_cem()		--6013,6012
-	alife():create("zep_doc_9", vector():set(-59.756,7.176,-34.437),288342,3620)			--dcity hdqtrs desk
+	create_zep_document(9)				--110000
 end
 
 ---------------------------- ZEP Dead City -----------------------------------
 function dcity_spawns()
 	dmx_mod.create_level_changer_dcity_to_gen()		--98017,98018
-	alife():create("zep_doc_10", vector():set(7.347,-6.507,14.564),5689,3197)				--lab in wreck room
+	create_zep_document(10)				--110000
 	alife():create("zep_note_dcity1", vector():set(-124.912,35.189,-478.509),192119,3096)	--hideout near camp
 	alife():create("zep_note_dcity2", vector():set(-7.777,-15.388,4.845),2829,3160)			--lab between beds
 	alife():create("zep_note_dcity3", vector():set(-2.787,5.412,20.529),4000,3173)			--small attic space
@@ -539,14 +703,14 @@ end
 function gen_spawns()
 	dmx_mod.create_level_changer_gen_to_dm()		--11521
 	dmx_mod.create_level_changer_kras_to_dm()		--272
-	alife():create("zep_doc_11", vector():set(-329.473,3.366,67.421),431778,4386)			--in old bus in tunnel
+	create_zep_document(11)				--110000
 	alife():create("zep_note_deadm1", vector():set(-70.852,3.411,266.442),991373,4399)		--dm note in northern camp
 end
 
 ---------------------------- ZEP Dead Marshes -----------------------------------
 function deadm_spawns()
 	dmx_mod.create_level_changer_gen_to_rs()		--11523
-	alife():create("zep_doc_12", vector():set(79.323,14.134,-38.940),372865,4384)			--computer desk
+	create_zep_document(12)				--110000
 	alife():create("zep_note_oldlab1", vector():set(205.108,-11.017,-30.164),512615,4384)	--note in old brain lab
 	TB3D_Mobs.spawn_mob(46.441,4.296,304.726,1247206,4390,1,2)					--between nw village and ne exit
 	TB3D_Mobs.spawn_mob(30.712,5.137,303.414,1213165,4390,1,2)
@@ -558,7 +722,7 @@ end
 ---------------------------- ZEP Research Station -----------------------------------
 function research_spawns()
 	dmx_mod.create_research_level_changers()		--98007,98030,98031
-	alife():create("zep_doc_13", vector():set(-255.855,-3.886,87.460),7909,1382)			--by bed in tunnel
+	create_zep_document(13)				--110000
 	news_manager.amk_send_tip_id("zep_sms_from_bar2","sms_barman",10,40,"barman")
 	dmx_mod.create_level_changer_res_ros()		--98032,98033
 end
@@ -573,7 +737,7 @@ function wild_spawns()		--killers
 	TB3D_Mobs.spawn_npcs(-272.819,-0.001,89.543,3428,1361,6,2)						--above tunnel
 	TB3D_Mobs.spawn_npcs(-163.447,0.100,185.511,34944,1329,6,2)						--behind rail cars
 	alife():create("zep_note_wh1", vector():set(8.329,-7.256,21.327),315780,1582)	--by bed in warehouse barracks
-	alife():create("zep_doc_14", vector():set(274.140,0.814,-216.411),113734,2350)	--npp1 camp near gen exit
+	create_zep_document(14)				--110000
 	alife():create("zep_note_npp1", vector():set(919.279,0.301,27.409),405327,2276)	--npp1  statue of head
 	alife():create("zep_note_src1", vector():set(372.722,0.443,33.997),160328,2384)	--note at sarc entrance
 end
@@ -622,7 +786,7 @@ function npp1_spawns()
 	TB3D_Mobs.spawn_npcs(271.208,4.800,-172.798,112308,2353,6,2)	--killers on platform
 	TB3D_Mobs.spawn_npcs(333.070,2.438,-171.808,141185,2349,6,2)	--killers on platform
 	alife():create("zep_note_npp2", vector():set(521.783,18.673,273.100),162087,2617)		--npp2 rooftop near generators
-	alife():create("zep_doc_15", vector():set(-68.866,14.353,201.048),212623,4356)			--rs trailer on wheels
+	create_zep_document(15)				--110000
 	alife():create("zep_note_rs2", vector():set(202.534,10.872,196.718),511307,4375)		--rs bunker
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", 204.882,9.641,198.346,513726,4381,6)	--rs bunker
 end
@@ -675,7 +839,7 @@ end
 function research2_spawns()
 	dmx_mod.create_level_changer_rsch_to_prom()		--368
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", 170.470,13.509,-92.188,484360,5025,6)	--train car in tunnel
-	alife():create("zep_doc_16", vector():set(-128.211,6.148,267.880),5457,4718)			--tech cann in tunnel w/controller
+	create_zep_document(16)				--110000
 end
 
 ---------------------------- ZEP Techniques ----------------------------
@@ -684,27 +848,28 @@ function tech_spawns()
 	alife():create("zep_note_wait1", vector():set(-444.298,-4.835,-142.785),264075,3906)	--desk in basement hdqtrs
 	alife():create("zep_note_wait2", vector():set(-265.313,20.237,265.397),531130,3938)		--cave
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -265.685,20.371,261.899,530028,3938,6)	--cave
-	alife():create("zep_doc_17", vector():set(-275.788,33.601,-159.478),513242,3934)		--wr helipad control
+	create_zep_document(17)				--110000
 end
 
 ---------------------------- ZEP Waiting Room ----------------------------
 function wroom_spawns()
 	dmx_mod.create_level_changer_rsch_to_wait()		--98012
 	dmx_mod.create_level_changer_rsch_to_hole()		--6021
-	alife():create("zep_doc_18", vector():set(-5.084,-6.941,3.256),100,5355)				--hole on shelf
+	TB3D_Triggers.spawn_item_rand("grenade_rgd6",-425.812,5.899,-157.665,290037,3905,6)		--elevator roof
+	create_zep_document(18)				--110000
 end
 
 ---------------------------- ZEP Hole in the ground ----------------------------
 function digger_spawns()
 	dmx_mod.create_digger_level_changers_1()		--209,277,98034,98035
 	dmx_mod.create_digger_level_changers_2()		--6015,6020
-	alife():create("zep_doc_19", vector():set(17.566,-0.600,-1.732),10775,5342)				--end st in office
+	create_zep_document(19)				--110000
 end
 
 ---------------------------- ZEP End Station ----------------------------
 function station_spawns()
 	dmx_mod.create_level_changer_dm_to_tech()		--98023, 98022 in ne corner
-	alife():create("zep_doc_20", vector():set(101.349,16.482,263.760),19340,5303)			--crty on desk
+	create_zep_document(20)				--110000
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -63.115,4.911,16.272,115,5282,6)
 	TB3D_Services.give_info("kras_el_razvvdm")												--start out with bandits and stalkers in courtyards
 	TB3D_Mobs.spawn_snorks(15.841,-3.222,61.346,10728,5342,3)								--behind underpass
@@ -719,7 +884,7 @@ end
 function courtyard_spawns()
 	dmx_mod.create_level_changer_tech_to_broken()	--257
 	dmx_mod.create_level_changer_wait_to_broken()	--241
-	alife():create("zep_doc_21", vector():set(-90.802,4.395,-2.974),132,5312)				--bm on bed
+	create_zep_document(21)				--110000
 	TB3D_Services.remove_info("kras_el_razvvdm")											--spawn the informer
 end
 
@@ -728,13 +893,13 @@ function market_spawns()
 	dmx_mod.create_level_changer_bm_to_dist()		--98024,98025
 	alife():create("zep_evac_order", vector():set(-58.439,5.162,297.161),374868,4478)   	--labs
 	alife():create("zep_evac_order", vector():set(216.205,13.024,18.315),815284,4547)		--tall building
-	alife():create("zep_doc_22", vector():set(240.262,1.180,22.658),849537,4554)			--on desk
+	create_zep_document(22)				--110000
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -46.235,2.547,0.629,870602,3983,6)		--stash in fridge in old store
 end
 
 ---------------------------- ZEP Broken Road ----------------------------
 function broken_spawns()
-	alife():create("zep_doc_23", vector():set(-49.565,30.564,-119.482),237861,4679)	--lab
+	create_zep_document(23)				--110000
 end
 
 function spawn_br2()							--TODO: broken road around east fence and back, cool towers!
@@ -748,12 +913,16 @@ end
 function f1_spawns()
 	dmx_mod.create_f1_level_changers()			--6004, 98009, 98004
 	dmx_mod.create_level_changer_zat_eprip()	--98975, 98976
-	alife():create("zep_doc_24", vector():set(55.450,2.802,12.076),33426,3808)				--jupu desk in office below booth
+	create_zep_document(24)				--110000
+	dmx_mod.create_level_changer_jupunder_to_jup(false)			--elevator, don't send news
+	dmx_mod.create_level_changer_jup_to_jupunder(false)
 end
 
 ---------------------------- ZEP Jupiter Underground ---------------------
 function jupu_spawns()
 	dmx_mod.create_jupu_level_changers()			--98028,98029,98026,98027
+	TB3D_Mobs.spawn_killer_squad(-10.423,0.074,-72.910,7524,3778,6,4,false)
+	TB3D_Mobs.spawn_killer_squad(24.252,4.611,-136.152,27964,3809,6,4,false)
 	TB3D_Mobs.spawn_snorks(64.440,5.359,-238.923,39122,3826,6)								--back near eprip exit
 	TB3D_Services.delayed_action(1,"tb3d_cube_garbled_msg", 10)
 end
@@ -1134,9 +1303,6 @@ function lanky_repair_done(first_speaker, second_speaker)
 	amk.spawn_in_inv("exo_mil_exoskeleton_tb3d", 1)											--give suit
 	TB3D_Services.remove_info("tb3d_lanky_suit_repairng")
 	TB3D_Services.remove_info("tb3d_lanky_suit_fixed")
-	if TB3D_Services.remove_info("tb3d_found_in_npp2") then
-		spawn_mushroom_arts_npp2()
-	end
 end
 
 function mush_art_have(first_speaker, second_speaker)
@@ -1158,24 +1324,34 @@ function spawn_mushroom_arts_npp2()		--109995
 	local rndm = math_random(1,10)
 	if rndm == 1 then
 		alife():create("af_dummy_mushroom", vector():set(490.540,17.100,372.640),137926,2586)		--e chute
+		alife():create("af_dummy_mushroom", vector():set(461.396,16.088,330.333),169828,2609)		--n gen
 	elseif rndm == 2 then
 		alife():create("af_dummy_mushroom", vector():set(466.934,16.755,436.732),189412,2619)		--end of chute
+		alife():create("af_dummy_mushroom", vector():set(517.790,16.053,366.531),169836,2609)		--s gen
 	elseif rndm == 3 then
 		alife():create("af_dummy_mushroom", vector():set(519.963,15.996,410.171),169836,2609)		--se gen
+		alife():create("af_dummy_mushroom", vector():set(461.644,16.098,409.809),169836,2609)		--nw gen
 	elseif rndm == 4 then
 		alife():create("af_dummy_mushroom", vector():set(517.790,16.053,366.531),169836,2609)		--s gen
+		alife():create("af_dummy_mushroom", vector():set(490.709,17.102,412.743),137926,2586)		--w chute
 	elseif rndm == 5 then
 		alife():create("af_dummy_mushroom", vector():set(519.396,16.027,328.596),169826,2609)		--sw gen
+		alife():create("af_dummy_mushroom", vector():set(461.644,16.098,409.809),169836,2609)		--nw gen
 	elseif rndm == 6 then
 		alife():create("af_dummy_mushroom", vector():set(461.239,16.063,372.241),169836,2609)		--ne gen
+		alife():create("af_dummy_mushroom", vector():set(519.963,15.996,410.171),169836,2609)		--se gen
 	elseif rndm == 7 then
 		alife():create("af_dummy_mushroom", vector():set(461.396,16.088,330.333),169828,2609)		--n gen
+		alife():create("af_dummy_mushroom", vector():set(466.934,16.755,436.732),189412,2619)		--end of chute
 	elseif rndm == 8 then
 		alife():create("af_dummy_mushroom", vector():set(461.644,16.098,409.809),169836,2609)		--nw gen
+		alife():create("af_dummy_mushroom", vector():set(490.540,17.100,372.640),137926,2586)		--e chute
 	elseif rndm == 9 then
 		alife():create("af_dummy_mushroom", vector():set(490.709,17.102,412.743),137926,2586)		--w chute
+		alife():create("af_dummy_mushroom", vector():set(461.239,16.063,372.241),169836,2609)		--ne gen
 	else
 		alife():create("af_dummy_mushroom", vector():set(490.895,17.099,331.450),137926,2586)		--center chute
+		alife():create("af_dummy_mushroom", vector():set(461.396,16.088,330.333),169828,2609)		--n gen
 	end
 end
 
@@ -1205,4 +1381,12 @@ function spawn_f1_mushart()
 	alife():create("af_dummy_mushroom", vector():set(201.287,-6.003,-36.824),510998,4384)	--research above brain
 	alife():create("af_dummy_mushroom", vector():set(-70.694,-4.716,113.152),209469,4384)	--research underground crane cab
 	alife():create("af_dummy_mushroom", vector():set(1094.891,0.758,-380.806),408027,2401)	--npp1 cooling tower
+end
+
+function research_mushroom_take()
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_veteran_respawn1",208.612,8.846,-48.534,518804,4377,1)				--110000, near exit to rostok
+	TB3D_Mobs.spawn_killer_squad(208.612,8.846,-48.534,518804,4377,7,4,true)
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",209.123,13.750,-20.542,519626,4384,1)				--on roof
+	if amk.load_variable("tb3d_storm_started", nil) == nil then amk.save_variable("tb3d_storm_started", level.get_time_days()) end
+	TB3D_Services.move_actor(96.377,20.699,-12.149, true)									--watch tower accross from rostok exit
 end

@@ -1,6 +1,7 @@
---TB3D 1.0.9.9.9.8 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
+--TB3D 1.1.0.0.0.0 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
 -- bandranen_pda, get protected item, _fss, merged death_generic keep items, tb3d_gspot, zep, redone for exact only,
--- ckts and flasks, pushka_fotik, m_car, explosive_barrel, wpn_gungauss, optimized using tags, debug, has_protected_item
+-- ckts and flasks, pushka_fotik, m_car, explosive_barrel, wpn_gungauss, optimized using tags, debug, has_protected_item,
+-- playboy10
 
 function my_ver() return "1.0.9.9.9.8" end
 local string_find = string.find
@@ -48,7 +49,7 @@ local tag7_prot = {
 	["old_doc"] = true,
 	["kluk_ka"] = true,
 	["dar_doc"] = true,
-	["playboy"] = true,
+	--["playboy"] = true,
 	["invento"] = true,
 	["mutant_"] = true,
 	["termos_"] = true,
@@ -66,7 +67,8 @@ local tag7_prot = {
 	["gorelka"] = true,
 	["kuvalda"] = true,						--109975, sledgehammer
 	["und_pda"] = true,
-	["rad_pda"] = true
+	["rad_pda"] = true,
+	["new_doc"] = true						--110000, new_document_sniper (beast)
 }
 local tag8_prot = {
 	["fraer_pd"] = true,
@@ -85,6 +87,9 @@ local tag8_prot = {
 	["wpn_flam"] = true,
 	["wpn_mp5_"] = true,
 	["wpn_rpg7"] = true					--TB3D 109940
+}
+local tag9_prot = {
+	["playboy10"] = true
 }
 local tag11_prot = {
 	["bland_flash"] = true,
@@ -136,7 +141,8 @@ local tag11_prot = {
 	["wpn_eagle_m"] = true,
 	["wpn_sg552_f"] = true,			--TB3D 109931
 	["wpn_sledgeh"] = true,			--109975, sledgehammer
-	["wpn_gungaus"] = true			--109991, in DV
+	["wpn_gungaus"] = true,			--109991, in DV
+	["esc_outfit_"] = true			--110000, perfected suit
 }
 
 -- 109993 use only exact matches, now uses tags
@@ -157,6 +163,8 @@ function obj_is_protected(sobj)
 					elseif tag4_prot[string_sub(item_section, 1, 4)] then
 						result = true
 					elseif tag8_prot[string_sub(item_section, 1, 8)] then
+						result = true
+					elseif tag9_prot[string_sub(item_section, 1, 9)] then
 						result = true
 					elseif tag11_prot[string_sub(item_section, 1, 11)] then
 						result = true
@@ -218,7 +226,7 @@ function get_obj_name(obj)
 			s_name = string_sub(obj:name(),1,-1)
 		end
 	elseif (obj.section_name) then
-		s_name = obj:name() --obj:section_name()
+		s_name = obj:section_name()
 	end
 	if (s_name == nil) then s_name = "" end	
 	return s_name

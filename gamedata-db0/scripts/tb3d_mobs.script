@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.9 new 10/31/13 to support new levels, zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.1.0.0.0.0 zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
 -- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns, spawn quest bandits,
 -- spawn_mob, spawn_tushkanos, promzone, 906 -harsh, spawn_deathclaws
-function my_ver() return "1.0.9.9.9.9" end
+function my_ver() return "1.1.0.0.0.0" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -54,7 +54,13 @@ local mob_list_npc = {
 	[25] = "tb3dm_killer_nauch",					--killer
 	[26] = "tb3dm_killer_exo_unic",
 	[27] = "tb3dm_killer_last_day",
-	[28] = "tb3dm_killer_last_day_nauc"
+	[28] = "tb3dm_killer_last_day_nauc",
+
+	[29] = "tb3dm_killer_last_day",					--killers all last day
+	[30] = "tb3dm_killer_last_day",
+	[31] = "tb3dm_killer_last_day",
+	[32] = "tb3dm_killer_last_day"
+
 }
 
 ----- randomly selected creature from group based on day/night ------------
@@ -1088,7 +1094,7 @@ function check_npp2_spawns()
 	local typ, qty = 5,4			--monolith
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
-		qty = 20
+		qty = 10
 		--spawn_mob(975.748,-0.048,78.427,243783,2635, typ, qty)	--se corner
 		--spawn_mob(1040.521,-0.101,192.322,245052,2636, typ, qty)	--e intersection
 		--spawn_mob(1048.023,-0.000,380.676,245052,2636, typ, qty)	--ne corner
@@ -1127,16 +1133,32 @@ end
 
 function check_gen_spawns(level_up)
 	local typ, qty = 2,8			--woods
+	local rand = math_random(6)
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 20
 		spawn_mob(-106.033,38.065,-503.517,212898,3096,typ,qty)		--camp
-		spawn_mob(15.113,38.037,-231.854,353870,3110,typ,qty)		--epicenter
+		if rand >5 then spawn_npcs(-38.167,34.362,-200.961,290384,3106,typ,1)		--behind generators from center
+		 elseif rand > 4 then spawn_npcs(-37.393,34.464,-258.961,291120,3105,typ,1)
+		 elseif rand > 3 then spawn_npcs(13.476,34.657,-283.761,351248,3109,typ,1)
+		 elseif rand > 2 then spawn_npcs(61.513,34.941,-262.345,408353,3114,typ,1)
+		 elseif rand > 1 then spawn_npcs(68.206,35.143,-200.294,415853,3116,typ,1)
+		 else spawn_npcs(13.587,35.377,-171.803,351374,3112,typ,1)		--behind generators from center
+		end
+		--spawn_mob(15.113,38.037,-231.854,353870,3110,typ,qty)		--epicenter
 		spawn_mob(159.415,30.765,-494.264,520602,3131,typ,qty)		--base
 	else
-		spawn_npcs(15.113,38.037,-231.854,353870,3110,5,6)		--epicenter
-		spawn_npcs(159.415,30.765,-494.264,520602,3131,5,6)		--base
-		spawn_npcs(-106.033,38.065,-503.517,212898,3096,5,6)	--camp
+		typ = 5
+		if rand >5 then spawn_npcs(-38.167,34.362,-200.961,290384,3106,typ,1)		--behind generators from center
+		 elseif rand > 4 then spawn_npcs(-37.393,34.464,-258.961,291120,3105,typ,1)
+		 elseif rand > 3 then spawn_npcs(13.476,34.657,-283.761,351248,3109,typ,1)
+		 elseif rand > 2 then spawn_npcs(61.513,34.941,-262.345,408353,3114,typ,1)
+		 elseif rand > 1 then spawn_npcs(68.206,35.143,-200.294,415853,3116,typ,1)
+		 else spawn_npcs(13.587,35.377,-171.803,351374,3112,typ,1)		--behind generators from center
+		end
+		--spawn_npcs(15.113,38.037,-231.854,353870,3110,typ,6)		--epicenter
+		spawn_npcs(159.415,30.765,-494.264,520602,3131,typ,6)		--base
+		spawn_npcs(-106.033,38.065,-503.517,212898,3096,typ,6)	--camp
 	end
 	if level_up > 1 then
 		TB3D_Triggers.warlab_spawns(level_up)					--109993
@@ -1221,4 +1243,23 @@ function eprip_exit_labx8()										--109998, ambush after gold bar found
 	spawn_npcs(-49.891,0.398,94.517,139638,3755,5,4)			--first floor end of hall
 	spawn_npcs(-80.131,4.502,95.582,110299,3754,5,4)			--second floor above elevator
 	spawn_npcs(-80.582,8.601,95.559,109644,3754,5,4)			--third floor above elevator
+end
+
+function check_dd_spawns(spawns)
+	local spawns = amk.load_variable("dd_spawns", 0)
+	if spawns == 0 then
+		--skip them first time through
+		spawns = 1
+	elseif spawns == 1 then
+		spawn_killer_squad(-35.073,3.466,29.672,2925,5300,7,4,false)			--near sandbags front of bank
+		spawn_killer_squad(-34.941,3.471,5.427,2892,5300,7,4,false)				--far sandbags front of bank
+		spawn_killer_squad(163.448,5.501,57.375,39224,5282,7,4,true)			--top of hill at command post
+		TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",116.466,2.986,29.715,23358,5301,1)				--sniper spot in town center
+		TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",82.229,2.872,27.336,16934,5289,1)				--sniper spot accross from bank
+		spawns = 2
+	else
+		spawn_bandits(-35.073,3.466,29.672,2925,5300,math_random(1,6))				--near sandbags front of bank
+		spawn_bandits(-34.941,3.471,5.427,2892,5300,math_random(1,6))				--far sandbags front of bank
+	end
+	amk.save_variable("dd_spawns", spawns)
 end

@@ -313,9 +313,9 @@ function calculate_predicate(npc, tbl, settings)
 	end
 	if tbl.condlist ~= nil then
 		if xr_logic.pick_section_from_condlist(db.actor, db.actor, tbl.condlist) ~= "true" then
-			--if is_report then
+			if is_report then
 				TB3D_Services.packet_alert("dialog_manager: calc predicate["..sname.."] condition ~= [true]")
-			--end
+			end
 			return false,0
 		end
 		property_num = property_num + #tbl.condlist.infop_check
@@ -368,10 +368,10 @@ function precondition_info_global(actor, npc)
 	   xr_wounded.is_heavy_wounded_by_id(npc:id()) or
 	   xr_wounded.is_psy_wounded_by_id(npc:id())
 	then
-		if TB3D_use_task_message then TB3D_Services.info_alert("DM: precondition info global [false]") end
+		if TB3D_Modders.use_task_message then TB3D_Services.info_alert("DM: precondition info global [false]") end
 		return false
 	end
-	if TB3D_use_task_message then TB3D_Services.info_alert("DM: precondition info global [true]") end
+	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("DM: precondition info global [true]") end
 	return true
 end
 
@@ -391,7 +391,7 @@ function save(npc, p)
 end
 
 function load(npc, reader, ver)	--!!!!TB3D fixed dialog version 109928
-	if TB3D_use_task_message then
+	if TB3D_Modders.use_task_message then
 		TB3D_Services.info_alert("DM:  load reader ["..utils.to_str(npc:id()).."]")
 	end
 	if selected_phrase_by_id == nil then
@@ -422,7 +422,7 @@ function load(npc, reader, ver)	--!!!!TB3D fixed dialog version 109928
 	else
 		selected_phrase_by_id.cool_info[npc:id()] = nil
 	end
-	--if TB3D_use_task_message then
-		TB3D_Services.info_alert("DM:  load reader done ["..utils.to_str(npc:id()).."] ver["..util.to_str(ver).."] flag["..utils.to_str(flag).."]")
-	--end
+	if TB3D_Modders.use_task_message then
+		TB3D_Services.info_alert("DM:  load reader done ["..utils.to_str(npc:id()).."] ver["..utils.to_str(ver).."] flag["..utils.to_str(flag).."]")
+	end
 end

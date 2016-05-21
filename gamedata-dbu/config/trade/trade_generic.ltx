@@ -1,12 +1,9 @@
-;<!-- TB3D 1.0.1e -->
+;;;TB3D 1.1.0.0.0.0 includes do not work under sects
+
 [trader]
 buy_condition = generic_buy
-sell_condition = generic_sell 
+sell_condition = generic_sell_1
 
+#include "TB3D_generic_buy_1.ltx"
+#include "TB3D_generic_sell.ltx"
 
-[generic_buy]
-#include "TB3D_QuestItemNoBuySell.ltx"
-
-
-[generic_sell]
-#include "TB3D_QuestItemNoBuySell.ltx"

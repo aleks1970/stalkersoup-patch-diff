@@ -15,7 +15,7 @@ function create_pda()
 		for id=0,last_object do	--!!!!!!!!!!!!!!!!!!chgd from 65535 to prevent ctd due to index out-of-bounds
 			np_obj = alife():object(id)
 			if np_obj then
-				if np_obj:section_name()=="netpacket_pda" then
+				if get_section(np_obj) == "netpacket_pda" then				--110000
 				  TB3D_Services.packet_alert("NET PDA CREATE: Created actor PDA in Sid["..utils.to_str(id).."]")
 				  netpacket_pda_id = id
 				  db.storage[db.actor:id()].pstor["have_netpacket_pda"] = netpacket_pda_id

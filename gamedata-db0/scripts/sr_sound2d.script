@@ -31,10 +31,10 @@ function action_sound2d:recreate_sounds()
     self.snd_obj_r = nil
     local name_left, name_right = self:get_sound_name()
     if name_left ~= nil then
-       --TB3D_Services.packet_alert("rs sound2d: RECREATE_SOUNDS. LEFT CHANNEL = ["..name_left.."]")
+       if TB3D_Modders.use_sound_message then TB3D_Services.packet_alert("rs sound2d: RECREATE_SOUNDS. LEFT CHANNEL = ["..name_left.."]") end
     end    
     if name_right ~= nil then
-       --TB3D_Services.packet_alert("rs sound2d: RECREATE_SOUNDS. RIGHT CHANNEL = ["..name_right.."]")
+       if TB3D_Modders.use_sound_message then TB3D_Services.packet_alert("rs sound2d: RECREATE_SOUNDS. RIGHT CHANNEL = ["..name_right.."]") end
     end    
     self.snd_obj_l = xr_sound.get_safe_sound_object(name_left)
     if name_right ~= nil then
@@ -75,6 +75,7 @@ function action_sound2d:get_sound_name()
 end
 ----------------------
 function action_sound2d:update(delta)
+	--if _g.is_disconnecting then return end
     if self.snd_obj_l == nil then 
        return 
     end
@@ -105,6 +106,7 @@ function action_sound2d:update(delta)
 end
 ----------------------
 function action_sound2d:play_sounds()
+	--if _g.is_disconnecting then return end
     local d
     if self.st.delay == self.st.delay_max then
        d = self.st.delay
@@ -114,14 +116,14 @@ function action_sound2d:play_sounds()
     local actor = db.actor
     if self.st.stereo == false then
 		if self.snd_obj_l ~= nil then
-			--TB3D_Services.packet_alert("sr sound2d: playing in [mono]")  
+			if TB3D_Modders.use_sound_message then TB3D_Services.packet_alert("sr sound2d: playing in [mono]") end
 			self.snd_obj_l:play_at_pos(actor, vector ():set (0, 0, 0), d / 1000.0, sound_object.s2d)
        end
     else
        if self.snd_obj_l == nil or self.snd_obj_r == nil then
           TB3D_Services.packet_alert("sr sound2d: Can't play stereo sound because sound file for left or right channel not loaded")  
        else
-		   --TB3D_Services.packet_alert("sr sound2d: playing in [stereo]")  
+		   if TB3D_Modders.use_sound_message then TB3D_Services.packet_alert("sr sound2d: playing in [stereo]") end
 		   local pos_l, pos_r = self:get_source_positions()
 		   self.snd_obj_l:play_at_pos(actor, pos_l, d / 1000.0, sound_object.s3d)
 		   self.snd_obj_r:play_at_pos(actor, pos_r, d / 1000.0, sound_object.s3d)

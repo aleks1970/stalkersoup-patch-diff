@@ -1,5 +1,5 @@
---<!-- TB3D 1.0.9.9.8.7   added scheme alert, optimized, removed npc hit, hit_callback, blow(), blowout_type(), optimized, gar_sniper_bandit, gar_wounded_bandit
-function my_ver() return "1.0.9.9.8.7" end
+--<!-- TB3D 1.1.0.0.0.0   added scheme alert, optimized, removed npc hit, hit_callback, blow(), blowout_type(), optimized, gar_sniper_bandit, gar_wounded_bandit, evaluator_outside:evaluate
+function my_ver() return "1.1.0.0.0.0" end
 -----------------------------------------------------------------------------------
 -- first created: 2007 Dmitri 'Red75' Roschin, Blowout hide v0.25 Behavioral scheme 
 -----------------------------------------------------------------------------------
@@ -131,14 +131,17 @@ end
 
 local ret_points={}
 function evaluator_outside:evaluate()
-  local npc=self.object
-  if TB3D_Modders.use_scheme_message then TB3D_Services.packet_alert("BLOW SCHEME: eval inhide execute["..utils.to_str(npc:character_name()).."]") end
-  if self.st.washitat and self.st.washitat>time_global() then
-    return false
-  end
-  self.st.washitat=nil
 	local blowout=TB3D_Services.blow() 							--109980
 	if blowout and TB3D_Services.blowout_type() == 0 then
+		local npc=self.object
+		if TB3D_Modders.use_scheme_message then
+			TB3D_Services.packet_alert("BLOW SCHEME: eval inhide execute["..utils.to_str(npc:character_name()).."]")
+		end
+		if npc.alive and not npc:alive() then return false end
+		if self.st.washitat and self.st.washitat>time_global() then
+			return false
+		end
+		self.st.washitat=nil
 		if blowout >= run_hide then
 			if self.st.nohide then
 				-- If the shelter can not be found, then ignore the release of
@@ -163,30 +166,33 @@ function evaluator_outside:evaluate()
 			end
 			self.prev=inhide
 			inhide=inhide and (not retpt)	-- NPC is considered to be got out of the shelter if it is outside or near the cusp
-			if inhide and self.uptime and self.uptime>time_global() then	-- If the NPC has gone into hiding, then give him another 1 second to go deeper
-				--if npc:character_name()=="Wolf" then amk.mylog(npc:character_name().." outside1") end
-				return true  -- Already in the shelter, but a second has not yet passed
-			elseif inhide and self.uptime and self.uptime<=time_global() then
-				-- In the woods. A second just passed
-			elseif inhide and (not self.uptime) then
-				-- Just went to the shelter
-				self.uptime=time_global()+1000
-				--if npc:character_name()=="Wolf" then amk.mylog(npc:character_name().." outside2") end
-				return true
-			elseif not inhide then
+			if inhide then
+				if self.uptime and self.uptime>time_global() then	-- If the NPC has gone into hiding, then give him another 1 second to go deeper
+					--if npc:character_name()=="Wolf" then amk.mylog(npc:character_name().." outside1") end
+					return true  -- Already in the shelter, but a second has not yet passed
+				elseif self.uptime and self.uptime<=time_global() then
+					-- In the woods. A second just passed
+				elseif not self.uptime then
+					-- Just went to the shelter
+					self.uptime=time_global()+1000
+					--if npc:character_name()=="Wolf" then amk.mylog(npc:character_name().." outside2") end
+					--TB3D_Services.packet_alert("BLOW SCHEME: eval inhide execute["..utils.to_str(npc:character_name()).."] return[true]")
+					return true
+				end
+				self.st.need_run=false
+			else
 				-- Not in hiding
 				self.uptime=nil
 			end
-			if inhide then 
-				self.st.need_run=false
-			end
+			if TB3D_Modders.use_scheme_message then TB3D_Services.packet_alert("BLOW SCHEME: eval inhide execute["..utils.to_str(npc:character_name()).."] return not inhide["..utils.to_str(inhide).."]") end
 			return (not inhide)
 		else
 			self.st.hidefound=nil
-			return false
+			--return false
 		end
+		--self.st.hidefound=nil
+		if TB3D_Modders.use_scheme_message then TB3D_Services.packet_alert("BLOW SCHEME: eval inhide execute["..utils.to_str(npc:character_name()).."] return[false]") end
 	end
-	--self.st.hidefound=nil
 	return false
 end
 

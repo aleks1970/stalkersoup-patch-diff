@@ -694,7 +694,7 @@ end
 
 --------------------------------- game endings -----------------------------------------------------
 function monolith_over()													--after wish granter vid
-	TB3D_Services.give_info("tb3d_chaes_done")
+	--TB3D_Services.give_info("tb3d_chaes_done")
 	TB3D_Services.give_info("sar_monolith_go")
 	--dmx_mod.create_level_changer_sarc_to_bar()			--109975 too soon
 	--dmx_mod.create_level_changer_sarc_to_chaes()
@@ -702,18 +702,42 @@ function monolith_over()													--after wish granter vid
 	TB3D_Services.teleportate("mon_over")									--agrounder
 end
 
-function join_osoznanie()													--after osozni vids
-	TB3D_Services.give_info("tb3d_chaes_done")
-	TB3D_Services.teleportate("joined")
+function join_osoznanie()													--110000, after osozni vids
+	--TB3D_Services.give_info("tb3d_chaes_done")
+	--change community reps, ecolg should not trust actor
+	--relation_registry.set_community_goodwill ("military", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("freedom", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("dolg", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("bandit", db.actor:id(), 0)
+	relation_registry.set_community_goodwill ("monolith", db.actor:id(), 400)
+	relation_registry.set_community_goodwill ("ecolog", db.actor:id(), 0)
+	local oldrep = db.actor:character_reputation()
+	db.actor:change_character_reputation(-oldrep)	--zero out rep, controls runaways
+	db.actor:change_character_reputation(900)
+	db.actor.health = 2			--full health
+	TB3D_Services.give_info("tb3d_joined_oc")
+	--TB3D_Services.teleportate("joined")
+	TB3D_Services.teleportate("refused")
 end
-function refuse_osoznanie()
-	TB3D_Services.give_info("tb3d_chaes_done")
+function refuse_osoznanie()													--110000, after osozni vids
+	--TB3D_Services.give_info("tb3d_chaes_done")
+	--change community reps, ecolg should like actor
+	--relation_registry.set_community_goodwill ("military", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("freedom", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("dolg", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
+	--relation_registry.set_community_goodwill ("bandit", db.actor:id(), 0)
+	relation_registry.set_community_goodwill ("monolith", db.actor:id(), -500)
+	relation_registry.set_community_goodwill ("ecolog", db.actor:id(), 400)
+	--sorry, health stay as is, what did you expect?
 	TB3D_Services.teleportate("refused")
 end
 
 function chaes_tower_portal()												--aes final portal
 	if TB3D_Services.give_info("tb3d_chaes_done") then
-		TB3D_Services.give_info("bar_dolg_video_start")
+		game.start_tutorial("dolg_dream")
+		TB3D_Services.give_info("bar_dolg_video_start")		--110000
 	else
 		dmx_mod.create_level_changer_marsh_yantar()
 		TB3D_Services.teleportate("npp_chaes_exit")							--to marsh
@@ -872,7 +896,8 @@ function spawn_sleep_places()
 	alife():create("place_of_sleep",vector():set(-2.859,-8.126,2.400),117,5355)				--hole
 	alife():create("place_of_sleep",vector():set(-430.777,12.411,-142.672),282924,3908)		--waiting room hq top floor
 	alife():create("place_of_sleep",vector():set(-40.353,-0.547,332.464),879755,3985)		--waiting room next to N. trader
-	TB3D_Services.packet_alert("tb3d triggers: spawn sleep places done")
+	alife():create("place_of_sleep",vector():set(-57.676,7.322,-40.176),290606,3620)		--110000, dead city HQ
+	--TB3D_Services.packet_alert("tb3d triggers: spawn sleep places done")
 end
 
 -------------------------tb3d_suits---------------------------------
@@ -1202,6 +1227,7 @@ function hr_spawns(idx)			--109978
 	if idx == 0 then
 		alife():create("vehicle_tb3d_btr", vector():set(-43.379,-3.021,1.548),393882,4467)			--in village
 		alife():create("vehicle_tb3d_btr", vector():set(-76.988,3.001,338.276),342695,4458)			--in motorpool
+		spawn_item_rand("grenade_rgd6",-75.015,-6.525,2.427,345520,4456,6)							--bottom of well
 		is_save = true
 	elseif idx == 1 then
 		alife():create("grenade_rgd6", vector():set(-245.593,30.712,-201.925),89566,4412)		--stash1 - roof
@@ -1238,6 +1264,8 @@ function npp_spawns(idx)			--109978
 		alife():create("vehicle_tb3d_btr", vector():set(966.393,-0.037,-219.751),432458,2285)	--drivable tank at entrance
 		alife():create("vehicle_tb3d_btr", vector():set(516.691,-0.101,-41.436),229322,2304)	--drivable tank near large pipes
 		alife():create("vehicle_tb3d_sport", vector():set(873.004,-0.102,-361.184),389488,2400)	--buggy behind gate for fast travel
+		alife():create("vehicle_tb3d_sport", vector():set(-177.544,0.108,-701.286),389488,2400)	--buggy near tracks for fast travel
+		alife():create("vehicle_tb3d_atv", vector():set(370.780,-7.920,-274.760),386473,2400)	--atv under viaduct
 		is_save = true		--109996
 	end
 	if is_save then amk.save_variable("npp1_spawns", idx+1) end

@@ -22,7 +22,7 @@ function check_spawn(s_object)
 			end
 		end
 		if npc == nil then npc = s_object end
-		if TB3d_Modders.start_alife_option > 1 and string_sub(s_object:section_name(), 1, 7) ~= "turret_" then				--hardcore
+		if TB3d_Modders.start_alife_option > 1 and string_sub(get_section(s_object), 1, 7) ~= "turret_" then				--hardcore
 			if is_report then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(sname).."] return[true] [hardcore alife]") end
 			return true 
 		end
@@ -32,7 +32,7 @@ function check_spawn(s_object)
 		end
 		if is_report then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(sname).."] return[false] [cond list]") end
 		return false 
-	elseif string_sub(s_object:section_name(), 1, 7) == "turret_" then				--dynamic stationary turrets
+	elseif string_sub(get_section(s_object), 1, 7) == "turret_" then				--dynamic stationary turrets
 		if is_report then TB3D_Services.packet_alert("xr spawn: check spawn["..utils.to_str(sname).."] return[true] [always spawn]") end
 		return true 
 	end

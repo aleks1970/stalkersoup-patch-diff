@@ -306,7 +306,7 @@ function convert_weapon(npc,id,flags)
 	local sim = alife()
 	local wpn = sim:object(id)
 	if wpn then
-		local sect = wpn:section_name()
+		local sect = get_section(wpn)
 		local data = amk.get_weapon_data(wpn)
 		if data.addon_flags ~= flags then
 			local pos = wpn.position

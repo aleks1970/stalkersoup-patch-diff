@@ -1004,6 +1004,7 @@ end
 -- Reproduce the sound
 -- Author - Real Wolf
 function play_sound(sound,obj)
+	if _g.is_disconnecting then	return end
 	if obj == nil then obj = db.actor end
 	snd = xr_sound.get_safe_sound_object(sound)
 	snd:play_no_feedback(obj, sound_object.s2d, 0, vector(), 1.0)
@@ -1448,24 +1449,28 @@ end
 
 -- /dAVROs and TB3D Jupiter elevator to Jupiter Underground elevator
 function create_level_changer_jup_to_jupunder(is_silent)
+	local pspot = 0
+	if is_silent then pspot = 1 end
 	local obj = alife():story_object(98003)
 	if not obj then
 	create_level_changer(98003, vector():set(326.335,13.888,-329.930),1243399,3745, 	
     1475,3772, vector():set(-44.722,8.012,444.343), 							
     vector():set(0.0,3.14,0), 												
-	"jupiter_underground",1,0,"jupiter_underground") 													
+	"jupiter_underground",1,pspot,"jupiter_underground") 													
 	if not is_silent then news_manager.amk_send_tip_id("path_jp_jpu", "path_new", 2, 25, "pda_icon") end
 	end
 end
 
 -- /dAVROs and TB3D Jupiter Underground elevator to Jupiter elevator
 function create_level_changer_jupunder_to_jup(is_silent)
+	local pspot = 0
+	if is_silent then pspot = 1 end
 	local obj = alife():story_object(97115)
 	if not obj then
 	create_level_changer(97115, vector():set(-50.187,8.008,458.433),805,3772, 	
     1252688,3745, vector():set(335.816,21.220,-329.225), 							
     vector():set(0.0,3.14,0), 												
-	"jupiter",0,0,"jupiter") 													
+	"jupiter",0,pspot,"jupiter") 													
 	if not is_silent then news_manager.amk_send_tip_id("path_jpu_jp", "path_new", 2, 25, "pda_icon") end
 	end
 end
@@ -1950,12 +1955,14 @@ function create_level_changer_gen_to_rs()
 end
 
 function create_level_changer_hosp_to_tunnels(is_silent)		--109984, fixed target
+	local pspot = 0
+	if is_silent then pspot = 1 end
 	local obj = alife():story_object(6022)
 	if not obj then
 		create_level_changer(6022, vector():set(-63.3486709594727,19.2402877807617,561.971435546875),7863,3075, 	
 			1258,3857, vector():set(71.726,-16.127,96.718),
 			vector():set(0.0,0.0,-1.0), 												
-			"cs_agroprom_underground",0,0,"to_tunnels") 													
+			"cs_agroprom_underground",0,pspot,"to_tunnels") 													
 		if not is_silent then news_manager.amk_send_tip_id("path_hosp_tunnels", "path_new", 2, 25, "pda_icon") end
 	end
 end
@@ -2006,13 +2013,15 @@ end
 
 --/TB3D   chaes to backwater
 function create_level_changer_chaes_to_zat(is_silent)
+	local pspot = 0
+	if is_silent then pspot = 1 end
 	local obj = alife():story_object(98997)
 	if not obj then
 		create_level_changer(98997, vector():set(1061.978,-0.098,-2.998),472711,2280, 	
 		311466,3669, vector():set(-318.693,40.698,-421.770), 							
 		vector():set(0.0,0.0,-1.0), 												
-		"zaton",0,0,"to_zaton") 													
-		if is_news then news_manager.amk_send_tip_id("path_sc_zat", "path_new", 2, 25, "pda_icon") end
+		"zaton",0,pspot,"to_zaton") 													
+		if not is_silent then news_manager.amk_send_tip_id("path_sc_zat", "path_new", 2, 25, "pda_icon") end
 	end
 end
 
@@ -2504,12 +2513,14 @@ function create_level_changer_jupu_tunnels()		--109982, when x14 done
 end
 
 function create_level_changer_tunnels_to_red_forest(is_silent)		--109984, fixed target
+	local pspot = 0
+	if is_silent then pspot = 1 end
 	local obj = alife():story_object(99040)
 	if not obj then
 		create_level_changer(99040, vector():set(-99.792,0.761,29.000),12285,3240,				--tunnel by camp
 			1536,3868, vector():set(81.072,-20.404,-181.405), 							
 		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
-			"cs_agroprom_underground",0,0,"to_tunnels") 													
+			"cs_agroprom_underground",0,pspot,"to_tunnels") 													
 		if not is_silent then news_manager.amk_send_tip_id("path_redf_tunnels", "path_new", 2, 25, "pda_icon") end
 	end
 	obj = alife():story_object(6014)
@@ -2539,8 +2550,16 @@ function create_level_changer_npp1_to_radar()													--109982, hunt lc stas
 	end
 end
 
---[red_forest]: (-99.792,0.761,29.000),12285,3240)
---[red_forest]: (-104.958,0.638,22.358),11416,3240)
+function create_level_changer_ff_to_rf()													--110000, puzir_level_changer_red_forest
+	local obj = alife():story_object(11528)
+	if not obj then
+		create_level_changer(11528, vector():set(-220.088,-0.002,47.390),14129,2881,			--e. rocks
+			155179,3321, vector():set(257.117,-1.451,-311.102),
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
+			"red_forest",0,0,"to_redforest") 													
+	end
+end
+
 --[cs_agroprom_underground]: (85.695,-16.928,-189.877),1579,3868)
 --[cs_agroprom_underground]: (83.660,-20.232,-186.914),1579,3868)
 

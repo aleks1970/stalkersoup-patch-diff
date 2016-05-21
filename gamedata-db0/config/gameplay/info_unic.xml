@@ -5,7 +5,10 @@
 <info_portion id="tb3d_started_as_collector"></info_portion>	<!-- used to control mob spawns -->
 <info_portion id="tb3d_restore_input"></info_portion>		<!-- force input back on -->
 <info_portion id="tb3d_gb1_done"></info_portion>			<!-- completed gold bars pass 1 -->
-<info_portion id="tb3d_start_x14"></info_portion>			<!-- got info about lab in fr -->
+<info_portion id="tb3d_start_x14">							<!-- got info about lab in fr -->
+	<article>tb3d_x14_article1_info</article>
+</info_portion>
+<info_portion id="tb3d_glavney_help"></info_portion>		<!-- give distress sms on entering npp -->
 <info_portion id="tb3d_x14_done"></info_portion>			<!-- time to start level_up 2 and the storm -->
 <info_portion id="tb3d_harsh_environment"></info_portion>	<!-- actor is in a harsh environment (level 2 and up) -->
 <info_portion id="tb3d_dm_deserters"></info_portion>		<!-- level_up 2 after the storm; ldk deserters start to repopulate -->
@@ -32,6 +35,7 @@
 	<article>levelup2_get_suit</article>
 </info_portion>
 <info_portion id="tb3d_lanky_suit_talk">					<!-- find mushroom art for suit -->
+	<article>tb3d_lanky_mush_art_quest_info</article>
 </info_portion>
 <info_portion id="tb3d_got_lanky_suit">						<!-- special suit for storm areas -->
 </info_portion>
@@ -50,6 +54,9 @@
 <info_portion id="tb3d_tools_spawned"></info_portion>		<!-- 109992, toolkit quest -->
 
 <info_portion id="tb3d_spawn_oman"></info_portion>			<!-- 109997, after storm -->
+
+<info_portion id="tb3d_crest1_done"></info_portion>			<!-- 110000, during storm -->
+<info_portion id="tb3d_crest2_done"></info_portion>			<!-- 110000, after storm -->
 
 <!-- ZEP: on findind a document, place last one in journal ---------------------------------------------------->
 <info_portion id="zep00_have">								<!-- ds gas station: send sms to talk to barman -->

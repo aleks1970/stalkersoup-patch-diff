@@ -1,35 +1,36 @@
---<!-- TB3D 1.0.9.9.9.9 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.1.0.0.0.0 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
 --item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals,
---lukash brains, agro knockdown
-function my_ver() return "1.0.9.9.9.9" end
+--lukash brains, agro knockdown, jupu, x16, check_dead
+function my_ver() return "1.1.0.0.0.0" end
 
 local translate = game.translate_string
 local text_color_tip = TB3D_Services.get_text_color("tip")
 
 local upd_pos = 0
 local fix_done = false
-function update(tnow, sbase)							--109983
-	if upd_pos < tnow then
-		upd_pos = tnow + (100 * sbase)
-		--109989, moved remove_brainlab_alife() to item take: amk_zapiska
-		if TB3D_Modders.zaton_lost then															--109999, can be deactivated
-			if not has_alife_info("tb3d_teleport_zaton") then									--109999 moved here, check if hideout done yet
-				if has_alife_info("agr_knockdown") then											--entered strelok hideout
-					if has_alife_info("tb3d_agr_knockdown") then								--send player to backwater
-						TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
-						TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
-						return																	--109999
-					elseif level.name() == "l03u_agr_underground" then							--109999, must be in agro under
-						TB3D_Services.give_info("tb3d_agr_knockdown")							--109999, delay one cycle
-					else
-						TB3D_Services.give_info("tb3d_teleport_zaton")							--109999, disable teleport if not agro under
+function update(time_now, slice_base)							--110000
+	if upd_pos < time_now then
+		upd_pos = time_now + 950
+		if slice_base < 4 then
+			if TB3D_Modders.zaton_lost then															--109999, can be deactivated
+				if not has_alife_info("tb3d_teleport_zaton") then									--109999 moved here, check if hideout done yet
+					if has_alife_info("agr_knockdown") then											--entered strelok hideout
+						if has_alife_info("tb3d_agr_knockdown") then								--send player to backwater
+							TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
+							TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
+							return																	--109999
+						elseif level.name() == "l03u_agr_underground" then							--109999, must be in agro under
+							TB3D_Services.give_info("tb3d_agr_knockdown")							--109999, delay one cycle
+						else
+							TB3D_Services.give_info("tb3d_teleport_zaton")							--109999, disable teleport if not agro under
+						end
 					end
 				end
 			end
+			braad_test.actor_update()										--TB3D 109999, moved from bind_stalker
 		end
-		braad_test.actor_update()										--TB3D 109999, moved from bind_stalker
 	end
 end
 
@@ -46,8 +47,7 @@ function on_info(info_id)
 		end
 	--elseif info_id=="brat_luis_have" then
 		--TB3D_Triggers.spawn_marmor()
-	elseif info_id=="yan_labx16_switcher_1_end" then
-		TB3D_Triggers.remove_brainlab_alife()
+	--elseif info_id=="yan_labx16_switcher_1_end" then				--110000
 	elseif info_id=="yan_has_ghost_pda" then
 		news_manager.send_tip(db.actor, "storyline_ghost_tip", nil, "wolf")
 		amk.spawn_item("amk_zapiska",vector():set(-117.381,18.722,-21.890),1529,84)		--109989, kept getting lost so moved it
@@ -86,7 +86,7 @@ function on_info(info_id)
 	   level.add_pp_effector("teleport.ppe", 2006, false) 
 	   db.actor:set_actor_position(patrol("kalmyak_tele_walk"):point(0))
 	   local dir = patrol("kalmyak_tele_look"):point(0):sub(patrol("kalmyak_tele_look"):point(0))
-	   db.actor:set_actor_direction(-dir:getH())
+	   TB3D_Services.rotate_actor(-dir:getH())
 	elseif info_id=="final_agro_kluk_ok_start" then							--109955 start timer to insure final sms activates
 		TB3D_Services.delayed_action(1, "naezd_zhuchok", 40)
 	elseif info_id=="naezd_zhuchok" then									--109955 play last sms messages if they did not trigger
@@ -187,6 +187,10 @@ function on_info(info_id)
 			if not has_alife_info("tb3d_skip_group1") then news_manager.save_collector("Meet the Flying Dealer", true) end
 		elseif info_id=="start_cop_prip_info_lab" then						--109982
 			news_manager.save_collector("Search the old Hospital", true)
+		elseif info_id=="aes2_teleport_trader" then
+			news_manager.save_collector("Weirding out in NPP North", true)		--110000
+		elseif info_id == "prizrak_finalzver_have" then							--110000
+			news_manager.save_collector("Take Beast Document to Ghost", true)
 		end
 	end
 end
@@ -224,7 +228,7 @@ function on_item_take(obj)
 		elseif ln=="l04u_labx18" then
 			info_given = TB3D_Services.give_info("info_amk_recipt_simbion")
 		elseif ln=="l08u_brainlab" then			--is on body, this may not be needed
-			TB3D_Triggers.remove_brainlab_alife()									--remove x16_m_controller_e, causes ctd on level exit
+			--TB3D_Triggers.remove_brainlab_alife()									--110000, remove x16_m_controller_e, causes ctd on level exit
 			info_given = TB3D_Services.give_info("info_amk_recipt_dummy")
 		end  
 		is_remove_obj = true
@@ -856,6 +860,10 @@ function process_levels(lname, sname)
 			if has_alife_info("agroprom_military_case_done") then
 				TB3D_Mobs.spawn_agrou_bandits()
 			end
+		elseif lname == "puzir" then									--110000
+			if sname == "red_forest" then
+				dmx_mod.create_level_changer_ff_to_rf()
+			end
 		end
 		if lname ~= "labx8" then
 			if TB3D_Services.remove_info("tb3d_bad_torch") then
@@ -864,4 +872,129 @@ function process_levels(lname, sname)
 			end
 		end
 	end
+end
+
+function check_dead()				--110000, consolidates death checks
+	if has_alife_info("mil_Svoboda_trader_plan_faze")
+		and has_alife_info("sar2_death_11")									--110000 all.spawn, agr_ratcatcher_umer")
+		and not has_alife_info("mil_Svoboda_trader_plan_2faze") then
+			TB3D_Services.give_info("mil_Svoboda_trader_plan_2faze")
+			sak.add_sak_plan()
+	end
+	if (has_alife_info("esc_vagon_wounded_umer")							--110000, death manager
+		and has_alife_info("sar2_death_17")									--110000 all.spawn, esc_stalker_fanat_umer")
+		or has_alife_info("sar2_death_12"))									--110000 all.spawn, esc_wolf_umer"))
+		and not has_alife_info("mil_volk_resiver_fail") then
+			TB3D_Services.give_info("mil_volk_resiver_fail")
+	end
+	if (has_alife_info("sar2_death_41")										--110000 all.spawn, bar_dolg_ivancov_umer")
+		or has_alife_info("mil_freedom_member0021_umer"))					--110000, death manager
+		and not has_alife_info("bar_ivancov_rg6_fail") then
+			TB3D_Services.give_info("bar_ivancov_rg6_fail")
+	end
+	if (has_alife_info("about_life_heart_sahar")
+		and has_alife_info("about_life_heart_sidor")
+		and has_alife_info("about_life_heart_barman"))
+		and not has_alife_info("about_life_heart_done") then
+			TB3D_Services.give_info("about_life_heart_done")
+	end
+	if not has_alife_info("dyak_help_done")
+		and (has_alife_info("esc_saha_dead")
+		or has_alife_info("dyak_dead")) then
+			TB3D_Services.give_info("dyak_help_fail")
+	end
+	if not has_alife_info("add_church_ban_signal")
+		and (has_alife_info("add_church_ban1_dead")
+		or has_alife_info("add_church_ban2_dead")
+		or has_alife_info("add_church_ban3_dead")) then
+			TB3D_Services.give_info("add_church_ban_signal") 
+	end
+	--if level.name()=="marsh" and has_alife_info("kalmyak_vstreca_start")
+		--and not has_alife_info("kalmyak_vstreca_sms") then
+			--amk.start_timer("kalmyak_vstreca",math_random(10,20))
+			--TB3D_Services.give_info("kalmyak_vstreca_sms")	
+	--end
+    if has_alife_info("marsh_dan_umer") then
+		if not has_alife_info("marsh_dan_umer_newsinfo1")
+			and has_alife_info("informator_pda_start")
+			and	not	has_alife_info("informator_pda_have")
+			and not	has_alife_info("informator_pda_done") then
+				amk.start_timer("sms_new",math_random(30,60))
+				TB3D_Services.give_info("marsh_dan_umer_newsinfo1")  
+		end
+		if not has_alife_info("marsh_dan_umer_newsinfo2")
+			and has_alife_info("dan_grab_start")
+			and	has_alife_info("dan_grab_have")
+			and not	has_alife_info("dan_grab_done") then
+				amk.start_timer("sms_new",math_random(40,70))
+				TB3D_Services.give_info("marsh_dan_umer_newsinfo2")
+		end
+		if not has_alife_info("marsh_dan_umer_newsinfo3")
+			and has_alife_info("marsh_dan_umer")
+			and	has_alife_info("dan_flash_start")
+			and	has_alife_info("dan_flash_have")
+			and not	has_alife_info("dan_flash_done") then
+				amk.start_timer("sms_new",math_random(40,70))
+				TB3D_Services.give_info("marsh_dan_umer_newsinfo3")
+		end
+	end
+	if not has_alife_info("marsh_dan_umer_newsinfo4")
+		and has_alife_info("ucen_talk_est") then
+			amk.start_timer("sms_new1",math_random(140,170))
+			TB3D_Services.give_info("marsh_dan_umer_newsinfo4")
+	end		
+    if not has_alife_info("val_pula_ammo_done")
+		and has_alife_info("gar_hellcar_umer")
+		and has_alife_info("val_pula_ammo_start") then
+			local rnd = math.random
+			local have_box = false
+			local obj
+            for i=0, db.actor:object_count()-1 do
+                obj = db.actor:object(i)
+				if obj and obj:section() == "inventory_sakbox_01" then
+                    have_box = true
+					break
+				end
+            end
+            if have_box then
+				if not has_alife_info("val_pula_ammo_newsinfo1") then
+                    amk.start_timer("sms",rnd(20,30),1)
+                    TB3D_Services.give_info("val_pula_ammo_newsinfo1")
+                elseif not has_alife_info("val_pula_ammo_newsinfo2") then 
+                        amk.start_timer("sms",rnd(50,60),2)
+                        TB3D_Services.give_info("val_pula_ammo_newsinfo2")
+                elseif not has_alife_info("val_pula_ammo_newsinfo3") then
+					amk.start_timer("sms",rnd(70,80),3)
+					TB3D_Services.give_info("val_pula_ammo_newsinfo3")
+				end
+			end
+    end
+    if not has_alife_info("bandit_krisyk_newsinfo")
+		and has_alife_info("bandit_krisyk_umer")
+		and has_alife_info("bandit_krisyk_start")
+		and not has_alife_info("bandit_krisyk_done") then
+            amk.start_timer("smska_borova",math.random(30,60))
+            TB3D_Services.give_info("bandit_krisyk_newsinfo")
+    end
+    if not has_alife_info("mil_volk_resiver_newsinfo")
+		and has_alife_info("esc_vagon_wounded_umer")
+		and has_alife_info("mil_volk_resiver_start")
+		and not has_alife_info("mil_volk_resiver_done") then
+            amk.start_timer("smska_volka",math.random(30,60))
+			TB3D_Services.give_info("mil_volk_resiver_newsinfo")
+    end
+    if not has_alife_info("mil_max_teleport_08_newsinfo")
+		and has_alife_info("mil_freedom_member0018_umer")
+		and has_alife_info("mil_max_teleport_08_start")
+		and not has_alife_info("mil_max_teleport_08_done") then
+            amk.start_timer("smska_shurupa",math.random(30,60))
+            TB3D_Services.give_info("mil_max_teleport_08_newsinfo")
+    end
+    if not has_alife_info("gar_dram_novice_mp5_m1_newsinfo")
+		and has_alife_info("gar_dm_novice_umer")
+		and has_alife_info("gar_dram_novice_mp5_m1_start")
+		and not has_alife_info("gar_dram_novice_mp5_m1_done") then
+            amk.start_timer("smska_dana",math.random(30,60))
+            TB3D_Services.give_info("gar_dram_novice_mp5_m1_newsinfo")
+    end
 end

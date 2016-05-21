@@ -178,7 +178,7 @@ function packet_sniff(wpn)
 	item[4] = "inv_grid_height"
 	item[5] = "inv_name_short"
 	item[6] = "cost"
-	local list = system_ini():r_string(wpn:section_name(), "slot")
+	local list = system_ini():r_string(get_section(wpn), "slot")
 	if list then
 		for str in string.gfind(list, "%s*([^%,]+)%s*") do
 			if str == "1" then	--and slot1_item==true
@@ -192,7 +192,7 @@ function packet_sniff(wpn)
 			end
 			for i=1,7 do
 				local name = item[i]
-				local list2 = system_ini():r_string(wpn:section_name(), name)
+				local list2 = system_ini():r_string(get_section(wpn), name)
 				if list2 then
 					for str in string.gfind(list2, "%s*([^%,]+)%s*") do
 						tbl[name] = str
@@ -440,7 +440,7 @@ function copy_addons(item)
 			for n=1,3 do
 				local ndx = addon_flags % (n*2)
 				if ndx > 0 then -- we have an addon
-					local addon_section = system_ini():r_string(alife_weapon:section_name(), addon_list[n])
+					local addon_section = system_ini():r_string(get_section(alife_weapon), addon_list[n])
 					if addon_section ~= nil then
 						local sobj = alife():create(addon_section, pos, act:level_vertex_id(), act:game_vertex_id())
 						table_insert(kit_cont,sobj.id)
@@ -622,7 +622,7 @@ end
 
 function calculate_parts(wpn)
 	local ltx = system_ini()
-	local section_name = wpn:section()
+	local section_name = get_section(wpn)
 	local weap_ceil = math.ceil(wpn:condition()*100)
 	local weap_cond = weap_ceil/100
 	local weap_weight
@@ -638,7 +638,7 @@ end
 function get_addon_location(item,name)
 	local array = {}
 	local ltx = system_ini()
-	local section_name = item:section()
+	local section_name = get_section(item)
 	if ltx:section_exist(section_name) then
 		if ltx:line_exist(section_name, name) then
 			local cls = ltx:r_string(section_name, name)
@@ -663,7 +663,7 @@ function get_addons(item)
 			for n=1,3 do
 				local ndx = addon_flags % (n*2)
 				if ndx > 0 then -- we have an addon
-					local addon_section = system_ini():r_string(alife_weapon:section_name(), addon_list[n])
+					local addon_section = system_ini():r_string(get_section(alife_weapon), addon_list[n])
 					if addon_section ~= nil then
 						table_insert(array,addon_section)
 --					else

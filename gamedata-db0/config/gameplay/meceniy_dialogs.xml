@@ -768,4 +768,91 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<dialog id="tb3d_crest1">
+		<has_info>tb3d_sms_storm</has_info>
+		<dont_has_info>tb3d_storm_over</dont_has_info>
+		<dont_has_info>tb3d_crest1_done</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>tb3d_crest1_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>tb3d_crest1_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>tb3d_crest1_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>tb3d_crest1_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>tb3d_crest1_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>tb3d_crest1_5</text>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>tb3d_crest1_6</text>
+				<next>7</next>
+			</phrase>
+			<phrase id="7">
+				<text>tb3d_crest1_7</text>
+				<give_info>tb3d_crest1_done</give_info>
+				<next>8</next>
+			</phrase>
+			<phrase id="8">
+				<text>tb3d_crest1_8</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="tb3d_crest2">
+		<has_info>tb3d_storm_over</has_info>
+		<dont_has_info>tb3d_crest2_done</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>tb3d_crest2_0</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>tb3d_crest2_1</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>tb3d_crest2_2</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>tb3d_crest2_3</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>tb3d_crest2_4</text>
+				<next>5</next>
+			</phrase>
+			<phrase id="5">
+				<text>tb3d_crest2_5</text>
+				<next>6</next>
+			</phrase>
+			<phrase id="6">
+				<text>tb3d_crest2_6</text>
+				<next>7</next>
+			</phrase>
+			<phrase id="7">
+				<text>tb3d_crest2_7</text>
+				<give_info>tb3d_crest2_done</give_info>
+				<next>8</next>
+			</phrase>
+			<phrase id="8">
+				<text>tb3d_crest2_8</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
 </game_dialogs>

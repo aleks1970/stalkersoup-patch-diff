@@ -154,7 +154,7 @@ function add_fresh_meat(obj)
 					--TB3D_Services.packet_alert("amk_off_line: add fresh meat weapon name["..utils.to_str(obj:name()).."] story id["..utils.to_str(obj.m_story_id).."]")
 					if map ~= "" then table.insert(off_npcs[map].weapons, {id=obj.id, name = obj:name()}) addedCounter = addedCounter + 1 end
 				end
-			elseif string_find(obj:section_name(),"^af_") then
+			elseif string_find(get_section(obj),"^af_") then
 				if obj.parent_id then
 					local p_obj = alife():object(obj.parent_id)
 					if p_obj then
@@ -1289,7 +1289,7 @@ end
 function pick_item(npc, obj)
 	local new = nil
 	if (npc and obj and db.actor and obj.id ~= db.actor:id()) then
-		local section = obj:section_name()
+		local section = get_section(obj)
 		new = alife():create(section, npc.position, npc.m_level_vertex_id, npc.m_game_vertex_id, npc.id)
 		if (new) then
 			if (new.parent_id) then
@@ -1329,9 +1329,9 @@ function get_npc_weapon(npc)
 				if wpn and IAmAWeapon[wpn:clsid()] and wpn:name() == v.name and wpn.parent_id == npc.id then
 					modes = {}
 					params = {}
-					sect = wpn:section_name()
+					sect = get_section(wpn)
 					cur_fp = 0				
-					modes = rx_wmgr.read_wm_modes(npc:community(),ranks.get_obj_rank_name(npc),npc:section_name())
+					modes = rx_wmgr.read_wm_modes(npc:community(),ranks.get_obj_rank_name(npc),get_section(npc))
 					params = rx_wmgr.read_wpn_params(sect)
 					if modes and params then
 						if modes.mode1 == "1" then
@@ -1379,7 +1379,7 @@ end
 function get_weapon_firepower(wpn)
 	local result = 0
 	if wpn and IAmAWeapon[wpn:clsid()] then
-		local sect = wpn:section_name()
+		local sect = get_section(wpn)
 		if wpn_fp[sect] then
 			result = wpn_fp[sect]
 		else
@@ -1418,7 +1418,7 @@ end
 
 function get_weapon_cost(weapon)
 	local result = 0
-	local sect = weapon:section_name()
+	local sect = get_section(weapon)
 	if (weapon and IAmAWeapon[weapon:clsid()]) then
 		-- result = utils.cfg_get_number(system_ini(), weapon:section_name(), "cost", weapon, false, 0)
 		result = getIniValueFloat(sect, "cost", 0, nil)
@@ -1428,9 +1428,10 @@ end
 
 function get_item_cost(item)
 	local result = 0
-	if (item and item.section_name) then
-		-- result = utils.cfg_get_number(system_ini(), item:section_name(), "cost", item, false, 0)
-		result = getIniValueFloat(item:section_name(), "cost", 0, nil)
+	if item then
+		local sect = get_section(item)
+		-- result = utils.cfg_get_number(system_ini(), sect, "cost", item, false, 0)
+		result = getIniValueFloat(sect, "cost", 0, nil)
 	end
 	return result
 end
@@ -1508,7 +1509,7 @@ function list_npc_items(obj)
 		for a=0,last_object do
 			it = sim:object(a)
 			if (it and it.parent_id == obj.id) then
-				if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: list_npc_items - ["..it:name().."]["..it:section_name().."]") end
+				if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: list_npc_items - ["..it:name().."]["..get_section(it).."]") end
 				--get_console():execute("load ~~~ list_npc_items - "..it:name().." "..it:section_name())
 				if (IAmAWeapon[it:clsid()]) then
 					find = it.id
@@ -1564,17 +1565,19 @@ function process_trade(npc)
 			
 		--Filtered quest items - always_keep_item, sell_table	
 		local obj
+		local sect
 		for ok,ov in pairs(items[npc.id]) do
 			obj = alife():object(ov.id)
 			if obj and obj:name()==ov.name then
-				--if always_keep_item[obj:section_name()] or sell_table[obj:section_name()] == nil or protected_items.obj_is_protected(obj) then
-				if sell_table[obj:section_name()] == nil or protected_items.obj_is_protected(obj) then
+				sect = get_section(obj)
+				--if always_keep_item[obj:section_name()] or sell_table[sect] == nil or protected_items.obj_is_protected(obj) then
+				if sell_table[sect] == nil or protected_items.obj_is_protected(obj) then
 					-- That we do not need.
-					--news_main.trace("Process_trade: "..npc:name().." ["..m_comm.."] filtered "..obj:section_name().." ["..obj:name().."]")
+					--news_main.trace("Process_trade: "..npc:name().." ["..m_comm.."] filtered "..sect.." ["..obj:name().."]")
 				else
 					table.insert(item_list, obj)
 					--item_list[v.id] = obj
-					--news_main.trace("Process_trade: "..npc:name().." ["..m_comm.."] have "..obj:section_name().." ["..obj:name().."]")
+					--news_main.trace("Process_trade: "..npc:name().." ["..m_comm.."] have "..sect.." ["..obj:name().."]")
 				end
 			end
 		end
@@ -1607,7 +1610,7 @@ function process_trade(npc)
 			local ac = ""
 			local vvv = {}
 			for k,v in pairs(item_list) do	
-				sect = v:section_name()
+				sect = get_section(v)
 				--news_main.trace("Process_trade: first pass - "..npc:name().." ["..m_comm.."] have "..sect.." ["..v:name().."]")
 				if IAmAWeapon[v:clsid()] and not (sect == "grenade_f1" or sect =="grenade_gd-05" or sect == "grenade_rgd5" or sect == "wpn_knife") then
 					bOk = false
@@ -1732,7 +1735,7 @@ function process_trade(npc)
 					--news_main.trace("Process trade - unknown - "..sect.." "..v:name())
 				end			
 			end
-			local modes = rx_wmgr.read_wm_modes(npc:community(),ranks.get_obj_rank_name(npc),npc:section_name())
+			local modes = rx_wmgr.read_wm_modes(npc:community(),ranks.get_obj_rank_name(npc),get_section(npc))
 			local weapons_types = {}
 			for z,i in ipairs(modes.types) do
 				weapons_types[i.t] = {}
@@ -1742,7 +1745,7 @@ function process_trade(npc)
 			local kf
 			for i,w in ipairs(weapons) do
 				params = {}
-				sect = w.obj:section_name()				
+				sect = get_section(w.obj)				
 				params = rx_wmgr.read_wpn_params(sect)
 				prm = 0
 				if modes.mode1 == "1" then
@@ -1788,19 +1791,19 @@ function process_trade(npc)
 					end
 					if b_self == false and b_ammo == true then
 						b_self = true
-					--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] SELF weapon is  "..w.obj:section_name().." ["..w.obj:name().."]")
-						s_self = w.obj:section_name()
+						s_self = get_section(w.obj)
+					--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] SELF weapon is  "..s_self.." ["..w.obj:name().."]")
 					elseif b_best == false then
 						if s_self ~= "" then
-							if w.obj:section_name() ~= s_self then
+							if get_section(w.obj) ~= s_self then
 								b_best = true
-							--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] BEST weapon is  "..w.obj:section_name().." ["..w.obj:name().."]")
+							--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] BEST weapon is  "..get_section(w.obj).." ["..w.obj:name().."]")
 							else
 								table.insert(sell_list, w.obj)
 							end
 						else
 							b_best = true
-						--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] BEST weapon is  "..w.obj:section_name().." ["..w.obj:name().."]")
+						--	news_main.trace("Process_trade: second pass - "..npc:name().." ["..m_comm.."] BEST weapon is  "..get_section(w.obj).." ["..w.obj:name().."]")
 						end
 					else
 						table.insert(sell_list, w.obj)
@@ -1825,11 +1828,11 @@ function process_trade(npc)
 			end
 			local cost, price
 			for kk,vv in pairs(sell_list) do
-				--news_main.trace("Process_trade: final pass - "..npc:name().." ["..m_comm.."] sells "..vv:section_name().." ["..vv:name().."]")
+				--news_main.trace("Process_trade: final pass - "..npc:name().." ["..m_comm.."] sells "..get_section(vv).." ["..vv:name().."]")
 				cost = get_item_cost(vv)
 				if (cost > 0) then
-					-- s_name = utils.cfg_get_string(system_ini(), vv:section_name(), "inv_name", vv, false, "", "")
-					s_name = getIniValueString(vv:section_name(), "inv_name", "", nil)
+					-- s_name = utils.cfg_get_string(system_ini(), get_section(vv), "inv_name", vv, false, "", "")
+					s_name = getIniValueString(get_section(vv), "inv_name", "", nil)
 					if (s_name == nil) then s_name = "" end
 					s_name = translate(s_name)
 					coeff = math_random(30,50) / 100
@@ -1874,20 +1877,20 @@ end
 -- Teaches immunities_sect read fire_wound_immunity. All damage is multiplied by him.
 function get_monster_params(obj)
 	--if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: get monster params") end
-  local sect = obj:section_name()
+	local sect = get_section(obj)
 	if (obj and IAmAMonster[obj:clsid()]) or (obj and obj.community and obj:community()=="zombied") then
 		if (monster_params and monster_params[sect]) then
 			return monster_params[sect]
 		else
-			-- local speed 	= utils.cfg_get_number(system_ini(), obj:section_name(), "MaxSpeed", obj, false, 5)
+			-- local speed 	= utils.cfg_get_number(system_ini(), sect, "MaxSpeed", obj, false, 5)
 			local speed 	= getIniValueFloat(sect, "MaxSpeed", 5, nil)
-			-- local dist 	= utils.cfg_get_number(system_ini(), obj:section_name(), "MaxAttackDist", obj, false, 3)
+			-- local dist 	= utils.cfg_get_number(system_ini(), sect, "MaxAttackDist", obj, false, 3)
 			local dist 		= getIniValueFloat(sect, "MaxAttackDist", 3, nil)
-			-- local imm_sect = utils.cfg_get_string(system_ini(), obj:section_name(), "immunities_sect", obj, false, "", "")
+			-- local imm_sect = utils.cfg_get_string(system_ini(), sect, "immunities_sect", obj, false, "", "")
 			local imm_sect 	= getIniValueString(sect, "immunities_sect", "", nil)
 			-- local immunity 	= utils.cfg_get_number(system_ini(), imm_sect, "fire_wound_immunity", obj, false, 1)
 			local immunity 	= getIniValueFloat(imm_sect, "fire_wound_immunity", 1, nil)
-			-- local att_sect 	= utils.cfg_get_string(system_ini(), obj:section_name(), "attack_params", obj, false, "", "")
+			-- local att_sect 	= utils.cfg_get_string(system_ini(), sect, "attack_params", obj, false, "", "")
 			local att_sect 	= getIniValueString(sect, "attack_params", "", nil)
 			local attack	= 0
 			if (system_ini():section_exist(att_sect)) then
@@ -1910,7 +1913,7 @@ function get_monster_params(obj)
 				end
 				attack = max_attack
 			end
-		if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: speed for ["..obj:section_name().."] is ["..tostring(speed).."]") end
+		if TB3D_Modders.use_alife_message then TB3D_Services.packet_alert("amk_off_line: speed for ["..sect.."] is ["..tostring(speed).."]") end
 			monster_params[sect] = {speed = speed, dist = dist, immunity = immunity, attack = attack}
 			return monster_params[sect]			
 		end
@@ -1935,9 +1938,9 @@ end
 
 function have_ammo(npc, weapon)
 	local result = false
-	local sect = weapon:section_name()
+	local sect = get_section(weapon)
 	if npc and weapon and IAmAStalker[npc:clsid()] and IAmAWeapon[weapon:clsid()] then
-		-- local ammo_str = utils.cfg_get_number(system_ini(), weapon:section_name(), "ammo_class", weapon, false, "")
+		-- local ammo_str = utils.cfg_get_number(system_ini(), sect, "ammo_class", weapon, false, "")
 		local ammo_str = getIniValueFloat(sect, "ammo_class", "", nil)
 		if ammo_str=="" then -- Bolt or garnet
 			return false
@@ -2025,7 +2028,7 @@ function is_valuable(item)
 	local result = false
 	if item and not (IAmAMonster[item:clsid()] or IAmAStalker[item:clsid()]) and protected_items.obj_is_protected(item) == false then
 		-- Unica not pick up (yet?)
-		--if always_keep_item[item:section_name()] or sell_table[item:section_name()] == nil then
+		--if always_keep_item[item:section_name()] or sell_table[get_section(item)] == nil then
 		if sell_table[item:section_name()] == nil then
 			return false
 		end
@@ -2040,20 +2043,4 @@ function is_valuable(item)
 	end
 	return result
 end
-
---[[function is_valuable(item)		--!!!!TB3D  saspan patch 20101118
-	local result = false
-	if item and not (IAmAMonster[item:clsid()] or IAmAStalker[item:clsid()]) 
-		and (protected_items.doNotTouchItemEquipment(item) or sell_table[item:section_name()] == nil) then
-		
-		local cost = get_item_cost(item)
-		if IAmAWeapon[item:clsid()] and cost >= 1000 then
-			result = true
-		elseif cost >= 800 then
-			result = true
-		end
-	end
-	return result
-end]]
-
 

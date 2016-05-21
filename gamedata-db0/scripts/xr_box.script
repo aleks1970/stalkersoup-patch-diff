@@ -40,7 +40,7 @@ function ph_item_box:__init(obj)
 		result, id, value	= death_ini:r_line(level_name,i,"","")
         mul_by_level[id] = tonumber(value)
 	end        
-    local item_count_section = "item_count_" .. level.get_game_difficulty()
+    local item_count_section = "item_count_"..TB3D_Services.get_difficulty_num() 	--level.get_game_difficulty()
     local n = death_ini:line_count(item_count_section)
 	local t = {}
 	local min, max

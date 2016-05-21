@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="windows-1252" standalone="yes"?>
-<!-- TB3D 1.0.9.9.9.8 version, Linked text from "ui & gameplay" folder, added/included files in this <string_table>
-removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "Fireball_ui", "Stone_Flower_ui", "Moonlight_ui", "Mica_ui", "Slug_ui", "Crystal_ui" and "Thorn_ui" - aleks1970 -->
+<!-- TB3D 1.1.0.0.0.0 version, Linked text from "ui & gameplay" folder, added/included files in this <string_table>
+removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "Fireball_ui", "Stone_Flower_ui", "Moonlight_ui", "Mica_ui", "Slug_ui", "Crystal_ui" and "Thorn_ui" - aleks1970, Astrologer -->
+<!-- Restructured sentences slightly. Sword2012 27 Jan 16 -->
 <string_table>
 #include "text\eng\ui_st_mp.xml"
 #include "text\eng\ui_st_mm.xml"
@@ -26,43 +27,52 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Valid locations are:</text>
 	</string>
 	<string id="enter_destination_name_ui">
-		<text>Enter the destination name in the travel box and hit TRAVEL.</text>
+		<text>Enter the destination name in the empty box below and hit TRAVEL</text>
 	</string>
 	<string id="genstronghold_taken_ui">
-		<text>genstronghold - CAUTION: Should use only AFTER base has been taken,</text>
+		<text>genstronghold - CAUTION: Use only AFTER the base has been taken</text>
+	</string>
+	<string id="skip_game_descr_hint_ui">
+		<text>Teleports - to skip some of the major parts of the game.</text>
 	</string>
 	<string id="escape_completes_cave_quest_ui">
-		<text>escape - The attic in Cordon and completes cave quest {SKIP CAVE}</text>
+		<text>escape - {SKIP CAVE} to the attic in Cordon, and completes the cave quest</text>
 	</string>
 	<string id="should_use_stargazer_ui">
-		<text>Should use just AFTER talking to Stargazer</text>
+		<text>Use just AFTER talking to Astrologer</text>
 	</string>
 	<string id="skip_first_parts_of_game_1_ui">
-		<text>- Teleports that will allow you to skip the first parts of the game. -</text>
+		<text>- Teleports that allow you to skip the first parts of the game -</text>
 	</string>
 	<string id="skip_first_parts_of_game_2_ui">
-		<text>They are still very much BETA but for the most part work</text>
+		<text>These are still very much in Beta but, for the most part, work well</text>
 	</string>
 	<string id="stalker_start_save_ui">
-		<text>after you talk to stargazer and the stalker start save is done you can use them:</text>
+		<text>Use them only after talking to Astrologer, and the 'Stalker Start' save is done</text>
+	</string>
+	<string id="skip_to_yan_ui">
+		<text>skip_to_yan - Completes the main quest up to the start of Yantar</text>
 	</string>
 	<string id="skip_to_mil_ui">
-		<text>skip_to_mil - completes the main quest up to the beginning of the Military Warehouses</text>
+		<text>skip_to_mil - Completes the main quest up to the start of the Army Warehouses</text>
+	</string>
+	<string id="skip_to_prip_ui">
+		<text>skip_to_prip - Completes the main quest up to the start of Pripyat</text>
 	</string>
 	<string id="skip_to_sar_ui">
-		<text>skip_to_sar - completes it up to entering the Sarcophagus</text>
+		<text>skip_to_sar - Completes the main quest up to entering the Sarcophagus</text>
 	</string>
 	<string id="skip_monolith_ui">
-		<text>skip_monolith - completes through the wish granter</text>
+		<text>skip_monolith - Completes through the Wish Granter</text>
 	</string>
 	<string id="skip_oso_ui">
-		<text>skip_oso - completes through the Monolith destruction and npp2 gauntlet</text>
+		<text>skip_oso - Completes through the Monolith destruction and the NPP2 gauntlet</text>
 	</string>
 	<string id="travel_ui">
 		<text>TRAVEL</text>
 	</string>
 	<string id="modders_tools_ui">
-		<text>STALKERSOUP Modders Tools</text>
+		<text>STALKERSOUP Modders' Tools</text>
 	</string>
 	<string id="ammunition_ui">
 		<text>Ammunition</text>
@@ -71,7 +81,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Weapons</text>
 	</string>
 	<string id="artifacts_ui">
-		<text>Artifacts</text>
+		<text>Artefacts</text>
 	</string>
 	<string id="items_ui">
 		<text>Items</text>
@@ -80,46 +90,43 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Outfits</text>
 	</string>
 	<string id="veh_anoms_ui">
-		<text>Veh + Anoms</text>
+		<text>Anomalies + Vehicles</text>
 	</string>
 	<string id="monsters_ui">
-		<text>Monsters</text>
+		<text>Creatures</text>
 	</string>
 	<string id="exit_ui">
 		<text>Exit</text>
 	</string>
-	<string id="teleport_vector_menu_ui">
-		<text>Teleport By Vector Menu</text>
-	</string>
-	<string id="the_coordinates_ui">
-		<text>Enter the coordinates: X, Y, Z</text>
-	</string>
 	<string id="move_ui">
 		<text>Move</text>
 	</string>
-	<string id="level_1_ui">
+	<!--string id="teleport_vector_menu_ui">
+		<text>Teleport by Vector Menu</text>
+	</string>
+	<string id="the_coordinates_ui">
+		<text>Enter the coordinates: X, Y, Z</text>
+	</string-->
+	<!--string id="level_1_ui">
 		<text>Level -</text>
 	</string>
 	<string id="vertex_games_ui">
-		<text>Vertex Games - </text>
+		<text>Vertex Games -</text>
 	</string>
 	<string id="vertex_level_ui">
-		<text>Vertex Level - </text>
+		<text>Vertex Level -</text>
 	</string>
 	<string id="position_ui">
-		<text>Position - </text>
+		<text>Position -</text>
 	</string>
 	<string id="turn_1_ui">
-		<text>Turn - </text>
+		<text>Turn -</text>
 	</string>
 	<string id="enter_name_savegame_ui">
 		<text>Enter a name for the Savegame ...</text>
 	</string>
 	<string id="name_2_ui">
-		<text>Name - </text>
-	</string>
-	<string id="copyright_studio_team_ui">
-		<text>Copyright 2008 ReaL Studio Team</text>
+		<text>Name -</text>
 	</string>
 	<string id="show_1_ui">
 		<text>Show</text>
@@ -129,7 +136,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 	</string>
 	<string id="save_1_ui">
 		<text>Save</text>
-	</string>
+	</string-->
 	<string id="chance_of_success_85_ui">
 		<text>Chance of Success = 85%</text>
 	</string>
@@ -194,7 +201,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Soul</text>
 	</string>
 	<string id="Gold_Fish_harm_ui">
-		<text>Gold Fish (harm)</text>
+		<text>Goldfish (harm)</text>
 	</string>
 	<string id="Spring_ui">
 		<text>Spring</text>
@@ -212,7 +219,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Crystal</text>
 	</string>
 	<string id="Gold_Fish_harm_2_ui">
-		<text>Gold Fish (harm)</text>
+		<text>Goldfish (harm)</text>
 	</string>
 	<string id="Gingerbread_ui">
 		<text>Gingerbread</text>
@@ -266,7 +273,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Help</text>
 	</string>
 	<string id="walkie-talkie_ui">
-		<text>Walkie-talkie</text>
+		<text>Walkie-Talkie</text>
 	</string>
 	<string id="general_channel_ui">
 		<text>Check general channel</text>
@@ -290,7 +297,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Activate GPS Tracker?</text>
 	</string>
 	<string id="ok_1_ui">
-		<text>OK</text>
+		<text>OKAY</text>
 	</string>
 	<string id="quit_1_ui">
 		<text>QUIT</text>
@@ -329,31 +336,31 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>TEST</text>
 	</string>
 	<string id="anomaly_detected_ui">
-		<text>Anomaly Detected</text>
+		<text>Anomaly detected</text>
 	</string>
 	<string id="translation_and_info_ui">
 		<text>STALKERSOUP Translation and Info (This does not spawn)</text>
 	</string>
 	<string id="translation_cartridges_ui">
-		<text>Translation cartridges</text>
+		<text>Translation of Ammo</text>
 	</string>
 	<string id="translation_of_arms_ui">
-		<text>Translation of Arms</text>
+		<text>Translation of Weapons</text>
 	</string>
 	<string id="translation_artifacts_ui">
-		<text>Translation Artifacts</text>
+		<text>Translation of Artefacts</text>
 	</string>
 	<string id="translation_articles_ui">
-		<text>Translation articles</text>
+		<text>Translation of Articles</text>
 	</string>
 	<string id="translation_armor_ui">
-		<text>Translation armor</text>
+		<text>Translation of Armour</text>
 	</string>
 	<string id="perkvod_npc_ui">
 		<text>Perkvod NPC</text>
 	</string>
 	<string id="hot_fold_ui">
-		<text>Hot. fold.</text>
+		<text>Hot. Fold.</text>
 	</string>
 	<string id="guide_to_acs_ui">
 		<text>Guide to ACS</text>
@@ -368,7 +375,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Teleport</text>
 	</string>
 	<string id="teleport_by_name_ui">
-		<text>Teleport By Name</text>
+		<text>Teleport by name</text>
 	</string>
 	<string id="location_name_from_list_ui">
 		<text>Enter location name from list</text>
@@ -395,7 +402,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>JOIN</text>
 	</string>
 	<string id="weapon_efficiency_ui">
-		<text>Weapon Efficiency</text>
+		<text>Weapon efficiency</text>
 	</string>
 	<string id="rank_ui">
 		<text>Rank</text>
@@ -455,10 +462,10 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>%s killed by %s</text>
 	</string>
 	<string id="killed_by_themselves_ui">
-		<text>%s and %s was killed by themselves</text>
+		<text>%s and %s were killed by themselves</text>
 	</string>
 	<string id="press_yes_to_pay_ui">
-		<text>You can buy a spawn for 1000 $. Press Yes to pay</text>
+		<text>You can buy a spawn for $1000. Press Yes to pay</text>
 	</string>
 	<string id="karta_name_ui">
 		<text>Karta Name</text>
@@ -470,13 +477,13 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Ammo</text>
 	</string>
 	<string id="wpn_ui">
-		<text>Wpn</text>
+		<text>Weapon</text>
 	</string>
 	<string id="armor_ui">
-		<text>armor</text>
+		<text>Armor</text>
 	</string>
 	<string id="money_ui">
-		<text>money</text>
+		<text>Money</text>
 	</string>
 	<string id="description_ui">
 		<text>Description</text>
@@ -530,14 +537,14 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Press any key to enter the Zone</text>
 	</string>
 	<string id="rank_2_ui">
-		<text>rank</text>
+		<text>Rank</text>
 	</string>
 	<string id="community_ui">
-		<text>community</text>
+		<text>Community</text>
 	</string>
 	<!-- "Hint" section start -->
 	<string id="Turn_Off_PDA_hint_ui">
-		<text>Turn Off PDA</text>
+		<text>Turn off PDA</text>
 	</string>
 	<string id="S_advanced_options_hint_ui">
 		<text>Show advanced options</text>
@@ -552,7 +559,7 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>One entry back</text>
 	</string>
 	<string id="One_entry_forward_hint_ui">
-		<text>One entry, forward</text>
+		<text>One entry forward</text>
 	</string>
 	<string id="ten_records_forward_hint_ui">
 		<text>10 records forward</text>
@@ -561,10 +568,10 @@ removed duplicated string id's: "exit_ui", "Flash_ui", "Slime_ui", "Soul_ui", "F
 		<text>Layout</text>
 	</string>
 	<string id="Decrease_volume_hint_ui">
-		<text>Decrease the volume</text>
+		<text>Decrease Volume</text>
 	</string>
 	<string id="Increase_volume_hint_ui">
-		<text>Increase volume</text>
+		<text>Increase Volume</text>
 	</string>
 	<string id="current_record_hint_ui">
 		<text>The current record</text>

@@ -1,6 +1,6 @@
-<!-- ************ TB3D 1.0.9.9.9.8 moved from game_tasks.xml, fixed Sahharov and pda(mil), Max to Prapor, petrushka to petruha,
+<!-- ************ TB3D 1.1.0.0.0.0 moved from game_tasks.xml, fixed Sahharov and pda(mil), Max to Prapor, petrushka to petruha,
  miser to skinflint, dummy glass beads, grandmothers beads, treatises to records, minor edits, ghost pda, krysyuks pda,
- boar_hoofs_vodka, Bring_safe_Syak, added articles, doktor_teleport_ *************** -->
+ boar_hoofs_vodka, Bring_safe_Syak, added articles, doktor_teleport_, changed some death infos *************** -->
 <game_task id="saharov_pda">
 	<title>Bring_Ghost_PDA_to_Sakharov_gameplay_titles</title>
 	<objective>
@@ -451,7 +451,8 @@
 		<text>Bring_PlayBoy_binder_gameplay_descriptions</text>
 		<icon>ui_iconsTotal_found_thing</icon>
 		<infoportion_complete>mil_max_teleport_08_done</infoportion_complete>
-		<infoportion_fail>mil_freedom_member0018_umer</infoportion_fail>
+		<!--infoportion_fail>mil_freedom_member0018_umer</infoportion_fail-->
+		<infoportion_fail>mil_max_dead</infoportion_fail>
 		<article>tex_mil_max_teleport_08</article>
 	</objective>
 	<objective>
@@ -635,7 +636,8 @@
 		<text>Find_lost_document_gameplay_descriptions</text>
 		<icon>ui_iconsTotal_found_thing</icon>
 		<infoportion_complete>escape_lager_volk_document_done</infoportion_complete>
-		<infoportion_fail>esc_wolf_umer</infoportion_fail>
+		<!--infoportion_fail>esc_wolf_umer</infoportion_fail-->
+		<infoportion_fail>sar2_death_12</infoportion_fail>
 		<article>tex_escape_lager_volk_document</article>
 	</objective>
 	<objective>
@@ -726,7 +728,8 @@
 		<text>Get_Medusa_Nimble_gameplay_descriptions</text>
 		<icon>ui_iconsTotal_artefact</icon>
 		<infoportion_complete>esc_shustryi_medusa_done</infoportion_complete>
-		<infoportion_fail>esc_shustryi_umer</infoportion_fail>
+		<!--infoportion_fail>esc_shustryi_umer</infoportion_fail-->
+		<infoportion_fail>esc_shustryi_dead</infoportion_fail>
 		<article>tex_esc_shustryi_medusa</article>
 	</objective>
 	<objective>
@@ -1067,7 +1070,8 @@
 		<text>Get_unlawful_order_gameplay_descriptions</text>
 		<icon>ui_iconsTotal_found_thing</icon>
 		<infoportion_complete>ratcatcher_order_done</infoportion_complete>
-		<infoportion_fail>agr_ratcatcher_umer</infoportion_fail>
+		<!--infoportion_fail>agr_ratcatcher_umer</infoportion_fail-->
+		<infoportion_fail>sar2_death_11</infoportion_fail>
 		<article>tex_ratcatcher_order</article>
 	</objective>
 	<objective>
@@ -1435,7 +1439,8 @@
 		<text>Deliver_dynamite_gameplay_descriptions</text>
 		<icon>ui_iconsTotal_mil_lukash_job</icon>
 		<infoportion_complete>mil_lukash_find_dinamit_done</infoportion_complete>
-		<infoportion_fail>mil_freedom_member0012_umer</infoportion_fail>
+		<!--infoportion_fail>mil_freedom_member0012_umer</infoportion_fail-->
+		<infoportion_fail>mil_lukash_dead</infoportion_fail>
 		<article>tex_mil_lukash_find_dinamit</article>
 	</objective>
 	<objective>

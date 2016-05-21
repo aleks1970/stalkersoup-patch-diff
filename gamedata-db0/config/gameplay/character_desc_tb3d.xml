@@ -104,7 +104,7 @@
 
   <specific_character id="predbannik_trader" no_random = "1">
     <name>pred_trader_name</name>
-    <icon>ui_npc_pavel_serg</icon>
+    <icon>ui_npc_u_trader</icon>
     <map_icon x="1" y="4"></map_icon>
     <bio>pred_trader_bio</bio>
     <class>predbannik_trader</class>
@@ -112,7 +112,7 @@
     <money min="100000" max="110000" infinitive="1"></money>
     <rank>700</rank>
     <reputation>50</reputation>
-    <visual>actors\neytral\unic\krohobor</visual>					<!-- underground like sid -->
+    <visual>new\sidor_kepka</visual>					<!-- underground like sid -->
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <crouch_type>-1</crouch_type>
 #include "inventory\trader_items.xml"

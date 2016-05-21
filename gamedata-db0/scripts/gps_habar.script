@@ -61,9 +61,9 @@ function objinfo(obj)
 			if obj.id then
 				text = text .. "[" .. tostring(obj.id) .. "] "
 			end
-			if obj.section_name then
-				text = text .. ", s_name=" .. tostring(obj:section_name())
-			end
+			--if obj.section_name then
+				text = text .. ", s_name=" .. tostring(get_section(obj))
+			--end
 			if obj.character_name then
 				text = text .. ", c_name=" .. tostring(obj:character_name())
 			end
@@ -205,7 +205,7 @@ function get_gps_count(boxId)
 		local sim = alife()
 		for i, v in pairs(items_in_box[boxId]) do
 			locObj = sim:object(v.id)
-			if locObj and locObj:section_name() == "amk_metka" then
+			if locObj and get_section(locObj) == "amk_metka" then
 				gps_count = gps_count + 1
 			end
 		end
@@ -482,7 +482,7 @@ function spawn_m_inv()
 	local sim = alife()
 	for i = first_object, last_object do 
 		aobj =  sim:object(i)
-		if aobj and aobj.section_name and aobj:section_name() == "m_inventory_box" then
+		if aobj and get_section(aobj) == "m_inventory_box" then
 			amk.add_spot_on_map(aobj.id, "red_location", "backpack")
 		end
 	end
@@ -515,8 +515,8 @@ function update_gps_habar(boxId)
 --					break
 --				end
 				locObj = sim:object(v.id)
-				if locObj and locObj:section_name() then
-					secName = locObj:section_name()
+				if locObj then
+					secName = get_section(locObj)
 					--invName = correct_name(translate(system_ini():r_string(secName, "inv_name")))
 					invName = correct_name(translate(getIniValueString(secName, "inv_name","",nil)))
 					is_yes = false

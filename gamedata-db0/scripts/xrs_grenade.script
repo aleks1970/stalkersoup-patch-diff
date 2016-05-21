@@ -660,11 +660,12 @@ end
 function net_spawn()
 	for a=first_object,last_object do
 		local sobj = alife():object(a)
+		local sect = get_section(sobj)
 		if sobj then
 			for k,v in pairs(gr_types) do
-				if sobj:section_name()==v.."_test" or sobj:section_name()==v.."_fake" then
+				if sect==v.."_test" or sect==v.."_fake" then
 					alife():release(sobj)
-					break		--!!!!TB3D
+					--break		--!!!!TB3D
 				end
 			end
 		end
@@ -673,8 +674,9 @@ end
 
 function fake_pickup(obj)
 	level.map_remove_object_spot(obj:id(), "grenade_location")
+	local sect = obj:section()
 	for k,v in pairs(gr_types) do
-		if obj:section()==v.."_test" or obj:section()==v.."_fake" then
+		if sect==v.."_test" or sect==v.."_fake" then
 			alife():release(alife():object(obj:id()))
 			return
 		end

@@ -110,7 +110,7 @@
 [sound]
 occlusion_scale = 0.4
 snd_collide_min_volume=0.1
-snd_collide_max_volume=200.
+snd_collide_max_volume=200.0
 
 [demo_record]
 speed0    = 0.3
@@ -180,19 +180,19 @@ $spawn               = "ai\graph point"
 ;-----------------------------------------------------------------
 ; Trade
 ;-----------------------------------------------------------------
-[trade]	;edits by glowworm 1.0.9.7
+[trade]	;109999
 ;coefficients of price changes in the trade, depending on the relationship to the character
 ;linearly approximated between the significance
-buy_price_factor_hostile  = 0.05    ;0.7  ;factor when buying goodwill = -100
-buy_price_factor_friendly = 0.3     ;1    ;factor when buying goodwill = 100
+buy_price_factor_hostile  = 0.5    ;0.7  ;factor when buying goodwill = -100
+buy_price_factor_friendly = 0.75     ;1    ;factor when buying goodwill = 100
 sell_price_factor_hostile = 2.0     ;1.2  ;factor when buying goodwill = -100
-sell_price_factor_friendly  = 1.25  ;1    ;factor when buying goodwill = 100
+sell_price_factor_friendly  = 1.0  ;1    ;factor when buying goodwill = 100
 ;-----------------------------------------------------------------
 
 [breakable_object]
 class           = O_BRKBL
 remove_time         = 10      ;after remove_time seconds object will be removed after it is breaked
-hit_break_threthhold    = 0.      ;weapon impact can stand breakable_object
+hit_break_threthhold    = 0.0      ;weapon impact can stand breakable_object
 collision_break_threthhold  = 2000.f  ;collision impact can stand breakable_object
 immunity_factor       = 1.3     ;hit power multiplier
 
@@ -239,15 +239,15 @@ view_aspect         		= 1
 view_far_plane        		= 100 ;150
 
 [details]
-swing_normal_amp1 = .1
-swing_normal_amp2 = .05
+swing_normal_amp1 = 0.1
+swing_normal_amp2 = 0.05
 swing_normal_rot1 = 30.0
 swing_normal_rot2 = 1.0
 swing_normal_speed  = 2.0
 ;// fast
 swing_fast_amp1   = 0.35;0.25
-swing_fast_amp2   = .20;0.15
+swing_fast_amp2   = 0.20;0.15
 swing_fast_rot1   = 5
-swing_fast_rot2   = .5;0.75
+swing_fast_rot2   = 0.5;0.75
 swing_fast_speed  = 0.5;1
 

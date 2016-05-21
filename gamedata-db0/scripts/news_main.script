@@ -1,8 +1,9 @@
---TB3D 1.0.9.9.8.0 fixed rucksack, no amk news.ltx file (commented out), added news_alert, 'Jury Semetsky' to 'Unknown STALKER',
+--TB3D 1.1.0.0.0.0 fixed rucksack, no amk news.ltx file (commented out), added news_alert, 'Jury Semetsky' to 'Unknown STALKER',
 -- added labx8 to isolated list, death news, blowout news, fast saves, obj level, removed generate_arts, blow(), translate
-function my_ver() return "1.0.9.9.8.0" end
+function my_ver() return "1.1.0.0.0.0" end
 -- local ti = table.insert
 
+local rnd = math.random
 local math_atan2 = math.atan2
 local table_remove = table.remove
 local table_sort = table.sort
@@ -73,7 +74,7 @@ table_killed_by_actor = {}
 spammers = {}
 
 function init()
-	local rnd = math.random
+	--local rnd = math.random
 	if (bInit == false) then
 		news_data.Init()
 		time_factor = system_ini():r_float("alife","time_factor")	    
@@ -101,7 +102,7 @@ function on_spawn_group(community, level, position, count, o_type)
 	if TB3D_Modders.use_news_message then
 		TB3D_Services.info_alert("NEWS MAIN: spawn group cnt["..utils.to_str(count).."]["..utils.to_str(o_type).."]")
 	end
-	local rnd = math.random
+	--local rnd = math.random
 	if (community and level and position and count and o_type and o_type > 0) then
 		local name, sname = TB3D_Services.get_names()
 		local s_author = name.." "..sname
@@ -181,7 +182,7 @@ function on_abuse(obj)
 			if TB3D_Modders.use_news_message then
 				TB3D_Services.info_alert("NEWS MAIN: abuse["..utils.to_str(obj:name()).."]")
 			end
-			local rnd = math.random
+			--local rnd = math.random
 			if (obj.alive and obj:alive() == false) then
 				return
 			end
@@ -234,7 +235,7 @@ end
 -- Preparing a message
 function on_stalker_death(victim_, killer_)
 	--if TB3D_Modders.show_death_news then
-	local rnd = math.random
+	--local rnd = math.random
 	if (victim_ == nil) then
 		return
 	end
@@ -338,7 +339,7 @@ end
 -- Preparing a message
 function on_npc_death(victim_, killer_)
 	--if TB3D_Modders.show_death_news then
-	local rnd = math.random
+	--local rnd = math.random
 	if (victim_ == nil) then
 		return
 	end
@@ -535,7 +536,7 @@ function get_object_name(obj)
 		end
 	elseif (obj.section_name) then
 		local sect = obj:section_name()
-		--value	= utils.cfg_get_string(system_ini(), obj:section_name(), "inv_name", obj, false, "", "")
+		--value	= utils.cfg_get_string(system_ini(), get_section(obj), "inv_name", obj, false, "", "")
 		value	= getIniValueString(sect, "inv_name", "", nil)
 		-- s_name = value
 		s_name = translate(value)
@@ -581,13 +582,8 @@ end
 function get_weapon_name(weapon)
 	if(weapon and IAmAWeapon[weapon:clsid()]) then
 		local result = ""
-		if weapon.section then
-			result = weapon:section()
-		elseif weapon.section_name then
-			result = weapon:section_name()
-		end
-		if result == nil then result = "" end
-		return result
+		result = get_section(weapon)
+		if result ~= "nil" then return result end
 	end
 	return ""
 end
@@ -765,7 +761,7 @@ end
 
 
 function do_news(text, from, timeout, showtime, section, author_id, priority)
-	if amk.load_variable("option_news", 1) > 0 then
+	if amk.load_variable("option_news", 1) > 0 and not has_alife_info("tb3d_harsh_environment") then
 		--if TB3D_Modders.use_news_message == true then
 			TB3D_Services.info_alert("NEWS MAIN: do news")
 		--end								--!!!!TB3D
@@ -798,8 +794,8 @@ end
 function show_news(text, from, timeout, showtime, section)
 	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: show news["..utils.to_str(text).."] from["..utils.to_str(from).."]") end							--!!!!TB3D
 	if text == nil or from == nil then return end
-	local rnd = math.random
 	if (isIsolatedLevel(level.name()) == true) or
+	has_alife_info("tb3d_harsh_environment") or
 	(text == "") or (from == "") or
 	sleep_manager.is_sleep_active() == true then return end
 	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: show news check blow["..utils.to_str(text).."]")		end							--!!!!TB3D
@@ -823,7 +819,7 @@ function show_news(text, from, timeout, showtime, section)
 end
 
 function format_death_by_monster(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_prefix = ""
 	local m_suffix = ""
@@ -850,7 +846,7 @@ function format_death_by_monster(obj)
 end
 
 function format_death_by_anomaly(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_prefix = ""
 	local m_suffix = ""
@@ -925,7 +921,7 @@ function format_death_monster_corpse(obj)
 end
 
 function format_death_hear_sounds(victim_, killer_, weapon_)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_hear_a = ""
 	local m_hear_z = ""
@@ -983,7 +979,7 @@ function format_death_hear_sounds(victim_, killer_, weapon_)
 end
 
 function format_template_killer_act(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	if(obj ~= nil) then
 		local m_class = ""
@@ -1020,7 +1016,7 @@ function format_template_killer_act(obj)
 end
 
 function format_template_heli(obj, template_type)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_level = ""
 	local m_pos
@@ -1048,7 +1044,7 @@ function format_template_heli(obj, template_type)
 end
 
 function format_template_weapon(weapon_type)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	if(weapon_type and news_data.weapon_classes[weapon_type] ~= nil and news_data.weapon_classes[weapon_type]["name"]) then
 		local t = {
@@ -1076,7 +1072,7 @@ function format_template_weapon(weapon_type)
 end
 
 function format_template_corpse_stalker(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	if(obj ~= nil) then
 		local m_name  = get_npc_name(obj)
@@ -1117,7 +1113,7 @@ function format_template_corpse_stalker(obj)
 end
 
 function format_template_corpse_npc(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	if(obj ~= nil) then
 		local m_name  = get_npc_name(obj)
@@ -1169,7 +1165,7 @@ function format_template_corpse_npc(obj)
 end
 
 function format_template_corpse_monster(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	if(obj ~= nil) then
 		local m_level = get_point_description(get_object_levelname(obj), get_object_position(obj))
@@ -1207,7 +1203,7 @@ function format_template_corpse_monster(obj)
 end
 
 function format_template_hear(obj, hear_a, hear_z)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_level = ""
 	local m_pos
@@ -1241,7 +1237,7 @@ function format_template_hear(obj, hear_a, hear_z)
 end
 
 function format_template_spawn(level_, position, class)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_level = ""
 	local m_pos
@@ -1270,7 +1266,7 @@ function format_template_spawn(level_, position, class)
 end
 
 function format_template_spawn_group(level_, position, class, count)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_level = ""
 	local m_pos
@@ -1316,7 +1312,7 @@ function format_template_spawn_group(level_, position, class, count)
 end
 
 function format_template_actor_seen(level_, position, class)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_level = ""
 	local m_pos
@@ -1350,7 +1346,7 @@ function format_template_actor_seen(level_, position, class)
 end
 
 function format_template_actor_seen_group(level_, position, class, count)
-	local rnd = math.random
+	--local rnd = math.random
 	local m_s = ""
 	local m_level = ""
 	local m_pos
@@ -1712,7 +1708,7 @@ end
 
 function on_weather_change(old_weather, new_weather)
 -- clear, pasmurno, rain, groza
-	local rnd = math.random
+	--local rnd = math.random
 	if (old_weather and new_weather) then
 		if (amk.game_minutes() - timer_weather_showed > timer_weather_freq) then	
 			if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: on_weather_change") end		--!!!!TB3D
@@ -1740,7 +1736,7 @@ end
 
 function on_daytime()
 -- night, sunrise, sunset...
-	local rnd = math.random
+	--local rnd = math.random
 	if (amk.game_minutes() - timer_daytime_showed > timer_daytime_freq) then
 		if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: on_daytime") end		--!!!!TB3D
 		local m_h = level:get_time_hours()
@@ -1801,7 +1797,7 @@ end
 -- Seen as HS did something
 function on_hero_seen(community, level, position, count, o_type)
 	--if TB3D_Modders.show_hero_news then
-		local rnd = math.random
+		--local rnd = math.random
 		if TB3D_Modders.use_news_message == true then
 			TB3D_Services.info_alert("NEWS MAIN: hero seen") end		--!!!!TB3D
 		if (community and level and position and count and o_type and o_type > 0) then		
@@ -1870,7 +1866,7 @@ end
 
 -- somewhere verolet gives a light (heli_combat:round, heli_combat.heli_combat:search, heli_combat.heli_combat:flyby)
 function on_heli_combat(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	if (obj and amk.game_minutes() - timer_heli_showed > timer_heli_freq) then	
 		if (rnd() < 0.5) then -- Do not be too often on the helicopter report
 			if (rnd() < prob) then
@@ -1894,7 +1890,7 @@ end
 
 -- saw the helicopter
 function on_heli_seen(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	if (obj and amk.game_minutes() - timer_heli_showed > timer_heli_freq) then
 		if (rnd() < prob) then
 			local name, sname = TB3D_Services.get_names()
@@ -1916,7 +1912,7 @@ end
 
 -- shot down the helicopter
 function on_heli_flame(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	if (obj and amk.game_minutes() - timer_heli_showed > timer_heli_freq) then	
 		if (rnd() < prob) then
 			local name, sname = TB3D_Services.get_names()
@@ -1938,7 +1934,7 @@ end
 
 -- crashed helicopter
 function on_heli_die(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	if (obj and amk.game_minutes() - timer_heli_showed > timer_heli_freq) then	
 		if (rnd() < prob) then
 			local name, sname = TB3D_Services.get_names()
@@ -1960,7 +1956,7 @@ end
 
 -- flew the helicopter
 function on_heli_retreat(obj)
-	local rnd = math.random
+	--local rnd = math.random
 	if (obj and amk.game_minutes() - timer_heli_showed > timer_heli_freq) then	
 		if (rnd() < prob) then
 			local name, sname = TB3D_Services.get_names()
@@ -1984,7 +1980,7 @@ end
 function do_seen_monster()
 	if TB3D_Modders.show_death_news then
 		local sim = alife()
-		local rnd = math.random
+		--local rnd = math.random
 		local avail = {}
 		local name, sname = TB3D_Services.get_names()
 		local s_author = name.." "..sname
@@ -2164,7 +2160,7 @@ end
 
 function on_wound(obj)
 	if TB3D_Modders.show_death_news then
-		local rnd = math.random
+		--local rnd = math.random
 		if (obj and obj.name) then
 			if (IsNpcStalker(obj)) then
 				if (rnd() < prob) then
@@ -2212,7 +2208,7 @@ end
 -- Message about the death of Semetskogo
 function do_eternal_stalker()
 	if TB3D_Modders.show_death_news then
-		local rnd = math.random
+		--local rnd = math.random
 		local m_level = news_data.levels[rnd(#news_data.levels-5)]
 		local b_indoor = news_data.levels_types[m_level]
 		if (m_level and news_data.level_name[m_level]) then
@@ -2251,7 +2247,7 @@ end
 --[[------------------------ News about time to release ----------------------]]
 function do_blow_news()
 	if TB3D_Modders.run_blowout_pp == true and TB3D_Modders.show_blowout_news then
-		local rnd = math.random
+		--local rnd = math.random
 		if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: release")	end							--!!!!TB3D
 		if (timer_next_blow == 0) then return end
 		--if (amk.load_variable("blowout",-1) > -1 and amk.load_variable("blowout",-1) < 5) then return end
@@ -2314,7 +2310,7 @@ end
 
 function on_news()
 	local sim = alife()
-	local rnd = math.random
+	--local rnd = math.random
 	local avail = {}
 	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: on news")	end										--!!!!TB3D
 	if news_stack then 
@@ -2496,7 +2492,7 @@ function on_offline_stalker_death(victim_, killer_, weapon_)
 		if (victim_ == nil) then
 			return
 		end
-		local rnd = math.random
+		--local rnd = math.random
 		local m_killer = ""
 		local m_killer_s = ""
 		local m_victim = ""
@@ -2581,7 +2577,7 @@ function on_offline_npc_death(victim_, killer_, weapon_)
 	if TB3D_Modders.show_death_news then
 		if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: On offline npc death") end
 		if (victim_ ~= nil) then
-			local rnd = math.random
+			--local rnd = math.random
 			local m_victim = ""
 			local m_killer = ""
 			local aid = nil
@@ -2661,7 +2657,7 @@ end
 
 function on_offline_corpse_found(who, object)
 	if TB3D_Modders.show_death_news then
-		local rnd = math.random
+		--local rnd = math.random
 		if (who and object) then
 			if (IAmAStalker[who:clsid()] and IsNpcStalker(who)) then
 				local s_corpse = ""
@@ -2686,7 +2682,7 @@ function on_offline_corpse_found(who, object)
 end
 
 function on_offline_trade(npc, item)
-	local rnd = math.random
+	--local rnd = math.random
 	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("NEWS MAIN: offline trade")	end							--!!!!TB3D
 	if (npc and item and rnd() < 0.25) then
 		local m_from = get_npc_name(npc)
@@ -2902,7 +2898,7 @@ function connection_message()		--called from ui_main_menu
 	if lname ~= sname then
 		local text = ""
 		local b_text = text
-		local rnd = math.random
+		--local rnd = math.random
 		if (isIsolatedLevel(lname)== true and isIsolatedLevel(sname) == false) then
 			text = news_data.disconnect_templates[rnd(#news_data.disconnect_templates)]
 		elseif (isIsolatedLevel(lname) == false and isIsolatedLevel(sname) == true) then

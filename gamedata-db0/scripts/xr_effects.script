@@ -1528,7 +1528,7 @@ function death_monolith_ghosts(actor, npc)
 end
 
 ---------------------------------------------------------
--- Sarcofag2
+-- Sarcofag2, 110000 not used
 ---------------------------------------------------------
 --[[
 local sar2_heroes_list = {
@@ -1593,7 +1593,6 @@ local sar2_heroes_list = {
     "sar2_monolith_exo",
     "sar2_monolith_exo2"
 }
---]]
 
 local sar2_heroes_sel_number, sar2_heroes_number = 0, 60
 local sar2_heroes_count, sar2_heroes_max_count = 0, 6
@@ -1650,6 +1649,7 @@ function sar2_hero_spawn(actor, npc)
 		end
 	end
 end
+--]]
 
 -------------------------------------------------------------------------------------
 -- Options for the helicopters
@@ -2858,10 +2858,15 @@ function clear_x10_teleports()
 	delete_teleport36()
 	delete_teleport35()
 	local sim = alife()
+	local sect
 	for a=first_object,last_object,1 do		--skip actor (0)
-		obj = alife():object(a)
-		if obj and obj:section_name() == "kostya_restrictor_x10" then
-			sim:release(obj, true)
+		obj = sim:object(a)
+		if obj then
+			sect = get_section(obj)
+			if sect == "kostya_restrictor_x10"		--110000
+			  or sect == "kostya_restrictor_x10" then
+				sim:release(obj, true)
+			end
 		end
 	end
 end

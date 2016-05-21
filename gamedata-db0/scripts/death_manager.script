@@ -1,34 +1,47 @@
---TB3D 1.0.9.9.9.9 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.1.0.0.0 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
---has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts, last_day, reduced vog-25 ammo
-function my_ver() return "1.0.9.9.9.9" end
+--has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts, last_day,
+--reduced vog-25 ammo, _umer from nepis_umer, optimized death info
+function my_ver() return "1.1.0.0.0.0" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
 local string_find = string.find
 
+--[[ following given elsewhere or not used
+	["brat_luis"] = "brat_luis_dead",			--in .ltx prior to 1.1
+	["snip_esc1"] = "snip_esc1_dead",			--in .ltx, 1.1
+	["snip_esc2"] = "snip_esc2_dead",			--in .ltx, 1.1
+	["snip_esc3"] = "snip_esc3_dead",			--in .ltx, 1.1
+	["snip_esc4"] = "snip_esc4_dead",			--in .ltx, 1.1
+	["snip_esc5"] = "snip_esc5_dead",			--in .ltx, 1.1
+	["snip_esc6"] = "snip_esc6_dead",			--in .ltx, 1.1
+	["snip_esc7"] = "snip_esc7_dead",			--in .ltx, 1.1
+	["snip_esc8"] = "snip_esc8_dead",			--in .ltx, 1.1
+	["snip_esc9"] = "snip_esc9_dead",			--in .ltx, 1.1
+	["snip_esc10"] = "snip_esc10_dead",			--in .ltx, 1.1
+	["snip_esc11"] = "snip_esc11_dead",			--in .ltx, 1.1
+	["snip_esc12"] = "snip_esc12_dead",			--in .ltx, 1.1
+	["naem_zahar1"] = "naem_zahar1_dead",			--in .ltx, 1.1
+	["naem_zahar2"] = "naem_zahar2_dead",			--in .ltx, 1.1
+	["naem_zahar3"] = "naem_zahar3_dead",			--in .ltx, 1.1
+	["naem_zahar4"] = "naem_zahar4_dead",			--in .ltx, 1.1
+	["naem_zahar5"] = "naem_zahar5_dead",			--in .ltx, 1.1
+	["naem_zahar6"] = "naem_zahar6_dead",			--in .ltx, 1.1
+	["pri_followers_bomber"] = "pri_bomber_dead",						--not in all.spawn
+	["bandit_krisyk"] = "bandit_krisyk_umer",							--110000, following added from nepis_umer, in .ltx
+	["esc_shustryi"] = "esc_shustryi_umer",
+	["bar_docent"] = "bar_docent_umer",									--in .ltx
+	["dolgovazyi"] = "dolgovazyi_umer",									--in .ltx
+	["sak_military_stalker"] = "sak_military_stalker_umer",				--in .ltx
+	["Sak"] = "Sak_umer",
+	["mil_freedom_member0012"] = "mil_freedom_member0012_umer",
+	["bar_dolg_petrenko"] = "bar_dolg_petrenko_umer",					--in .ltx
+	["mil_freedom_member0018"] = "mil_freedom_member0018_umer",
+]]--
+
 local names_info = {
-	["esc_shustryi"] = "esc_shustryi_dead",				--109991
-	["brat_luis"] = "brat_luis_dead",
-	["snip_esc1"] = "snip_esc1_dead",
-	["snip_esc2"] = "snip_esc2_dead",
-	["snip_esc3"] = "snip_esc3_dead",
-	["snip_esc4"] = "snip_esc4_dead",
-	["snip_esc5"] = "snip_esc5_dead",
-	["snip_esc6"] = "snip_esc6_dead",
-	["snip_esc7"] = "snip_esc7_dead",
-	["snip_esc8"] = "snip_esc8_dead",
-	["snip_esc9"] = "snip_esc9_dead",
-	["snip_esc10"] = "snip_esc10_dead",
-	["snip_esc11"] = "snip_esc11_dead",
-	["snip_esc12"] = "snip_esc12_dead",
-	["naem_zahar1"] = "naem_zahar1_dead",
-	["naem_zahar2"] = "naem_zahar2_dead",
-	["naem_zahar3"] = "naem_zahar3_dead",
-	["naem_zahar4"] = "naem_zahar4_dead",
-	["naem_zahar5"] = "naem_zahar5_dead",
-	["naem_zahar6"] = "naem_zahar6_dead",
 	["ecolog_wound_bunker"] = "ucen_talk_est",
 	["mitya"] = "mitya_dead",
 	["grab_stal1"] = "grab_stal1_dead",
@@ -36,17 +49,14 @@ local names_info = {
 	["grab_stal3"] = "grab_stal3_dead",
 	["grab_stal4"] = "grab_stal4_dead",
 	["grab_stal5"] = "grab_stal5_dead",
-	["mil_trader_gavr"] = "info_gavr_dead",
-	["Mil_Dolg_Zoneguard"] = "mil_scull_dead", --skull
-	["mil_dolg_stalker0000"] = "mil_scull_dead", --skull
-	["mil_freedom_member0018"] = "mil_max_dead",	--max
-	["mil_Svoboda_master_Max"] = "mil_max_dead",	--max
-	["Sak"] = "mil_max_dead",						--max
-	["mil_freedom_member0012"] = "mil_lukash_dead",		--lucash
-	["mil_Svoboda_leader"] = "mil_lukash_dead",		--lucash
-	["svoboda_leader_zombi"] = "mil_lukash_dead",		--lucash
-	["final_lukash"] = "mil_lukash_dead",		--lucash
-	["xalyava_naem1"] = "xalyava_naem1_dead",	--in case logic fails
+	["mil_trader_gavr"] = "info_gavr_dead",								--not in all.spawn
+	["Mil_Dolg_Zoneguard"] = "mil_scull_dead", 							--skull, not in all.spawn
+	["mil_dolg_stalker0000"] = "mil_scull_dead", 						--skull
+	["mil_Svoboda_master_Max"] = "mil_max_dead",						--max, not in all.spawn
+	["mil_Svoboda_leader"] = "mil_lukash_dead",							--lucash, not in all.spawn
+	["svoboda_leader_zombi"] = "mil_lukash_dead",						--lucash, not in all.spawn
+	["final_lukash"] = "mil_lukash_dead",								--lucash
+	["xalyava_naem1"] = "xalyava_naem1_dead",							--in case logic fails
 	["xalyava_naem2"] = "xalyava_naem2_dead",
 	["xalyava_naem3"] = "xalyava_naem3_dead",
 	["xalyava_naem4"] = "xalyava_naem4_dead",
@@ -55,8 +65,26 @@ local names_info = {
 	["xalyava_naem7"] = "xalyava_naem7_dead",
 	["xalyava_naem8"] = "xalyava_naem8_dead",
 	["pri_followers_leader"] = "pri_aes_mapspot",
-	["val_lager_bandits_borov"] = "val_borov_dead"
-	--["pri_followers_bomber"] = "pri_bomber_dead"
+	["val_lager_bandits_borov"] = "val_borov_dead",
+	["esc_vagon_wounded"] = "esc_vagon_wounded_umer",
+	["mil_freedom_member0021"] = "mil_freedom_member0021_umer",			--Miser
+	["esc_shustryi"] = "esc_shustryi_dead",								--109991
+	["Sak"] = "mil_max_dead",											--max
+	["esc_novice_attacker1"] = "esc_novice_attacker1_umer",
+	["esc_provodnik"] = "esc_provodnik_umer",
+	["esc_bridge_soldier5"] = "esc_bridge_soldier5_umer",
+	["esc_fox"] = "esc_fox_umer",
+	["mil_freedom_member0012"] = "mil_lukash_dead",						--lucash
+	["bar_dolg_leader"] = "bar_dolg_leader_umer",						--in all.spawn gives %+sar2_death_43 +bar_voronin_dead%
+	["bar_dolg_regular_5"] = "bar_dolg_regular_5_umer",
+	["val_escort_captive"] = "val_escort_captive_umer",
+	["val_escort_nap1"] = "val_escort_nap1_umer",
+	["agr_krot"] = "agr_krot_umer",										--in all.spawn gives %+agr_krot_dead +sar2_death_19%
+	["gar_hellcar"] = "gar_hellcar_umer",
+	["gar_dm_novice"] = "gar_dm_novice_umer",							--%+gar_dm_novice_dead =gar_dm_bandits_fight%
+	["gar_dolg_blokpost_4"] = "gar_dolg_blokpost_4_umer",
+	["mil_freedom_member0018"] = "mil_max_dead",						--max
+	["mil_freedom_stalker0026"] = "mil_freedom_stalker0026_umer"
 }
 local coll_names_info = {
 	["tractorist"] = "tractorist_zep3_done",			--spawns note if not already done
@@ -91,10 +119,10 @@ function drop_manager:check_dead_weapons()
 		local npc_name = protected_items.get_obj_name(self.npc)		--strips off the id
 		local commun = self.npc:character_community()		--109990
 		--TB3D_Services.packet_alert("death mgr: check dead weapons["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."]")
-		if commun and commun == "lastday" then
-			if string_find(npc_name, "charactercommander") then return end
+		--if commun and commun == "lastday" then
+			--if string_find(npc_name, "charactercommander") then return end
 			--if lname == "red_forest" or lname == "dead_city" then return end
-		end
+		--end
 		local is_rand = TB3D_Modders.loadout_rand_cond
 		local min_cond = TB3D_Modders.loadout_min_cond									--109981
 		if min_cond == nil or min_cond < 0 or min_cond > 99 then min_cond = 80 end
@@ -108,7 +136,7 @@ function drop_manager:check_dead_weapons()
 			item_in_slot:unload_magazine()													--remove ammo to prevent child ctd
 			if is_rand then item_in_slot:set_condition(math_random(min_cond, 100)/100) end
 		end
-		function check_weapon(npc, item)																	--109981
+--[[		function check_weapon(npc, item)																	--109981
 			if npc and item and alife():object(item:id()) then
 				if IAmAWeapon[item:clsid()] then
 					item:unload_magazine()																	--109981, pm still causes error with 9x18_fmj
@@ -121,6 +149,7 @@ function drop_manager:check_dead_weapons()
 			return false
 		end
 		--self.npc:iterate_inventory(check_weapon, self.npc)
+--]]
 	end
 end
 

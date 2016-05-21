@@ -1,11 +1,11 @@
---' TB3D 1.0.9.9.9.9 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.1.0.0.0.0 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
 -- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, repair_kit
--- text color, give repair_kit and spare_parts Revamped - aleks1970, 186 char size limit to sms messages!!!!
-function my_ver() return "1.0.9.9.9.9" end
+-- text color, give repair_kit and spare_parts Revamped - aleks1970, 186 char size limit to sms messages!!!!, new weapon for/from Fox - aleks1970
+function my_ver() return "1.1.0.0.0.0" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -18,13 +18,37 @@ end
 
 --' check the availability of guns for Fox
 function fox_kriss_have()
-	return amk_utils.inventory_search("wpn_spas12",1) ~= false
+	return amk_utils.inventory_search("wpn_xm1014_3",1) ~= false	-- new weapon for Fox - aleks1970
 end
 
 --' give up the trunk of the Fox
 function fox_kriss_done(first_speaker, second_speaker)
-	sak.out_item_namber("wpn_spas12",1)
-	dialogs.relocate_item_section(second_speaker, "wpn_winchester_m1","in")
+	sak.out_item_namber("wpn_xm1014_3",1)	-- new weapon for Fox and better rewards (based on infos) - aleks1970
+	-- different weapons - aleks1970
+	if has_alife_info("doc_otdan_p") and has_alife_info("freeman_eagle_done") and has_alife_info("bar_dolg_base_guard_art_done") and has_alife_info("kostya_svalka_taynik_done") then
+		dialogs.relocate_item_section(second_speaker, "wpn_usas12","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_zhekan_izomorf","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_zhekan_izomorf","in")
+	elseif has_alife_info("esc_bridge_vodka_done") and has_alife_info("doc_otdan_p") and has_alife_info("kostya_svalka_taynik_done") and has_alife_info("freeman_eagle_done") then
+		dialogs.relocate_item_section(second_speaker, "wpn_protecta_col","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_zhekan_izomorf","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_12x70_kart","in")
+	elseif has_alife_info("esc_bridge_vodka_done") and has_alife_info("doc_otdan_p") and has_alife_info("kostya_svalka_taynik_done") then
+		dialogs.relocate_item_section(second_speaker, "wpn_zastava_z92_mod","in")
+		dialogs.relocate_item_section(second_speaker, "wpn_addon_sil_545_ar","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_7.62x39_ap","in")
+	elseif has_alife_info("esc_bridge_vodka_done") and has_alife_info("hand_otdan") then
+		dialogs.relocate_item_section(second_speaker, "wpn_m4super90_ves","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_12x76_dart","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_12x70_kart","in")
+	elseif has_alife_info("esc_bridge_vodka_done") and has_alife_info("kostya_art_done") then
+		dialogs.relocate_item_section(second_speaker, "wpn_xm1014","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_12x70_kart","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_12x70_kart","in")
+	else
+		dialogs.relocate_item_section(second_speaker, "wpn_winchester_m1","in")
+		dialogs.relocate_item_section(second_speaker, "ammo_12x70_kart","in")
+	end
 end
 
 --' This function checks the minigun
@@ -1618,14 +1642,14 @@ function snova_seif(first_speaker, second_speaker)
 end
 
 --' spawn little artov in NC
-function spawn_aver_art1()
+function spawn_aver_art1()														--110000, fixed locations
 	if TB3D_Services.is_collector(4000) == false then
-		alife():create("af_spirit_1",vector():set(-311.500,0.390,-338.304),335058,2890)
-		alife():create("af_fireball",vector():set(52.464,-13.941,-186.119),959429,2908)
-		alife():create("af_cristall",vector():set(-338.465,-26.910,176.832),287481,2891)
-		alife():create("af_armor_2",vector():set(125.058,38.844,397.450),1088689,2899)
-		alife():create("af_fireball",vector():set(-126.538,-53.295,-185.044),652148,2897)
-		alife():create("art_acumm",vector():set(-276.414,-23.379,250.316),396447,2891)
+		alife():create("af_spirit_1",vector():set(-27.219,7.337,15.929),165952,2881)
+		alife():create("af_fireball",vector():set(54.109,0.035,-165.066),232504,2884)
+		alife():create("af_cristall",vector():set(31.167,-0.004,108.981),214894,2885)
+		alife():create("af_armor_2",vector():set(85.394,1.220,-207.879),261404,2884)
+		alife():create("af_fireball",vector():set(-101.954,12.038,-191.628),106788,2882)
+		alife():create("art_acumm",vector():set(198.669,-0.163,11.353),350062,2885)
 	end
 end
 
@@ -1669,7 +1693,7 @@ end
 
 --' spawn little more artov in NC
 function spawn_aver_art2()
-	if TB3D_Services.is_collector(4000) == false then
+	--if TB3D_Services.is_collector(4000) == false then
 		alife():create("af_vyvert",vector():set(-252.372,-1.190,-325.960),436604,2892)
 		alife():create("af_gravi",vector():set(-163.165,51.365,-415.454),588454,2890)
 		alife():create("af_drops",vector():set(-119.568,22.321,64.620),664582,2894)
@@ -1677,7 +1701,7 @@ function spawn_aver_art2()
 		alife():create("af_blood",vector():set(345.540,4.877,-87.297),1485407,2902)
 		alife():create("af_mincer_meat",vector():set(306.971,-38.273,386.180),1415062,2904)
 		alife():create("af_electra_sparkler",vector():set(134.876,14.633,66.266),1105003,2902)
-	end
+	--end
 end
 
 --' give up the bag and safe medic
@@ -1828,7 +1852,7 @@ end
 
 --' spawn little more artov in NC
 function spawn_aver_art3()
-	if TB3D_Services.is_collector(4000) == false then
+	--if TB3D_Services.is_collector(4000) == false then
 		alife():create("af_rusty_thorn",vector():set(420.649,43.074,321.392),1631337,2906)
 		alife():create("af_rusty_kristall",vector():set(18.712,48.116,-415.46),898878,2898)
 		alife():create("af_drops",vector():set(-50.587,-39.939,-99.154),782762,2897)
@@ -1836,7 +1860,7 @@ function spawn_aver_art3()
 		alife():create("art_acumm",vector():set(93.864,-4.432,-105.082),1033389,2902)
 		alife():create("af_mincer_meat",vector():set(-276.414,-23.379,250.316),396447,2891)
 		alife():create("af_mincer_meat",vector():set(76.217,-8.158,-208.145),1002137,2897)
-	end
+	--end
 end
 
 --' ultradetektor check for Adrenaline

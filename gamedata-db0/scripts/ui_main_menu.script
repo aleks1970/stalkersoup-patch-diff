@@ -61,10 +61,10 @@ function main_menu:InitControls()
 	local mm = _G.main_menu.get_main_menu()
 	local _ver = xml:InitStatic("mod_version",self)
 	if mm.GetGSVer and mm:GetGSVer() ~= nil then
-		_ver:SetText(" GSC["..mm:GetGSVer().."] STALKERSOUP Managed MegaMOD "..TB3D_Services.title_ver())
+		_ver:SetText(" GSC["..mm:GetGSVer().."] STALKERSOUP "..TB3D_Services.title_ver())
 	else
 		TB3D_Services.packet_alert("GSC Version 1.0006/1.0008ww only")
-		_ver:SetText("GSC[1.0004] STALKERSOUP Managed MegaMOD "..TB3D_Services.title_ver())
+		_ver:SetText("GSC[1.0004] STALKERSOUP "..TB3D_Services.title_ver())
 	end
 	_ver:SetTextColor(255,60,100,180)
 end

@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.8 chgd >0.95 to >0.94, dmx135, fixed act_upgreid_ suit order, sveeblov_ferma_have, formatting and debug,
+--TB3D 1.1.0.0.0.0 chgd >0.95 to >0.94, dmx135, fixed act_upgreid_ suit order, sveeblov_ferma_have, formatting and debug,
 -- add_man health, kalmyak, prizrak_finalzver_done, treasure_ecolog_have, out_item_much, mutant parts for dan, can_start_dan,
--- can_start_arhara, out_items_count
-function my_ver() return "1.0.9.9.9.8" end
+-- can_start_arhara, out_items_count, new weapon for Fox - aleks1970, secret box
+function my_ver() return "1.1.0.0.0.0" end
 
 local nagrad = {
   level_1 = {
@@ -209,7 +209,7 @@ end
 
 function prapor_jaw_done(first_speaker, second_speaker) 
 	dialogs.relocate_item_section(first_speaker, "mutant_krovosos_jaw", "out")
-	dialogs.relocate_item_section(second_speaker, "wpn_spas12", "in")
+	dialogs.relocate_item_section(second_speaker, "wpn_xm1014_3", "in")	-- new weapon for Fox - aleks1970
 end	
 
 function informator_pda_have(task, objective) 
@@ -618,7 +618,7 @@ end
 function prizrak_zver_done(first_speaker, second_speaker) 
     dialogs.relocate_item_section(first_speaker, "sniper_flash", "out")
 	dialogs.relocate_item_section(second_speaker, "wpn_dark_gauss", "in")
-	treasure_manager.get_treasure_manager():give_treasure("lost_village_inventory_box") -- Lost Village - Ghost blue box - aleks1970
+	treasure_manager.get_treasure_manager():give_treasure("lost_village_inventory_box") --110000, Lost Village - Ghost blue box - aleks1970
 end	
 
 function prizrak_finalzver_have(task, objective) 
@@ -1833,7 +1833,36 @@ end
 
 
 function shadowman_zver_have(task, info)
-    if (db.actor:has_info("shadowman_zver1_dead") and db.actor:has_info("shadowman_zver2_dead") and db.actor:has_info("shadowman_zver3_dead") and db.actor:has_info("shadowman_zver4_dead") and db.actor:has_info("shadowman_zver5_dead") and db.actor:has_info("shadowman_zver6_dead") and 	db.actor:has_info("shadowman_zver7_dead") and db.actor:has_info("shadowman_zver8_dead") and db.actor:has_info("shadowman_zver9_dead") and	db.actor:has_info("shadowman_zver10_dead") and db.actor:has_info("shadowman_zver11_dead") and db.actor:has_info("shadowman_zver12_dead") and db.actor:has_info("shadowman_zver13_dead") and db.actor:has_info("shadowman_zver14_dead") and db.actor:has_info("shadowman_zver15_dead") and db.actor:has_info("shadowman_zver16_dead") and db.actor:has_info("shadowman_zver17_dead") and db.actor:has_info("shadowman_zver18_dead") and db.actor:has_info("shadowman_zver19_dead") and db.actor:has_info("shadowman_zver20_dead") and db.actor:has_info("shadowman_zver21_dead") and db.actor:has_info("shadowman_zver22_dead") and db.actor:has_info("shadowman_zver23_dead") and db.actor:has_info("shadowman_zver24_dead") and db.actor:has_info("shadowman_zver25_dead") and db.actor:has_info("shadowman_zver26_dead") and db.actor:has_info("shadowman_zver27_dead") and db.actor:has_info("shadowman_zver28_dead") and db.actor:has_info("shadowman_zver29_dead") and db.actor:has_info("shadowman_zver30_dead")) then
+    if (has_alife_info("shadowman_zver1_dead")
+	and has_alife_info("shadowman_zver2_dead")
+	and has_alife_info("shadowman_zver3_dead")
+	and has_alife_info("shadowman_zver4_dead")
+	and has_alife_info("shadowman_zver5_dead")
+	and has_alife_info("shadowman_zver6_dead")
+	and has_alife_info("shadowman_zver7_dead")
+	and has_alife_info("shadowman_zver8_dead")
+	and has_alife_info("shadowman_zver9_dead")
+	and	has_alife_info("shadowman_zver10_dead")
+	and has_alife_info("shadowman_zver11_dead")
+	and has_alife_info("shadowman_zver12_dead")
+	and has_alife_info("shadowman_zver13_dead")
+	and has_alife_info("shadowman_zver14_dead")
+	and has_alife_info("shadowman_zver15_dead")
+	and has_alife_info("shadowman_zver16_dead")
+	and has_alife_info("shadowman_zver17_dead")
+	and has_alife_info("shadowman_zver18_dead")
+	and has_alife_info("shadowman_zver19_dead")
+	and has_alife_info("shadowman_zver20_dead")
+	and has_alife_info("shadowman_zver21_dead")
+	and has_alife_info("shadowman_zver22_dead")
+	and has_alife_info("shadowman_zver23_dead")
+	and has_alife_info("shadowman_zver24_dead")
+	and has_alife_info("shadowman_zver25_dead")
+	and has_alife_info("shadowman_zver26_dead")
+	and has_alife_info("shadowman_zver27_dead")
+	and has_alife_info("shadowman_zver28_dead")
+	and has_alife_info("shadowman_zver29_dead")
+	and has_alife_info("shadowman_zver30_dead")) then
 		TB3D_Services.shadowman_cleanup()
 		return true 
 	end

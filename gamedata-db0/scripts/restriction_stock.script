@@ -1,4 +1,4 @@
---<!-- TB3D 1.0.9.9.4.4 missing comma line 251, wpn_sg552_fss_de, translate-->
+--<!-- TB3D 1.1.0.0.0.0 missing comma line 251, wpn_sg552_fss_de, translate, still not working-->
 --File:  restriction_stock .script
 --Created:  28.05.2008
 --Copyright:  © 2008 AMK team
@@ -56,10 +56,10 @@ function restriction_of_stock(ItemObj,Fix)
 	
 		if InvStat - InvMax > 0 then
 			news_manager.amk_send_tip(msg[math.random(1, table.getn(msg))],nil,nil,5)
-			amk.drop_item(actor,ItemObj)
-			if isWeapon(ItemObj) then
-				ammo_discharge(ItemObj)
-			end
+			actor:drop_item(ItemObj)
+			--if isWeapon(ItemObj) then
+				--ammo_discharge(ItemObj)
+			--end
 		end
 	end
 end

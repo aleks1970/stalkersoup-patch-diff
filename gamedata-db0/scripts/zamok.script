@@ -94,7 +94,6 @@ function restore()
 	--LevelVertexId()
 	--meceniy_art.art_respawn_test()
 	--test_r_line()
-	local sect = ""
 	local parents = {}
 	local items = {}
 	local itemsCount = 0
@@ -102,18 +101,20 @@ function restore()
 	local se_obj, se_box --, se_parent
 	for i = first_object, last_object do
 		se_obj = sim:object(i)
-		if se_obj and se_obj:section_name() == "zamok" and se_obj.parent_id and se_obj.parent_id ~= 0 and se_obj.parent_id ~= expendable_object then
-			se_box = sim:object(se_obj.parent_id) -- get server object owner
-			if se_box then
-				--local se_box_section = se_box:section_name()
-				--local se_box_class = se_box:clsid()
-				--get_console():execute("load ~~~ se_box_section: "..se_box_section.." se_box_class: "..se_box_class)
-				if se_box:clsid() == clsid.inventory_box then
-					--get_console():execute("load ~~~ restore protect box ID: "..se_box.id.." story ID: "..se_box.m_story_id.." name: "..se_box:name())
-					table_insert(amk_offline_alife.protected.ids, se_box.id)
+		if se_obj then
+			if get_section(se_obj) == "zamok" and se_obj.parent_id and se_obj.parent_id ~= 0 and se_obj.parent_id ~= expendable_object then
+				se_box = sim:object(se_obj.parent_id) -- get server object owner
+				if se_box then
+					--local se_box_section = se_box:section_name()
+					--local se_box_class = se_box:clsid()
+					--get_console():execute("load ~~~ se_box_section: "..se_box_section.." se_box_class: "..se_box_class)
+					if se_box:clsid() == clsid.inventory_box then
+						--get_console():execute("load ~~~ restore protect box ID: "..se_box.id.." story ID: "..se_box.m_story_id.." name: "..se_box:name())
+						table_insert(amk_offline_alife.protected.ids, se_box.id)
+					end
+				else
+					if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("ZAMOK: FAILED restore protect box id: ["..i.."] name: ["..protected_items.get_obj_name(se_obj).."]") end
 				end
-			else
-				if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("ZAMOK: FAILED restore protect box id: ["..i.."] name: ["..protected_items.get_obj_name(se_obj).."]") end
 			end
 		end
 	end

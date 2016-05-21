@@ -1145,7 +1145,7 @@ end
 function CRandomTask:register_target(obj)
 if obj then
 	local rstring = "NONE"
-	if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: register target NAME["..utils.to_str(obj:name()).."] sect["..utils.to_str(obj:section_name()).."]") end
+	if TB3D_Modders.use_task_message == true then TB3D_Services.info_alert("TASK MGR: register target NAME["..utils.to_str(obj:name()).."] sect["..utils.to_str(get_section(obj)).."]") end
 	if IAmAStalker[obj:clsid()] then
 		rstring = "STALKER"
 		--' Probably recorded goal for the quest to kill the stalker "
@@ -1188,7 +1188,7 @@ if obj then
 		--' Probably recorded goal for the quest "to find the object"
 		for k,v in pairs(self.task_id_by_type["find_item"]) do
 		--TB3D_Services.packet_alert("TASK MGR: find item =["..utils.to_str(self.task_info[v].target).."]")
-			if obj:section_name() == self.task_info[v].target then
+			if get_section(obj) == self.task_info[v].target then
 				if self.task_info[v].target_objects == nil then	self.task_info[v].target_objects = {} end	--create first entry
 				if TB3D_Modders.use_task_message == true then TB3D_Services.packet_alert("TASK MGR: find item ["..utils.to_str(v).."]") end
 				self.task_info[v].target_objects[#self.task_info[v].target_objects+1] = obj.id

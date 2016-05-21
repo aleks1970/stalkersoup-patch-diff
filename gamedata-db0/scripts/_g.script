@@ -1,5 +1,6 @@
--- TB3D 1.0.9.9.9.9 added tables to debug, new rep system, optimized, cleanup, db calls, added intervals, show_tables, generic_m_story_id, post process, is_spawner
-function my_ver() return "1.0.9.9.9.9" end
+-- TB3D 1.1.0.0.0.0 added tables to debug, new rep system, optimized, cleanup, db calls, added intervals, show_tables, generic_m_story_id, post process, is_spawner
+prefetch("TB3D_Modders")
+function my_ver() return "1.1.0.0.0.0" end
 
 if (jit == nil) then
   profiler.setup_hook ()
@@ -29,6 +30,7 @@ run_hide = 1 --2
 huddle_up = 3
 can_leave = 6
 is_spawner = false									--109998, bypass pop control if from spawn menu
+time_changed = true									--110000, used to reset weather in bind_stalker.update
 
 -- Loads the schema from a file on the disk and activates a motivator.
 -- Here:
@@ -965,7 +967,11 @@ function is_object_online(obj_id)
 end
 
 function get_clsid(npc)
-  return npc and npc:clsid()
+	if npc and npc.clsid then
+		return npc:clsid()
+	else
+		return
+	end
 end
 
 --[[ 
@@ -1252,7 +1258,7 @@ end
 --// Is obj monster
 function is_object_monster(obj)
 	local otype = get_clsid(obj)
-	if (otype == clsid.crow
+	if otype and (otype == clsid.crow
 		or otype == clsid.zombie
 		or otype == clsid.flesh
 		or otype == clsid.controller
@@ -1440,27 +1446,52 @@ end
 IAmAMonster = {}
 function IAmAMonsterInit()
     IAmAMonster = {
-       [clsid.boar_s] = true,
-       [clsid.bloodsucker_s] = true,
-       [clsid.dog_s] = true,
-       [clsid.flesh_s] = true,
-       [clsid.pseudodog_s] = true,
-       [clsid.psy_dog_s] = true,
-       [clsid.burer_s] = true,
-       [clsid.cat_s] = true,
-       [clsid.chimera_s] = true,
-       [clsid.controller_s] = true,
-       [clsid.fracture_s] = true,
-       [clsid.poltergeist_s] = true,
-       [clsid.gigant_s] = true,
-       [clsid.zombie_s] = true,
-       [clsid.tushkano_s] = true,
-       [clsid.snork_s] = true,
-		[clsid.psy_dog_phantom_s] = true
+		[clsid.boar_s] = true,
+		[clsid.bloodsucker_s] = true,
+		[clsid.dog_s] = true,
+		[clsid.flesh_s] = true,
+		[clsid.pseudodog_s] = true,
+		[clsid.psy_dog_s] = true,
+		[clsid.burer_s] = true,
+		[clsid.cat_s] = true,
+		[clsid.chimera_s] = true,
+		[clsid.controller_s] = true,
+		[clsid.fracture_s] = true,
+		[clsid.poltergeist_s] = true,
+		[clsid.gigant_s] = true,
+		[clsid.zombie_s] = true,
+		[clsid.tushkano_s] = true,
+		[clsid.snork_s] = true,
+		[clsid.psy_dog_phantom_s] = true,
+		[36] = true										--m_trader
 		--[clsid.werewolf_s ] = true,
 		--[clsid.bibliotekar_s ] = true
     }
 end-------------------------------------------------------------------------------------------
+
+function get_section(obj)					--110000
+	local sect = ""
+	if obj then
+		if obj.section_name then sect = obj:section_name() end
+		if not sect or sect == "" then
+			if obj.section then sect = obj:section() end
+		end
+--[[
+		if not sect then
+			if string_find(obj:name(), "physic_destroyable_object") then
+				sect = "physic_destroyable_object"
+			elseif string_find(obj:name(), "physic_object") then
+				sect = "physic_object"
+			elseif string_find(obj:name(), "light_galogen") then
+				sect = "lights_hanging_lamp"
+			elseif string_find(obj:name(), "lights_") then
+				sect = "lights_hanging_lamp"
+			end
+		end
+--]]
+	end
+	return sect
+end
 
 function level_object_by_sid( sid )
   local sim = alife()
@@ -1592,9 +1623,9 @@ function start_game_callback()
 	IAmAWeaponInit()
 	task_manager.clear_task_manager()
 	treasure_manager.clear_treasure_manager()
-	xr_sound.clear_all_sound_object()
 	dialog_manager.fill_phrase_table() 
 	amk.on_game_start() --obj)  --AMK UTILS		sets rand seed, ver, start time and cslid lists
+	xr_sound.clear_all_sound_object()
 	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("_G: start game callback done") end
 end
 

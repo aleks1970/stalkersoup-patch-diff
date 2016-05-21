@@ -37,7 +37,7 @@ function deathStatCollect()
 end
 
 function deathStatChangeDifficulty()
-	local difficultyNumber = level.get_game_difficulty()
+	local difficultyNumber = TB3D_Services.difficulty_num		--level.get_game_difficulty()
 	--news_manager.amk_send_tip(tostring(difficultyNumber), "Cleaner", 0, 15, "gen_info")
 	local f = getFS()
 	local flist = f:file_list_open_ex("$game_saves$", bit_or(FS.FS_ListFiles, FS.FS_RootOnly), "death_*.sta")
@@ -69,7 +69,7 @@ function deathStatChangeDifficulty()
 				if string.len(lastDate) == 8 then
 					if deathCount >= deathCountLimitDown then
 						if difficultyNumber > 0 then
-							news_manager.amk_send_tip("%c[255,0,255,0]Marked One is not able for Stalker difficulty. Reduc difficulty.%c[default]", "LOCAL NETWORK", 0, 15, "gen_info")
+							news_manager.amk_send_tip("%c[255,0,255,0]Marked One is not able for Stalker difficulty. Reduced difficulty.%c[default]", "LOCAL NETWORK", 0, 15, "gen_info")
 							difficultyNumber = difficultyNumber - 1
 						else
 							news_manager.amk_send_tip("%c[255,0,255,0]Marked One is not able for this difficulty. But there is nothing easier!%c[default]", "LOCAL NETWORK", 0, 15, "gen_info")
@@ -81,7 +81,7 @@ function deathStatChangeDifficulty()
 					else
 						if lastDate ~= dateNow then
 							if deathCount <= deathCountLimitUp then
-								if difficultyNumber < 3 then
+								if difficultyNumber < 4 then
 									news_manager.amk_send_tip("%c[255,0,255,0]Marked One is too good for this difficulty. Increase the severity of the Zone.%c[default]", "LOCAL NETWORK", 0, 15, "gen_info")
 									difficultyNumber = difficultyNumber + 1
 								else
@@ -115,5 +115,7 @@ function deathStatChangeDifficulty()
 		local f2 = f:update_path("$game_saves$", "death_"..dateNow.."_0.sta")
 		f:file_copy(f1, f2)
 	end
+	TB3D_Services.change_difficulty(difficultyNumber)
+	if difficultyNumber > 3 then difficultyNumber = 3 end
 	level.set_game_difficulty(difficultyNumber)
 end

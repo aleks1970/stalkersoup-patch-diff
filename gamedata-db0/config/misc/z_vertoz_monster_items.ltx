@@ -1,0 +1,391 @@
+;<!-- TB3D 1.0.9.9.9.8, commented out "discovery_dependency" aleks1970 -->
+
+;<!-- TUSHKANO'S HEAD -->
+[mutant_face_tushkano]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\mutant_face_tushkano"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\face_tushkano.ogf
+radius				= 1
+
+inv_name			= mutant_face_tushkano
+inv_name_short		= mutant_face_tushkano
+description			= mutant_face_tushkano_description
+
+inv_weight			= 0.3
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 21
+inv_grid_y			= 5
+belt				= true
+cost				= 250
+
+;<!-- CONTROLLER'S HAND -->
+[mutant_hand_kontroler]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\hand_kontroler"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\hand_kontroler.ogf
+radius				= 1
+
+inv_name			= mutant_hand_kontroler
+inv_name_short		= mutant_hand_kontroler
+description			= mutant_hand_kontroler_description
+
+inv_weight			= 0.2
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 21
+inv_grid_y			= 6
+belt				= true
+cost				= 1200
+
+;<!-- POLTERGEIST'S EYE -->
+[mutant_poltergeist_glas]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\poltergeist_glas"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\poltergeist_glas.ogf
+radius				= 1
+
+inv_name			= mutant_poltergeist_glas
+inv_name_short		= mutant_poltergeist_glas
+description			= mutant_poltergeist_glas_description
+
+inv_weight			= 0.1
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 21
+inv_grid_y			= 7
+belt				= true
+cost				= 300
+
+;<!-- PSEUDOGIANT'S HAND -->
+[mutant_psevdogigant_hand]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\psevdogigant_hand"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\psevdogigant_hand.ogf
+radius				= 1
+
+inv_name			= mutant_psevdogigant_hand
+inv_name_short		= mutant_psevdogigant_hand
+description			= mutant_psevdogigant_hand_description
+
+inv_weight			= 0.3
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 22
+inv_grid_y			= 5
+belt				= true
+cost				= 700
+
+;<!-- FERAL CAT'S TAIL -->
+[mutant_tail_cat]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\tail_cat"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\tail_cat.ogf
+radius				= 1
+
+inv_name			= mutant_tail_cat
+inv_name_short		= mutant_tail_cat
+description			= mutant_tail_cat_description
+
+inv_weight			= 0.2
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 22
+inv_grid_y			= 6
+belt				= true
+cost				= 500
+
+;<!-- COLLECTABLE PARTS -->
+;<!-- CHIMERA TALONS -->
+[mutant_chimera_kogot]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\chimera_kogott"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\chimera_kogot.ogf
+radius				= 1
+
+inv_name			= mutant_chimera_kogot
+inv_name_short		= mutant_chimera_kogot
+description			= mutant_chimera_kogot_description
+
+inv_weight			= 0.1
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 22
+inv_grid_y			= 7
+belt				= true
+cost				= 1000
+
+[mutant_werewolf_kogot]:mutant_chimera_kogot
+$spawn 				= "devices\monster_items\werewolf_paws"
+visual				= monster_items\werewolf_paws.ogf	;missing model, need to edit object - aleks1970
+inv_name			= mutant_werewolf_kogot
+inv_name_short		= mutant_werewolf_kogot
+description			= mutant_werewolf_kogot_description
+
+inv_weight			= 1.2
+can_trade			= on
+
+inv_grid_width		= 2	;new icon - aleks1970
+inv_grid_height		= 1
+inv_grid_x			= 70
+inv_grid_y			= 22
+belt				= true
+cost				= 35000
+
+;;; Venom Claw(Raptor)
+[mutant_raptor_kogot]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\monster_items\chimera_kogott"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\chimera_kogot.ogf
+radius				= 1
+
+inv_name			= mutant_raptor_kogot
+inv_name_short		= mutant_raptor_kogot
+description			= enc_mutant_raptor_kogot_description
+
+inv_weight			= 0.1
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 20
+inv_grid_y			= 66
+belt				= true
+cost				= 12000
+
+;<!-- IZLOM'S HAND -->
+[mutant_fracture_hand]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\mutant_fracture_hand"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\fracture_hand.ogf
+radius				= 1
+
+inv_name			= mutant_fracture_hand
+inv_name_short		= mutant_fracture_hand
+description			= mutant_fracture_hand_description
+
+inv_weight			= 0.3
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 17
+inv_grid_y			= 39
+belt				= true
+cost				= 750
+
+;<!-- RAT'S SPLEEN -->
+[mutant_spleen_rat]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\mutant_spleen_rat"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\rat_tail_normal.ogf
+radius				= 1
+
+inv_name			= mutant_spleen_rat
+inv_name_short		= mutant_spleen_rat
+description			= mutant_spleen_rat_description
+
+inv_weight			= 0.1
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 15
+inv_grid_y			= 23
+belt				= true
+cost				= 300
+
+;----------------------------;
+;--spare babusek----------;
+;----------------------------;
+;<!-- ZOMBIE'S TEETH -->
+[mutant_zombie_teeth]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\mutant_zombie_teeth"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= new_item\mutant_zombie_teeth.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+
+inv_name			     = mutant_zombie_teeth
+inv_name_short		     = mutant_zombie_teeth
+description			= enc_mutant_zombie_teeth
+inv_weight			= 0.2
+can_trade			= on
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 25	;38 - aleks1970
+inv_grid_y         = 20	;50
+cost				= 1700
+belt				= true
+
+;<!-- TARAKAN SHELL -->
+[part_tarakan]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\part_tarakan"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= new_item\part_tarakan.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+
+inv_name			= part_tarakan
+inv_name_short		= part_tarakan
+description		= enc_part_tarakan
+inv_weight		= 0.2
+can_trade			= on
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 22	;46 - aleks1970
+inv_grid_y         = 26	;47
+cost				= 1000
+belt				= true
+
+;<!-- AGED TARAKAN SHELL -->
+[part_tarakan_strong]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\part_tarakan_strong"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= new_item\part_tarakan_strong.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+
+inv_name			     = part_tarakan_strong
+inv_name_short		     = part_tarakan_strong
+description			= enc_part_tarakan_strong
+inv_weight			= 0.2
+can_trade			= on
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 22	;45 - aleks1970
+inv_grid_y         = 25	;47
+cost				= 1800
+belt				= true
+
+;<!-- FEMALE ZOMBIE'S BREAST -->
+[rudiment_big]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\rudiment_big"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= new_item\rudiment_babka_big.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+quest_item			= false
+
+description			= enc_rudiment_big
+
+inv_name			     = rudiment_big
+inv_name_short		     = rudiment_big
+inv_weight			= 0.6
+inv_grid_width		     = 1
+inv_grid_height		= 1
+inv_grid_x			= 25	;39 - aleks1970
+inv_grid_y			= 21	;50
+cost				     = 7500
+
+;<!-- LIBRARIAN'S FUR -->
+[part_digitis_biblio]:identity_immunities
+GroupControlSection	= spawn_group
+; discovery_dependency = ; aleks1970  
+$spawn 				= "devices\monster_items\part_tarakan_strong"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= new_item\part_digitis_biblio.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+
+inv_name			     = part_digitis_biblio
+inv_name_short		     = part_digitis_biblio
+description			= enc_part_digitis_biblio
+inv_weight			= 2.80
+can_trade			= on
+inv_grid_width     = 3
+inv_grid_height    = 1
+inv_grid_x         = 79	;37 new icon - aleks1970
+inv_grid_y         = 14	;19
+cost				= 40000
+belt				= true
+
+[mutant_deathclaw_antler]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\monster_items\mutant_deathclaw_antler"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= monster_items\deathclaw_antler.ogf
+radius				= 1
+
+inv_name			= mutant_deathclaw_antler
+inv_name_short		= mutant_deathclaw_antler
+description			= enc_mutant_deathclaw_antler_description
+
+inv_weight			= 0.6
+can_trade			= on
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 57
+belt				= true
+cost				= 18000

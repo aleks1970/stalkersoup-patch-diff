@@ -258,8 +258,10 @@ function net_spawn()
 		local sobj
 		for i=first_object,last_object do
 			sobj=sim:object(i)
-			if sobj and art_hit[sobj:section_name()] and sobj.parent_id == 0 then
-				art_cnt=art_cnt+1
+			if sobj then
+				if art_hit[get_section(sobj)] and sobj.parent_id == 0 then
+					art_cnt=art_cnt+1
+				end
 			end
 		end
 	end

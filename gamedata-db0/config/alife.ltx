@@ -116,13 +116,13 @@
 
 [alife]
 ;;;;;[DMX: 1,1,900,0.1,5,2,5,140,0.1][SEC TRAILS: 1,1,900,0.1,5,2,5,150,0.1][1.0007ww: 1,1,900,0.1,10,10,5,150,0.1]
-;;;;;[TB3D: 1,1,900,0.1,6,6,5,140,0.1] (default) tested to work best with smooth alife activity and least quest issues
-    schedule_min				= 1											; milliseconds
+;;;;;[TB3D: 1,1,900,0.1,5,5,5,140,0.1] (default) tested to work best with smooth alife activity and least quest issues
+    schedule_min				= 0.1											; milliseconds
     schedule_max				= 1											; milliseconds
     process_time				= 900	;;;TB3D 109928						; microseconds
     update_monster_factor		= 0.1
-    time_factor					= 6					; [timer_check_freq * 1000 * 60 * time_factor], 6 = 10 game minutes = 1 real minute
-    normal_time_factor			= 6 				; Offline movement and weather are divided by this factor
+    time_factor					= 5					; [timer_check_freq * 1000 * 60 * time_factor], 5 = 10 game minutes = 1 real minute
+    normal_time_factor			= 5 				; Offline movement and weather are divided by this factor
     max_combat_iteration_count	= 5											; maximum combat iteration count
     switch_distance				= 140										; metres, must be >= to offline_alife search distance(140)
 																			; help fox fails and village attacks military if > 140
@@ -132,7 +132,7 @@
     start_date					= 01.05.2012
     autosave_interval			= 99:99:99									; can cause CTD if created when certain effects are occuring
     delay_autosave_interval		= 00:00:30
-	objects_per_update			= 10
+	objects_per_update			= 4											; 110000, smooths out spawns
 	start_game_callback			= _G.start_game_callback					; on starting new game or loading saved one
 	
 [online_offline_group]

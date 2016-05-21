@@ -1320,12 +1320,11 @@ function checkStalker(npc_community, gulag_type)
 end
 
 function checkMonster(npc_community, gulag_type, npc_rank, se_obj)
-		
 	if gulag_type == "bar_arena_monstr" then
 		if npc_community == "arena_enemy" then
 			return true
 		end
-		local se_obj_name = se_obj:section_name()
+		local se_obj_name = get_section(se_obj)
 		if se_obj_name == "pseudodog_arena" or
 		   se_obj_name == "snork_arena" or
 		   se_obj_name == "bloodsucker_arena" or
@@ -1335,6 +1334,5 @@ function checkMonster(npc_community, gulag_type, npc_rank, se_obj)
 		end
 		return false
 	end
-		
 	return false
 end

@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9, translate and text color - aleks1970
-function my_ver() return "1.0.9.9.9" end
+--TB3D 1.0.9.9.9.9, translate and text color - aleks1970, trade directory
+function my_ver() return "1.0.9.9.9.9" end
 
 local translate = game.translate_string
 local text_color_treasure = TB3D_Services.get_text_color("treasure")
@@ -242,16 +242,16 @@ end
 
 --' Conservation
 function CTreasure:check()
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: check") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: check") end
 	for k,v in pairs(self.treasure_info) do
 		self:give_treasure(k)
 	end
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: check DONE") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: check DONE") end
 end
 
 --' Issue Cache
 function CTreasure:give_treasure(k)
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: give treasure") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: give treasure") end
 	local v = self.treasure_info[k]
 	local obj = alife():story_object(v.target)
 	if obj ~= nil and level.map_has_object_spot(obj.id, "treasure") == 0 then
@@ -293,17 +293,17 @@ function CTreasure:give_treasure(k)
 		if sim ~= nil and obj.online then
 			sim:set_switch_online  (obj.id, false)
 			sim:set_switch_offline (obj.id, true)
-			amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
+			--amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
 		end
 	else
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: treasure not exist ["..utils.to_str(k).."]") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: treasure not exist ["..utils.to_str(k).."]") end
 	end
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: give treasure done") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: give treasure done") end
 end
 
 --' Remove the checkmark from the cache
 function CTreasure:treasure_empty(box, box_story_id)
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: treasure empty") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: treasure empty") end
 	local k = self.treasure_by_target[box_story_id]
 
 	if k == nil or self.treasure_info[k] == nil then 
@@ -504,11 +504,11 @@ function CTreasure:named_treasure(v)
 end
 
 function get_treasure_manager()
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: get treasure mgr") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: get treasure mgr") end
 	if treasure_manager == nil then
 		treasure_manager = CTreasure()
 	end
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRADE TREASURE MGR: get treasure mgr done") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: get treasure mgr done") end
 	return treasure_manager
 end
 

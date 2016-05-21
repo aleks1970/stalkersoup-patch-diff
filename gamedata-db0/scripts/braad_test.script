@@ -1,8 +1,8 @@
---TB3D 1.0.9.9.9.8 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
+--TB3D 1.1.0.0.0.0 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
 -- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
 -- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info,
 -- translate and text color - aleks1970, grib_respawn
-function my_ver() return "1.0.9.9.9.8" end
+function my_ver() return "1.1.0.0.0.0" end
 
 local string_find = string.find
 local math_random = math.random
@@ -56,7 +56,7 @@ function false_info()			--bstalk: net spawn
 	end
 end
 
-function check_dead()
+--[[function check_dead()			--110000 moved to tb3d_stalker
 	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking dead") end
 	if not has_alife_info("dyak_help_done")
 		and (has_alife_info("esc_saha_dead")
@@ -104,7 +104,7 @@ function check_dead()
 			TB3D_Services.give_info("marsh_dan_umer_newsinfo4")
 	end		
 	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("braad test: checking dead done") end
-end
+end]]--
 
 -- local nepis={9613,9622}
 -- local nepis_id={9850,9851}
@@ -703,7 +703,7 @@ function set_kalmyak_ruk()
 		for a=first_object,last_object do
 			obj = sim:object(a) 
 		   if obj then
-			  if obj:section_name() == "box_kalmyak" then 
+			  if get_section(obj) == "box_kalmyak" then 
 				amk.add_spot_on_map(obj.id,"crlc_big","Kalmyak's backpack") 
 				break
 			  end
@@ -718,7 +718,7 @@ function remove_kalmyak_ruk()
 	for a=first_object,last_object do
 		obj = sim:object(a)
 		if obj then
-			if obj:section_name() == "box_kalmyak" then 
+			if get_section(obj) == "box_kalmyak" then 
 				--TB3D_Services.packet_alert("braad test: remove_kalmyak_ruk")
 				level.map_remove_object_spot(obj.id,"crlc_big")
 				break
@@ -1893,7 +1893,7 @@ function del_mushroom()
 		obj=sim:object(a)
 		-- obj = level.object_by_id(a)
 	    if obj then
-	        if string.find(obj:section_name(),"mushroom") then
+	        if string.find(get_section(obj),"mushroom") then
 			    if obj.position:distance_to(actorpos) > 30 then sim:release(obj,true) end	
 			end   
 	    end

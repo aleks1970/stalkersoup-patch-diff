@@ -2,6 +2,7 @@
 active = walker@day
 on_hit = hit@soldier
 combat_ignore = combat_ignore@bandit_krisyk
+on_death = death@krisyk
 
 [walker@day]
 ;on_info = {!is_day} walker@night
@@ -54,6 +55,9 @@ combat_ignore_cond = {-bandit_krisyk_enemy =fighting_actor}
 
 [hit@soldier]
 on_info = {=hit_by_actor} %+bandit_krisyk_enemy%
+
+[death@krisyk]
+on_info = %+bandit_krisyk_umer%
 
 [meet_day]
 use = true

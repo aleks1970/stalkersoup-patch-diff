@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.8 db calls, use_binder_message
-function my_ver() return "1.0.9.9.9.8" end
+-- TB3D 1.1.0.0.0.0 db calls, use_binder_message
+function my_ver() return "1.1.0.0.0.0" end
 --[[------------------------------------------------------------------------------------------------
 Space restrictor binder
 Chugai Alexander
@@ -79,11 +79,12 @@ function restrictor_binder:net_destroy()
 		else
 			sname = "nil"
 		end
-		if (s_obj.section) then
-			sect = s_obj:section()
-		else
-			sect = "nil"
-		end
+		--if (s_obj.section) then
+			--sect = s_obj:section()
+		--else
+			--sect = "nil"
+		--end
+		sect = get_section(s_obj)
 		if TB3D_Modders.use_destroy_message or (TB3D_Modders.use_state_message and string_find(sname, TB3D_Modders.npc_to_log)) then is_report = true end
 		if is_report then TB3D_Services.packet_alert("bind restrictor: net destroy["..sname.."] section["..sect.."]") end
 		if (s_obj.id) then
@@ -112,15 +113,18 @@ end
 
 -- called locally
 function restrictor_binder:actor_update(delta)
-	if not self.initialized then
-		amk.oau_watchdog=887												-----------------887
-		self.initialized = true
-		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_restrictor)
-		if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("restrictor: init["..utils.to_str(self.object:name()).."]") end
-	elseif self.st.active_section ~= nil then
-		amk.oau_watchdog=888												-----------------888
-		if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("restrictor: update["..utils.to_str(self.object:name()).."]") end
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
+	local sobj = self.object
+	if sobj then
+		if self.st.active_section then
+			amk.oau_watchdog=888												-----------------888
+			--if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("restrictor: update["..utils.to_str(sobj:name()).."]") end
+			xr_logic.issue_event(sobj, self.st[self.st.active_scheme], "update", delta)
+		elseif not self.initialized then
+			amk.oau_watchdog=887												-----------------887
+			self.initialized = true
+			xr_logic.initialize_obj(sobj, self.st, self.loaded, db.actor, modules.stype_restrictor)
+			if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("restrictor: init["..utils.to_str(sobj:name()).."] sect["..get_section(sobj).."]") end
+		end
 	end
 end
 

@@ -36,7 +36,7 @@ function remove_spot()
 	for a=first_object,last_object do
 		obj = alife():object(a)
 		if obj then
-			if obj:section_name()=="trubka" then
+			if get_section(obj)=="trubka" then
 				level.map_remove_object_spot(obj.id,"red_location")
 				break
 			end
@@ -149,7 +149,7 @@ function set_metka()
 	for a=first_object,last_object do
 		local obj = alife():object(a)
 		if obj then
-			if obj:section_name()=="trubka" then
+			if get_section(obj)=="trubka" then
 				amk.add_spot_on_map(obj.id,"red_location","Tube")
 				return
 			end

@@ -1,5 +1,6 @@
 [logic]
 active = walker
+on_death = death@dolgo
 
 [walker]
 path_walk = dolgovazyi_walk_way
@@ -9,6 +10,9 @@ danger = danger_ignore
 
 [danger_ignore]
 ignore_distance = 0
+
+[death@dolgo]
+on_info = %+dolgovazyi_umer%
 
 [meet]
 use = true

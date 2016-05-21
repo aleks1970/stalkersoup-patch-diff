@@ -1,9 +1,9 @@
---<!-- TB3D 1.0.9.9.4.0 -->
-function my_ver() return "1.0.9.9.4.0" end
+--<!-- TB3D 1.1.0.0.0.0 -->
+function my_ver() return "1.1.0.0.0.0" end
 
 local radius = 10 --radius of the circle with the center under the feet of HS, which disables the anomalies
 
-local function get_anoms(npc, radius)
+local function get_anoms(npc, rad)
 	local obj, dist
 	local anoms = {}
 	local pos = npc:position()
@@ -12,7 +12,7 @@ local function get_anoms(npc, radius)
 		if obj then
 			if amk_anoms.is_anomaly(obj:clsid()) then
 				dist = pos:distance_to(obj:position())
-				if dist and obj:clsid() and dist < radius then
+				if dist and obj:clsid() and dist < rad then
 					--get_console():execute("load ~#I#:"..string.format("Added anomName: "..obj:name().." ID: "..obj:id()))
 					table.insert(anoms, obj)
 				end
@@ -31,9 +31,8 @@ function remove_anoms()
 	end
 	for i, obj in ipairs(anoms) do
 		if obj then
-			--get_console():execute("load ~#I#:"..string.format("Removing: "..obj:name().." ID: "..obj:id()))
+			TB3D_Services.packet_alert("anom remover: anomaly["..utils.to_str(obj:name()).."] id["..utils.to_str(obj:id()).."] disabled")
 			obj:disable_anomaly()
-			--dbg.log("anomaly[%s] disabled", obj:name())		
 		end
 	end
 end
@@ -44,7 +43,7 @@ function remove_all()
 		if obj then
 			TB3D_Services.packet_alert("anom remover: object["..utils.to_str(obj:name()).."]")
 			if amk_anoms.is_anomaly(obj:clsid()) then
-				TB3D_Services.packet_alert("anom remover: anomaly["..utils.to_str(obj:name()).."] removed")
+				TB3D_Services.packet_alert("anom remover: anomaly["..utils.to_str(obj:name()).."] disabled")
 				obj:disable_anomaly()
 			end
 		end

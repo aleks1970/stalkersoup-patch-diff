@@ -61,22 +61,21 @@ end
 function set_sound(npc, sound, now, into_timeout)
 	if _g.is_disconnecting == false then
 		local is_report = false
-		if TB3D_Modders.use_state_message and npc:name() == TB3D_Modders.npc_to_log then is_report = true end
-		if is_report then TB3D_Services.packet_alert("xr_sound: ["..utils.to_str(npc:name()).."] set sound["..utils.to_str(sound).."]") end
+		if TB3D_Modders.use_sound_message or (TB3D_Modders.use_state_message and npc:name() == TB3D_Modders.npc_to_log) then is_report = true end
+		--if is_report then TB3D_Services.packet_alert("xr_sound: set sound["..utils.to_str(npc:name()).."] set sound["..utils.to_str(sound).."]") end
 		local npc_id = npc:id()
 		if npc_id then
 			if sound == nil then sound = "" end					--used to stop sound that is playing
 			if now == true or db.sound[npc_id] == nil or db.sound[npc_id].theme ~= sound then
 				if db.sound[npc_id] == nil then
-					if is_report or TB3D_Modders.use_sound_message then
-						TB3D_Services.packet_alert("xr sound: set_sound["..utils.to_str(sound).."] for["..npc:name().."] not in database")
+					if is_report then
+						TB3D_Services.packet_alert("xr sound: set_sound["..utils.to_str(sound).."] for["..npc:name().."] adding to database")
 					end
 					db.create_sound(npc)
-				elseif is_report or TB3D_Modders.use_sound_message then
-					TB3D_Services.packet_alert("xr sound: set_sound["..utils.to_str(sound).."] for["..npc:name().."] = theme["..utils.to_str(db.sound[npc_id].theme).."]")
 				end
 				db.sound[npc_id].theme = sound
 				db.sound[npc_id].snd = parse_names(sound)
+				--if is_report then TB3D_Services.packet_alert("xr sound: set_sound["..utils.to_str(db.sound[npc_id].snd).."] for["..npc:name().."] = theme["..utils.to_str(db.sound[npc_id].theme).."]") end
 				if db.sound[npc_id].last_snd == nil then
 					db.sound[npc_id].last_snd = {}
 				else	
@@ -102,40 +101,46 @@ function set_sound(npc, sound, now, into_timeout)
 				if now == true then
 					stop_play_sound(npc)
 				end
-			else
-				if is_report then TB3D_Services.packet_alert("xr_sound: ["..utils.to_str(npc:name()).."] set sound [not now] or already playing") end
+			elseif is_report then
+				if now == true then
+					TB3D_Services.packet_alert("xr_sound: ["..utils.to_str(npc:name()).."] set sound["..utils.to_str(sound).."] [not now]")
+				else
+					TB3D_Services.packet_alert("xr_sound: ["..utils.to_str(npc:name()).."] set sound["..utils.to_str(sound).."] [already playing]")
+				end
 			end
 		end
 	end
 end
 
 function set_sound_play(npc, sound, timeout)
-	local is_report = false
-	if TB3D_Modders.use_state_message and npc:name() == TB3D_Modders.npc_to_log then is_report = true end
-	if TB3D_Services.is_collector(300) == true then
-		if string_find(sound,"pri_followers_")		--running the quantlet
-		  or string_find(sound,"pri_wave")
-		  or string_find(sound,"aes_battle")
-		  or string_find(sound,"sar_monolith")
-		  or string_find(sound,"kruglov_help")
-		  or string_find(sound,"volkodav_")
-		  --or string_find(sound,"radio_voice_")
-		  or string_find(sound,"volkodav_radio_see_enemy")
-		  or string_find(sound,"sniper_radio_see_enemy") then
-			if is_report then TB3D_Services.packet_alert("xr sound: set_sound_play["..utils.to_str(sound).."] for["..npc:name().."] skipped") end
-			return
+	if _g.is_disconnecting == false then
+		local is_report = false
+		if TB3D_Modders.use_sound_message or (TB3D_Modders.use_state_message and npc:name() == TB3D_Modders.npc_to_log) then is_report = true end
+		if TB3D_Services.is_collector(300) == true then
+			if string_find(sound,"pri_followers_")		--running the quantlet
+			  or string_find(sound,"pri_wave")
+			  or string_find(sound,"aes_battle")
+			  or string_find(sound,"sar_monolith")
+			  or string_find(sound,"kruglov_help")
+			  or string_find(sound,"volkodav_")
+			  --or string_find(sound,"radio_voice_")
+			  or string_find(sound,"volkodav_radio_see_enemy")
+			  or string_find(sound,"sniper_radio_see_enemy") then
+				if is_report then TB3D_Services.packet_alert("xr sound: set_sound_play["..utils.to_str(sound).."] for["..npc:name().."] skipped") end
+				return
+			end
 		end
+		if is_report then
+			TB3D_Services.packet_alert("xr sound: set_sound_play["..utils.to_str(sound).."] for["..npc:name().."] timeout["..utils.to_str(timeout).."]")
+		end
+		local npc_id = npc:id()
+		if db.sound[npc_id] == nil then db.create_sound(npc) end --db.sound[npc_id] = {} end
+		if db.sound[npc_id].last_snd == nil then
+			db.sound[npc_id].last_snd = {}
+		end
+		stop_play_sound(npc)
+		this.play_sound(npc, parse_names(sound), timeout)
 	end
-	if is_report or TB3D_Modders.use_sound_message then
-		TB3D_Services.packet_alert("xr sound: set_sound_play["..utils.to_str(sound).."] for["..npc:name().."] timeout["..utils.to_str(timeout).."]")
-	end
-	local npc_id = npc:id()
-	if db.sound[npc_id] == nil then db.create_sound(npc) end --db.sound[npc_id] = {} end
-	if db.sound[npc_id].last_snd == nil then
-		db.sound[npc_id].last_snd = {}
-	end
-	stop_play_sound(npc)
-	this.play_sound(npc, parse_names(sound), timeout)
 end
 
 function update(npc)
@@ -183,8 +188,8 @@ end
 
 function play_sound(npc, themes, timeout)
 	local is_report = false
-	if TB3D_Modders.use_state_message and npc:name() == TB3D_Modders.npc_to_log then is_report = true end
-	if is_report then TB3D_Services.packet_alert("xr_sound: ["..utils.to_str(npc:name()).."] play sound") end
+	if TB3D_Modders.use_sound_message or (TB3D_Modders.use_state_message and npc:name() == TB3D_Modders.npc_to_log) then is_report = true end
+	--if is_report then TB3D_Services.packet_alert("xr_sound: play sound for["..utils.to_str(npc:name()).."]") end
 	-- need to compile a list of those
 	local snd_table = {}
 	local t = 0		
@@ -194,7 +199,7 @@ function play_sound(npc, themes, timeout)
 			snd_table[t].theme = v
 			get_sound(sound_theme.theme[v], snd_table[t], npc)
 		else
-			if is_report or TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("ERROR: ILLEGAL PLAY SOUND!!! ["..v.."] for["..npc:name().."]") end
+			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("ERROR: ILLEGAL PLAY SOUND!!! ["..v.."] for["..npc:name().."]") end
 		end
 		t = t + 1
 	end	
@@ -301,22 +306,18 @@ function set_actor_sound_factor(factor)
 	end
 end
 
-function update_actor()
+function update_actor()								--only level_border_detector from xr_detector
 	local theme = sound_theme.actor_theme[actor_sound.theme]
-	if theme == nil then return end
-	if table.getn(theme.sounds) == 0 then
-		return
-	end
-	if actor_sound.begin == nil or
-	   time_global() - actor_sound.begin >= actor_sound.idle
-	then
-		actor_sound.begin = time_global()
-		--' You've got to play sound
-		local sound = theme.sounds[math.random(table.getn(theme.sounds))]
-		if sound ~= nil then
-			sound:play(db.actor, 0, sound_object.s2d)
+	if theme and table.getn(theme.sounds) ~= 0 then
+		if actor_sound.begin == nil or time_global() - actor_sound.begin >= actor_sound.idle then
+			actor_sound.begin = time_global()
+			--' You've got to play sound
+			local sound = theme.sounds[math.random(table.getn(theme.sounds))]
+			if sound ~= nil then
+				sound:play(db.actor, 0, sound_object.s2d)
+			end
+			actor_sound.idle = math.random(actor_sound.min_snd, actor_sound.max_snd)
 		end
-		actor_sound.idle = math.random(actor_sound.min_snd, actor_sound.max_snd)
 	end
 end
 
@@ -325,7 +326,7 @@ sound_object_by_theme = {}
 --' type = [random|seq|looped]
 function get_sound_object(theme, t_type)
 	if sound_theme.ph_snd_themes[theme] == nil then
-		if TB3D_Modders.use_scheme_message then TB3D_Services.info_alert("xr sound: get sound object["..Utils.to_str(theme).."] not in themes") end
+		if TB3D_Modders.use_sound_message then TB3D_Services.info_alert("xr sound: get sound object["..Utils.to_str(theme).."] not in themes") end
 		return
 	end
 	if sound_object_by_theme[theme] == nil then

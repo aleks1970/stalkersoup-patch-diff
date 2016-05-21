@@ -1287,6 +1287,10 @@ function agr_nii_pop_check(actor, npc)
 	return false
 end
 
+function prizrak_zver_have(actor, npc)											--110000, called by treasure_manager
+	return xr_conditions_impl.actor_has_object(actor,"sniper_flash")
+end
+
 -------------------------------------------------------------------------------------
 -- Special for rostok
 -------------------------------------------------------------------------------------

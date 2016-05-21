@@ -1,5 +1,5 @@
-;<!-- TB3D 1.0.9.9.9.9 new ranks, blocked barmen_eliminate_camp_2, missing "," and correct link for green_artefact task (Zahar 1666-1680 lines) aleks1970,
-; tm_kill_stalker_2, mil_lukash_heal_reward, yan snork lair, agroprom_military_case_done, barmen eliminate camp 2 fixed, sim_stalker_gusarov, esc2-->
+;<!-- TB3D 1.1.0.0.0.0 new ranks, blocked barmen_eliminate_camp_2, missing "," and correct link for green_artefact task (Zahar 1666-1680 lines) aleks1970,
+; tm_kill_stalker_2, mil_lukash_heal_reward, yan snork lair, agroprom_military_case_done, barmen eliminate camp 2 fixed, sim_stalker_gusarov, esc2, tm_kill_stalker_2-->
 [list]
 
 ;----------Trader-----------------
@@ -254,6 +254,7 @@ sar_monolith
 [tm_eliminate_camp_1]
 type = eliminate_lager
 community = actor
+condlist = {+bar_deactivate_radar_done}			;;110000, some things need to wait
 ;init_condition = {=actor_on_level(l02_garbage) +agroprom_military_case_done}
 text = tm_eliminate_camp_1_text
 description = tm_eliminate_camp_1_descr
@@ -270,6 +271,7 @@ reward_item = grenade_rgd5, grenade_rgd5
 [tm_eliminate_camp_2]
 type = eliminate_lager
 community = actor
+condlist = {+bar_deactivate_radar_done}			;;110000, some things need to wait
 ;init_condition = {=actor_on_level(l01_escape) +agroprom_military_case_done}
 text = tm_eliminate_camp_2_text
 description = tm_eliminate_camp_2_descr
@@ -286,6 +288,7 @@ prior = 3
 [tm_eliminate_camp_3]
 type = eliminate_lager
 community = actor
+condlist = {+agroprom_military_case_done}
 ;init_condition = {=actor_on_level(l03u_agr_underground)}
 text = tm_eliminate_camp_3_text
 description = tm_eliminate_camp_3_descr
@@ -316,6 +319,7 @@ prior = 1
 [tm_eliminate_camp_5]
 type = eliminate_lager
 community = actor
+condlist = {+bar_deactivate_radar_done}			;;110000, some things need to wait
 ;--init_condition = {=actor_on_level(l02_garbage) +agroprom_military_case_done}
 text = tm_eliminate_camp_5_text
 description = tm_eliminate_camp_5_descr
@@ -406,6 +410,7 @@ prior = 3
 [tm_kill_stalker_1]
 type = kill_stalker
 community = actor
+condlist = {+agroprom_military_case_done}
 ;init_condition = {=actor_on_level(l02_garbage)}
 text = tm_kill_stalker_1_text
 description = tm_kill_stalker_1_descr
@@ -425,7 +430,7 @@ condlist = {+agroprom_military_case_done}
 text = tm_kill_stalker_2_text
 description = tm_kill_stalker_2_descr
 parent = trader
-target = snip_marsh4 ;;sim_stalker_general
+target = esc_saha  ;;snip_marsh4 ;;sim_stalker_general
 ;;reward_money = 1500
 reward_reputation = -15
 reward_item = af_gravi
@@ -436,6 +441,7 @@ prior = 3
 [tm_kill_stalker_3]
 type = kill_stalker
 community = actor
+condlist = {+esc_darklab_documents_read}
 text = tm_kill_stalker_3_text
 description = tm_kill_stalker_3_descr
 parent = trader
@@ -450,7 +456,7 @@ prior = 2
 [tm_kill_stalker_4]
 type = kill_stalker
 community = actor
-condlist = {+agroprom_military_case_done}
+condlist = {+esc_darklab_documents_read}
 text = tm_kill_stalker_4_text
 description = tm_kill_stalker_4_descr
 parent = trader
@@ -464,7 +470,7 @@ prior = 4
 [tm_kill_stalker_5]
 type = kill_stalker
 community = actor
-condlist = {+agroprom_military_case_done}
+condlist = {+esc_darklab_documents_read}
 text = tm_kill_stalker_5_text
 description = tm_kill_stalker_5_descr
 parent = trader
@@ -478,6 +484,7 @@ prior = 5
 [tm_kill_stalker_6]
 type = kill_stalker
 community = actor
+condlist = {+esc_darklab_documents_read}
 text = tm_kill_stalker_6_text
 description = tm_kill_stalker_6_descr
 parent = trader
@@ -1459,6 +1466,7 @@ community = actor
 text = freedom_eliminate_camp_4_text
 description = freedom_eliminate_camp_4_descr
 parent = freedom
+condlist = {+bar_deactivate_radar_done}			;;110000, some things need to wait
 target = gar_dolg_blokpost
 ;;reward_money = 6000
 reward_reputation = +35

@@ -1,9 +1,11 @@
-;<!-- TB3D 1.0.1e -->
+;;;TB3D 1.1.0.0.0.0 includes do not work under sects
+
 [trader]
-buy_condition = barman_generic_buy
-sell_condition = {+yan_labx16_switcher_primary_off} barman_after_brain_sell, {+bar_darklab_document_done} barman_after_darkvalley_sell, barman_start_sell
+buy_condition = generic_buy
+sell_condition = {+yan_labx16_switcher_primary_off} generic_sell_3, {+bar_darklab_document_done} generic_sell_2, generic_sell_1
 buy_supplies = {+yan_labx16_switcher_primary_off} supplies_after_brain, {+bar_darklab_document_done} supplies_after_darkvalley, supplies_start
 
-#include "shop_barman\barman_buy.ltx"
+#include "TB3D_generic_buy_1.ltx"
+#include "TB3D_generic_sell.ltx"
 #include "shop_barman\barman_supl.ltx"
-#include "shop_barman\barman_trade.ltx"
+

@@ -1,10 +1,10 @@
---TB3D 1.0.9.9.9.9 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+--TB3D 1.1.0.0.0.0 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
 -- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
 -- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
 -- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions, radar_monolit_dead, generic_m_story_id,
 -- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update,
 -- agro soldiers health, krysuk, death callback, "NIL" to "nil", optimized can_remove_dead, motivator_delta
-function my_ver() return "1.0.9.9.9.9" end
+function my_ver() return "1.1.0.0.0.0" end
 --[[------------------------------------------------------------------------------------------------------------------
 Author: Ruslan Didenko (Stohe)
 how to call methods of Binder:
@@ -95,14 +95,17 @@ function motivator_binder:net_spawn(sobject)
 			if is_report or TB3D_Modders.use_info_message then
 				TB3D_Services.packet_alert("xr motivator: net spawn["..npc_name.."]["..sobj_name.."] id["..utils.to_str(npc_id).."] is alive["..utils.to_str(is_alive).."] level["..utils.to_str(lname).."]")
 			end
-			if is_alive == false and lname ~= TB3D_Services.level_on_save() then
-				if TB3D_Services.can_remove_dead(lname, npc_name) then				--109996, interactive corpse cleaner
-					if not db.check_corpse_looted(npc) and protected_items.obj_has_protected_item(npc) == false then             
-						if is_report then
-							TB3D_Services.packet_alert("XR MOTIVATOR: dead["..npc_name.."] removed")
+			if not is_alive then
+				if lname ~= TB3D_Services.level_on_save() then
+					if TB3D_Services.can_remove_dead(lname, npc_name) then				--109996, interactive corpse cleaner
+						if not db.check_corpse_looted(npc) and protected_items.obj_has_protected_item(npc) == false then             
+							if is_report or TB3D_Modders.use_info_message then			--110000
+								TB3D_Services.packet_alert("XR MOTIVATOR: dead["..npc_name.."] removed")
+							end
+							--sim:object(npc_id).dont_spawn_online = true
+							sim:release(sim:object(npc_id))
+							return false
 						end
-						sim:release(sim:object(npc_id))
-						return false
 					end
 				end
 			end
@@ -229,8 +232,8 @@ function motivator_binder:net_spawn(sobject)
 				xr_sound.load_sound(npc)				--' Loading Voice
 				xr_gulag.setup_gulag_and_logic_on_spawn( npc, self.st, sobject, modules.stype_stalker, self.loaded )
 				--if TB3d_Modders.use_packet_message then TB3D_Services.info_alert("XR MOTIVATOR: net spawn gulag done "..npc_name) end
-				amk.on_npc_spawn(npc)
-				amk.on_net_spawn(npc)
+				--amk.on_npc_spawn(npc)					--110000, only called from here, not used
+				amk.on_net_spawn(npc)					--110000, adds to btr table, called from bind_monster and bind_physic_object also
 				if particle_param and system_ini():section_exist(particle_param) then
 					local tmp=amk.parse_ini_section_to_array_new(nil,particle_param)
 					local t = {}

@@ -189,24 +189,27 @@ local unique_sect = {
 
 --leaves the zone by one (Fig, now two) of each type of artifact
 function remove_duplicate()
-local sobj
-local text=""
-local sect=nil
+	local sobj
+	local text=""
+	local sect
 	local t = check_duplicate()
 	for k, v in pairs(belt_id) do
 		sobj = alife():object(k)
 		if sobj then
-			sect = nil
-			sect = sobj:section_name()
+			sect = get_section(sobj)
+			if not sect then
+				sect = sobj:section()		--110000
+				if not sect then sect = "nil" end
+			end
 			if unique_sect[sect] and t[sect] ~= nil and t[sect] > 0 then
-			alife():release(sobj, true)
-			text=translate("Unnecessary_artifact_0").." "..translate(amk.get_inv_name(sect)).." "..translate("moved_from_belt_pack")
-			news_manager.send_tip_txt(db.actor, text, nil, nil, nil)
-			amk.spawn_item_in_inv(sect, db.actor)
-			t[sect] = t[sect] - 1
+				alife():release(sobj, true)
+				text=translate("Unnecessary_artifact_0").." "..translate(amk.get_inv_name(sect)).." "..translate("moved_from_belt_pack")
+				news_manager.send_tip_txt(db.actor, text, nil, nil, nil)
+				amk.spawn_item_in_inv(sect, db.actor)
+				t[sect] = t[sect] - 1
+			end
 		end
 	end
-end
 end
 
 --Old duplicate collects on the belt

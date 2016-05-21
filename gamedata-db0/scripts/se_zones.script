@@ -22,8 +22,9 @@ end
 
 function se_zone_anom:on_register()
   cse_anomalous_zone.on_register(self)
-   self.artefact_spawn_idle = 60*60*1000*getIniValueFloat(self:section_name(), "artefact_spawn_idle", 24, nil)
-   self.artefact_spawn_rnd = getIniValueFloat(self:section_name(), "artefact_spawn_rnd", TB3D_Modders.arts_max, nil)
+  local sect = get_section(self)
+   self.artefact_spawn_idle = 60*60*1000*getIniValueFloat(sect, "artefact_spawn_idle", 24, nil)
+   self.artefact_spawn_rnd = getIniValueFloat(sect, "artefact_spawn_rnd", TB3D_Modders.arts_max, nil)
 end
 
 function se_zone_anom:on_unregister()
@@ -133,8 +134,9 @@ end
 
 function se_zone_visual:on_register()
   cse_zone_visual.on_register(self)
-   self.artefact_spawn_idle = 60*60*1000*getIniValueFloat(self:section_name(), "artefact_spawn_idle", 24, nil)
-   self.artefact_spawn_rnd = getIniValueFloat(self:section_name(), "artefact_spawn_rnd", TB3D_Modders.arts_max, nil)
+  local sect = get_section(self)
+   self.artefact_spawn_idle = 60*60*1000*getIniValueFloat(sect, "artefact_spawn_idle", 24, nil)
+   self.artefact_spawn_rnd = getIniValueFloat(sect, "artefact_spawn_rnd", TB3D_Modders.arts_max, nil)
 end
 
 function se_zone_visual:update()

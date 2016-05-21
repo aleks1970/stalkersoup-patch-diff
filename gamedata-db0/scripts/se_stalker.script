@@ -63,8 +63,8 @@ function se_stalker:can_switch_offline()
 	end
 	if string_find(self:name(), "generators_udav") and not has_alife_info("udav_pabota_ok_start") then			--109988
 		result = false
-	elseif amk.convert_npc[self.id]==true then 
-		result = true 
+	--elseif amk.convert_npc[self.id]==true then 
+		--result = true 
 	--dc-- elseif amk.convert_npc[self.id]==false then
 		--  return false
 	elseif self.job_online_condlist ~= nil then
@@ -83,17 +83,20 @@ end
 --------------------
 function se_stalker:can_switch_online()
 	local result = false								--assume no
-	if not self.dont_spawn_online then
-		if TB3D_Population_Control.can_go_online(self) then
+	if TB3D_Modders.test_without_npc then
+		TB3D_Services.packet_alert("SE STALKER: cso["..self:name().."] blocked!!!!")
+		self.dont_spawn_online = true
+	else
+		if not self.dont_spawn_online and TB3D_Population_Control.stalker_can_go_online(self) then
 			--TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online")
 			-- local ecolog=string.find(self:name(),"bar_ecolog")
 			-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
 			-- if ecolog then amk.dump_table(self.spawner) end
-			if amk.convert_npc[self.id]==true then
-				result = false
+			--if amk.convert_npc[self.id]==true then
+				--result = false
 			--dc-- elseif amk.convert_npc[self.id]==false then
 				-- result = true
-			elseif self.job_online_condlist ~= nil then
+			if self.job_online_condlist ~= nil then
 				result = xr_logic.pick_section_from_condlist(db.actor, self, self.job_online) ~= nil
 			elseif self.job_online ~= nil then
 				result = self.job_online
@@ -107,11 +110,7 @@ function se_stalker:can_switch_online()
 				result = true
 			end
 		end
-		if result and TB3D_Modders.test_without_npc then
-			TB3D_Services.packet_alert("SE STALKER: cso["..self:name().."] blocked!!!!")
-			self.dont_spawn_online = true
-			result = false
-		elseif TB3D_Modders.use_setup_message and string_find(self:name(), TB3D_Modders.npc_to_log) then
+		if TB3D_Modders.use_setup_message and string_find(self:name(), TB3D_Modders.npc_to_log) then
 			TB3D_Services.packet_alert("se stalker: ["..self:name().."] can switch online["..utils.to_str(result).."]")
 		end
 	end
@@ -177,7 +176,7 @@ function se_stalker:on_register()
 	local tbl=amk.read_stalker_params(self)
 	tbl.crvu32u16u2={}
 	amk.write_stalker_params(tbl,self)
-  cse_alife_human_stalker.on_register( self )
+	cse_alife_human_stalker.on_register( self )
 	--if TB3D_Services.is_collector(70) then xr_companion.is_companion_se(self) end		--109950, 109978 moved to xr_motivator.update
   --if(actor_stats.add_to_ranking~=nil)then
     local community = self:community()
@@ -278,11 +277,11 @@ function se_stalker:can_switch_offline_old()
 	--if TB3D_Modders.use_smh3_message == true then
 		TB3D_Services.packet_alert("se stalker:	can switch offline old")
 	--end
-  if amk.convert_npc[self.id]==true then 
-    result = true 
+  --if amk.convert_npc[self.id]==true then 
+    --result = true 
   --elseif amk.convert_npc[self.id]==false then
   --  return false
-  elseif self:get_job_online_old() ~= nil then
+  if self:get_job_online_old() ~= nil then
     result = not self:get_job_online_old()
   else
     result = cse_alife_human_stalker.can_switch_offline(self)
@@ -301,12 +300,12 @@ function se_stalker:can_switch_online_old()
 	-- local ecolog=string.find(self:name(),"bar_ecolog")
 	-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
 	-- if ecolog then amk.dump_table(self.spawner) end
-	if TB3D_Population_Control.can_go_online(self) then --:name()) then
-		if amk.convert_npc[self.id]==true then 
-			result = false
+	if TB3D_Population_Control.stalker_can_go_online(self) then --:name()) then
+		--if amk.convert_npc[self.id]==true then 
+			--result = false
 		--elseif amk.convert_npc[self.id]==false then 
 			-- return true
-		elseif self:get_job_online_old() ~= nil then
+		if self:get_job_online_old() ~= nil then
 			result = self:get_job_online_old()
 		elseif self.ini == nil or self.spawner == nil then
 			result = cse_alife_human_stalker.can_switch_online(self)

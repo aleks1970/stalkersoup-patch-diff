@@ -3,6 +3,7 @@ none = true
 
 [logic]
 active=camper
+on_death = death@zahar4
 
 [camper]
 sniper = true
@@ -10,4 +11,7 @@ def_state_campering = threat_na
 radius = 60
 path_walk = naem_zahar4_walk
 path_look = naem_zahar4_look
+
+[death@zahar4]
+on_info = %+naem_zahar4_dead%
 

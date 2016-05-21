@@ -514,7 +514,7 @@ function horrortime()
 			--TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."]")
 			level_info = tabl_horror_by_level[lname]
 			local diff_range = TB3D_Services.get_level_up() + 1									--109978, insure between 1 and 11
-			diff_range = diff_range + level.get_game_difficulty()								--2 to 5, so novice = 20% chance, master = 50% chance
+			diff_range = diff_range + TB3D_Services.difficulty_num	--level.get_game_difficulty()								--2 to 5, so novice = 20% chance, master = 50% chance
 			diff_range = math.random(1,diff_range)
 			--TB3D_Services.packet_alert("mec in hell: diff_range["..utils.to_str(diff_range).."]")
 			if level_info and diff_range == 3 or diff_range == 5 or diff_range == 7 or diff_range == 9 or diff_range == 11 then										-- 3 or 5 then start hell hour

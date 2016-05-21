@@ -1,5 +1,6 @@
---TB3D 1.0.9.9.7.0
+--TB3D 1.1.0.0.0.0
 --optional file for testing
+function my_ver() return "1.1.0.0.0.0" end
 
 function init()			--called  from amk_mod.check_spawn()
 --[[--------------set direction test---------------------------
@@ -12,3 +13,4 @@ function init()			--called  from amk_mod.check_spawn()
 		alife():set_switch_offline(obj,false)
 	end
 ]]--------------------------------------------------------------
+end

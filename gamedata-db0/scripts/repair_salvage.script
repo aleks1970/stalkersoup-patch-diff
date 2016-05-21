@@ -303,7 +303,7 @@ function set_stage()
 			salvage_wpn_prog[count]:Show(true)
 			salvage_wpn_bk[count]:Show(true)
 			salvage_wpn_prog[count]:SetProgressPos(weap_cond)
-			local section_name = item:section()
+			local section_name = get_section(item)
 			local equipped_addons = {}
 			equipped_addons = repair.get_addons(item)
 			for k,v in ipairs(equipped_addons) do
@@ -434,7 +434,7 @@ function set_stage()
 			salvage_wpn_prog[count]:Show(true)
 			salvage_wpn_bk[count]:Show(true)
 			salvage_wpn_prog[count]:SetProgressPos(weap_cond)
-			local section_name = item:section()
+			local section_name = get_section(item)
 			local equipped_addons = {}
 			equipped_addons = repair.get_addons(item)
 			for k,v in ipairs(equipped_addons) do

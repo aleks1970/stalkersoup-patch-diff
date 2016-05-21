@@ -234,7 +234,7 @@ function se_smart_terrain:fill_npc_info( obj, npc_info )
   end
   npc_info.se_obj       = obj
   npc_info.class_id     = obj:clsid()
-  npc_info.section_name = obj:section_name()
+  npc_info.section_name = get_section(obj)
   npc_info.name         = obj:name()
   npc_info.story_id     = obj.m_story_id
   npc_info.community    = self:get_obj_community( obj )

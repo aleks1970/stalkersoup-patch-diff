@@ -1,7 +1,7 @@
 --TB3D 1.0.9.9.4.0 new
 function my_ver() return "1.0.9.9.4.0" end
 
-function is_in_level(gvid)
+function is_in_level(gvid)			--not used yet 109999
 	local lname = level.name()
 	local result = false
 	if gvid > 5388 then	--firing range

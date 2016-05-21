@@ -70,8 +70,8 @@ function se_monster:get_ini()
 				self.day_night_switch = false
 			end
 		end
-		self.day_begin = utils.cfg_get_number(system_ini(), self:section_name(), "DayTime_Begin", self, false, -1)
-		self.day_end = utils.cfg_get_number(system_ini(), self:section_name(), "DayTime_End", self, false, -1)
+		self.day_begin = utils.cfg_get_number(system_ini(), get_section(self), "DayTime_Begin", self, false, -1)
+		self.day_end = utils.cfg_get_number(system_ini(), get_section(self), "DayTime_End", self, false, -1)
 		if self.day_begin ~= -1 and self.day_end ~= -1 then self.day_night_switch = true end
 		--TB3D_Services.packet_alert("se monster: day begin["..utils.to_str(self.day_begin).."] end["..utils.to_str(self.day_end).."]")
 	end
@@ -87,7 +87,7 @@ end
 --------------------
 function se_monster:can_switch_offline()
 	if self and self.name then
-		if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+		if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.creature_to_log)) then
 			TB3D_Services.packet_alert("se monster: can switch offline["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
 		end
 		local jbo = (self.get_job_online and self:get_job_online())
@@ -107,102 +107,102 @@ function se_monster:can_switch_online()
 	local is_report = false
 	if self and self.name then
 		--TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."]")
-		if not self.dont_spawn_online and TB3D_Population_Control.can_go_online(self) == true then
-			if TB3D_Modders.test_without_creatures then
-				TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] blocked!!!!")
-				self.dont_spawn_online = true
-			else
-				if TB3D_Modders.use_setup_message and string.find(self:name(), TB3D_Modders.npc_to_log) then is_report = true end
-				--TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] ok to go online")
-				if need_be_online[self.id]~=nil then
-					local r=need_be_online[self.id]
-					need_be_online[self.id]=nil
-					if is_report then
-						TB3D_Services.packet_alert("SE MONSTER: can switch online["..self:name().."] need_be_online ["..tostring(r).."]")
-					end
-					if (r) and r == true then
-						return save_state(self, true)
-					else
-						return save_state(self, false)
-					end
+		if TB3D_Modders.test_without_creatures then
+			--TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] blocked!!!!")
+			self.dont_spawn_online = true
+			return save_state(self, false)
+		elseif not self.dont_spawn_online and TB3D_Population_Control.monster_can_go_online(self) == true then
+			if TB3D_Modders.use_setup_message and string.find(self:name(), TB3D_Modders.creature_to_log) then is_report = true end
+			--TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] ok to go online")
+			if need_be_online[self.id]~=nil then
+				local r=need_be_online[self.id]
+				need_be_online[self.id]=nil
+				if is_report then
+					TB3D_Services.packet_alert("SE MONSTER: can switch online["..self:name().."] need_be_online ["..tostring(r).."]")
 				end
-				local r=(self.get_job_online and self:get_job_online())
-				if r ~= nil then
-					if is_report then
-						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] get_job_online ["..tostring(r).."]")
-					end
-					return save_state(self, r)
-				end
-				local day_night_switch,check_distance = select_logic(self)
-				if self.online == false then	-- If the player is not, in the offline
-					if db.actor == nil or db.actor:alive() == false then
-						if is_report then
-							TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] actor alive[false] offline")
-						end
-						return save_state(self, false) 
-					end
-					local chk_spawner=xr_spawner.check_spawn(self)	--returns nil if not custom and true/false otherwise
-					if chk_spawner~=nil then	-- If the little animals have custom_data cond section [spawner]
-						if is_report then
-							TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] check spawn online["..tostring(chk_spawner).."]")
-						end
-						return save_state(self, chk_spawner)
-					end
-					if not is_creature_day(self, day_night_switch) then						--if the "night" - remain in the off
-						if is_report then
-							TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] creature's time of day[false] offline")
-						end
-						return save_state(self, false)
-					end
-					--if given a distance check, then check.
-					if check_distance == true then
-						-- check the distance to the player. if less than required, then off
-						if not amk_offline_alife.sobj_is_far(self, self.min_distance) then
-							if is_report then
-								TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] distance[false] offline ")
-							end
-							return save_state(self, false)
-						end
-					end
-					if is_report then
-						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] offline normal")
-					end
-					return save_state(self, cse_alife_monster_base.can_switch_online(self))
+				if (r) and r == true then
+					return save_state(self, true)
 				else
-					if db.actor == nil or db.actor:alive() == false then
-						if is_report then
-							TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] actor dead[true] online")
-						end
-						return save_state(self, true)
-					end
-					local chk_spawner=xr_spawner.check_spawn(self)								--returns nil if not custom and true/false otherwise
-					if chk_spawner~=nil then	-- If the little animals have custom_data cond section [spawner]
-						if is_report then
-							TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] check spawn online["..tostring(chk_spawner).."]")
-						end
-						return save_state(self, chk_spawner)
-					end
-					if check_distance == true then
-						if not amk_offline_alife.sobj_is_far(self, self.min_distance) then		-- check the distance to the player.
-							local obj = level.object_by_id(self.id)								--if the "night" and HS does not see - go offline
-							local r=is_creature_day(self, day_night_switch) or (obj~=nil and db.actor:see(obj))
-							if is_report then
-								TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] day see online["..tostring(r).."]")
-							end
-							return save_state(self, r)
-						end
-					end
-					if is_report then
-						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] online normal")
-					end
-					return save_state(self, cse_alife_monster_base.can_switch_online(self))
+					return save_state(self, false)
 				end
 			end
-			if is_report then
+			local r=(self.get_job_online and self:get_job_online())
+			if r ~= nil then
+				if is_report then
+					TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] get_job_online ["..tostring(r).."]")
+				end
+				return save_state(self, r)
+			end
+			local day_night_switch,check_distance = select_logic(self)
+			if self.online == false then	-- If the player is not, in the offline
+				if db.actor == nil or db.actor:alive() == false then
+					if is_report then
+						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] actor alive[false] offline")
+					end
+					return save_state(self, false) 
+				end
+				local chk_spawner=xr_spawner.check_spawn(self)	--returns nil if not custom and true/false otherwise
+				if chk_spawner~=nil then	-- If the little animals have custom_data cond section [spawner]
+					if is_report then
+						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] check spawn online["..tostring(chk_spawner).."]")
+					end
+					return save_state(self, chk_spawner)
+				end
+				if not is_creature_day(self, day_night_switch) then						--if the "night" - remain in the off
+					if is_report then
+						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] creature's time of day[false] offline")
+					end
+					return save_state(self, false)
+				end
+				--if given a distance check, then check.
+				if check_distance == true then
+					-- check the distance to the player. if less than required, then off
+					if not amk_offline_alife.sobj_is_far(self, self.min_distance) then
+						if is_report then
+							TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] distance[false] offline ")
+						end
+						return save_state(self, false)
+					end
+				end
+				if is_report then
+					TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] offline normal")
+				end
+				return save_state(self, cse_alife_monster_base.can_switch_online(self))
+			else
+				if db.actor == nil or db.actor:alive() == false then
+					if is_report then
+						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] actor dead[true] online")
+					end
+					return save_state(self, true)
+				end
+				local chk_spawner=xr_spawner.check_spawn(self)								--returns nil if not custom and true/false otherwise
+				if chk_spawner~=nil then	-- If the little animals have custom_data cond section [spawner]
+					if is_report then
+						TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] check spawn online["..tostring(chk_spawner).."]")
+					end
+					return save_state(self, chk_spawner)
+				end
+				if check_distance == true then
+					if not amk_offline_alife.sobj_is_far(self, self.min_distance) then		-- check the distance to the player.
+						local obj = level.object_by_id(self.id)								--if the "night" and HS does not see - go offline
+						local r=is_creature_day(self, day_night_switch) or (obj~=nil and db.actor:see(obj))
+						if is_report then
+							TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] day see online["..tostring(r).."]")
+						end
+						return save_state(self, r)
+					end
+				end
+				if is_report then
+					TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] online normal")
+				end
+				return save_state(self, cse_alife_monster_base.can_switch_online(self))
+			end
+		end
+--[[			if is_report then
 				TB3D_Services.packet_alert("SE MONSTER: cso["..self:name().."] pop control or dont_spawn_online [offline]")
 			end
 			return save_state(self, false)
-		end
+		end]]
 	else
 		TB3D_Services.packet_alert("se monster: cso[no self or self.name]")
 	end
@@ -212,7 +212,7 @@ end
 --------------------
 
 function se_monster:STATE_Write(packet)
-	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.creature_to_log)) then
 		TB3D_Services.packet_alert("se monster: write packet["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
 	end
 	cse_alife_monster_base.STATE_Write (self, packet)
@@ -235,7 +235,7 @@ function se_monster:STATE_Write(packet)
 end
 --------------------
 function se_monster:STATE_Read(packet, size)
-	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.creature_to_log)) then
 		TB3D_Services.packet_alert("se monster: read packet["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
 	end
 	cse_alife_monster_base.STATE_Read (self, packet, size)
@@ -276,7 +276,7 @@ end
 --------------------
 function se_monster:on_unregister()
 	--TB3D_Services.packet_alert("SE_monster: on unregister id["..utils.to_str(self:name()).."] unregistered")
-	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.npc_to_log)) then
+	if (TB3D_Modders.use_state_message and string.find(self:name(), TB3D_Modders.creature_to_log)) then
 		TB3D_Services.packet_alert("se monster: on unregister["..utils.to_str(self:name()).."] id["..utils.to_str(self.id).."]")
 	end
 	cse_alife_monster_base.on_unregister( self )

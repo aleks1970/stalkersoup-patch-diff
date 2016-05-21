@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.8.2 localized text, added otclik, actor, det_indy, spots, debug, pda_is_blocked
-function my_ver() return "1.0.9.9.8.2" end
+-- TB3D 1.1.0.0.0.0 localized text, added otclik, actor, det_indy, spots, debug, pda_is_blocked, art_accum
+function my_ver() return "1.1.0.0.0.0" end
 --//----------------------------------------
 --//Author: Singapur22 rewritten Peregrine
 --//Released: 10.01.2010
@@ -46,7 +46,7 @@ local list_arts = {
 ["af_caterpillar"] = "af_caterpillar",
 ["artifact_electro_crystal_thorn"] = "af_electro_crystal_thorn",
 ["af_arhara_globus"] = "af_arhara_globus",
-["art_acumm"] = "black_power",
+["art_acumm"] = "item_zharka",
 ["af_water_flower"] = "af_water_flower",
 ["af_water_flower1"] = "af_water_flower1",
 ["af_spiral"] = "af_spiral",
@@ -123,10 +123,9 @@ function create_list()
 	local n = db.actor:item_in_slot(1)
 	if n and n:section() == "det_artefact_super" then is_super = true end
     for id = first_object, last_object do
-		sect = nil
 	    sobj = sim:object( id )
 		if sobj then
-			sect = sobj:section_name()
+			sect = get_section(sobj)
 			if game_graph():valid_vertex_id(sobj.m_game_vertex_id) then						--109976 now per level and unique super items
 				local obj_level = game_graph():vertex(sobj.m_game_vertex_id):level_id()
 				local level_name = alife():level_name(obj_level)	
@@ -235,7 +234,7 @@ function det_izomorf()
 						    end
 					    end]]
 						if k and level.map_has_object_spot(k, "artefact_location") == 0 then
-							level.map_add_object_spot(k, "artefact_location", "Local Energy zone")
+							level.map_add_object_spot(k, "artefact_location", translate("local_energy_zone"))			--110000
 							artefacts[k].spot = true
 						end
 			        end
@@ -260,29 +259,16 @@ function det_super()
 	local ggraph = game_graph()
     local sobj
     local level_id = sim:level_id()
-    local section
     local name
     for k,v in pairs(artefacts) do
 	    sobj = sim:object( k )
 		if sobj then
 			if ggraph:valid_vertex_id(sobj.m_game_vertex_id) and ggraph:vertex(sobj.m_game_vertex_id):level_id() == level_id
 			  and sobj.parent_id == expendable_object and not sobj.is_day_night then
-				if not v.spot then
-			-- names are stored in the local table - not good in apdeyte inishki kolbasit
---[[				    local ini = system_ini()
-					local section = sobj:section_name()
-					local name = ""
-					if ini and section and ini:section_exist(section) then
-					    if ini:line_exist(section, "inv_name") then
-						    name = ini:r_string(section, "inv_name")
-						end
-					end]]
-					section = sobj:section_name()
-					name = ""
-					if section and list_arts[section] then
-						name = list_arts[section]
-					end
-					if k and  level.map_has_object_spot(k, "artefact_location") == 0 then
+				if not v.spot then			-- names are stored in the local table - not good in apdeyte inishki kolbasit
+					name = list_arts[get_section(sobj)]
+					--TB3D_Services.packet_alert("bind det arts: artifact["..name.."]") -- ["..get_section(sobj).."]") -- ["..utils.to_str(ggraph:vertex(sobj.m_game_vertex_id):level_id()).."]")
+					if k and level.map_has_object_spot(k, "artefact_location") == 0 then
 						level.map_add_object_spot(k, "artefact_location", "artifact: "..translate(name))
 						artefacts[k].spot = true
 					end

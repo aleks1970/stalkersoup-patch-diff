@@ -4,7 +4,26 @@ function my_ver() return "1.0.9.9.9.8" end
 
 function init()			--called  from bind_stalker.net_spawn()
 	-------------------------------------test setcion-------------------------------------------
-	--TB3D_Services.move_actor(60.4173583984375,29.2011890411377,164.266647338867)
+	--TB3D_Services.move_actor(-276.414,-23.379,250.316)
 	--tb3d_net_manager.network_send("test")
 	--------------------------------------------------------------------------------------------
 end
+
+--[[		need test spawn_aver_art2 and _art3		in forgotten forest
+
+		alife():create("af_vyvert",vector():set(-252.372,-1.190,-325.960),436604,2892)
+		alife():create("af_gravi",vector():set(-163.165,51.365,-415.454),588454,2890)
+		alife():create("af_drops",vector():set(-119.568,22.321,64.620),664582,2894)
+		alife():create("af_vyvert",vector():set(-391.785,58.160,361.651),194833,2887)
+		alife():create("af_blood",vector():set(345.540,4.877,-87.297),1485407,2902)
+		alife():create("af_mincer_meat",vector():set(306.971,-38.273,386.180),1415062,2904)
+		alife():create("af_electra_sparkler",vector():set(134.876,14.633,66.266),1105003,2902)
+		
+		alife():create("af_rusty_thorn",vector():set(420.649,43.074,321.392),1631337,2906)
+		alife():create("af_rusty_kristall",vector():set(18.712,48.116,-415.46),898878,2898)
+		alife():create("af_drops",vector():set(-50.587,-39.939,-99.154),782762,2897)
+		alife():create("art_acumm",vector():set(-129.216,38.372,403.420),648050,2896)
+		alife():create("art_acumm",vector():set(93.864,-4.432,-105.082),1033389,2902)
+		alife():create("af_mincer_meat",vector():set(-276.414,-23.379,250.316),396447,2891)
+		alife():create("af_mincer_meat",vector():set(76.217,-8.158,-208.145),1002137,2897)
+]]

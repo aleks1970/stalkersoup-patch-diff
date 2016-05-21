@@ -1,7 +1,7 @@
-;<!-- TB3D 1.0.9.9.9.9  new levels, karina and tweed, dav update 16Apr14, gen to dm, 98977-98995, 98975, 6, organized, 4000-4001 started, 4500, 99300
-; form: sid = <object_story_id> that is used in game task descriptions, jupu to tunnels, 99043
-; generic_m_story_id = 4294967296 used by engine when not specified in all.spawn
+;<!-- TB3D 1.1.0.0.0.0  new levels, karina and tweed, dav update 16Apr14, gen to dm, 98977-98995, 98975, 6, organized, 4000-4001 started, 4500, 99300
+; form: sid = <object_story_id> that is used in game task descriptions, jupu to tunnels, 18030
 
+; generic_m_story_id = 4294967296 used by engine when not specified in all.spawn
 [story_ids]
   65535 = "Invalid" ;;used for spawning non important creatures and NPCs
    
@@ -74,18 +74,18 @@
   123			= "gar_seryi_drug_wounded"
   124			= "gar_stalker_corpse"
   
-  ;?;191		   = "gar_exit_to_agroprom_01"					;not in all.aspawn
+  ;191		   = "gar_exit_to_agroprom_01"					;not in all.aspawn
   
   192			= "gar_exit_to_agroprom_02"					;exit_to_agroprom_02
   193			= "gar_exit_to_escape"						;exit_to_escape_01
   194			= "gar_exit_to_bar"							;exit_to_bar_01
   
-  ;?;195			= "gar_exit_to_darkvalley_low"				;not in all.aspawn
+  ;195			= "gar_exit_to_darkvalley_low"				;not in all.aspawn
   
   196			= "gar_exit_to_darkvalley_high"				;exit_to_darkvalley_01
   
-  ;?;197			= "puzir_to_garbage"						;not in all.aspawn
-  ;?;198			= "puzir_to_darkvalley"						;not in all.aspawn
+  ;197			= "puzir_to_garbage"						;not in all.aspawn
+  ;198			= "puzir_to_darkvalley"						;not in all.aspawn
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;dark_forest (200-203)					;;;;109940
   200			= "dark_forest_to_village"
@@ -188,7 +188,7 @@
   320		   = "agr_factory_location"
   321		   = "agr_nii_location"
   350		   = "agr_doctor_spot"
-;  350			= "kat_stalker"
+  ;350			= "kat_stalker"
   
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;marsh					;;;;109940
   351           = "mar_level_changer_to_zaton"
@@ -841,7 +841,7 @@
   5483		  = "hr_inventory_box_specnaz"
   5484		  = "hr_inventory_box_baza_nauch"
   5485		  = "hr_inventory_box_1"
-  5486		  = "ds_bandit_stoy_inventory_box"			;;;Darkscape
+  5486		  = "ds_bandit_stoy_inventory_box"			;;;Darkscape, used in tweed clear bandits task
   5487		  = "inventory_pripw_kinot1_mon"
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;exits
@@ -1492,7 +1492,7 @@
   ;10001			= "tm_stohe_selo_test_lager"
   
   11500        = "exit_to_puzir_from_garbage"
-  11501        = "level_changer_from_puzir_to_red_forest"
+  ;11501        = "level_changer_from_puzir_to_red_forest"  ;;110000, not used
   11502        = "exit_to_peshera_from_garbage"
   11503        = "exit_to_peshera_from_agroprom"
   11504        = "peshera_to_svalka"
@@ -1518,8 +1518,8 @@
   11524        = "red_level_changer_to_atp"
   11525        = "red_level_changer_to_limansk"
   11526        = "red_level_changer_to_radar"
-  ;11527        = "red_level_changer_to_puzir"		;;TB3D commented out in 134
-  11528        = "level_changer_to_red_forest_from_radar"
+  11527        = "red_level_changer_to_puzir"		;;TB3D commented out in 134
+  11528        = "puzir_level_changer_red_forest"	;;110000, added back in
   11529        = "lost_village_limansk"
   11530        = "level_changer_to_hospital_from_generators"
   11531        = "lost_village_hospital"
@@ -1702,6 +1702,9 @@
   18027		  = "dead_city_secret_3"
   18028		  = "dead_city_secret_4"
   18029		  = "dead_city_secret_5"  				;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;new treasures 110000
+  18030			= "lost_village_inventory_box"			;;all.spawn id: 18872
+  
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   18100         = "gener_na_boloto"						;;;marsh_heli_dok lc
   18101         = "boloto_na_gener"						;;;marsh_heli_dok lc
@@ -1954,10 +1957,6 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;dark_scape
   ;99200		= "dark_forest_to_village"				;;all.spawn id: 3188
   ;99201		= "dark_forest_to_swamp"				;;all.spawn id: 3228
-  
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;new treasures 109999
-  99300			= "lost_village_inventory_box"			;;all.spawn id: 18872
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   
   481516        = "gar_stalker_flame_quest23"
   

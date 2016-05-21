@@ -105,6 +105,7 @@ function action_sound:update( delta )
 	--if not xr_logic.is_active(self.object, self.st) then
 	--	return
 	--end
+	--if _g.is_disconnecting then	return end
 	---------------------------------------
 	-- check for update of sliding sound
 	if self.slide_active and not self.snd_obj:playing() and self.st.sound_slide_once then
@@ -175,7 +176,7 @@ function action_sound:on_enter( obj )
 				end
 			end
 			local snd_name = self.st.sound_names[math.random(1, table.getn(self.st.sound_names))]
-			--TB3D_Services.packet_alert("sr sound: on enter restrictor["..self.object:name().."] pos_type["..self.st.pos_type.."] snd[".. snd_name.."]")
+			TB3D_Services.packet_alert("sr sound: on enter restrictor["..self.object:name().."] pos_type["..self.st.pos_type.."] snd[".. snd_name.."]")
 			self.snd_obj = xr_sound.get_safe_sound_object(snd_name)
 	        if self.st.play_at_actor == false then
 			   self.snd_obj:play_at_pos( obj, pos, self.st.delay )

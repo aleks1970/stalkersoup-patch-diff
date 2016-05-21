@@ -1,4 +1,4 @@
--- TB3D 1.0.9.9.9.9 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.1.0.0.0.0 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
@@ -7,8 +7,8 @@
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
 -- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
 -- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin, missing scientist in pripyat, yan_specnaz_dead,
--- deathclaw
-function my_ver() return "1.0.9.9.9.9" end
+-- deathclaw, x16
+function my_ver() return "1.1.0.0.0.0" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -75,7 +75,8 @@ function force_fixes()
 		is_skip = is_fixed
 		if obj then
 			if obj.name then obj_name = obj:name() else obj_name = "NIL" end
-			if obj.section_name then sect = obj:section_name() else sect = "NIL" end
+			sect = get_section(obj)
+			--TB3D_Services.packet_alert("tb3d fixer: checking object["..utils.to_str(obj_name).."] sect name["..utils.to_str(sect).."] sect["..get_section(obj).."]")
 			if string_find(obj_name, "sea-urchin") or string_find(obj_name, "charactercommander") then			--109996, remove names with '-' and bad ldk spawns
 				--if TB3D_Modders.use_cleaner_message == true then
 					TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] removed")
@@ -114,6 +115,8 @@ function force_fixes()
 								arts_count = arts_count + 1
 								is_fixed = true
 							end
+						elseif string_sub(sect, 1, 9) == "amk_zone_" and string_find(obj_name, "mincer_average_27") then			--110000 remove so not to interfere with factory assault
+							is_fixed = true
 						elseif string_find(obj_name, "^val_zapis_")	then		--109992, hunt stashes
 							is_skip = true
 						elseif string_find(obj_name, "glow_stick_")	then		--remove used ones
@@ -146,7 +149,7 @@ function force_fixes()
 					is_fixed = true
 				end --valid gv
 				if is_fixed == true then	--end fixer, if not fixed then if new level then apply cleaner
-					if TB3D_Modders.use_cleaner_message == true then
+					if TB3D_Modders.use_fixer_message == true then
 						TB3D_Services.packet_alert("tb3d fixer: idx["..utils.to_str(a).."] object["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."] removed")
 					end
 					alife():release(obj, true)
@@ -212,7 +215,7 @@ function check_story_object(a)
 		if TB3D_Modders.show_story_ids then		--109990, for correct snil count
 			local obj_name, sect
 			if obj.name then obj_name = obj:name() else obj_name = "NIL" end
-			if obj.section_name then sect = obj:section_name() else sect = "NIL" end
+			sect = get_section(obj)
 			local obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
 			local level_name = alife():level_name(obj_level)	
 			TB3D_Services.packet_alert("tb3d fixer: index["..utils.to_str(a).."] story id["..utils.to_str(obj.id).."] name["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(obj_level).."]["..utils.to_str(level_name).."]")
@@ -278,13 +281,16 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 			else
 				is_skip = true
 			end
-		--elseif string_find(obj_name, "predbannik_physic_destroyable_object_baza") then			--109999 renamed in all.spawn inner door of upper room
 		--elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--109999, left door of wood cabinet
-			--is_fixed = true
+		elseif string_find(obj_name, "predbannik_physic_destroyable_object_baza") then				--109999 renamed in all.spawn inner door of upper room
+			is_fixed = true
 		else
 			is_skip = true
 		end
 	elseif sect == "lights_hanging_lamp" then
+		--if string_find(obj_name, "predbannik_lights_hanging_lamp_") then				--110000, causes ctd on level exit
+			--is_fixed = true
+		--else
 		if is_collector then
 			if string_find(obj_name, "_light_oso_verh")
 			  or string_find(obj_name, "antenna_zenter_lights")
@@ -330,6 +336,8 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 		end
 	elseif string_find(obj_name, "outfit_specnaz_m1") then					--F1 stash interferes with Yantar quest
 		if lnum == 45 then is_fixed = true end
+	--elseif string_find(obj_name, "predbannik_m_trader") then													--test
+		--is_fixed = true
 	end
 	return is_skip, is_fixed
 end
@@ -931,7 +939,7 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 		  or string_find(obj_name, "fracture_strong")
 		  or string_find(obj_name, "yan_controller_respawn_01")				--controller with ghost's body
 		  or string_find(obj_name, "x16_m_controller") then					--controller with ghost's body
-			if is_collector or has_alife_info("yan_has_ghost_pda")
+			if is_collector 												--110000, or has_alife_info("yan_has_ghost_pda")
 			  or has_alife_info("tb3d_skip_group1") then is_fixed = true end		--109982
 		elseif string_find(obj_name,"home_snork_0013") then					--ctd on offline
 			is_fixed = true	
@@ -949,6 +957,8 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 			else
 				is_skip = true
 			end
+		elseif string_find(obj_name,"x16_zone_zharka_static_average") then					--110000, ctd on exit??
+			if TB3D_Modders.x16_no_zharkas then is_fixed = true	end
 		end
 	elseif obj_level == 11 then												--l07_military
 		if string_find(obj_name,"fotomuzhik")
@@ -986,10 +996,11 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 		  or string_find(obj_name, "road_patroler")
 		  or string_find(obj_name, "svoboda_")
 		  or string_find(obj_name, "road_guard")
-		  or string_find(obj_name,"_monolith")
-		  or string_find(obj_name,"rad_curve_")
-		  or string_find(obj_name,"_antenna_")
-		  or string_find(obj_name,"_dead") then
+		  or string_find(obj_name, "_monolith")
+		  or string_find(obj_name, "rad_curve_")
+		  or string_find(obj_name, "_antenna_")
+		  --or string_find(obj_name, "boev_")							--110000
+		  or string_find(obj_name, "_dead") then
 			if is_collector then
 				is_fixed = true
 			else
@@ -1100,14 +1111,19 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 			is_fixed = true
 		end
 	elseif obj_level == 21 then												--puzir
-		  if string_find(obj_name, "puzir_dog_strong")
-		   or string_find(obj_name, "puzir_boar_strong") then
-				if is_collector then
-					is_fixed = true
-				else
-					is_skip = true
-				end
-		  end
+		if string_find(obj_name, "af_electra_flash") then					--110000, spawns underground
+			is_fixed = true
+		elseif string_find(obj_name, "puzir_dog_strong")
+		  or string_find(obj_name, "puzir_boar_strong") then
+			if is_collector then
+				is_fixed = true
+			else
+				is_skip = true
+			end
+		elseif string_find(obj_name, "_thorn") then									--110000, remove bad art spawns
+			is_fixed = true
+			--TB3D_Services.packet_alert("tb3d fixer: checking object["..utils.to_str(obj_name).."] sect name["..utils.to_str(sect).."] sect["..get_section(obj).."]")
+		end
 	elseif obj_level == 22 then												--aver
 		  if string_find(obj_name, "aver_arhara_heli")
 		   or string_find(obj_name, "pantera_vertuha_aver")

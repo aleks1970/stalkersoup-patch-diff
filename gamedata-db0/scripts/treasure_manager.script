@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.9 fixed spawn={} in loop, removed af_ameba_ from lists as they cannot motivate in stashes, \\n, debug,
--- translate and text color - aleks1970, misc\ to trade\
-function my_ver() return "1.0.9.9.9.9" end
+--TB3D 1.1.0.0.0.0 fixed spawn={} in loop, removed af_ameba_ from lists as they cannot motivate in stashes, \\n, debug,
+-- translate and text color - aleks1970, misc\ to trade\, give treasure, ghost treasure
+function my_ver() return "1.1.0.0.0.0" end
 -- solid_list based on Linspiro Addon v1.1
 local translate = game.translate_string
 local text_color_name = TB3D_Services.get_text_color("name")
@@ -350,7 +350,7 @@ end
 class "CTreasure"
 function CTreasure:__init()
 	--' At Designer proofreads LTX and create a piece of quests.
-	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure init") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: ctreasure init") end
 	local iniFileName = "trade\\treasure_manager.ltx"
 	self.ini = ini_file(iniFileName)
 	--' We iterate over all settings phrases
@@ -363,7 +363,7 @@ function CTreasure:__init()
 		self.treasure_info = {}
 		for i=0,n-1 do
 			result, id, value	= getIniLine("list",i,"","",iniFileName)
-			--TB3D_Services.packet_alert("treasure mgr: init result["..utils.to_str(result).."] id["..id.."] value["..value.."]")
+			if TB3D_Modders.use_trade_message then TB3D_Services.packet_alert("treasure mgr: init result["..utils.to_str(result).."] id["..id.."] value["..value.."]") end
 			self.treasure_info[id] = {}
 			self.treasure_info[id].target		= utils.cfg_get_number(self.ini, id, "target", nil, true)
 			--self.treasure_info[id].target		= getIniValueFloat(id, "target", nil, iniFileName)
@@ -393,11 +393,11 @@ function CTreasure:__init()
 			self.treasure_by_target[v.target] = k	
 		end
 	end
-	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure init DONE") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: ctreasure init DONE") end
 end
 --' Yuzanie initiator (to issue a cache)
 function CTreasure:use(npc)
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TREASURE MGR: use") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TREASURE MGR: use") end
 	if npc ~= nil then	--must make sure he still exists
 		if TB3D_Modders.money_decoder == true and db.actor:object("device_warning_module") then -- decoder			---!!!!TB3D in 133, passes obj.id not a boolean
 			--TB3D_Services.packet_alert("lootmoney: has module")
@@ -467,8 +467,9 @@ function CTreasure:check()
 end
 --' Issue Cache
 function CTreasure:give_treasure(k)
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TREASURE MGR: give treasure") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TREASURE MGR: give treasure") end
 	local v = self.treasure_info[k]
+	if not v then return end
 	local obj = alife():story_object(v.target)
 	if obj ~= nil then
 		news_manager.send_treasure(v.name)
@@ -511,7 +512,7 @@ function CTreasure:give_treasure(k)
        sim:set_switch_offline (obj.id, true)
 --       sim:set_switch_online  (obj.id, true)
 --       sim:set_switch_offline (obj.id, false)
-       amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
+       --amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
     end
 	else
 		--printf("TREASURE %s, target doesnt exist", k)
@@ -533,7 +534,7 @@ function CTreasure:treasure_empty(box, box_story_id)
 end
 --' Conservation
 function CTreasure:save(p)
-	if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("TREASURE MGR: save packet") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TREASURE MGR: save packet") end
 	--' Save the table size
 	local size = 0
 	for k,v in pairs(self.treasure_info) do
@@ -548,7 +549,7 @@ function CTreasure:save(p)
 end
 --' Download
 function CTreasure:load(p)
-	if TB3D_Modders.use_packet_message then TB3D_Services.info_alert("TREASURE MGR: load packet") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TREASURE MGR: load packet") end
 	local t = p:r_u16()
 	local k
 	for i = 1,t do
@@ -650,7 +651,6 @@ function CTreasure:named_treasure(v)
    or v.name == "x18_secret_0000_name" --Smoked stash
    or v.name == "yan_secret_0011_name" --Cache scientist
    or v.name == "agr_krysyk_secret_name"
-   or v.name == "agr_krysyk_secret_name"
    or v.name == "mil_borov_secret_name"
    or v.name == "aver_arhara_secret_1" --Cache Arkhara
    or v.name == "aver_arhara_secret_2" --Cache Pilgrim
@@ -678,6 +678,7 @@ function CTreasure:named_treasure(v)
    or v.name == "dead_city_secret_4" --Caches old-timer
    or v.name == "dead_city_secret_5" --Dedkiny things 
    or v.name == "esc_secret_0010_name" --Stash of beer
+   or v.name == "lost_village_inventory_box" --110000, Stash of ghost
  then
    return true
  else
@@ -688,9 +689,9 @@ end
 function get_treasure_manager()
 	if treasure_manager == nil then
 		treasure_manager = CTreasure()
-		if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRSR MGR: ctreasure get = ctreasure") end
+		if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: ctreasure get = ctreasure") end
 	end
-	if TB3D_Modders.use_task_message then TB3D_Services.info_alert("TRSR MGR: ctreasure get DONE") end
+	--if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: ctreasure get DONE") end
 	return treasure_manager
 end
 
@@ -705,7 +706,7 @@ function clear_treasure_manager()		--called from _g.script
 end
 
 function CTreasure:dialog(npc)
-	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure dialog") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: ctreasure dialog") end
 	if npc ~= nil then
 	  n_rank = npc:character_rank()
 	 else 
@@ -725,6 +726,7 @@ function CTreasure:dialog(npc)
 			v.active == false
 			then
 				if tonumber(treasure_prob) == 100 then
+					if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: give["..utils.to_str(k).."]") end
 					self:give_treasure(k)
 				else
 					table.insert(avail, {k = k, prob = treasure_prob})
@@ -733,28 +735,28 @@ function CTreasure:dialog(npc)
 			end
 		end
 	end
-	if tr_sum == 0 then
-		return
-	end
-	local tr_w = math.random(tr_sum)
-	for k,v in pairs(avail) do
-		tr_w = tr_w - v.prob
-		if tr_w <= 0 then
-			self:give_treasure(v.k)
-			break
+	if tr_sum > 0 then
+		local tr_w = math.random(tr_sum)
+		for k,v in pairs(avail) do
+			tr_w = tr_w - v.prob
+			if tr_w <= 0 then
+				if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: give random["..utils.to_str(v.k).."]") end
+				self:give_treasure(v.k)
+				break
+			end
 		end
 	end
-	if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("TRSR MGR: ctreasure dialog DONE") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: ctreasure dialog DONE") end
 end
 
 function lootmoney(npc)
-	if TB3D_Modders.use_news_message == true then TB3D_Services.packet_alert("lootmoney: lootmoney") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.packet_alert("lootmoney: lootmoney") end
 	--if TB3D_Modders.money_decoder == true and db.actor:object("device_warning_module") then -- decoder			---!!!!TB3D in 133, passes obj.id not a boolean
 		--TB3D_Services.packet_alert("lootmoney: has module")
 		--if npc ~= nil and not string.find(npc:section(),"arena") and npc:character_community()~= "arena_enemy" then
 			local money = npc:money()
 			if money ~= nil and money > 1 then
-				--TB3D_Services.packet_alert("lootmoney: money["..utils.to_str(money).."]")
+				if TB3D_Modders.use_trade_message then TB3D_Services.packet_alert("lootmoney: money["..utils.to_str(money).."]") end
 				local deadmoney = money
 				local npc_rank
 				if TB3D_Services.is_collector(200) == true then
@@ -786,5 +788,5 @@ function lootmoney(npc)
 			end		---!!!!
 		--end
 	--end
-	if TB3D_Modders.use_news_message == true then TB3D_Services.info_alert("lootmoney: lootmoney done") end
+	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("lootmoney: lootmoney done") end
 end

@@ -910,7 +910,7 @@ function global_update(tg)
 				wms[k] = nil
 			end
 		end
-		manage_box()
+		--manage_box()
 		update_time = tg+wm_modes.update_prd
 	end
 	local item
@@ -1256,11 +1256,13 @@ function manage_box()
 		local obj
 		for id=0,last_object do
 			obj = sim:object(id)
-			if obj and obj:section_name() == "inventory_box" and obj.position.y == -300 and ggraph:vertex(obj.m_game_vertex_id):level_id() == clid then
-				--printf("manage_box:%s",id)
-				box = obj
-				boxid = id
-				break
+			if obj then
+				if get_section(obj) == "inventory_box" and obj.position.y == -300 and ggraph:vertex(obj.m_game_vertex_id):level_id() == clid then	--110000
+					--printf("manage_box:%s",id)
+					box = obj
+					boxid = id
+					break
+				end
 			end
 		end
 	end
@@ -1283,7 +1285,7 @@ function create_box()
 		local obj = alife():create("inventory_box",pos,db.actor:level_vertex_id(),db.actor:game_vertex_id())
 		if obj then
 			boxid = obj.id
-			--printf("box[%s] created on level '%s'",tostring(obj.id),tostring(level.name()))
+			--TB3D_Services.packet_alert("rx wmgr: create box["..utils.to_str(obj.id).."] on level ["..utils.to_str(level.name()).."]")
 		end
 	end
 end

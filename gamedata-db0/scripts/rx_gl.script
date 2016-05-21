@@ -715,7 +715,7 @@ local sec =""
 	for a=first_object,last_object do
 		sobj = sim:object(a)
 		if sobj then
-			sec = sobj:section_name()
+			sec = get_section(sobj)
 			if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
 --				--printf("net_spawn:remove %s",sec)
 				temp.rem[a] = true

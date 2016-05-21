@@ -1,5 +1,6 @@
 [logic]
 active = walker
+on_death = death@docent
 
 [walker]
 path_walk = bar_docent_walk_way
@@ -9,6 +10,9 @@ danger = danger_ignore
 
 [danger_ignore]
 ignore_distance = 0
+
+[death@docent]
+on_info = %+bar_docent_umer%
 
 [meet]
 use = true

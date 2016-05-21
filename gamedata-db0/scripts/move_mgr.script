@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.0 suggested_wait_time, debug
-function my_ver() return "1.0.9.9.8.0" end
+--TB3D 1.1.0.0.0.0 suggested_wait_time, debug, suggested time
+function my_ver() return "1.1.0.0.0.0" end
 -- Movement manager
 -- Created by: Andrey Fidrya (Zmey), af@svitonline.com
 
@@ -596,7 +596,7 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 				self.pt_wait_time = nil -- -1
 			else
 				local tm = tonumber(suggested_wait_time)
-				if tm ~= 0 then
+				if tm and tm > 0 then
 					if tm < 1000 then
 						if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("move mgr: object["..self.object:name().."] path_look["..self.path_look.."] time["..utils.to_str(tm).."] incorrect time specified: 0 or a range of 1k to 30k is expected") end
 						tm = 1000

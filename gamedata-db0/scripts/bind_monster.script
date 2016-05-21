@@ -504,38 +504,40 @@ function generic_object_binder:net_spawn(sobject)
 		return false
 	end
 	if not object_binder.net_spawn(self, sobject) then 
-		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("BIND_MONSTER: net spawn["..self.object:name().."] DID NOT SPAWN") end
+		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("BIND_MONSTER: net spawn["..utils.to_str(self.object:name()).."] DID NOT SPAWN") end
 		return false 
 	end 
 	if self.object then
 		local is_report = false
-		if TB3D_Modders.use_state_message and string_find(self.object:name(), TB3D_Modders.npc_to_log) then is_report = true end
-		if self.object.id then
-			if is_report or TB3D_Modders.use_spawn_message or TB3D_Modders.pop_spawn_message then
-				TB3D_Services.packet_alert("BIND MONSTER: net spawn["..self.object:name()..":"..self.object:section().."]")
-			end
-			local sobj = self.object:id()
-			if sobj then
-				local obj_name = self.object:name()
-				if obj_name == nil then obj_name = self.object:section() end		--109996
-				if obj_name == nil then obj_name = "NIL" end
+		local sobj = self.object
+		if sobj then
+			local obj_name = sobj:name()
+			local sobj_sect = get_section(sobj)
+			if obj_name == nil then obj_name = sobj_sect end		--109996
+			if obj_name == nil then obj_name = "NIL" end
+			if TB3D_Modders.use_spawn_message or TB3D_Modders.pop_spawn_message or (TB3D_Modders.use_state_message and string_find(obj_name, TB3D_Modders.npc_to_log)) then is_report = true end
+			local sobj_id = sobj:id()
+			if sobj_id then
 				local lname = level:name()
 				--local sname = amk.load_variable("level_on_save", lname)			--109983
-				if self.object.alive and self.object:alive() == false and lname ~= TB3D_Services.level_on_save() then
+				if is_report then
+					TB3D_Services.packet_alert("BIND MONSTER: net spawn["..obj_name..":"..sobj_sect.."]")
+				end
+				if sobj.alive and sobj:alive() == false and lname ~= TB3D_Services.level_on_save() then
 					if TB3D_Services.can_remove_dead(lname, obj_name) == true and db.check_corpse_looted(obj) ~= nil then			--now interactive corpse cleaner
-						if is_report or TB3D_modders.use_spawn_message or TB3D_Modders.pop_spawn_message then
+						if is_report then
 							TB3D_Services.packet_alert("bind monster: dead["..obj_name.."] removed")
 						end
-						alife():release(alife():object(sobj))
+						alife():release(alife():object(sobj_id))
 						return false
 					end
 				end
-				if alife():object(sobj) then
-					if alife():object(sobj).m_story_id then
-						local sid = alife():object(sobj).m_story_id    -- Tags
+				if alife():object(sobj_id) then
+					if alife():object(sobj_id).m_story_id then
+						local sid = alife():object(sobj_id).m_story_id    -- Tags
 						if sid then
 							if sid ~= generic_m_story_id then									--just key npc
-								dmx_mod.mapspot_npc(sid,sobj)
+								dmx_mod.mapspot_npc(sid,sobj_id)
 							end
 						end
 					else
@@ -546,42 +548,42 @@ function generic_object_binder:net_spawn(sobject)
 					return false
 				end
 				--TB3D_Services.packet_alert("bind monster: net spawn2")
-				db.spawn_monster(self.object)									--109940
+				db.spawn_monster(sobj)									--109940
 				--TB3D_Services.packet_alert("bind monster: net spawn3")
-				xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded ) 
-				amk.on_net_spawn(self.object) 
-				local particle_param = getIniValueString(self.object:section(), "bones_particles", nil, nil) 
+				xr_gulag.setup_gulag_and_logic_on_spawn( sobj, self.st, sobject, modules.stype_mobile, self.loaded ) 
+				amk.on_net_spawn(sobj) 
+				local particle_param = getIniValueString(sobj_sect, "bones_particles", nil, nil) 
 				--TB3D_Services.packet_alert("bind monster: net spawn4")
-				if self.object:alive() then
-					local community = xr_statistic.get_monster_spot(self.object)	--clsid may not be available here
+				if sobj:alive() then
+					local community = xr_statistic.get_monster_spot(sobj)	--clsid may not be available here
 -- ------------------------------------------ new addon minimap - aleks1970 -------------------------------------------------
 					if community then
 						if community=="controller" and has_alife_info("have_kontroler_spot")  then
-							if level.map_has_object_spot(sobj, "kontroler_spot") == 0 then level.map_add_object_spot(sobj, "kontroler_spot", "Controller") end
+							if level.map_has_object_spot(sobj_id, "kontroler_spot") == 0 then level.map_add_object_spot(sobj_id, "kontroler_spot", "Controller") end
 						elseif community=="bloodsucker" and has_alife_info("have_bloodsucker_spot")  then
-							if level.map_has_object_spot(sobj, "bloodsucker_spot") == 0 then level.map_add_object_spot(sobj, "bloodsucker_spot", "Bloodsucker") end
+							if level.map_has_object_spot(sobj_id, "bloodsucker_spot") == 0 then level.map_add_object_spot(sobj_id, "bloodsucker_spot", "Bloodsucker") end
 						elseif community=="pseudo_gigant" and has_alife_info("have_pseudo_gigant_spot")  then
-							if level.map_has_object_spot(sobj, "pseudo_gigant_spot") == 0 then level.map_add_object_spot(sobj, "pseudo_gigant_spot", "Pseudogiant") end
+							if level.map_has_object_spot(sobj_id, "pseudo_gigant_spot") == 0 then level.map_add_object_spot(sobj_id, "pseudo_gigant_spot", "Pseudogiant") end
 						elseif community=="chimera" and has_alife_info("have_chimera_spot")  then
-							if level.map_has_object_spot(sobj, "chimera_spot") == 0 then level.map_add_object_spot(sobj, "chimera_spot", "Chimera") end
+							if level.map_has_object_spot(sobj_id, "chimera_spot") == 0 then level.map_add_object_spot(sobj_id, "chimera_spot", "Chimera") end
 						elseif community=="burer" and has_alife_info("have_burer_spot")  then
-							if level.map_has_object_spot(sobj, "burer_spot") == 0 then level.map_add_object_spot(sobj, "burer_spot", "Burer") end
+							if level.map_has_object_spot(sobj_id, "burer_spot") == 0 then level.map_add_object_spot(sobj_id, "burer_spot", "Burer") end
 						elseif community=="werewolf" and has_alife_info("have_wolf_spot")  then
-							if level.map_has_object_spot(sobj, "wolf_spot") == 0 then level.map_add_object_spot(sobj, "wolf_spot", "Werewolf") end
+							if level.map_has_object_spot(sobj_id, "wolf_spot") == 0 then level.map_add_object_spot(sobj_id, "wolf_spot", "Werewolf") end
 						elseif community=="bibliotekar" and has_alife_info("have_biblio_spot")  then
-							if level.map_has_object_spot(sobj, "bibliotekar_spot") == 0 then level.map_add_object_spot(sobj, "bibliotekar_spot", "Bibliotekar") end
+							if level.map_has_object_spot(sobj_id, "bibliotekar_spot") == 0 then level.map_add_object_spot(sobj_id, "bibliotekar_spot", "Bibliotekar") end
 						end
 					end
-					if TB3D_Modders.hit_on_spawn then TB3D_Hit_Styles.hit_on_spawn(self.object) end      --109980, moved hit em
+					if TB3D_Modders.hit_on_spawn then TB3D_Hit_Styles.hit_on_spawn(sobj) end      --109980, moved hit em
 					if particle_param and system_ini():section_exist(particle_param) then 
 						local tmp=amk.parse_ini_section_to_array_new(nil,particle_param) 
 						local t = {}
 						for k,v in pairs(tmp) do 
 							t = {}
 							t = amk.parse_ini_section_to_array_new(nil, v) 
-							t.obj = self.object 
+							t.obj = sobj 
 							if t ~= nil then
-								play_particle(self.object, t) 
+								play_particle(sobj, t) 
 							end 
 						end 
 					end
@@ -592,9 +594,9 @@ function generic_object_binder:net_spawn(sobject)
 						for k,v in pairs(tmp) do 
 							t = {}
 							t = amk.parse_ini_section_to_array_new(nil, v) 
-							t.obj = self.object 
+							t.obj = sobj 
 							if t ~= nil and not t.stop_on_death then 
-								play_particle(self.object, t) 
+								play_particle(sobj, t) 
 							end 
 						end 
 					end 
@@ -674,6 +676,11 @@ function generic_object_binder:net_destroy() 			--goes offline
 			if st_obj then
 				local sid = st_obj.m_story_id							-- check the id and insure not generic
 				if sid and sid ~= generic_m_story_id then dmx_mod.remove_mapspot_npc(sid,id) end	--key sid so see if has a spot
+				if st_obj.clsid then
+					if is_report then TB3D_Services.packet_alert("bind monster: net destroy["..sname.."] clsid["..utils.to_str(st_obj:clsid()).."]") end
+				else
+					TB3D_Services.packet_alert("bind monster: net destroy["..sname.."] clsid[NIL]   !!!!!!!!")
+				end
 				if IAmAMonster[st_obj:clsid()] then 					-- if a monster then clear table
 					local tbl=amk.read_monster_params(st_obj) 
 					tbl.crvu32u16u2={} 

@@ -871,17 +871,20 @@ end
 
 function spawn_anomoly(item,x,y,z,lv,gv)
 	local obj = alife():create(item,vector():set(x,y,z),lv,gv)
-	--TB3D_Services.packet_alert("dyn spawn: obj["..obj:name().."] sect["..obj:section_name().."]")
-    if string.find(obj:section_name(), "zone_mine_gravitational") or
-       string.find(obj:section_name(), "zone_no_gravity_tb3d") or 
-       string.find(obj:section_name(), "field") or 
-       string.find(obj:section_name(), "teleport") or
-       string.find(obj:section_name(), "death") or  
-       string.find(obj:section_name(), "sarcofag") or  
-       string.find(obj:section_name(), "zone_radioactive") then
-			anom.create_anom(obj,3, vector():set(x,y,z),lv,gv,"field")
-	else
-		anom.create_anom(obj,3, vector():set(x,y,z),lv,gv)
+	if obj then
+		local sect = get_section(obj)
+		--TB3D_Services.packet_alert("dyn spawn: obj["..obj:name().."] sect["..sect.."]")
+		if string.find(sect, "zone_mine_gravitational") or
+		   string.find(sect, "zone_no_gravity_tb3d") or 
+		   string.find(sect, "field") or 
+		   string.find(sect, "teleport") or
+		   string.find(sect, "death") or  
+		   string.find(sect, "sarcofag") or  
+		   string.find(sect, "zone_radioactive") then
+				anom.create_anom(obj,3, vector():set(x,y,z),lv,gv,"field")
+		else
+			anom.create_anom(obj,3, vector():set(x,y,z),lv,gv)
+		end
 	end
 end
 

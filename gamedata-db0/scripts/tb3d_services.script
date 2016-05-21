@@ -1,4 +1,4 @@
----TB3D 1.0.9.9.9.9 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.1.0.0.0.0 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
@@ -6,13 +6,49 @@
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
 -- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed,
 -- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over, zat lost, grib_respawn, tb3d_storm_started, killed by actor,
--- yan_specnaz_dead
-function my_ver() return "1.0.9.9.9.9" end	--modders append with initials and rev.
+-- yan_specnaz_dead, difficulty_num
+function my_ver() return "1.1.0.0.0.0" end	--modders append with initials and rev.
 
 --title version will display network info in future
-function title_ver() return "{Version: 1 Release: BETA Revision: 9.9.9.9}" end
+--function title_ver() return "{Version: 1 Release: ALPHA Revision: 0.0.0.0}" end
+local difficulty_ver = ""									--set by bind_stalker load or amk_mod new game start
+local difficulty_num = 0
+local rev_number = "0.0.0.0"
+local translate = game.translate_string
+function title_ver()
+	local game_dif = amk.load_variable("game_diff", 0)
+	if game_dif ~= 0 then
+		difficulty_ver = translate(game_dif)
+	elseif _g.is_disconnecting then
+		difficulty_ver = ""
+	end
+	return "{"..translate("version_scr").." 1 "..translate("release_scr").." ALPHA "..translate("revision_scr").." "..rev_number.."} "..difficulty_ver	--.." "..network_info
+end
+function set_difficulty(gdiff)
+	local game_version
+	if gdiff == 0 then
+		game_version = "game_gd_novice"
+	elseif gdiff == 1 then
+		game_version = "game_gd_stalker"
+	elseif gdiff == 2 then
+		game_version = "game_gd_veteran"
+	elseif gdiff == 3 then
+		game_version = "game_gd_markedone"
+	else
+		game_version = "game_gd_collector"
+	end
+	--give_info("game_difficulty")
+	give_info(game_version)
+	amk.save_variable("game_diff", game_version)
+	difficulty_num = gdiff
+	difficulty_ver = translate(game_version)
+	packet_alert("TB3D: set diff["..utils.to_str(difficulty_num).."] ["..difficulty_ver.."]")
+end
+function get_difficulty_num()
+	return difficulty_num
+end
 
-major_version = 109999							--used in saves
+major_version = 110000							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -22,17 +58,20 @@ local ismidnight, isnoon						--major day cycle event points, true for 5 game mi
 local string_find = string.find					--create a local pointer for faster lookups
 local math_random = math.random
 local math_trunc = math.floor
-local translate = game.translate_string
 local medkit,antirad,bandage,vodka = 0,0,0,0         -- counters items
 local medkit_wnd,antirad_wnd,bandage_wnd,vodka_wnd   -- static window
 local is_skipping = false
 local level_up, blow_phase, blow_type								--109980
 local last_level
+local started
+
+function get_started()
+	if started == nil then started = amk.load_variable("first_started", 0) end
+	return started
+end
 
 function level_on_save(sname)
-	if last_level == nil then
-		last_level = sname
-	end
+	if last_level == nil then last_level = sname end
 	return last_level
 end
 
@@ -70,8 +109,8 @@ end
 function is_collector(idx)
 	local is_freeplay = get_level_up()			--109980
 	 if is_freeplay == -1 then
-		packet_alert("tb3d services: is collector freeplay[nil] for["..utils.to_str(idx).."]")
-		if get_console():get_string("mm_net_srv_name") == translate_string("gd_collector") then
+		packet_alert("TB3D: is collector freeplay[nil] for["..utils.to_str(idx).."]")
+		if get_console():get_string("mm_net_srv_name") == translate("gd_collector") then
 			is_freeplay = 1
 		else
 			is_freeplay = 0
@@ -228,7 +267,7 @@ end
 function show_mem_usage()
 	local con = get_console()
   if con then
-	con:execute("load ~~~ TB3D services: Memory check")
+	con:execute("load ~~~ TB3D: Memory check")
 	con:execute("stat_memory")
 	con:execute("flush")
   end
@@ -238,9 +277,9 @@ function show_belt_items()			--109975
 	for i = 0, 12 do
 		local oitem = db.actor:item_in_slot(i)
 		if oitem then
-			packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] ["..oitem:name().."]")
+			packet_alert("TB3D: actor item in slot["..utils.to_str(i).."] ["..oitem:name().."]")
 		else
-			packet_alert("tb3d services: actor item in slot["..utils.to_str(i).."] [empty]")
+			packet_alert("TB3D: actor item in slot["..utils.to_str(i).."] [empty]")
 		end
 	end
 end
@@ -264,7 +303,7 @@ function report_gulags()
 end
 
 function report_plug_ins()
-	packet_alert("tb3d services: reporting plug ins...")
+	packet_alert("TB3D: reporting plug ins...")
 	get_language_pack()							--in localization.ltx
 	get_texture_pack()							--in TB3D_Texture_pack.ltx
 	get_weapons_pack()							--in weapons.ltx
@@ -276,10 +315,13 @@ function report_plug_ins()
 	get_mp_pack()								--in TB3D_Livelink.ltx
 	get_ui_pack()								--in TB3D_Ui_Pack.ltx
 	get_trade_pack()							--in TB3D_Trade_Pack.ltx
-	packet_alert("tb3d services: reporting plug ins done")
+	packet_alert("TB3D: reporting plug ins done")
 	local gmode = system_ini():r_string("game_mode", "mode")
+	packet_alert("TB3D: actor reputation["..utils.to_str(db.actor:character_reputation()).."] diff["..utils.to_str(difficulty_num).."] rank["..utils.to_str(db.actor:character_rank()).."] koef["..utils.to_str(global_koef(level_up)).."] comm["..utils.to_str(db.actor:character_community()).."] money["..utils.to_str(db.actor:money()).."] level up["..utils.to_str(level_up).."] gmode["..utils.to_str(gmode).."]")
+end
+
+function check_goodwill()
 	local act_id = db.actor:id()
-	packet_alert("tb3d_services: actor reputation["..utils.to_str(db.actor:character_reputation()).."] diff["..utils.to_str(level.get_game_difficulty()).."] rank["..utils.to_str(db.actor:character_rank()).."] koef["..utils.to_str(global_koef(level_up)).."] comm["..utils.to_str(db.actor:character_community()).."] money["..utils.to_str(db.actor:money()).."] level up["..utils.to_str(level_up).."] gmode["..utils.to_str(gmode).."]")
 	if TB3D_Modders.force_all_goodwill then
 		local gdwl = TB3D_Modders.force_all_goodwill
 		relation_registry.change_community_goodwill("stalker",  act_id, gdwl)
@@ -298,31 +340,32 @@ function report_plug_ins()
 		relation_registry.change_community_goodwill("stranger",  act_id, gdwl)
 		relation_registry.change_community_goodwill("lastday",  act_id, gdwl)
 	else
-		packet_alert("tb3d_services: actor goodwill stalker["..utils.to_str(relation_registry.community_goodwill("stalker",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill ecolog["..utils.to_str(relation_registry.community_goodwill("ecolog",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill green["..utils.to_str(relation_registry.community_goodwill("green",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill nebo["..utils.to_str(relation_registry.community_goodwill("nebo",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill stalker["..utils.to_str(relation_registry.community_goodwill("stalker",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill ecolog["..utils.to_str(relation_registry.community_goodwill("ecolog",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill green["..utils.to_str(relation_registry.community_goodwill("green",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill nebo["..utils.to_str(relation_registry.community_goodwill("nebo",  act_id)).."]")
 		if TB3D_Modders.force_mil_goodwill then
 			relation_registry.change_community_goodwill("military",  act_id, TB3D_Modders.force_mil_goodwill)
 		else
-			packet_alert("tb3d_services: actor goodwill Military["..utils.to_str(relation_registry.community_goodwill("military",  act_id)).."]")
+			packet_alert("TB3D: actor goodwill Military["..utils.to_str(relation_registry.community_goodwill("military",  act_id)).."]")
 		end
-		packet_alert("tb3d_services: actor goodwill dolg["..utils.to_str(relation_registry.community_goodwill("dolg",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill dolg["..utils.to_str(relation_registry.community_goodwill("dolg",  act_id)).."]")
 		if TB3D_Modders.force_fre_goodwill then
 			relation_registry.change_community_goodwill("freedom",  act_id, TB3D_Modders.force_fre_goodwill)
 		else
-			packet_alert("tb3d_services: actor goodwill freedom["..utils.to_str(relation_registry.community_goodwill("freedom",  act_id)).."]")
+			packet_alert("TB3D: actor goodwill freedom["..utils.to_str(relation_registry.community_goodwill("freedom",  act_id)).."]")
 		end
-		packet_alert("tb3d_services: actor goodwill bandit["..utils.to_str(relation_registry.community_goodwill("bandit",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill killer["..utils.to_str(relation_registry.community_goodwill("killer",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill monolith["..utils.to_str(relation_registry.community_goodwill("monolith",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill zombied["..utils.to_str(relation_registry.community_goodwill("zombied",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill trader["..utils.to_str(relation_registry.community_goodwill("trader",  act_id)).."]")
-		--packet_alert("tb3d_services: actor goodwill hunter["..utils.to_str(relation_registry.community_goodwill("hunter",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill stranger["..utils.to_str(relation_registry.community_goodwill("stranger",  act_id)).."]")
-		packet_alert("tb3d_services: actor goodwill lastday["..utils.to_str(relation_registry.community_goodwill("lastday",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill bandit["..utils.to_str(relation_registry.community_goodwill("bandit",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill killer["..utils.to_str(relation_registry.community_goodwill("killer",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill monolith["..utils.to_str(relation_registry.community_goodwill("monolith",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill zombied["..utils.to_str(relation_registry.community_goodwill("zombied",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill trader["..utils.to_str(relation_registry.community_goodwill("trader",  act_id)).."]")
+		--packet_alert("TB3D: actor goodwill hunter["..utils.to_str(relation_registry.community_goodwill("hunter",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill stranger["..utils.to_str(relation_registry.community_goodwill("stranger",  act_id)).."]")
+		packet_alert("TB3D: actor goodwill lastday["..utils.to_str(relation_registry.community_goodwill("lastday",  act_id)).."]")
 	end
 end
+
 function get_language_pack()
     local ltx = system_ini()
 	local lang, author, version
@@ -340,7 +383,7 @@ function get_language_pack()
 	if lang == nil then lang = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: language pack["..utils.to_str(lang).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: language pack["..utils.to_str(lang).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_texture_pack()
     local ltx = system_ini()
@@ -359,7 +402,7 @@ function get_texture_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: texture pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: texture pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_weapons_pack()
     local ltx = system_ini()
@@ -378,7 +421,7 @@ function get_weapons_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: weapons pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: weapons pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_weather_pack()
     local ltx = system_ini()
@@ -397,7 +440,7 @@ function get_weather_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: weather pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: weather pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_inventory_pack()
     local ltx = system_ini()
@@ -416,7 +459,7 @@ function get_inventory_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: inventory pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: inventory pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_mp_pack()
     local ltx = system_ini()
@@ -435,7 +478,7 @@ function get_mp_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: multiplayer pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: multiplayer pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_music_pack()
     local ltx = system_ini()
@@ -454,7 +497,7 @@ function get_music_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: music pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: music pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 -- New Plug-ins addon start aleks1970
 function get_ui_pack()
@@ -474,7 +517,7 @@ function get_ui_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: ui pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: ui pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_scopes_pack()
     local ltx = system_ini()
@@ -493,7 +536,7 @@ function get_scopes_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: scopes pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: scopes pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_outfit_pack()
     local ltx = system_ini()
@@ -512,7 +555,7 @@ function get_outfit_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: outfit pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: outfit pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 function get_trade_pack()
     local ltx = system_ini()
@@ -531,7 +574,7 @@ function get_trade_pack()
 	if style == nil then style = "Unknown" end
 	if author == nil then author = "Unknown" end
 	if version == nil then version = "Unknown" end
-	packet_alert("tb3d services: trade pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
+	packet_alert("TB3D: trade pack["..utils.to_str(style).."] author["..utils.to_str(author).."] version["..utils.to_str(version).."]")
 end
 -- New Plug-ins addon start aleks1970
 
@@ -539,23 +582,23 @@ function get_obj_level(gvid)
 	--local gvid = sobj.m_game_vertex_id
     if gvid and game_graph():valid_vertex_id(gvid) then
 		local level_id = game_graph():vertex(gvid):level_id()
-		--packet_alert("tb3d services: get obj level["..utils.to_str(level_id).."]")
+		--packet_alert("TB3D: get obj level["..utils.to_str(level_id).."]")
 		return alife():level_name(level_id)
 	end
-	packet_alert("tb3d services: get obj level - gvid["..utils.to_str(gvid).."]  invalid !!!!")
+	packet_alert("TB3D: get obj level - gvid["..utils.to_str(gvid).."]  invalid !!!!")
 	return ""
 end
 
 function savegame(save_name)
 	if isGameOn() and save_name ~= nil then
-		--packet_alert("tb3d services: save name["..utils.to_str(save_name).."]")
+		--packet_alert("TB3D: save name["..utils.to_str(save_name).."]")
 		local save_param
 		if is_collector(1) == true then
 			save_param = user_name().." -FP LVL"..utils.to_str(get_level_up()).."- "..save_name
 		else
 			save_param = user_name().." -stalker- "..save_name
 		end
-		--packet_alert("tb3d services: save param["..utils.to_str(save_param).."]")
+		--packet_alert("TB3D: save param["..utils.to_str(save_param).."]")
 		get_console():execute("save "..save_param)
 		save_param = nil
     end
@@ -565,7 +608,7 @@ end
 function start_disconnect()
 	_g.is_disconnecting = true
 	if alife() and db.actor then
-		packet_alert("tb3d services: start disconnect")
+		packet_alert("TB3D: start disconnect")
 		if TB3D_Modders.use_info_message then
 			show_belt_items()		--109975
 			--remove_dyn_objects()
@@ -583,6 +626,8 @@ function set_daytime()												--needed to set isnight without triggering cam
 	else
 		isnight = false
 	end
+	give_info("tb3d_force_weather")
+	_g.time_changed = false
 	packet_alert("tb3d: game time hr["..utils.to_str(m_h).."] mn["..utils.to_str(m_m).."] is night["..utils.to_str(isnight).."]")		--109996
 end
 
@@ -865,37 +910,15 @@ function check_teleportation()
 						sim:release(t_obj, true)
 						db.actor.health = 2			--full health, to survive Collector start
 					else
-						t_obj = sim:story_object(1999994) -- joined osozn
+						t_obj = sim:story_object(1999994) --110000, joined osozn now not used, refused used for both to always go to npp2
 						if t_obj then
 							sim:release(t_obj, true)
 							sname = "l12u_sarcofag"
-							--change community reps, ecolg should not trust actor
-							--relation_registry.set_community_goodwill ("military", db.actor:id(), 0)
-							--relation_registry.set_community_goodwill ("freedom", db.actor:id(), 0)
-							--relation_registry.set_community_goodwill ("dolg", db.actor:id(), 0)
-							--relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
-							--relation_registry.set_community_goodwill ("bandit", db.actor:id(), 0)
-							relation_registry.set_community_goodwill ("monolith", db.actor:id(), 400)
-							relation_registry.set_community_goodwill ("ecolog", db.actor:id(), 0)
-							local oldrep = db.actor:character_reputation()
-							db.actor:change_character_reputation(-oldrep)	--zero out rep, controls runaways
-							db.actor:change_character_reputation(900)
-							db.actor.health = 2			--full health
-							give_info("tb3d_joined_oc")
 						else
-							t_obj = sim:story_object(1999993) -- refused osozn
+							t_obj = sim:story_object(1999993) --110000, refused osozn
 							if t_obj then
 								sim:release(t_obj, true)
 								sname = "l12u_sarcofag"
-								--change community reps, ecolg should like actor
-								--relation_registry.set_community_goodwill ("military", db.actor:id(), 0)
-								--relation_registry.set_community_goodwill ("freedom", db.actor:id(), 0)
-								--relation_registry.set_community_goodwill ("dolg", db.actor:id(), 0)
-								--relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
-								--relation_registry.set_community_goodwill ("bandit", db.actor:id(), 0)
-								relation_registry.set_community_goodwill ("monolith", db.actor:id(), -500)
-								relation_registry.set_community_goodwill ("ecolog", db.actor:id(), 400)
-								--sorry, health stay as is, what did you expect?
 							else
 								t_obj = sim:story_object(1999992) -- chaes tower
 								if t_obj then
@@ -985,7 +1008,7 @@ function check_teleportation()
 end
 
 function set_community(npc, comm, gw, rep)				--109981
-	if TB3D_Modders.use_info_message then packet_alert("tb3d services: set community["..npc:name().."] comm["..utils.to_str(comm).."] gw["..utils.to_str(gw).."] rep["..utils.to_str(rep).."]") end
+	if TB3D_Modders.use_info_message then packet_alert("TB3D: set community["..npc:name().."] comm["..utils.to_str(comm).."] gw["..utils.to_str(gw).."] rep["..utils.to_str(rep).."]") end
 	if npc and comm then
 		if gw and rep then
 			npc:set_character_community(comm,gw,rep)			--change all three
@@ -1028,7 +1051,7 @@ function check_active_community()								--109981, actor only on spawn
 		end
 	end
 	if comm ~= db.actor:character_community() then
-		if TB3D_Modders.use_info_message then packet_alert("tb3d services: set actor community from["..utils.to_str(db.actor:character_community()).."] to["..utils.to_str(comm).."]") end
+		if TB3D_Modders.use_info_message then packet_alert("TB3D: set actor community from["..utils.to_str(db.actor:character_community()).."] to["..utils.to_str(comm).."]") end
 		if comm == "actor" then
 			db.actor:set_character_community(comm)				--if actor then leave goodwill and reputation as it was
 		else
@@ -1604,7 +1627,7 @@ function get_names()
 		sname = ini:r_string("names",tostring(math_random(300)))
 	end
 	ini = nil
-	--packet_alert("tb3d services get names: name["..utils.to_str(name).."] sname["..utils.to_str(sname).."]")
+	--packet_alert("TB3D get names: name["..utils.to_str(name).."] sname["..utils.to_str(sname).."]")
 	return name, sname
 end
 
@@ -1676,7 +1699,7 @@ function get_text_color(text_type)
 end
 
 function time_resync()
-	--packet_alert("TB3D Services: time resync")
+	--packet_alert("TB3D: time resync")
 	level.set_time_factor(system_ini():r_float("alife","time_factor"))	--resync time of day
 end
 
@@ -1687,6 +1710,7 @@ local frogs_snd_soft
 local frogs_snd
 local cooling_snd
 local is_raining = false
+local is_gloss_on = false
 function env_update()
 	local m_h = level:get_time_hours()
 	local m_m = level.get_time_minutes()
@@ -1744,6 +1768,7 @@ function env_update()
 	end
 	local is_fires_on = false
 	local rain_factor = level.rain_factor()
+	--packet_alert("tb3d: rain factor["..utils.to_str(rain_factor).."]")
 	if is_raining then
 		if rain_factor < TB3D_Modders.heavy_rain_factor - 0.1 then is_raining = false end			--create a deadzone of 0.1 to prevent thrashing
 	else
@@ -1755,10 +1780,22 @@ function env_update()
 		is_fires_on = true							--turn them on or keep them on
 		if TB3D_Modders.use_environment_message and not fires_on then packet_alert("tb3d: fires[on] indoor or always on") end
 	elseif is_raining then
+		if not is_gloss_on then
+			local gloss_factor = TB3D_Modders.gloss_factor*(rain_factor+1)			--110000, (1.0 to 2.0) * gloss_factor
+			if gloss_factor > 10 then gloss_factor = 10 end
+			get_console():execute("r2_gloss_factor "..utils.to_str(gloss_factor))
+			is_gloss_on = true
+		end
 		is_fires_on = true							--turn them on or keep them on
-		if TB3D_Modders.use_environment_message and not fires_on then packet_alert("tb3d: fires[on] rain["..utils.to_str(level.rain_factor()).."]") end
-	elseif fires_on then							--normal daytime
-		if TB3D_Modders.use_environment_message then packet_alert("tb3d: fires[off] daytime") end
+		if TB3D_Modders.use_environment_message and not fires_on then packet_alert("tb3d: fires[on] rain["..utils.to_str(rain_factor).."]") end
+	else
+		if is_gloss_on then
+			get_console():execute("r2_gloss_factor "..utils.to_str(TB3D_Modders.gloss_factor))
+			is_gloss_on = false
+		end
+		if fires_on then							--normal daytime
+			if TB3D_Modders.use_environment_message then packet_alert("tb3d: fires[off] daytime") end
+		end
 	end
 	if is_fires_on then
 		if not fires_on then
@@ -1845,7 +1882,7 @@ function env_update()
 end
 
 function in_zone(level_name)
-	local inzone = 2																	--0 = not, 1 = outer and 2 = inner
+	local inzone = 2																	--0 = not, 1 = outer(quiet) and 2 = inner(loud)
 	local alt = db.actor:position().y													--marsh water level at 0
 	local posx = db.actor:position().x
 	local posz = db.actor:position().z
@@ -1872,6 +1909,9 @@ function in_zone(level_name)
 		  then
 			inzone = 1
 		end
+	elseif level_name == "swamp_old" then												--110000, water level at -7.5
+		if posz > 50 then inzone = 0													--river on w side
+		else alt = alt - 0.275 end
 	elseif level_name == "l03_agroprom" then											--water level at 0
 		if posx > -138
 		  or posz < -9
@@ -1982,6 +2022,7 @@ function set_harsh_environment(type)											--109980
 		level.add_pp_effector("nano.ppe", 77777771, true)
 		harsh_snd = sound_object("ambient\\radar_2")
 	end
+	_g.time_changed = true
 	if harsh_snd then harsh_snd:play_no_feedback(db.actor, sound_object.s2d + sound_object.looped, 0, vector(), 2.5) end
 end
 
@@ -1993,6 +2034,7 @@ function clear_harsh_environment()											--109980
 		delayed_action(1, "tb3d_bad_torch", 10)
 		amk.save_variable("torch_state", 3)
 	end
+	_g.time_changed = true
 end
 
 function check_storm_over()					--109998
@@ -2279,10 +2321,10 @@ function is_invulnerable(npc)
 	local npc_name = protected_items.get_obj_name(npc)		--strips off the id
 	if npc_name then
 		if invuln_npc[npc_name] then
-			--packet_alert("tb3d services: is_invulnerable["..npc_name.."][true]")
+			--packet_alert("TB3D: is_invulnerable["..npc_name.."][true]")
 			return true
 		end
-		--packet_alert("tb3d services: is_invulnerable["..npc_name.."][false]")
+		--packet_alert("TB3D: is_invulnerable["..npc_name.."][false]")
 	end
 	return false
 end
@@ -2323,7 +2365,7 @@ function check_invuln_can_die(npc)
 			result = has_alife_info("mil_headquarter_attack")		--attack freedom base
 		end
  	end
-	packet_alert("tb3d services: can die?["..npc_name.."] ["..utils.to_str(result).."]")
+	packet_alert("TB3D: can die?["..npc_name.."] ["..utils.to_str(result).."]")
 	return result
 end
 
@@ -2337,10 +2379,10 @@ function is_immortal(npc)
 	local npc_name = protected_items.get_obj_name(npc)		--strips off the id
 	if npc_name then
 		if immortals[npc_name] then
-			--packet_alert("tb3d services: is_immortal["..npc_name.."][true]")
+			--packet_alert("TB3D: is_immortal["..npc_name.."][true]")
 			return true
 		end
-		--packet_alert("tb3d services: immortal["..npc_name.."][false]")
+		--packet_alert("TB3D: immortal["..npc_name.."][false]")
 	end
 	return false
 end
@@ -2415,16 +2457,9 @@ function move_actor(x,y,z,is_hit)
 	end
 end
 
-function rotate_actor(degs)
-	local pos = db.actor:position()
-	local angle = degs
-	if angle == nil then
-		angle = 180
-	end
-	--db.actor:set_actor_direction(vector_rotate_y(device().cam_dir, angle))
-	db.actor:set_actor_direction(vector_rotate_y(db.actor:direction(), angle))
-	--packet_alert("tb3d services: actor rotated["..utils.to_str(angle).."]")
-	--db.actor:set_actor_position(vector():set(pos.x, pos.y, pos.z+0.001))
+function rotate_actor(dir)
+	--packet_alert("TB3D: rotate actor["..utils.to_str(dir).."]")
+	db.actor:set_actor_direction(dir)		--110000
 end
 
 function check_box_closed()
@@ -2468,6 +2503,7 @@ end
 
 function can_remove_dead(lname, npc_name)
 	local result = false
+	--packet_alert("TB3D: can remove dead["..npc_name.."] level["..lname.."]")
 	if lname == "l01_escape" then
 		if has_alife_info("bar_darklab_document_done") then result = true end
 	elseif lname == "l02_garbage" then
@@ -2487,7 +2523,7 @@ function can_remove_dead(lname, npc_name)
 			result = true
 		end
 	elseif lname == "l07_military" then
-		if has_alife_info("rad_after_antenna_turned_off") then result = true end
+		if has_alife_info("aes_found_sarcofag") then result = true end				--110000
 	elseif lname == "l03_agroprom" then
 		if has_alife_info("agroprom_military_case_done") then result = true end
 	elseif lname == "atp_for_test22" then
@@ -2503,8 +2539,8 @@ function can_remove_dead(lname, npc_name)
 			result = true
 		end
 	elseif lname == "l10_radar" then
-		if string_find(npc_name, "radar_monolit_dead") then if is_collector(0) then result = true end
-		elseif has_alife_info("rad_after_antenna_turned_off") then result = true end
+		if is_collector(0) then result = true
+		elseif has_alife_info("aes_found_sarcofag") then result = true end		--110000
 	elseif lname == "l11_pripyat" then
 		if string_find(npc_name, "ecolog_respawn_2") then						--dead scientist with usb
 			if is_collector(0) then result = true end
@@ -2664,7 +2700,7 @@ function show_game_graph()
 			end
 		end
 	end
-	packet_alert("tb3d services: total gvids["..utils.to_str(cnt).."]")
+	packet_alert("TB3D: total gvids["..utils.to_str(cnt).."]")
 end
 
 local time_wait
@@ -2923,9 +2959,9 @@ function check_prior_version(tb3d_ver)											--109972
 	local obj
 	local stage = amk.load_variable("tb3d_fixer_stage", 0)		--returns 0 if not created yet
 	--local tb3d_ver = amk.load_variable("tb3d_version", 0)
-	local started = amk.load_variable("first_started", 0)
+	started = get_started()
 	if started < 109984 and stage < 6 then stage = 0 end				--109984, redo fixes
-	packet_alert("tb3d services: check prior version started["..utils.to_str(started).."] version["..utils.to_str(tb3d_ver).."] stage["..utils.to_str(stage).."]")
+	packet_alert("TB3D: check prior version started["..utils.to_str(started).."] version["..utils.to_str(tb3d_ver).."] stage["..utils.to_str(stage).."]")
 	if stage < 1 then
 		obj = alife():story_object(99200)																		--old ds lc, actually in wasted wood
 		if obj then alife():release(obj) end
@@ -2958,14 +2994,14 @@ function check_prior_version(tb3d_ver)											--109972
 				obj = alife():object(a)
 				if obj then
 					if obj.name then obj_name = obj:name() else obj_name = "NIL" end
-					if obj.section_name then sect = obj:section_name() else sect = "NIL" end
+					sect = get_section(obj)
 					if string_find(obj_name, "zone_radioactive_tb3d") and sect == "zone_radioactive_tb3d" then
 						alife():release(obj, true)
 						--cnt = cnt + 1
 					end
 				end
 			end
-			--packet_alert("tb3d services: old version fixer removed["..utils.to_str(cnt).."] rad zones!!!!")
+			--packet_alert("TB3D: old version fixer removed["..utils.to_str(cnt).."] rad zones!!!!")
 		--end
 		stage = 2
 	end
@@ -3096,5 +3132,76 @@ function clear_targets()
 end
 
 function check_kill_target_spawned(selected_target)
-	packet_alert("tb3d services: check kill target[..utils.to_str(selected_target)..}")
+	packet_alert("TB3D: check kill target[..utils.to_str(selected_target)..}")
 end
+
+function change_difficulty(gdiff)
+	if has_alife_info("game_gd_novice") and gdiff ~= 0 then
+		remove_info("game_gd_novice")
+	elseif has_alife_info("game_gd_stalker") and gdiff ~= 1 then
+		remove_info("game_gd_stalker")
+	elseif has_alife_info("game_gd_veteran") and gdiff ~= 2 then
+		remove_info("game_gd_veteran")
+	elseif has_alife_info("game_gd_markedone") and gdiff ~= 3 then
+		remove_info("game_gd_markedone")
+	elseif has_alife_info("game_gd_collector") and gdiff ~= 4 then
+		remove_info("game_gd_collector")
+	end
+	if gdiff == 0 then
+		game_version = "game_gd_novice"
+	elseif gdiff == 1 then
+		game_version = "game_gd_stalker"
+	elseif gdiff == 2 then
+		game_version = "game_gd_veteran"
+	elseif gdiff == 3 then
+		game_version = "game_gd_markedone"
+	else
+		game_version = "game_gd_collector"
+	end
+	amk.save_variable("game_diff", game_version)
+	difficulty_num = gdiff
+	difficulty_ver = translate(game_version)
+	--packet_alert("TB3D: change diff["..utils.to_str(difficulty_num).."] ["..difficulty_ver.."]")
+end
+
+function set_existing_difficulty(gdiff)
+	if gdiff == 0 then
+		game_version = "game_gd_novice"
+	elseif gdiff == 1 then
+		game_version = "game_gd_stalker"
+	elseif gdiff == 2 then
+		game_version = "game_gd_veteran"
+	elseif gdiff == 3 then
+		game_version = "game_gd_markedone"
+	else
+		game_version = "game_gd_collector"
+	end
+	difficulty_num = gdiff
+	difficulty_ver = translate(game_version)
+	packet_alert("TB3D: set existing diff["..utils.to_str(difficulty_num).."] ["..difficulty_ver.."]")
+end
+
+function is_difficulty1()
+	if has_alife_info("game_gd_novice") or has_alife_info("game_gd_stalker") then
+		return true
+	else
+		return false
+	end
+end
+
+function is_difficulty2()
+	if has_alife_info("game_gd_veteran") or has_alife_info("game_gd_markedone") then
+		return true
+	else
+		return false
+	end
+end
+
+function is_difficulty3()
+	if has_alife_info("game_gd_collector") then
+		return true
+	else
+		return false
+	end
+end
+-- ----------------------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ local string_gfind = string.gfind
 
 ----------------
 local timer_trigger=nil
-convert_npc={}
+--convert_npc={}
 oAmkLauncher = amkII_launcher.CAmkLauncher()
 local StartTime
 
@@ -1298,17 +1298,18 @@ function on_actor_update(delta)
 	--oau_watchdog=658
 	--mod_call("blowout_phantoms")		--to bstalk 109950
 	--mod_call("check_radar_off")			--removed killactor and just reduce health by 0.01  --to bstalk 109950
-	oau_watchdog=657
-	mod_call("check_metka")				--gps spots
+	--oau_watchdog=657
+	--mod_call("check_metka")				--110000, moved to bstalk, gps spots
 	oau_watchdog=656
 	mod_call("doabcevents")				--hud breath, blood...
-	dmx_cars.check_btr()				--ogse usable btrs 109950
-	antirad_update()					--ogse usable btrs 109950
+	--dmx_cars.check_btr()				--ogse usable btrs 109950
+	--antirad_update()					--ogse usable btrs 109950
 	--mod_call("weather_manager")
 	--mod_call("check_armor")			--to bstalk 109950
 	--mod_call("interactive_music")		--to bstalk 109950
 	--mod_call("firebat_ammo")
 	--if amk_target then amk_target.update() end		-- !!!!TB3D just a debug call
+--[[
 	oau_watchdog=655
 	local obj, sobj
 	for k,v in pairs(convert_npc) do
@@ -1333,6 +1334,7 @@ function on_actor_update(delta)
 			convert_npc[k]=nil
 		end
 	end
+]]
 	oau_watchdog=654
 	if TB3D_Modders.amk_style_hit == true and prev_health > (db.actor.health + 0.05) then
 		TB3D_hit_styles.amk_health_hit(prev_health)
@@ -1343,7 +1345,7 @@ function on_actor_update(delta)
 	oAmkLauncher:UpdateFuncs()
 	oau_watchdog=652
 	--if TB3D_Modders.Global_Debug == true then TB3D_Services.info_alert("AMK: on_actor_update end") end
-	oau_watchdog=651	--all good, return to actor binder
+	--oau_watchdog=651	--all good, return to actor binder
 end
 
 --callback nepisya to create (or rather its transition to online), using a following function for action selection
@@ -1982,7 +1984,7 @@ function write_stalker_params(tbl,sobj,noconvert)	--TB3D  only here
   sobj:UPDATE_Read(uppk)
   local npc=level.object_by_id(sobj.id)
   if npc and (not noconvert) then		--noconvert true from tag_sqb, news_main, linspiro
-    convert_npc[sobj.id]=true
+    --convert_npc[sobj.id]=true
 	npc:stop_talk()
     switch_offline(npc)
   end

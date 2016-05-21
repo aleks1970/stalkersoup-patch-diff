@@ -1,8 +1,8 @@
----TB3D 1.0.9.9.9.9 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
+---TB3D 1.1.0.0.0.0 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
 -- removed din_rad and added use_rad_fields, TB3D_net_manager, added items, tb3d_dav_hunt, debug, gulag_deadcity,
 -- gulag_generators, gulag_aver, new vars and reorg, loadout_min_cond, loadout_ammo_count, loadout_ammo_loot, hdr,
 -- hardcore_mobs_mult, repair, bind_mashalat
-local vers = "1.0.9.9.9.9"
+local vers = "1.1.0.0.0.0"
 -- following removed from the mod ------------------------------------------------------------------------------------------------------------------------
 	--if valerich_dialog then TB3D_Services.packet_alert("valerich_dialog ok") else TB3D_Services.packet_alert("valerich_dialog failed!!!!") is_failed = true end
 	--if valerich_treasures then TB3D_Services.packet_alert("valerich_treasures ok") else TB3D_Services.packet_alert("valerich_treasures failed!!!!") is_failed = true end
@@ -27,6 +27,7 @@ local vers = "1.0.9.9.9.9"
 	--if sak_off_corpses then TB3D_Services.packet_alert("sak_off_corpses: "..sak_off_corpses.my_ver()) else TB3D_Services.packet_alert("sak_off_corpses failed!!!!") is_failed = true end
 	--if amk_dolg then TB3D_Services.packet_alert("amk_dolg: "..amk_dolg.my_ver()) else TB3D_Services.packet_alert("amk_dolg failed!!!!") is_failed = true end
 	--if amk_freedom then TB3D_Services.packet_alert("amk_freedom: "..amk_freedom.my_ver()) else TB3D_Services.packet_alert("amk_freedom failed!!!!") is_failed = true end
+	--if positioninformer then TB3D_Services.packet_alert("positioninformer: "..positioninformer.my_ver()) else TB3D_Services.packet_alert("positioninformer failed!!!!") is_failed = true end
 -----------------------------------------------------------------------------------------------------------------------------------------------------------	
 
 function verify_files()
@@ -178,8 +179,8 @@ function verify_files()
 	if gulag_aver then TB3D_Services.packet_alert("gulag_aver: "..gulag_aver.my_ver()) else TB3D_Services.packet_alert("gulag_aver failed!!!!") is_failed = true end
 	if gulag_bar then TB3D_Services.packet_alert("gulag_bar: "..gulag_bar.my_ver()) else TB3D_Services.packet_alert("gulag_bar failed!!!!") is_failed = true end
 	if gulag_dark_valley then TB3D_Services.packet_alert("gulag_dark_valley: "..gulag_dark_valley.my_ver()) else TB3D_Services.packet_alert("gulag_dark_valley failed!!!!") is_failed = true end
-	if gulag_deadcity then TB3D_Services.packet_alert("gulag_deadcity: "..gulag_deadcity.my_ver()) else TB3D_Services.packet_alert("gulag_deadcity failed!!!!") is_failed = true end
 	if gulag_dd then TB3D_Services.packet_alert("gulag_dd: "..gulag_dd.my_ver()) else TB3D_Services.packet_alert("gulag_dd failed!!!!") is_failed = true end
+	if gulag_deadcity then TB3D_Services.packet_alert("gulag_deadcity: "..gulag_deadcity.my_ver()) else TB3D_Services.packet_alert("gulag_deadcity failed!!!!") is_failed = true end
 	if gulag_escape then TB3D_Services.packet_alert("gulag_escape: "..gulag_escape.my_ver()) else TB3D_Services.packet_alert("gulag_escape failed!!!!") is_failed = true end
 	if gulag_garbage then TB3D_Services.packet_alert("gulag_garbage: "..gulag_garbage.my_ver()) else TB3D_Services.packet_alert("gulag_garbage failed!!!!") is_failed = true end
 	if gulag_general then TB3D_Services.packet_alert("gulag_general: "..gulag_general.my_ver()) else TB3D_Services.packet_alert("gulag_general failed!!!!") is_failed = true end
@@ -288,8 +289,6 @@ function verify_files()
 
 	if player_ogg then TB3D_Services.packet_alert("player_ogg: "..player_ogg.my_ver()) else TB3D_Services.packet_alert("player_ogg failed!!!!") is_failed = true end
 	
-	if positioninformer then TB3D_Services.packet_alert("positioninformer: "..positioninformer.my_ver()) else TB3D_Services.packet_alert("positioninformer failed!!!!") is_failed = true end
-	
 	if pripyat_tasks then TB3D_Services.packet_alert("pripyat_tasks: "..pripyat_tasks.my_ver()) else TB3D_Services.packet_alert("pripyat_tasks failed!!!!") is_failed = true end
 	
 	if protected_items then TB3D_Services.packet_alert("protected_items: "..protected_items.my_ver()) else TB3D_Services.packet_alert("protected_items failed!!!!") is_failed = true end
@@ -308,6 +307,7 @@ function verify_files()
 	if repair then TB3D_Services.packet_alert("repair: "..repair.my_ver()) else TB3D_Services.packet_alert("repair failed!!!!") is_failed = true end
 	if repair_check then TB3D_Services.packet_alert("repair_check: "..repair_check.my_ver()) else TB3D_Services.packet_alert("repair_check failed!!!!") is_failed = true end
 	if repair_repair then TB3D_Services.packet_alert("repair_repair: "..repair_repair.my_ver()) else TB3D_Services.packet_alert("repair_repair failed!!!!") is_failed = true end
+	if repair_salvage then TB3D_Services.packet_alert("repair_salvage: "..repair_salvage.my_ver()) else TB3D_Services.packet_alert("repair_salvage failed!!!!") is_failed = true end
 	
 	if restriction_stock then TB3D_Services.packet_alert("restriction_stock: "..restriction_stock.my_ver()) else TB3D_Services.packet_alert("restriction_stock failed!!!!") is_failed = true end
 	
@@ -393,6 +393,8 @@ function verify_files()
 	
 	if taynik_spawn then TB3D_Services.packet_alert("taynik_spawn: "..taynik_spawn.my_ver()) else TB3D_Services.packet_alert("taynik_spawn failed!!!!") is_failed = true end
 	
+	if TB3D_amk_spawn then TB3D_Services.packet_alert("TB3D_amk_spawn: "..TB3D_amk_spawn.my_ver()) else TB3D_Services.packet_alert("TB3D_amk_spawn failed!!!!") is_failed = true end
+	if TB3D_bstalk_spawn then TB3D_Services.packet_alert("TB3D_bstalk_spawn: "..TB3D_bstalk_spawn.my_ver()) else TB3D_Services.packet_alert("TB3D_bstalk_spawn failed!!!!") is_failed = true end
 	if TB3D_Collector then TB3D_Services.packet_alert("TB3D_Collector: "..TB3D_Collector.my_ver()) else TB3D_Services.packet_alert("TB3D_Collector failed!!!!") is_failed = true end
 	if TB3D_Collector_dialog then TB3D_Services.packet_alert("TB3D_Collector_dialog: "..TB3D_Collector_dialog.my_ver()) else TB3D_Services.packet_alert("TB3D_Collector_dialog failed!!!!") is_failed = true end
 	if tb3d_dav_hunt then TB3D_Services.packet_alert("tb3d_dav_hunt: "..tb3d_dav_hunt.my_ver()) else TB3D_Services.packet_alert("tb3d_dav_hunt failed!!!!") is_failed = true end
@@ -404,6 +406,9 @@ function verify_files()
 	if TB3D_mobs then TB3D_Services.packet_alert("TB3D_Mobs: "..TB3D_mobs.my_ver()) else TB3D_Services.packet_alert("TB3D_Mobs failed!!!!") is_failed = true end
 	if TB3D_Modders then TB3D_Services.packet_alert("TB3D_Modders: "..TB3D_Modders.my_ver()) else TB3D_Services.packet_alert("TB3D_Modders failed!!!!") is_failed = true end	
 	
+		TB3D_Services.packet_alert("opt_directX11["
+		..utils.to_str(TB3D_Modders.use_DX11).."]")
+		
 		TB3D_Services.packet_alert("opt_start["
 		..utils.to_str(TB3D_Modders.default_portal_spawn).."]["..utils.to_str(TB3D_Modders.default_items).."]["
 		..utils.to_str(TB3D_Modders.use_ammo_belt).."]")
@@ -413,7 +418,7 @@ function verify_files()
 		..utils.to_str(TB3D_Modders.alife_slice_mult).."]["..utils.to_str(TB3D_Modders.respawner_max_per_slice).."]")
 		
 		TB3D_Services.packet_alert("opt_offline_alife["
-		..utils.to_str(TB3D_Modders.use_offline_alife).."]["..utils.to_str(TB3D_Modders.alife_slice_mult).."]["
+		..utils.to_str(TB3D_Modders.use_offline_alife).."]["
 		..utils.to_str(TB3D_Modders.look_radius_box).."]["..utils.to_str(TB3D_Modders.search_intensivity).."]["
 		..utils.to_str(TB3D_Modders.offline_alife_trade).."]")
 
@@ -447,8 +452,11 @@ function verify_files()
 
 		TB3D_Services.packet_alert("opt_game["..utils.to_str(TB3D_Modders.use_DMX_cars).."]["
 		..utils.to_str(TB3D_Modders.give_items_on_spawn).."]["..utils.to_str(TB3D_Modders.unlimited_bolts).."]["
-		..utils.to_str(TB3D_Modders.use_ammo_stack).."]["..utils.to_str(TB3D_Modders.hide_weapon).."]["
-		..utils.to_str(TB3D_Modders.pda_spawn_rate).."]")
+		..utils.to_str(TB3D_Modders.use_ammo_stack).."]["..utils.to_str(TB3D_Modders.pda_spawn_rate).."]["
+		..utils.to_str(TB3D_Modders.join_factions).."]["..utils.to_str(TB3D_Modders.reduce_bar_visitors).."]["
+		..utils.to_str(TB3D_Modders.restrict_stock).."]")
+		
+		TB3D_Services.packet_alert("opt_weapon["..utils.to_str(TB3D_Modders.hide_weapon).."]")
 		
 		TB3D_Services.packet_alert("opt_adv_ai["..utils.to_str(TB3D_Modders.use_tb3d_wmgr).."]["
 		..utils.to_str(TB3D_Modders.use_xtrm_ai).."]["..utils.to_str(TB3D_Modders.sniper_aim_ratio).."]["
@@ -485,8 +493,15 @@ function verify_files()
 		..utils.to_str(TB3D_Modders.night_creatures).."]["..utils.to_str(TB3D_Modders.hits_to_kill_invuln).."]["
 		..utils.to_str(TB3D_Modders.hits_to_head_invuln).."]["..utils.to_str(TB3D_Modders.check_bad_weapons).."]["
 		..utils.to_str(TB3D_Modders.hardcore_mobs).."]["..utils.to_str(TB3D_Modders.hardcore_mobs_mult).."]["
-		..utils.to_str(TB3D_Modders.spawn_esc_dog_rush).."]["..utils.to_str(TB3D_Modders.spawn_thermos_inside).."]")
+		..utils.to_str(TB3D_Modders.spawn_esc_dog_rush).."]["..utils.to_str(TB3D_Modders.spawn_thermos_inside).."]["
+		..utils.to_str(TB3D_Modders.actor_idle_delay).."]["..utils.to_str(TB3D_Modders.actor_idle_dist).."]")
 
+		TB3D_Services.packet_alert("opt_repair["..utils.to_str(TB3D_Modders.max_small_parts).."]["
+		..utils.to_str(TB3D_Modders.max_large_parts).."]["..utils.to_str(TB3D_Modders.max_armor_parts).."]["
+		..utils.to_str(TB3D_Modders.min_to_repair).."]["..utils.to_str(TB3D_Modders.max_to_repair).."]["
+		..utils.to_str(TB3D_Modders.enemy_near_check).."]["..utils.to_str(TB3D_Modders.enemy_check_radius).."]["
+		..utils.to_str(TB3D_Modders.enemy_check_distance).."]")
+		
 		TB3D_Services.packet_alert("opt_loot["..utils.to_str(TB3D_Modders.money_decoder).."]["
 		..utils.to_str(TB3D_Modders.money_scarce).."]["..utils.to_str(TB3D_Modders.loot_option).."]")
 
@@ -511,8 +526,10 @@ function verify_files()
 		..utils.to_str(TB3D_Modders.hardcore_anomolies).."]["..utils.to_str(TB3D_Modders.easy_anomolies).."]["
 		..utils.to_str(TB3D_Modders.Cadet_level_anomolies).."]")
 		
-		TB3D_Services.packet_alert("opt_arts["..utils.to_str(TB3D_Modders.arts_total).."]["
-		..utils.to_str(TB3D_Modders.arts_max).."]["..utils.to_str(TB3D_Modders.less_arts).."]")
+		TB3D_Services.packet_alert("opt_arts["
+		..utils.to_str(TB3D_Modders.dyn_arts_always).."]["..utils.to_str(TB3D_Modders.arts_total).."]["
+		..utils.to_str(TB3D_Modders.arts_max).."]["..utils.to_str(TB3D_Modders.less_arts).."]["
+		..utils.to_str(TB3D_Modders.give_art_on_death).."]")
 		
 		TB3D_Services.packet_alert("opt_blowout["
 		..utils.to_str(TB3D_Modders.run_blowout_pp).."]["..utils.to_str(TB3D_Modders.zombie_team).."]["
@@ -531,36 +548,71 @@ function verify_files()
 		..utils.to_str(TB3D_Modders.is_set_label_on_npc).."]["..utils.to_str(TB3D_Modders.is_show_health).."]["
 		..utils.to_str(TB3D_Modders.is_warning_on_death).."]["..utils.to_str(TB3D_Modders.max_display_lines).."]")
 
-		TB3D_Services.packet_alert("opt_system["
-		..utils.to_str(TB3D_Modders.fires_always_on).."]["..utils.to_str(TB3D_Modders.aem_light_style).."]["
-		..utils.to_str(TB3D_Modders.bar_music).."]["..utils.to_str(TB3D_Modders.display_compass).."]["
-		..utils.to_str(TB3D_Modders.CopKeys).."]["
+		TB3D_Services.packet_alert("opt_BTR["..utils.to_str(TB3D_Modders.btr_min_fire_time).."]["
+		..utils.to_str(TB3D_Modders.btr_update_time).."]["..utils.to_str(TB3D_Modders.btr_fast_update_time).."]")
+		
+		TB3D_Services.packet_alert("opt_env["
+		..utils.to_str(TB3D_Modders.fires_always_on).."]["..utils.to_str(TB3D_Modders.heavy_rain_factor).."]["
+		..utils.to_str(TB3D_Modders.coefficient_factor).."]")
+		
+		TB3D_Services.packet_alert("opt_arena["
+		..utils.to_str(TB3D_Modders.time_open).."]["..utils.to_str(TB3D_Modders.time_close).."]["
+		..utils.to_str(TB3D_Modders.delay_min).."]["..utils.to_str(TB3D_Modders.delay_max).."]["
+		..utils.to_str(TB3D_Modders.delay_mult).."]["..utils.to_str(TB3D_Modders.stake1).."]["
+		..utils.to_str(TB3D_Modders.stake2).."]["..utils.to_str(TB3D_Modders.stake3).."]["
+		..utils.to_str(TB3D_Modders.perc_min).."]["..utils.to_str(TB3D_Modders.perc_max).."]["
+		..utils.to_str(TB3D_Modders.aem_light_style).."]["..utils.to_str(TB3D_Modders.aem_light_shadows).."]["
+		..utils.to_str(TB3D_Modders.aem_dim_ambient).."]["..utils.to_str(TB3D_Modders.aem_light_global).."]["
+		..utils.to_str(TB3D_Modders.aem_light_ambient).."]")
+		
+		TB3D_Services.packet_alert("opt_music["
+		..utils.to_str(TB3D_Modders.bar_music).."]["..utils.to_str(TB3D_Modders.volume_on_pause).."]")
+		
+		TB3D_Services.packet_alert("opt_ui["
+		..utils.to_str(TB3D_Modders.display_compass).."]["..utils.to_str(TB3D_Modders.CopKeys).."]["
 		..utils.to_str(TB3D_Modders.menu_char_height).."]["..utils.to_str(TB3D_Modders.menu_date_start).."]["
-		..utils.to_str(TB3D_Modders.menu_show_keys).."]["..utils.to_str(TB3D_Modders.autosave_wait_time).."]["
-		..utils.to_str(TB3D_Modders.force_garbage_collect).."]["
+		..utils.to_str(TB3D_Modders.menu_show_keys).."]")
+		
+		TB3D_Services.packet_alert("opt_services["
+		..utils.to_str(TB3D_Modders.autosave_wait_time).."]["..utils.to_str(TB3D_Modders.force_garbage_collect).."]")
+		
+		TB3D_Services.packet_alert("opt_advanced["
 		..utils.to_str(TB3D_Modders.fov_nv).."]["..utils.to_str(TB3D_Modders.advanced_nightvision).."]["
+		..utils.to_str(TB3D_Modders.packet_limit).."]")
+		
+		TB3D_Services.packet_alert("opt_ddof["
 		..utils.to_str(TB3D_Modders.ddof_mode).."]["..utils.to_str(TB3D_Modders.ddof_kernel_C).."]["
-		..utils.to_str(TB3D_Modders.ddof_kernel_G).."]["..utils.to_str(TB3D_Modders.motion_blur).."]["
+		..utils.to_str(TB3D_Modders.ddof_kernel_G).."]["..utils.to_str(TB3D_Modders.motion_blur).."]")
+		
+		TB3D_Services.packet_alert("opt_hud["
 		..utils.to_str(TB3D_Modders.bio_map_pulse).."]["..utils.to_str(TB3D_Modders.biodetect_all).."]["
-		..utils.to_str(TB3D_Modders.bioradar_max_count).."]["..utils.to_str(TB3D_Modders.auto_levels).."]["
-		..utils.to_str(TB3D_Modders.level_set_max).."]")
+		..utils.to_str(TB3D_Modders.bioradar_max_count).."]")
+		
+		TB3D_Services.packet_alert("opt_levels["
+		..utils.to_str(TB3D_Modders.auto_levels).."]["..utils.to_str(TB3D_Modders.level_set_max).."]")
 		
 		TB3D_Services.packet_alert("opt_graphics["
-		..utils.to_str(TB3D_Modders.sun_intensity).."]["..utils.to_str(TB3D_Modders.sun_ambient).."]["
+		..utils.to_str(TB3D_Modders.sun_ambient).."]["..utils.to_str(TB3D_Modders.hdr_lowlum_indoor).."]["
+		..utils.to_str(TB3D_Modders.hdr_hilum_indoor).."]["..utils.to_str(TB3D_Modders.parallax_height).."]["
+		..utils.to_str(TB3D_Modders.sun_intensity).."]["..utils.to_str(TB3D_Modders.bloom_intensity).."]["
+		..utils.to_str(TB3D_Modders.bloom_threshold).."]["..utils.to_str(TB3D_Modders.bloom_speed).."]["
 		..utils.to_str(TB3D_Modders.hdr_midpoint).."]["..utils.to_str(TB3D_Modders.hdr_lowlum).."]["
-		..utils.to_str(TB3D_Modders.hdr_lowlum_indoor).."]["..utils.to_str(TB3D_Modders.hdr_hilum).."]["
-		..utils.to_str(TB3D_Modders.hdr_hilum_indoor).."]["..utils.to_str(TB3D_Modders.hdr_adapt).."]["
-		..utils.to_str(TB3D_Modders.gloss_factor).."]["..utils.to_str(TB3D_Modders.parallax_height).."]["
-		..utils.to_str(TB3D_Modders.bloom_intensity).."]["..utils.to_str(TB3D_Modders.bloom_threshold).."]["
-		..utils.to_str(TB3D_Modders.bloom_speed).."]["..utils.to_str(TB3D_Modders.use_soft_effects).."]")
-		
+		..utils.to_str(TB3D_Modders.hdr_hilum).."]["..utils.to_str(TB3D_Modders.hdr_adapt).."]["
+		..utils.to_str(TB3D_Modders.gloss_factor).."]["..utils.to_str(TB3D_Modders.use_sun_advanced).."]["
+		..utils.to_str(TB3D_Modders.sun_near).."]["..utils.to_str(TB3D_Modders.sun_near_border).."]["
+		..utils.to_str(TB3D_Modders.gi_clip).."]["..utils.to_str(TB3D_Modders.gi_refl).."]["
+		..utils.to_str(TB3D_Modders.use_soft_effects).."]["..utils.to_str(TB3D_Modders.force_r2_hw).."]")
+
 		TB3D_Services.packet_alert("opt_time_slice["
 		..utils.to_str(TB3D_Modders.delta_critical).."]["..utils.to_str(TB3D_Modders.delta_moderate).."]["
 		..utils.to_str(TB3D_Modders.delta_low).."]["..utils.to_str(TB3D_Modders.delta_lowest).."]["
-		..utils.to_str(TB3D_Modders.respawner_max_per_slice).."]")
+		..utils.to_str(TB3D_Modders.delta_motivator).."]")
 		
 		TB3D_Services.packet_alert("opt_companions["
 		..utils.to_str(TB3D_Modders.max_companions_rt).."]")
+		
+		TB3D_Services.packet_alert("opt_zaton_lost["
+		..utils.to_str(TB3D_Modders.zaton_lost).."]")
 		
 		TB3D_Services.packet_alert("opt_debug1["
 		..utils.to_str(TB3D_Modders.Global_Debug).."]["..utils.to_str(TB3D_Modders.use_abort_message).."]["
@@ -583,28 +635,33 @@ function verify_files()
 		..utils.to_str(TB3D_Modders.use_perception_message).."]["..utils.to_str(TB3D_Modders.use_sound_message).."]")
 		
 		TB3D_Services.packet_alert("opt_debug4["
-		..utils.to_str(TB3D_Modders.show_tables).."]["
-		..utils.to_str(TB3D_Modders.show_smart_packets).."]["..utils.to_str(TB3D_Modders.use_slice_message).."]["
-		..utils.to_str(TB3D_Modders.show_news_spots).."]["..utils.to_str(TB3D_Modders.use_fast_news_debug).."]["
+		..utils.to_str(TB3D_Modders.show_tables).."]["..utils.to_str(TB3D_Modders.show_smart_packets).."]["
+		..utils.to_str(TB3D_Modders.use_slice_message).."]["..utils.to_str(TB3D_Modders.show_news_spots).."]["
+		..utils.to_str(TB3D_Modders.use_fast_news_debug).."]["
 		..utils.to_str(TB3D_Modders.log_game_stats).."]["..utils.to_str(TB3D_Modders.show_hit_actions).."]["
 		..utils.to_str(TB3D_Modders.show_hit_invulnerable).."]["..utils.to_str(TB3D_Modders.use_cleaner_message).."]["
+		..utils.to_str(TB3D_Modders.use_fixer_message).."]["..utils.to_str(TB3D_Modders.show_story_ids).."]["
 		..utils.to_str(TB3D_Modders.use_population_report).."]["..utils.to_str(TB3D_Modders.use_loadout_message).."]["
-		..utils.to_str(TB3D_Modders.use_info_message).."]["..utils.to_str(TB3D_Modders.use_mob_messages).."]["
+		..utils.to_str(TB3D_Modders.use_info_message).."]["..utils.to_str(TB3D_Modders.use_trade_message).."]["
+		..utils.to_str(TB3D_Modders.use_mob_messages).."]["
 		..utils.to_str(TB3D_Modders.use_binder_message).."]["..utils.to_str(TB3D_Modders.use_wmgr_messages).."]["
 		..utils.to_str(TB3D_Modders.use_destroy_message).."]["..utils.to_str(TB3D_Modders.pop_spawn_message).."]["
 		..utils.to_str(TB3D_Modders.use_db_message).."]["..utils.to_str(TB3D_Modders.use_looting_message).."]["
 		..utils.to_str(TB3D_Modders.use_server_messages).."]["..utils.to_str(TB3D_Modders.use_vehicle_message).."]["
 		..utils.to_str(TB3D_Modders.use_livelink_message).."]["..utils.to_str(TB3D_Modders.use_companion_message).."]["
-		..utils.to_str(TB3D_Modders.use_coop_message).."]")
+		..utils.to_str(TB3D_Modders.use_coop_message).."]["..utils.to_str(TB3D_Modders.use_outfit_debug).."]["
+		..utils.to_str(TB3D_Modders.show_logic_state_calls).."]")
 		
 		TB3D_Services.packet_alert("opt_debug5["
 		..utils.to_str(TB3D_Modders.use_state_message).."]["..utils.to_str(TB3D_Modders.use_setup_message).."]["
 		..utils.to_str(TB3D_Modders.use_smt_message).."]["..utils.to_str(TB3D_Modders.npc_to_log).."]["
-		..utils.to_str(TB3D_Modders.smt_to_log).."]")
+		..utils.to_str(TB3D_Modders.creature_to_log).."]["..utils.to_str(TB3D_Modders.smt_to_log).."]")
 		
 		TB3D_Services.packet_alert("opt_debug6["
 		..utils.to_str(TB3D_Modders.check_smart_terrain).."]["..utils.to_str(TB3D_Modders.show_zoom_fov).."]["
-		..utils.to_str(TB3D_Modders.verify_script_versions).."]["..utils.to_str(TB3D_Modders.display_delta).."]")
+		..utils.to_str(TB3D_Modders.verify_script_versions).."]["..utils.to_str(TB3D_Modders.display_delta).."]["
+		..utils.to_str(TB3D_Modders.show_spot_sid).."]["..utils.to_str(TB3D_Modders.show_removed_items).."]["
+		..utils.to_str(TB3D_Modders.use_child_message).."]["..utils.to_str(TB3D_Modders.use_sak_message).."]")
 		
 		TB3D_Services.packet_alert("opt_debug7["
 		..utils.to_str(TB3D_Modders.test_without_npc).."]["..utils.to_str(TB3D_Modders.test_without_creatures).."]")
@@ -615,10 +672,15 @@ function verify_files()
 		TB3D_Services.packet_alert("opt_debug9["
 		..utils.to_str(TB3D_Modders.use_combat_planner).."]["
 		..utils.to_str(TB3D_Modders.use_combat_monolith).."]["
-		..utils.to_str(TB3D_Modders.gg_show_spots).."]["
+		..utils.to_str(TB3D_Modders.x16_no_zharkas).."]")
+		
+		TB3D_Services.packet_alert("opt_developer["
+		..utils.to_str(TB3D_Modders.coll_states).."]["
 		..utils.to_str(TB3D_Modders.coll_spots).."]["
-		..utils.to_str(TB3D_Modders.show_spot_sid).."]["
-		..utils.to_str(TB3D_Modders.show_test_spots).."]")
+		..utils.to_str(TB3D_Modders.zep_spots).."]["
+		..utils.to_str(TB3D_Modders.force_all_goodwill).."]["
+		..utils.to_str(TB3D_Modders.force_mil_goodwill).."]["
+		..utils.to_str(TB3D_Modders.force_fre_goodwill).."]")
 		
 	if TB3D_net_manager then TB3D_Services.packet_alert("TB3D_net_manager: "..TB3D_net_manager.my_ver()) else TB3D_Services.packet_alert("TB3D_net_manager	failed!!!!") is_failed = true end
 
@@ -630,8 +692,8 @@ function verify_files()
 		TB3D_Services.packet_alert("TB3D_Services failed!!!!") is_failed = true
 	 end
 	if TB3D_Shaders then TB3D_Services.packet_alert("TB3D_Shaders: "..TB3D_Shaders.my_ver()) else TB3D_Services.packet_alert("TB3D_Shaders failed!!!!") is_failed = true end
-	if TB3D_Spots then TB3D_Services.packet_alert("TB3D_Spots: "..TB3D_Spots.my_ver()) else TB3D_Services.packet_alert("TB3D_Spots failed!!!!") is_failed = true end
 	if TB3D_Smart_Checker then TB3D_Services.packet_alert("TB3D_Smart_Checker: "..TB3D_Smart_Checker.my_ver()) else TB3D_Services.packet_alert("TB3D_Smart_Checker failed!!!!") is_failed = true end
+	if TB3D_Spots then TB3D_Services.packet_alert("TB3D_Spots: "..TB3D_Spots.my_ver()) else TB3D_Services.packet_alert("TB3D_Spots failed!!!!") is_failed = true end
 	if TB3D_Stalker then TB3D_Services.packet_alert("TB3D_Stalker: "..TB3D_Stalker.my_ver()) else TB3D_Services.packet_alert("TB3D_Stalker failed!!!!") is_failed = true end
 	if TB3D_Triggers then TB3D_Services.packet_alert("TB3D_Triggers: "..TB3D_Triggers.my_ver()) else TB3D_Services.packet_alert("TB3D_Triggers failed!!!!") is_failed = true end
 	if TB3D_Update then TB3D_Services.packet_alert("TB3D_Update: "..TB3D_Update.my_ver()) else TB3D_Services.packet_alert("TB3D_Update failed!!!!") is_failed = true end
@@ -659,10 +721,6 @@ function verify_files()
 	if ui_cheat_timer then TB3D_Services.packet_alert("ui_cheat_timer: "..ui_cheat_timer.my_ver()) else TB3D_Services.packet_alert("ui_cheat_timer failed!!!!") is_failed = true end
 
 	if ui_comm then TB3D_Services.packet_alert("ui_comm: "..ui_comm.my_ver()) else TB3D_Services.packet_alert("ui_comm failed!!!!") is_failed = true end
-	--if ui_dots then TB3D_Services.packet_alert("ui_dots: "..ui_dots.my_ver()) else TB3D_Services.packet_alert("ui_dots failed!!!!") is_failed = true end
-	--if ui_game_arcanoid then TB3D_Services.packet_alert("ui_game_arcanoid: "..ui_game_arcanoid.my_ver()) else TB3D_Services.packet_alert("ui_game_arcanoid failed!!!!") is_failed = true end
-	--if ui_game_bulldozer then TB3D_Services.packet_alert("ui_game_bulldozer: "..ui_game_bulldozer.my_ver()) else TB3D_Services.packet_alert("ui_game_bulldozer failed!!!!") is_failed = true end
-	--if ui_game_saper then TB3D_Services.packet_alert("ui_game_saper: "..ui_game_saper.my_ver()) else TB3D_Services.packet_alert("ui_game_saper failed!!!!") is_failed = true end
 	if ui_gps_trade then TB3D_Services.packet_alert("ui_gps_trade: "..ui_gps_trade.my_ver()) else TB3D_Services.packet_alert("ui_gps_trade failed!!!!") is_failed = true end
 	if ui_handradio then TB3D_Services.packet_alert("ui_handradio: "..ui_handradio.my_ver()) else TB3D_Services.packet_alert("ui_handradio failed!!!!") is_failed = true end
 	if ui_load_dialog then TB3D_Services.packet_alert("ui_load_dialog: "..ui_load_dialog.my_ver()) else TB3D_Services.packet_alert("ui_load_dialog failed!!!!") is_failed = true end
