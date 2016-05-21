@@ -1,8 +1,8 @@
--- TB3D 1.0.9.9.9.9   fixed rucksack, added old pda sound option, TB3D_Update, amk style hit (gg_kick), consolidated packet srvcs,
+-- TB3D 1.1.0.0.0.1   fixed rucksack, added old pda sound option, TB3D_Update, amk style hit (gg_kick), consolidated packet srvcs,
 -- removed tips, removed ^ from can see actor, updated to 135, hit styles, added collector start to pause menu, amk hit replaced,
 -- db calls, send_tip, game_start, npc_spawner, tb3d_delay, hud_weap, ogse timers, ghost_strong_timer, skip groups, send_tip_id optimization,
--- pause autosave prevention, timer, restore_community, removed ver and get_ver(), remove_item_from_inventory, removed convert_timers
-function my_ver() return "1.0.9.9.9.9" end
+-- pause autosave prevention, timer, restore_community, removed ver and get_ver(), remove_item_from_inventory, removed convert_timers, fixed convert
+function my_ver() return "1.1.0.0.0.1" end
 -- Idler: file from the mod 'People halophyte 2.0'. Adapted for fashion 'label with swag 2.1.2' 30.09.2008 0:08:52
 -- Added fenechka by TAG
 
@@ -23,7 +23,7 @@ local string_gfind = string.gfind
 
 ----------------
 local timer_trigger=nil
---convert_npc={}
+convert_npc={}
 oAmkLauncher = amkII_launcher.CAmkLauncher()
 local StartTime
 
@@ -1309,7 +1309,6 @@ function on_actor_update(delta)
 	--mod_call("interactive_music")		--to bstalk 109950
 	--mod_call("firebat_ammo")
 	--if amk_target then amk_target.update() end		-- !!!!TB3D just a debug call
---[[
 	oau_watchdog=655
 	local obj, sobj
 	for k,v in pairs(convert_npc) do
@@ -1334,7 +1333,6 @@ function on_actor_update(delta)
 			convert_npc[k]=nil
 		end
 	end
-]]
 	oau_watchdog=654
 	if TB3D_Modders.amk_style_hit == true and prev_health > (db.actor.health + 0.05) then
 		TB3D_hit_styles.amk_health_hit(prev_health)
@@ -1984,7 +1982,7 @@ function write_stalker_params(tbl,sobj,noconvert)	--TB3D  only here
   sobj:UPDATE_Read(uppk)
   local npc=level.object_by_id(sobj.id)
   if npc and (not noconvert) then		--noconvert true from tag_sqb, news_main, linspiro
-    --convert_npc[sobj.id]=true
+    convert_npc[sobj.id]=true
 	npc:stop_talk()
     switch_offline(npc)
   end

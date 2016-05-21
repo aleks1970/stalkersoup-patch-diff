@@ -116,7 +116,7 @@ function remove_sign_lamps()
 		obj = alife():object(id)
 		if obj then
 			if string.find(obj:name(), "tb3d_aem_sign") then
-				--TB3D_Services.packet_alert("remove lamp["..obj:name().."]")
+				if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("remove lamp["..obj:name().."]") end
 				alife():release(obj, true)
 			end
 		end
@@ -124,10 +124,12 @@ function remove_sign_lamps()
 end
 
 function sign_lights_on()
+	if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("aem sign on") end
 	create_lamp(v3f(163.516,9.00,74.10),40163,1180, nil, "physics\\light\\lampa_walls_01", 1.0, is_shadows, -8878179, "tb3d_aem_sign")
 	create_lamp(v3f(159.817,9.00,74.10),40163,1180, nil, "physics\\light\\lampa_walls_01", 1.0, is_shadows, -8878179, "tb3d_aem_sign")
 end
 function sign_lights_off()
+	if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("aem sign off") end
 	create_lamp(v3f(163.516,9.00,74.10),40163,1180, nil, "physics\\light\\lampa_walls_01", 0, is_shadows, nil, "tb3d_aem_sign")
 	create_lamp(v3f(159.817,9.00,74.10),40163,1180, nil, "physics\\light\\lampa_walls_01", 0, is_shadows, nil, "tb3d_aem_sign")
 end

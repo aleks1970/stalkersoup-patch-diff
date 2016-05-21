@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.9, translate and text color - aleks1970, trade directory
-function my_ver() return "1.0.9.9.9.9" end
+--TB3D 1.1.0.0.0.1, translate and text color - aleks1970, trade directory, give treasure
+function my_ver() return "1.1.0.0.0.1" end
 
 local translate = game.translate_string
 local text_color_treasure = TB3D_Services.get_text_color("treasure")
@@ -89,14 +89,11 @@ function parse_spawns(line)
 	if line == nil then
 		return {}
 	end
-
 	--' if the default-s is greater than the values ??in the ini, then the score, missing the last value from the ini
 	local t = se_respawn.parse_names(line)
 	local n = table.getn(t)
-		
 	local ret_table = {}
 	local k = 1
-
 	local spawn = {}
 	local p
 	while k <= n do
@@ -130,47 +127,36 @@ function CTreasure:__init()
 if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("trade trsr mgr: treasure init") end
 	--' At Designer proofreads LTX and create a piece of quests.
 	self.ini = ini_file("trade\\treasure_manager.ltx")	-- changed misc to trade!!! - aleks1970
-
 	--' We iterate over all settings phrases
 	if not self.ini:section_exist("list") then
 		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("trade trsr mgr: There is no section [list] in treasure_manager.ltx") end
 	end
 	local n = self.ini:line_count("list")
 	local id, value = "",""
-
 	--' initial setup
 	self.treasure_info = {}
 	local community
 	for i=0,n-1 do
 		result, id, value	= self.ini:r_line("list",i,"","")
-		
 		self.treasure_info[id] = {}
-
 		self.treasure_info[id].target		= utils.cfg_get_number(self.ini, id, "target", nil, true)
 		self.treasure_info[id].name			= utils.cfg_get_string(self.ini, id, "name", nil, true, "")
 		self.treasure_info[id].description	= utils.cfg_get_string(self.ini, id, "description", nil, true, "")
 		self.treasure_info[id].items		= parse_spawns(utils.cfg_get_string(self.ini, id, "items", nil, true, ""))
-
 		community	= parse_names(utils.cfg_get_string(self.ini, id, "community", nil, false, "", "stalker, bandit, dolg, freedom"))
 		self.treasure_info[id].community = {}
 		for k,v in pairs(community) do
 			self.treasure_info[id].community[v] = true
 		end
-
-
 		if self.treasure_info[id].items == nil then
 			if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("trade trsr mgr: cant find 'items' in  "..id) end
 		end
-
 		self.treasure_info[id].condlist		= xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", utils.cfg_get_string(self.ini, id, "condlist", nil, false, "", ""))
-		
 		--' It should be noted as a new cache
 		self.treasure_info[id].active = false
 		self.treasure_info[id].done = false
-
 		--if TB3D_Modders.show_tables then show_tables(self.treasure_info, nil, "trade trsr mgr") end
 	end
-
 	--' Auxiliary tables for easy retrieval
 	self.treasure_by_target = {}
 	for k,v in pairs(self.treasure_info) do
@@ -183,20 +169,17 @@ end
 function CTreasure:use(npc)
 	--printf("TREASURE USE")
 	local rarets = 70
-	
-if npc ~= nil then
-	  n_rank = npc:character_rank()
-	 else 
-      n_rank = 0
+	if npc ~= nil then
+		n_rank = npc:character_rank()
+	else 
+		n_rank = 0
 	end
 	if TB3D_Modders.Global_Debug then
 		rarets=0
 	end
-	
 	if math.random(100) < rarets then 
 		return
 	end
-	
 	--' Need to randomly select one of the caches.
 	local avail = {}
 	local tr_sum = 0
@@ -222,13 +205,11 @@ if npc ~= nil then
 			end
 		end
 	end
-
 	if tr_sum == 0 or
 		math.random(100) < 65
 	then
 		return
 	end
-
 	local tr_w = math.random(tr_sum)
 	for k,v in pairs(avail) do
 		tr_w = tr_w - v.prob
@@ -237,7 +218,6 @@ if npc ~= nil then
 			break
 		end
 	end
- 
 end
 
 --' Conservation
@@ -258,12 +238,10 @@ function CTreasure:give_treasure(k)
 		news_manager.send_treasure(v.name)		
 		local text = text_color_treasure..translate(v.name).."\n%c[default]"..translate(v.description)
 		level.map_add_object_spot_ser(obj.id, "treasure", text)
-
 		-- check what type of cache is selected, if the cache is not a classic, and not nominal, then replace the contents
 		if amk.load_variable("option_treasure", 0) ~= 0 and self:named_treasure(v) == false then
 		v.items = self:give_item_list()
 		end  
-		
 		--' Generate things
 		for kk,vv in pairs(v.items) do
 			if ammo_section[vv.section] == true then
@@ -283,17 +261,15 @@ function CTreasure:give_treasure(k)
 				end
 			end
 		end
-		
 		--' Mark the cache as issued
 		self.treasure_info[k].active = true
 		self.treasure_info[k].done = true
-		
 		-- Send in an offline cache
 		local sim = alife ()
 		if sim ~= nil and obj.online then
-			sim:set_switch_online  (obj.id, false)
-			sim:set_switch_offline (obj.id, true)
-			--amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
+			sim:set_switch_online(obj.id, false)
+			sim:set_switch_offline(obj.id, true)
+			amk.convert_npc[obj.id]=true 										--110001 put in place for withdrawal in the online
 		end
 	else
 	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRADE TREASURE MGR: treasure not exist ["..utils.to_str(k).."]") end
@@ -496,6 +472,7 @@ function CTreasure:named_treasure(v)
    or v.name == "dead_city_secret_3" --Nychka Swoon
    or v.name == "dead_city_secret_4" --Caches old-timer
    or v.name == "dead_city_secret_5" --Dedkiny things
+   or v.name == "lost_village_inventory_box" --110001, Stash of ghost
  then
    return true
  else

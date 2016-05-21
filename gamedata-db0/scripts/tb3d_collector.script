@@ -727,7 +727,7 @@ end
 function item_drop(obj)
 	if obj then
 		local level_up = TB3D_Services.get_level_up()									--109955 for actions past the Collector levelup
-		local sect = obj:section()
+		local sect = get_section(obj)				--110001
 		if sect == "hand_radio_f" then														--companion radio
 			if amk.check_game() then amk.start_timer("comp_radio", 0.1, obj:id()) end
 		--elseif sect == "device_torch" then
@@ -801,11 +801,11 @@ function item_drop(obj)
 				end
 			end
 		else																					--level_up > 3
-			if (TB3D_DLC_001 and TB3D_DLC_001.process_levels(lname, sname, blow))		--110000, optional dlc content, moved from tb3d_collector
-			or (TB3D_DLC_002 and TB3D_DLC_002.process_levels(lname, sname, blow))
-			or (TB3D_DLC_003 and TB3D_DLC_003.process_levels(lname, sname, blow))
-			or (TB3D_DLC_004 and TB3D_DLC_004.process_levels(lname, sname, blow))
-			or (TB3D_DLC_005 and TB3D_DLC_005.process_levels(lname, sname, blow)) then
+			if (TB3D_DLC_001 and TB3D_DLC_001.item_drop(obj, sect))		--110000, optional dlc content, moved from tb3d_collector
+			or (TB3D_DLC_002 and TB3D_DLC_002.item_drop(obj, sect))
+			or (TB3D_DLC_003 and TB3D_DLC_003.item_drop(obj, sect))
+			or (TB3D_DLC_004 and TB3D_DLC_004.item_drop(obj, sect))
+			or (TB3D_DLC_005 and TB3D_DLC_005.item_drop(obj, sect)) then
 				--was handled
 			else
 				--need do something
@@ -814,41 +814,38 @@ function item_drop(obj)
 	end
 end
 
-function on_use_object(obj)
+function on_use_object(obj, sect)
 	meceniy_outfit.on_item_drop(obj)
 	dmx_mod.dmx_use(obj)
 	bolt_ending.on_actor_use(obj)
-	hidden_slots.on_eat(obj:section())
+	hidden_slots.on_eat(sect)								--110001
 	dmx_medicines.use(obj)
 	dmx_cars.car_repair(obj) 
 	local level_up = TB3D_Services.get_level_up()												--109978, for DLC content
 	if level_up > 3 then
-		if (TB3D_DLC_001 and TB3D_DLC_001.process_levels(lname, sname, blow))		--110000, optional dlc content, moved from tb3d_collector
-		or (TB3D_DLC_002 and TB3D_DLC_002.process_levels(lname, sname, blow))
-		or (TB3D_DLC_003 and TB3D_DLC_003.process_levels(lname, sname, blow))
-		or (TB3D_DLC_004 and TB3D_DLC_004.process_levels(lname, sname, blow))
-		or (TB3D_DLC_005 and TB3D_DLC_005.process_levels(lname, sname, blow)) then
+		if (TB3D_DLC_001 and TB3D_DLC_001.use_object(obj, sect))		--110000, optional dlc content, moved from tb3d_collector
+		or (TB3D_DLC_002 and TB3D_DLC_002.use_object(obj, sect))
+		or (TB3D_DLC_003 and TB3D_DLC_003.use_object(obj, sect))
+		or (TB3D_DLC_004 and TB3D_DLC_004.use_object(obj, sect))
+		or (TB3D_DLC_005 and TB3D_DLC_005.use_object(obj, sect)) then
 			--was handled
-		else
-			--need do something
 		end
 	end
 end
 
-function check_usable_item(obj)		--VICTIM ONLY, actor checks these directly in binder, called by amk_mod.script
+function check_usable_item(obj, comm, lname)		--VICTIM ONLY, actor checks these directly in binder, called by amk_mod.script
 	--TB3D_Services.packet_alert("tb3d collector: check usable item["..obj:name().."]")
 	local level_up = TB3D_Services.get_level_up()									--109978, for DLC content
 	if level_up > 3 then
-		if (TB3D_DLC_001 and TB3D_DLC_001.process_levels(lname, sname, blow))		--110000, optional dlc content, moved from tb3d_collector
-		or (TB3D_DLC_002 and TB3D_DLC_002.process_levels(lname, sname, blow))
-		or (TB3D_DLC_003 and TB3D_DLC_003.process_levels(lname, sname, blow))
-		or (TB3D_DLC_004 and TB3D_DLC_004.process_levels(lname, sname, blow))
-		or (TB3D_DLC_005 and TB3D_DLC_005.process_levels(lname, sname, blow)) then
-			--was handled
-		else
-			--need do something
+		if (TB3D_DLC_001 and TB3D_DLC_001.check_item(obj,comm,lname))		--110000, optional dlc content, moved from tb3d_collector
+		or (TB3D_DLC_002 and TB3D_DLC_002.check_item(obj,comm,lname))
+		or (TB3D_DLC_003 and TB3D_DLC_003.check_item(obj,comm,lname))
+		or (TB3D_DLC_004 and TB3D_DLC_004.check_item(obj,comm,lname))
+		or (TB3D_DLC_005 and TB3D_DLC_005.check_item(obj,comm,lname)) then
+			return true		--info portion was given
 		end
 	end
+	return false
 end
 
 function process_levels(lname, sname, blow)
@@ -856,6 +853,10 @@ function process_levels(lname, sname, blow)
 	if lname ~= sname then
 		--TB3D_Services.packet_alert("tb3d collector: process levels lname["..lname.."] sname["..sname.."] levelup["..utils.to_str(level_up).."]")
 		reset_spawn_triggers()												--109981, save in vars for reloads
+		TB3D_Services.give_info("informer_out")									--109980, bar_bar_osvedomitel (snitch) goes to dist ctr
+		if TB3D_Modders.actor_idle_delay and TB3D_Modders.actor_idle_delay > 0 then
+			amk.start_timer("tb3d_delay_idle", TB3D_Modders.actor_idle_delay)							--109999, spawn enemies if stays in one place too long
+		end
 		if sname == "jupiter" then
 			TB3D_Services.remove_info("yan_bunker_door_1_open")											--reset bunker doors
 		end

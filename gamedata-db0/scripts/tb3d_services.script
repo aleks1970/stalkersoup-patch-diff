@@ -1,4 +1,4 @@
----TB3D 1.1.0.0.0.0 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.1.0.0.0.1 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
@@ -7,13 +7,13 @@
 -- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed,
 -- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over, zat lost, grib_respawn, tb3d_storm_started, killed by actor,
 -- yan_specnaz_dead, difficulty_num
-function my_ver() return "1.1.0.0.0.0" end	--modders append with initials and rev.
+function my_ver() return "1.1.0.0.0.1" end	--modders append with initials and rev.
 
 --title version will display network info in future
---function title_ver() return "{Version: 1 Release: ALPHA Revision: 0.0.0.0}" end
+--function title_ver() return "{Version: 1 Release: ALPHA Revision: 0.0.0.1}" end
 local difficulty_ver = ""									--set by bind_stalker load or amk_mod new game start
 local difficulty_num = 0
-local rev_number = "0.0.0.0"
+local rev_number = "0.0.0.1"
 local translate = game.translate_string
 function title_ver()
 	local game_dif = amk.load_variable("game_diff", 0)
@@ -48,9 +48,9 @@ function get_difficulty_num()
 	return difficulty_num
 end
 
-major_version = 110000							--used in saves
+major_version = 110001							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
-dm_flag_version = 7								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
+dm_flag_version = 6								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
 --local lastrepreward = 0							--used to determine direction the next reputation reward should swing
 local isnight									--flag is set based on day_start and day_end in modders script
@@ -100,12 +100,12 @@ function delayed_action(num, info_id, delay)					-- 1 thru 4
 	amk.start_timer("tb3d_delay_"..num,delay,info_id)
 end
 
---idx: 0=update, 1=save, 2=rank, 10-13=amk_mod, 20-33=bind_stalker, 40-44=amk, 50=bind_monster,
+--idx: 0=update, 1=save, 2=rank, 4=comm, 5=torch, 6=state , 10-13=amk_mod, 20-33=bind_stalker, 40-44=amk, 50=bind_monster,
 -- 60=death_manager, 70=se_stalker, 80-81=tb3d pop control, 90=tb3d_fixer, 100-101=tb3d_triggers,
 -- 200=treasure_manager, 300=xr_sound, 310=sr_sound2d, 400-407=xr_motivator, 500=xr_conditions, 600=ui_handradio,
 -- 700-704=tb3d_dyn_spawn, 800-802=news_manager, 900-921=dmx_mod, 950-957=bar_rostok_tasks,
 -- 1000=gulag_pripyat, 1100=escape_dialog, 1200-1201=dialogs_yantar, 1300-1301=bar_dialogs,
--- 2000=xr_effects, 3000=braad_test, 4000=arhara_dialog, 5000=new_spawn, 6000=bind_mteleport
+-- 2000=xr_effects, 3000=braad_test, 4000=arhara_dialog, 5000=new_spawn, 6000=bind_mteleport, 7000 = amk_anoms
 function is_collector(idx)
 	local is_freeplay = get_level_up()			--109980
 	 if is_freeplay == -1 then
@@ -1028,7 +1028,7 @@ function check_active_community()								--109981, actor only on spawn
 	local comm = "actor"
 	if has_alife_info("zombien_already") then								--109982, zombied takes pres.
 		comm = "zombied"
-	elseif is_collector() == false then
+	elseif is_collector(4) == false then
 		if lname == "l08_yantar" then
 			if has_alife_info("xvatit_uzhe") then								--109982, friends with chernomer
 				comm = "stranger"
@@ -3026,7 +3026,7 @@ function check_prior_version(tb3d_ver)											--109972
 		stage = 4			--109981
 	end
 	if stage < 5 then
-		if is_collector() then set_player_relations(5) end	--109981, fixed relations: killer, lastday and mono -500, all others 0
+		if is_collector(5) then set_player_relations(5) end	--109981, fixed relations: killer, lastday and mono -500, all others 0
 		stage = 5
 	end
 	if stage < 6 then
@@ -3061,7 +3061,7 @@ function check_flashlight()					--109982
 		end
 		amk.spawn_item_in_inv("device_torch_bad")						--breaks nv and light
 		amk.save_variable("torch_state", 2)
-		if not is_collector() then amk.start_timer("ghost_strong_timer",10,"") end
+		if not is_collector(6) then amk.start_timer("ghost_strong_timer",10,"") end
 	elseif stage == 3 then														--tb3d_stalker.process_levels() sets it to 3 to end it
 		local oitem = db.actor:object("device_torch_bad")						--see if one in inventory
 		if oitem then

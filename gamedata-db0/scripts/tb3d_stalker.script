@@ -661,11 +661,11 @@ function item_drop(obj)
 	end
 end
 
-function on_use_object(obj)
+function on_use_object(obj, sect)
 	meceniy_outfit.on_item_drop(obj)
 	dmx_mod.dmx_use(obj)
 	bolt_ending.on_actor_use(obj)
-	hidden_slots.on_eat(obj:section())
+	hidden_slots.on_eat(sect)			--110001
 	dmx_medicines.use(obj)
 	dmx_cars.car_repair(obj) 
 end
@@ -673,6 +673,8 @@ end
 function process_levels(lname, sname)
 	local obj
 	if lname ~= sname then																--109955
+		TB3D_Services.remove_info("informer_out")								--109980, bar_bar_osvedomitel (snitch) in the bar
+		braad_test.false_info()
 		if lname=="l01_escape" then
 			if has_alife_info("escape_lager_spawn_killers") then						--109951  keep corpses on reloads
 				if has_alife_info("escape_lager_killers_die") then TB3D_Services.remove_info("escape_lager_spawn_killers") end

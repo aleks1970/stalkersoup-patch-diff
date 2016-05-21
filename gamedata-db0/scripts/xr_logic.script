@@ -684,128 +684,129 @@ function cond_name(cond, etalon)
 end
 
 function try_switch_to_another_section(npc, st, actor)
-  local lgc = st.logic
-  local npc_id = npc:id()
-  if not npc or not actor then
-    --if TB3D_Modders.use_logic_message then
-		TB3D_Services.packet_alert("xr logic: try_switch_to_another_section(): error in implementation of scheme ["..utils.to_str(st.scheme).."] npc or actor is nil!!!!")
-	--end
-    return
-  end
-  local npc_name = npc:name()
-  if not npc_name then npc_name = "" end
-  local is_report = false
+	local lgc = st.logic
+	local npc_id = npc:id()
+	if not npc or not actor then
+		--if TB3D_Modders.use_logic_message then
+			TB3D_Services.packet_alert("xr logic: try_switch_to_another_section(): error in implementation of scheme ["..utils.to_str(st.scheme).."] npc or actor is nil!!!!")
+		--end
+		return
+	end
+	local npc_name = npc:name()
+	if not npc_name then npc_name = "" end
+	local is_report = false
 	if TB3D_Modders.use_logic_message or (TB3D_Modders.use_state_message and string_find(npc_name, TB3D_Modders.npc_to_log)) then is_report = true end
-  if lgc then
-	  local switched = false
-	  for n, c in pairs(lgc) do
-		if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] logic index["..utils.to_str(n).."] cond["..utils.to_str(c.name).."]") end
-		if cond_name(c.name, "on_actor_dist_le") then
-		  if is_report then TB3D_Services.packet_alert("xr logic: dist["..utils.to_str(distance_between(actor, npc)).."] need <= ["..utils.to_str(c.v1).."] see_actor["..utils.to_str(see_actor(npc)).."]") end
-		  if see_actor(npc) and distance_between(actor, npc) <= c.v1 then
-			if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_dist_le conditions met") end
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_actor_dist_le_nvis") then
-		  if distance_between(actor, npc) <= c.v1 then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_actor_dist_ge") then
-		  if is_report then TB3D_Services.packet_alert("xr logic: dist["..utils.to_str(distance_between(actor, npc)).."] need <= ["..utils.to_str(c.v1).."] see_actor["..utils.to_str(see_actor(npc)).."]") end
-		  -- HERE DELIBERATELY> and not&gt; =, because it is paired with on_actor_dist_le, where q =
-		  if see_actor(npc) and distance_between(actor, npc) > c.v1 then
-			if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_dist_ge conditions met") end
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_actor_dist_ge_nvis") then
-		  -- HERE DELIBERATELY> and not&gt; =, because it is paired with on_actor_dist_le_nvis, where q =
-		  if distance_between(actor, npc) > c.v1 then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_signal") then
-			if is_report then TB3D_Services.packet_alert("xr logic: on_signal["..utils.to_str(c.v1).."] for["..npc_name.."] actor["..actor:name().."]") end
-		  if st.signals and st.signals[c.v1] then
-			if is_report then
-				TB3D_Services.packet_alert("xr logic: on_signal["..utils.to_str(c.v1).."] signalled["..npc_name.."]")
-			end
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		 -- FIXME: not duplicate here the names, leave one on_info, but add a few copies of it to the list
-		elseif cond_name(c.name, "on_info") then
-		  switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		elseif cond_name(c.name, "on_timer") then
-		  if is_report then
-			TB3D_Services.packet_alert("xr logic: on_timer["..utils.to_str(npc_name).."] ["..utils.to_str(time_global()).."] >= act time["..utils.to_str(db.storage[npc_id].activation_time + c.v1).."]")
-		  end
-		  if time_global() >= db.storage[npc_id].activation_time + c.v1 then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		-- GAMETIME added by Stohe.
-		elseif cond_name(c.name, "on_game_timer") then
-			local t_time = c.v1
-			if string_find(npc_name, "esc_bridge_kill_zone") then						--109974, values in all.spawn are x10 and too long
-				t_time = 300
-			elseif string_find(npc_name, "agr_space_restrictor_tower") then
-				t_time = 120
-			elseif string_find(npc_name, "esc_blockpost_patrol_restrictor") then
-				t_time = 720
-			end
-			if is_report then
-				TB3D_Services.packet_alert("xr logic: on_game_timer time["..utils.to_str(game.get_game_time():diffSec(db.storage[npc_id].activation_game_time)).."] >= v1["..utils.to_str(t_time).."]")
-			end
-			if game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= t_time then
+	if lgc then
+		local switched = false
+		for n, c in pairs(lgc) do
+			if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] logic index["..utils.to_str(n).."] cond["..utils.to_str(c.name).."]") end
+			if cond_name(c.name, "on_actor_dist_le") then
+				if is_report then TB3D_Services.packet_alert("xr logic: dist["..utils.to_str(distance_between(actor, npc)).."] need <= ["..utils.to_str(c.v1).."] see_actor["..utils.to_str(see_actor(npc)).."]") end
+				if see_actor(npc) and distance_between(actor, npc) <= c.v1 then
+					if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_dist_le conditions met") end
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_actor_dist_le_nvis") then
+				if distance_between(actor, npc) <= c.v1 then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_actor_dist_ge") then
+				if is_report then TB3D_Services.packet_alert("xr logic: dist["..utils.to_str(distance_between(actor, npc)).."] need <= ["..utils.to_str(c.v1).."] see_actor["..utils.to_str(see_actor(npc)).."]") end
+				-- HERE DELIBERATELY> and not&gt; =, because it is paired with on_actor_dist_le, where q =
+				if see_actor(npc) and distance_between(actor, npc) > c.v1 then
+					if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_dist_ge conditions met") end
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_actor_dist_ge_nvis") then
+				-- HERE DELIBERATELY> and not&gt; =, because it is paired with on_actor_dist_le_nvis, where q =
+				if distance_between(actor, npc) > c.v1 then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_signal") then
+				if is_report then TB3D_Services.packet_alert("xr logic: on_signal["..utils.to_str(c.v1).."] for["..npc_name.."] actor["..actor:name().."]") end
+				if st.signals and st.signals[c.v1] then
+					if is_report then
+						TB3D_Services.packet_alert("xr logic: on_signal["..utils.to_str(c.v1).."] signalled["..npc_name.."]")
+					end
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+				-- FIXME: not duplicate here the names, leave one on_info, but add a few copies of it to the list
+			elseif cond_name(c.name, "on_info") then
 				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+			elseif cond_name(c.name, "on_timer") then
+				if is_report then
+					TB3D_Services.packet_alert("xr logic: on_timer["..utils.to_str(npc_name).."] ["..utils.to_str(time_global()).."] >= act time["..utils.to_str(db.storage[npc_id].activation_time + c.v1).."]")
+				end
+				if time_global() >= db.storage[npc_id].activation_time + c.v1 then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+				-- GAMETIME added by Stohe.
+			elseif cond_name(c.name, "on_game_timer") then
+				local t_time = c.v1
+				if string_find(npc_name, "esc_bridge_kill_zone") then						--109974, values in all.spawn are x10 and too long
+					t_time = 300
+				elseif string_find(npc_name, "agr_space_restrictor_tower") then
+					t_time = 120
+				elseif string_find(npc_name, "esc_blockpost_patrol_restrictor") then
+					t_time = 720
+				end
+				if is_report then
+					TB3D_Services.packet_alert("xr logic: on_game_timer time["..utils.to_str(game.get_game_time():diffSec(db.storage[npc_id].activation_game_time)).."] >= v1["..utils.to_str(t_time).."]")
+				end
+				if game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= t_time then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_actor_in_zone") then
+				if utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_actor_not_in_zone") then
+				if not utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_npc_in_zone") then
+				if utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_npc_not_in_zone") then
+				if not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_actor_inside") then
+				if utils.npc_in_zone(actor, npc) then
+					if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_inside [true]") end
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			elseif cond_name(c.name, "on_actor_outside") then
+				if not utils.npc_in_zone(actor, npc) then
+					switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+				end
+			else
+				if is_report then TB3D_Services.packet_alert("xr logic: WARNING: object ["..utils.to_str(npc_name).."] try_switch_to_another_section: unknown condition ["..utils.to_str(c.name).."] encountered") end
 			end
-		elseif cond_name(c.name, "on_actor_in_zone") then
-		  if utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_actor_not_in_zone") then
-		  if not utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_npc_in_zone") then
-		  if utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_npc_not_in_zone") then
-		  if not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_actor_inside") then
-		  if utils.npc_in_zone(actor, npc) then
-			if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] on_actor_inside [true]") end
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		elseif cond_name(c.name, "on_actor_outside") then
-		  if not utils.npc_in_zone(actor, npc) then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		  end
-		else
-		  if is_report then TB3D_Services.packet_alert("xr logic: WARNING: object ["..utils.to_str(npc_name).."] try_switch_to_another_section: unknown condition ["..utils.to_str(c.name).."] encountered") end
+			if switched then
+				if is_report then
+					TB3D_Services.packet_alert("xr logic: ["..utils.to_str(npc_name).."] SWITCHED[true]")
+				end
+				break
+			end
 		end
-		if switched then
-		  if is_report then
-			TB3D_Services.packet_alert("xr logic: ["..utils.to_str(npc_name).."] SWITCHED[true]")
-		  end
-		  break
-		end
-	  end
+		if is_report then TB3D_Services.packet_alert("xr logic: npc["..utils.to_str(npc_name).."] done") end
 		return switched
 	else
-		if is_report then
+		--if is_report then
 			TB3D_Services.packet_alert("xr logic: Can't find script switching information in storage, scheme  ["..utils.to_str(st.active_scheme).."]")
-		end
+		--end
 	end
 end
 
 function is_active(npc, st)
-  if st.section == nil then
-    if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: npc ["..utils.to_str(npc:name()).."] st.section is nil, active section is ["..utils.to_str(db.storage[npc:id()].active_section).."]") end
-  end
-  local is_act = (st.section == db.storage[npc:id()].active_section)
-  -- The current section is active and has not worked, none of the conditions for switching to other sections
-  return is_act
+	if st.section == nil then
+		if TB3D_Modders.use_logic_message then TB3D_Services.packet_alert("xr logic: npc ["..utils.to_str(npc:name()).."] st.section is nil, active section is ["..utils.to_str(db.storage[npc:id()].active_section).."]") end
+	end
+	local is_act = (st.section == db.storage[npc:id()].active_section)
+	-- The current section is active and has not worked, none of the conditions for switching to other sections
+	return is_act
 end
 
 function abort_syntax_error_in_cond(npc, section, field)

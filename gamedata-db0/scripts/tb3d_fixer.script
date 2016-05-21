@@ -1351,6 +1351,9 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 	elseif obj_level == 36 then												--labx8
 	elseif obj_level == 37 then												--cs agro under
 	elseif obj_level == 38 then												--predbennik
+		if string_find(obj_name,"predbannik_physic_object_0005") then		--110001, ctd on exit??
+			if TB3D_Modders.x16_no_zharkas then is_fixed = true	end
+		end
 	--elseif obj_level == 39 then											--old garbage same as promzone
 	elseif obj_level == 40 then												--old yantar
 	elseif obj_level == 41 then												--old swamp

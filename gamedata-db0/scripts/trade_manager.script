@@ -1,12 +1,12 @@
---TB3D 1.1.0.0.0.0 cleanup, data to db, new trade folder
-function my_ver() return "1.1.0.0.0.0" end
+--TB3D 1.1.0.0.0.1 cleanup, data to db, new trade folder, trade_otshelnik
+function my_ver() return "1.1.0.0.0.1" end
 local string_find = string.find
 
 function trade_init(npc, cfg)
 	local cnfg = cfg
 	local npc_id = npc:id()
 	if TB3D_Modders.use_trade_message then TB3D_Services.packet_alert("trade manager: TRADE INIT["..npc:name().."] cfg["..utils.to_str(cnfg).."]") end
-	if TB3D_Services.get_started() < 110000 then																--110000, fix old saves
+	if TB3D_Services.get_started() < 110001 then																--110001, fix old saves
 		local changed = false
 		if string_find(cnfg, "adrenalin_trader") then
 			cnfg = "trade\\trade_adrenalin.ltx"
@@ -31,6 +31,9 @@ function trade_init(npc, cfg)
 			changed = true
 		elseif string_find(cnfg, "trade_marsh_barman") then
 			cnfg = "trade\\trade_marsh_barman.ltx"
+			changed = true
+		elseif string_find(cnfg, "trade_otshelnik") then			--110001
+			cnfg = "trade\\trade_otshelnik.ltx"
 			changed = true
 		elseif string_find(cnfg, "trade_zahar") then
 			cnfg = "trade\\trade_zahar.ltx"

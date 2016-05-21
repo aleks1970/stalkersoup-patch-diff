@@ -63,8 +63,8 @@ function se_stalker:can_switch_offline()
 	end
 	if string_find(self:name(), "generators_udav") and not has_alife_info("udav_pabota_ok_start") then			--109988
 		result = false
-	--elseif amk.convert_npc[self.id]==true then 
-		--result = true 
+	elseif amk.convert_npc[self.id]==true then  	--110001
+		result = true 
 	--dc-- elseif amk.convert_npc[self.id]==false then
 		--  return false
 	elseif self.job_online_condlist ~= nil then
@@ -84,7 +84,7 @@ end
 function se_stalker:can_switch_online()
 	local result = false								--assume no
 	if TB3D_Modders.test_without_npc then
-		TB3D_Services.packet_alert("SE STALKER: cso["..self:name().."] blocked!!!!")
+		--TB3D_Services.packet_alert("SE STALKER: cso["..self:name().."] blocked!!!!")
 		self.dont_spawn_online = true
 	else
 		if not self.dont_spawn_online and TB3D_Population_Control.stalker_can_go_online(self) then
@@ -92,11 +92,11 @@ function se_stalker:can_switch_online()
 			-- local ecolog=string.find(self:name(),"bar_ecolog")
 			-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
 			-- if ecolog then amk.dump_table(self.spawner) end
-			--if amk.convert_npc[self.id]==true then
-				--result = false
+			if amk.convert_npc[self.id]==true then		--110001
+				result = false
 			--dc-- elseif amk.convert_npc[self.id]==false then
 				-- result = true
-			if self.job_online_condlist ~= nil then
+			elseif self.job_online_condlist ~= nil then
 				result = xr_logic.pick_section_from_condlist(db.actor, self, self.job_online) ~= nil
 			elseif self.job_online ~= nil then
 				result = self.job_online
@@ -277,11 +277,11 @@ function se_stalker:can_switch_offline_old()
 	--if TB3D_Modders.use_smh3_message == true then
 		TB3D_Services.packet_alert("se stalker:	can switch offline old")
 	--end
-  --if amk.convert_npc[self.id]==true then 
-    --result = true 
+  if amk.convert_npc[self.id]==true then 	--110001
+    result = true 
   --elseif amk.convert_npc[self.id]==false then
   --  return false
-  if self:get_job_online_old() ~= nil then
+  elseif self:get_job_online_old() ~= nil then
     result = not self:get_job_online_old()
   else
     result = cse_alife_human_stalker.can_switch_offline(self)
@@ -301,11 +301,11 @@ function se_stalker:can_switch_online_old()
 	-- if ecolog then TB3D_Services.packet_alert("chp1 "..self:name()) end
 	-- if ecolog then amk.dump_table(self.spawner) end
 	if TB3D_Population_Control.stalker_can_go_online(self) then --:name()) then
-		--if amk.convert_npc[self.id]==true then 
-			--result = false
+		if amk.convert_npc[self.id]==true then 		--110001
+			result = false
 		--elseif amk.convert_npc[self.id]==false then 
 			-- return true
-		if self:get_job_online_old() ~= nil then
+		elseif self:get_job_online_old() ~= nil then
 			result = self:get_job_online_old()
 		elseif self.ini == nil or self.spawner == nil then
 			result = cse_alife_human_stalker.can_switch_online(self)

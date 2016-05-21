@@ -789,7 +789,7 @@ function torch_binder:net_spawn(data)
 end
 
 function torch_binder:net_destroy()
-	object_binder.net_destroy(self)
+	if self and self.object then object_binder.net_destroy(self) end
 end
 
 function torch_binder:net_save_relevant()

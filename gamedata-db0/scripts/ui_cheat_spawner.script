@@ -226,7 +226,7 @@ function deadman_to_life()
 				if (posobj:distance_to(actorpos) < 2) then
 					id = obj:id()
 					--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("NET PDA CREATE: "..string.format("2.Name: "..obj:name().." ID: "..obj:id())) end
-					--amk.convert_npc[id] = true
+					amk.convert_npc[id] = true
 					sim:set_switch_online(id, false)
 					sim:set_switch_offline(id, true)
 					-- amk.oAmkLauncher:AddFunc("KolmogorRespawn", "ressurect.kolmogor_respawn(id)",5)

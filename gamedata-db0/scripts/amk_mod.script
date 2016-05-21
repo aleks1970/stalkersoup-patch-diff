@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.0 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.1.0.0.0.1 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -9,8 +9,8 @@
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
--- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over, debug
-function my_ver() return "1.1.0.0.0.0" end
+-- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over, debug, fixer, sv/cl logs
+function my_ver() return "1.1.0.0.0.1" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -136,11 +136,13 @@ function check_spawn()
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("AMK MOD: check spawn start")
 	end
-	if not TB3D_Modders.use_server_messages then
+	if TB3D_Modders.use_server_messages then
+		get_console():execute("net_sv_log_data 1")	--user.ltx uses on/off which fails				--110001
+		get_console():execute("net_cl_log_data 1")	--user.ltx uses on/off which fails
+	else
 		get_console():execute("net_sv_log_data 0")	--user.ltx uses on/off which fails
 		get_console():execute("net_cl_log_data 0")	--user.ltx uses on/off which fails
 	end
-	if lname ~= sname then TB3D_FIXER.force_fixes() end												--110000, moved here, must be before dynamic spawns and env update
 	spawn_unspawned_respawners() 
 	if TB3D_amk_spawn then TB3D_amk_spawn.init() end				-- used for testing spawns
 	if amk.load_variable("option_auto", 0) > 0 then					-- check levels that need lower settings to protect against ctd from bad oclusion (.HOM) files
@@ -151,7 +153,7 @@ function check_spawn()
 	else
 		get_console():execute("cam_inert 0")											--head sway and bob OFF
 	end
-	if amk.load_variable("temp_intro",0) > 0 then											--new game
+	if amk.load_variable("temp_intro",0) > 0 then										--new game
 		local gdiff = TB3D_Services.get_difficulty_num()		--level.get_game_difficulty()											--starting rank
 		if gdiff == 4 then
 			db.actor:set_character_rank(900)
@@ -312,17 +314,17 @@ function check_spawn()
 				amk.g_start_timer("blow_shift", 0, 0, 2)							-- give time for guards to go online
 				news_main.next_blow(4)
 				TB3D_Services.give_info("agr_nii_rupor_off")						--109996, make sure speaker is off
-				TB3D_Collector.process_levels(lname, sname, true)					--110000, skip anoms
+				--TB3D_Collector.process_levels(lname, sname, true)					--110000, skip anoms
 			elseif levelup == 2 then												--109978, Desolation
 				TB3D_Services.set_player_relations(5)								--109981, killer, lastday and mono -500, all others 0
 				TB3D_Services.delayed_action(1, "tb3d_sms_storm", 10)				--start timer to send sms
 				TB3D_Services.set_harsh_environment(2)								--start earthquake and wake
-				TB3D_Collector.process_levels(lname, sname, blow)					--110000
+				--TB3D_Collector.process_levels(lname, sname, blow)					--110000
 			elseif levelup == 3 then												--109996, reclamation
 				alife():create("zep_note_gen_grimwald", vector():set(-223.757,33.071,-127.943),78486,3077)		--109997, tent ne near checkpoint
 				TB3D_Services.give_info("tb3d_spawn_oman")							--oman occupies waiting room helipad
-				TB3D_Collector.process_levels(lname, sname, blow)					--110000
-			elseif levelup > 3 then													--109996, free play and DLC
+				--TB3D_Collector.process_levels(lname, sname, blow)					--110000
+--[[			elseif levelup > 3 then													--109996, free play and DLC
 				if (TB3D_DLC_001 and TB3D_DLC_001.process_levels(lname, sname, blow))		--110000, optional dlc content, moved from tb3d_collector
 				or (TB3D_DLC_002 and TB3D_DLC_002.process_levels(lname, sname, blow))
 				or (TB3D_DLC_003 and TB3D_DLC_003.process_levels(lname, sname, blow))
@@ -332,7 +334,7 @@ function check_spawn()
 				else
 					--TB3D_Services.set_player_relations(5)								--109996, killer, lastday and mono -500, all others 0
 					TB3D_Collector.process_levels(lname, sname, blow)					--110000
-				end
+				end]]--
 			end
 		else
 			--TB3D_Services.packet_alert("AMK MOD: check spawn 5")
@@ -348,7 +350,7 @@ function check_spawn()
 					dmx_cars.quest_cars_spawn()										--spawn quest cars
 				end
 			end
-			local levelup = TB3D_Services.get_level_up()
+--[[			local levelup = TB3D_Services.get_level_up()
 			if levelup > 3 then																--110000, free play and DLC
 				if (TB3D_DLC_001 and TB3D_DLC_001.process_levels(lname, sname, blow))		--110000, optional dlc content, moved from tb3d_collector
 				or (TB3D_DLC_002 and TB3D_DLC_002.process_levels(lname, sname, blow))
@@ -361,7 +363,7 @@ function check_spawn()
 				end
 			else
 				TB3D_Collector.process_levels(lname, sname, blow)						--110000
-			end
+			end]]--
 			TB3D_Services.update()													--!!!!TB3D start task update timer
 		end
 		--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("AMK MOD: check spawn c6") end
@@ -399,7 +401,7 @@ function check_spawn()
 			else
 				if amk.has_timer("blow_shift") == false then start_blow_timer(0) end
 			end
-			TB3D_Stalker.process_levels(lname, sname)
+			--TB3D_Stalker.process_levels(lname, sname)
 			TB3D_Services.update()														--!!!!TB3D start task update timer
 		end
 		--TB3D_Services.packet_alert("AMK MOD: check spawn 7")
@@ -417,14 +419,6 @@ function check_spawn()
 	TB3D_Services.report_gulags()
 	task_manager.show_counts()
 	--if TB3D_Modders.force_garbage_collect then collectgarbage("collect") end		--force memory cleanup
-	if lname ~= sname then
-		TB3D_dyn_spawn.dynamic_objects(lname)													--dynamic spawns - TB3D 109934
-		if has_alife_info("bar_deactivate_radar_done") then										--110000, keep arts until scorcher done
-			amk_anoms.generate_arts(lname)														--109976 now per level
-		end
-	end
-	art_hit.net_spawn()
-    bind_det_arts.start_update()															--110000, moved here to prevent phantom arts
   	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("AMK MOD: check spawn done")
 	end
@@ -2334,10 +2328,8 @@ function check_usable_item(obj)		--VICTIM ONLY, actor checks these directly in b
 			else
 				dmx_mod.play_sound([[ambient\switch_2]])
 			end
-		elseif obj:section()=="vehicle_btr" then		--use a btr and die???
-			--db.actor:kill(db.actor)
 		elseif TB3D_Services.is_collector(13) then
-			TB3D_Collector.check_usable_item(obj)
+			info_given = TB3D_Collector.check_usable_item(obj, comm, lname)			--110001
 		elseif obj:name()=="mil_stalker0012" then
 			info_given = TB3D_Services.give_info("info_amk_recipt_stone_dikoobraz")
 		elseif comm=="killer" then

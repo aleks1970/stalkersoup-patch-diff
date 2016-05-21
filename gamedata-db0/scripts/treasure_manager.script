@@ -1,6 +1,6 @@
---TB3D 1.1.0.0.0.0 fixed spawn={} in loop, removed af_ameba_ from lists as they cannot motivate in stashes, \\n, debug,
--- translate and text color - aleks1970, misc\ to trade\, give treasure, ghost treasure
-function my_ver() return "1.1.0.0.0.0" end
+--TB3D 1.1.0.0.0.1 fixed spawn={} in loop, removed af_ameba_ from lists as they cannot motivate in stashes, \\n, debug,
+-- translate and text color - aleks1970, misc\ to trade\, give treasure, ghost treasure, amk.convert
+function my_ver() return "1.1.0.0.0.1" end
 -- solid_list based on Linspiro Addon v1.1
 local translate = game.translate_string
 local text_color_name = TB3D_Services.get_text_color("name")
@@ -395,7 +395,8 @@ function CTreasure:__init()
 	end
 	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TRSR MGR: ctreasure init DONE") end
 end
---' Yuzanie initiator (to issue a cache)
+
+--' use initiator (to issue a cache)
 function CTreasure:use(npc)
 	if TB3D_Modders.use_trade_message then TB3D_Services.info_alert("TREASURE MGR: use") end
 	if npc ~= nil then	--must make sure he still exists
@@ -512,7 +513,7 @@ function CTreasure:give_treasure(k)
        sim:set_switch_offline (obj.id, true)
 --       sim:set_switch_online  (obj.id, true)
 --       sim:set_switch_offline (obj.id, false)
-       --amk.convert_npc[obj.id]=true --109999 put in place for withdrawal in the online
+       amk.convert_npc[obj.id]=true 							--110001, put in place for withdrawal in the online
     end
 	else
 		--printf("TREASURE %s, target doesnt exist", k)

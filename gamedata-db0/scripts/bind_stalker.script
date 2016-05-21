@@ -182,6 +182,7 @@ function actor_binder:net_spawn(data)
 		TB3D_Services.packet_alert("bstalk: Using DX9 Shaders")
 	end
 	amk.on_game_load()																--amk freeplay variable set
+	local sname = amk.load_variable("level_on_save","")
 	if TB3D_Services.is_collector(44) == false then									--109999, moved from amk.on_game_load
 		if has_alife_info("val_actor_has_borov_key") and not has_alife_info("val_borov_dead") then
 			TB3D_Services.give_info("val_borov_dead")
@@ -198,6 +199,7 @@ function actor_binder:net_spawn(data)
 		TB3D_Services.packet_alert("BSTALK: actor net spawn3")
 	end
 	TB3D_Services.set_daytime()														--establishes day/night
+	if lname ~= sname then TB3D_FIXER.force_fixes()	end								--110001, moved here, must be before dynamic spawns and env update
 	_g.time_changed = false															--no need to set twice on start
 	self.weather_manager:reset()
 	actor_stats.add_to_ranking(self.object:id())
@@ -231,33 +233,59 @@ function actor_binder:net_spawn(data)
 	end
 	TB3D_Shaders.on_spawn()
 	--TB3D_Services.check_active_community(lname)									--109981, determine by most significant item/info
+	local blow = TB3D_Services.blow()
 	if TB3D_Services.is_collector(20) then
 		if not has_alife_info("tb3d_collector") then								--start out stormy prior to blowout
 			level_weathers.set_new_weather("stormy")
 		elseif amk_mod.blowout() == false and (not Psy or (db.Flag2 == 0 and db.Flag3 == 0 and db.Flag4 == 0 and db.Flag5 == 0)) then	--if not in blowout then restore previous weather
 			level_weathers.set_new_weather(self.cur_weather)
 		else
-			level_weathers.set_new_weather("stormy")				--keep stormy for blowout transition
+			level_weathers.set_new_weather("stormy")							--keep stormy for blowout transition
 		end
-		TB3D_Services.give_info("informer_out")									--109980, bar_bar_osvedomitel (snitch) goes to dist ctr
-		if TB3D_Modders.actor_idle_delay and TB3D_Modders.actor_idle_delay > 0 then
-			amk.start_timer("tb3d_delay_idle", TB3D_Modders.actor_idle_delay)							--109999, spawn enemies if stays in one place too long
+		--TB3D_Services.give_info("informer_out")									--109980, bar_bar_osvedomitel (snitch) goes to dist ctr
+		--if TB3D_Modders.actor_idle_delay and TB3D_Modders.actor_idle_delay > 0 then
+			--amk.start_timer("tb3d_delay_idle", TB3D_Modders.actor_idle_delay)							--109999, spawn enemies if stays in one place too long
+		--end
+		local levelup = TB3D_Services.get_level_up()
+		if levelup > 3 then																--110000, free play and DLC
+			if (TB3D_DLC_001 and TB3D_DLC_001.process_levels(lname, sname, blow))		--110000, optional dlc content, moved from tb3d_collector
+			or (TB3D_DLC_002 and TB3D_DLC_002.process_levels(lname, sname, blow))
+			or (TB3D_DLC_003 and TB3D_DLC_003.process_levels(lname, sname, blow))
+			or (TB3D_DLC_004 and TB3D_DLC_004.process_levels(lname, sname, blow))
+			or (TB3D_DLC_005 and TB3D_DLC_005.process_levels(lname, sname, blow)) then
+				--levels processed by 1 or more dlcs
+			else
+				TB3D_Collector.process_levels(lname, sname, blow)						--110000
+			end
+		else
+			TB3D_Collector.process_levels(lname, sname, blow)						--110000
 		end
 	else
-		TB3D_Services.remove_info("informer_out")								--109980, bar_bar_osvedomitel (snitch) in the bar
-		braad_test.false_info()
+		--TB3D_Services.remove_info("informer_out")								--109980, bar_bar_osvedomitel (snitch) in the bar
+		--braad_test.false_info()
 		if not has_alife_info("zvezdochet_talk_start") then						--just got off truck so should be stormy
 			level_weathers.set_new_weather("stormy")
+		elseif amk.load_variable("level_on_save",lname) == "peshera" then		--10001, storm starts to clear after dream in cave
+			level_weathers.set_new_weather("grey")
 		elseif amk_mod.blowout() == false and (not Psy or (db.Flag2 == 0 and db.Flag3 == 0 and db.Flag4 == 0 and db.Flag5 == 0)) then	--if not in blowout then restore previous weather
 			level_weathers.set_new_weather(self.cur_weather)
 		else
 			level_weathers.set_new_weather("stormy")				--keep stormy for blowout transition
 		end
+		TB3D_Stalker.process_levels(lname, sname)
 	end
 	TB3D_Services.give_info("tb3d_force_weather")
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("BSTALK: actor net spawn6a")
 	end
+	if lname ~= sname then
+		TB3D_dyn_spawn.dynamic_objects(lname)													--dynamic spawns - TB3D 109934
+		if has_alife_info("bar_deactivate_radar_done") then										--110000, keep arts until scorcher done
+			amk_anoms.generate_arts(lname)														--109976 now per level
+		end
+	end
+	art_hit.net_spawn()
+    bind_det_arts.start_update()															--110000, moved here to prevent phantom arts
 	TB3D_Services.clear_targets()			--109994
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("BSTALK: actor net spawn6b")
@@ -746,15 +774,18 @@ function actor_binder:update(delta)
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("Bind STALKER: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] delta <<<<["..utils.to_str(delta).."]>>>>")
 	end
-	amk.oau_watchdog=900												-----------------900
+	amk.oau_watchdog=900														-----------------900
+	local lname = level.name()
 	--------------------establish time and delta time---------------------------------------
 	-- delta is ms between updates, internally limited to 1sec
 	-- 10 is a great machine, 60 is near unplayable, 100 (1/10 sec) causes staggers
 	-- delta is prevented from going less than 1ms for slice_base calculations
 	-- less important services start getting skipped if delta is greater than 20,30,40,50
 	----------------------------------------------------------------------------------------
+	if time_now == 0 then
+		delta = 0
+	end
 	time_now = time_global()
-	--if delta < 1 then delta = 1 end										--prevent 0 at start
 	if TB3D_Modders.Global_Debug then
 		slice_base = 1
 	elseif delta < delta_lowest then
@@ -800,21 +831,21 @@ function actor_binder:update(delta)
 	if TB3D_Modders.use_slice_message then 
 		TB3D_Services.packet_alert("BSTALK: actor_update time_global["..utils.to_str(time_now).."] slice_base["..utils.to_str(slice_base).."]")
 	end
-	amk.oau_watchdog=899													-----------------899
+	amk.oau_watchdog=899														-----------------899
 	object_binder.update(self, delta)
-	amk.oau_watchdog=898 													-----------------898 
+	amk.oau_watchdog=898 														-----------------898 
 	if self.bCheckStart then
-		amk.oau_watchdog=897												-----------------897
+		amk.oau_watchdog=897													-----------------897
 		--if TB3D_bsu_start then TB3D_bsu_start.update(delta, self.object, time_now) end	-- modders interface
-		if not has_alife_info("storyline_actor_start") and (level.name() == "l01_escape") then
+		if not has_alife_info("storyline_actor_start") and (lname == "l01_escape") then
 			TB3D_Services.give_info("storyline_actor_start")
 			if TB3D_Services.is_collector(28) == false then _G.g_start_avi = true end		--109976
 		end
 		TB3D_Services.give_info("global_dialogs")
 		self.bCheckStart = false    
 	end
-	if _g.time_changed == true then														--110000, force time of day env change
-		TB3D_Services.set_daytime()														--resync time of day
+	if _g.time_changed == true then												--110000, force time of day env change
+		TB3D_Services.set_daytime()												--resync time of day
 	end
 	if TB3D_Services.remove_info("tb3d_force_weather") == true then
 		if has_alife_info("tb3d_harsh_environment") then
@@ -831,7 +862,7 @@ function actor_binder:update(delta)
 	--TB3D_Services.packet_alert("BSTALK: actor_update1")
 	hidden_slots.on_update()
 	inventory.update() 
-	amk.oau_watchdog=896						-- Update hiding weapons	-----------------896
+	amk.oau_watchdog=896						-- Update hiding weapons		-----------------896
 	if self.object:is_talking() then hide_weapon() end
 	if weapon_hide == true then
 		if self.weapon_hide == false then
@@ -842,7 +873,7 @@ function actor_binder:update(delta)
 		self.object:restore_weapon()
 		self.weapon_hide = false
 	end
-	amk.oau_watchdog=895				-- Update off the keyboard	-----------------895
+	amk.oau_watchdog=895				-- Update off the keyboard				-----------------895
 	if TB3D_Services.remove_info("tb3d_restore_input") then
 			level.enable_input()
 			self.st.disable_input_time = nil
@@ -852,32 +883,32 @@ function actor_binder:update(delta)
 			self.st.disable_input_time = nil
 	end
 	--TB3D_Services.packet_alert("BSTALK: actor_update2")
-	amk.oau_watchdog=894 													-----------------894 
-	dmx_mod.blood_hud_update()												--109970 moved here to render hud BEHIND timers
+	amk.oau_watchdog=894 														-----------------894 
+	dmx_mod.blood_hud_update()													--109970 moved here to render hud BEHIND timers
 	scopeUsed = TB3D_Shaders.digital_zoom()
-	if TB3D_Modders.show_zoom_fov then dmx_mod.zoom_update() end			--109970 displays fov and dist for debug
-	amk.oau_watchdog=893 													-----------------893 
+	if TB3D_Modders.show_zoom_fov then dmx_mod.zoom_update() end				--109970 displays fov and dist for debug
+	amk.oau_watchdog=893 														-----------------893 
 	if has_alife_info("tb3d_bioradar_on") and not scopeUsed then biodetector.update() else biodetector.biodetectorRemove() end
-	amk.oau_watchdog=892 													-----------------892 
+	amk.oau_watchdog=892 														-----------------892 
 	sak.show_time(scopeUsed, slice_base)
-	amk.oau_watchdog=891 													-----------------891 
+	amk.oau_watchdog=891 														-----------------891 
 	local is_collector = TB3D_Services.is_collector(29)
 	--TB3D_Services.packet_alert("BSTALK: actor_update3")
 	--========================================== slice based actions ===============================================
-	--============================================= slice base 4 =========================================
+	--============================ least important: skip if slice base > 1 =========================================
 	if upd_timeFTL < time_now then
-		amk.oau_watchdog=695											-----------------695
+		amk.oau_watchdog=695													-----------------695
 		upd_timeFTL = time_now + upd_time_FTL
-		if slice_base < 5 then
+		if slice_base < 2 then
 			local pos = db.actor:position()
 			if TB3D_Services.fell_through_level(pos) then
 				TB3D_Services.jump_to_safe_spot()
-			elseif level.name() == "generators" then
+			elseif lname == "generators" then
 				amk.oau_watchdog=694											-----------------694
 				if pos.x < -273 or pos.x > 318 or pos.z < -587 or pos.z > -12 then		--send to center
 					TB3D_Services.move_actor(14.172,38.013,-233.055, true)				--give drunk effect
 				end
-			elseif level.name() == "yantar_old" then			--109999, replaces kill zones
+			elseif lname == "yantar_old" then									--109999, replaces kill zones
 				amk.oau_watchdog=693											-----------------693
 				if TB3D_Collector.actor_in_range(vector():set(135.242,-1.243,65.743), 60) then			--rs under floating boat, mid
 					TB3D_Services.move_actor(-266.35855102539,4.2769775390625,158.32368469238, true)	--give drunk effect
@@ -886,50 +917,50 @@ function actor_binder:update(delta)
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - FTL["..utils.to_str(upd_timeFTL).."]") end
 		end
 	end
-	if upd_timeCTD < time_now then											--110000, check less often
+	if upd_timeCTD < time_now then												--110000, check less often
 		upd_timeCTD = time_now + upd_time_CTD
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if is_collector then
 				TB3D_Collector.check_dead()
 			else
-				TB3D_Stalker.check_dead()			--110000, sak, wawka and braad
+				TB3D_Stalker.check_dead()										--110000, sak, wawka and braad
 			end
 		end
 	end
 	if upd_timeNET < time_now then
-		amk.oau_watchdog=9999												-----------------9999
+		amk.oau_watchdog=9999													-----------------9999
 		upd_timeNET = time_now + upd_time_NET
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - NET["..utils.to_str(upd_timeNET).."]") end
 			--local sdate, stime, newpacket = tb3d_net_manager.network_pole()
 			--if sdate then TB3D_Services.packet_alert("net recieve: ["..sdate.."_"..stime.."_"..newpacket.."]") end
 		end
 	end
 	if upd_timeHEL < time_now then
-		amk.oau_watchdog=858												-----------------858
+		amk.oau_watchdog=858													-----------------858
 		upd_timeHEL = time_now + upd_time_HEL
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - HEL["..utils.to_str(upd_timeHEL).."]") end
 			if TB3D_Modders.hell == true then meceniy_in_hell.horrortime() end
 		end
 	end
 	if upd_timeSAK < time_now then
-		amk.oau_watchdog=850												-----------------850
+		amk.oau_watchdog=850													-----------------850
 		upd_timeSAK = time_now + upd_time_SAK
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - SAK["..utils.to_str(upd_timeSAK).."]") end
 			if TB3D_Modders.zombie == true then meceniy_work.mainw() end
 			--if TB3D_bsu_upd5 then TB3D_bsu_upd5.update(delta, self.object, time_now) end					-- modders interface
 		end
 	end
 	if upd_timeBLW < time_now then
-		amk.oau_watchdog=820											--blowout check, added 109932--------820  
+		amk.oau_watchdog=820													--blowout check, added 109932--------820  
 		upd_timeBLW = time_now + upd_time_BLW
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - BLW["..utils.to_str(upd_timeBLW).."]") end
 			local bphase = TB3D_Services.blow() or -1					--109980   amk.load_variable("blowout",-1)
 			if bphase ~= -1 then				--109989
-				local hide = amk_mod.check_actor_hide()						--nil/0=full protect, >0=reduced protection, 1=not in hideout
+				local hide = amk_mod.check_actor_hide()							--nil/0=full protect, >0=reduced protection, 1=not in hideout
 				local helmet = hidden_slots.get_item_in_helmet_slot()
 				local bt = amk_mod.blowout_type()
 				local outfit = dmx_inv_weight_static.update()
@@ -946,9 +977,9 @@ function actor_binder:update(delta)
 		end
 	end
 	if upd_timeDOC < time_now then
-		amk.oau_watchdog=810											-----------------810
+		amk.oau_watchdog=810													-----------------810
 		upd_timeDOC = time_now + upd_time_DOC
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - DOC["..utils.to_str(upd_timeDOC).."]") end
 			if sleep_manager.is_sleep_active() and xr_conditions.actor_dead() then
 				xr_logic.issue_event(db.actor, db.storage[db.actor:id()]["ar_sleep"], "update")
@@ -968,9 +999,9 @@ function actor_binder:update(delta)
 		end
 	end
 	if upd_timeMUS < time_now then
-		amk.oau_watchdog=790	 											-----------------790 
+		amk.oau_watchdog=790	 												-----------------790 
 		upd_timeMUS = time_now + upd_time_MUS
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - MUS["..utils.to_str(upd_timeMUS).."]") end
 			xr_giditara.guitar_update()
 			xr_garmon.garmoshka_update()
@@ -982,9 +1013,9 @@ function actor_binder:update(delta)
 		end
 	end
 	if upd_timePSY < time_now then
-		amk.oau_watchdog=770						-- Update PSI antenna	-----------------770
+		amk.oau_watchdog=770						-- Update PSI antenna		-----------------770
 		upd_timePSY = time_now + upd_time_PSY
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - PSY["..utils.to_str(upd_timePSY).."]") end
 			if not is_collector then																	--109980, stop using psi effect
 				if sr_psy_antenna.psy_antenna then sr_psy_antenna.psy_antenna:update(delta) end			--all.spawn: yantar, brainlab, radar, pripyat
@@ -993,47 +1024,47 @@ function actor_binder:update(delta)
 		end
 	end
 	if upd_timeENV < time_now then
-		amk.oau_watchdog=760												-----------------760
+		amk.oau_watchdog=760													-----------------760
 		upd_timeENV = time_now + upd_time_ENV
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - ENV["..utils.to_str(upd_timeENV).."]") end
 			TB3D_Services.env_update()
 			--if TB3D_bsu_upd0 then TB3D_bsu_upd0.update(delta, self.object, time_now) end				-- modders interface	
 		end
 	end
 	if upd_timeOAL < time_now then
-		amk.oau_watchdog=730											-----------------730
+		amk.oau_watchdog=730													-----------------730
 		upd_timeOAL = time_now + upd_time_OAL
-		if slice_base < 5 then
+		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then
 				TB3D_Services.packet_alert("BSTALK: actor_update - OAL["..utils.to_str(upd_timeOAL).."]")
 			end
 			if TB3D_Modders.use_offline_alife then amk_offline_alife.update() end									--updates offline alife actions
 		end
 	end
+	--============================ less important: skip if slice base > 2 =========================================
 	if upd_timeCMP < time_now then
-		amk.oau_watchdog=705											-----------------705				--109950 ogse companions
+		amk.oau_watchdog=705													-----------------705				--109950 ogse companions
 		upd_timeCMP = time_now + upd_time_CMP
-		if slice_base < 5 then
+		if slice_base < 3 then
 			if is_collector then xr_companion.reset_enemy_by_time() end
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - CMP["..utils.to_str(upd_timeCMP).."]") end
 		end
 	end
-	--======================================================= slice base 3 ===============================================
 	if upd_timeMED < time_now then
-		amk.oau_watchdog=840											--DMX MEDS--------840  
+		amk.oau_watchdog=840													--DMX MEDS--------840  
 		upd_timeMED = time_now + upd_time_MED
-		if slice_base < 4 then
+		if slice_base < 3 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - MED["..utils.to_str(upd_timeMED).."]") end
-			dmx_mod.dmx_update(delta)										--109970 health hit only
+			dmx_mod.dmx_update(delta)											--109970 health hit only
 			dmx_medicines.update()
-			TB3D_Services.show_medkits(scopeUsed)							-- Indicators of CP at Uhud
+			TB3D_Services.show_medkits(scopeUsed)								-- Indicators of CP at Uhud
 		end
 	end
 	if upd_timeRAD < time_now then
-		amk.oau_watchdog=830					--Display radiation	warning	-----------------830
+		amk.oau_watchdog=830					--Display radiation	warning		-----------------830
 		upd_timeRAD = time_now + upd_time_RAD
-		if slice_base < 4 then
+		if slice_base < 3 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - RAD["..utils.to_str(upd_timeRAD).."]") end
 			if self.object.radiation >= 0.7 then
 				local hud = get_hud()
@@ -1049,13 +1080,13 @@ function actor_binder:update(delta)
 				  hud:RemoveCustomStatic("cs_radiation_danger")
 				end
 			end
-			xr_sound.update_actor()																--110000, update sound scheme actor, geiger counter only
+			xr_sound.update_actor()												--110000, update sound scheme actor, geiger counter only
 		end
 	end
 	if upd_timeARC < time_now then
-		amk.oau_watchdog=800												-----------------800
+		amk.oau_watchdog=800													-----------------800
 		upd_timeARC = time_now + upd_time_ARC
-		if slice_base < 4 then
+		if slice_base < 3 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - ARC["..utils.to_str(upd_timeARC).."]") end
 			arc_main.actor_update(time_now)
 			amk.mod_call("check_armor")
@@ -1063,26 +1094,26 @@ function actor_binder:update(delta)
 		end
 	end
 	if upd_timeAEM < time_now then
-		amk.oau_watchdog=780						--- ARENA_EXTENSION_MOD -----------------780
+		amk.oau_watchdog=780						--- ARENA_EXTENSION_MOD 	-----------------780
 		upd_timeAEM = time_now + upd_time_AEM
-		if slice_base < 4 then
+		if slice_base < 3 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - AEM["..utils.to_str(upd_timeAEM).."]") end
 			aem_manager.get_aem():update()
 			--if TB3D_bsu_aem then TB3D_bsu_aem.update(delta, self.object, time_now) end				-- modders interface	
 		end
 	end
 	if upd_timeFSS < time_now then
-		amk.oau_watchdog=740											-----------------740
+		amk.oau_watchdog=740													-----------------740
 		upd_timeFSS = time_now + upd_time_FSS
-		if slice_base < 4 then
+		if slice_base < 3 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - FSS["..utils.to_str(upd_timeFSS).."]") end
 			TB3D_Services.actor_update(self.object, delta, time_now)
 		end
 	end
 	if upd_timeGMS < time_now then
-		amk.oau_watchdog=710											-----------------710
+		amk.oau_watchdog=710													-----------------710
 		upd_timeGMS = time_now + upd_time_GMS
-		if slice_base < 4 then
+		if slice_base < 3 then
 			if TB3D_Modders.log_game_stats == true then game_stats.update(delta, self.object, time_now) end
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - GMS["..utils.to_str(upd_timeGMS).."]") end
 			if TB3D_Modders.use_sak_message then sak_dialog.on_update() end		--109999 test aleks1970 -------------
@@ -1091,9 +1122,9 @@ function actor_binder:update(delta)
 		end
 	end
 	if upd_timeKEY < time_now then
-		amk.oau_watchdog=700											-----------------700
+		amk.oau_watchdog=700													-----------------700
 		upd_timeKEY = time_now + upd_time_KEY
-		if slice_base < 4 then
+		if slice_base < 3 then
 			db.check_car_fix()
 			--keylogger.update()		-- 109997
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - KEY["..utils.to_str(upd_timeKEY).."]") end
@@ -1102,31 +1133,31 @@ function actor_binder:update(delta)
 	if upd_timeBTR < time_now then												--110000, from amk.actor_update
 		amk.oau_watchdog=640													-----------------640
 		upd_timeBTR = time_now + upd_time_BTR
-		if slice_base < 4 then
-			dmx_cars.check_btr()				--ogse usable btrs 109950
-			amk.antirad_update()				--ogse usable btrs 109950
+		if slice_base < 3 then
+			dmx_cars.check_btr()												--ogse usable btrs 109950
+			amk.antirad_update()												--ogse usable btrs 109950
 		end
 	end
-	--================= slice base 2 ======================================================================
+	--============================ more important: skip if slice base > 3 =========================================
 	if upd_timeAMK < time_now then												--110000, from amk.actor_update
 		amk.oau_watchdog=640													-----------------640
 		upd_timeAMK = time_now + upd_time_AMK
-		if slice_base < 3 then
+		if slice_base < 4 then
 			amk.oau_watchdog=650												-----------------650
 			art_hit.update()
 			amk.on_actor_update(delta)
 		end
 	end
 	if upd_timeTSK < time_now then
-		amk.oau_watchdog=890												-----------------890, 889
+		amk.oau_watchdog=890													-----------------890, 889
 		upd_timeTSK = time_now + upd_time_TSK
-		if slice_base < 3 then
+		if slice_base < 4 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - TSK["..utils.to_str(upd_timeTSK).."]") end
 			task_manager.actor_update()
 		end
 	end
 	if self.next_restrictors_update_time < time_now then
-		if slice_base < 3 then
+		if slice_base < 4 then
 			amk.oau_watchdog=886												-----------------886, 887, 888
 			bind_restrictor.actor_update(delta)
 			amk.oau_watchdog=885
@@ -1135,9 +1166,9 @@ function actor_binder:update(delta)
 	end
 	if upd_timeRST < time_now then											--109986
 		--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("restrictors: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]") end
-		amk.oau_watchdog=880						-- Update restrictors	-----------------880
+		amk.oau_watchdog=880						-- Update restrictors		-----------------880
 		upd_timeRST = time_now + upd_time_RST
-		if slice_base < 3 then
+		if slice_base < 4 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - RST["..utils.to_str(self.next_restrictors_update_time).."]") end
 			bind_mteleport.actor_update(delta)								-- Update our teleport (Kostya_level)
 			--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("restrictors: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done") end
@@ -1145,9 +1176,9 @@ function actor_binder:update(delta)
 	end
 	--TB3D_Services.packet_alert("BSTALK: actor_update4")
 	if upd_timeSCP < time_now then
-		amk.oau_watchdog=870												-----------------870  
+		amk.oau_watchdog=870													-----------------870  
 		upd_timeSCP = time_now + upd_time_SCP
-		if slice_base < 3 then
+		if slice_base < 4 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - SCP["..utils.to_str(upd_timeSCP).."]") end
 			if TB3D_Modders.use_ammo_stack and self.object:is_talking() == false then
 				-- if stacking is enabled and no dialog is open, give ammo_stack.on_update a chance to stack ammo
@@ -1159,24 +1190,25 @@ function actor_binder:update(delta)
 			--if TB3D_bsu_updS then TB3D_bsu_updS.update(delta, self.object, time_now, scopeUsed) end			-- modders interface		
 		end
 	end
+	--============================ most important: skip if slice base > 4 =========================================
 	if upd_timeWEP < time_now then
-		amk.oau_watchdog=860											-----------------860
+		amk.oau_watchdog=860													-----------------860
 		upd_timeWEP = time_now + upd_time_WEP
-		if slice_base < 3 then
+		if slice_base < 5 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - WEP["..utils.to_str(upd_timeWEP).."]") end
-			rx_wmgr.global_update(time_now) 								--weapon manager updates
+			rx_wmgr.global_update(time_now) 									--weapon manager updates
 			rx_addons.update(time_now) 
 			rx_gl.update(time_now) 
 			meceniy_wpn.on_actor_update()
 			dmx_mod.wpn_explode_update()
 			rx_shoot_enable.shoot_effect() 											--109989  The effect of firing
-			--if TB3D_bsu_upd3 then TB3D_bsu_upd3.update(delta, self.object, time_now) end					-- modders interface	
+			--if TB3D_bsu_upd3 then TB3D_bsu_upd3.update(delta, self.object, time_now) end	-- modders interface	
 		end
 	end
 	if upd_timeOTF < time_now then
-		amk.oau_watchdog=859												-----------------859
+		amk.oau_watchdog=859													-----------------859
 		upd_timeOTF = time_now + upd_time_OTF
-		if slice_base < 3 then
+		if slice_base < 5 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - OTF["..utils.to_str(upd_timeOTF).."]") end
 			meceniy_outfit.on_actor_update(scopeUsed)
 			repair.update()	--109998,  Revamped repair kit - aleks1970
@@ -1186,17 +1218,19 @@ function actor_binder:update(delta)
 			if TB3D_Modders.invisible then meceniy_work.set_invisible() end
 		end
 	end
-	--TB3D_Services.info_alert("Bind_Stalker actor_update slices done")
-	--===============================================end slice based actions===============================================
-	self.actor_detector:update()										-- update circuit detector
-	if TB3D_Modders.amk_style_hit == false then							--109970 moved here, amk hit already does this
-		amk.oau_watchdog=570											-----------------570  
-		dmx_mod.red_effect() 											-- Red wound effect
+	if slice_base < 5 then
+		self.actor_detector:update()											-- update circuit detector
+		if TB3D_Modders.amk_style_hit == false then								--109970 moved here, amk hit already does this
+			amk.oau_watchdog=570												-----------------570  
+			dmx_mod.red_effect() 												-- Red wound effect
+		end
+		amk.oau_watchdog=610													-----------------610
+		if TB3D_Modders.CopKeys == true then keylogger.update() end				-- New buttons
+		amk.oau_watchdog=600													-----------------600
+		if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.actor_update(delta) end	--grenade and armor
 	end
-	amk.oau_watchdog=610												-----------------610
-	if TB3D_Modders.CopKeys == true then keylogger.update() end			-- New buttons
-	amk.oau_watchdog=600												-----------------600
-	if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.actor_update(delta) end							--grenade and armor
+	--TB3D_Services.info_alert("Bind_Stalker actor_update slices done")
+	--============================ end slice based actions ===============================================
 	if is_collector == true then
 		amk.oau_watchdog=680													-----------------680  
 		TB3D_Collector.update(time_now, slice_base)
@@ -1204,20 +1238,20 @@ function actor_binder:update(delta)
 		amk.oau_watchdog=660													-----------------660
 		TB3D_Stalker.update(time_now, slice_base)								--109983
 	end
- 	amk.oau_watchdog=590												-----------------590
-	bolt_ending.update() 												-- Ending bolts
-	amk.oau_watchdog=580												-----------------580
+ 	amk.oau_watchdog=590														-----------------590
+	bolt_ending.update() 														-- Ending bolts
+	amk.oau_watchdog=580														-----------------580
 	--if TB3D_bsu_last then TB3D_bsu_last.update(delta, self.object, time_now) end		--109978, before alert
-	amk.oau_watchdog=550												-----------------550
+	amk.oau_watchdog=550														-----------------550
 	if last_time == nil then															--109975, first update
 		if TB3D_Modders.use_info_message then
 			TB3D_Services.show_belt_items()
 			db.show_counts()
 		end
 		TB3D_Services.show_mem_usage()
-		TB3D_Services.check_active_community()											--109982, determine by most significant item/info
+		TB3D_Services.check_active_community()									--109982, determine by most significant item/info
 	end
-	if self.warning then 												-- added by Red75. Control over the overflow	!!!!TB3D OVERFLOW ERROR WARNING 
+	if self.warning then 														-- added by Red75. Control over the overflow	!!!!TB3D OVERFLOW ERROR WARNING 
 		self.warning=nil
 		get_hud():AddCustomStatic("hud_save_warning")
 		local wnd=get_hud():GetCustomStatic("hud_save_warning"):wnd()
@@ -1236,7 +1270,7 @@ function actor_binder:update(delta)
 		  get_hud():RemoveCustomStatic("hud_save_warning")
 		end
 	end
-	last_time = time_now												--save for next loop
+	last_time = time_now														--save for next loop
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("Bind STALKER: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] <<<<done>>>>")
 	end
@@ -1410,9 +1444,9 @@ function actor_binder:on_use_object(obj)
 		else
 			spawn_level_changer.checking_droped_obj(obj)			--109999
 			if TB3D_Services.is_collector(33) then
-				TB3D_Collector.on_use_object(obj)
+				TB3D_Collector.on_use_object(obj, sect)
 			else
-				TB3D_Stalker.on_use_object(obj)
+				TB3D_Stalker.on_use_object(obj, sect)
 			end
 		end
 	end

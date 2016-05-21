@@ -1,5 +1,5 @@
--- TB3D 1.1.0.0.0.0   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
-function my_ver() return "1.1.0.0.0.0" end
+-- TB3D 1.1.0.0.0.1   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
+function my_ver() return "1.1.0.0.0.1" end
 ----------------------------------------------------------------------------------------------------
 -- Physic objects binding
 ----------------------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ function generic_physics_binder:net_spawn(data)
 		if sobj:spawn_ini() ~= nil and sobj:spawn_ini():section_exist("drop_box") == true then
 			self.box_items = xr_box.ph_item_box(sobj)
 		end
-		if sobj:clsid() == clsid.car_s or obj_sect == "m_car" then db.add_car_to_fix(sobj) end		--109950
+		--if sobj:clsid() == clsid.car_s or obj_sect == "m_car" then db.add_car_to_fix(sobj) end		--110001, only add those that need it when they are spawned in pop control
 		amk.on_net_spawn(sobj)
 	end
 	return true

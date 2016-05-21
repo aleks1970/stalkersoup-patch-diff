@@ -1,5 +1,6 @@
--- TB3D 1.1.0.0.0.0  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init, get_art_type, net destroy, leave bar alone
-function my_ver() return "1.1.0.0.0.0" end
+-- TB3D 1.1.0.0.0.1  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init, get_art_type, net destroy, leave bar alone,
+-- generate_anoms, net_spawn
+function my_ver() return "1.1.0.0.0.1" end
 
 --[[-------------------------- variable and table --------------------------]]
 local table_sort=table.sort
@@ -368,9 +369,9 @@ local arts_amk={
 	["af_fireball"]=true,
 	["af_cristall"]=true
 }
-function dynamic_art(obj_name, lname, sect)
+function dynamic_art(obj_name, lname, sect)		--10001, only called by tb3d_collector
 	local result = true																--default: is a dynamic art so don't remove
-	if TB3D_Services.is_collector() or TB3D_Modders.dyn_arts_always then			--109981, default = start dyn arts on levelup 1
+	--if TB3D_Modders.dyn_arts_always then			--109981, default = start dyn arts on levelup 1
 		if lname ~= "" then
 			if level_vertexes[lname] then											--109996, must be one of the dyn levels
 				if arts_amk[sect] == true then										--109981, must be in list
@@ -381,7 +382,7 @@ function dynamic_art(obj_name, lname, sect)
 			TB3D_Services.packet_alert("amk anoms: dynamic_art["..utils.to_str(obj_name).."] sect["..utils.to_str(sect).."] level["..utils.to_str(lname).."] bad vert. removed")
 			result = false  														--bad vert so remove
 		end
-	end
+	--end
 	return result
 end
 local arts_get1={
@@ -440,7 +441,7 @@ local anti_spawn_zones={}
 
 function generate_anoms()
 	local lname=level.name()
-	if level_anoms[lname] then
+	if level_vertexes[lname] then					--110001
 		local iniFileName="scripts\\amk\\anoms\\anoms.ltx"
 		if iniLineSectionExist(lname,iniFileName) then
 			local result, id, value = nil, nil, nil 
@@ -495,7 +496,7 @@ function generate_anoms()
 end
  
 function generate_arts(lname)
-	if TB3D_Services.is_collector() or TB3D_Modders.dyn_arts_always then				--109981, wait for levelup to do dyn arts
+	if TB3D_Services.is_collector(7001) or TB3D_Modders.dyn_arts_always then				--109981, wait for levelup to do dyn arts
 		local existing = bind_det_arts.art_count()
 		local max_arts = TB3D_Modders.arts_total or 20									--109976 per level
 		--if lname == "puzir" and not has_alife_info("otdan_q") then return end			--many arts in quest
@@ -918,7 +919,7 @@ class "anom_binder" ( object_binder )
 function anom_binder:__init(obj) super(obj) end
 
 function anom_binder:net_spawn(sobj)
-	if sobj and sobj.id then return true end
+	--if sobj and sobj.id then return true end			--110001
 	if not object_binder.net_spawn( self,sobj ) then return false end
 	local status=get_anomaly_status(sobj)
 	if status=="del" or status=="off" then
