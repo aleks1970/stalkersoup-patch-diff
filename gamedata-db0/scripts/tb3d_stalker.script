@@ -1,9 +1,9 @@
---<!-- TB3D 1.1.0.0.0.3 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.1.0.0.0.4 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
 --item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals,
---lukash brains, agro knockdown, jupu, x16, check_dead, math_random
-function my_ver() return "1.1.0.0.0.3" end
+--lukash brains, agro knockdown, jupu, x16, check_dead, math_random, tb3d_chaes_done, level number optimization
+function my_ver() return "1.1.0.0.0.4" end
 
 local translate = game.translate_string
 local math_random = math.random
@@ -11,10 +11,37 @@ local text_color_tip = TB3D_Services.get_text_color("tip")
 
 local upd_pos = 0
 local fix_done = false
-function update(time_now, slice_base)							--110000
+local lname
+local sname
+local ln = 0
+function set_level_num(lvlnum)																--110004, another optimization
+	ln = lvlnum
+	lname = level.name()
+	sname = amk.load_variable("level_on_save","start")
+end
+
+function update(blow_phase, time_now, slice_base)																--110000
 	if upd_pos < time_now then
+		local pos = db.actor:position()
 		upd_pos = time_now + 950
-		if slice_base < 4 then
+		if ln == 17 then --l12_stancia_2															--110004 ==============================================================
+			if not has_alife_info("tb3d_chaes_done") then											--110004, keep player in gauntlet
+				if TB3D_Collector.actor_in_range(vector():set(5.047,5.201,64.887), 10)				--back to lab
+				  or TB3D_Collector.actor_in_range(vector():set(44.292,1.079,243.722), 500)			--chopper
+				  or TB3D_Collector.actor_in_range(vector():set(127.589,17.281,105.430), 1000)		--core of second reactor
+				  or TB3D_Collector.actor_in_range(vector():set(80.667,2.136,212.769), 760) then	--between walls
+					if has_alife_info("aes2_monolit_roof29_1") then
+						TB3D_Services.move_actor(717.904,19.225,87.890, true)						--after sid vid
+					elseif has_alife_info("aes2_rpg_ambush1") then
+						TB3D_Services.move_actor(165.639,58.484,138.577, true)						--roof near top ladder
+					elseif has_alife_info("aes2_monolit_teleport2") then
+						TB3D_Services.move_actor(190.812,16.754,195.508, true)						--start of viaducts 
+					else
+						TB3D_Services.move_actor(62.580,4.994,79.474, true)							--near start	(stairs above start area 86.464,33.447,133.204)
+					end
+				end
+			end
+		elseif ln == 4 then	--l03u_agr_underground
 			if TB3D_Modders.zaton_lost then															--109999, can be deactivated
 				if not has_alife_info("tb3d_teleport_zaton") then									--109999 moved here, check if hideout done yet
 					if has_alife_info("agr_knockdown") then											--entered strelok hideout
@@ -22,16 +49,14 @@ function update(time_now, slice_base)							--110000
 							TB3D_Services.give_info("tb3d_teleport_zaton")							--MUST be here to prevent re-entry and 'story obj already exists' error
 							TB3D_Services.teleportate("zatlost")									--gives tb3d_teleport_zaton and TB3D_update removes tb3d_agr_knockdown
 							return																	--109999
-						elseif level.name() == "l03u_agr_underground" then							--109999, must be in agro under
-							TB3D_Services.give_info("tb3d_agr_knockdown")							--109999, delay one cycle
 						else
-							TB3D_Services.give_info("tb3d_teleport_zaton")							--109999, disable teleport if not agro under
+							TB3D_Services.give_info("tb3d_agr_knockdown")							--109999, delay one cycle
 						end
 					end
 				end
 			end
-			braad_test.actor_update()										--TB3D 109999, moved from bind_stalker
 		end
+		braad_test.actor_update()																	--TB3D 109999, moved from bind_stalker
 	end
 end
 
@@ -44,19 +69,19 @@ function on_info(info_id)
 		TB3D_Triggers.spawn_esc_medkit()
 	elseif info_id == "tutorial_end" then
 		if has_alife_info("esc_kill_bandits_quest_kill") and not has_alife_info("esc_shustryi_dead") then
-			TB3D_Triggers.make_camp_friends()						--109991, camp should be friends after saving nimble
+			TB3D_Triggers.make_camp_friends()														--109991, camp should be friends after saving nimble
 		end
 	--elseif info_id=="brat_luis_have" then
 		--TB3D_Triggers.spawn_marmor()
-	--elseif info_id=="yan_labx16_switcher_1_end" then				--110000
+	--elseif info_id=="yan_labx16_switcher_1_end" then												--110000
 	elseif info_id=="yan_has_ghost_pda" then
 		news_manager.send_tip(db.actor, "storyline_ghost_tip", nil, "wolf")
-		amk.spawn_item("amk_zapiska",vector():set(-117.381,18.722,-21.890),1529,84)		--109989, kept getting lost so moved it
-	if has_alife_info("agr_find_gunslinger_cache_final") then			--delay it so all.spawn will trigger provodnik first
+		amk.spawn_item("amk_zapiska",vector():set(-117.381,18.722,-21.890),1529,84)					--109989, kept getting lost so moved it
+	if has_alife_info("agr_find_gunslinger_cache_final") then										--delay it so all.spawn will trigger provodnik first
 			TB3D_Services.give_info("yan_provodnik_spawn")
 		end
 	elseif info_id == "yan_kruglov_decoder_have" then
-		TB3D_Triggers.spawn_decoder_mob()									--109983, upto 2 burers where ghost was found
+		TB3D_Triggers.spawn_decoder_mob()															--109983, upto 2 burers where ghost was found
 	elseif info_id=="tb3d_esc_prison" then
 		if has_alife_info("esc_prison") then
 			TB3D_Services.remove_info("esc_prison")
@@ -83,11 +108,12 @@ function on_info(info_id)
 	elseif info_id=="sey_after_pobeg_start" then
 		TB3D_Triggers.start_black_doc_sms()
 	elseif info_id=="kalmyak_vstreca_start" then							--109951 adjusted to happen faster
+	   --TB3D_Hit_Styles.small_hit(db.actor, 4)
+	   level.add_pp_effector("deadcity_wake.ppe", 4467, false)				--110004
+	   --level.add_pp_effector("teleport.ppe", 2006, false)
+	   --level.add_pp_effector ("alcohol.ppe", 3000, false)       
+	elseif info_id=="kalmyak_vstreca_grab" then								--110004
 	   --level.add_pp_effector ("blink.ppe", 234, false)       
-	   level.add_pp_effector("teleport.ppe", 2006, false) 
-	   db.actor:set_actor_position(patrol("kalmyak_tele_walk"):point(0))
-	   local dir = patrol("kalmyak_tele_look"):point(0):sub(patrol("kalmyak_tele_look"):point(0))
-	   TB3D_Services.rotate_actor(-dir:getH())
 	elseif info_id=="final_agro_kluk_ok_start" then							--109955 start timer to insure final sms activates
 		TB3D_Services.delayed_action(1, "naezd_zhuchok", 40)
 	elseif info_id=="naezd_zhuchok" then									--109955 play last sms messages if they did not trigger
@@ -123,7 +149,7 @@ function on_info(info_id)
 		if snd_obj then
 			snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 		else
-			TB3D_Services.packet_alert("tb3s stalker: play snd nil!!!!")
+			TB3D_Services.packet_alert("TB3D stalker: play snd nil!!!!")
 		end
 	elseif info_id == "cit_fail_first_task" then
 		TB3D_Mobs.spawn_bandits(-57.551,-6.502,13.167,4007,778,6)										--109989, institute entrance
@@ -136,6 +162,10 @@ function on_info(info_id)
 		if has_alife_info("esc_commander_die") then
 			TB3D_Services.give_info("esc_blocpost_pust")												--must be player attacking so spawn choppers
 		end
+	elseif info_id == "tb3d_chaes_done" then															--110004, open npp2 for gold chunks and diary quests
+		dmx_mod.create_npp1_level_changers()															--98020,98021, central gates
+		dmx_mod.create_level_changer_npp2_npp1()														--99043, west gates
+		sak.add_new_chaes2_to_chaes()																	--97102, west gates
 	elseif info_id == "tb3d_complete_group0" then														--to mil start, delayed task completions
 		TB3D_Services.complete_group(0)
 	elseif info_id == "tb3d_complete_group1" then														--to mil start, delayed task completions
@@ -199,14 +229,13 @@ end
 function on_item_take(obj)
 	local is_remove_obj = false
 	local info_given = false
-	local ln = level.name()
 	local sect=obj:section()
 	if not sect then sect = obj:name() end
 	--TB3D_Services.packet_alert("tb3d stalker: on item take["..sect.."]")
 	if obj:name()=="mil_stalker0012" then
 		info_given = TB3D_Services.give_info("info_amk_recipt_stone_dikoobraz")
 	elseif sect == "mushroom" then													--109989
-		if ln == "l03_agroprom" and has_alife_info("esc_find_doctor_start") then	--find doc in hideout
+		if lname == "l03_agroprom" and has_alife_info("esc_find_doctor_start") then	--find doc in hideout
 			TB3D_Mobs.spawn_dogs(4.143,5.443,110.879,244698,514,2)					--hills on either side
 			TB3D_Mobs.spawn_dogs(-46.125,8.178,118.542,194965,519,2)
 		end
@@ -215,33 +244,33 @@ function on_item_take(obj)
 			TB3D_Services.give_info("dan_grab_have")
 		end
 	elseif sect == "mono_dead_doc" then
-		if ln=="marsh" and has_alife_info("kot_need_doc_start") and not has_alife_info("kot_need_doc_done") then
+		if lname =="marsh" and has_alife_info("kot_need_doc_start") and not has_alife_info("kot_need_doc_done") then
 			TB3D_Services.give_info("kot_need_doc_have")
 		end
 	elseif sect=="amk_af_night_star" then
 		TB3D_Services.give_info("test_quest_art_vziat")
 	elseif sect=="amk_zapiska" then
-		--TB3D_Services.packet_alert("bstalk: zapiska["..utils.to_str(ln).."]")
-		if ln=="l03_agroprom" then
+		--TB3D_Services.packet_alert("bstalk: zapiska["..utils.to_str(lname).."]")
+		if lname =="l03_agroprom" then
 			sak.add_new_escape_100()
-		elseif ln=="l01_escape" then
+		elseif lname =="l01_escape" then
 			info_given = TB3D_Services.give_info("info_amk_recipt_shkura")
-		elseif ln=="l04u_labx18" then
+		elseif lname =="l04u_labx18" then
 			info_given = TB3D_Services.give_info("info_amk_recipt_simbion")
-		elseif ln=="l08u_brainlab" then			--is on body, this may not be needed
+		elseif lname =="l08u_brainlab" then			--is on body, this may not be needed
 			--TB3D_Triggers.remove_brainlab_alife()									--110000, remove x16_m_controller_e, causes ctd on level exit
 			info_given = TB3D_Services.give_info("info_amk_recipt_dummy")
 		end  
 		is_remove_obj = true
 	elseif sect=="rad_document6" then
-		if ln=="l01_escape" then
+		if lname =="l01_escape" then
 			if TB3D_Services.give_info("info_artmod_rusty_kristall_mincer") then
 				info_given = true
 				sak.info_artmod()
 			end
-		elseif ln=="l10_radar" then
+		elseif lname =="l10_radar" then
 			sak.add_new_darkvalley_107()
-		elseif ln=="l03_agroprom" then
+		elseif lname =="l03_agroprom" then
 			if TB3D_Services.give_info("info_artmod_rusty_thorn_buzz") then
 				info_given = true
 				sak.info_artmod()
@@ -249,7 +278,7 @@ function on_item_take(obj)
 		end
 		is_remove_obj = true
 	elseif sect=="sak_document" then
-		if ln=="l10_radar" then
+		if lname =="l10_radar" then
 			sak.add_new_radar_106()
 			is_remove_obj = true
 		end
@@ -263,7 +292,7 @@ function on_item_take(obj)
 			sak.add_new_rostok_105()
 			sak.add_new_mil_104() 
 		end
-		if ln=="l07_military" then
+		if lname =="l07_military" then
 			if TB3D_Services.give_info("ara_pda_est") then
 				is_remove_obj = true
 			end
@@ -291,29 +320,30 @@ function on_item_take(obj)
 	elseif sect=="outfit_bandit_m1" then
 		TB3D_Services.give_info("esc_shustryi_outfit")
 	elseif sect=="sak_book4" then
-		if TB3D_Services.give_info("doktor_alife") then				--triggers all.spawn
-			sak.info_doktor()	--sends tip that doctor is alive
+		if TB3D_Services.give_info("doktor_alife") then						--triggers all.spawn
+			--sak.info_doktor()
+			news_manager.amk_send_tip_id("doc_alive",nil,0,10,"gen_info")	--sends tip that doctor is alive
 		end
 	elseif sect=="sysh_document" then
-		if ln=="l10u_bunker" then TB3D_Services.give_info("treasure_sysh_have") end
+		if lname =="l10u_bunker" then TB3D_Services.give_info("treasure_sysh_have") end
 		is_remove_obj = true
 	elseif sect=="sysh_flash" then
-		if ln=="l06_rostok" then TB3D_Services.give_info("treasure_sysh_start") end
+		if lname =="l06_rostok" then TB3D_Services.give_info("treasure_sysh_start") end
 		is_remove_obj = true
 	elseif sect=="voen_document" then
-		if ln=="l01_escape" then TB3D_Services.give_info("bandranen_pda_need") end
+		if lname =="l01_escape" then TB3D_Services.give_info("bandranen_pda_need") end
 		is_remove_obj = true
 	elseif sect=="zapiska_ranennogo" then
-		if ln=="l08_yantar" then TB3D_Services.give_info("have_listok") end
+		if lname =="l08_yantar" then TB3D_Services.give_info("have_listok") end
 	elseif sect=="kapitan_pda" then
-		if ln=="lost_village" then TB3D_Services.give_info("pda_bazar") end
+		if lname =="lost_village" then TB3D_Services.give_info("pda_bazar") end
 	elseif sect=="dosye_zvez" then
-		if ln=="generators" then TB3D_Services.give_info("idu_na_nz") end
+		if lname =="generators" then TB3D_Services.give_info("idu_na_nz") end
 	elseif sect == "disk_adren" then													--109993
 		if has_alife_info("arh_disk_start") and not has_alife_info("arh_disk_have") then
 			if arhara_dialog.arh_disk_have() == true then
 				TB3D_Services.give_info("arh_disk_have")
-				if ln=="atp_for_test22" then TB3D_Services.give_info("atp_banda_disk_spawn") end
+				if lname =="atp_for_test22" then TB3D_Services.give_info("atp_banda_disk_spawn") end
 			end
 		end
 	elseif sect=="bandranen_pda" then
@@ -474,7 +504,7 @@ function on_item_take(obj)
 	elseif sect=="new_book_prizrak" then TB3D_Services.give_info("treasure_ecolog_have")		--109988
 	elseif sect=="inventory_new_box" then TB3D_Services.give_info("yakut_ograblen_have")		--109988
 	elseif sect == "pri_decoder_documents" then
-		if ln == "l11_pripyat" and amk.load_variable("tb3d_suits", 0) < 3 then
+		if lname == "l11_pripyat" and amk.load_variable("tb3d_suits", 0) < 3 then
 			TB3D_Triggers.spawn_suit(10,99.434,4.336,131.041,215847,2185)
 			amk.save_variable("tb3d_suits", 3)
 		end
@@ -483,7 +513,7 @@ function on_item_take(obj)
 			TB3D_Services.give_info("esc_find_groza_have")
 		end
 	elseif sect=="sak_resiver" then												--109972
-		if ln == "l02_garbage" then
+		if lname == "l02_garbage" then
 			if has_alife_info("mil_volk_resiver_1have") then
 				TB3D_Services.give_info("mil_volk_resiver_have")
 			end
@@ -537,7 +567,7 @@ function on_item_take(obj)
 			--TB3D_Services.give_info("plot_dialog_say_have")
 		--end
 	elseif sect == "outfit_specnaz_m1" then		--109998, found in first trip to yantar
-		if ln == "l08_yantar" then
+		if lname == "l08_yantar" then
 			TB3D_Services.give_info("mil_lukash_heal_reward")
 		end
 	elseif sect == "notebook_new" then
@@ -605,7 +635,6 @@ local point_drop={
 	} 
 function item_drop(obj)
 	local sect = obj:section()
-	local ln = level.name()
 	if sect=="device_torch" then
 		--to be used in the future
 	elseif sect == "glushitel" then
@@ -616,28 +645,28 @@ function item_drop(obj)
 			braad_test.del_lim()
 		end
 	elseif sect=="sak_resiver_yantar" then
-		if ln=="l01_escape" then
+		if lname =="l01_escape" then
 			if has_alife_info("yan_scientist_teleport_02_start")
 			and amk.check_npc_in_box(db.actor, point_drop[3],point_drop[4])~=false then
 				TB3D_Services.give_info("yan_scientist_teleport_02_done")
 				amk.remove_item(obj)
 				amk.spawn_item("m_sak_resiver_yantar",vector():set(62.99,29.23,154.39),97,359827) 
 			end
-		elseif ln=="l07_military" then
+		elseif lname =="l07_military" then
 			if has_alife_info("yan_scientist_teleport_01_start")
 			and	amk.check_npc_in_box(db.actor, point_drop[1],point_drop[2])~=false then
 				TB3D_Services.give_info("yan_scientist_teleport_01_done")
 				amk.remove_item(obj)
 				amk.spawn_item("m_sak_resiver_yantar",vector():set(-244.62,-5.98,299.94),1797,89408) 
 			end
-		elseif ln=="l11_pripyat" then
+		elseif lname =="l11_pripyat" then
 			if has_alife_info("yan_scientist_teleport_03_start")
 			and amk.check_npc_in_box(db.actor, point_drop[5],point_drop[6])~=false then
 				TB3D_Services.give_info("yan_scientist_teleport_03_done")
 				amk.remove_item(obj)
 				amk.spawn_item("m_sak_resiver_yantar",vector():set(9.47,0.32,119.13),2166,113785)
 			end
-		elseif ln=="l12_stancia" then
+		elseif lname =="l12_stancia" then
 			if has_alife_info("life_heart_sahar_start")
 			and amk.check_npc_in_box(db.actor, point_drop[9],point_drop[10])~=false then
 				TB3D_Services.give_info("life_heart_sahar_have")
@@ -646,7 +675,7 @@ function item_drop(obj)
 			end
 		end
 	elseif sect=="af_gold_fish" then
-		if ln=="l12u_sarcofag" then
+		if lname =="l12u_sarcofag" then
 			if has_alife_info("strelok_pda_have")
 			and amk.check_npc_in_box(db.actor, point_drop[7],point_drop[8])~=false then
 				amk_mod.af_flash(obj)
@@ -671,8 +700,9 @@ function on_use_object(obj, sect)
 	dmx_cars.car_repair(obj) 
 end
 
-function process_levels(lname, sname, blow)
+function process_levels(blow)
 	local obj
+	TB3D_Services.packet_alert("TB3D_Stalker: process levels name["..lname.."] index["..utils.to_str(ln).."] from["..sname.."]")
 	if lname ~= sname then																--109955
 		TB3D_Services.remove_info("informer_out")										--109980, bar_bar_osvedomitel (snitch) in the bar
 		braad_test.false_info()
@@ -804,6 +834,13 @@ function process_levels(lname, sname, blow)
 			if sname == "l12_stancia" then
 				TB3D_Services.give_info("aes_found_sarcofag")
 			end
+		elseif lname=="l12_stancia_2" then
+			if sname == "l12u_control_monolith" then										--110004, monolith secret
+				if not has_alife_info("tb3d_chaes_done") then
+					news_manager.amk_send_tip_id("tb3d_sms_chaes_start","sms_smonoliths",10,40,"common_channel")
+					news_manager.amk_send_tip_id("tb3d_sms_chaes_start2","sms_smonoliths",15,40,"common_channel")
+				end
+			end
 		elseif lname=="marsh" then
 			if TB3D_Services.give_info("marsh_band_spawn") then								--Kalmyak and rucksack
 				braad_test.spawn_marsh_band()
@@ -829,13 +866,17 @@ function process_levels(lname, sname, blow)
 				TB3D_Services.give_info("info_restriction")				--109997, make sure portals are active
 			end
 		elseif lname=="l11_pripyat" then
-			if has_alife_info("tb3d_chaes_done") and not has_alife_info("dok_arh_say_start") then		--!!!!TB3D
+			if has_alife_info("tb3d_chaes_done") then		--and not has_alife_info("dok_arh_say_start") then		--!!!!TB3D
 				if not has_alife_info("doktor_book") and not has_alife_info("doktor_alife") then
+					--TB3D_Services.give_info("dok_arh_say_start")
 					if TB3D_Services.give_info("tb3d_sak_book4") then
 						amk.spawn_item("sak_book4",vector():set(-3.77,-4.25,191.19),2195,97948) 		-- Book that spawns Doctor
+						news_manager.amk_send_tip_id("tb3d_sms_doc_book","sms_tb3d",10,20,"common_channel")		--110004
 					end
 				end
 			end
+		elseif lname == "jupiter" then
+			--TODO
 		elseif lname=="labx8" then
 			if sname=="pripyat" then
 				TB3D_Services.give_info("peshera_code_door_unlocked")									--open lab door
@@ -916,7 +957,7 @@ function check_dead()				--110000, consolidates death checks
 		or has_alife_info("add_church_ban3_dead")) then
 			TB3D_Services.give_info("add_church_ban_signal") 
 	end
-	--if level.name()=="marsh" and has_alife_info("kalmyak_vstreca_start")
+	--if lname=="marsh" and has_alife_info("kalmyak_vstreca_start")
 		--and not has_alife_info("kalmyak_vstreca_sms") then
 			--amk.start_timer("kalmyak_vstreca",math_random(10,20))
 			--TB3D_Services.give_info("kalmyak_vstreca_sms")	

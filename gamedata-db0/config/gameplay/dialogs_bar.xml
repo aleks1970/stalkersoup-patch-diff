@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 fixed research dialog, removed bar_dialogs.barman_has_job, dmx135, fixed bar_bar, voronin, reduced several duplicate dialogs, spawn_sak_trader*************** -->
+<!-- ************ TB3D 1.1.0.0.0.4 fixed research dialog, removed bar_dialogs.barman_has_job, dmx135, fixed bar_bar, voronin, reduced several duplicate dialogs, spawn_sak_trader, bar_ecolog_crush_professor_start *************** -->
 <game_dialogs>
 	<dialog id="artmod_53_61_dialog">
 		<!-- *************** !!!!TB3D 134 *************** -->
@@ -2225,6 +2225,14 @@
 			<phrase id="10121">
 				<text>bar_ecolog_crush_professor_start_10121</text>
 			</phrase>
+			<phrase id="20">
+				<text/>
+				<dont_has_info>info_amk_recipt_almaz_kolobok</dont_has_info>
+				<dont_has_info>bar_rescue_research_reward</dont_has_info>
+				<dont_has_info>bar_rescue_research_done</dont_has_info>
+				<has_info>bar_bandits_dead</has_info>
+				<next>31</next>
+			</phrase>
 			<phrase id="0">
 				<text/>
 				<next>1</next>
@@ -2235,6 +2243,7 @@
 				<next>7</next>
 				<next>9</next>
 				<next>10</next>
+				<next>20</next>
 			</phrase>
 			<phrase id="1">
 				<text/>
@@ -2317,6 +2326,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="bar_arena_man_story">
+		<dont_has_info>tb3d_spawn_backwater_stash</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
 				<text>bar_arena_man_story_0</text>
@@ -2344,6 +2354,7 @@
 			</phrase>
 			<phrase id="6">
 				<text>bar_arena_man_story_6</text>
+				<give_info>tb3d_spawn_backwater_stash</give_info>
 			</phrase>
 		</phrase_list>
 	</dialog>

@@ -1,10 +1,10 @@
---TB3D 1.1.0.0.0.0 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+--TB3D 1.1.0.0.0.4 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
 -- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
 -- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
 -- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions, radar_monolit_dead, generic_m_story_id,
 -- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update,
--- agro soldiers health, krysuk, death callback, "NIL" to "nil", optimized can_remove_dead, motivator_delta
-function my_ver() return "1.1.0.0.0.0" end
+-- agro soldiers health, krysuk, death callback, "NIL" to "nil", optimized can_remove_dead, motivator_delta, dead_character_use
+function my_ver() return "1.1.0.0.0.4" end
 --[[------------------------------------------------------------------------------------------------------------------
 Author: Ruslan Didenko (Stohe)
 how to call methods of Binder:
@@ -816,7 +816,7 @@ function motivator_binder:update(delta)
 				--self.st.state_mgr = nil			--do not do here, dead bodies are re-entrant
 			end
 			self_object:set_tip_text_default()
-			--self_object:set_tip_text("character_use")
+			--self_object:set_tip_text("dead_character_use")			--110004
 			self_object:info_clear()
 		end
 		if TB3D_Services.is_collector(407) then xr_companion.process_enemy(self_object) end		--109950 ogse	

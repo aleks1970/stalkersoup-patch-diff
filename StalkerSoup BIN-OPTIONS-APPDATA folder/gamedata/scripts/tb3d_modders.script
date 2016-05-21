@@ -1,6 +1,6 @@
---- TB3D 1.1.0.0.0.2 PRE-release of the Modders Mega Mod, changed dyn suit options,
--- bio radar pulse option, logic debug option, DMX135, death_hit, expanded hit styles,
--- added cave_no_big_electros, pump_it_up to in game menu, alife tweaks, cleaner, dist coef,
+--- TB3D 1.1.0.0.0.4 PRE-release of the Modders' Mega Mod, changed dyn suit options,
+-- bioradar pulse option, logic debug option, DMX135, death_hit, expanded hit styles,
+-- added cave_no_big_electros, pump_it_up to in-game menu, alife tweaks, cleaner, dist coef,
 -- population control, max_phantoms, radiation_factor, adjusted populations, start_alife_option,
 -- loot_option, radiation_factor to 1.0, effector_spawn back off, alife_option from in game menu,
 -- adjusted sniper aim, added state messages, random tanks, use_hits, check_bad_weapons,
@@ -12,24 +12,24 @@
 -- advanced graphics, chgd daytime, volume_on_pause, blowout_rad_val from 1.0 to 0.05, arena lights,
 -- turn info message back off, adjusted loot ammo, force_r2_hw, coefficient_factor, show_story_ids, slice thresholds,
 -- show_removed_items, coef, DX11, DX11 graphics settings, packet_limit, repair kit, actor_idle_, give_art_on_death,
--- restrict_stock, edited comments
+-- restrict_stock, edited comments, max_inventory_items
 
-function my_ver() return "1.1.0.0.0.2" end
---// Modders resource central for script options
---// Certain function calls from script files in the gamedata\scripts dir redirected here
---// For mod testing and game play options - NOT compatible with non-TB3D mods
---// Options capable of reducing memory/CPU load when OFF are indicated with --!M!... in comment
+function my_ver() return "1.1.0.0.0.4" end
+--// Modders' Resource Central for script options. Defaults are shown in () and should not be changed.
+--// Certain function calls from script files in the gamedata\scripts dir redirected here.
+--// For STALKERSOUP mod testing and gameplay options - NOT compatible with non-TB3D mods
+--// Options capable of reducing memory/CPU load when OFF are indicated with !M! in comment
 
 -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DirectX 11 Support<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
---// If you are not using the Launcher then set this to true, and also remove // from #define DX11 in the shadersettings.txt
---// If you want DX11. If using the launcher, then leave 'false' as it is set by the launcher at runtime.
-use_DX11 = false			-- (false) !M! Default uses DX9/DX10 shaders (leave false, set by launcher)
+--// If you want DX11, but are not using the Launcher, then set this to 'true', and also remove // from #define DX11 in the shadersettings.txt
+--// If using the Launcher, then leave as 'false' as it is set by the Launcher at runtime.
+use_DX11 = false			-- (false) !M! Default uses DX9/DX10 shaders (leave 'false', to be set by Launcher)
 
 -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>GAME START OPTIONS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-----------------------!!!!!!!-REQUIRES NEW GAME IF CHANGED-!!!!!-----------------------------
+----------------------!!!!!-REQUIRES NEW GAME IF CHANGED-!!!!!-----------------------------
 
---// Turns on all safe level changers when false. STALKER starts only
---// Will cause broken quests when used without proper info portions from normal playthrough
+--// Turns on all safe level changers when false. 'STALKER Starts' only.
+--// Will cause broken quests when used without proper info portions from normal playthrough.
 default_portal_spawn = true		-- (true)
 
 --// true = raincoat, then medkit, knife, gun and ammo
@@ -37,7 +37,7 @@ default_portal_spawn = true		-- (true)
 default_items = true			-- (true)
 
 --// If true, you will have to load ammo onto your belt (vest)
---// !M! Not done for all ammo so default is NOT to use
+--// !M! Not yet done for all ammo, so default is to leave as 'false'
 use_ammo_belt = false			-- (false)
 
 -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>GAME PLAY OPTIONS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -63,74 +63,74 @@ use_ammo_belt = false			-- (false)
 open_alife_in_SOC = false		-- (false)!M! All levels open, and NOT recommended
 
 -----------------------------ALIFE RESPAWN SYSTEM--------------------------------------------------
---// Default progresses automatically in-game based on gameplay, rank and level-up values,
---// moderate and hardcore respawns kick in AFTER Radar is deactivated to not interfere with main
---// quests to that point, but if used at start then exiting X-10 and beyond will be intense and may
---// cause a crash on weaker systems. Minimum spawn distance from player also affected.
+--// Default progresses automatically in-game based on gameplay, rank and level-up values.
+--// Moderate and Hardcore respawns kick in AFTER Radar is deactivated, to not interfere with main
+--// quests to that point; but if used at start then exiting X-10 and beyond will be intense and may
+--// cause a crash on weaker systems. Minimum spawn distance from actor also affected.
 --// Respawn rates and distances will start immediately and are:
---//   default: random 12hrs to 24hrs - default distance with a 50m min distance cap
---//   moderate: random 6hrs to 12hrs - 80m min distance to player
---//   hardcore: random 1 hr to 6 hrs - 50m min distance to player
---// Caution should be used with hardcore, as creature packs like dogs and bloodsuckers can be
---// overwhelming at first.
+--//   Default:  random 12hrs to 24hrs - default distance with a 50m min distance cap
+--//   Moderate: random 6hrs  to 12hrs - 80m min distance to actor
+--//   Hardcore: random 1 hr  to 6 hrs - 50m min distance to actor
+--// Caution should be used with Hardcore, as creature packs like dogs and bloodsuckers can be
+--// overwhelming at first
 
-start_alife_option = 0			-- (0)!M! 0 (default), 1 (moderate) and 2 (hardcore)
+start_alife_option = 0			-- (0)  !M! 0 (Default), 1 (Moderate), and 2 (Hardcore)
 alife_slice_mult=15				-- (15) Slice update in binder, multiplier * (1 game minute), default: every 15 game minutes
-respawner_max_per_slice	= 8		-- (8) Maximum objects created per slice
+respawner_max_per_slice	= 8		-- (8)  Maximum objects created per slice
 
 ------------------------------- OFFLINE ALIFE --------------------------------------------
 use_offline_alife = false		-- (false)!M!(extreme usage) Use offline alife updates of fictitious events
-look_radius_box = 100			-- (100) Distance to search for inventory boxes
-search_intensivity=20			-- (20)!M! Search intensity - number of alife objects to search for each table update
-offline_alife_trade = false		-- (false)!M! News on items for trade, off for better performance
+look_radius_box = 100			-- (100)  Distance to search for inventory boxes
+search_intensivity=20			-- (20)   !M! Search intensity - number of alife objects to search for each table update
+offline_alife_trade = false		-- (false)!M! News on items for trade. Use 'false' for better performance
 
 ------------------------------- ONLINE ALIFE ---------------------------------------------------------------
-search_actor_dist=6				-- (6) If actor is within this distance of the item/corpse than NPC skips it
-search_busy_dist=5				-- (5) Only if right under foot when in danger, camper or walker
-search_max_dist=40				-- (40) Maximum distance for NPC to search for loot
-look_radius=120					-- (120) Maximum obj search distance, should be <= alife.ltx switch_distance (TB3D = 120)
-to_actor = look_radius-20		-- (look_radius-20) Distance from actor checks, obj must be: ( < look_radius and > to_actor ) to be spawned, range: 1 to to_actor-1 (look_radius-20)
-max_rounds = 10					-- (10) Duration of attacks, keep spawning up to 10 times per assault
+search_actor_dist=6				-- (6)    If actor is within this distance of the item/corpse, then NPC skips it
+search_busy_dist=5				-- (5)    Only if right under foot when in danger, camper or walker
+search_max_dist=40				-- (40)   Maximum distance for NPC to search for loot
+look_radius=120					-- (120)  Maximum object search distance. Should be <= alife.ltx switch_distance (TB3D = 120)
+to_actor = look_radius-20		-- (look_radius-20) Distance from actor checks. Object must be: ( < look_radius and > to_actor ) to be spawned, range: 1 to to_actor-1 (look_radius-20)
+max_rounds = 10					-- (10)   Duration of attacks, keep spawning up to 10 times per assault
 health_wound = 0.20				-- (0.20) At what level of health an NPC is considered to be wounded 
 health_wound_set = 0.02			-- (0.02) First wound start
 --// actual code: fp = math_ceil((priority * 1000) + (GetAccuracy * TB3D_Modders.accuracy_mult) + (GetRPM * 3) + (GetDamage * TB3D_Modders.damage_mult)) - 5000
-base_fp = 1400					-- (1400) Standard firepower\distance at distance = 1 to remove 100% health [defender.health - (attack_info.fp / TB3D_Modders.base_fp)]
-dist_coeff = 8					-- (8) The coefficient for the distance [firepower / (dist / dist_coeff)]
-accuracy_mult = 100				-- (100) Percentage of weapon accuracy (in config) to apply, lower = less accurate
-damage_mult = 8					-- (8) Damage value in weapon config multiplied by this value, lower = less damage
+base_fp = 1400					-- (1400) Standard firepower/distance at distance = 1 to remove 100% health [defender.health - (attack_info.fp / TB3D_Modders.base_fp)]
+dist_coeff = 8					-- (8)    The coefficient for the distance [firepower / (dist / dist_coeff)]
+accuracy_mult = 100				-- (100)  Percentage of weapon accuracy (in config) to apply. Lower = less accurate
+damage_mult = 8					-- (8)    Damage value in weapon config multiplied by this value. Lower = less damage
 sell_limit = 3000				-- (3000) Vendor sale limit
-rate_kill_base = 100			-- (100) Rating for murder. By killing the weaker - 0.5 * rate_kill_base, stronger - 2 * rate_kill_base
-rate_art_found = 20				-- (20) Rank change for victims with artefacts
-condition_threshold = 0.9		-- (0.9) DEFAULT threshold at which point an object is considered in good condition. Changes in-game, but resets to this
+rate_kill_base = 100			-- (100)  Rating for murder. By killing the weaker - 0.5 * rate_kill_base, stronger - 2 * rate_kill_base
+rate_art_found = 20				-- (20)   Rank change for victims with artefacts
+condition_threshold = 0.9		-- (0.9)  DEFAULT threshold at which point an object is considered in good condition. Changes in-game, but resets to this
 
 --------------------------------SMART TERRAIN--------------------------------------------------------
-------- spawn/respawn params, quick,medium,long in npc.customdata or default
---// base value: quick=1,2  medium=3,4   long=5,6    default=1000,10001
+------- spawn/respawn params, Quick, Medium, Long in npc.customdata or default
+--// base value: Quick = 1,2  Medium = 3,4   Long = 5,6    default = 1000,10001
 --// algo: (base value * smt_stay_time_mult) limited to range 1,10001 internally
-smt_stay_time_mult = 10					-- (10)!M! Stay time multiplier, 1 to 100, smaller the number the faster the respawns (default 10 = 12hr min)
-smt_spawn_radius_min = look_radius-20	-- (look_radius-20) Minimum distance in meters to actor allowed for respawn, just inside look_radius best
-smt_spawn_rank_min = 90					-- (90) Default minimum rank, used when not in npc.customdata
+smt_stay_time_mult = 10					-- (10)   !M! Stay time multiplier, 1 to 100. The smaller the number, the faster the respawns (default 10 = 12hr min)
+smt_spawn_radius_min = look_radius+20	-- (look_radius+20) Minimum distance in meters from actor allowed for respawn, just outside look_radius so offline at first	--110004
+smt_spawn_rank_min = 90					-- (90)   Default minimum rank, used when not in npc.customdata
 smt_spawn_rank_max = 1000				-- (1000) Default maximum rank, used when not in npc.customdata
 
 --------------------------------POPULATION CONTROL--------------------------------------------------------
-population_controller = false			-- (false) Uses the values below to limit number of creatures on a level. Can triple loading times
+population_controller = false	-- (false) Uses the values below to limit the number of creatures on a level. Can triple loading times.
 --// Maximum allowed creatures on the level you spawn. Caution: too small a number may break some quests.
 --// Does not include some 'specific' quest creatures or dynamic spawns
 max_bibliotekar = 2				--(2)  Minimum for Marsh
 max_bloodsuckers = 20			--(20)
-max_boars = 16					--(16) for Esc and Pripyat
+max_boars = 16					--(16) for Cordon and Pripyat
 max_burers = 8					--(8)  Lab X-18
 max_cats = 10					--(10)
 max_chimera = 4					--(4)
 max_controllers = 4				--(4)
-max_crows = 28					--(28) works best. Normal is 56
+max_crows = 28					--(28) works best. Normal was 56
 max_dogs = 60					--(60) Dog packs
 max_flesh = 12					--(12)
 max_fractures = 10				--(10)
 max_ghouls = 4					--(4)
 max_gigants = 4					--(4)
 max_phantoms = 8				--(8)
-max_poltergeist = 8				--(8)  Minimum for labs
+max_poltergeist = 8				--(8)  Minimum for laboratories
 max_pseudodogs = 12				--(12)
 max_rats = 20					--(20)
 max_scelets = 6					--(6)  Minimum for Labyrinth
@@ -141,113 +141,114 @@ max_werewolves = 6				--(6)  Red Forest
 max_zombies = 20				--(20) Minimum for Yantar
 
 ---------------------------------GAMEPLAY DEFAULTS---------------------------------------------
---// You can turn it on any time and will spawn on next level change
-use_DMX_cars = true				-- (true)!M! use the new DMX cars. False will cause them to not spawn, but quests are not changed
+--// You can turn these on any time, and they'll spawn on next level change
+use_DMX_cars		= true		-- (true)  !M! COLLECTOR ONLY: Special and drivable cars. Quests are not effected.	--110004
 
-give_items_on_spawn = false		-- (false) spawns the items contained in func actor_net_spawn(). Will happen every time you enter a new level
-unlimited_bolts		= true		-- (true) just spawns a new one each throw. False = DMX style disposable
-use_ammo_stack		= true		-- (true) by GlowWorm 109976. Stacks ammo boxes together when picked up
-pda_spawn_rate		= 40		-- (40) percentage chance of PDA spawning on corpse (limited to 80%)     --109989
+give_items_on_spawn = false		-- (false) Spawns the items contained in func actor_net_spawn(). Will happen every time you enter a new level
+unlimited_bolts		= true		-- (true)  Spawns a new bolt each throw. False = DMX style disposable
+use_ammo_stack		= true		-- (true)  Stacks ammo boxes together when picked up. Created by GlowWorm 109976. 
+pda_spawn_rate		= 40		-- (40)    Percentage chance of PDA spawning on corpse (limited to 80%)     		--109989
 
-join_factions		= false		-- (false) allows joining factions at any time. Can cause quest breaks if used in NS play through --109989
+join_factions		= false		-- (false) Allows joining factions at any time. Can cause quest breaks if used in NS playthrough --109989
 
-reduce_bar_visitors = true		-- (true) !M! Will reduce number of visitors around campfires in half --109989
+reduce_bar_visitors = true		-- (true)  !M! Will reduce number of visitors around campfires by half				--109989
 restrict_stock		= false		-- (false) !M! AMK inventory stock restriction
+max_inventory_items = 1000		-- (1000)  !M! Will force item to drop if inventory is above this amount.			--110004
 
 ---------------------------------HIDE WEAPON-----------------------------------------------------
---// Cars and some gameplay require hiding the weapon. These will NOT be affected by this setting.
---// Does not stop NPC from complaining, and even reacting to it
+--// Cars and some gameplay require holstering your weapon. These will NOT be affected by this setting.
+--// Does not stop NPC from complaining, and even reacting to your drawn weapon
 hide_weapon			= false		-- (false)  during conversation and item usage
 
 ---------------------------------ADVANCED AI----------------------------------------------------------------
 use_tb3d_wmgr		= true		-- (true) Advanced characteristics and handling. Some advanced weapons require this
-use_xtrm_ai			= true		-- (true) causes more looting, and more aggressive combat
+use_xtrm_ai			= true		-- (true) Causes more looting, and more aggressive combat
 sniper_aim_ratio	= 30		-- (30) =10:1 ratio, if (distance_to_object * sniper_aim_ratio) <= sniper_aim_min then shoot else target
 sniper_aim_min		= 3000		-- (3000) equal to 300m in-game. Further than this is targeting or not seen. Tested with Rostok and Agroprom snipers
 ai_anomoly_evade	= false		-- (false)!M! NPCs will try to evade anomalies. Uses more memory (currently causes NPCs to throw all their bolts)
-npc_default_armor	= true		-- (true)!M! (if use_extreme_ai = true) If false then NPC will use xrs_armour to upgrade to better armour if found. <<SHOULD LEAVE AS TRUE>> 109981
+npc_default_armor	= true		-- (true) !M! (if use_extreme_ai = true) If false then NPC will use xrs_armour to upgrade to better armour if found. <<SHOULD LEAVE AS TRUE>> 109981
 
 --------------------------------AMK NEWS SYSTEM---------------------------------------------------------
-check_news_rate		= 160		-- (160) game seconds between news checks, and start of a random 40 game second window
---!!!!!!!! The following are still being tested, and they may cause CTDs in game. Important news is still shown !!!!!!!--
-show_death_news 	= false		-- (false) turns death news on/off. Random deaths, but not key characters
-show_spawn_news 	= false		-- (false) turns spawn news on/off. Random spawns, but not key characters
-show_abuse_news		= false		-- (false) turns abuse news on/off. Random acts by fictitious characters
-show_hero_news 		= false		-- (false)!M! News about your exploits in the Zone. Also causes bandits to travel
+check_news_rate		= 160		-- (160)   Game seconds between news checks, and start of a random 40 game-second window
+--!!!!!!! The following are still being tested, and they may cause CTDs in game. Important news is still shown !!!!!!!--
+show_death_news 	= false		-- (false) Turns death news on/off. Random deaths, but not key characters
+show_spawn_news 	= false		-- (false) Turns spawn news on/off. Random spawns, but not key characters
+show_abuse_news		= false		-- (false) Turns abuse news on/off. Random acts by fictitious characters
+show_hero_news 		= false		-- (false) !M! News about your exploits in the Zone. Also causes bandits to travel
 show_blowout_news 	= false		-- (false) Only affects predictions after a blowout
-show_info_news 		= false		-- (false)!M! Also spawns surprise creatures, some of which can spawn improperly and cause CTDs
+show_info_news 		= false		-- (false) !M! Also spawns surprise creatures, some of which can spawn improperly and cause CTDs
 
 ---------------------------------HIT STYLES------------------------------------------------------------- 
-use_hits			= true					-- (true) allows any of the following hit styles False deactivates ALL of them
-default_hit			= use_hits and true		-- (true) Hit effects like bullets, explosions, and anomalies
+use_hits			= true					-- (true)  Allows any of the following hit styles. 'false' deactivates ALL of them
+default_hit			= use_hits and true		-- (true)  Hit effects like bullets, explosions, and anomalies
 amk_style_hit		= use_hits and false	-- (false) When health drops to a certain amount, you receive added pain. Real hardcore!
 blowout_crows		= use_hits and false	-- (false)!M! The death of crows during blowouts. Randomly causes hung birds
-blowout_npc			= use_hits and false	-- (false)!M! Hit NPCs do not reach hideout during blowouts. Causes many dead NPCs
-blowout_rad_val		= 0.05					-- (0.05) Hit radiation level during blowout when actor unprotected, 0 = none, >=1 = max (death)
-horror_hit			= use_hits and true		-- (true) hits actor during Hell Hour
-meet_hit			= use_hits and true		-- (true) hits actor on meeting an NPC with a bad reputation
-sleep_hit			= use_hits and true		-- (true) hits actor on waking up
-wound_hit			= use_hits and true		-- (true) hits NPCs/creatures after getting wounded
-death_hit			= use_hits and true		-- (true) hits NPCs/creatures after death, lifting the pelvis slightly
-animation_hit		= use_hits and true		-- (true) hits NPCs/creatures, who rotate/bend when wounded
-alcohol_hit			= use_hits and true		-- (true) hits actor when drunk
-artefact_hit		= use_hits and true		-- (true) hits actor when picking up hot artefacts
-art_hit_multiplier	= 1						-- (1) Intensity of hit from artefacts when artefact_hit = true, 1 to 100
-teleport_hit		= use_hits and false	-- (false) Actor rotates when teleported
-mutator_hit			= use_hits and true		-- (true) hits actor on transmutator effect
-radiation_hit		= use_hits and true		-- (true) hits actor when rad level high
-zavis_hit			= use_hits and false	-- (false) hits NPC on final removal
+blowout_npc			= use_hits and false	-- (false)!M! Hit NPCs do not reach a hideout during blowouts. Causes many dead NPCs
+blowout_rad_val		= 0.05					-- (0.05)  Hit radiation level during blowout when actor unprotected, 0 = none, >=1 = max (death)
+horror_hit			= use_hits and true		-- (true)  Hits actor during Hell Hour
+meet_hit			= use_hits and true		-- (true)  Hits actor on meeting an NPC with a bad reputation
+sleep_hit			= use_hits and true		-- (true)  Hits actor on waking up
+wound_hit			= use_hits and true		-- (true)  Hits NPCs and creatures after getting wounded
+death_hit			= use_hits and true		-- (true)  Hits NPCs and creatures after death, lifting the pelvis slightly
+animation_hit		= use_hits and true		-- (true)  Hits NPCs and creatures, who rotate/bend when wounded
+alcohol_hit			= use_hits and true		-- (true)  Hits actor when drunk
+artefact_hit		= use_hits and true		-- (true)  Hits actor when picking up hot artefacts
+art_hit_multiplier	= 1						-- (1)     Intensity of hit from artefacts when artefact_hit = true. 1 to 100
+teleport_hit		= use_hits and false	-- (false) Causes actor to rotate when teleported
+mutator_hit			= use_hits and true		-- (true)  Hits actor on transmutator effect
+radiation_hit		= use_hits and true		-- (true)  Hits actor when radiation level is high
+zavis_hit			= use_hits and false	-- (false) Hits NPC on final removal
 
 --------------------------------GAMEPLAY DIFFICULTY----------------------------------------------------------
-cave_no_big_electros = false	-- (false) removes the 4 large Electro anomalies in the Cave
-cave_hard			= true		-- (true)!M! if true, then more and stronger creatures appear, but extra artefacts will spawn as a reward. False reduces number and strength of creatures
-heli_attack			= false		-- (false) Creates helicopter attacks on player
+cave_no_big_electros = false	-- (false) Removes the four large Elektro anomalies in the Cave
+cave_hard			= true		-- (true)  !M! If true, then more and stronger creatures appear, but extra artefacts will spawn as a reward. 'false' reduces number and strength of creatures
+heli_attack			= false		-- (false) Creates helicopter attacks on actor
 default_sleep		= false		-- (false) Sleeping bags (matras) and beds use default sleep, or sleep any time, except for Hell Hour and blowouts
 die_in_sleep		= false		-- (false) When true, you can die in your sleep from starvation, bleeding, and radiation
-guns_can_explode	= true		-- (true) If false then they will malfunction instead
-head_bob			= true		-- (true) Initial setting. Can be changed in-game in Advanced Options
-head_sway_power		= 0.4		-- (0.4)  Amount of camera inertia to apply for sway and bob
-loadout_rand_cond	= true		-- (true) randomly sets the NPC load out weapons/suit conditions between 80 and 100%
-loadout_min_cond	= 80		-- (80) The minimum condition allowed if the above is true, range: 0 - 99  									--109980
-loadout_ammo_count	= 200		-- (200) Rounds of ammo to give from loadout. Excess rounds removed when NPC dies						--109981
-loadout_ammo_loot	= 20		-- (20) Max rounds of ammo of each type to leave when NPC dies. (random) range: 0 to 100					--109989
-radiation_factor	= 1.0		-- (1.0) Multiplier for radiation delta. 0.0 is the same as Invulnerable mode. The higher the number, the faster the rise
-zombie				= true		-- (true)  Player can be zombiefied (true - on, false - off)
+guns_can_explode	= true		-- (true)  If 'false' they malfunction instead
+head_bob			= true		-- (true)  Initial setting. Can be changed in-game in Advanced Options
+head_sway_power		= 0.4		-- (0.4)   Amount of camera inertia to apply for sway and bob
+loadout_rand_cond	= true		-- (true)  Randomly sets the NPC load out weapons/suit conditions between 80 and 100%
+loadout_min_cond	= 80		-- (80)    The minimum condition allowed if the above is true. Range: 0 - 99  								--109980
+loadout_ammo_count	= 200		-- (200)   Rounds of ammo to give from loadout. Excess rounds are removed when NPC dies						--109981
+loadout_ammo_loot	= 20		-- (20)    Max rounds of ammo of each type to leave when NPC dies. (random) range: 0 to 100					--109989
+radiation_factor	= 1.0		-- (1.0)   Multiplier for radiation delta. 0.0 is the same as Invulnerable mode. The higher the number, the faster the rise
+zombie				= true		-- (true)  Actor can be zombiefied (true - on, false - off)
 invisible			= true		-- (true)  Use of invisible suits (true - on, false - off)
-teleporter_use		= true 		-- (true)  Using smart hand teleporters (true - on, false - off)
-effector_spawn		= false		-- (false)!M!  Spawn a group of bloodsuckers close by, whenever obtaining an infoportion about the presence of quest items (true - on, false - off)
-night_creatures		= true		-- (true) turns random 'creatures of the night' on/off. Around midnight, they only spawn if you are actually present
-hits_to_kill_invuln	= 20		-- (20) Hit threshold to kill an 'invulnerable' if he becomes mortal by the quest conditions
-hits_to_head_invuln	= 1			-- (1) Hits_to_kill_invuln/hits_to_head_invuln = number of hits awarded for a head shot, (5/1=5) = 1 to 2 head shots
-check_bad_weapons	= true		-- (true) Checks quest weapons for condition before an NPC will accept it
-hardcore_mobs		= false		-- (false) Increases the number of creatures in a dynamic mob by hardcore_mobs_mult
-hardcore_mobs_mult	= 2.0		-- (2.0) If 'hardcore_mobs' is true, then multiply spawn result by this value	--109996
-spawn_esc_dog_rush	= false		-- (false) causes CTD on going offline in low memory. Solution pending
-spawn_thermos_inside = false	-- (false) spawns big Thermos flasks inside the base, instead of outside
-actor_idle_delay	= 200		-- (200) 109999, game seconds before Level-up 1 and upwards can spawn cretaures and enemies (0 = off) --109990
-actor_idle_dist		= 10		-- (10) 109999, moved less than 10 meters
+teleporter_use		= true 		-- (true)  Use of smart hand teleporters (true - on, false - off)
+effector_spawn		= false		-- (false) !M! Spawn a pack of bloodsuckers close by, whenever you obtain an infoportion about the presence of quest items (true - on, false - off)
+night_creatures		= true		-- (true)  Turns random 'creatures of the night' on/off. Around midnight, they only spawn if you are actually present
+hits_to_kill_invuln	= 20		-- (20)    Hit threshold to kill an 'invulnerable' if he becomes mortal by the quest conditions
+hits_to_head_invuln	= 1			-- (1)     hits_to_kill_invuln/hits_to_head_invuln = number of hits awarded for a head shot, (5/1=5) = 1 to 2 head shots
+check_bad_weapons	= true		-- (true)  Checks quest weapons for condition before an NPC will accept it
+hardcore_mobs		= false		-- (false) Increases the number of creatures in a dynamic pack by hardcore_mobs_mult
+hardcore_mobs_mult	= 2.0		-- (2.0)   If 'hardcore_mobs' is true, then multiply spawn result by this value	--109996
+spawn_esc_dog_rush	= false		-- (false) (Currently causes CTD on going offline in low memory. Solution pending)
+spawn_thermos_inside = false	-- (false) Spawns large Thermos flasks inside the base area, instead of outside
+actor_idle_delay	= 200		-- (200)   109999, game seconds before Level-up 1 and upwards can spawn creatures and enemies (0 = off) --109990
+actor_idle_dist		= 10		-- (10)    109999, moved less than 10 metres
 
 ---------------------------------REPAIR KIT---------------------------------------------------
-max_small_parts = 45			-- (45) 109999, Small arms salvaged repair parts
-max_large_parts = 55			-- (55) 109999, Long guns salvaged repair parts count
-max_armor_parts = 75			-- (75) 109999, Armour salvaged repair parts count
+max_small_parts = 45			-- (45)   109999, Small arms salvaged repair parts
+max_large_parts = 55			-- (55)   109999, Long guns salvaged repair parts count
+max_armor_parts = 75			-- (75)   109999, Armour salvaged repair parts count
 min_to_repair = 0.05			-- (0.05) 109998, Needs to be at least this condition to be repairable
 max_to_repair = 0.95			-- (0.95) 109998, Needs be less than this condition to be repairable
-enemy_near_check = true			-- (true) 109999, prevents using kit when enemy are near
-enemy_check_radius = 120		-- (120) 109999, Maximum distance to scan around actor
-enemy_check_distance = 20		-- (20) 109999, If enemy is this close, then prevents kit use
+enemy_near_check = true			-- (true) 109999, Prevents using your repair kit when an enemy is close
+enemy_check_radius = 120		-- (120)  109999, Maximum distance to scan around actor
+enemy_check_distance = 20		-- (20)   109999, If enemy is this close, then use of your repair kit is prevented
 
 ---------------------------------MONEY OPTIONS------------------------------------------------
 --// for decoder and loot items on corpses
-money_decoder		= true		-- (true) finds money on NPCs. Default true = on
-money_scarce		= true		-- (true) Money is scarce on NPCs when true, and gets scarcer with rank/level increases
-loot_option			= 1			-- (1)!M! Mode for random loot on corpses. 0 = no loot, 5 = max loot rand(1-6), 1 = default rand(1-2)
+money_decoder		= true		-- (true) Finds money on NPCs. Default 'true' = on
+money_scarce		= true		-- (true) Money is scarce on NPCs when 'true', and gets scarcer with rank/level increases
+loot_option			= 1			-- (1)!M! Mode for random loot on corpses. 0 = no loot, 5 = max loot random (1-6), 1 = default random (1-2)
 
 --------------------------------DYNAMIC SPAWNS------------------------------------------------
---// these are created on level entry and removed on level change, this reuses same memory allocs
+--// These are created on level entry and removed on level change. This reuses same memory allocations
 use_fog				= true		-- (true) Poisonous fog
 use_swamp_mist		= true		-- (true) Swamp mist
-use_smoke			= true		-- (true) Smoke, cigs, bar
+use_smoke			= true		-- (true) Smoke, cigarettes, bar
 use_campfire_smoke	= true		-- (true) Smoke around outdoor camp fires
 use_heat_vapors		= true		-- (true) Small vapours rising
 use_heat_distorts	= true		-- (true) Large heat waves
@@ -264,60 +265,59 @@ use_random_mutants	= true		-- (true) TB3D randomly occurring wolves, zombies, ch
 use_dyn_cars		= true		-- (true) TB3D quad ATVs and dune buggies in some areas
 
 -----------------------DYNAMIC AMBIENT SOUNDS-----------------------------------------------
-swamp_sounds		= true		-- (true) Sounds of frogs and crickets in marshes
+swamp_sounds		= true		-- (true) Sounds of frogs and crickets in marshes enabled
 cooling_sounds		= true		-- (true) Ambient ventilator system sounds in indoor levels
 
 -----------------------------24HR CLOCK----------------------------------------------------
---// day_start and day_end dictate when environment changes, like camp fires, occur
+--// day_start and day_end dictate the time that environment changes, like camp fires, occur
 day_start			= 4			--(04:00)am - day starts at this hour
 day_end				= 19		--(19:00)pm - day ends after this hour
 
 ------------------------------ANOMALIES------------------------------------------------
 --// Anomalies are now spawned based on player free play level/rank, not difficulty.
-least_anomolies			= false		-- (false) Minimal anomalies spawned (skips random anoms), overrides hardcore anomalies
+least_anomolies			= false		-- (false) Minimal anomalies spawned (skips random anomalies), overrides hardcore_anomalies
 hardcore_anomolies		= false		-- (false) Starts at Level 3, but ignored when 'least anomalies' = true
-easy_anomolies			= false		-- (false) Spawns only easy to detect anomalies when true, ignored when least anomalies = true
+easy_anomolies			= false		-- (false) Spawns only easy to detect anomalies when 'true', ignored when least_anomalies = true
 Cadet_level_anomolies	= false		-- (false) Spawns at cadet rank only, and fewer spawned
 
 ------------------------------ARTEFACTS---------------------------------------------------
---dyn_arts_always		= false		-- (false)!M! 110001, <OBSOLETE> Wait until Level-up 1 before removing and regenerating arts
-arts_total			= 20		-- (20)!M! 109976. Total allowable artefacts respawned per level
-arts_max			= 5			-- (5)!M! 109976. se_zones: Anomaly artefact respawn limit. Range: 1 to 100
-less_arts			= false		-- (false)!M! AMK random artefacts. Reduces them by half when true
-give_art_on_death	= true		-- (true) !M! 109999. Randomly gives an artefact on death, based on community, after Brain Scorcher turned off
+arts_total			= 20		-- (20)   !M! 109976. Total allowable artefacts respawned per level
+arts_max			= 5			-- (5)    !M! 109976. se_zones: Anomaly artefact respawn limit. Range: 1 to 100
+less_arts			= false		-- (false)!M! AMK random artefacts. Reduces them by half when 'true'
+give_art_on_death	= true		-- (true) !M! 109999. Randomly gives an artefact on death, based on community, after the Brain Scorcher is turned off
 
 ------------------------------BLOWOUT and HELL HOUR OPTIONS---------------------------------------------------------
-run_blowout_pp		= true		-- (true)!M!  Emissions occur regularly. False will stop emissions totally
-zombie_team			= false		-- (false)!M! Transform NPCs to zombies when true. Causes CTDs, so leave as false
-surge_day_effect	= true		-- (true)!M! COP-style blowout effect. Causes errors in low memory situations
-phantom_spawn 		= true		-- (true)!M! Spawn phantoms on the level during blowouts and horror (true - on, false - off). They sometimes spawn with bad GV.
+run_blowout_pp		= true		-- (true) !M! Emissions occur regularly. 'False' will stop emissions totally
+zombie_team			= false		-- (false)!M! Transform NPCs to zombies when 'true'. Causes CTDs, so leave as 'false'
+surge_day_effect	= true		-- (true) !M! COP-style blowout effect. Causes errors in low memory situations
+phantom_spawn 		= true		-- (true) !M! Spawn phantoms on the level during blowouts and horror (true - on, false - off). They sometimes spawn with bad Game Vertex
 --// time and phase: next blow minutes = floor(blow_time_basis + (math_random()*blow_time_shift) - (blow_time_shift/2))
 blow_time_basis		= 1440		-- (1440)= 24 hrs, the base number of minutes between releases (default = 24 to 28 hours)
-blow_time_shift		= 360		-- (360)= 6 hrs, random (if not 0) shift in minutes between releases
+blow_time_shift		= 360		-- (360)=   6 hrs, random (if not 0) shift in minutes between releases
 --// duration = blow_phase_basis + (math_random()*blow_phase_shift) - (blow_phase_shift/2)
 --// duration ranged between: blow_phase_basis and blow_phase_max
-blow_phase_basis	= 2			-- (2) The base duration of one phase output (only during the release of five phases) in the short game
-blow_phase_shift	= 3			-- (3) maximum-phase output (only during the release of five phases) in the short game
-blow_phase_max		= 3			-- (3) number is used to adjust blow_phase_basis, if equal to 0, while one phase is = blow_phase_basis
-blow_enemy_dist		= 300		-- (300) Enemy must be less than this distance to attack during blowout range: 100 to 400
---// HELL HOUR, 20% chance novice to 50% chance master, 50% chance collector
+blow_phase_basis	= 2			-- (2)    The base duration of one phase output(only during the release of five phases)in the short game
+blow_phase_shift	= 3			-- (3)    Maximum-phase output (only during the release of five phases) in the short game
+blow_phase_max		= 3			-- (3)    Number is used to adjust blow_phase_basis, if equal to 0, while one phase is = blow_phase_basis
+blow_enemy_dist		= 300		-- (300)  Enemy must be less than this distance to attack during blowout range: 100 to 400
+--// HELL HOUR, 20% chance Novice to 50% chance Master, 50% chance Collector
 hell				= true		-- (true) Time of Horror (Hell Hour)(true - on, false - off)
-hell_spawn			= true		-- (true)!M! Spawn monsters on the level during the Horror (true - on, false - off)
-hell_hour_alarm		= true		-- (true) Sounds siren or distortion (default) at start of Hell Hour. False = off
+hell_spawn			= true		-- (true) !M! Spawn monsters on the level during the Horror (true - on, false - off)
+hell_hour_alarm		= true		-- (true) Sounds siren or distortion (default) at start of Hell Hour. 'false' = off
 
 ----------------------------------------- GPS/PDA -------------------------------------------------------------
-habar_list_mode			= true		--(true) On/off mode beacon to show the list of items at the hiding place
-is_show_quantity		= true		--(true) Skip count items
-is_update_on_time		= true		--(true) Updates the list on the plan every 3 minutes (game)
-is_color_and_sort_list	= true		--(true) Sort and list items in color
-activity_time			= 0			--(0) while the beacon is without activity (in hours). 0 - activity not required.
-warning_time			= 6			--(6) Number of hours a warning message about low battery will be displayed. 0 - Do not warn me.
-warning_icons_time		= 6			--(6) Number of hours before the 'low battery' display changes, in terms of color of the icon cache on red. 0 - no change.
-auto_recharge			= true		--(true) The exchange of things with the cache, activity battery beacon. Otherwise the need to recharge the beacon is rearranged.
-is_set_label_on_npc		= true		--(true) puts a mark on the NPC in the sale of his beacon
-is_show_health			= false		--(false) skips the terms of the active state of a Stalker (alive/dead)
-is_warning_on_death		= true		--(true) warns if 'death marked a Stalker'
-max_display_lines		= 38		--(38) lines of comments before scrolling
+habar_list_mode			= true		--(true)  On/off mode GPS beacon to show the list of items at the stash
+is_show_quantity		= true		--(true)  Skip the item count at the stash
+is_update_on_time		= true		--(true)  Updates the list on the plan every 3 minutes (game time)
+is_color_and_sort_list	= true		--(true)  Sort and list items in color
+activity_time			= 0			--(0)     When the beacon is without activity (in hours). 0 - activity not required.
+warning_time			= 6			--(6)     Number of hours a warning message about low battery will be displayed. 0 - Do not warn me
+warning_icons_time		= 6			--(6)     Number of hours before the 'low battery' display changes, in terms of color of the icon cache on red. 0 - no change
+auto_recharge			= true		--(true)  The exchange of items with the cache, activity battery beacon. Otherwise the need to recharge the beacon is rearranged
+is_set_label_on_npc		= true		--(true)  Puts a mark on the NPC in the sale of his beacon
+is_show_health			= false		--(false) Skips the terms of the active state of a Stalker (alive/dead)
+is_warning_on_death		= true		--(true)  Warns if 'death marked a Stalker'
+max_display_lines		= 38		--(38)    Lines of comments before scrolling
 
 ---------------------------------------- BTR -----------------------------------------------------------------------
 btr_min_fire_time		= 0			--(0)
@@ -327,77 +327,79 @@ btr_fast_update_time	= 1000		--(1000)
 --===================================SYSTEM======================================================================
 
 --------------------------ENVIRONMENT---------------------------------------
---// !M! fires always on instead of just at night, does not effect indoor/cave as they are always on
-fires_always_on		= false		-- (false)!M! fires burn from 7pm to 6am - should use 'true' for static lighting
-heavy_rain_factor	= 0.5		-- (0.5) range: 0 - 1.00, Fires will turn on in heavy rain as well as some AI will be effected
+--// !M! Fires always on, instead of just at night. Does not affect indoor/cave, as they are always on
+fires_always_on			= false		-- (false) !M! Fires burn from 7pm to 6am - should always use 'true' for 'Static Lighting'
+heavy_rain_factor		= 0.5		-- (0.5)   Fires will come on in heavy rain, as well as some AI being affected - range: 0 - 1.00
 --// Difficulty = (0.5 thru 1.5) for STALKER and (1.5 through 5.0) for Collector
-coefficient_factor	= 10000		-- (10000) !M! koef_ratio = 1/factor, result = difficulty * (rank * koef_ratio), 109990 to stretch accross 10 level_ups
+coefficient_factor		= 10000		-- (10000) !M! koef_ratio = 1/factor, result = difficulty * (rank * koef_ratio), 109990 to stretch across 10 level_ups
 
 -------------------------ARENA OPTIONS	109987-------------------------------------
-time_open	= 22	-- (22) Time (h) of Arena opening. min = 0, max = 23
-time_close	= 7		-- (7) Time (h) of Arena closing. min = 0, max = 23, NOTE: The Arena custodian's dialogue will still say 2200 to 0600
-delay_min	= 0		-- (0) minimum number of days between the opening and closing arena, min = 0
-delay_max	= 2		-- (2) maximum number of days between the opening and closing arena, min = 1
-delay_mult	= 4		-- (4) number of days before the opening of a complete list of mutants, min = 0
-stake1		= 500	-- (500) rate number 1 when betting (RR)
-stake2		= 1000	-- (1000) bet number 2 in the para-mutual (RR)
-stake3		= 2000	-- (2000) rate number 3 when betting (RR)
-perc_min	= 30	-- (30) minimum percentage of income from the amount of bets
-perc_max	= 100	-- (100) the maximum percentage of income from the amount of bets
+time_open	= 22	-- (22)   Time (h) of Arena opening, min = 0, max = 23
+time_close	= 7		-- (7)    Time (h) of Arena closing, min = 0, max = 23. NOTE: The Arena custodian's dialogue will still state 2200 to 0600 as the standard opening times
+delay_min	= 0		-- (0)    Minimum number of days between opening and closing the Arena. Minimum = 0
+delay_max	= 2		-- (2)    Maximum number of days between opening and closing the Arena. Minimum = 1
+delay_mult	= 4		-- (4)    Number of days before having a complete list of creatures again. Minimum = 0
+stake1		= 500	-- (500)  Rate number 1 when betting (RR)
+stake2		= 1000	-- (1000) Bet  number 2 in the para-mutual (RR)
+stake3		= 2000	-- (2000) Rate number 3 when betting (RR)
+perc_min	= 30	-- (30)   Minimum percentage of income from the amount of bets
+perc_max	= 100	-- (100)  The maximum percentage of income from the amount of bets
 --// Arena lights
--- 0 = Use default lights (should always be used with static lighting)
+-- 0 = Use default lights (should always be used with 'Static Lighting')
 -- 1 = Center row: 3 lamps
 -- 2 = Outer rows: 8 lamps
 -- 3 = Center and outer rows: 11 lamps
--- 4 = Outer rows and center row of 3 dim rotating: 11 lamps
+-- 4 = Outer rows, and center row of 3 dim rotating lamps: 11 lamps
 -- 5 = Emergency lighting only: 3 lamps
 -- 6 = Randomly picked (1 thru 5) per fight
-aem_light_style		= 6			-- (6) Set on start of fight
+aem_light_style		= 6			-- (6)    Set on start of fight
 aem_light_shadows	= true		-- (true) !M! Ignored if style = 0
 aem_dim_ambient		= true		-- (true) Reduces ambient and global lighting for deeper shadows
 aem_light_global	= 0.73		-- (0.73) If aem_dim_ambient = true, range: -1.00 - 3.00, maximum amount of light
-aem_light_ambient	= 0.37		-- (0.37) If aem_dim_ambient = true, range: 0 - 3.00, amount of light in shadows/faces
+aem_light_ambient	= 0.37		-- (0.37) If aem_dim_ambient = true, range: 0 - 3.00, amount of light on shadows/faces
 
 -------------------------MUSIC OPTIONS----------------------------------
---// bar music default, 0 = Retro, 1 = Rock, 2 = Rock'n'Roll, 3 = Modern
+--// Bar music default    0 = Retro, 1 = Rock, 2 = Rock'n'Roll, 3 = Modern
 bar_music			= 1			-- (1)
 volume_on_pause		= 0.5		-- (0.5) Range: 0 - 1.0, Music volume while in Pause menu 109982
 
 ------------------------MINIMAP OPTIONS----------------------------------
-display_compass		= true		-- (true) compass heading displayed in minimap
+display_compass		= true		-- (true) Compass heading displayed on minimap
+display_enemy_count	= true		-- (false) Displays number of live enemy npc are nearby	--110004
+display_enemy_range	= 100		-- (100) Radius around actor to count enemies			--110004
 
 -----------------------!M! COP Quick Keys----------------------------------
 --// NOTE: NOT FUNCTIONING IN BETA,   numpad +/- will still turn HUD on/off
-CopKeys				= false		-- (false) not 100% as on_key callback not functional
+CopKeys				= false		-- (false) Not 100% as on_key callback not functional
 
 ------------------------MENU DISPLAY ---------------------------------------
-menu_char_height	= 20		-- (20) for file list spacing
-menu_date_start		= 330		-- (330) start column for file date listing
-menu_show_keys		= false		-- (false) displays Modders' keys on Menu screen
+menu_char_height	= 20		-- (20)    For file list spacing
+menu_date_start		= 330		-- (330)   Start column for file date listing
+menu_show_keys		= false		-- (false) Displays Modders' keys on Menu screen
 
 --------------------------SERVICES-------------------------------------------
-autosave_wait_time		= 14	-- (14) game seconds to wait before saving. Default is set to not break audio dialogues
-force_garbage_collect	= true	-- (true) forces a garbage collection on level init
+autosave_wait_time		= 14	-- (14)    Game seconds to wait before saving. Default is set to not break any audio dialogues
+force_garbage_collect	= true	-- (true)  Forces a garbage collection on level initialisation
 
 --===========================ADVANCED SYSTEMS===========================================================
---// When night vision kicks in on binoculars and some weapons (DMX default 35)
---// use 'ESC N' to toggle between night time only, and NV at all times
-fov_nv				 = 35		-- (35) Start of night vision in digital binoculars/weapons (max 35, min 10)
-advanced_nightvision = false	-- (false)!M! Not active yet. Colored reticles in shaders still a Work in Progress
+--// When night vision kicks in on binoculars and some weapons (DMX default 35).
+--// Use 'ESC N' to toggle between night time only, and NV at all times
+fov_nv				 = 35		-- (35)    Start of night vision in digital binoculars/weapons (max 35, min 10)
+advanced_nightvision = false	-- (false) !M! Not active yet. Colored reticles in shaders still a 'Work in Progress'
 packet_limit		 = 15000	-- (15000) !M! Player packet limit: packet_limit-1000=critical warning, packet_limit-2000=high warning
 
 -----------------------------DDOF and MBLUR-------------------------------------------------------
 ------------ Initial mode set here. Now an option in game Menu
 --// ignored if use_DX11 = true
-ddof_mode			= 0		-- (0) [startup] dynamic depth of field: 0=off, 1=Motion Blur, 2=Classic, 3=Gaussian
-ddof_kernel_C		= 0.5	-- (0.5) density of the blur samples, classic, range = 0.3 to 0.6
-ddof_kernel_G		= 0.7	-- (0.7) density of the blur samples, Gaussian, range = 0.7 to 1.0
-motion_blur			= 0.4	-- (0.4) replaces setting in user.ltx, 0=off. Also in-game advanced graphics menu: range = 0.0 to 1.0
+ddof_mode			= 0		-- (0) [startup] dynamic depth of field: 0 = Off, 1 = Motion Blur, 2 = Classic, 3 = Gaussian
+ddof_kernel_C		= 0.5	-- (0.5) Density of the blur samples, Classic,  range = 0.3 to 0.6
+ddof_kernel_G		= 0.7	-- (0.7) Density of the blur samples, Gaussian, range = 0.7 to 1.0
+motion_blur			= 0.4	-- (0.4) Replaces setting in user.ltx, 0 = Off. Also in-game advanced graphics menu: range = 0.0 to 1.0
 
 ------------------------------HUD ELEMENTS-------------------------------------------------------
-bio_map_pulse		= true	-- (true) Screen display fades in and out. False = fixed on
+bio_map_pulse		= true	-- (true) Screen display fades in and out. 'false' = display is fixed on
 biodetect_all		= true	-- (true) Detects all creatures without parts on belt
-bioradar_max_count	= 60	-- (60) Maximum number of objects to display. Limited to 100 internally
+bioradar_max_count	= 60	-- (60)   Maximum number of objects to display. Limited to 100 internally
 
 -----------------------------AUTO LEVEL ADJUST------------------------------------------------
 auto_levels			= 0		-- (0) If set to 1 then the render settings will be automatically
@@ -413,59 +415,59 @@ level_set_max		= 100	-- (100) If auto_levels = 1 then do not set any level past 
 -----------------------------GRAPHICS DEFAULT SETTINGS-------------------------------------------
 --// 109981 Called from PDA to reset advanced settings to engine defaults
 --// PDA Commands: reset Sun, reset HDR, reset Gloss, reset Parallax, reset Bloom, reset ALL
-sun_ambient			= 1.8		--(1.8)		range: 0 - 3.00. Amount of sunlight on shadows and faces
+sun_ambient			= 1.8		--(1.8)		Range: 0 - 3.00. Amount of sunlight on shadows and faces
 hdr_lowlum_indoor	= 0.0001	--(0.0001)	Creates proper mood lighting indoors. Too much ruins several effects
 hdr_hilum_indoor	= 0.06		--(0.06)	Creates proper mood lighting indoors. Too much ruins several effects
-parallax_height		= 0.02		--(0.02)	Range: 0 - 0.500, the amount of depth in textures
+parallax_height		= 0.02		--(0.02)	The amount of depth in textures. Range: 0 - 0.500
 if use_DX11 then			--109996
-	sun_intensity		= 1.5		--(1.5)		range: -1.00 - 3.00 Maximum amount of sunlight on the world
-	bloom_intensity		= 0.5		--(0.5)		range: 0.50 - 2.00 The amount of light injected at max bloom
-	bloom_threshold		= 0.8		--(0.8)		range: 0 - 1.000 When bloom starts to occur
-	bloom_speed			= 10.0		--(10.0)	range: 1.0 - 100.0 How quickly the bloom effect comes and goes
-	hdr_midpoint		= 1.0		--(1.0)		range: 0 - 2.00 At what point of light change to react to (centered is normal)
+	sun_intensity		= 1.5		--(1.5)		range: -1.00 - 3.00    Maximum amount of sunlight on the world
+	bloom_intensity		= 0.5		--(0.5)		range: 0.50 - 2.00     The amount of light injected at max bloom
+	bloom_threshold		= 0.8		--(0.8)		range: 0 - 1.000       When bloom starts to occur
+	bloom_speed			= 10.0		--(10.0)	range: 1.0 - 100.0     How quickly the bloom effect comes and goes
+	hdr_midpoint		= 1.0		--(1.0)		range: 0 - 2.00        At what point of light change to react to (centered is normal)
 	hdr_lowlum			= 0.3		--(0.3)		range: 0.0001 - 1.0000 Amount of light to inject when looking at dark areas
-	hdr_hilum			= 0.7		--(0.7)		range: 0 - 1.000 Amount of light to inject when looking at light areas
-	hdr_adapt			= 1.9		--(1.9)		range: 0.01 - 10.000 Eye rate of change to light and darkness
-	gloss_factor		= 2.0		--(1.0)		range: 0 - 10.0 Produces shiny/wet surfaces (multiplied by rain_factor+1)
+	hdr_hilum			= 0.7		--(0.7)		range: 0 - 1.000       Amount of light to inject when looking at light areas
+	hdr_adapt			= 1.9		--(1.9)		range: 0.01 - 10.000   Eye rate of change to light and darkness
+	gloss_factor		= 2.0		--(2.0)		range: 0 - 10.0        Produces shiny/wet surfaces (multiplied by rain_factor+1)
 else
-	sun_intensity		= 1.5		--(1.5)		range: -1.00 - 3.00 Maximum amount of sunlight on the world
-	bloom_intensity		= 0.5		--(0.5)		range: 0.50 - 2.00 The amount of light injected at max bloom
-	bloom_threshold		= 0.8		--(0.8)		range: 0 - 1.000 When bloom starts to occur
-	bloom_speed			= 10.0		--(10.0)	range: 1.0 - 100.0 How quickly the bloom effect comes and goes
-	hdr_midpoint		= 1.0		--(1.0)		range: 0 - 2.00 At what point of light change to react to (centered is normal)
+	sun_intensity		= 1.5		--(1.5)		range: -1.00 - 3.00    Maximum amount of sunlight on the world
+	bloom_intensity		= 0.5		--(0.5)		range: 0.50 - 2.00     The amount of light injected at max bloom
+	bloom_threshold		= 0.8		--(0.8)		range: 0 - 1.000       When bloom starts to occur
+	bloom_speed			= 10.0		--(10.0)	range: 1.0 - 100.0     How quickly the bloom effect comes and goes
+	hdr_midpoint		= 1.0		--(1.0)		range: 0 - 2.00        At what point of light change to react to (centered is normal)
 	hdr_lowlum			= 0.3		--(0.3)		range: 0.0001 - 1.0000 Amount of light to inject when looking at dark areas
-	hdr_hilum			= 0.7		--(0.7)		range: 0 - 1.000 Amount of light to inject when looking at light areas
-	hdr_adapt			= 1.9		--(1.9)		range: 0.01 - 10.000 Eye rate of change to light and darkness
-	gloss_factor		= 2.0		--(1.0)		range: 0 - 10.0 Produces shiny/wet surfaces (multiplied by (rain_factor+1))
+	hdr_hilum			= 0.7		--(0.7)		range: 0 - 1.000       Amount of light to inject when looking at light areas
+	hdr_adapt			= 1.9		--(1.9)		range: 0.01 - 10.000   Eye rate of change to light and darkness
+	gloss_factor		= 2.0		--(2.0)		range: 0 - 10.0        Produces shiny/wet surfaces (multiplied by (rain_factor+1))
 end
 
 use_sun_advanced		= true		--(true)	Shows advanced sun controls in Menu
 if use_DX11 then					--109992	Added Meltac DX11 support
-	sun_near			= 50		--(50.0)	range: 1.0 - 50.0 Distance sun is from world surface
-	sun_near_border		= 0.98		--(0.98)	range: 0.5 - 1.00 Distance multiplier of view fulcrum (eye origin)
-	gi_clip				= 0.0065	--(0.0065)	range: 0 - 0.100 Global Illumination clipping range
+	sun_near			= 50		--(50.0)	range: 1.0 - 50.0      Distance sun is from world surface
+	sun_near_border		= 0.98		--(0.98)	range: 0.5 - 1.00      Distance multiplier of view fulcrum (eye origin)
+	gi_clip				= 0.0065	--(0.0065)	range: 0 - 0.100       Global Illumination clipping range
 else
-	sun_near			= 50		--(50.0)	range: 1.0 - 50.0 Distance sun is from world surface
-	sun_near_border		= 0.98		--(0.98)	range: 0.5 - 1.00 Distance multiplier of view fulcrum (eye origin)
-	gi_clip				= 0.0065	--(0.0065)	range: 0 - 0.100 Global Illumination clipping range
+	sun_near			= 50		--(50.0)	range: 1.0 - 50.0      Distance sun is from world surface
+	sun_near_border		= 0.98		--(0.98)	range: 0.5 - 1.00      Distance multiplier of view fulcrum (eye origin)
+	gi_clip				= 0.0065	--(0.0065)	range: 0 - 0.100       Global Illumination clipping range
 end
-gi_refl					= 0.9		--(0.9)		range: 0.001 - 0.990 Global Illumination reflective light in shadows
+gi_refl					= 0.9		--(0.9)		range: 0.001 - 0.990   Global Illumination reflective light in shadows
 
---DOES NOT WORK gi_depth		= 1			--(1)		range: 1 - 5 Global Illumination depth multiplier
---DOES NOT WORK gi_photons		= 16		--(16)		range: 8 - 256 Global Illumination photons that penetrate shadows
+--DOES NOT WORK gi_depth		= 1			--(1)	range: 1 - 5       Global Illumination depth multiplier
+--DOES NOT WORK gi_photons		= 16		--(16)	range: 8 - 256     Global Illumination photons that penetrate shadows
 
 use_soft_effects	= false		--(false)	NOT AVAILABLE 109995 - will add soft particles and water to the advanced graphics option (unstable att)
 
-force_r2_hw			= false		--(false)	Set to true if you know you have an R2 hardware-capable graphics card, but Menu always shows static lighting
+force_r2_hw			= false		--(false)	Set to true if you know you have an R2 hardware-capable graphics card, but Menu always displays 'Static Lighting'
 											--NVIDIA update .5306 broken: always returns false 109989. 109996, fixed in update .5362
 
 -----------------------------DELTA TIME SLICE THRESHOLDS---------------------------------------
 --// Below delta_lowest = slice 1. Each slice level causes more
 --// non-crucial services to be skipped until it lowers. Edited 110000
 delta_critical		= 100	--(100) Slice = 5
-delta_moderate		= 80	--(80) Slice = 4
-delta_low			= 60	--(60) Slice = 3
-delta_lowest		= 50	--(50) Slice = 2
+delta_moderate		= 80	--(80)  Slice = 4
+delta_low			= 60	--(60)  Slice = 3
+delta_lowest		= 50	--(50)  Slice = 2
 
 delta_motivator		= 800	--(800) 110000, update time slice for all alife
 
@@ -473,9 +475,9 @@ delta_motivator		= 800	--(800) 110000, update time slice for all alife
 max_companions_rt	= 20	--(20) Total number of active timers (rt1-rt20)
 
 --=========================GAME START FUNCTIONS==========================================
-zaton_lost			= false	--(false) Sends player to Zaton on second visit to Agroprom under secret place
+zaton_lost			= false	--(false) Sends actor to Zaton on second visit to Agroprom under secret place
 
---// Separate sections for STALKER starts and The Collector start
+--// Separate sections for 'STALKER' starts and 'The Collector' start
 -------------------------------STALKER SECTION ------------------------------------
 function stalker_start()
 	if give_items_on_spawn then
@@ -494,14 +496,14 @@ function stalker_spawn()
 end --stalker spawn
 
 -------------------------------- COLLECTOR SECTION --------------------------------
-function collector_spawn()	-- Given each time spawn on a level
-	--amk.spawn_in_inv("razgruzka",1)  --Ammo vest, was given by Fox. Not useful, so off by default
+function collector_spawn()					-- Given each time spawn on a level
+	--amk.spawn_in_inv("razgruzka",1)		--Ammo vest, was given by Fox. Not useful, so off by default
 	--amk.spawn_in_inv("fake_wpn_coujaf",1)	--Exotic Knife, StarGate?
-	--amk.spawn_in_inv("wpn_fs",1)	--the default start handgun
+	--amk.spawn_in_inv("wpn_fs",1)			--the default start handgun
 end
 
 --==================================DEBUG SECTION================================================--
-------------- Should stay off in normal play except for abort messages ----------------------------
+------------- Should stay off in normal play, except for abort messages ----------------------------
 Global_Debug = false		--Turns on upper level debug info. Can be toggled in-game with 'ESC 0'
 ------ In-game messages for minor errors. Useful for modders who work with schemes ----------------
 local use_all			= false				--TURNS ON ALL MESSAGES BELOW
@@ -516,10 +518,10 @@ use_environment_message	= use_all or false	--Info on day/night changes and actio
 use_lc_message			= use_all or false	--Info on level changers, in log
 use_sak_message			= use_all or false	--Info on sak inventory actions, in log
 use_logic_message		= use_all or false	--Info on xr logic actions, in log
-use_smh1_message		= use_all or false	--Info on smart_terrain general actions, in log, keep off
-use_smh2_message		= use_all or false	--Info on xr_gulag detailed actions, in log, keep off
+use_smh1_message		= use_all or false	--Info on smart_terrain general actions, in log. Keep off
+use_smh2_message		= use_all or false	--Info on xr_gulag detailed actions, in log. Keep off
 use_smh3_message		= use_all or false	--Info on se_stalker detailed actions and extra checks, in log. Keep off
-use_combat_message		= use_all or false	--Info on hit/death callbacks. Good for tweaking weapons, damages...
+use_combat_message		= use_all or false	--Info on hit/death callbacks. Good for tweaking weapons and damages...
 use_rxai_message		= use_all or false	--Info on extended AI functions, in log
 use_news_message		= use_all or false	--Info on news-related functions, in log
 use_counter_message		= use_all or false	--Shows the total, increments and decrements to creature counts
@@ -539,7 +541,7 @@ show_news_spots			= false		--(false) Shows a red spot where news occurred, but m
 use_fast_news_debug		= false		--(false) Speeds up news, and adds more info for testing
 log_game_stats			= false		--(false) Logs actor condition at intervals. Also task and money transactions
 show_hit_actions		= false		--(false) Logs hits made in hit_styles
-show_hit_invulnerable	= false		--(false) Logs hits on invulnerable (only actor kills) and immortal (no one kills) NPCs
+show_hit_invulnerable	= false		--(false) Logs hits on invulnerable (only actor kills) and immortal (nobody kills) NPCs
 use_cleaner_message		= false		--(false) Logs the results of the cleaner
 use_fixer_message		= false		--(false) 110000. Logs items removed by fixer
 show_story_ids			= false		--(false) Logs the active story ID's in spawn registry. 109989
@@ -570,7 +572,7 @@ show_logic_state_calls	= false		--(false) 109999. Shows the logic state being se
 use_state_message		= false		--(false) Logs the transition states of the state manager. Can be a restrictor
 use_setup_message		= false		--(false) Logs the initial smart terrain setup logic on spawn and gulag jobs
 use_smt_message			= false		--(false) Logs the condition for filling a smart
-npc_to_log				= "predbannik_barman"
+npc_to_log				= "radist_open_door_restrictor"
 creature_to_log			= "werewolf"
 smt_to_log				= "esc2_st_fabric"
 
@@ -586,7 +588,7 @@ use_sak_message			= false		--(false) 109999 - Displays Sherstyk's credits as new
 
 ------------------------STAY OFFLINE-------------------------------------------------------------------------7
 test_without_npc		= false		--(false) NPCs will not go online, except for key traders and vehicles
-test_without_creatures	= false		--(false) Creatures will not go online, except crows and some mobs
+test_without_creatures	= false		--(false) Creatures will not go online, except for crows and some packs
 
 --============================== LEGACY SUPPORT =================================================================8
 hit_on_spawn			= false		--(false) Motivates stuck AI. Used on saves started before 109954
@@ -597,10 +599,11 @@ hit_on_spawn			= false		--(false) Motivates stuck AI. Used on saves started befo
 use_level_cleaner		= false		--(false) Integrated cleaner. Removes excess non-protected items when changing levels
 
 --============================ FOR FUTURE USE - DO NOT USE =================================================9
-use_combat_planner		= false		--(false) Adds the planner to the xr_combat binder, not working yet
+use_combat_planner		= false		--(false) Adds the planner to the xr_combat binder. Not working yet
 use_combat_monolith		= false		--(false) Adds the xr_combat_monolith to the xr_combat binder. Still developing/testing
 
-x16_no_zharkas			= true		--(true) 110000, It appears that these cause transition CTDs
+x16_no_zharkas			= true		--(true)  110000, It appears that these cause transition CTDs
+pred_village_trader		= false		--(false) 110003, needs own skin and may be causing ctd on exit
 
 ------------END FILE
 

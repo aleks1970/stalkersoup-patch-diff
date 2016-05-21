@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.7.6 optimized, added force weapon hide, GC on inv close, removed garbagecollect, bioradar and belt size check, translate
-function my_ver() return "1.0.9.9.7.6" end
+-- TB3D 1.1.0.0.0.4 optimized, added force weapon hide, GC on inv close, removed garbagecollect, bioradar and belt size check, translate, inv_count
+function my_ver() return "1.1.0.0.0.4" end
 
 belt = {}					--actually whole inventory, not the belt slots
 belt_id = {}
@@ -12,7 +12,16 @@ local separator = "separator"
 local translate = game.translate_string
 
 local flag
-
+local first_scan
+local inv_count
+--local belt_count
+function get_inv_count()
+	if inv_count then
+		return inv_count
+	else
+		return 0
+	end
+end
 function update()
 	if need_update == true then
 		if TB3D_Modders.use_inventory_message == true and belt_status == true then TB3D_Services.info_alert("belt_status=false") end
@@ -32,7 +41,10 @@ function update()
 		belt_id = {}
 		flag = 0
 		-- Scan tools
+		inv_count = flag
+		--belt_count = flag
 		db.actor:inventory_for_each(scan_inv)
+		if not first_scan then TB3D_Services.packet_alert("BSTALK: actor inventory count["..utils.to_str(inventory.get_inv_count()).."]") first_scan = true end
 		need_update = false
 		-- Remove the separating y element
 		db.actor:inventory_for_each(del_separator)
@@ -72,11 +84,15 @@ function scan_inv(item)
 	if flag == 1 then
 		if slot_item(item) ~= nil then
 			flag = 2
+			return
 		else
 			insert_to_table(belt, section)
 			belt_id[item:id()] = true
+			--belt_count = belt_count + 1
+			return
 		end
 	end
+	inv_count = inv_count + 1
 end
 
 -- Adding a table

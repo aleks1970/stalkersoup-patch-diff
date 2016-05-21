@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.1  HUD for STALKERSOUP NS DMX135  widescrn, compass and delta, btr, adjusted timer, new HUD's aleks1970 *************** -->
+<!-- ************ TB3D 1.1.0.0.0.4  HUD for STALKERSOUP NS DMX135  widescrn, compass and delta, btr, adjusted timer, new HUD's aleks1970, hud_show_enemy *************** -->
 <header>
 	<hud_coord x="0" y="15" width="1024" height="128">
 		<text x="0" y="0" font="graffiti19" r="238" g="238" b="23" a="255" align="r" complex_mode="1"/>
@@ -216,6 +216,9 @@ Selected timers such as the Chernobyl nuclear power plant, top center
 	<hud_show_delta x="130" y="010" width="52" height="52">
 		<text x="0" y="0" font="letterica16" r="0" g="255" b="255" a="255" align="l"/>
 	</hud_show_delta>
+	<hud_show_enemy x="140" y="140" width="30" height="52">
+		<text x="0" y="0" font="letterica16" r="255" g="0" b="0" a="255" align="l"/>
+	</hud_show_enemy>
 	<cs_demo_play x="165" y="735" width="600" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
 		<text font="letterica18" r="240" g="217" b="182" a="255" align="l"/>
 	</cs_demo_play>

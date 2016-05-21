@@ -1,6 +1,6 @@
--- TB3D 1.1.0.0.0.1  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init, get_art_type, net destroy, leave bar alone,
--- generate_anoms, net_spawn
-function my_ver() return "1.1.0.0.0.1" end
+-- TB3D 1.1.0.0.0.4  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init, get_art_type, net destroy, leave bar alone,
+-- generate_anoms, net_spawn, generate_arts
+function my_ver() return "1.1.0.0.0.4" end
 
 --[[-------------------------- variable and table --------------------------]]
 local table_sort=table.sort
@@ -477,13 +477,13 @@ function generate_anoms()
 			elseif TB3D_Modders.hardcore_anomolies == true then
 				forced_rank = 2500
 			end
-			local koef = TB3D_Services.global_koef(flevel, forced_rank)				--109986
-			if not koef or koef < 0.1 then koef = 0.1 end
+			local koef = TB3D_Services.global_koef(flevel, forced_rank)				--109986, 1,2 for stalker and 1 thru 5 for collector
 			if TB3D_Modders.least_anomolies then koef = koef * 0.5 end
-			local min = math_floor(koef * v[1])
+			local min = v[1]														--110004, use difference to prevent inversion
 			if min < 1 then min = 1 end
-			local max = math_floor(koef * v[2])
-			if max <= min then max = min + 1 end
+			local max = v[2] - min
+			max = math_floor(koef * max) + min
+			--TB3D_Services.packet_alert("AMK ANOMS: generate: ["..lname.."] v1["..v[1].."] v2["..v[2].."] min["..min.."] max["..max.."]")
 			local mxx = math_random(min,max)
 			local cnt = 0
 			while cnt < mxx do
@@ -496,10 +496,9 @@ function generate_anoms()
 end
  
 function generate_arts(lname)
-	if TB3D_Services.is_collector(7001) or TB3D_Modders.dyn_arts_always then				--109981, wait for levelup to do dyn arts
+	if TB3D_Services.is_collector(7001) or has_alife_info("otdan_q") then				--110004, wait for levelup or forgotten forest art quest to do dyn arts
 		local existing = bind_det_arts.art_count()
 		local max_arts = TB3D_Modders.arts_total or 20									--109976 per level
-		--if lname == "puzir" and not has_alife_info("otdan_q") then return end			--many arts in quest
 		if level_vertexes[lname] and existing < max_arts then 
 			local v=level_arts[lname]
 			local added = 0
@@ -518,7 +517,7 @@ function generate_arts(lname)
 				end
 			end
 			if added > 0 then
-				if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("amk anoms: added["..utils.to_str(added).."] artefacts") end
+				if TB3D_Modders.use_info_message then TB3D_Services.packet_alert("amk anoms: existing["..utils.to_str(existing).."] added["..utils.to_str(added).."] artefacts") end
 				bind_det_arts.refresh_list()
 			end
 			--generate_test(lname)

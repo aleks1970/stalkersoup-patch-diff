@@ -1,6 +1,6 @@
-;<!-- TB3D 1.0.9.9.9.9 new Collector additions, trader edits by glowworm, ldk edits, removed narod_opt, ald weapons,
+;<!-- TB3D 1.1.0.0.0.4 new Collector additions, trader edits by glowworm, ldk edits, removed narod_opt, ald weapons,
 ; immunities/damages and added conditions.ltx and terrains.ltx, criticals.ltx, ldk, attachable_item,
-; aleks1970; excluded duplicates section, revamped and seperated into includes, new levels, consolidated weapon includes, cleanup, plug ins, ui_enc_locations - aleks1970
+; aleks1970; excluded duplicates section, revamped and seperated into includes, new levels, consolidated weapon includes, cleanup, plug ins, ui_enc_locations - aleks1970, mp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; origin: "People Salsola 2009" from 14.06.
 ; First Adaptation: Rulix aka Bak on 02/07/2009, edited by Idler
@@ -88,7 +88,7 @@
 #include "script_engine.ltx"				;;;; TB3D 109933
 #include "name_generator.ltx"				;;;; TB3D 109933
 #include "attachable_items.ltx"				;;;; TB3D 109933
-#include "mp_skins.ltx"
+;#include "mp_skins.ltx"
 #include "restrictor_engine.ltx"			;;;; TB3D 109933
 #include "medic.ltx"						;;;;
 #include "arsenal_expansion.ltx"			;;;; TB3D 109933, alife and timers
@@ -127,8 +127,9 @@ ang_speed3  = 2.0
 inv_grid_size=50	;4096x4096 ui_icon_equipment.dds, for future use
 ;---------------------------------------------------------------------------------------
 
-[texture_desc]
-files = ui_mp_icon_rank, ui_icons_map, ui_common, ui_old_textures, ui_ingame, ui_map_description, ui_models_multiplayer, ui_team_logo, ui_team_logo_small, ui_mainmenu, ui_mp_main, ui_statistics, ui_si_frame, amk_transmutator, ui_enc_locations, ui_hud, ui_numpad, ui_inventory, ui_inventory2, ui_iconstotal, ui_pda, ui_icons_npc, ui_npc_monster, ui_npc_unique, ui_buy_menu, ui_asus_intro, amk_ui_base, aem_ui_npc, ui_arhara_unique, ui_razgruzka, amk_pda, amk_blank, ui_npc_ldk, ui_repair_buttons
+[texture_desc]	;mp files removed 110004
+;files = ui_mp_icon_rank, ui_icons_map, ui_common, ui_old_textures, ui_ingame, ui_map_description, ui_models_multiplayer, ui_team_logo, ui_team_logo_small, ui_mainmenu, ui_mp_main, ui_statistics, ui_si_frame, amk_transmutator, ui_enc_locations, ui_hud, ui_numpad, ui_inventory, ui_inventory2, ui_iconstotal, ui_pda, ui_icons_npc, ui_npc_monster, ui_npc_unique, ui_buy_menu, ui_asus_intro, amk_ui_base, aem_ui_npc, ui_arhara_unique, ui_razgruzka, amk_pda, amk_blank, ui_npc_ldk, ui_repair_buttons
+files = ui_icons_map, ui_common, ui_old_textures, ui_ingame, ui_map_description, ui_mainmenu, ui_statistics, ui_si_frame, amk_transmutator, ui_enc_locations, ui_hud, ui_numpad, ui_inventory, ui_inventory2, ui_iconstotal, ui_pda, ui_icons_npc, ui_npc_monster, ui_npc_unique, ui_buy_menu, ui_asus_intro, amk_ui_base, aem_ui_npc, ui_arhara_unique, ui_razgruzka, amk_pda, amk_blank, ui_npc_ldk, ui_repair_buttons
 
 [info_portions]
 ;a list of xml files containing info_portions

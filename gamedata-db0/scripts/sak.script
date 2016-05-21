@@ -1,10 +1,11 @@
---TB3D 1.1.0.0.0.0 removed item number function, removed set_npc_health(), 
+--TB3D 1.1.0.0.0.4 removed item number function, removed set_npc_health(), 
 -- devil to Bes, added breaks, cons pkt srvcs, fixed item reloc and item out functions, 
 -- glowworm fixes, removed ratcatcher check from used item, 'to the swamp' vice cave, petrushka to petruha,
 -- dmx135, hit styles, doc in pripyat, chgd nepis_umer, trasure to treasure, delta display,
 -- delta display to slice mult, add_tail, removed make_kill_task_failed, levchn ids changed in all.spawn, garb - cave
--- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box, translate, repair kit, nepis_umer
-function my_ver() return "1.1.0.0.0.0" end
+-- show_time, obj level, hosp to agro, wild terr, to_lostvillage, debug, repair box, translate, repair kit, nepis_umer,
+-- display_enemy_count, info_doktor()
+function my_ver() return "1.1.0.0.0.4" end
 
 ---------------------------------------------------------------------
 -- Hi from Syaka 
@@ -18,6 +19,7 @@ local string_find = string.find
 local string_format = string.format
 local string_gsub = string.gsub
 local translate = game.translate_string
+local level_object_by_id = level.object_by_id
 
 function add_new_escape_100() 
 	add_new_lc(9100,8067,"to_escape","info_way100a")
@@ -489,12 +491,12 @@ function info_artmod()
   news_manager.amk_send_tip_id("mod_downloaded",nil,0,10,"gen_info")
 end
 
-function info_doktor()
-	if TB3D_Services.give_info("dok_arh_say_start") then
-		news_manager.amk_send_tip_id("doc_alive",nil,0,10,"gen_info")
-		arhara_dialog.spawn_tele_dok_prip_vxod()
-	end
-end
+--function info_doktor()
+	--if TB3D_Services.give_info("dok_arh_say_start") then
+		--news_manager.amk_send_tip_id("doc_alive",nil,10,10,"gen_info")
+		--arhara_dialog.spawn_tele_dok_prip_vxod()
+	--end
+--end
 
 function info_teleport()
   news_manager.amk_send_tip_id("tele_ready",nil,0,10,"gen_info")
@@ -770,7 +772,8 @@ function get_yantar_kordonr() get_teleport("yantar","kordon",0,9124) end
 function get_yantar_pripyatr() get_teleport("yantar","pripat",0,9124) end
 function get_sarcofag_stancia() get_teleport("sarcofag","stancia",1,9125) end
 
-function get_teleport(pos_out,pos_in,made,sidlc) local obj1, name_level, obj_tport local a, b
+function get_teleport(pos_out,pos_in,made,sidlc)
+	local obj1, name_level, obj_tport local a, b
 	if     pos_out == "kordon"	then	a = out_points_kordon[1]
 	elseif pos_out == "pripat" 	then 	a = out_points_pripat[1]
 	elseif pos_out == "military" then 	a = out_points_military[1]
@@ -854,6 +857,7 @@ function show_time(scopeused, slice_base)
 	local cs_time = hud:GetCustomStatic("hud_show_time")
 	local cs_comp = hud:GetCustomStatic("hud_show_compass")
 	local cs_delta = hud:GetCustomStatic("hud_show_delta")
+	local cs_enemy = hud:GetCustomStatic("hud_show_enemy")		--110004
 	if not scopeused then
 		local dtext
 		if cs_time == nil then
@@ -874,8 +878,9 @@ function show_time(scopeused, slice_base)
 			else
 				h_str = string.format("0%d:", time_h)
 			end
-			local dtext = h_str..m_str
+			dtext = h_str..m_str
 			cs_time:wnd():SetText(dtext)
+			dtext = ""
 		end
 		if TB3D_Modders.display_compass then
 			if cs_comp == nil then
@@ -923,6 +928,7 @@ function show_time(scopeused, slice_base)
 				end
 				cs_comp:wnd():SetText(dtext)
 			end
+			dtext = ""
 		end
 		if TB3D_Modders.display_delta then
 			dtext = "DELTA[0"..tostring(slice_base).."]"
@@ -937,6 +943,38 @@ function show_time(scopeused, slice_base)
 			if cs_delta then
 				cs_delta:wnd():SetText(dtext)
 			end
+			dtext = ""
+		end
+		if TB3D_Modders.display_enemy_count then				--110004
+			local o
+			local objpos
+			local actorPos = db.actor:position()
+			local ncnt = 0
+			for id,obj in pairs(db.storage) do
+				o = level_object_by_id(id)
+				if o and o.clsid and o:clsid() == 34 then
+					if o.alive and o:alive() == true then
+						objPos = o:position()
+						if objPos:distance_to_xz(actorPos) <= TB3D_Modders.display_enemy_range then
+							if o:relation(db.actor) == game_object.enemy then
+								ncnt = ncnt + 1
+							end
+						end
+					end
+				end
+			end
+			if ncnt > 0 then
+				dtext = tostring(ncnt)
+				if cs_enemy == nil then
+					hud:AddCustomStatic("hud_show_enemy", true)
+					cs_enemy = hud:GetCustomStatic("hud_show_enemy")
+				end
+				if cs_enemy then
+					cs_enemy:wnd():SetText(dtext)
+				end
+			elseif cs_enemy then
+				hud:RemoveCustomStatic("hud_show_enemy")
+			end
 		end
 	else
 		if cs_time then
@@ -947,6 +985,9 @@ function show_time(scopeused, slice_base)
 		end
 		if cs_delta then
 			hud:RemoveCustomStatic("hud_show_delta")
+		end
+		if cs_enemy then
+			hud:RemoveCustomStatic("hud_show_enemy")
 		end
     end
 end

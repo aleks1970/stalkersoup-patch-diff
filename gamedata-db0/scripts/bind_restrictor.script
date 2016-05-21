@@ -1,5 +1,5 @@
--- TB3D 1.1.0.0.0.0 db calls, use_binder_message
-function my_ver() return "1.1.0.0.0.0" end
+-- TB3D 1.1.0.0.0.4 db calls, use_binder_message
+function my_ver() return "1.1.0.0.0.4" end
 --[[------------------------------------------------------------------------------------------------
 Space restrictor binder
 Chugai Alexander
@@ -15,7 +15,10 @@ local updatable_binders = {}    -- binders, which require updates(update)
 function actor_update(delta)
 	if db.actor then
 		for i, v in pairs(updatable_binders) do
-			if (v) and (v.actor_update) then v:actor_update(delta) end
+			if (v) then
+				--TB3D_Services.packet_alert("bind restrictor: update["..utils.to_str(v.name).."]")
+				if (v.actor_update) then v:actor_update(delta) end
+			end
 		end
 	end
 end

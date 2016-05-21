@@ -1,10 +1,11 @@
--- TB3D 1.0.9.9.9.8   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
+-- TB3D 1.1.0.0.0.4   added bolt option in modders script , added TB3D_Update to replace, gun explode option,
 -- zaton to red forest, dmx135, using dmx blood instead of amk, fixed soul cube, tp news removed, chg redeffect call,
 -- drop item to inv, dose_asses removed, frogs and cooling moved to services, dav update 16Apr14, hud, gen to dm,
 -- hosp to agro, tip_id, send_tip_id optimization, 97104, 98975,6, _ds_to_poli target, sticks,
 -- changed "exo_mil_exoskeleton_addrs" to "exo_mil_exoskeleton_addx" aleks1970, npp2 to x14, eprip to prip, removed blowout_wave,
--- switched targets; hosp and red forest to tunnels, jup to eprip, shadows_cube_prov_check, allow cube quest in collector, rsch_to_wait, 99043
-function my_ver() return "1.0.9.9.9.8" end
+-- switched targets; hosp and red forest to tunnels, jup to eprip, shadows_cube_prov_check, allow cube quest in collector,
+-- rsch_to_wait, 99043, hud_show_enemy
+function my_ver() return "1.1.0.0.0.4" end
 --[[- max.script, centralized create_level_changer, uncommtd line 48 (11/21/11)------------
  File         : dmx_mod.script
  Description  : The main script fashion, contain quest function, spawn, etc.
@@ -1039,7 +1040,7 @@ function hidden_static()			--startup and suit changes
 		end
 	end
 	cs_names = {"hud_show_time", "hud_show_compass", "hud_show_delta", "inv_weight_static", "sleep_static", "dmx_speedometr", "car_equalize",
-						"anabiotic_static", "radioprotector_static", "psy_blockade_static", "hud_show_timer"}
+						"anabiotic_static", "radioprotector_static", "psy_blockade_static", "hud_show_timer", "hud_show_enemy"}
 	for k,v in pairs(cs_names) do
 		if hud:GetCustomStatic(v) then
 			hud:RemoveCustomStatic(v)
@@ -1238,6 +1239,7 @@ function create_level_changer(
 		level.map_add_object_spot(obj.id, "level_changer", p_hint)
 		--news_manager.send_tip(db.actor, "added spot: "..utils.to_str(obj.id), nil, nil, 30000)
 	end
+	return obj
 end
 
 function get_lc_data(obj)
@@ -1609,8 +1611,8 @@ function create_f1_level_changers()
 	obj = alife():story_object(98004)--  Jupiter Underground ladder to East Pripyat ladder entrance
 	if not obj then
 		create_level_changer(98004, vector():set(82.617,32.694,-222.547),40755,3827, 	
-		415473,3765, vector():set(185.421,-0.510,-258.138), 							
-		vector():set(0.0,0.0,-1.0), 												
+		415473,3765, vector():set(185.360,-0.523,-258.448),
+		vector():set(0.710,0.000,0.705), 												
 		"pripyat",0,0,"to_eprip") 													
 		--news_manager.amk_send_tip_id("path_jp_ep", "path_new", 2, 25, "pda_icon")
 	end
@@ -1759,7 +1761,10 @@ function create_npp1_level_changers()
 		"l12_Stancia",0,0,"to_aes") 													
 		--news_manager.amk_send_tip_id("path_npp2_npp1", "path_new", 2, 25, "pda_icon")
 	end
-	obj = alife():story_object(97000)
+end
+
+function create_npp1_research_level_changer()			--110004
+	local obj = alife():story_object(97000)
 	if not obj then
 		create_level_changer(97000, vector():set(843.808,-0.099,464.161),214460,2654, 	
 			354353,4364, vector():set(64,4.19999980926514,-274), 							
@@ -1970,11 +1975,17 @@ end
 function create_level_changer_rsch_to_hole()
 	local obj = alife():story_object(6021)
 	if not obj then
-		create_level_changer(6021, vector():set(-72.231,-13.827,182.428),207428,4384, 	
+		local sobj = create_level_changer(6021, vector():set(-72.231,-13.827,182.428),207428,4384, 	
 			142,5360, vector():set(7.5,-1.70000004768372,0.300000011920929), 							
 			vector():set(0.0,0.0,-1.0), 												
-			"digger_stash",0,0,"to_digger") 													
+			"digger_stash",0,1,"to_digger") 													
 		news_manager.amk_send_tip_id("path_rsch_hole", "path_new", 2, 25, "pda_icon")
+		if sobj then
+			if level.map_has_object_spot(sobj.id, "crlc_biggest") == 0 then
+				level.map_add_object_spot(sobj.id, "crlc_biggest", "zep_doc_18_hint")
+			end
+			--TB3D_Services.give_info("tb3d_digger_start")
+		end
 	end
 end
 
@@ -2144,7 +2155,7 @@ function create_level_changer_bm_to_dist()
 	end
 	obj = alife():story_object(98025)--/TB3D   dist to black market
 	if not obj then
-		create_level_changer(98025, vector():set(-78.688,-1.713,74.842),982,5280, 	
+		create_level_changer(98025, vector():set(-78.688,-1.713,74.842),982,5280,
 			8083,5312, vector():set(-20.282,-0.506,-34.170), 							
 		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 												
 		"l03_rinok",0,0,"to_rinok") 													
@@ -2435,7 +2446,7 @@ function create_level_changer_npp2_x14()
 	if not obj then
 		create_level_changer(99031, vector():set(-0.016,-34.570,-4.893),1996,5377,
 			50137,2538, vector():set(206.838,-0.100,377.046),
-		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 												
+		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 				---43.560,-0.103,-77.855),10114,2371								
 		"l12_stancia_2",0,1,"to_north_aes")
 	end
 	obj = alife():story_object(99034)					--109980, gate south of viaduct on tracks to ne ds
@@ -2467,12 +2478,15 @@ function create_level_changer_npp2_x14()
 		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 												
 		"l12_stancia",0,0,"to_aes")
 	end
-	obj = alife():story_object(99043)															--109998, west gate npp1 to npp2
+end
+
+function create_level_changer_npp2_npp1()		--110004, for gold chunks and diary quests
+	local obj = alife():story_object(99043)														--109998, west gate npp1 to npp2
 	if not obj then
 		create_level_changer(99043, vector():set(-43.049,-0.101,-69.817),10377,2371,
 			10118,2517, vector():set(-41.458,-0.038,68.393),
 		vector():set(-2.02234588186911e-007,-1.08743614427812e-015,-5.37710276304892e-009), 	--faces north											
-			"l12_stancia_2",0,0,"to_north_aes") 													
+			"l12_stancia",0,0,"to_north_aes") 													
 	end
 end
 

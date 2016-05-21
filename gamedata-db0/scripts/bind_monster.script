@@ -1,8 +1,8 @@
--- TB3D 1.0.9.9.9.9 added COP options to modders script, removed empty calls to utils, dmx135, death_hit,
+-- TB3D 1.1.0.0.0.4 added COP options to modders script, removed empty calls to utils, dmx135, death_hit,
 -- dmx blood vice amk, hit style, net spawn check, bad char in spawn chk, alife() index protection, display delta
 -- death callback, db calls, kill the rats, zombie team, monster spots, stall hits, level 5, motivator hits,
--- drop weapon, generic_m_story_id, db.check_corpse_looted, debug, victim, vehicle hits, blowout phases
-function my_ver() return "1.0.9.9.9.9" end
+-- drop weapon, generic_m_story_id, db.check_corpse_looted, debug, victim, vehicle hits, blowout phases, dead_character_use
+function my_ver() return "1.1.0.0.0.4" end
 -----------------------------------------------------------------------------------
 -- Monster binding
 -----------------------------------------------------------------------------------
@@ -312,7 +312,7 @@ function generic_object_binder:update(delta)
 			end
 		end	
 	else	--dead
-		self.object:set_tip_text("character_use") 
+		self.object:set_tip_text("dead_character_use") 						--110004
 	end
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("bind   monster: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done")

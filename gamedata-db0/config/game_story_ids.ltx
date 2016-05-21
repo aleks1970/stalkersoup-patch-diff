@@ -1,4 +1,4 @@
-;<!-- TB3D 1.1.0.0.0.0  new levels, karina and tweed, dav update 16Apr14, gen to dm, 98977-98995, 98975, 6, organized, 4000-4001 started, 4500, 99300
+;<!-- TB3D 1.1.0.0.0.4  new levels, karina and tweed, dav update 16Apr14, gen to dm, 98977-98995, 98975, 6, organized, 4000-4001 started, 4500, 99300
 ; form: sid = <object_story_id> that is used in game task descriptions, jupu to tunnels, 18030
 
 ; generic_m_story_id = 4294967296 used by engine when not specified in all.spawn
@@ -336,6 +336,9 @@
   608		= "rostok_exit_to_yantar"
   609		= "bar_wasted_level_changer"	;;;;109940
 
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Limqansk   (615-???)
+  615		= "lim_physic_object_0034"		;;;;limansk fence switch
+  
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Military   (700-799)
   700          = "Freedom_patrol_commander_base"
   701          = "Freedom_patrol_commander_level" 
@@ -1508,8 +1511,8 @@
   11514        = "exit_to_aver_from_as"
   11515        = "yantar_to_av_peshera"
   11516        = "exit_to_red_forest"
-  11517        = "exit_to_red_forest_from_limansk"
-  11518        = "exit_to_lost_village"
+  11517        = "exit_from_limansk"	;;;"exit_to_red_forest_from_limansk" 110004
+  11518        = "exit_to_hospital"	;;;"exit_to_lost_village"
   11519        = "exit_to_limansk_from_hospital"				;;;109940
   11520        = "level_changer_to_generators_from_pripyat"
   11521        = "gener_to_hospital_level_changer"					;;;109954
@@ -1545,7 +1548,7 @@
    14002        = "escape_to_marsh"
    14003        = "kalmyak"
    14004        = "kot"
-   14005        = "borman"
+   14005        = "borman"							;;;Limansk
    14100        = "kashei"
    14101        = "level_on_liman"
    14102        = "scromnyi"
@@ -1668,7 +1671,7 @@
   17050         = "atp_sedoy_delete_restrictor"
   17051         = "spawn_bland_restrictor"
   17052         = "spawn1_bland1_restrictor"
-  17053         = "video_finish_dopa_restrictor"
+  17053         = "video_finish_dopa_restrictor"		;;;Limansk
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;treasures
   18000		  = "aver_arhara_secret_1"				;;;;!!!!TB3D   DMX
   18001		  = "aver_arhara_secret_2"
@@ -1759,8 +1762,8 @@
   19034         = "strelka_mesto_dialog_restrictor"
   19035         = "strelka_radius_space_restrictor"
   19036         = "molniy"
-  19037         = "oblast_klucha_restrictor"
-  19038         = "teleport_podval_ok_restrictor"
+  19037         = "oblast_klucha_restrictor"				;;;;Limansk
+  19038         = "teleport_podval_ok_restrictor"			;;;;Limansk
   19039         = "forest_last_snip_proval_restrictor"
   19040         = "red_dolbannay_doska"
   19041         = "dsity_rasstrel1"
@@ -1810,23 +1813,20 @@
   97104         = "hospital_agroprom"  ;;;"hospital_radar"   109940
   97105         = "agroprom_marsh1"
   97106         = "gener_pripyat_level_changer"
-  97107         = "limansk_to_generators"
+  97107         = "limansk_to_generators"					;;;;Limansk
   97108         = "red_forest_to_warlab"
-  97109         = "dcity_to_limansk"
-  97110         = "dead_city_to_atp"
-  97111         = "dead_city_to_newrostok"
+  97109         = "dcity_to_limansk"			;;sak.add_new_dcity()
+  97110         = "dead_city_to_atp"			;;sak.add_new_dcity()
+  97111         = "dead_city_to_newrostok"		;;sak.add_new_dcity()
+  97112         = "atp_to_dead_city"			;;sak.add_new_dcity()
+  97113         = "dcity_to_zaton"				;;sak.add_new_dcity_to_zaton() (all.spawn id: 1518) not used
+  97114         = "lima_to_dead_city"			;;sak.add_new_lima_to_dead_city()
   
-  ;;;;;;;;;;;;;;;;;TODO: INVESTIGATE!!!!;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  97112         = "atp_to_dead_city"
-  97113         = "dcity_to_zaton"			;;all.spawn id: 1518
-  97114         = "lima_to_dead_city"
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  
-  97115         = "prip_to_eprip"			;;109970
-  97116			= "pripyat_cop_to_pripyat_1"			;;109978
-  97117			= "pripyat_cop_to_pripyat_2"			;;109978
-  97118			= "pripyat_cop_to_lab_x8"			;;109978
-  97119			= "lab_x8_to_pripyat_cop"			;;109978
+  97115         = "prip_to_eprip"				;;109970
+  97116			= "pripyat_cop_to_pripyat_1"	;;109978
+  97117			= "pripyat_cop_to_pripyat_2"	;;109978
+  97118			= "pripyat_cop_to_lab_x8"		;;109978
+  97119			= "lab_x8_to_pripyat_cop"		;;109978
   
   97120         = "syslov"
   97121         = "shadows"
@@ -1835,10 +1835,10 @@
   97124         = "pavel_sergeevich"
   97125			= "ds_tweed"					;added to all.spawn 109950
   97126			= "karina"						;added to all.spawn 109950
-  ;97127			= "predbannik_barman"			;added to all.spawn 109954
+  ;97127			= "predbannik_barman"		;added to all.spawn 109954
   97128			= "tractorist"					;added to all.spawn 109954
   
-  ; dAVROs LCs for Collector
+  ; dAVROs LCs for treasure hunt
   98000		= "zat_to_jup"
   98001		= "jup_to_eprip"
   98002		= "eprip_to_jup"

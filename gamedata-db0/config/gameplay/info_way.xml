@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.6 chgd lines 822,826,830,834 to _Services, test trans to remove, removed trans, dead_monolit_info*************** -->
+<!-- ************ TB3D 1.1.0.0.0.4 chgd lines 822,826,830,834 to _Services, test trans to remove, removed trans, dead_monolit_info, lim_fence_open*************** -->
 <game_information_portions>
 	<!--removed 109970 ----------------------------------------->
 	<!--info_portion id="level_newmarch"/>	<!-- *************** !!!! REMOVE FOR VERSION 2 *************** -->
@@ -207,6 +207,9 @@
 	<info_portion id="lim_spawn_restr1"/>
 	<info_portion id="lim_spawn_restr2"/>
 	<info_portion id="lim_spawn_restr3"/>
+	<info_portion id="lim_fence_open">
+		<action>TB3D_Triggers.lim_remove_electros</action>
+	</info_portion>
 	
 	<!-- ***************muffler (not what you think)*************** -->
 	<info_portion id="borman_glushitel_start">

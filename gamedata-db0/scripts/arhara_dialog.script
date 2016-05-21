@@ -1,12 +1,12 @@
---' TB3D 1.1.0.0.0.2 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.1.0.0.0.4 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
 -- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, repair_kit
 -- text color, give repair_kit and spare_parts Revamped - aleks1970, 186 char size limit to sms messages!!!!, new weapon for/from Fox - aleks1970,
--- kukla
-function my_ver() return "1.1.0.0.0.2" end
+-- kukla, agro_torgash_sms
+function my_ver() return "1.1.0.0.0.4" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -111,7 +111,7 @@ end
 
 --' check availability antizombin
 function chaes_perexod_have()										--109995, force info if has one
-	TB3D_Services.packet_alert("peroxide have")
+	--TB3D_Services.packet_alert("peroxide have")
 	if amk_utils.inventory_search("antizombie",1) ~= false then
 		TB3D_Services.give_info("chaes_perexod_have")
 		return true
@@ -717,7 +717,7 @@ end
 --' remove unnecessary Environmentalists
 function delete_nps_ecolog()
 	if TB3D_Services.is_collector(4010) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_nps_ecolog")
+		--TB3D_Services.packet_alert("arh dialog: delete_nps_ecolog")
 		local se_obj = alife():object("bar_ecolog_crush_1")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -740,7 +740,7 @@ end
 --' remove the corpse Korchagin
 function delete_korchagin()
 	if TB3D_Services.is_collector(4011) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_korchagin")
+		--TB3D_Services.packet_alert("arh dialog: delete_korchagin")
 		local se_obj = alife():object("dead_korchagin_military")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -751,7 +751,7 @@ end
 --' remove the dead warriors from the URT
 function delete_voen_urt()
 	if TB3D_Services.is_collector(4012) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_voen_urt")
+		--TB3D_Services.packet_alert("arh dialog: delete_voen_urt")
 		local se_obj = alife():object("dead_military_qvest_crest")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -762,7 +762,7 @@ end
 --' remove the corpse of Andrew
 function delete_voen_andrey()
 	if TB3D_Services.is_collector(4013) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_voen_andrey")
+		--TB3D_Services.packet_alert("arh dialog: delete_voen_andrey")
 		local se_obj = alife():object("dead_military_esc")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -773,7 +773,7 @@ end
 --' remove the prisoners from the Maze
 function delete_labirint_shahter()
 	if TB3D_Services.is_collector(4014) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_labirint_shahter")
+		--TB3D_Services.packet_alert("arh dialog: delete_labirint_shahter")
 		local se_obj = alife():object("labirint_monolit_shahter")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -784,7 +784,7 @@ end
 --' Astrologer remove the cordon !!!!TB3D
 function delete_zvezd()
 	if TB3D_Services.is_collector(4015) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_zvezd")
+		--TB3D_Services.packet_alert("arh dialog: delete_zvezd")
 		local se_obj = alife():object("esc_zvezdochet")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -795,7 +795,7 @@ end
 --' removes the first Bolotny Doctors
 function delete_doktor1()
 	if TB3D_Services.is_collector(4016) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_doktor1")
+		--TB3D_Services.packet_alert("arh dialog: delete_doktor1")
 		local se_obj = alife():object("doktor1")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -1684,7 +1684,7 @@ end
 --' remove Astrologer with NZ
 function delete_land_zvezdochet()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_land_zvezdochet")
+	--TB3D_Services.packet_alert("arh dialog: delete_land_zvezdochet")
   local se_obj = alife():object("land_arhara_zvezdochet")
   if se_obj then
     alife():release(se_obj, true)
@@ -1836,7 +1836,7 @@ end
 --' remove bearded Pilgrim
 function delete_land_piligrim()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_land_piligrim")
+	--TB3D_Services.packet_alert("arh dialog: delete_land_piligrim")
   local se_obj = alife():object("piligrim")
   if se_obj then
     alife():release(se_obj, true)
@@ -1976,7 +1976,7 @@ end
 --' remove the wounded Monolith
 function delete_dead_mono()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_dead_mono")
+	--TB3D_Services.packet_alert("arh dialog: delete_dead_mono")
   local se_obj = alife():object("dead_mono_labirint")
   if se_obj then
     alife():release(se_obj, true)
@@ -2154,7 +2154,7 @@ end
 --'Remove the corpse of the Comptroller
 function delete_trups() 
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_trups")
+	--TB3D_Services.packet_alert("arh dialog: delete_trups")
 	local se_obj = alife():object("trupak")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -2393,7 +2393,7 @@ end
 --' Remove Fang and Pilgrim with AU
 function delete_stalky_as()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_stalky_as")
+	--TB3D_Services.packet_alert("arh dialog: delete_stalky_as")
 	local se_obj = alife():object("kluk_sklad")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -2486,7 +2486,7 @@ end
 --'Remove Panther and bodyguards
 function delete_pant_warl()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_pant_warl")
+	--TB3D_Services.packet_alert("arh dialog: delete_pant_warl")
 	local se_obj = alife():object("pantera")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -2544,7 +2544,7 @@ end
 --' Remove Panther neytralku bodyguards Gologramu and boss
 function del_pant_neytral_warl()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: del_pant_neytral_warl")
+	--TB3D_Services.packet_alert("arh dialog: del_pant_neytral_warl")
 	local se_obj = alife():object("pantera_new")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -2607,7 +2607,7 @@ end
 --' Vitamin remove from our warehouses
 function delete_vitaminsklad()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_vitaminsklad")
+		--TB3D_Services.packet_alert("arh dialog: delete_vitaminsklad")
 		local se_obj = alife():object("military_vitamin")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -2618,7 +2618,7 @@ end
 --' Remove Fang and Pilgrim with a restrictor NC
 function delete_stalky_nz()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_stalky_nz")
+		--TB3D_Services.packet_alert("arh dialog: delete_stalky_nz")
 		local se_obj = alife():object("stalk_kluk")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -2652,7 +2652,7 @@ end
 --' remove svobodovtsev with Radar
 function delete_svoboda_radars()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_svoboda_radars")
+		--TB3D_Services.packet_alert("arh dialog: delete_svoboda_radars")
 		local se_obj = alife():object("radar_vitamin")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -2746,7 +2746,7 @@ end
 --' remove Kidal
 function delete_kidalo()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_kidalo")
+	--TB3D_Services.packet_alert("arh dialog: delete_kidalo")
 	local se_obj = alife():object("esc_kidalo")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -2880,7 +2880,7 @@ function yan_sms_barmen()
 end
 function yan_barmen_otvet()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_yan_barmen_otvet","sms_barkeep",1,40,"barman")
+		news_manager.amk_send_tip_id("sms_yan_barmen_otvet","sms_barman",1,40,"barman")									--110004
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_65]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	end
@@ -2990,7 +2990,7 @@ function warl_pili_gg_otvet_sms()
 end
 function agro_torgash_sms()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_agro_torgash","sms_gray",1,25,"common_channel")
+		news_manager.amk_send_tip_id("sms_agro_torgash","sms_hoary",1,25,"common_channel")
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_128]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	end
@@ -6042,7 +6042,7 @@ end
 --' remove the fellows from the Village
 function delete_chel_village()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_chel_village")
+	--TB3D_Services.packet_alert("arh dialog: delete_chel_village")
 	local se_obj = alife():object("village_kapatel3")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -6144,7 +6144,7 @@ end
 --' Remove dead bodies colliding with the Marshes
 function delete_stalky_marsh()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_stalky_marsh")
+	--TB3D_Services.packet_alert("arh dialog: delete_stalky_marsh")
 	local se_obj = alife():object("marsh_stalker_burer1")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -6177,7 +6177,7 @@ end
 --' remove the wire, with Panther swamp
 function delete_bol_provodnik()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_bol_provodnik")
+	--TB3D_Services.packet_alert("arh dialog: delete_bol_provodnik")
 	local se_obj = alife():object("boloto_provodnik")
   if se_obj then
     alife():release(se_obj, true)
@@ -6192,7 +6192,7 @@ end
 --' Pilgrim remove from the bar
 function delete_pili_bar()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_pili_bar")
+	--TB3D_Services.packet_alert("arh dialog: delete_pili_bar")
 	local se_obj = alife():object("piligrim_bar")
   if se_obj then
     alife():release(se_obj, true)
@@ -6203,7 +6203,7 @@ end
 --' remove the Panther from the Village
 function delete_vill_pantera()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_vill_pantera")
+	--TB3D_Services.packet_alert("arh dialog: delete_vill_pantera")
 	local se_obj = alife():object("village_pantera")
   if se_obj then
     alife():release(se_obj, true)
@@ -6213,7 +6213,7 @@ end
 
 --' remove mobile huckster with Agra
 function delete_agro_mobil_torgash()
-	TB3D_Services.packet_alert("arh dialog: delete_agro_mobil_torgash")
+	--TB3D_Services.packet_alert("arh dialog: delete_agro_mobil_torgash")
 	local se_obj = alife():object("agro_mobil_torgash")
   if se_obj then
     alife():release(se_obj, true)
@@ -6509,7 +6509,7 @@ end
 
 function delete_pereod_gen_bol()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_pereod_gen_bol")
+		--TB3D_Services.packet_alert("arh dialog: delete_pereod_gen_bol")
 		local sim = alife()
 		local se_obj = sim:story_object(18100)
 		if se_obj then
@@ -6561,7 +6561,7 @@ end
 --' remove quest vertuhu with generator
 function dell_gen_heli_hit()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_gen_heli_hit")
+	--TB3D_Services.packet_alert("arh dialog: dell_gen_heli_hit")
 	local se_obj = alife():object("generators_heli_hit")
   if se_obj then
     alife():release(se_obj, true)
@@ -6618,7 +6618,7 @@ end
 --' Astrologer remove the generator
 function dell_zvezd_generators()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_zvezd_generators")
+	--TB3D_Services.packet_alert("arh dialog: dell_zvezd_generators")
 	local se_obj = alife():object("generators_zvezdochet")
   if se_obj then
     alife():release(se_obj, true)
@@ -6636,7 +6636,7 @@ end
 --' Boatswain remove the marshes
 function dell_udav_bolota()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_udav_bolota")
+	--TB3D_Services.packet_alert("arh dialog: dell_udav_bolota")
 	local se_obj = alife():object("marsh_udav")
   if se_obj then
     alife():release(se_obj, true)
@@ -6647,7 +6647,7 @@ end
 --' remove vertuhu the marshes to die Boatswain
 function dell_marsh_heli_dok()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_marsh_heli_dok")
+	--TB3D_Services.packet_alert("arh dialog: dell_marsh_heli_dok")
 	local se_obj = alife():object("marsh_heli_dok")
   if se_obj then
     alife():release(se_obj, true)
@@ -6658,7 +6658,7 @@ end
 --' remove vertuhu to dock with the generators
 function dell_generators_heli_dok()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_generators_heli_dok")
+	--TB3D_Services.packet_alert("arh dialog: dell_generators_heli_dok")
 	local se_obj = alife():object("generators_heli_dok")
   if se_obj then
     alife():release(se_obj, true)
@@ -6708,7 +6708,7 @@ end
 --' Fritz remove the generator
 function dell_frits()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_frits")
+	--TB3D_Services.packet_alert("arh dialog: dell_frits")
 	local se_obj = alife():object("frits")
 	if se_obj then
 		alife():release(se_obj, true)
@@ -6719,7 +6719,7 @@ end
 --' remove Fritsa2 with generator
 function delete_frits2()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_frits2")
+		--TB3D_Services.packet_alert("arh dialog: delete_frits2")
 		local se_obj = alife():object("gener_frits2")
 	  if se_obj then
 		alife():release(se_obj, true)
@@ -6730,7 +6730,7 @@ end
 --' remove protection Andersen
 function delete_ohrana_ander()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_ohrana_ander")
+		--TB3D_Services.packet_alert("arh dialog: delete_ohrana_ander")
 		local se_obj = alife():object("gener_dok_stalk1")
 	  if se_obj then
 		alife():release(se_obj, true)
@@ -6745,7 +6745,7 @@ end
 --' remove Sapsan with generators
 function del_gen_komandir()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: del_gen_komandir")
+		--TB3D_Services.packet_alert("arh dialog: del_gen_komandir")
 		local se_obj = alife():object("gener_desant_black_komandir")
 	  if se_obj then
 		alife():release(se_obj, true)
@@ -6756,7 +6756,7 @@ end
 --' remove the body of the Panthers, Doc and Sapsan
 function delete_pebyta_after_proval()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_pebyta_after_proval")
+		--TB3D_Services.packet_alert("arh dialog: delete_pebyta_after_proval")
 		--local se_obj = alife():object("gener_desant_black_komandir")
 	  --if se_obj then
 		--alife():release(se_obj, true)
@@ -6789,13 +6789,11 @@ end
 --' Boatswain remove the generator 
 function delete_botsman_gener()
 	if TB3D_Services.is_collector(4000) == false then
-	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_botsman_gener")
+		--TB3D_Services.packet_alert("arh dialog: delete_botsman_gener")
 		local se_obj = alife():object("generators_udav")
 	  if se_obj then
 		alife():release(se_obj, true)
 	  end
-  end
   end
 end
 
@@ -6826,7 +6824,7 @@ end
 --' remove Fang Bara
 function delete_kluk_bar()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_kluk_bar")
+	--TB3D_Services.packet_alert("arh dialog: delete_kluk_bar")
 	local se_obj = alife():object("kluk_bar")
   if se_obj then
     alife():release(se_obj, true)
@@ -6896,7 +6894,7 @@ end
 --' remove the Panther and Astrologer with NZ
 function delete_aver_vragi()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_aver_vragi")
+	--TB3D_Services.packet_alert("arh dialog: delete_aver_vragi")
 	local se_obj = alife():object("aver_zvezdochet2")
   if se_obj then
     alife():release(se_obj, true)
@@ -6920,7 +6918,7 @@ end
 --' remove the specter of CHAES1
 function dell_chaes1_prizrak()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_chaes1_prizrak")
+		--TB3D_Services.packet_alert("arh dialog: dell_chaes1_prizrak")
 		local se_obj = alife():object("chaes1_prizrak")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -6929,10 +6927,10 @@ function dell_chaes1_prizrak()
 	end
 end
 
---' remove the specter of radara
+--' remove the specter of radar
 function dell_new_prizrak()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_new_prizrak")
+		--TB3D_Services.packet_alert("arh dialog: dell_new_prizrak")
 		local se_obj = alife():object("new_prizrak")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -6965,7 +6963,7 @@ end
 --' remove vertuhu Panthers with Avera
 function dell_pantera_vertuha_aver()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_pantera_vertuha_aver")
+	--TB3D_Services.packet_alert("arh dialog: dell_pantera_vertuha_aver")
 	local se_obj = alife():object("pantera_vertuha_aver")
   if se_obj then
     alife():release(se_obj, true)
@@ -6976,7 +6974,7 @@ end
 --' remove vertuhu Hermit with Avera
 function dell_aver_arhara_heli_1()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_aver_arhara_heli_1")
+	--TB3D_Services.packet_alert("arh dialog: dell_aver_arhara_heli_1")
 	local se_obj = alife():object("aver_arhara_heli_1")
   if se_obj then
     alife():release(se_obj, true)
@@ -6987,7 +6985,7 @@ end
 --' remove the military from the generator. helicopter NC
 function dell_muziki_aver()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_muziki_aver")
+	--TB3D_Services.packet_alert("arh dialog: dell_muziki_aver")
 	local se_obj = alife():object("soprov_muha_soldat1")
   if se_obj then
     alife():release(se_obj, true)
@@ -7002,7 +7000,7 @@ end
 --' remove a fly from NZ
 function dell_devchonka()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_devchonka")
+	--TB3D_Services.packet_alert("arh dialog: dell_devchonka")
 	local se_obj = alife():object("devchonka")
   if se_obj then
     alife():release(se_obj, true)
@@ -7019,7 +7017,7 @@ end
 --' remove the body of the Fly and wounded with Avera 
 function dell_muha_die_aver()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_muha_die_aver")
+	--TB3D_Services.packet_alert("arh dialog: dell_muha_die_aver")
 	local se_obj = alife():object("muha_soldat_ranen")
   if se_obj then
     alife():release(se_obj, true)
@@ -7052,7 +7050,7 @@ end
 --' remove scientists from the generators
 function dell_lomonosov()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_lomonosov")
+	--TB3D_Services.packet_alert("arh dialog: dell_lomonosov")
 	local se_obj = alife():object("solvador")
   if se_obj then
     alife():release(se_obj, true)
@@ -7139,7 +7137,7 @@ end
 --' remove psevdoteleport, peregrine falcon and svobodovtsa
 function gen_dell_tele_sapsan()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: gen_dell_tele_sapsan")
+	--TB3D_Services.packet_alert("arh dialog: gen_dell_tele_sapsan")
 	local se_obj = alife():object("imitator_tele_final1")
   if se_obj then
     alife():release(se_obj, true)
@@ -7176,7 +7174,7 @@ end
 --' Scientists remove the copy to the generator 
 function dell_uchen_gen_povtorno()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_uchen_gen_povtorno")
+	--TB3D_Services.packet_alert("arh dialog: dell_uchen_gen_povtorno")
 	local se_obj = alife():object("gen_solvador1")
   if se_obj then
     alife():release(se_obj, true)
@@ -7191,7 +7189,7 @@ end
 --' remove Andersena1 with generators
 function dell_uchen_andersen1()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_uchen_andersen1")
+	--TB3D_Services.packet_alert("arh dialog: dell_uchen_andersen1")
 	local se_obj = alife():object("gen_andersen1")
   if se_obj then
     alife():release(se_obj, true)
@@ -7202,7 +7200,7 @@ end
 --' remove Solvadora1 with generators
 function dell_uchen_solvador1()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_uchen_solvador1")
+	--TB3D_Services.packet_alert("arh dialog: dell_uchen_solvador1")
 	local se_obj = alife():object("gen_solvador1")
   if se_obj then
     alife():release(se_obj, true)
@@ -7221,7 +7219,7 @@ end
 --' remove the second Fang Avera
 function dell_new_kluk_nz()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_new_kluk_nz")
+	--TB3D_Services.packet_alert("arh dialog: dell_new_kluk_nz")
 	local se_obj = alife():object("new_kluk_nz")
   if se_obj then
     alife():release(se_obj, true)
@@ -7275,7 +7273,7 @@ end
 --' remove Fang chaes2 and along with Panther with generators
 function dell_kluk_chaes2()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_kluk_chaes2")
+	--TB3D_Services.packet_alert("arh dialog: dell_kluk_chaes2")
 	local se_obj = alife():object("kluk_chaes2")
   if se_obj then
     alife():release(se_obj, true)
@@ -7333,7 +7331,7 @@ end
 --' remove dead flies from the hospital
 function dell_hospital_muha_trup()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_hospital_muha_trup")
+	--TB3D_Services.packet_alert("arh dialog: dell_hospital_muha_trup")
 	local se_obj = alife():object("hospital_muha_trup")
   if se_obj then
     alife():release(se_obj, true)
@@ -7376,7 +7374,7 @@ end
 --' remove the hologram BH
 function dell_hospital_bl_dok()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_hospital_bl_dok")
+	--TB3D_Services.packet_alert("arh dialog: dell_hospital_bl_dok")
 	local se_obj = alife():object("hospital_bl_dok")
   if se_obj then
     alife():release(se_obj, true)
@@ -7393,7 +7391,7 @@ end
 --' remove the father and the Panther
 function dell_otez_and_pant()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_otez_and_pant")
+	--TB3D_Services.packet_alert("arh dialog: dell_otez_and_pant")
 	local se_obj = alife():object("hosp_father")
   if se_obj then
     alife():release(se_obj, true)
@@ -7425,7 +7423,7 @@ end
 --' remove Sedogo with the ATP
 function atp_sedoy_dell()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: atp_sedoy_dell")
+	--TB3D_Services.packet_alert("arh dialog: atp_sedoy_dell")
 	local se_obj = alife():object("atp_mobil_torgovetz")
   if se_obj then
     alife():release(se_obj, true)
@@ -7436,7 +7434,7 @@ end
 --' remove vertuhu Sedogo with the ATP
 function atp_sedoy_heli_dell()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: atp_sedoy_heli_dell")
+	--TB3D_Services.packet_alert("arh dialog: atp_sedoy_heli_dell")
 	local se_obj = alife():object("atp_sedoy_heli")
   if se_obj then
     alife():release(se_obj, true)
@@ -7461,7 +7459,7 @@ end
 --' remove the card scout
 function razved_karta_dell()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: razved_karta_dell")
+	--TB3D_Services.packet_alert("arh dialog: razved_karta_dell")
 	local se_obj = alife():object("razved_karta")
   if se_obj then
     alife():release(se_obj, true)
@@ -7472,7 +7470,7 @@ end
 --' remove the doc from the Pripyat
 function prip_dok_arh_dell()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: prip doc arh dell")
+	--TB3D_Services.packet_alert("arh dialog: prip doc arh dell")
 	local se_obj = alife():object("prip_dok_arh")
   if se_obj then
     alife():release(se_obj, true)
@@ -8026,14 +8024,14 @@ function del_podstanziy_doza_timer(story_id)
 end
 
 function disabl_weapon(actor, npc)
-	TB3D_Services.packet_alert("arhara dialog: disable weapon")
+	--TB3D_Services.packet_alert("arhara dialog: disable weapon")
     bind_stalker.hide_weapon()
     --level.disable_input()
     --level.hide_indicators()
     --printf("xr_effects <disable_ui>")
 end
 function enabl_weapon(actor, npc)
-	TB3D_Services.packet_alert("arhara dialog: enable weapon")
+	--TB3D_Services.packet_alert("arhara dialog: enable weapon")
     --level.show_indicators()
     level.enable_input()
     bind_stalker.restore_weapon()
@@ -8058,7 +8056,7 @@ end
 --' remove the heli-Blake with a generator
 function dell_gener_heli_black()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_gener_heli_black")
+	--TB3D_Services.packet_alert("arh dialog: dell_gener_heli_black")
 	local se_obj = alife():object("generators_heli_black")
   if se_obj then
     alife():release(se_obj, true)
@@ -8069,7 +8067,7 @@ end
 --' remove vert Astrologer with a generator
 function dell_gener_heli_zvez()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_gener_heli_zvez")
+	--TB3D_Services.packet_alert("arh dialog: dell_gener_heli_zvez")
 	local se_obj = alife():object("gener_heli_zvez_pobeg")
   if se_obj then
     alife():release(se_obj, true)
@@ -8161,7 +8159,7 @@ end
 --' remove Sepator & Co.
 function delete_sepator()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_sepator")
+	--TB3D_Services.packet_alert("arh dialog: delete_sepator")
 	local se_obj = alife():object("esc_hunter_zaschita_2")
   if se_obj then
     alife():release(se_obj, true)
@@ -8180,7 +8178,7 @@ end
 --' remove the heli-Dad with Amber
 function dell_yantar_heli_baty()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_yantar_heli_baty")
+	--TB3D_Services.packet_alert("arh dialog: dell_yantar_heli_baty")
 	local se_obj = alife():object("yantar_heli_baty")
   if se_obj then
     alife():release(se_obj, true)
@@ -8191,7 +8189,7 @@ end
 --' remove Batyu
 function delete_yantar_baty()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_yantar_baty")
+	--TB3D_Services.packet_alert("arh dialog: delete_yantar_baty")
 	local se_obj = alife():object("yantar_baty")
   if se_obj then
     alife():release(se_obj, true)
@@ -8357,7 +8355,7 @@ end
 --' removes the first Ghost in generaorov
 function delete_gen_prizrak()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_gen_prizrak")
+	--TB3D_Services.packet_alert("arh dialog: delete_gen_prizrak")
   local se_obj = alife():object("generators_prizrak")
   if se_obj then
     alife():release(se_obj, true)
@@ -8558,7 +8556,7 @@ end
 --' Fang and remove the radio operator of the bunker
 function delete_kluk_and_radist()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_kluk_and_radist")
+	--TB3D_Services.packet_alert("arh dialog: delete_kluk_and_radist")
 	local se_obj = alife():object("stalk_radist")
   if se_obj then
     alife():release(se_obj, true)
@@ -8573,7 +8571,7 @@ end
 --' remove forest_lastday_snip1
 function dell_forest_last_snip()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_forest_last_snip")
+	--TB3D_Services.packet_alert("arh dialog: dell_forest_last_snip")
 	local se_obj = alife():object("forest_lastday_snip1")
   if se_obj then
     alife():release(se_obj, true)
@@ -8715,7 +8713,7 @@ end
 --'foto_monolitovets
 function dell_foto_monolitovets()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_foto_monolitovets")
+		--TB3D_Services.packet_alert("arh dialog: dell_foto_monolitovets")
 		local se_obj = alife():object("foto_monolitovets")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -8846,7 +8844,7 @@ end
 --' remove Chernomor zombie
 function dell_chernomor_zombi()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_chernomor_zombi")
+	--TB3D_Services.packet_alert("arh dialog: dell_chernomor_zombi")
 	local se_obj = alife():object("chernomor_zombi")
   if se_obj then
     alife():release(se_obj, true)
@@ -8911,7 +8909,7 @@ end
 --' remove sober skipper
 function dell_trezv_kapit()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_trezv_kapit")
+	--TB3D_Services.packet_alert("arh dialog: dell_trezv_kapit")
 	local se_obj = alife():object("trezv_kapitan")
   if se_obj then
     alife():release(se_obj, true)
@@ -8971,7 +8969,7 @@ end
 --' removing debris from Agra Drunk
 function delete_agro_musor()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: delete_agro_musor")
+	--TB3D_Services.packet_alert("arh dialog: delete_agro_musor")
 	local se_obj = alife():object("agro_chsovoy_trezv")
   if se_obj then
     alife():release(se_obj, true)
@@ -9027,7 +9025,7 @@ end
 --' Panther remove the cordon
 function dell_esc_pantera()
 	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_esc_pantera")
+	--TB3D_Services.packet_alert("arh dialog: dell_esc_pantera")
 	local se_obj = alife():object("esc_pantera_bomba")
   if se_obj then
     alife():release(se_obj, true)
@@ -9143,17 +9141,15 @@ end
 
 --' remove the Panther with his father from the hospital
 function dell_gospital_pantera2()
-	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_gospital_pantera2")
+	--TB3D_Services.packet_alert("arh dialog: dell_gospital_pantera2")
 	local se_obj = alife():object("hos_father_new")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 	se_obj = alife():object("hos_new_panterka")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 end
 
 --' check the availability of things stalker
@@ -9184,24 +9180,20 @@ function otdal_veschi(first_speaker, second_speaker)	-- error test - aleks1970
 
 --' remove the spare photos from the cordon
 function dell_zapasnoy_foto_muz()
-	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_zapasnoy_foto_muz")
-		local se_obj = alife():object("zapasnoy_foto_muzhik")
-	  if se_obj then
+	--TB3D_Services.packet_alert("arh dialog: dell_zapasnoy_foto_muz")
+	local se_obj = alife():object("zapasnoy_foto_muzhik")
+	if se_obj then
 		alife():release(se_obj, true)
-	  end
-  end
+	end
 end
 
 --' remove the photo'd corpse from the cordon
 function dell_esc_foto_muzhik()
-	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_esc_foto_muzhik")
-		local se_obj = alife():object("esc_foto_muzhik")
-	  if se_obj then
+	--TB3D_Services.packet_alert("arh dialog: dell_esc_foto_muzhik")
+	local se_obj = alife():object("esc_foto_muzhik")
+	if se_obj then
 		alife():release(se_obj, true)
-	  end
-  end
+	end
 end
 
 --' Tushkany for nix
@@ -9231,12 +9223,10 @@ end
 
 --' remove the one-legged with a generator
 function dell_odnonogiy()
-	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_odnonogiy")
-		local se_obj = alife():object("odnonogiy_stalk")
-	  if se_obj then
+	--TB3D_Services.packet_alert("arh dialog: dell_odnonogiy")
+	local se_obj = alife():object("odnonogiy_stalk")
+	if se_obj then
 		alife():release(se_obj, true)
-	  end
 	end
 end
 
@@ -9247,24 +9237,20 @@ end
 
 --' remove military_fotomuzhik
 function dell_milit_fotomuzhik()
-	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_milit_fotomuzhik")
+	--TB3D_Services.packet_alert("arh dialog: dell_milit_fotomuzhik")
 	local se_obj = alife():object("military_fotomuzhik")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 end
 
 --' remove military_fotomuzhik stock
 function dell_milit_zapas_fotomuz()
-	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_milit_zapas_fotomuz")
+	--TB3D_Services.packet_alert("arh dialog: dell_milit_zapas_fotomuz")
 	local se_obj = alife():object("milit_zapas_fotomuzhik")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 end
 
 --' Tushkany for acid
@@ -9274,13 +9260,11 @@ end
 
 --' remove Nix the cordon	!!!!TB3D
 function dell_stalk_shuher()
-	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_stalk_shuher")
+	--TB3D_Services.packet_alert("arh dialog: dell_stalk_shuher")
 	local se_obj = alife():object("esc_stalk_shuher")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 end
 
 --' check the availability of pictures with the killer Military
@@ -9302,32 +9286,26 @@ end
 
 --' remove Malicious from Avera
 function dell_aver_zlobn()
-	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_aver_zlobn")
+	--TB3D_Services.packet_alert("arh dialog: dell_aver_zlobn")
 	local se_obj = alife():object("aver_zlobnuy")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 end
 
 --' remove the restrictor arrows on Avery
 function del_strelka_mesto_restr(story_id)
-	if TB3D_Services.is_collector(4000) == false then
 	local se_obj = alife():story_object(19034)
 	if se_obj then
 		alife():release(se_obj)
-	end
 	end
 end
 
 --' remove the restrictor-range dip arrows on Avery
 function del_strelka_radius_restr(story_id)
-	if TB3D_Services.is_collector(4000) == false then
 	local se_obj = alife():story_object(19035)
 	if se_obj then
 		alife():release(se_obj)
-	end
 	end
 end
 
@@ -9343,18 +9321,15 @@ end
 
 --'remove the one-legged with Avera
 function dell_aver_odnon()
-	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_aver_odnon")
+	--TB3D_Services.packet_alert("arh dialog: dell_aver_odnon")
 	local se_obj = alife():object("aver_odnonogiy")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 end
 
 --' remove the sugar transition, the brain-shift and teleport
 function delete_saxar_perex()
-	if TB3D_Services.is_collector(4000) == false then
 	local sim = alife()
 	local se_obj = sim:story_object(18111)
 	if se_obj then
@@ -9370,7 +9345,6 @@ function delete_saxar_perex()
 	if se_obj then
 		sim:release(se_obj, true)
 	end
-	end
 end
 
 --' verify the presence of clay
@@ -9380,13 +9354,11 @@ end
 
 --' remove Lightning
 function dell_molniy()
-	if TB3D_Services.is_collector(4000) == false then
-	TB3D_Services.packet_alert("arh dialog: dell_molniy")
+	--TB3D_Services.packet_alert("arh dialog: dell_molniy")
 	local se_obj = alife():object("molniy")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+	if se_obj then
+		alife():release(se_obj, true)
+	end
 end
 
 --' Pebbles on the brain
@@ -9831,7 +9803,7 @@ end
 --' removing Malicious from MG
 function delete_zlo_and_ko()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: delete_zlo_and_ko")
+		--TB3D_Services.packet_alert("arh dialog: delete_zlo_and_ko")
 		local se_obj = alife():object("dead_city_zlobnuy")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -9999,7 +9971,7 @@ end
 --' remove visible Dock of the MG
 function dell_dcity_dok_vidim()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_dcity_dok_vidim")
+		--TB3D_Services.packet_alert("arh dialog: dell_dcity_dok_vidim")
 		local se_obj = alife():object("dcity_dok_bolot")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10010,7 +9982,7 @@ end
 --' remove invisible Doc of the MG
 function dell_dok_nevidim()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_dok_nevidim")
+		--TB3D_Services.packet_alert("arh dialog: dell_dok_nevidim")
 		local se_obj = alife():object("dcity_dok_nevidim")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10021,7 +9993,7 @@ end
 --' remove the doc from the Pripyat River
 function prip_dok_sak_dell()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: prip doc sak dell")
+		--TB3D_Services.packet_alert("arh dialog: prip doc sak dell")
 		local se_obj = alife():object("doktor")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10051,7 +10023,7 @@ end
 --' remove the Fly from the hospital
 function dell_muha_hosp_live()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_muha_hosp_live")
+		--TB3D_Services.packet_alert("arh dialog: dell_muha_hosp_live")
 		local se_obj = alife():object("muha_hosp_live")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10067,7 +10039,7 @@ end
 --' remove lightning from MG
 function dell_dcity_molniy()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_dcity_molniy")
+		--TB3D_Services.packet_alert("arh dialog: dell_dcity_molniy")
 		local se_obj = alife():object("dead_city_molniy")
 		if se_obj then
 			--alife():release(se_obj, true)
@@ -10268,7 +10240,7 @@ end
 --' remove Parfyumera1 of MG
 function dell_parfuym1()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_parfuym1")
+		--TB3D_Services.packet_alert("arh dialog: dell_parfuym1")
 		local se_obj = alife():object("dcity_parfumer")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10279,7 +10251,7 @@ end
 --' remove from Swoon MG
 function dell_obmorok()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_obmorok")
+		--TB3D_Services.packet_alert("arh dialog: dell_obmorok")
 		local se_obj = alife():object("dcity_obmorok")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10332,7 +10304,7 @@ end
 --' Bland remove from AP
 function dell_dark_bland()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_dark_bland")
+		--TB3D_Services.packet_alert("arh dialog: dell_dark_bland")
 		local se_obj = alife():object("dark_bland")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10480,7 +10452,7 @@ end
 
 function delet_otshel()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arhara dialog: delet_otshel")
+		--TB3D_Services.packet_alert("arhara dialog: delet_otshel")
 		local se_obj = alife():object("final_otshelnik")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10494,7 +10466,7 @@ end
 
 function psev_have()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arhara dialog: psev have")
+		--TB3D_Services.packet_alert("arhara dialog: psev have")
 		alife():create("ver", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
 	end
 end
@@ -10502,7 +10474,7 @@ end
 --' remove the restrictor rallies authorities
 function dell_sxodnyak()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arhara dialog: dell_sxodnyak  restrictors")
+		--TB3D_Services.packet_alert("arhara dialog: dell_sxodnyak  restrictors")
 		local se_obj = alife():object("muxa_chel_dell_restrictor")
 	  if se_obj then
 		alife():release(se_obj, true)
@@ -10520,7 +10492,7 @@ end
 
 function nax_poshel()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: nax_poshel")
+		--TB3D_Services.packet_alert("arh dialog: nax_poshel")
 		local se_obj = alife():object("chernomor_zombi")
 		if se_obj then
 			alife():release(se_obj, true)
@@ -10531,7 +10503,7 @@ end
 --'remove Chernomor zombie
 function dell_chernomor_zombi1()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: dell_chernomor_zombi1")
+		--TB3D_Services.packet_alert("arh dialog: dell_chernomor_zombi1")
 		local se_obj = alife():object("chernomor_zombi1")
 	  if se_obj then
 		alife():release(se_obj, true)
@@ -10541,7 +10513,7 @@ end
 
 function del_chern_zombi1()
 	if TB3D_Services.is_collector(4000) == false then
-		TB3D_Services.packet_alert("arh dialog: del_chern_zombi1")
+		--TB3D_Services.packet_alert("arh dialog: del_chern_zombi1")
 		local sim = alife()
 		local se_obj = sim:story_object(9626)
 		if se_obj then

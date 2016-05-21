@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.3 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.1.0.0.0.4 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
@@ -8,7 +8,7 @@
 -- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
 -- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin, missing scientist in pripyat, yan_specnaz_dead,
 -- deathclaw, x16, check_dyn_spawns, F1 arts, radar, yantar
-function my_ver() return "1.1.0.0.0.3" end
+function my_ver() return "1.1.0.0.0.4" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -60,7 +60,7 @@ local mushroom_count = 0			--109991
 local contrlr = false
 local bloodsuckers = 0				--109997
 
-function force_fixes()
+function force_fixes(lname)
 	TB3D_Services.packet_alert("tb3d fixer: ver["..utils.to_str(my_ver()).."]: start")
 	local obj_level, level_name = ""
 	local obj
@@ -166,7 +166,7 @@ function force_fixes()
 					or sect == "level_changer" or sect == "device_pda"
 					or sect == "explosive_barrel" or sect == "explosive_barrel_low"
 					or sect == "explosive_dinamit" or sect == "physic_destroyable_object"
-					or sect == "device_torch" or sect == "helicopter" or sect == "m_car"
+					or sect == "device_torch" or sect == "helicopter"
 					or sect == "sysh_document" or sect == "lab_x10_documents"
 					or sect =="binocular" or sect =="binocular_a" or sect == "fireball_zone"
 					or sect == "lights_hanging_lamp" or sect == "search_light"
@@ -1352,6 +1352,8 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 			if is_collector then
 				is_fixed = true
 			end
+		--elseif string_find(obj_name,"amk_zone_") then					--110000, ctd on exit??
+			--if TB3D_Modders.x16_no_zharkas then is_fixed = true	end
 		end
 	elseif obj_level == 32 then												--zaton
 	elseif obj_level == 33 then												--jupiter
@@ -1360,8 +1362,12 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 	elseif obj_level == 36 then												--labx8
 	elseif obj_level == 37 then												--cs agro under
 	elseif obj_level == 38 then												--predbennik
-		if string_find(obj_name,"predbannik_physic_object_0005") then		--110001, ctd on exit??
-			if TB3D_Modders.x16_no_zharkas then is_fixed = true	end
+		if string_find(obj_name,"predbannik_physic_object_0005") then		--110004, renamed to predbannik_btr_cry_0001
+			is_fixed = true
+		elseif string_find(obj_name,"predbannik_physic_object_0007") then	--110004, duplicate name, now predbannik_btr_u09_0001 and predbannik_btr_90_0001
+			is_fixed = true
+		elseif string_find(obj_name,"predbannik_m_trader") then				--110004, ctd on exit? also needs new skin
+			if TB3D_Modders.pred_village_trader then is_skip = true else is_fixed = true end
 		end
 	--elseif obj_level == 39 then											--old garbage same as promzone
 	elseif obj_level == 40 then												--old yantar

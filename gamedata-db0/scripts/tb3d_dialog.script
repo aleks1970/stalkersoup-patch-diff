@@ -1,7 +1,7 @@
---TB3D 1.1.0.0.0.3 moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+--TB3D 1.1.0.0.0.4 moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
 --bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom,
 --tb3d_gbars_chp2, deathclaw, pripyat_art_take
-function my_ver() return "1.1.0.0.0.3" end
+function my_ver() return "1.1.0.0.0.4" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -82,6 +82,7 @@ function found_zep_document(doc_nmbr)
 	elseif doc_nmbr == 14 then
 		if TB3D_Services.give_info("zep14_have") then
 			npp1_spawns()							--spawn next doc and resistance in npp1
+			dmx_mod.create_level_changer_npp2_npp1()
 			do_save = true
 		end
 	elseif doc_nmbr == 15 then
@@ -155,7 +156,7 @@ function drop_zep_document(doc_nmbr)
 	--maybe future use
 end
 
---=================== gold bars quests ========================================================
+--=================== gold bars quest and misc ========================================================
 function found_zep_note(sect)
 	--TB3D_Services.packet_alert("tb3d dialog: zep note["..sect.."]")
 	if sect == "tower" then																			--mobs and open lab door in jup
@@ -485,7 +486,7 @@ function create_zep_document(idx)					--110000
 		if TB3D_Modders.use_info_message then
 			TB3D_Services.packet_alert("tb3d dialog: spawn zep doc["..utils.to_str(vx)..","..utils.to_str(vy)..","..utils.to_str(vz).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."] doc["..zep_doc.."]")
 		end
-		level.map_add_object_spot_ser(nobj.id, "crlc_biggest", zep_doc.."_hint")		--110003, show area and add hint
+		if idx ~= 18 then level.map_add_object_spot_ser(nobj.id, "crlc_biggest", zep_doc.."_hint") end		--110003, show area and add hint
 	end
 end
 
@@ -782,15 +783,15 @@ end
 
 ---------------------------- ZEP NPP1 -----------------------------------
 function npp1_spawns()
-	dmx_mod.create_npp1_level_changers()		--98020,98021,97000
-	dmx_mod.create_level_changer_dv_npp1()		--98994, 98995
+	dmx_mod.create_npp1_research_level_changer()					--97000			--110004
+	dmx_mod.create_level_changer_dv_npp1()							--98994, 98995
 	TB3D_Mobs.spawn_mob(334.470,4.842,-145.427,141908,2354,3,3)		--mob accross from exit
 	TB3D_Mobs.spawn_mob(383.169,-0.001,-215.857,165959,2347,3,3)	--mob near exit
 	TB3D_Mobs.spawn_npcs(409.132,-0.103,-33.086,178213,2306,6,2)	--killers outside sarc entrance
 	TB3D_Mobs.spawn_npcs(271.208,4.800,-172.798,112308,2353,6,2)	--killers on platform
 	TB3D_Mobs.spawn_npcs(333.070,2.438,-171.808,141185,2349,6,2)	--killers on platform
 	alife():create("zep_note_npp2", vector():set(521.783,18.673,273.100),162087,2617)		--npp2 rooftop near generators
-	create_zep_document(15)				--110000
+	create_zep_document(15)											--110000
 	alife():create("zep_note_rs2", vector():set(202.534,10.872,196.718),511307,4375)		--rs bunker
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", 204.882,9.641,198.346,513726,4381,6)	--rs bunker
 end

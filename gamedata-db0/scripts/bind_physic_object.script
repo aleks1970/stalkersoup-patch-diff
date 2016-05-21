@@ -1,5 +1,5 @@
--- TB3D 1.1.0.0.0.1   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn
-function my_ver() return "1.1.0.0.0.1" end
+-- TB3D 1.1.0.0.0.4   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn, hit_car
+function my_ver() return "1.1.0.0.0.4" end
 ----------------------------------------------------------------------------------------------------
 -- Physic objects binding
 ----------------------------------------------------------------------------------------------------
@@ -7,12 +7,30 @@ function my_ver() return "1.1.0.0.0.1" end
 -- Revised: Andrey Fidrya (Zmey) af@svitonline.com
 ----------------------------------------------------------------------------------------------------
 local string_find = string.find
+local string_sub = string.sub
 local actor_inside_car = false
 function restore_actor_inside_car()
     actor_inside_car = false
 end
 
+local hit_car = {
+vehicle_zil131 = true,					--truck in dv
+falling_car = true,
+dar_zaz = true,
+ds_m_car_0002 = true,
+ds_m_car_0003 = true,
+ds_m_car_0004 = true,
+ds_m_car_0013 = true,
+ds_m_car_0015 = true,
+ds_m_car_0017 = true,
+ds_m_car_0030 = true,
+ds_m_car_0040 = true,
+ds_m_car_0070 = true,
+ds_m_car_0090 = true,
+vehicle_laz4202 = true					--truch in agro
+}
 function init(obj)
+	--TB3D_Services.packet_alert("bind physic object: bind["..utils.to_str(obj:name()).."] section["..get_section(obj).."]")
 	----------------------------------------------------------------------------------------
 	-- Old scheme
 	----------------------------------------------------------------------------------------
@@ -37,7 +55,17 @@ function init(obj)
 	db.init_my_storage(obj)
 	local new_binder = generic_physics_binder(obj)
 	obj:bind_object(new_binder)
-	--if TB3D_Modders.use_binder_message then TB3D_Services.packet_alert("bind physic object: bind["..utils.to_str(obj:name()).."] section["..get_section(obj).."]") end
+	if get_section(obj) == "m_car" then
+		--TB3D_Services.packet_alert("bind physic object: bind["..utils.to_str(obj:name()).."] section["..get_section(obj).."]")
+		if hit_car[obj:name()] == true then
+			TB3D_hit_styles.hit_car(obj)										--110004, falling truck in ds
+		end
+	elseif string_sub(obj:name(), 1, 8) == "vehicle_" then
+		--TB3D_Services.packet_alert("bind physic object: bind["..utils.to_str(obj:name()).."] section["..get_section(obj).."]")
+		if hit_car[get_section(obj)] == true then
+			TB3D_hit_styles.hit_car(obj)										--110004, make sure they aren't floating
+		end
+	end
 end
 
 ---------------------------------------------------------------------------------------------
@@ -82,12 +110,6 @@ function generic_physics_binder:update(delta)
             --printf("GRAPH POINT DISABLED")
         end
 	end
---[[	local sobj = self.object
-		local obj_name, obj_sect
-		if sobj.name then obj_name = sobj:name() else obj_name = "nil" end
-		if sobj.section_name then obj_sect = sobj:section_name() else obj_sect = "nil" end
-		TB3D_Services.packet_alert("bind physic object: update["..obj_name.."] sect["..obj_sect.."] clsid["..utils.to_str(sobj:clsid()).."]")
---]]
 	if self.st.active_section ~= nil or (self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true) then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
 		--if not self.callbackset then
@@ -129,24 +151,12 @@ function generic_physics_binder:net_spawn(data)
 		if sobj.name then obj_name = sobj:name() else obj_name = "nil" end
 		local obj_sect = get_section(sobj)
 		--TB3D_Services.packet_alert("bind physic object: net spawn["..obj_name.."] sect name["..obj_sect.."] clsid["..utils.to_str(sobj:clsid()).."] sect["..utils.to_str(sobj:section()).."]")
---[[		if string_find(obj_name,"x16_physic_destroyable_object_0000") then						--109996
-			if has_alife_info("yantar_tunnel_finish") then										--grate can fall shut in an explosion
-				--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] not spawned")
-				alife():release(sobj, true)
-				return true
-			end
-		--elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--109996, inner door of upper room
-			--TB3D_Services.packet_alert("bind mteleport: spawn["..obj_name.."] not spawned")
-			--alife():release(sobj, true)
-			--return true
-		end]]--
 		if sobj:clsid() == clsid.projector then
 			db.add_sl(sobj)
 		end
 		if sobj:spawn_ini() ~= nil and sobj:spawn_ini():section_exist("drop_box") == true then
 			self.box_items = xr_box.ph_item_box(sobj)
 		end
-		--if sobj:clsid() == clsid.car_s or obj_sect == "m_car" then db.add_car_to_fix(sobj) end		--110001, only add those that need it when they are spawned in pop control
 		amk.on_net_spawn(sobj)
 	end
 	return true
@@ -165,13 +175,6 @@ function generic_physics_binder:net_destroy()
 			obj_sect = get_section(sobj)
 			TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."] sect name["..obj_sect.."] clsid["..utils.to_str(sobj:clsid()).."] sect["..utils.to_str(sobj:section()).."]")
 		end
---[[		if string_find(obj_name,"x16_physic_destroyable_object_0000") then						--109996
-			TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."] !!!!")
-			if has_alife_info("yantar_tunnel_finish") then return end										--grate can fall shut in an explosion
-		elseif string_find(obj_name, "predbannik_physic_destroyable_object_0000") then			--109996, inner door of upper room
-			TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."] !!!!")
-			return
-		end]]--
 		if (sobj.clsid) and sobj:clsid() == clsid.projector then
 			db.del_sl(sobj)
 		end

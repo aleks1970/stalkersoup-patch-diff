@@ -1,5 +1,5 @@
-<!-- ************ TB3D 1.0.9.9.9.8 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
-  can_start_dan, treasure_ecolog_have, ghost diary, preds after info checks *************** -->
+<!-- ************ TB3D 1.1.0.0.0.4 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
+  can_start_dan, treasure_ecolog_have, ghost diary, preds after info checks, zahar_ask_help *************** -->
 <game_dialogs>
 	<dialog id="prinesi_hvost">
 		<has_info>zahar_vstrecha_start</has_info>
@@ -1541,6 +1541,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="zahar_ask_help">
+		<has_info>bar_rescue_research_reward</has_info>
 		<has_info>atak_larger_begin</has_info>
 		<dont_has_info>zahar_naemnik_start</dont_has_info>
 		<phrase_list>

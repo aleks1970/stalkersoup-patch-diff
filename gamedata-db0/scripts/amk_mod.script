@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.2 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.1.0.0.0.4 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -10,7 +10,7 @@
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
 -- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over, debug, fixer, sv/cl logs
-function my_ver() return "1.1.0.0.0.2" end
+function my_ver() return "1.1.0.0.0.4" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -2301,7 +2301,7 @@ function check_usable_item(obj)		--VICTIM ONLY, actor checks these directly in b
 				dmx_mod.play_sound([[ambient\switch_2]])
 			end
 		elseif TB3D_Services.is_collector(13) then
-			info_given = TB3D_Collector.check_usable_item(obj, comm, lname)			--110001
+			info_given = TB3D_Collector.check_usable_item(obj, comm)			--110004
 		elseif obj:name()=="mil_stalker0012" then
 			info_given = TB3D_Services.give_info("info_amk_recipt_stone_dikoobraz")
 		elseif comm=="killer" then

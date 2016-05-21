@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.8 added my_ver, counts, spawn and destroy, removed creatures and added corpses, reporting,
--- car fix, optimized, state_mgr, trade
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.1.0.0.0.4 added my_ver, counts, spawn and destroy, removed creatures and added corpses, reporting,
+-- car fix, optimized, state_mgr, trade, removed fix car
+function my_ver() return "1.1.0.0.0.4" end
 --[[------------------------------------------------------------------------------------------------
 Database live online sites, zones, and actor restrictor
 Chugai Alexander
@@ -364,29 +364,6 @@ function del_monster(obj)						--bind_monster
 		end
 	end
 end	
-
-local fix_count
-function add_car_to_fix(obj)
-	if not fix_count then fix_count = 1
-	else fix_count = fix_count + 1 end
-	if obj then
-		if not cars_to_fix[fix_count] then
-			--TB3D_Services.packet_alert("db: car to fix["..utils.to_str(fix_count).."]["..obj:name().."]")
-			cars_to_fix[fix_count] = obj
-		end
-	end
-end
-
-function check_car_fix()
-	if not fix_count then fix_count = 0 end
-	while fix_count > 0 do
-		if cars_to_fix[fix_count] then
-			TB3D_hit_styles.hit_car(cars_to_fix[fix_count])
-			cars_to_fix[fix_count] = nil
-		end
-		fix_count = fix_count - 1
-	end
-end
 
 --------------------------------------------------------------- DMX MOD
 

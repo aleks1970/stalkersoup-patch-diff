@@ -1,12 +1,12 @@
----TB3D 1.1.0.0.0.3 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.1.0.0.0.4 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
 -- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
--- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs, jup and jupu random
-function my_ver() return "1.1.0.0.0.3" end
+-- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs, jup and jupu random, lim_remove_electros
+function my_ver() return "1.1.0.0.0.4" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random = math.random
 local math_floor = math.floor
@@ -1239,7 +1239,7 @@ function hr_spawns(idx)			--109978
 		alife():create("grenade_rgd9", vector():set(-343.482,10.232,-167.246),21706,4404)		--stash2
 		alife():create("tb3dm_gigant_strong", vector():set(-275.012,11.994,-203.376),63256,4410,expendable_object)		--gigant1
 		alife():create("tb3dm_gigant_strong", vector():set(-247.722,12.109,-172.212),87437,4412,expendable_object)		--gigant2
-		--alife():create("tb3dm_gigant_strong", vector():set(-221.770,14.858,-223.422),119816,4416,expendable_object)		--gigant3
+		--alife():create("tb3dm_gigant_strong", vector():set(-221.770,14.858,-223.422),119816,4416,expendable_object)	--gigant3
 		is_save = true
 	end
 	if is_save then amk.save_variable("hr_spawns", idx+1) end
@@ -1252,7 +1252,7 @@ function warlab_spawns(level_up)			--109978
 		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,1,false)
 	else
 		local cnt = math_random(3)
-		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,cnt,false)			--around lab entrance
+		TB3D_Mobs.spawn_killer_squad(187.740,30.820,-493.186,553011,3139,6,cnt,false)		--around lab entrance
 		TB3D_Mobs.spawn_killer_squad(158.189,30.681,-499.143,518915,3131,6,cnt,false)
 		TB3D_Mobs.spawn_killer_squad(141.388,31.783,-444.763,499813,3127,6,cnt,false)
 	end
@@ -1318,6 +1318,9 @@ function zat_spawns(idx)			--109978
 		TB3D_Mobs.spawn_killer_squad(-333.718,9.476,397.311,284411,3665,6,6,false)				--npc in center of mill
 		idx = 1																					--rotate through 2 and 4 for now
 		is_save = true
+	end
+	if has_alife_info("tb3d_spawn_backwater_stash") then
+		alife():create("tb3dm_controller_normal", vector():set(-110.759,4.996,-157.111),759130,3679,expendable_object)		--controller cave
 	end
 	if is_save then amk.save_variable("zat_spawns", idx+1) end
 end
@@ -1430,10 +1433,16 @@ function spawn_enemy_at(npc)							--109981, used to motivate non-mob traders on
 end
 
 function spawn_x14_guard()
-	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(24.278,0.148,44.296),28106,3806) ,"vehicle_btr","jupu")
-	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(4.060,8.066,243.872),16039,3796) ,"vehicle_btr","jupu")
-	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(9.147,8.047,308.679),19257,3789) ,"vehicle_btr","jupu")
-	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(-1.018,8.032,405.489),13189,3787) ,"vehicle_btr","jupu")
+	local sname = amk.load_variable("level_on_save","start")
+	if sname == "pripyat" then
+		amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(24.278,0.148,44.296),28106,3806) ,"vehicle_btr","jupu")		--large room
+		amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(9.147,8.047,308.679),19257,3789) ,"vehicle_btr","jupu")		--second tank behind door
+	else			--110004, came from elevator
+		amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(-8.654,0.000,29.461),8108,3779) ,"vehicle_btr","jupu")		--large room
+		amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(10.078,8.044,282.823),19671,3799) ,"vehicle_btr","jupu")	--second tank behind door
+	end
+	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(-1.018,8.032,405.489),13189,3787) ,"vehicle_btr","jupu")		--first tank from elevator
+	amk_mod.spawn_military_tech_pack( alife():create("vehicle_btr",vector():set(4.060,8.066,243.872),16039,3796) ,"vehicle_btr","jupu")			--third tank amoung trucks
 	spawn_suit(6,64.986,4.131,-0.547,39059,3808)													--desk in booth
 	alife():create("wpn_rg-6",vector():set(54.844,2.798,11.796),33426,3808)							--side room
 	alife():create("ammo_vog-25",vector():set(54.844,2.798,11.796),33426,3808)
@@ -2093,4 +2102,55 @@ function jupu_spawn_random_enemy()
 		spawn_jupu_tough_006()
 		spawn_jupu_easy_006()
 	end
+end
+
+function lim_remove_electros()			--110004, deactivates electric fence in Limansk
+	local obj_level
+	local obj
+	local obj_name
+	for a=first_object,last_object,1 do		--skip actor (0)
+		obj = alife():object(a)
+		if obj then
+			if game_graph():valid_vertex_id(obj.m_game_vertex_id) then
+				obj_level = game_graph():vertex(obj.m_game_vertex_id):level_id()
+				if obj_level == 24 then
+					if obj.name then obj_name = obj:name() else obj_name = "NIL" end
+					if string_find(obj_name, "zone_emi_tb3d") then
+						alife():release(obj, true)
+					end
+				end
+			end
+		end
+	end
+end
+
+function collector_found_esc_stash()
+	TB3D_Mobs.spawn_bandits(313.630,3.548,120.234,572044,143,8)					--wolf's group campfire
+	TB3D_Mobs.spawn_bandits(210.544,2.129,319.883,504984,238,8)					--large rocks near house
+end
+
+function spawn_backwater_stash()												--110004, stash under gas station after talking to Arnie
+	alife():create("killer_outfit_bastplus", vector():set(-129.106,-4.618,-229.811),683720,3673)	--dead end
+	alife():create("grenade_gravi", vector():set(-95.991,-8.137,-198.424),748975,3673)				--special grenades
+	alife():create("grenade_gravi", vector():set(-95.991,-8.137,-198.424),748975,3673)				--special grenades
+	alife():create("grenade_gravi", vector():set(-95.991,-8.137,-198.424),748975,3673)				--special grenades
+	alife():create("ammo_gravi", vector():set(-96.593,-7.355,-207.852),747521,3673)					--rare ammo
+	alife():create("ammo_gravi", vector():set(-96.593,-7.355,-207.852),747521,3673)					--rare ammo
+	alife():create("ammo_gravi", vector():set(-96.593,-7.355,-207.852),747521,3673)					--rare ammo
+	alife():create("grenade_shok", vector():set(-113.589,-6.179,-229.927),713471,3673)				--special grenades
+	alife():create("grenade_shok", vector():set(-113.589,-6.179,-229.927),713471,3673)				--special grenades
+	alife():create("grenade_shok", vector():set(-113.589,-6.179,-229.927),713471,3673)				--special grenades
+	alife():create("grenade_shok", vector():set(-148.045,-18.360,-188.849),645724,3673)				--car
+	alife():create("grenade_shok", vector():set(-148.045,-18.360,-188.849),645724,3673)				--car
+	alife():create("grenade_gravi", vector():set(-148.045,-18.360,-188.849),645724,3673)			--car
+	alife():create("grenade_gravi", vector():set(-148.045,-18.360,-188.849),645724,3673)			--car
+	alife():create("ammo_gravi", vector():set(-148.045,-18.360,-188.849),645724,3673)				--car
+	alife():create("ammo_gravi", vector():set(-148.045,-18.360,-188.849),645724,3673)				--car
+	alife():create("wpn_gravigun", vector():set(-148.045,-18.360,-188.849),645724,3673)				--car
+	TB3D_dialog.stack_money(-92.466,7.943,-173.329,775003,3679,3,6)									--cave above arches
+	TB3D_dialog.stack_money(-111.497,5.192,-159.420,759130,3679,3,10)										--controller cave
+	alife():create("artifact_electro_crystal_thorn", vector():set(-416.169,-10.524,209.710),182015,3666)	--controller cave
+	local obj = alife():create("zep_note_backwater1", vector():set(-149.289,16.738,-160.550),644289,3672)	--document for spot
+	if obj then level.map_add_object_spot_ser(obj.id, "crlc_biggest", "back1_stash_hint") end
+	amk.save_variable("back1_id", obj.id)
 end

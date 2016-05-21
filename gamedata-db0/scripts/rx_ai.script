@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.8  new reporting 12/07/11, tweed
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.1.0.0.0.4  new reporting 12/07/11, tweed
+function my_ver() return "1.1.0.0.0.4" end
 ---- Rulix aka Bak --- 25.3.2009
 --------------------------------------utils------------------------------------------
 
@@ -90,7 +90,7 @@ end
 function npc_switch_offline(npc)
 	if npc then
 		if TB3D_Modders.use_rxai_message then
-			TB3D_Services.info_alert("RX AI: npc_switch_offline["..npc:name().."]")
+			TB3D_Services.info_alert("RX AI: npc_switch_offline["..npc:name().."]", true)
 		end
 		--if rx_wmgr then
 			rx_wmgr.kill_wm(npc)

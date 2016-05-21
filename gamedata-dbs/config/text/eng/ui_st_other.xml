@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<!-- TB3D 1.0.9.9.9.8 startup prompts, moved _mm -->
+<!-- TB3D 1.1.0.0.0.4 startup prompts, moved _mm _mp -->
 
-	<string id="id_mp_money">
-		<text>Money</text>
+	<string id="ui_pda_details">
+		<text>#/details</text>
 	</string>
-	<string id="mm_mp_pda_hunt">
-		<text>PDA bonus</text>
-	</string>
-	<string id="st_drink">
-		<text>Drink</text>
-	</string>
-	<string id="st_mp_direct_ip">
-		<text>Direct IP</text>
-	</string>
+	
 	<string id="ui_mm_default">
 		<text>Default</text>
 	</string>
@@ -28,9 +20,10 @@
 	<string id="ui_mm_render_2">
 		<text>Render 2</text>
 	</string>
-	<string id="ui_pda_details">
-		<text>#/details</text>
+	<string id="ui_mm_delete_existing_file_q">
+		<text>Delete File?</text>
 	</string>
+	
 	<string id="ui_st_btn_cancel">
 		<text>Cancel</text>
 	</string>
@@ -88,9 +81,6 @@
 	<string id="ui_st_secs">
 		<text>sec.</text>
 	</string>
-	<string id="ui_st_select_one_map">
-		<text>Please select at least one map</text>
-	</string>
 	<string id="ui_st_take_all">
 		<text>Take All</text>
 	</string>
@@ -109,6 +99,67 @@
 	<string id="ui_st_your_items">
 		<text>Your Items</text>
 	</string>
+	<string id="ui_st_description">
+		<text>Description</text>
+	</string>
+	<string id="ui_st_team1_name">
+		<text>Freedom</text>
+	</string>
+	<string id="ui_st_team2_name">
+		<text>Mercs</text>
+	</string>
+	<string id="ui_st_conn_version_differs">
+		<text>Connection error: Different version.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_invalid">
+		<text>Connection error: Invalid CD-Key.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_in_use">
+		<text>Connection error: CD-Key already in use.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_disabled">
+		<text>Connection error: Your CD-Key is disabled. Contact customer's service.</text>
+	</string>
+	<string id="ui_st_conn_new_patch">
+		<text>New patch is available.\n Version: %s\n Location: %s\nDo you want to download it now?</text>
+	</string>
+	<string id="ui_st_conn_no_new_patch">
+		<text>No new patches available now</text>
+	</string>
+	<string id="ui_st_connecting_to_masterserver">
+		<text>Trying to connect to master server</text>
+	</string>
+	<string id="ui_st_patch_download_success">
+		<text>Patch was successfully downloaded. Do you want to install it?</text>
+	</string>
+	<string id="ui_st_patch_download_error">
+		<text>Unable to download the patch.</text>
+	</string>
+	<string id="ui_st_load_game_confirm">
+		<text>... You are returning to the Zone ...</text>
+	</string>
+	<string id="ui_st_invalid_saved_game">
+		<text>Saved game version mismatch or saved game is corrupted</text>
+	</string>
+	<string id="ui_st_last_set">
+		<text>Last preset</text>
+	</string>
+	<string id="ui_st_preset1">
+		<text>Preset 1</text>
+	</string>
+	<string id="ui_st_preset2">
+		<text>Preset 2</text>
+	</string>
+	<string id="ui_st_preset3">
+		<text>Preset 3</text>
+	</string>
+	<string id="ui_st_reset">
+		<text>Reset</text>
+	</string>
+	<string id="ui_st_sell_all">
+		<text>Sell All</text>
+	</string>
+  
 	<string id="st_game_over_press_jump">
 		<text>Press ($$ACTION_JUMP$$) to exit to main menu</text>
 	</string>
@@ -172,27 +223,6 @@
 	<string id="st_loading_sectors_portals">
 		<text>Loading sectors and portals</text>
 	</string>
-	<string id="ui_st_conn_version_differs">
-		<text>Connection error: Different version.</text>
-	</string>
-	<string id="ui_st_conn_cdkey_invalid">
-		<text>Connection error: Invalid CD-Key.</text>
-	</string>
-	<string id="ui_st_conn_cdkey_in_use">
-		<text>Connection error: CD-Key already in use.</text>
-	</string>
-	<string id="ui_st_conn_cdkey_disabled">
-		<text>Connection error: Your CD-Key is disabled. Contact customer's service.</text>
-	</string>
-	<string id="ui_st_conn_new_patch">
-		<text>New patch is available.\n Version: %s\n Location: %s\nDo you want to download it now?</text>
-	</string>
-	<string id="ui_st_conn_no_new_patch">
-		<text>No new patches available now</text>
-	</string>
-	<string id="ui_mm_delete_existing_file_q">
-		<text>Delete File?</text>
-	</string>
 	<string id="st_game_paused">
 		<text>Pause</text>
 	</string>
@@ -214,51 +244,34 @@
 	<string id="st_controll">
 		<text>Controls</text>
 	</string>
-	<string id="ui_st_connecting_to_masterserver">
-		<text>Trying to connect to master server</text>
-	</string>
-	<string id="mp_only_one_voting">
-		<text>Only one active voting allowed</text>
-	</string>
-	<string id="ui_st_patch_download_success">
-		<text>Patch was successfully downloaded. Do you want to install it?</text>
-	</string>
-	<string id="ui_st_patch_download_error">
-		<text>Unable to download the patch.</text>
-	</string>
-	<string id="ui_st_load_game_confirm">
-		<text>... You are returning to the Zone ...</text>
-	</string>
-	<string id="ui_st_invalid_saved_game">
-		<text>Saved game version mismatch or saved game is corrupted</text>
+	<string id="st_drink">
+		<text>Drink</text>
 	</string>
 	
+	<string id="af_neutral">
+		<text>Artifact</text>
+	</string>
+	<string id="self">
+		<text>It's you</text>
+	</string>
+	<string id="friend">
+		<text>Ally</text>
+	</string>
+	<string id="team_base_1">
+		<text>Freedom's base</text>
+	</string>
+	<string id="team_base_2">
+		<text>Mercs' base</text>
+	</string>
 	<string id="switch_off">
 		<text>Switch off</text>
 	</string>
 	<string id="switch_on">
 		<text>Include</text>
 	</string>
+	
 	<!-- Addon for "done" Word, aleks1970 -->
 	<string id="game_task_done">
 		<text>done</text>
 	</string>
 	
-	<string id="ui_st_last_set">
-		<text>Last preset</text>
-	</string>
-	<string id="ui_st_preset1">
-		<text>Preset 1</text>
-	</string>
-	<string id="ui_st_preset2">
-		<text>Preset 2</text>
-	</string>
-	<string id="ui_st_preset3">
-		<text>Preset 3</text>
-	</string>
-	<string id="ui_st_reset">
-		<text>Reset</text>
-	</string>
-	<string id="ui_st_sell_all">
-		<text>Sell All</text>
-	</string>

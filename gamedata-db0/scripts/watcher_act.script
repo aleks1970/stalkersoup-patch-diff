@@ -1,6 +1,6 @@
---TB3D 1.1.0.0.0.3 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
--- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list dcity doc, glavny, radar
-function my_ver() return "1.1.0.0.0.3" end
+--TB3D 1.1.0.0.0.4 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
+-- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list dcity doc, glavny, radar, petruha
+function my_ver() return "1.1.0.0.0.4" end
 -- Red75 (c) 2008
 -- Marauder scheme v 1.1
 -- Part of AMK MOD
@@ -633,6 +633,7 @@ function npc_no_looting(npc)
 		or profile_name == "Mudri"
 		or profile_name == "Grozn"
 		or profile_name == "Alex"
+		or name =="esc_novice_attacker1"							--110004, petruha wanders toward bridge
 		or name =="agr_defector_stalker1"
 		or name =="agr_ratcatcher"									--109989, deserter in swamp
 		or name =="gar_dm_novice"									--109989, yurik
@@ -646,6 +647,8 @@ function npc_no_looting(npc)
 		or name =="yantar_ecolog_general" 							-- mad at the Military and Sakharov
 		or name =="mil_freedom_member0021" 							-- Miser into a zombie!
 		or name =="dcity_dok_bolot"									-- 109993, dcity doctor
+		or name =="dead_city_molniy"								-- 110004, panther
+		or name =="dcity_parfumer"									-- 110004, need stay in position
 		or name =="andersen"
 		or name =="zemlyk"
 		or name == "glavny"											-- 109998, lab x14
@@ -661,5 +664,7 @@ function npc_no_looting(npc)
 		or string_find(name, "gar_bandit_stroyka")
 		or string_find(name, "rad_stalker")							-- 110002, interferes with assault on pripyat exit
 		or string_find(name, "generators_")							-- 110003, village and lab areas
+		or string_find(name, "pred_baza_")							-- 110004, makes base attack too easy
+		or string_find(name, "predbannik_")							-- 110004
 		)
 end

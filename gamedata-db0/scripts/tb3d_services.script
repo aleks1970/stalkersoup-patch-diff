@@ -1,4 +1,4 @@
----TB3D 1.1.0.0.0.3 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.1.0.0.0.4 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
@@ -6,13 +6,13 @@
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
 -- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed,
 -- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over, zat lost, grib_respawn, tb3d_storm_started, killed by actor,
--- yan_specnaz_dead, difficulty_num
-function my_ver() return "1.1.0.0.0.3" end	--modders append with initials and rev.
+-- yan_specnaz_dead, difficulty_num, check old save, rotate_actor
+function my_ver() return "1.1.0.0.0.4" end	--modders append with initials and rev.
 
 --title version will display network info in future
 local difficulty_ver = ""									--set by bind_stalker load or amk_mod new game start
 local difficulty_num = 0
-local rev_number = "0.0.0.3"
+local rev_number = "0.0.0.4"
 local translate = game.translate_string
 function title_ver()
 	local game_dif = amk.load_variable("game_diff", 0)
@@ -47,7 +47,7 @@ function get_difficulty_num()
 	return difficulty_num
 end
 
-major_version = 110003							--used in saves
+major_version = 110004							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 6								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -251,7 +251,6 @@ function packet_alert(strg)
 	local con = get_console()
   if con and strg then
 	con:execute("load ~~~ "..strg)
-	--error_log("test")
   end
 end
 
@@ -317,6 +316,46 @@ function report_plug_ins()
 	packet_alert("TB3D: reporting plug ins done")
 	local gmode = system_ini():r_string("game_mode", "mode")
 	packet_alert("TB3D: actor reputation["..utils.to_str(db.actor:character_reputation()).."] diff["..utils.to_str(difficulty_num).."] rank["..utils.to_str(db.actor:character_rank()).."] koef["..utils.to_str(global_koef(level_up)).."] comm["..utils.to_str(db.actor:character_community()).."] money["..utils.to_str(db.actor:money()).."] level up["..utils.to_str(level_up).."] gmode["..utils.to_str(gmode).."]")
+--[[	callbacks in xr_game.dll
+	packet_alert("trade start ["..utils.to_str(callback.trade_start).."]")							--0
+	packet_alert("trade stop ["..utils.to_str(callback.trade_stop).."]")							--1
+	packet_alert("trsde ["..utils.to_str(callback.trade_sell_buy_item).."]")						--2
+	packet_alert("trade operation ["..utils.to_str(callback.trade_perform_operation).."]")			--3
+	packet_alert("zone enter ["..utils.to_str(callback.zone_enter).."]")							--4
+	packet_alert("zone exit ["..utils.to_str(callback.zone_exit).."]")								--5
+	packet_alert("border exit ["..utils.to_str(callback.level_border_exit).."]")					--6
+	packet_alert("border enter ["..utils.to_str(callback.level_border_enter).."]")					--7
+	packet_alert("death ["..utils.to_str(callback.death).."]")										--8
+	packet_alert("patrol path ["..utils.to_str(callback.patrol_path_in_point).."]")					--9
+	packet_alert("inventory pda ["..utils.to_str(callback.inventory_pda).."]")						--10
+	packet_alert("info ["..utils.to_str(callback.inventory_info).."]")								--11
+	packet_alert("article ["..utils.to_str(callback.article_info).."]")								--12
+	packet_alert("task ["..utils.to_str(callback.task_state).."]")									--13
+	packet_alert("map location added ["..utils.to_str(callback.map_location_added).."]")			--14
+	packet_alert("use ["..utils.to_str(callback.use_object).."]")									--15
+	
+	
+	packet_alert("action move ["..utils.to_str(callback.action_movement).."]")						--18
+	packet_alert("action watch ["..utils.to_str(callback.action_watch).."]")						--19
+	packet_alert("action anim ["..utils.to_str(callback.action_animation).."]")						--20
+	packet_alert("action sound ["..utils.to_str(callback.action_sound).."]")						--21
+	packet_alert("action particle ["..utils.to_str(callback.action_particle).."]")					--22
+	packet_alert("action object ["..utils.to_str(callback.action_object).."]")						--23
+	packet_alert("sleep ["..utils.to_str(callback.actor_sleep).."]")								--24
+	packet_alert("heli on point ["..utils.to_str(callback.helicopter_on_point).."]")				--25
+	packet_alert("heli on hit ["..utils.to_str(callback.helicopter_on_hit).."]")					--26
+	packet_alert("item take ["..utils.to_str(callback.on_item_take).."]")							--27
+	packet_alert("item drop ["..utils.to_str(callback.on_item_drop).."]")							--28
+	packet_alert("script anim ["..utils.to_str(callback.script_animation).."]")						--29
+	packet_alert("trader anim rqst ["..utils.to_str(callback.trader_global_anim_request).."]")		--30
+	packet_alert("trader head anim ["..utils.to_str(callback.trader_head_anim_request).."]")		--31
+	packet_alert("trader sound end ["..utils.to_str(callback.trader_sound_end).."]")				--32
+	packet_alert("from box ["..utils.to_str(callback.take_item_from_box).."]")						--33
+	
+	packet_alert("buy cond ["..utils.to_str(callback.buy_condition).."]")							--nil
+	packet_alert("sell cond ["..utils.to_str(callback.sell_condition).."]")							--nil
+	packet_alert("show cond ["..utils.to_str(callback.show_condition).."]")							--nil
+--]]
 end
 
 function check_goodwill()
@@ -1081,7 +1120,7 @@ end
 function change_rank(npc, rval)
 	--if lastrepreward > 0 and npc:character_reputation() > 0 then	--not being a bad guy or zombied, give rank increase 
 		local newrank = npc:character_rank()	-- + rval
-		if TB3D_Modders.use_alife_message then packet_alert("CHG RANK: npc["..utils.to_str(npc:name()).."] was["..utils.to_str(newrank).."] reward["..utils.to_str(rval).."] last reward["..utils.to_str(lastrepreward).."]") end
+		if TB3D_Modders.use_alife_message then packet_alert("CHG RANK: npc["..utils.to_str(npc:name()).."] was["..utils.to_str(newrank).."] reward["..utils.to_str(rval).."]") end --last reward["..utils.to_str(lastrepreward).."]") end
 		if is_collector(2) == true then	--level up and reset rank/rep
 			newrank = newrank + (rval/2)
 			if newrank > 25000 then newrank = 25000 end
@@ -1509,49 +1548,49 @@ function teleportate(str)
 		if ini:line_exist(str,"x") then
 			 x=ini:r_float(str,"x")
 		else
-			news_manager.send_tip_txt(db.actor,"Attention:\\n parameter X does not exist, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Attention: parameter X does not exist, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if ini:line_exist(str,"y") then
 			 y=ini:r_float(str,"y")
 		else
-			news_manager.send_tip_txt(db.actor,"Attention:\\n parameter Y does not exist, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Attention: parameter Y does not exist, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if ini:line_exist(str,"z") then
 			 z=ini:r_float(str,"z")
 		else
-			news_manager.send_tip_txt(db.actor,"Please note:\\n the parameter Z does not exist, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Please note: the parameter Z does not exist, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if ini:line_exist(str,"lname_for_LC") then
 			 lname=tostring(ini:r_string(str,"lname_for_LC"))
 		else
-			news_manager.send_tip_txt(db.actor,"Warning:\\n There is no option lname_for_LC, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Warning: There is no option lname_for_LC, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if ini:line_exist(str,"gv") then
 			 gv=ini:r_float(str,"gv")
 		else
-			news_manager.send_tip_txt(db.actor,"Warning:\\n GV parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Warning: GV parameter does not exist, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if ini:line_exist(str,"lv") then
 			 lv=ini:r_float(str,"lv")
 		else
-			news_manager.send_tip_txt(db.actor,"Warning:\\n LV parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Warning: LV parameter does not exist, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if ini:line_exist(str,"question") then
 			 question=ini:r_s32(str,"question")
 		else
-			news_manager.send_tip_txt(db.actor,"Please note:\\n Question of the parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Please note: Question of the parameter does not exist, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if ini:line_exist(str,"id") then
 			 id=ini:r_s32(str,"id")
 		else
-			news_manager.send_tip_txt(db.actor,"Warning:\\n Id parameter does not exist, check the configuration File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Warning: Id parameter does not exist, check the configuration File TB3D_teleports.ltx")
 			 teleporting=false
 		end
 		if teleporting == true then
@@ -1568,10 +1607,10 @@ function teleportate(str)
 			1)
 			start_disconnect()
 		else
-			news_manager.send_tip_txt(db.actor,"ERROR:\\n Not all options exist in the section: ".. str ..". Check the integrity of the File TB3D_teleports.ltx")
+			news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n ERROR: Not all options exist in the section: ".. str ..". Check the integrity of the File TB3D_teleports.ltx")
 		end
 	else
-		news_manager.send_tip_txt(db.actor,"Section:\\n "..str..", does not exist!")
+		news_manager.send_tip_txt(db.actor,"TELEPORTER:\\n Section: "..str..", does not exist!")
 		teleporting=false
 	end
 	lname = ""
@@ -2456,9 +2495,29 @@ function move_actor(x,y,z,is_hit)
 	end
 end
 
-function rotate_actor(dir)
-	--packet_alert("TB3D: rotate actor["..utils.to_str(dir).."]")
-	db.actor:set_actor_direction(dir)		--110000
+local direction
+function rotate_actor(dir)									--110004
+	direction = dir
+end
+function check_rotate()										--110004
+	if direction then
+		packet_alert("TB3D: rotate actor["..utils.to_str(direction).."]")
+		local pos = db.actor:position()
+		local dir
+		local target
+		if direction == 90 then								--left
+			target = vector():set(pos.x+10, pos.y, pos.z)
+		elseif direction == -90 then						--right
+			target = vector():set(pos.x-10, pos.y, pos.z)
+		elseif direction == 180 then						--full 180
+			target = vector():set(pos.x, pos.y, pos.z-10)
+		else												--full 180
+			target = vector():set(pos.x, pos.y, pos.z+10)
+		end
+		dir = target:sub(pos)
+		db.actor:set_actor_direction(-dir:getH())
+		direction = nil
+	end
 end
 
 function check_box_closed()
@@ -2566,17 +2625,21 @@ function can_remove_dead(lname, npc_name)
 	elseif lname == "red_forest" then
 		if has_alife_info("zep24_have") then result = true end
 	elseif lname == "aver" then				--recon
-		--result = true
+		if is_collector(0) then result = true end
 	elseif lname == "puzir" then			--forgotten forest
-		--result = true
+		if is_collector(0) then result = true end
 	elseif lname == "hospital" then
-		if has_alife_info("zep24_have") then result = true end
+		--if has_alife_info("zep24_have") then result = true end
+		result = true
 	elseif lname == "jupiter" then
-		if has_alife_info("zep24_have") then result = true end
+		--if has_alife_info("zep24_have") then result = true end
+		result = true
 	elseif lname == "zaton" then
-		if has_alife_info("zep24_have") then result = true end
+		--if has_alife_info("zep24_have") then result = true end
+		result = true
 	elseif lname == "dead_city" then
-		if has_alife_info("zep24_have") then result = true end
+		if has_alife_info("zlobnuy_sity_one_start") then result = true end
+		--result = true
 	elseif lname == "l04u_labX18" then														--------underground/indoor levels------------
 		if has_alife_info("bar_darklab_document_done") then result = true end
 	elseif lname == "l03u_agr_underground" then
@@ -2592,15 +2655,16 @@ function can_remove_dead(lname, npc_name)
 	elseif lname == "jupiter_underground" then
 		if has_alife_info("zep24_have") then result = true end
     elseif lname == "l12u_control_monolith" then
-		if has_alife_info("zep24_have") then result = true end
+		--if has_alife_info("zep24_have") then result = true end
+		result = true
 	elseif lname == "peshera" then
-		if string_find(npc_name, "peshera_stalker_dead") then
+		--if string_find(npc_name, "peshera_stalker_dead") then
 			if is_collector(0) then result = true end
-		else
+		--else
 		--result = false
-		end
+		--end
     elseif lname == "av_peshera" then
-		--result = false
+		if is_collector(0) then result = true end
 	elseif lname == "predbannik" then
 		if has_alife_info("zep24_have") then result = true end
 	elseif lname == "promzone" then
@@ -2763,11 +2827,11 @@ function show_medkits(scopeused)
 			end
 		else
 			if cs then
-			   hud:RemoveCustomStatic("caption_medkit")
-			   hud:RemoveCustomStatic("caption_antirad")
-			   hud:RemoveCustomStatic("caption_bandage")
-			   hud:RemoveCustomStatic("caption_vodka")
-			   hud:RemoveCustomStatic("caption_button")
+				hud:RemoveCustomStatic("caption_medkit")
+				hud:RemoveCustomStatic("caption_antirad")
+				hud:RemoveCustomStatic("caption_bandage")
+				hud:RemoveCustomStatic("caption_vodka")
+				hud:RemoveCustomStatic("caption_button")
 				hud:RemoveCustomStatic("caption_value_1")
 				hud:RemoveCustomStatic("caption_value_2")
 				hud:RemoveCustomStatic("caption_value_3")
@@ -2957,7 +3021,6 @@ end
 function check_prior_version(tb3d_ver)											--109972
 	local obj
 	local stage = amk.load_variable("tb3d_fixer_stage", 0)		--returns 0 if not created yet
-	--local tb3d_ver = amk.load_variable("tb3d_version", 0)
 	started = get_started()
 	if started < 109984 and stage < 6 then stage = 0 end				--109984, redo fixes
 	packet_alert("TB3D: check prior version started["..utils.to_str(started).."] version["..utils.to_str(tb3d_ver).."] stage["..utils.to_str(stage).."]")
@@ -3045,6 +3108,18 @@ function check_prior_version(tb3d_ver)											--109972
 		--		end
 		--	end
 		end
+		stage = 7
+	end
+	if stage < 8 then
+		if started < 110004 then																		--110004, duplicate names in all.spawn
+			obj = alife():story_object(1441)															--sniper1_spawn_krusha1_restrictor
+			if obj then alife():release(obj) end
+			obj = alife():story_object(1443)															--sniper2_spawn2_krusha1_restrictor
+			if obj then alife():release(obj) end
+			if not has_alife_info("sniper_spawn_krusha1") then alife():create(1441) end
+			if not has_alife_info("sniper2_spawn2_krusha1") then alife():create(1443) end
+		end
+		stage = 8
 	end
 	amk.save_variable("tb3d_fixer_stage", stage)
 end
@@ -3201,6 +3276,76 @@ function is_difficulty3()
 		return true
 	else
 		return false
+	end
+end
+
+function check_lc_rotate(lname, sname)										--110004
+	if lname == "l05_bar" then
+		if sname == "yantar_old" then rotate_actor(180) end
+	elseif lname == "l06_rostok" then
+		if sname == "l07_military" then rotate_actor(90) end
+	elseif lname == "l04_darkvalley" then
+		if sname == "k01_darkscape" then rotate_actor(-90) end
+	elseif lname == "k01_darkscape" then
+		if sname == "l04_darkvalley" then rotate_actor(180)
+		elseif sname == "l01_escape" then rotate_actor(90) end
+	elseif lname == "zaton" then
+		if sname == "lost_village" then rotate_actor(180)
+		elseif sname == "pripyat" then rotate_actor(-90)
+		elseif sname == "level_f-1" then rotate_actor(-90) end
+	elseif lname == "l11_pripyat" then
+		if sname == "zaton" then rotate_actor(180)
+		elseif sname == "pripyat" then rotate_actor(-90)
+		elseif sname == "jupiter" then rotate_actor(90) end
+	elseif lname == "jupiter" then
+		if sname == "l11_pripyat" then rotate_actor(-90) end
+	elseif lname == "pripyat" then
+		if sname == "l11_pripyat" then rotate_actor(90)
+		elseif sname == "zaton" then rotate_actor(90) end
+	elseif lname == "predbannik" then
+		if sname == "promzone" then rotate_actor(180)
+		elseif sname == "yantar_old" then rotate_actor(-90) end
+	elseif lname == "promzone" then
+		if sname == "predbannik" then rotate_actor(180)
+		elseif sname == "swamp_old" then rotate_actor(90) end
+	elseif lname == "l01_krasivay" then
+		if sname == "l11_pripyat" then rotate_actor(90)
+		elseif sname == "l03_rinok" then rotate_actor(90) end
+	elseif lname == "l04_pogost" then
+		if sname == "l01_krasivay" then rotate_actor(-90)
+		elseif sname == "dead_city" then rotate_actor(-90) end
+	elseif lname == "dead_city" then
+		if sname == "l04_pogost" then rotate_actor(180)
+		elseif sname == "generators" then rotate_actor(180) end
+	elseif lname == "generators" then
+		if sname == "swamp_old" then rotate_actor(180)
+		elseif sname == "l12_stancia" then rotate_actor(180)
+		elseif sname == "promzone" then rotate_actor(180)
+		elseif sname == "yantar_old" then rotate_actor(-90) end
+	elseif lname == "warlab" then
+		if sname == "generators" then rotate_actor(180) end
+	elseif lname == "swamp_old" then
+		if sname == "generators" then rotate_actor(-90)
+		elseif sname == "l01_krasivay" then rotate_actor(90)
+		elseif sname == "promzone" then rotate_actor(-90) end
+	elseif lname == "yantar_old" then
+		if sname == "generators" then rotate_actor(-90)
+		elseif sname == "promzone" then rotate_actor(180)
+		elseif sname == "predbannik" then rotate_actor(180)
+		elseif sname == "l05_bar" then rotate_actor(-90) end
+	elseif lname == "aver" then
+		if sname == "l12_stancia" then rotate_actor(-90) end
+	elseif lname == "digger_stash" then
+		if sname == "yantar_old" then rotate_actor(-90) end
+	elseif lname == "l05_vokzal" then
+		if sname == "l11_pripyat" then rotate_actor(180) end
+	elseif lname == "hiding_road" then
+		if sname == "promzone" then rotate_actor(-90)
+		elseif sname == "level_f-1" then rotate_actor(90) end
+	elseif lname == "level_f-1" then
+		if sname == "hiding_road" then rotate_actor(-90) end
+	elseif lname == "jupiter_underground" then
+		if sname == "pripyat" then rotate_actor(-90) end
 	end
 end
 -- ----------------------------------------------------------------------------------------------------------------

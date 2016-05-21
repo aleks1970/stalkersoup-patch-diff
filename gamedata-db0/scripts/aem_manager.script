@@ -1,6 +1,6 @@
--- TB3D 1.1.0.0.0.2    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem,
--- fast saves, community, improvements, translate and text color - aleks1970
-function my_ver() return "1.1.0.0.0.2" end
+-- TB3D 1.1.0.0.0.4    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem,
+-- fast saves, community, improvements, translate and text color - aleks1970, debug
+function my_ver() return "1.1.0.0.0.4" end
 local time_open = TB3D_Modders.time_open
 local time_close = TB3D_Modders.time_close
 local stake1 = TB3D_Modders.stake1
@@ -974,6 +974,7 @@ function CArenaext:start(phr_id)
 	local spawn
 	local place
 	if info.group == "stakes" then
+		if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("arena spawning stakes") end
 		local team1 = self.teams[amk.load_variable(info.team1, "")]		-- spawn the first team - mutants
 		local a1 = team1.mutants_min
 		local b1 = team1.mutants_max
@@ -1003,6 +1004,7 @@ function CArenaext:start(phr_id)
 		end
 		TB3D_Services.give_info("aem_fight_wait")		-- delayed start
 	elseif info.group == "turnament" then
+		if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("arena spawning tournament") end
 		local team1 = self.teams[amk.load_variable(info.team1, "")]		-- spawn first team
 		local n1 = table.getn(team1.spawn1)
 		amk.save_variable("aem_team1", n1)
@@ -1696,16 +1698,16 @@ end
 -- void put_items_to_box(game_object box, {["section1"]=true, ["section2"]=true, ...} items)
 -------
 function put_items_to_box(box, items)
-	--TB3D_Services.packet_alert("aem mgr: put_items_to_box["..utils.to_str(box:name()).."]")
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: put_items_to_box["..utils.to_str(box:name()).."]") end
 	local obj
 	local cnt = db.actor:object_count()
 	for i=0, cnt-1 do
 		obj = db.actor:object(i)
 		if items[obj:section()] == true then
-			--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] transfered")
+			if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] transfered") end
 			db.actor:transfer_item(obj, box)
 		else
-			--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not transfered")
+			if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not transfered") end
 		end
 	end
 end
@@ -1715,17 +1717,17 @@ end
 -- void put_items_to_box_exept(game_object box, {["section1"]=true, ["section2"]=true, ...} exept)
 -------
 function put_items_to_box_except(box, except)
-	--TB3D_Services.packet_alert("aem mgr: put_items_to_box_except["..utils.to_str(box:name()).."]")
+	TB3D_Services.packet_alert("aem mgr: put_items_to_box_except["..utils.to_str(box:name()).."]")
 	local obj
 	local cnt = db.actor:object_count()
 	for i=0, cnt-1 do
 		obj = db.actor:object(i)
 		if obj:clsid() ~= clsid.equ_stalker_s then -- leave HS suit
 			if except[obj:section()] ~= true then
-				--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] transfered")
+				if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] transfered") end
 				db.actor:transfer_item(obj, box)
 			else
-				--TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not transfered")
+				if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: section["..utils.to_str(obj:section()).."] not transfered") end
 			end
 		end
 	end
@@ -1736,7 +1738,7 @@ end
 -- void get_items_from_box(game_object box)
 ------
 function get_items_from_box(box)
-	--TB3D_Services.packet_alert("aem mgr: get_items_from_box["..utils.to_str(box:name()).."]")
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: get_items_from_box["..utils.to_str(box:name()).."]") end
 	local obj
 	local ids = enum_box_items(box)
 	for i, id in pairs(ids) do
@@ -1753,7 +1755,7 @@ end
 -- void clear_items({["section1"]=true, ["section2"]=true, ...} items)
 -------
 function clear_items(items)
-	--TB3D_Services.packet_alert("aem mgr: clear_items from actor")
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: clear_items from actor") end
 	local obj
 	local cnt = db.actor:object_count()
 	for i=0, cnt-1 do
@@ -1770,7 +1772,7 @@ end
 -- void clear_box(game_object box)
 -------
 function clear_box(box)
-	--TB3D_Services.packet_alert("aem mgr: clear_box["..utils.to_str(box:name()).."]")
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: clear_box["..utils.to_str(box:name()).."]") end
 	local obj
 	local ids = enum_box_items(box)
 	for i, id in pairs(ids) do
@@ -1783,7 +1785,7 @@ end
 -- void clear_offline_box(number sid)
 -------
 function clear_offline_box(sid)
-	--TB3D_Services.packet_alert("aem mgr: clear_offline_box")
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: clear_offline_box") end
 	local obj = alife():story_object(sid)
 	if obj then
 		local box = obj.id
@@ -1803,7 +1805,7 @@ end
 -- {id1, id2, ...} enum_box_items(game_object box)
 -------
 function enum_box_items(box)
-	--TB3D_Services.packet_alert("aem mgr: enum_box_items["..utils.to_str(box:name()).."]")
+	if TB3D_Modders.use_arena_message == true then TB3D_Services.packet_alert("aem mgr: enum_box_items["..utils.to_str(box:name()).."]") end
 	local obj
 	local own
 	local ids = {}

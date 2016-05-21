@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.9.8 for new levels, 11502, 11503, 11521, 98977-98996, 98975-6, set_spots, 4500, test_list, optimized, peshera, npp1w
-function my_ver() return "1.0.9.9.9.8" end
+-- TB3D 1.1.0.0.0.4 for new levels, 11502, 11503, 11521, 98977-98996, 98975-6, set_spots, 4500, test_list, optimized, peshera, npp1w, atp, 6000, 97092
+function my_ver() return "1.1.0.0.0.4" end
 
 --level changers: sid = destination
 --if sid exists than create spot, does not include underground spots
@@ -7,30 +7,23 @@ local lc_table = {
 [91] = "to_garbage",
 [94] = "to_zaton",
 [95] = "to_hiding",
---[191] = "to_agroprom",
 [192] = "to_agroprom",
 [193] = "to_escape",
 [194] = "to_bar",
---[195] = "to_darkvalley",
 [196] = "to_darkvalley",
---[197] = "to_puzir",
---[198] = "to_puzir",
 [200] = "to_lostvillage",
 [201] = "to_marsh",
 [203] = "to_bar",
 [209] = "to_vokzal",
 [210] = "to_zaton",
 [211] = "to_darkforest",		--when ???
-[212] = "to_poli",		--when ???
+[212] = "to_poli",				--when ???
 [213] = "to_lostvillage",		--when ???
 [214] = "to_pripyat",
-[231] = "to_npp",		--when ???
-[232] = "to_pred",		--when ???
+[231] = "to_npp",				--when ???
+[232] = "to_pred",				--when ???
 [241] = "to_hiding",
 [242] = "to_prom",
---[251] = "to_aver",
---[252] = "to_peshera",
---[253] = "to_digger",
 [256] = "to_yanold",
 [257] = "to_hiding",
 [258] = "to_pred",
@@ -43,15 +36,14 @@ local lc_table = {
 [271] = "to_kras",
 [272] = "to_swampold",
 [273] = "to_pogost",
-[274] = "to_dd",		--when ???
+[274] = "to_dd",				--when ???
 [275] = "to_vokzal",
-[276] = "to_kras",		--when ???
+[276] = "to_kras",				--when ???
 [277] = "to_pripyat",
 [278] = "to_rinok",
 [279] = "to_dd",
 [280] = "to_dd",
 [282] = "to_redforest",		--when ???
---[284] = "to_jupunder",
 [285] = "to_escape",
 [286] = "to_darkscape",
 [292] = "to_generators",
@@ -92,7 +84,7 @@ local lc_table = {
 [1008] = "to_military",
 [1223] = "to_generators",
 [4500] = "to_pripyat",
-[6000] = "to_pripyat",
+[6000] = "to_pripyat",			--from npp2 tower after chaes, special big circle during gauntlet
 [6001] = "to_pripyat",			--when ???
 [6002] = "to_darkvalley",
 [6003] = "to_escape",
@@ -106,12 +98,6 @@ local lc_table = {
 [6011] = "to_eprip",
 [6012] = "to_deadcity",
 [6013] = "to_pogost",		--dead city to cemetery
---[6014] = "to_red"			--tunnels to red forest
---[6015] = "to_tech",		--diggers to tech
---[6016] = "to_rsrch",		--diggers to research
---[6017]  level_changer_lab_x14_to_sar
---[6018]  level_changer_lab_x14_to_eprip
---[6019] = "to_hosp",		--tunnels to hosp
 [6020] = "to_digger",
 [6021] = "to_digger",
 [6022] = "to_tunnels",		--hosp to tunnels
@@ -127,19 +113,14 @@ local lc_table = {
 [9109] = "to_radar",
 [9110] = "to_military",
 [9111] = "to_darkvalley",
---[9120] = "to_rostok",	--teleport_120 in escape beyond fence near village
+--[9120] = "to_rostok",		--teleport_120 in escape beyond fence near village
 [11500] = "to_puzir",
 [11502] = "to_cave",
 [11503] = "to_cave",
---[11504] = "to_garbage",
---[11505] = "to_agroprom",
 [11506] = "to_darkvalley",
 [11507] = "to_garbage",
 [11508] = "to_darkvalley",
 [11509] = "to_military",
---[11510] = "to_maze",
---[11511] = "to_aver",
---[11512] = "to_yantar",
 [11513] = "to_aver",
 [11514] = "to_aver",
 [11515] = "to_maze",
@@ -174,6 +155,7 @@ local lc_table = {
 [14002] = "to_marsh",
 [14091] = "to_redforest",
 [14101] = "to_limansk",
+[17040] = "to_deadcity",		--110004
 [18100] = "to_marsh",
 [18101] = "to_generators",
 [18109] = "to_lostvillage",
@@ -184,23 +166,23 @@ local lc_table = {
 [18114] = "to_atp",
 [21410] = "to_sarcofag",
 [31410] = "to_labx10",
-[31510] = "to_labx10",	--"to_sarcofag",
+[31510] = "to_labx10",			--"to_sarcofag",
 [31610] = "to_north_aes",
 [31710] = "to_sarcofag",
 [33001] = "to_marsh",
 [79891] = "to_north_aes",
 [97000] = "to_yanold",
 [97001] = "to_atp",
---[97021] = "to_maze",
+--[97021] = "to_maze",			--not shown
 [97041] = "to_pripyat",
 [97071] = "to_puzir",
 [97081] = "to_cave",
 [97091] = "to_military",
---[97092] = "to_escape",	--hidden lc on rocks in atp
+[97092] = "to_escape",			--hidden lc on rocks in atp
 [97093] = "to_garbage",
-[97094] = "to_warlab",		--in radar, given by Fang
+[97094] = "to_warlab",			--in radar, given by Fang
 [97098] = "to_warlab",
-[97099] = "to_atp",
+[97099] = "to_atp",				--from npp2 east side
 [97100] = "to_lostvillage",
 [97101] = "to_darkforest",
 [97102] = "to_aes",
@@ -216,11 +198,9 @@ local lc_table = {
 [97112] = "to_deadcity",
 [97113] = "to_zaton",
 [97114] = "to_deadcity",
---[97115] = "to_eprip",
 [97116] = "to_pripyat_n",
 [97117] = "to_pripyat_s",
---[97118] = "to_labx8",
---[97119] = "to_eprip",
+--[97118] = "to_labx8",			--not shown
 [98000] = "to_jupiter",
 [98001] = "to_eprip",
 [98002] = "to_jupiter",
@@ -289,6 +269,10 @@ local lc_table = {
 }
 
 local test_list = {								--109980, original game lcs to be verified
+--[191] = "to_agroprom",		--not in all.spawn
+--[195] = "to_darkvalley",		--not in all.spawn
+--[197] = "to_puzir",			--not in all.spawn
+--[198] = "to_puzir",			--not in all.spawn
 [9801]         = "lc_to_x10",
 [9802]         = "lc_to_svalka",
 [9803]         = "lc_to_as",
@@ -385,11 +369,44 @@ function set_spots()							--109980
 	for sid = 90, 99043 do
 		if lc_table[sid] then
 			obj = alife():story_object(sid)
-			if obj and level.map_has_object_spot(obj.id, "level_changer") == 0 then
-				if TB3D_Modders.show_spot_sid then
-					level.map_add_object_spot(obj.id, "level_changer", utils.to_str(sid))		--DEBUG: display sid
-				else
-					level.map_add_object_spot(obj.id, "level_changer", lc_table[sid]) 			--display name
+			if obj then
+				if sid == 6000 then																	--NPP2 exit to Pripyat after gauntlet
+					if has_alife_info("tb3d_chaes_done") then
+						if level.map_has_object_spot(obj.id, "crlc_biggest") ~= 0 then
+							level.map_remove_object_spot(obj.id, "crlc_biggest")
+						end
+					elseif has_alife_info("oso_question") then
+						if level.map_has_object_spot(obj.id, "crlc_biggest") == 0 then
+							level.map_add_object_spot(obj.id, "crlc_biggest", "tb3d_npp2chaes_hint")
+						end
+					end
+				elseif sid == 6021 then
+					if has_alife_info("zep17_have") and not has_alife_info("zep18_have") then
+						if level.map_has_object_spot(obj.id, "crlc_biggest") == 0 then
+							level.map_add_object_spot(obj.id, "crlc_biggest", "zep_doc_18_hint")
+						end
+					else
+						if level.map_has_object_spot(obj.id, "crlc_biggest") ~= 0 then
+							level.map_remove_object_spot(obj.id, "crlc_biggest")
+						end
+						if level.map_has_object_spot(obj.id, "level_changer") == 0 then
+							if TB3D_Modders.show_spot_sid then
+								level.map_add_object_spot(obj.id, "level_changer", utils.to_str(sid))		--DEBUG: display sid
+							else
+								level.map_add_object_spot(obj.id, "level_changer", lc_table[sid]) 			--display name
+							end
+						end
+					end
+				elseif sid == 97092 then															--ATP hidden in rocks
+					if level.map_has_object_spot(obj.id, "crlc_biggest") == 0 then
+						level.map_add_object_spot(obj.id, "crlc_biggest", "tb3d_atp_esc_hint")
+					end
+				elseif level.map_has_object_spot(obj.id, "level_changer") == 0 then
+					if TB3D_Modders.show_spot_sid then
+						level.map_add_object_spot(obj.id, "level_changer", utils.to_str(sid))		--DEBUG: display sid
+					else
+						level.map_add_object_spot(obj.id, "level_changer", lc_table[sid]) 			--display name
+					end
 				end
 			end
 		end
@@ -398,24 +415,24 @@ function set_spots()							--109980
 end
 
 local under_spots = {
-[251]="peshera",
-[252]="av_peshera",
-[253]="av_peshera",
-[284]="lab_x14",
-[6014]="cs_agroprom_underground",
-[6015]="digger_stash",
-[6016]="digger_stash",
-[6017]="lab_x14",
-[6018]="lab_x14",
-[6019]="cs_agroprom_underground",
-[11504]="peshera",
-[11505]="peshera",
-[11510]="av_peshera",
-[11511]="av_peshera",
-[11512]="av_peshera",
+[251]="peshera",							--[251] = "to_aver",
+[252]="av_peshera",							--[252] = "to_peshera",
+[253]="av_peshera",							--[253] = "to_digger",
+[284]="lab_x14",							--[284] = "to_jupunder",
+[6014]="cs_agroprom_underground",			--[6014] = "to_red"			--tunnels to red forest
+[6015]="digger_stash",						--[6015] = "to_tech",		--diggers to tech
+[6016]="digger_stash",						--[6016] = "to_rsrch",		--diggers to research
+[6017]="lab_x14",							--[6017]  level_changer_lab_x14_to_sar
+[6018]="lab_x14",							--[6018]  level_changer_lab_x14_to_eprip
+[6019]="cs_agroprom_underground",			--[6019] = "to_hosp",		--tunnels to hosp
+[11504]="peshera",							--[11504] = "to_garbage",
+[11505]="peshera",							--[11505] = "to_agroprom",
+[11510]="av_peshera",						--[11510] = "to_maze",
+[11511]="av_peshera",						--[11511] = "to_aver",
+[11512]="av_peshera",						--[11512] = "to_yantar",
 [97021]="peshera",
-[97115]="jupiter_underground",
-[97119]="labx8",
+[97115]="jupiter_underground",				--[97115] = "to_eprip",
+[97119]="labx8",							--[97119] = "to_eprip",
 [98004]="jupiter_underground",
 [98006]="jupiter_underground",
 [98015]="labx8",

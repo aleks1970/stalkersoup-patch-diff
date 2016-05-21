@@ -1,8 +1,8 @@
----TB3D 1.0.9.9.9.9 new - creates objects that get removed on level load prior to alloc then creates new objects,
+---TB3D 1.1.0.0.0.4 new - creates objects that get removed on level load prior to alloc then creates new objects,
 -- tb3d_esc_spawns, dyn_rad, get_monster_spot, marsh zones, cooling zones, new levels, rats back, marsh, hiding_road,
 -- l02_dd, bar turret, removed generate_arts, debug, level_up, removed level_up and moved spawns to tb3d_collector, x14,
--- spawn_sarc_pack, bar, deathclaws
-function my_ver() return "1.0.9.9.9.9" end
+-- spawn_sarc_pack, bar, deathclaws, limansk, core #2
+function my_ver() return "1.1.0.0.0.4" end
 
 --============= non-dynamic vehicles only spawned once ============================================================
 --	vehicle_tb3d_atv				- quad atvs
@@ -40,7 +40,7 @@ function my_ver() return "1.0.9.9.9.9" end
 -- fixed auto track player: turret_mgun.create_turret("turret_tb3d_pivot", "k01_darkscape", vector():set(-486.327,-0.966,-479.734), "killer", "", 60, 60)
 --=============================================================================================================================
 
-function dynamic_objects(lname)		--dynamic spawns on level spawn, last are removed by fixer on spawn
+function dynamic_objects(lname, sname)		--dynamic spawns on level spawn, last are removed by fixer on spawn
 	TB3D_Services.info_alert("tb3d triggers: dynamic spawns level["..lname.."]")
 	if lname == "l01_escape" then
 		if TB3D_Modders.use_heat_vapors == true then
@@ -87,18 +87,18 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 	elseif lname == "marsh" then ----------------------------------------------------------------------------------------------marsh
 		TB3D_Services.give_info("tb3d_marsh_zones")
 		if TB3D_Modders.use_swamp_mist == true then						
-			alife():create("zone_tuman_cop",vector():set(516.049,0.465,-151.257),491125,3563) --first camp outhouse
-			alife():create("zone_tuman_cop",vector():set(274.669,4.917,46.806),312960,3519)	-- mists in burnt ranch
+			alife():create("zone_tuman_cop",vector():set(516.049,0.465,-151.257),491125,3563)	--first camp outhouse
+			alife():create("zone_tuman_cop",vector():set(274.669,4.917,46.806),312960,3519)		-- mists in burnt ranch
 			alife():create("zone_tuman_cop",vector():set(258.602,4.159,72.975),301099,3516)
 			alife():create("zone_tuman_cop",vector():set(245.104,4.041,55.440),292294,3516)
-			alife():create("zone_tuman_cop",vector():set(383.790,-2.484,317.785),386353,3540) -- mists in cracks
+			alife():create("zone_tuman_cop",vector():set(383.790,-2.484,317.785),386353,3540)	-- mists in cracks
 			alife():create("zone_tuman_cop",vector():set(394.875,-2.016,318.315),386353,3540)
 			alife():create("zone_tuman_cop",vector():set(392.901,-1.775,314.055),386353,3540)
-			alife():create("zone_tuman_cop",vector():set(-127.758,-1.800,208.202),64900,3378) --swirl
-			alife():create("zone_tuman_cop",vector():set(-5.588,-0.518,20.285),132051,3414) --pump house
-			alife():create("zone_tuman_cop",vector():set(-125.061,-1.616,-273.075),82172,3381) --base outhouse
-			alife():create("zone_tuman_cop",vector():set(-316.804,-1.917,-163.847),5879,3356) --dip in far water
-			alife():create("zone_tuman_cop",vector():set(-269.555,-0.526,459.091),8913,3356)		--far edge accross the water
+			alife():create("zone_tuman_cop",vector():set(-127.758,-1.800,208.202),64900,3378)	--swirl
+			alife():create("zone_tuman_cop",vector():set(-5.588,-0.518,20.285),132051,3414)		--pump house
+			alife():create("zone_tuman_cop",vector():set(-125.061,-1.616,-273.075),82172,3381)	--base outhouse
+			alife():create("zone_tuman_cop",vector():set(-316.804,-1.917,-163.847),5879,3356)	--dip in far water
+			alife():create("zone_tuman_cop",vector():set(-269.555,-0.526,459.091),8913,3356)	--far edge accross the water
 			alife():create("zone_tuman_cop",vector():set(-336.332,-0.274,407.536),7842,3356)
 			alife():create("zone_tuman_cop",vector():set(-387.885,-0.697,339.524),7842,3356)
 			alife():create("zone_tuman_cop",vector():set(-412.657,-0.306,271.979),7842,3356)
@@ -131,7 +131,7 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			alife():create("zone_fog_indoor",vector():set(-182.024,2.115,534.371),119948,3393) --small cave
 		end
 		alife():create("zone_large_heat_distort_tb3d",vector():set(386.212,-1.713,318.689),397307,3549)	--crack near factory
-		alife():create("zone_large_heat_distort_tb3d",vector():set(-335.463,-0.562,77.249),49,3378)	--accross from abandoned tower in crack
+		alife():create("zone_large_heat_distort_tb3d",vector():set(-335.463,-0.562,77.249),49,3378)		--accross from abandoned tower in crack
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-338.205,-0.662,65.336),49,3378)
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-338.235,-0.678,53.346),49,3378)
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-342.432,-0.673,39.698),49,3378)
@@ -147,35 +147,35 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-284.273,-0.198,459.545),3415,3356)
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-294.447,-0.697,445.559),5865,3356)
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-360.142,0.785,-63.271),3415,3356)	--island in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-353.063,0.050,-93.700),3415,3356)	--islands in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-357.240,0.429,-80.078),3415,3356)	--islands in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-360.142,0.785,-63.271),3415,3356)	--islands in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-363.394,0.725,-47.031),3415,3356)	--islands in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-366.026,0.580,-29.365),876,3348)	--islands in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-365.897,0.191,-14.720),876,3348)	--islands in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-365.257,0.378,4.851),876,3348)		--islands in front of barge
-		alife():create("zone_emi_tb3d",vector():set(-363.173,0.585,16.847),876,3348)	--islands in front of barge
-		meceniy_dinrad.spawn_rad_zone(vector():set(-175.060,-0.482,-107.649),65664,3394,0.05)	--near base along fence
-		meceniy_dinrad.spawn_rad_zone(vector():set(-216.424,-0.369,371.471),28596,3361,0.05)	--nw corner, controllers
-		meceniy_dinrad.spawn_rad_zone(vector():set(-238.929,-0.833,-164.433),30358,3360,0.05)	--around pump station
+		alife():create("zone_emi_tb3d",vector():set(-353.063,0.050,-93.700),3415,3356)					--islands in front of barge
+		alife():create("zone_emi_tb3d",vector():set(-357.240,0.429,-80.078),3415,3356)					--islands in front of barge
+		alife():create("zone_emi_tb3d",vector():set(-360.142,0.785,-63.271),3415,3356)					--islands in front of barge
+		alife():create("zone_emi_tb3d",vector():set(-363.394,0.725,-47.031),3415,3356)					--islands in front of barge
+		alife():create("zone_emi_tb3d",vector():set(-366.026,0.580,-29.365),876,3348)					--islands in front of barge
+		alife():create("zone_emi_tb3d",vector():set(-365.897,0.191,-14.720),876,3348)					--islands in front of barge
+		alife():create("zone_emi_tb3d",vector():set(-365.257,0.378,4.851),876,3348)						--islands in front of barge
+		alife():create("zone_emi_tb3d",vector():set(-363.173,0.585,16.847),876,3348)					--islands in front of barge
+		meceniy_dinrad.spawn_rad_zone(vector():set(-175.060,-0.482,-107.649),65664,3394,0.05)			--near base along fence
+		meceniy_dinrad.spawn_rad_zone(vector():set(-216.424,-0.369,371.471),28596,3361,0.05)			--nw corner, controllers
+		meceniy_dinrad.spawn_rad_zone(vector():set(-238.929,-0.833,-164.433),30358,3360,0.05)			--around pump station
 		meceniy_dinrad.spawn_rad_zone(vector():set(-24.411,0.677,200.279),112232,3396,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(81.789,-0.538,10.520),169490,3446,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(29.095,-0.653,39.577),158606,3437,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(-23.226,-0.653,-13.656),151795,3437,0.05)
-		meceniy_dinrad.spawn_rad_zone(vector():set(434.779,-0.529,-186.802),431864,3554,0.05)	--se creek and pool
+		meceniy_dinrad.spawn_rad_zone(vector():set(434.779,-0.529,-186.802),431864,3554,0.05)			--se creek and pool
 		meceniy_dinrad.spawn_rad_zone(vector():set(404.702,-0.391,-160.593),412581,3547,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(433.963,-0.849,-160.470),419489,3547,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(561.983,-0.214,-125.638),508513,3567,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(469.077,1.175,-231.929),434193,3547,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(532.738,-0.413,-10.171),500367,3548,0.05)
-		meceniy_dinrad.spawn_rad_zone(vector():set(221.439,-0.449,-17.806),283659,3518,0.05)	--around burnt ranch
+		meceniy_dinrad.spawn_rad_zone(vector():set(221.439,-0.449,-17.806),283659,3518,0.05)			--around burnt ranch
 		meceniy_dinrad.spawn_rad_zone(vector():set(250.158,-0.652,372.721),295228,3509,0.05)
-		meceniy_dinrad.spawn_rad_zone(vector():set(215.325,-0.519,390.703),281693,3488,0.05)	--upper wasteland
+		meceniy_dinrad.spawn_rad_zone(vector():set(215.325,-0.519,390.703),281693,3488,0.05)			--upper wasteland
 		meceniy_dinrad.spawn_rad_zone(vector():set(192.439,-0.531,465.991),265378,3488,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(96.645,-0.557,435.052),221228,3474,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(-101.856,-0.660,407.822),96543,3393,0.05)
 		meceniy_dinrad.spawn_rad_zone(vector():set(-102.238,-0.701,371.592),96542,3393,0.05)
-		alife():create("zone_small_low_fog_tb3d",vector():set(-47.897,-0.385,301.973),115772,3402)			--pit in village with water tower
+		alife():create("zone_small_low_fog_tb3d",vector():set(-47.897,-0.385,301.973),115772,3402)		--pit in village with water tower
 		alife():create("zone_large_heat_distort_tb3d",vector():set(-47.897,-0.385,301.973),115772,3402)
 		if has_alife_info("tb3d_gb1_done") then
 			TB3D_Mobs.spawn_deathclaws(-269.555,-0.526,459.091,8913,3356,2,2)			--far edge accross the water
@@ -310,22 +310,37 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			alife():create("tb3dm_gigant_strong", vector():set(100.497,-0.001,-387.222),386832,2400)
 		end
 	elseif lname == "l12_stancia_2" then
-		alife():create("zone_fog_cigarette",vector():set(775.831,-0.047,189.699),206885,2639)
+		alife():create("zone_fog_cigarette",vector():set(775.831,-0.047,189.699),206885,2639)		--strange fog that sends player to roof near generators
 		alife():create("zone_fog_cigarette",vector():set(774.940,-0.059,180.787),206885,2639)
 		alife():create("zone_fog_cigarette",vector():set(766.636,-0.100,188.829),206885,2639)
 		alife():create("zone_fog_cigarette",vector():set(762.765,-0.100,185.783),206885,2639)
 		alife():create("zone_fog_cigarette",vector():set(757.506,-0.101,183.582),205817,2633)
+		alife():create("zone_fog_indoor",vector():set(154.773,37.024,128.334),69619,2549)			--110004, inside core #2
+		alife():create("zone_fire_tb3d",vector():set(154.773,37.024,128.334),69619,2549)
+		meceniy_dinrad.spawn_rad_zone(vector():set(154.773,37.024,128.334),69619,2549,0.5)
+		alife():create("zone_fog_cigarette",vector():set(138.901,35.210,127.712),69619,2549)		--110004, inside core #2
+		alife():create("zone_fire_tb3d",vector():set(138.901,35.210,127.712),69619,2549)
+		meceniy_dinrad.spawn_rad_zone(vector():set(138.901,35.210,127.712),69619,2549,0.5)
+		alife():create("zone_fog_indoor",vector():set(117.521,35.768,127.340),69619,2549)			--110004, inside core #2
+		alife():create("zone_fire_tb3d",vector():set(117.521,35.768,127.340),69619,2549)
+		meceniy_dinrad.spawn_rad_zone(vector():set(117.521,35.768,127.340),69619,2549,0.5)
+		alife():create("zone_fog_cigarette",vector():set(122.616,36.761,108.569),69619,2549)		--110004, inside core #2
+		alife():create("zone_fire_tb3d",vector():set(122.616,36.761,108.569),69619,2549)
+		meceniy_dinrad.spawn_rad_zone(vector():set(122.616,36.761,108.569),69619,2549,0.5)
+		alife():create("zone_fog_indoor",vector():set(132.770,39.150,88.698),69619,2549)			--110004, inside core #2
+		alife():create("zone_fire_tb3d",vector():set(132.770,39.150,88.698),69619,2549)
+		meceniy_dinrad.spawn_rad_zone(vector():set(132.770,39.150,88.698),69619,2549,0.5)
 	elseif lname == "k01_darkscape" then
 		if has_alife_info("falling_car") then
 			if has_alife_info("zep12_have") and not has_alife_info("zep14_have") then
 				turret_mgun.create_turret("turret_tb3d_pkm", "k01_darkscape", vector():set(-468.449,-1.04,-482.794), "killer", "", 60, 50)		--sw road before cordon exit
 				turret_mgun.create_turret("turret_tb3d_pivot", "k01_darkscape", vector():set(-137.163,5.865,-530.620), "killer", "", 100, 60)	--south pass
 				turret_mgun.create_turret("turret_tb3d_pkm", "k01_darkscape", vector():set(426.534,-0.27,-380.279), "killer", "", 60, 50)		--gas station
-				turret_mgun.create_turret("turret_tb3d_pivot", "k01_darkscape", vector():set(429.022,18.919,279.687), "killer", "", 100, 50)		--rail bridge
+				turret_mgun.create_turret("turret_tb3d_pivot", "k01_darkscape", vector():set(429.022,18.919,279.687), "killer", "", 100, 50)	--rail bridge
 				turret_mgun.create_turret("turret_tb3d_pkm", "k01_darkscape", vector():set(469.177,21.102,285.762), "killer", "", 60, 50)		--east rail tunnel
 				turret_mgun.create_turret("turret_tb3d_pkm", "k01_darkscape", vector():set(397.446,20.411,289.952), "killer", "", 60, 50)		--catwalk
 				turret_mgun.create_turret("turret_tb3d_pkm", "k01_darkscape", vector():set(338.769,21.102,285.925), "killer", "", 60, 50)		--west rail tunnel
-				turret_mgun.create_turret("turret_tb3d_pivot", "k01_darkscape", vector():set(375.938,18.922,278.696), "killer", "", 100, 50)		--rail bride
+				turret_mgun.create_turret("turret_tb3d_pivot", "k01_darkscape", vector():set(375.938,18.922,278.696), "killer", "", 100, 50)	--rail bride
 				turret_mgun.create_turret("turret_tb3d_pkm", "k01_darkscape", vector():set(239.358,1.786,565.539), "killer", "", 60, 50)		--tank bridge
 			elseif has_alife_info("tweed_zep1_done") then
 				turret_mgun.create_turret("turret_tb3d_pivot", "k01_darkscape", vector():set(429.022,18.919,279.687), "killer", "", 100, 80)		--rail bridge
@@ -357,9 +372,16 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		turret_mgun.create_turret("turret_tb3d_barrier", "limansk", vector():set(95.053,10.424,-353.519), "killer", "", 100, 80, 0)
 		turret_mgun.create_turret("turret_tb3d_barrier", "limansk", vector():set(47.498,11.713,-399.065), "killer", "", 100, 80, 0)
 		--turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(178.917,7.002,135.842), "killer", "", 50, 80)		--front of house near tunnel
-		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(159.334,9.308,99.218), "killer", "", 50, 80)		--between houses near tunnel
-		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(149.622,8.226,52.019), "killer", "", 50, 80)		--n between houses
-		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(194.732,7.634,28.505), "killer", "", 50, 80)		--n between houses
+		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(159.334,9.308,99.218), "killer", "", 50, 80)			--between houses near tunnel
+		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(149.622,8.226,52.019), "killer", "", 50, 80)			--n between houses
+		turret_mgun.create_turret("turret_tb3d_pkm", "limansk", vector():set(194.732,7.634,28.505), "killer", "", 50, 80)			--n between houses
+		if not has_alife_info("lim_fence_open") then																				--110004, must deactivate switch to continue
+			alife():create("zone_emi_tb3d",vector():set(63.421,3.407,329.894),56315,3023)	--fence
+			alife():create("zone_emi_tb3d",vector():set(58.129,3.333,330.070),54506,3023)	--fence
+			alife():create("zone_emi_tb3d",vector():set(46.805,2.939,304.053),51130,3023)	--pool
+			alife():create("zone_emi_tb3d",vector():set(51.627,2.938,303.906),51905,3023)	--pool
+			alife():create("zone_emi_tb3d",vector():set(49.174,3.091,304.116),51385,3023)	--pool
+		end
 	elseif lname == "lost_village" then
 	
 	
@@ -430,7 +452,7 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		alife():create("zone_tuman_cop",vector():set(227.404,14.267,-314.810),1103937,3734)
 		alife():create("zone_tuman_cop",vector():set(-35.673,15.215,-322.139),658009,3710) --heart chamber
 		alife():create("zone_tuman_cop",vector():set(-25.824,15.115,-324.239),673844,3710)	
-		spawn_anomoly("zone_fountain_tb3d",230.474,14.267,-308.928,1100530,3734)--fountains in sump
+		spawn_anomoly("zone_fountain_tb3d",230.474,14.267,-308.928,1100530,3734)			--fountains in sump
 		spawn_anomoly("zone_fountain_tb3d",238.869,14.266,-309.001,1100530,3734)
 		spawn_anomoly("zone_fountain_tb3d",238.701,14.266,-312.983,1100524,3734)
 		spawn_anomoly("zone_fountain_tb3d",230.543,14.267,-316.874,1100518,3734)
@@ -442,7 +464,7 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		spawn_anomoly("zone_fountain_tb3d",240.060,14.263,-303.352,1122038,3735)
 		spawn_anomoly("zone_fountain_tb3d",230.178,14.266,-312.154,1120894,3735)
 		spawn_anomoly("zone_fountain_tb3d",230.103,14.266,-302.295,1120894,3735)
-		spawn_anomoly("zone_emi_tb3d",146.145,16.780,-251.393,965516,3735) --sump area
+		spawn_anomoly("zone_emi_tb3d",146.145,16.780,-251.393,965516,3735)					--sump area
 		spawn_anomoly("zone_emi_tb3d",125.964,17.780,-250.077,933119,3727)
 		spawn_anomoly("zone_emi_tb3d",134.874,16.864,-286.700,946370,3727)
 		spawn_anomoly("zone_emi_tb3d",151.121,16.614,-307.969,973701,3735)
@@ -464,9 +486,9 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 		spawn_anomoly("zone_emi_tb3d",206.600,17.482,-329.492,1068622,3734)
 		spawn_anomoly("zone_emi_tb3d",204.330,20.389,-327.160,1065065,3734)
 		spawn_anomoly("zone_emi_tb3d",206.814,16.757,-256.120,1068726,3735)
-		spawn_anomoly("zone_emi_tb3d",-30.735,36.044,-321.462,666015,3710) --heart chamber roof
-		meceniy_dinrad.spawn_rad_zone(vector():set(104.270,26.213,-349.510),898767,3734,0.05) --van in sump area	
-		meceniy_dinrad.spawn_rad_zone(vector():set(143.764,16.368,-428.208),960653,3726,0.25, 24) --drainage pool
+		spawn_anomoly("zone_emi_tb3d",-30.735,36.044,-321.462,666015,3710)							--heart chamber roof
+		meceniy_dinrad.spawn_rad_zone(vector():set(104.270,26.213,-349.510),898767,3734,0.05)		--van in sump area	
+		meceniy_dinrad.spawn_rad_zone(vector():set(143.764,16.368,-428.208),960653,3726,0.25, 24)	--drainage pool
 		meceniy_dinrad.spawn_rad_zone(vector():set(131.889,16.368,-426.734),940089,3726,0.25, 24)
 		meceniy_dinrad.spawn_rad_zone(vector():set(119.625,16.366,-425.804),919414,3726,0.25, 24)
 	elseif lname == "zaton" then -------------------------------------------------------------------------------------------backwater
@@ -475,12 +497,12 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			alife():create("zone_tuman_cop",vector():set(-150.294,-23.482,-180.884),641421,3673)	-- cave under station
 			alife():create("zone_tuman_cop",vector():set(-150.294,-23.482,-180.884),641421,3673)
 			alife():create("zone_tuman_cop",vector():set(-99.357,-6.429,-194.681),740340,3673)
-			alife():create("zone_tuman_cop",vector():set(-108.160,4.851,-153.448),770554,3679) -- cave under station
-			alife():create("zone_tuman_cop",vector():set(-417.805,-1.153,51.118),151475,3660) --bl pit
+			alife():create("zone_tuman_cop",vector():set(-108.160,4.851,-153.448),770554,3679)		-- cave under station
+			alife():create("zone_tuman_cop",vector():set(-417.805,-1.153,51.118),151475,3660)		--bl pit
 			alife():create("zone_tuman_cop",vector():set(-417.825,-1.150,56.560),151491,3660)
-			alife():create("zone_tuman_cop",vector():set(-417.849,-1.151,57.918),151495,3660) --bl pit
-			alife():create("zone_tuman_cop",vector():set(-431.900,2.780,6.489),132274,3660) --end of drain
-			alife():create("zone_tuman_cop",vector():set(-446.143,-9.311,159.839),116112,3660) --swirls
+			alife():create("zone_tuman_cop",vector():set(-417.849,-1.151,57.918),151495,3660)		--bl pit
+			alife():create("zone_tuman_cop",vector():set(-431.900,2.780,6.489),132274,3660)			--end of drain
+			alife():create("zone_tuman_cop",vector():set(-446.143,-9.311,159.839),116112,3660)		--swirls
 			alife():create("zone_tuman_cop",vector():set(-432.549,-9.954,184.378),123797,3660)
 			alife():create("zone_tuman_cop",vector():set(-416.905,-10.712,209.172),123797,3660)
 			alife():create("zone_tuman_cop",vector():set(-448.160,-9.015,226.254),116112,3660)
@@ -492,11 +514,11 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			alife():create("zone_tuman_cop",vector():set(-442.987,-9.393,144.053),115330,3660)
 			alife():create("zone_tuman_cop",vector():set(-421.340,-9.059,179.709),184065,3666)
 			alife():create("zone_tuman_cop",vector():set(-338.511,-7.461,151.738),275469,3666)
-			alife():create("zone_tuman_cop",vector():set(-329.064,-7.293,143.661),292897,3666) --swirls
-			alife():create("zone_tuman_cop",vector():set(-302.143,12.399,-163.028),342174,3672)--swamp claws in twisted tree
+			alife():create("zone_tuman_cop",vector():set(-329.064,-7.293,143.661),292897,3666)		--swirls
+			alife():create("zone_tuman_cop",vector():set(-302.143,12.399,-163.028),342174,3672)		--swamp claws in twisted tree
 			alife():create("zone_tuman_cop",vector():set(-307.977,12.095,-158.566),331600,3672)
 			alife():create("zone_tuman_cop",vector():set(-312.134,12.675,-165.972),323888,3672)
-			alife():create("zone_tuman_cop",vector():set(266.661,21.171,-302.271),1420007,3690) --crack of doom
+			alife():create("zone_tuman_cop",vector():set(266.661,21.171,-302.271),1420007,3690)		--crack of doom
 			alife():create("zone_tuman_cop",vector():set(270.236,14.736,-294.698),1424807,3690)
 			alife():create("zone_tuman_cop",vector():set(273.597,10.257,-285.273),1434028,3688)
 			alife():create("zone_tuman_cop",vector():set(278.276,6.649,-274.859),1441977,3688)
@@ -509,7 +531,7 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			alife():create("zone_tuman_cop",vector():set(299.068,-7.130,-220.060),1473995,3688)
 			alife():create("zone_tuman_cop",vector():set(302.765,-7.440,-211.468),1480110,3688)
 			alife():create("zone_tuman_cop",vector():set(305.820,-7.470,-203.373),1484280,3688)
-			alife():create("zone_tuman_cop",vector():set(401.938,-4.333,420.907),1628575,3689) --dome
+			alife():create("zone_tuman_cop",vector():set(401.938,-4.333,420.907),1628575,3689)		--dome
 			alife():create("zone_tuman_cop",vector():set(395.533,-5.331,433.138),1628575,3689)
 			alife():create("zone_tuman_cop",vector():set(403.648,-4.976,436.939),1630720,3689)
 			alife():create("zone_tuman_cop",vector():set(394.381,-5.688,441.313),1628575,3689)
@@ -528,10 +550,10 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			alife():create("zone_tuman_cop",vector():set(377.546,-4.853,428.682),1589784,3689)
 		end
 		if TB3D_Modders.use_fog == true then
-			alife():create("zone_fog_indoor",vector():set(-106.707,-9.334,-209.306),727364,3673) -- cave under filling station
-			alife():create("zone_fog_indoor",vector():set(-99.357,-6.429,-194.681),740340,3673) --bl pit
-			alife():create("zone_fog_indoor",vector():set(-418.204,-1.151,64.378),151510,3660) --swirls
-			alife():create("zone_fog_indoor",vector():set(-435.172,-9.065,156.668),115330,3660) --swirls, chopper
+			alife():create("zone_fog_indoor",vector():set(-106.707,-9.334,-209.306),727364,3673)	-- cave under filling station
+			alife():create("zone_fog_indoor",vector():set(-99.357,-6.429,-194.681),740340,3673)		--bl pit
+			alife():create("zone_fog_indoor",vector():set(-418.204,-1.151,64.378),151510,3660)		--swirls
+			alife():create("zone_fog_indoor",vector():set(-435.172,-9.065,156.668),115330,3660)		--swirls, chopper
 		end
 		if TB3D_Modders.use_smoke == true then
 			alife():create("zone_fog_cigarette",vector():set(-71.391,7.477,254.903),799048,3675) --cave under houses
@@ -628,24 +650,24 @@ function dynamic_objects(lname)		--dynamic spawns on level spawn, last are remov
 			TB3D_Mobs.spawn_deathclaws(-152.144,20.099,259.131,117457,4344,2,2)				--nw, strong
 		end
 	elseif lname == "l01_krasivay" then
-		--if TB3D_Modders.use_random_tanks and TB3D_Services.is_collector() then
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(-66.896,1.09,122.875), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(-59.086,1.079,116.656), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(55.887,3.41,-70.635), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(80.110,3.987,-58.190), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(99.758,6.547,-58.487), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(118.739,5.211,165.949), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(150.073,5.282,98.883), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(153.838,5.44,121.142), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(174.477,5.728,99.962), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(193.255,6.588,77.710), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(208.941,8.013,65.236), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(150.937,5.004,84.738), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(136.370,5.298,100.438), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(166.327,6.683,58.848), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(158.701,6.861,44.818), "killer", "", 40, 60)
-			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(204.252,9.679,30.939), "killer", "", 40, 60)
-		--end
+		if sname ~= "swamp_old" then
+			turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(204.252,9.679,30.939), "killer", "", 40, 60)		--corner across from lc
+		end
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(-66.896,1.09,122.875), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(-59.086,1.079,116.656), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(55.887,3.41,-70.635), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(80.110,3.987,-58.190), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(99.758,6.547,-58.487), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(118.739,5.211,165.949), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(150.073,5.282,98.883), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(153.838,5.44,121.142), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(174.477,5.728,99.962), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(193.255,6.588,77.710), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(208.941,8.013,65.236), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(150.937,5.004,84.738), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(136.370,5.298,100.438), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(166.327,6.683,58.848), "killer", "", 40, 60)
+		turret_mgun.create_turret("turret_tb3d_pkm", "l01_krasivay", vector():set(158.701,6.861,44.818), "killer", "", 40, 60)
 	elseif lname == "l01_poligon" then
 	
 	

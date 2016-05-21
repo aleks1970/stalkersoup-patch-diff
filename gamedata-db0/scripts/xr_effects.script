@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.0 commented out lamps, added forced weapon hiding, changed end game after credits, fixed arena box and items
+--TB3D 1.1.0.0.0.4 commented out lamps, added forced weapon hiding, changed end game after credits, fixed arena box and items
 --activate_bolt commented out, cleanup, military_dolg_dead, optimized, rad_barrels, pripyat, localized, kostya_restrictors,
--- translate, debug, skip groups, send_tip_id optimization, gold bars, sar_monolit_send, start small reject, debug, aem lights
-function my_ver() return "1.0.9.9.9.0" end
+-- translate, debug, skip groups, send_tip_id optimization, gold bars, sar_monolit_send, start small reject, debug, aem lights, teleport
+function my_ver() return "1.1.0.0.0.4" end
 ----------------------------------------------------------------------------------------------------
 -- General functions
 ----------------------------------------------------------------------------------------------------
@@ -990,103 +990,116 @@ local function transfer_object_item(item)
 end
 
 function bar_arena_teleport ( actor, npc)
-	inv_box_1 = level_object_by_sid (573)
-	aem_manager.transfer_to_box(inv_box_1)
-	local spawn_items = {}  
-	if has_alife_info("bar_arena_fight_1") then 
-		table.insert(spawn_items, "wpn_pm")
-		table.insert(spawn_items, "ammo_9x18_pmm")
-		table.insert(spawn_items, "ammo_9x18_pmm")
-		table.insert(spawn_items, "wpn_knife")
-		table.insert(spawn_items, "novice_outfit")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-	elseif has_alife_info("bar_arena_fight_2") then
-		table.insert(spawn_items, "wpn_mp5")
-		table.insert(spawn_items, "ammo_9x19_pbp")
-		table.insert(spawn_items, "wpn_knife")    
-		table.insert(spawn_items, "killer_outfit")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-	elseif has_alife_info("bar_arena_fight_3") then
-		table.insert(spawn_items, "wpn_bm16")
-		table.insert(spawn_items, "ammo_12x70_buck")
-		table.insert(spawn_items, "ammo_12x70_buck")
-		table.insert(spawn_items, "wpn_knife")
-		table.insert(spawn_items, "stalker_outfit")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-	elseif has_alife_info("bar_arena_fight_4") then      
-		table.insert(spawn_items, "wpn_ak74")
-		table.insert(spawn_items, "ammo_5.45x39_ap")
-		table.insert(spawn_items, "ammo_5.45x39_ap")
-		table.insert(spawn_items, "wpn_knife")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "military_outfit")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-	elseif has_alife_info("bar_arena_fight_5") then  
-		table.insert(spawn_items, "wpn_abakan")
-		table.insert(spawn_items, "ammo_5.45x39_ap")
-		table.insert(spawn_items, "ammo_5.45x39_ap")
-		table.insert(spawn_items, "ammo_5.45x39_ap")
-		table.insert(spawn_items, "wpn_knife")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "svoboda_light_outfit")
-	elseif has_alife_info("bar_arena_fight_6") then
-		table.insert(spawn_items, "wpn_groza")
-		table.insert(spawn_items, "ammo_9x39_ap")
-		table.insert(spawn_items, "ammo_9x39_ap")
-		table.insert(spawn_items, "ammo_9x39_ap")
-		table.insert(spawn_items, "wpn_knife")
-		table.insert(spawn_items, "grenade_f1")
-		table.insert(spawn_items, "specops_outfit")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-	elseif has_alife_info("bar_arena_fight_7") then
-		table.insert(spawn_items, "wpn_knife")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "grenade_f1")
-		table.insert(spawn_items, "grenade_f1")
-		table.insert(spawn_items, "grenade_f1")
-		table.insert(spawn_items, "grenade_f1")
-		table.insert(spawn_items, "neytral_exo_antigas_outfit")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-	elseif has_alife_info("bar_arena_fight_8") then
-		table.insert(spawn_items, "wpn_g36")
-		table.insert(spawn_items, "ammo_5.56x45_ap")
-		table.insert(spawn_items, "ammo_5.56x45_ap")
-		table.insert(spawn_items, "ammo_5.56x45_ap")
-		table.insert(spawn_items, "ammo_5.56x45_ap")
-		table.insert(spawn_items, "wpn_knife")
-		table.insert(spawn_items, "killer_blue_exoskeleton")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "medkit")
-		table.insert(spawn_items, "bandage")
-		table.insert(spawn_items, "bandage")
+	if TB3D_Modders.Global_Debug == true then
+		TB3D_Services.packet_alert("xr effects: bar arena teleport")
 	end
-	for k,v in pairs(spawn_items) do
-		alife():create(v, 
-            db.actor:position(),
-            db.actor:level_vertex_id(), 
-            db.actor:game_vertex_id(), 
-            db.actor:id())
-	end 
-	aem_lights.lights_on(TB3D_Modders.aem_light_style)	--causes actor freeze in arena
+	local act_id = db.actor:id()
+	if act_id then
+		inv_box_1 = level_object_by_sid (573)
+		aem_manager.transfer_to_box(inv_box_1)
+		local spawn_items = {}  
+		if has_alife_info("bar_arena_fight_1") then 
+			table.insert(spawn_items, "wpn_pm")
+			table.insert(spawn_items, "ammo_9x18_pmm")
+			table.insert(spawn_items, "ammo_9x18_pmm")
+			table.insert(spawn_items, "wpn_knife")
+			table.insert(spawn_items, "novice_outfit")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+		elseif has_alife_info("bar_arena_fight_2") then
+			table.insert(spawn_items, "wpn_mp5")
+			table.insert(spawn_items, "ammo_9x19_pbp")
+			table.insert(spawn_items, "wpn_knife")    
+			table.insert(spawn_items, "killer_outfit")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+		elseif has_alife_info("bar_arena_fight_3") then
+			table.insert(spawn_items, "wpn_bm16")
+			table.insert(spawn_items, "ammo_12x70_buck")
+			table.insert(spawn_items, "ammo_12x70_buck")
+			table.insert(spawn_items, "wpn_knife")
+			table.insert(spawn_items, "stalker_outfit")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+		elseif has_alife_info("bar_arena_fight_4") then      
+			table.insert(spawn_items, "wpn_ak74")
+			table.insert(spawn_items, "ammo_5.45x39_ap")
+			table.insert(spawn_items, "ammo_5.45x39_ap")
+			table.insert(spawn_items, "wpn_knife")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "military_outfit")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+		elseif has_alife_info("bar_arena_fight_5") then  
+			table.insert(spawn_items, "wpn_abakan")
+			table.insert(spawn_items, "ammo_5.45x39_ap")
+			table.insert(spawn_items, "ammo_5.45x39_ap")
+			table.insert(spawn_items, "ammo_5.45x39_ap")
+			table.insert(spawn_items, "wpn_knife")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "svoboda_light_outfit")
+		elseif has_alife_info("bar_arena_fight_6") then
+			table.insert(spawn_items, "wpn_groza")
+			table.insert(spawn_items, "ammo_9x39_ap")
+			table.insert(spawn_items, "ammo_9x39_ap")
+			table.insert(spawn_items, "ammo_9x39_ap")
+			table.insert(spawn_items, "wpn_knife")
+			table.insert(spawn_items, "grenade_f1")
+			table.insert(spawn_items, "specops_outfit")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+		elseif has_alife_info("bar_arena_fight_7") then
+			table.insert(spawn_items, "wpn_knife")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "grenade_f1")
+			table.insert(spawn_items, "grenade_f1")
+			table.insert(spawn_items, "grenade_f1")
+			table.insert(spawn_items, "grenade_f1")
+			table.insert(spawn_items, "neytral_exo_antigas_outfit")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+		elseif has_alife_info("bar_arena_fight_8") then
+			table.insert(spawn_items, "wpn_g36")
+			table.insert(spawn_items, "ammo_5.56x45_ap")
+			table.insert(spawn_items, "ammo_5.56x45_ap")
+			table.insert(spawn_items, "ammo_5.56x45_ap")
+			table.insert(spawn_items, "ammo_5.56x45_ap")
+			table.insert(spawn_items, "wpn_knife")
+			table.insert(spawn_items, "killer_blue_exoskeleton")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "medkit")
+			table.insert(spawn_items, "bandage")
+			table.insert(spawn_items, "bandage")
+		end
+		local pos = db.actor:position()
+		local gv = db.actor:game_vertex_id()
+		local lv = db.actor:level_vertex_id()
+		--TB3D_Services.packet_alert("xr effects: bar arena teleport posx["..utils.to_str(pos.x).."] posy["..utils.to_str(pos.y).."] posz["..utils.to_str(pos.z).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."]")
+		--NOTE 110004: The following will freeze the game if the player inventory is too large !!!!!
+		if pos and lv and gv then
+			for k,v in pairs(spawn_items) do
+				alife():create(v, pos, lv, gv, act_id)
+			end
+		else
+			TB3D_Services.packet_alert("xr effects: bar arena teleport bad position info!!!!")
+		end
+		aem_lights.lights_on(TB3D_Modders.aem_light_style)	--causes actor freeze in arena
+	else
+		TB3D_Services.packet_alert("xr effects: bar arena teleport no actor id!!!!")
+	end
 end
 
 function bar_arena_weapon_slot ()

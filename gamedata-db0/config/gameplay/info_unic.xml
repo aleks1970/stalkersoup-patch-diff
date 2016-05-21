@@ -1,4 +1,4 @@
-<!-- TB3D 1.1.0.0.0.3 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
+<!-- TB3D 1.1.0.0.0.4 new levels, companions, jupunder doors, agro final, skip groups, treasure hunt wrapup, soul cube,
  predbannik_barman, zver_taken, more content, articles, suit, storm stages, storm_over, lanky suit, tb3d_gbars_chp2, storm-->
  
 <game_information_portions>
@@ -59,6 +59,8 @@
 <info_portion id="tb3d_crest2_done"></info_portion>			<!-- 110000, after storm -->
 
 <info_portion id="tb3d_syslov_dialog_storm"></info_portion>			<!-- 110003, yantar scientist about storm -->
+<info_portion id="tb3d_spawn_backwater_stash"></info_portion>		<!-- 110004, spawn stash in backwater after talking to arnie -->
+<info_portion id="tb3d_backwater_stash_found"></info_portion>		<!-- 110004, found stash in backwater -->
 
 <!-- ZEP: on findind a document, place last one in journal ---------------------------------------------------->
 <info_portion id="zep00_have">								<!-- ds gas station: send sms to talk to barman -->
@@ -301,14 +303,15 @@
 <info_portion id="pred_barkeep_zep1_done"></info_portion>		<!-- barman first meet -->
 <info_portion id="pred_barkeep_zep2_done"></info_portion>		<!-- barman about snitch -->
 <info_portion id="pred_barkeep_zep3_done"></info_portion>		<!-- barman about booze -->
-<info_portion id="tb3d_pred_trader"/>							<!-- spawns trader, model has bad cycles NEED FIX -->
+<info_portion id="tb3d_pred_start"></info_portion>				<!-- 110003, first time in pred -->
+<info_portion id="tb3d_pred_trader"></info_portion>				<!-- spawns trader, model has bad cycles NEED FIX -->
 <info_portion id="wr_barman_informer_yes"></info_portion>		<!-- dd informant can go to wr -->
 <info_portion id="wr_barman_informer_no"></info_portion>		<!-- dd informant cannot go to wr -->
 <info_portion id="tb3d_spawn_omon"></info_portion>				<!-- spawns pred_baza_omon_smart 1-10 inside helipad area levelup 3-->
 <info_portion id="tb3d_spawn_army"></info_portion>				<!-- spawns pred_baza_army_smart 1-10 huts and gate levelup 4-->
-<info_portion id="tb3d_pred_attack"/>							<!-- spawns blockpost capt. stalker:predbannik_blokpost_soldier70 -->
+<info_portion id="tb3d_pred_attack"></info_portion>				<!-- spawns blockpost capt. stalker:predbannik_blokpost_soldier70 -->
 <info_portion id="predbannik_podmoga_blokpost"></info_portion>	<!-- blockpost capt on death, spawns pre_blokpost_military_guard_ on road-->
-<info_portion id="tb3d_pred_comm"/>								<!-- freedom (nuetral) in helipad comm center NOT USED YET-->
+<info_portion id="tb3d_pred_comm"></info_portion>				<!-- freedom (nuetral) in helipad comm center NOT USED YET-->
 <info_portion id="obmorok_dialog1_done"></info_portion>			<!-- -->
 <info_portion id="obmorok_dialog2_done"></info_portion>			<!-- -->
 <info_portion id="karatel_dialog1_done"></info_portion>			<!-- -->

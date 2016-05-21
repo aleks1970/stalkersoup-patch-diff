@@ -1,9 +1,9 @@
---TB3D 1.1.0.0.0.0 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
+--TB3D 1.1.0.0.0.4 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
 -- bandranen_pda, get protected item, _fss, merged death_generic keep items, tb3d_gspot, zep, redone for exact only,
 -- ckts and flasks, pushka_fotik, m_car, explosive_barrel, wpn_gungauss, optimized using tags, debug, has_protected_item,
--- playboy10
+-- playboy10, get_section
 
-function my_ver() return "1.0.9.9.9.8" end
+function my_ver() return "1.1.0.0.0.4" end
 local string_find = string.find
 local string_sub = string.sub
 
@@ -86,7 +86,8 @@ local tag8_prot = {
 	["mono_not"] = true,
 	["wpn_flam"] = true,
 	["wpn_mp5_"] = true,
-	["wpn_rpg7"] = true					--TB3D 109940
+	["wpn_rpg7"] = true,					--TB3D 109940
+	["gold_art"] = true						--110004
 }
 local tag9_prot = {
 	["playboy10"] = true
@@ -149,10 +150,12 @@ local tag11_prot = {
 function obj_is_protected(sobj)
 	local result=false
 	if _g.is_disconnecting == false then							-- not while disconnect or startup
-		--TB3D_Services.packet_alert("protected items start")
+		if TB3D_Modders.use_inventory_message == true and result == true then
+			TB3D_Services.packet_alert("protected items start")
+		end
 		if sobj then
 			if sobj.section then
-				local item_section = sobj:section()
+				local item_section = get_section(sobj) 						--110004
 				if item_section and item_section ~= "" then
 					if tag7_prot[string_sub(item_section, 1, 7)] then
 						result = true

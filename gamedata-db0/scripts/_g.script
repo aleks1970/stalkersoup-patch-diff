@@ -1,6 +1,7 @@
--- TB3D 1.1.0.0.0.0 added tables to debug, new rep system, optimized, cleanup, db calls, added intervals, show_tables, generic_m_story_id, post process, is_spawner
+-- TB3D 1.1.0.0.0.4 added tables to debug, new rep system, optimized, cleanup, db calls, added intervals,
+--show_tables, generic_m_story_id, post process, is_spawner, get_level_index
 prefetch("TB3D_Modders")
-function my_ver() return "1.1.0.0.0.0" end
+function my_ver() return "1.1.0.0.0.4" end
 
 if (jit == nil) then
   profiler.setup_hook()
@@ -32,6 +33,7 @@ can_leave = 6
 is_spawner = false									--109998, bypass pop control if from spawn menu
 time_changed = true									--110000, used to reset weather in bind_stalker.update
 delta_100 = 0
+near_enemy_count = 1								--110004, for display on hud
 
 -- Loads the schema from a file on the disk and activates a motivator.
 -- Here:
@@ -63,6 +65,7 @@ for sect, val in pairs(iniSections) do
 end
 
 function getIniValueFloat(sect, line, default, iniFileName)
+	--TB3D_Services.packet_alert("_G: getIniValueFloat")
     if sect and line then
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
@@ -94,10 +97,12 @@ function getIniValueFloat(sect, line, default, iniFileName)
             end
         end
     end
+	--TB3D_Services.packet_alert("_G: getIniValueFloat done")
     return default
 end
 
 function getIniValueU32(sect, line, default, iniFileName)
+	--TB3D_Services.packet_alert("_G: getIniValueU32")
     if sect and line then
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
@@ -129,10 +134,12 @@ function getIniValueU32(sect, line, default, iniFileName)
             end
         end
     end
+	--TB3D_Services.packet_alert("_G: getIniValueU32 done")
     return default
 end
 
 function getIniValueString(sect, line, default, iniFileName)
+	--TB3D_Services.packet_alert("_G: getIniValueString")
     if sect and line then
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
@@ -164,10 +171,12 @@ function getIniValueString(sect, line, default, iniFileName)
             end
         end
     end
+	--TB3D_Services.packet_alert("_G: getIniValueString done")
     return default
 end
 
 function getIniValueStringWQ(sect, line, default, iniFileName)
+	--TB3D_Services.packet_alert("_G: getIniValueStringWQ")
     if sect and line then
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
@@ -197,10 +206,12 @@ function getIniValueStringWQ(sect, line, default, iniFileName)
             end
         end
     end
+	--TB3D_Services.packet_alert("_G: getIniValueStringWQ done")
    return default
 end
 
 function getIniValueBool(sect, line, default, iniFileName)
+	--TB3D_Services.packet_alert("_G: getIniValueBool")
     if sect and line then
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
@@ -233,6 +244,7 @@ function getIniValueBool(sect, line, default, iniFileName)
             end
         end
     end
+	--TB3D_Services.packet_alert("_G: getIniValueBool done")
     return default
 end
 
@@ -269,7 +281,7 @@ function iniLinesCount(sect, iniFileName)
 end
 
 function iniLineSectionExist(sect, iniFileName)
---TB3D_Services.info_alert("_g  section exist")
+	--TB3D_Services.packet_alert("_G: iniLineSectionExist")
     if sect then
         if iniCaching and (iniSections[sect] or iniSectionsCount == 0) then
             if iniFileName and (not iniOtherLines[iniFileName]
@@ -292,11 +304,12 @@ function iniLineSectionExist(sect, iniFileName)
             return (ini and ini:section_exist(sect))
         end
     end
+	--TB3D_Services.packet_alert("_G: iniLineSectionExist done")
     return false
 end
 
 function getIniLine(sect, lineNumber, defaultKey, defaultValue, iniFileName)
---TB3D_Services.info_alert("_g  get line")
+	--TB3D_Services.packet_alert("_G: getIniLine")
     if sect and lineNumber then
         if iniStatistic then
             if iniStat[sect] then iniStat[sect] = iniStat[sect] + 1 else iniStat[sect] = 1 end
@@ -332,10 +345,12 @@ function getIniLine(sect, lineNumber, defaultKey, defaultValue, iniFileName)
             end
         end
     end
+	--TB3D_Services.packet_alert("_G: getIniLine done")
     return false, defaultKey, defaultValue
 end
 
 function getIniValuePrepare(valueType, sect, iniFileName)
+	--TB3D_Services.packet_alert("_G: getIniValuePrepare")
     local ini
     local sectLines
     if iniFileName then
@@ -360,6 +375,7 @@ function getIniValuePrepare(valueType, sect, iniFileName)
         end
         sectLines = iniLines[valueType][sect]
     end
+	--TB3D_Services.packet_alert("_G: getIniValuePrepare done")
 	return ini, sectLines
 end
 -------======= / ini reading functions by sapsan =======------
@@ -1441,7 +1457,8 @@ IAmAStalker = {}
 function IAmAStalkerInit()
     IAmAStalker = {
         [clsid.actor] = true,
-        [clsid.script_stalker] = true
+        [clsid.script_stalker] = true,
+		[34] = true
     }
 end
 IAmAMonster = {}
@@ -1492,6 +1509,74 @@ function get_section(obj)					--110000
 --]]
 	end
 	return sect
+end
+
+level_index = {
+["..."] = 0,
+["l01_escape"] = 1,
+["l02_garbage"] = 2,
+["l03_agroprom"] = 3,
+["l03u_agr_underground"] = 4,
+["l04_darkvalley"] = 5,
+["l04u_labx18"] = 6,
+["l05_bar"] = 7,
+["l06_rostok"] = 8,
+["l08_yantar"] = 9,
+["l08u_brainlab"] = 10,
+["l07_military"] = 11,
+["l10_radar"] = 12,
+["l11_pripyat"] = 13,
+["l12_stancia"] = 14,
+["l12u_sarcofag"] = 15,
+["l12u_control_monolith"] = 16,
+["l12_stancia_2"] = 17,
+["l10u_bunker"] = 18,
+["atp_for_test22"] = 19,
+["peshera"] = 20,
+["puzir"] = 21,
+["aver"] = 22,
+["av_peshera"] = 23,
+["limansk"] = 24,
+["hospital"] = 25,
+["generators"] = 26,
+["warlab"] = 27,
+["red_forest"] = 28,
+["lost_village"] = 29,
+["marsh"] = 30,
+["dead_city"] = 31,
+["zaton"] = 32,
+["jupiter"] = 33,
+["pripyat"] = 34,
+["jupiter_underground"] = 35,
+["labx8"] = 36,
+["cs_agroprom_underground"] = 37,
+["predbannik"] = 38,
+["garbage_old"] = 39,
+["yantar_old"] = 40,
+["swamp_old"] = 41,
+["hiding_road"] = 42,
+["k01_darkscape"] = 43,
+["dark_forest"] = 44,
+["level_f-1"] = 45,
+["promzone"] = 46,
+["deadcity"] = 47,
+["l01_krasivay"] = 48,
+["l02_dd"] = 49,
+["l03_rinok"] = 50,
+["l04_pogost"] = 51,
+["l05_vokzal"] = 52,
+["digger_stash"] = 53,
+["lab_x14"] = 54,
+["collector22"] = 55,
+["l01_poligon"] = 56
+}
+local level_indx
+function get_level_index(lname)			--110004
+	if level_indx == nil then
+		level_indx = level_index[lname]
+		TB3D_Services.packet_alert("_g: level["..lname.."] index["..utils.to_str(level_indx).."]")
+	end
+	return level_indx
 end
 
 function level_object_by_sid( sid )

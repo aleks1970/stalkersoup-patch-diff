@@ -1,8 +1,8 @@
---TB3D 1.1.0.0.0.2 zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.1.0.0.0.4 zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
 -- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns, spawn quest bandits,
 -- spawn_mob, spawn_tushkanos, promzone, 906 -harsh, spawn_deathclaws
-function my_ver() return "1.1.0.0.0.2" end
+function my_ver() return "1.1.0.0.0.4" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -940,24 +940,17 @@ function spawn_agrou_bandits()						--109997
 end
 
 --============================ HARSH LEVEL SPAWNS ==============================================
-function check_eprip_spawns(level_up)
+function check_eprip_spawns(sname, level_up)
 	local typ, qty
 	local spawns = amk.load_variable("eprip_spawns", 0)
+	TB3D_Services.packet_alert("East Pripyat spawns["..utils.to_str(spawns).."] level up["..utils.to_str(level_up).."] from["..utils.to_str(sname).."]")
 	if TB3D_Triggers.eprip_spawns(spawns) then												--109978, consolidated to triggers
 		amk.save_varible("eprip_spawns", spawns+1)
-	end
-	if level_up == 1 then																--Collector = ZEP, Gold Bars and treasure hunt
-		if sname == "jupiter_underground" then
-			eprip_exit_jupu()
-		elseif sname == "labx8" then
-			eprip_exit_labx8()													--109998, gold bars
-		end
 	end
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6		--harsh
 		qty = 10
 	else
-		typ = 3		--city
 		qty = 2
 		spawn_rats(-153.966,-0.467,-189.385,51516,3752,qty)
 		spawn_rats(-96.738,0.506,-245.988,94442,3756,qty)
@@ -968,27 +961,43 @@ function check_eprip_spawns(level_up)
 		spawn_rats(144.527,-0.505,-56.168,373652,3766,qty)
 		spawn_rats(317.088,-0.078,245.918,483818,3769,qty)
 		spawn_rats(171.339,-0.428,409.823,401433,3769,qty)
+		if level_up == 1 then															--110004, Collector = ZEP, Gold Bars and treasure hunt
+			if sname == "jupiter_underground" then
+				eprip_exit_jupu()
+			elseif sname == "labx8" then
+				eprip_exit_labx8()														--109998, gold bars
+			elseif sname == "l11_pripyat" then
+				qty = 6
+				spawn_killer_squad(38.355,1.409,182.464,249696,3761,6,qty,false)		--110004, n of H shaped building
+				spawn_killer_squad(36.087,1.554,111.623,246401,3758,7,qty,false)		--110004, s of H shaped building
+				spawn_killer_squad(20.151,-0.391,367.885,224573,3760,6,qty,false)		--110004, around theater
+				spawn_killer_squad(64.696,0.151,373.311,283013,3760,7,qty,false)		--110004, around theater
+				spawn_killer_squad(106.378,0.717,367.584,331405,3760,6,qty,false)		--110004, around theater
+			end
+		end
+		qty = 1
+		typ = 3		--city
 	end
-	spawn_mob(-153.966,-0.467,-189.385,51516,3752,typ, qty)		--playground
-	spawn_mob(-96.738,0.506,-245.988,94442,3756,typ, qty)		--bookstore
-	spawn_mob(-96.047,-0.425,-350.417,94942,3753,typ, qty)		--n of playground
-	spawn_mob(19.167,-0.424,-326.185,221806,3756,typ, qty)		--statue
-	spawn_mob(-21.300,-0.507,-155.657,168813,3756,typ, qty)		--center
-	spawn_mob(62.658,-0.319,-48.081,280796,3766,typ, qty)		--theater
-	spawn_mob(144.527,-0.505,-56.168,373652,3766,typ, qty)		--n exit
-	spawn_mob(163.778,-0.396,194.960,393156,3769,typ, qty)		--storage bins
-	spawn_mob(287.592,-0.363,213.238,474216,3769,typ, qty)		--near dock
-	spawn_mob(317.088,-0.078,245.918,483818,3769,typ, qty)		--patio near dock
-	spawn_mob(316.140,-9.175,293.587,483682,3769,typ, qty)		--waters edge
-	spawn_mob(171.339,-0.428,409.823,401433,3769,typ, qty)		--ne exit
+	spawn_mob(-153.966,-0.467,-189.385,51516,3752,typ, qty)			--playground
+	spawn_mob(-96.738,0.506,-245.988,94442,3756,typ, qty)			--bookstore
+	spawn_mob(-96.047,-0.425,-350.417,94942,3753,typ, qty)			--n of playground
+	spawn_mob(19.167,-0.424,-326.185,221806,3756,typ, qty)			--statue
+	spawn_mob(-21.300,-0.507,-155.657,168813,3756,typ, qty)			--center
+	spawn_mob(62.658,-0.319,-48.081,280796,3766,typ, qty)			--theater
+	spawn_mob(144.527,-0.505,-56.168,373652,3766,typ, qty)			--n exit
+	spawn_mob(163.778,-0.396,194.960,393156,3769,typ, qty)			--storage bins
+	spawn_mob(287.592,-0.363,213.238,474216,3769,typ, qty)			--near dock
+	spawn_mob(317.088,-0.078,245.918,483818,3769,typ, qty)			--patio near dock
+	spawn_mob(316.140,-9.175,293.587,483682,3769,typ, qty)			--waters edge
+	spawn_mob(171.339,-0.428,409.823,401433,3769,typ, qty)			--ne exit
 end
 
 function eprip_exit_jupu()
-	spawn_npcs(206.827,-0.415,-279.036,431486,3765,6,2)						--near farrari
-	spawn_npcs(133.216,-0.334,-279.646,360185,3765,6,2)						--other end of bulding
-	spawn_npcs(189.921,-0.509,-217.184,419675,3765,6,2)						--corner accross from exit
-	spawn_npcs(157.848,-0.474,-204.615,386476,3765,6,2)						--courtyard by hdqtrs
-	spawn_npcs(125.283,-0.430,-205.338,351607,3765,6,2)						--container in front of hdqtrs
+	spawn_npcs(206.827,-0.415,-279.036,431486,3765,6,2)				--near farrari
+	spawn_npcs(133.216,-0.334,-279.646,360185,3765,6,2)				--other end of bulding
+	spawn_npcs(189.921,-0.509,-217.184,419675,3765,6,2)				--corner accross from exit
+	spawn_npcs(157.848,-0.474,-204.615,386476,3765,6,2)				--courtyard by hdqtrs
+	spawn_npcs(125.283,-0.430,-205.338,351607,3765,6,2)				--container in front of hdqtrs
 end
 
 function check_cemetery_spawns()

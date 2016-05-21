@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.0 localized hit styles, actor blowout, show_hit_actions, dynamite, small_hit, level 5, hit_on_spawn()
-function my_ver() return "1.0.9.9.8.0" end
+--TB3D 1.1.0.0.0.4 localized hit styles, actor blowout, show_hit_actions, dynamite, small_hit, level 5, hit_on_spawn()
+function my_ver() return "1.1.0.0.0.4" end
 -- bone = "bip01_spine" will force armor to be considered when hit
 
 local string_find = string.find
@@ -443,16 +443,19 @@ function hit_companion(npc, who, power)
 end
 
 function hit_car(obj)
-	if TB3D_Modders.show_hit_actions == true then
-		TB3D_Services.packet_alert("tb3d hit styles: car hit["..obj:name().."]")
+	if obj.hit then
+		--if TB3D_Modders.show_hit_actions == true then
+			TB3D_Services.packet_alert("tb3d hit styles: car hit["..obj:name().."]")
+		--end
+		local h = hit()	
+		h.type = hit.explosion
+		h.impulse = 0.0001
+		h.draftsman = db.actor
+		h.power = 0
+		h.direction = vector():set(0,0,0)		
+		obj:hit(h)	
+		obj.health = 400
 	end
-	local h = hit()	
-	h.type = hit.explosion
-	h.impulse = 0.001
-	h.draftsman = db.actor
-	h.power = 0
-	h.direction = vector():set(0,0,0)		
-	obj:hit(h)	
 end
 
 function hit_on_spawn(obj)						--109980, legacy code moved here from bind_monster
