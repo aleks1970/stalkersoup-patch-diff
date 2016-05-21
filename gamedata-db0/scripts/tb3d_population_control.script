@@ -1,10 +1,10 @@
--- TB3D 1.1.0.0.0.2 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.1.0.0.0.3 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized,
 -- pri_monolith_10, vampire, specnaz_dead, generators, esc2_ respawns, is_spawner, sepaerate can_go_online for monsters and stalkers,
 -- radar
-function my_ver() return "1.1.0.0.0.2" end
+function my_ver() return "1.1.0.0.0.3" end
 -----over population control----
 local string_find = string.find
 local string_sub = string.sub
@@ -908,8 +908,8 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 				elseif hdr4 == "dar_" or hdr4 == "gar_" or hdr4 == "agr_" or hdr6 == "mil_bo" then
 					result = true
 				elseif hdr6 == "dark_b" 		--dark btr
-				  or hdr6 == "dark_s" 		--dark btr soldiers
-				  or hdr6 == "bland_" 		--belong only in DV
+				  or hdr6 == "dark_s" 			--dark btr soldiers
+				  or hdr6 == "bland_" 			--belong only in DV
 				  or hdr4 == "sak_" then
 					if extended_levels then
 						dont_spawn_online = true
@@ -972,11 +972,33 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 							result = true
 						end
 					elseif string_find(obj_name, "stalker_0001") then			--109989, Barin wandering around warehouse exit
-						if has_alife_info("naemn_shturm_poluch_done") then		-- after humback mission
+						if extended_levels then
+							dont_spawn_online = true
+						elseif has_alife_info("naemn_shturm_poluch_done") then		-- after humback mission
 							result = true
 						else
 							dont_spawn_online = true
 						end
+					elseif string_find(obj_name, "house_stalker")					--110003, reduce npc after level up
+					  or string_find(obj_name, "angar_zoneguard")
+					  or string_find(obj_name, "zastava_guard_2")
+					  or string_find(obj_name, "dolg_regular_1")
+					  or string_find(obj_name, "bar_visitors_") --1_2")
+					  --or string_find(obj_name, "bar_visitors_2_1")
+					  --or string_find(obj_name, "bar_visitors_3_2")
+					  --or string_find(obj_name, "bar_visitors_3_3")
+					  --or string_find(obj_name, "bar_visitors_3_4")
+					  or string_find(obj_name, "bunker_2")
+					  or string_find(obj_name, "bunker_3")
+					  or string_find(obj_name, "bunker_4")
+					  or string_find(obj_name, "bunker_0002") then
+						if extended_levels then
+							dont_spawn_online = true
+						else
+							result = true
+						end
+					--elseif string_find(obj_name, "barman") then					--for testing
+						--dont_spawn_online = true
 					else
 						result = true
 					end
@@ -1012,7 +1034,12 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 					  or string_find(obj_name, "_vorobey")
 					  or string_find(obj_name, "_prapor")
 					  or string_find(obj_name, "_stalker_novice")
-					  then result = true
+					  then
+						if extended_levels then
+							dont_spawn_online = true
+						else
+							result = true
+						end
 					end
 				end
 			elseif lname == "l06_rostok" then
@@ -1715,7 +1742,7 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 				if hdr4 == "gen_"			--short circuit known spawns
 				  or hdr6 == "gener_"
 				  or hdr6 == "genera" then
-					if not extended_levels then								--109993, wait for collector
+					if extended_levels then								--110003
 						dont_spawn_online = true
 					else
 						result = true
@@ -2916,19 +2943,8 @@ function monster_can_go_online(obj)		--110000, called by se_monster
 			elseif lname == "generators" then
 				if hdr4 == "gen_"			--short circuit known spawns
 				  or hdr6 == "gener_"
-				  or hdr6 == "genera" then
-					if not extended_levels then								--109993, wait for collector
-						if string_find(obj_name, "burer2")					--generators_burer2
-						  or string_find(obj_name, "_bloodsucker_strong1")
-						  or string_find(obj_name, "bloodsucker_na_krushe")
-						  or string_find(obj_name, "_chim") then
-							dont_spawn_online = true
-						else
-							result = true
-						end
-					else
-						result = true
-					end
+				  or hdr6 == "genera" then		--110003
+					result = true
 				elseif hdr4 == "sim_" then										--see if allowed simulation
 					if string_find(obj_name, "generators_")
 					  or string_find(obj_name, "gener_") then

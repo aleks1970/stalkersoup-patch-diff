@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.2  added hide weapon option, The Collector, restored keylogger, abort_alert added,
+-- TB3D 1.1.0.0.0.3  added hide weapon option, The Collector, restored keylogger, abort_alert added,
 -- fov nvision fixed, added Meltac DDOF option, toggle dig NV, adjusted slices, re-wrote hiding weapons
 -- re-wrote on item take to add short-circuiting of section tests, dmx135, added art det, chgd modders interface
 -- removed vkluchit_generator_done as it has flaw in all.spawn, fixed save/load amkII error, chgd fixer, fixed ara_pda,
@@ -10,8 +10,8 @@
 -- force_garbage_collect, earth shake, xr_spawner, time_now, no avi in collector, update alert last, ftl time, debug,
 -- informer_out, blow(), on_item_take, removed blowout_wave, run_hide, active community, removed unused timers, restrictor slice,
 -- mteleport updates, memory check on save, deactivated modders calls, slice levels, removed amk_utils cache, meceniy_outfit-net_destroy,
---  translate, moved dx11 check, slices, moved braad_test.update to tb3d_stalker
-function my_ver() return "1.1.0.0.0.2" end
+--  translate, moved dx11 check, slices, moved braad_test.update to tb3d_stalker, on_spawn
+function my_ver() return "1.1.0.0.0.3" end
 -- TB3D re-written 08/15/2011
 -- file from the mod "People Salsola 2009" from 14.06.
 -- Adapted to the Manager of weapons. Rulix aka Bak on 02/07/2009
@@ -27,7 +27,7 @@ slice_base	= 1													--time slicer, global for xr motivator
 time_now 	= 0													--global time, all synch to the actor update in motivator
 ---- end globals ------------------------
 
-local RestrictionStock = TB3D_Modders.restrict_stock			--Restrictions on the capacity of equipment if true
+local RestrictionStock = TB3D_Modders.restrict_stock			--Restrictions on the capacity of equipment carried if true
 local weapon_hide = false										--used by update
 local last_time													--used by time slicer, must start as nil
 
@@ -47,7 +47,6 @@ local upd_timeMED
 local upd_timeSAK
 local upd_timeWEP
 local upd_timeSCP
-local upd_timeRST 		--restrictors has it's own
 local upd_timeTSK
 local upd_timeNET
 local upd_timeKEY		--keylogger 109950
@@ -105,10 +104,10 @@ local upd_time_RST = 20		--restrictors		--most important, uses own counter
 
 -----------slice_base is a muliplier of above----------------
 --------also used as a skip condition: *(<slice) in above-----------------
-local delta_high = TB3D_Modders.delta_critical     	-- below 60ms, slice = 4 else slice = 5		(worst case)
-local delta_moderate = TB3D_Modders.delta_moderate	-- below 50ms, slice = 3
-local delta_low = TB3D_Modders.delta_low			-- below 40ms, slice = 2
-local delta_lowest = TB3D_Modders.delta_lowest		-- below 30ms, slice = 1					(process all)
+local delta_high = TB3D_Modders.delta_critical     	-- below 100ms, slice = 4 else slice = 5	(worst case, 5 also happens on idle)
+local delta_moderate = TB3D_Modders.delta_moderate	-- below 80ms, slice = 3
+local delta_low = TB3D_Modders.delta_low			-- below 60ms, slice = 2
+local delta_lowest = TB3D_Modders.delta_lowest		-- below 50ms, slice = 1					(process all)
 
 local table_sort = table.sort
 local math_ceil = math.ceil
@@ -118,7 +117,7 @@ local game_difficulty_by_num = {
   [2] = "gd_veteran",
   [3] = "gd_master",
   [4] = "gd_collector"		--!!!!TB3D
-  }
+}
 
 local last_weather
  
@@ -151,20 +150,20 @@ function actor_binder:net_spawn(data)
 		TB3D_Services.packet_alert("BSTALK: actor net spawn")
 	end
 	local lname = level.name()
-	_g.is_disconnecting = false					--110000
+	_g.is_disconnecting = false															--110000
 	zamok.restore()
 	babah.collectBombs()
 	level.show_indicators()
 	self.bCheckStart = true
-	self.weapon_hide = false -- hidden or not the weapon during a conversation.
-	weapon_hide = false  --used by cars, arhara, medicines
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn2")
-	end
+	self.weapon_hide = false 															-- hidden or not the weapon during a conversation.
+	weapon_hide = false  																--used by cars, arhara, medicines
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn2")
+	--end
 	if object_binder.net_spawn(self,data) == false then	return false end
 	db.add_actor(self.object)
 	TB3D_Services.packet_alert("bstalk: net spawn actor added to database")
-	local d3d_mode = tb3d_net_manager.launcher_check()			--109995, also removes the old network file
+	local d3d_mode = tb3d_net_manager.launcher_check()									--109995, also removes the old network file
 	if d3d_mode then
 		if d3d_mode == "dx11" then
 			TB3D_Modders.use_DX11 = true
@@ -181,43 +180,43 @@ function actor_binder:net_spawn(data)
 	else
 		TB3D_Services.packet_alert("bstalk: Using DX9 Shaders")
 	end
-	amk.on_game_load()																--amk freeplay variable set
+	amk.on_game_load()																	--amk freeplay variable set
 	local sname = amk.load_variable("level_on_save","")
-	if TB3D_Services.is_collector(44) == false then									--109999, moved from amk.on_game_load
+	if TB3D_Services.is_collector(44) == false then										--109999, moved from amk.on_game_load
 		if has_alife_info("val_actor_has_borov_key") and not has_alife_info("val_borov_dead") then
 			TB3D_Services.give_info("val_borov_dead")
 		end
 	end
-	dmx_cars.add_btr_hud()				--ogse usable btrs 109950					--109999, moved from amk.on_game_load
-	dmx_cars.set_current_car(amk.load_variable("car", nil))							--109999, moved from amk.on_game_load
-	--TB3D_Services.remove_info("u_6")												--no music playing
+	dmx_cars.add_btr_hud()																--109999, ogse usable btrs moved from amk.on_game_load
+	dmx_cars.set_current_car(amk.load_variable("car", nil))								--109999, moved from amk.on_game_load
+	--TB3D_Services.remove_info("u_6")													--no music playing
 	if TB3D_Services.remove_info("tb3d_test_spawns") == true then
 		TB3D_Services.test_spawns()
 	end
 	if self.st.disable_input_time == nil then level.enable_input() end
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn3")
-	end
-	TB3D_Services.set_daytime()														--establishes day/night
-	if lname ~= sname then TB3D_FIXER.force_fixes()	end								--110001, moved here, must be before dynamic spawns and env update
-	_g.time_changed = false															--no need to set twice on start
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn3")
+	--end
+	TB3D_Services.set_daytime()															--establishes day/night
+	if lname ~= sname then TB3D_FIXER.force_fixes()	end									--110001, moved here, must be before dynamic spawns and env update
+	_g.time_changed = false																--no need to set twice on start
 	self.weather_manager:reset()
 	actor_stats.add_to_ranking(self.object:id())
 	if TB3D_Modders.use_xtrm_ai == true then xrs_ai.actor_net_spawn(self) end
 	rx_ai.actor_net_spawn()
-    hidden_slots.net_spawn() -- DMX MOD
+    hidden_slots.net_spawn() 															-- DMX MOD
     dmx_treasure.net_spawn()
     bolt_ending.net_spawn()
 	dmx_medicines.net_spawn()
 	meceniy_work.main()
 	meceniy_utils.net_spawn_callback()
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn5")
-	end
-	spawn_teleport.spawn_teleport_exit()  -- kostya_level --
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn5")
+	--end
+	spawn_teleport.spawn_teleport_exit()  												-- kostya_level --
 	spawn_teleport.spawn_teleport_hospital()
     netpacket_pda_id = netpacket_pda_create.create_pda()
-	if lname=="l05_bar" then			--!!!!TB3D
+	if lname=="l05_bar" then															--!!!!TB3D
 		if TB3D_Modders.bar_music == 3 then
 			TB3D_Services.give_info("bar_modern")
 		elseif TB3D_Modders.bar_music == 2 then
@@ -228,26 +227,29 @@ function actor_binder:net_spawn(data)
 			TB3D_Services.give_info("bar_retro")
 		end
 	end
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.info_alert("BSTALK: actor net spawn6")
-	end
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.info_alert("BSTALK: actor net spawn6")
+	--end
 	TB3D_Shaders.on_spawn()
-	--TB3D_Services.check_active_community(lname)									--109981, determine by most significant item/info
+	--TB3D_Services.check_active_community(lname)										--109981, determine by most significant item/info
 	local blow = TB3D_Services.blow()
 	if TB3D_Services.is_collector(20) then
-		if not has_alife_info("tb3d_collector") then								--start out stormy prior to blowout
+		if not has_alife_info("tb3d_collector") then									--start out stormy prior to blowout
 			level_weathers.set_new_weather("stormy")
-		elseif amk_mod.blowout() == false and (not Psy or (db.Flag2 == 0 and db.Flag3 == 0 and db.Flag4 == 0 and db.Flag5 == 0)) then	--if not in blowout then restore previous weather
-			level_weathers.set_new_weather(self.cur_weather)
+		elseif amk_mod.blowout() == false and (not Psy or (db.Flag2 == 0 and db.Flag3 == 0 and db.Flag4 == 0 and db.Flag5 == 0)) then
+			level_weathers.set_new_weather(self.cur_weather)							--if not in blowout then restore previous weather
 		else
-			level_weathers.set_new_weather("stormy")							--keep stormy for blowout transition
+			level_weathers.set_new_weather("stormy")									--keep stormy for blowout transition
 		end
-		--TB3D_Services.give_info("informer_out")									--109980, bar_bar_osvedomitel (snitch) goes to dist ctr
-		--if TB3D_Modders.actor_idle_delay and TB3D_Modders.actor_idle_delay > 0 then
-			--amk.start_timer("tb3d_delay_idle", TB3D_Modders.actor_idle_delay)							--109999, spawn enemies if stays in one place too long
-		--end
 		local levelup = TB3D_Services.get_level_up()
 		if levelup > 3 then																--110000, free play and DLC
+			if TB3D_Modders.actor_idle_delay and TB3D_Modders.actor_idle_delay > 0 then
+				amk.start_timer("tb3d_delay_idle", TB3D_Modders.actor_idle_delay)		--110003, spawn enemies if stays in one place too long
+			end
+			if sname == "jupiter" then
+				TB3D_Services.remove_info("yan_bunker_door_1_open")						--reset bunker doors
+			end
+			TB3D_Triggers.check_coll_portals()
 			if (TB3D_DLC_001 and TB3D_DLC_001.process_levels(lname, sname, blow))		--110000, optional dlc content, moved from tb3d_collector
 			or (TB3D_DLC_002 and TB3D_DLC_002.process_levels(lname, sname, blow))
 			or (TB3D_DLC_003 and TB3D_DLC_003.process_levels(lname, sname, blow))
@@ -255,61 +257,71 @@ function actor_binder:net_spawn(data)
 			or (TB3D_DLC_005 and TB3D_DLC_005.process_levels(lname, sname, blow)) then
 				--levels processed by 1 or more dlcs
 			else
-				TB3D_Collector.process_levels(lname, sname, blow)						--110000
+				TB3D_Collector.process_levels_random(lname, sname, levelup, blow)		--110003
+				if has_alife_info("tb3d_collector_hunt") then							--can end up on more than one level/level_up
+					if has_alife_info("tb3d_jupu_doc_has") then
+						TB3D_Services.delayed_action(1, "collector_done_with_jupund", 30)
+						TB3D_Services.remove_info("tb3d_collector_hunt")				--done with treasure hunt
+					else
+						dav_ldk.check_spawn(lname)										--hunt part 2
+					end
+				end
+				if not blow then
+					amk_anoms.pre_blow_off()											--110003, moved from amk_anoms.init(), always regenerate on level change
+					amk_anoms.generate_anoms()
+				end
 			end
 		else
-			TB3D_Collector.process_levels(lname, sname, blow)						--110000
+			TB3D_Collector.process_levels(lname, sname, levelup, blow)					--110003
 		end
 	else
-		--TB3D_Services.remove_info("informer_out")								--109980, bar_bar_osvedomitel (snitch) in the bar
-		--braad_test.false_info()
-		if not has_alife_info("zvezdochet_talk_start") then						--just got off truck so should be stormy
+		if not has_alife_info("zvezdochet_talk_start") then								--just got off truck so should be stormy
 			level_weathers.set_new_weather("stormy")
-		elseif amk.load_variable("level_on_save",lname) == "peshera" then		--10001, storm starts to clear after dream in cave
+		elseif amk.load_variable("level_on_save",lname) == "peshera" then				--10001, storm starts to clear after dream in cave
 			level_weathers.set_new_weather("grey")
-		elseif amk_mod.blowout() == false and (not Psy or (db.Flag2 == 0 and db.Flag3 == 0 and db.Flag4 == 0 and db.Flag5 == 0)) then	--if not in blowout then restore previous weather
-			level_weathers.set_new_weather(self.cur_weather)
+		elseif amk_mod.blowout() == false and (not Psy or (db.Flag2 == 0 and db.Flag3 == 0 and db.Flag4 == 0 and db.Flag5 == 0)) then
+			level_weathers.set_new_weather(self.cur_weather)							--if not in blowout then restore previous weather
 		else
-			level_weathers.set_new_weather("stormy")				--keep stormy for blowout transition
+			level_weathers.set_new_weather("stormy")									--keep stormy for blowout transition
 		end
-		TB3D_Stalker.process_levels(lname, sname)
+		TB3D_Stalker.process_levels(lname, sname, blow)									--110003
 	end
 	TB3D_Services.give_info("tb3d_force_weather")
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn6a")
-	end
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn6a")
+	--end
 	if lname ~= sname then
-		TB3D_dyn_spawn.dynamic_objects(lname)													--dynamic spawns - TB3D 109934
-		if has_alife_info("bar_deactivate_radar_done") then										--110000, keep arts until scorcher done
-			amk_anoms.generate_arts(lname)														--109976 now per level
+		TB3D_dyn_spawn.dynamic_objects(lname)											--dynamic spawns - TB3D 109934
+		if has_alife_info("bar_deactivate_radar_done") then								--110000, keep arts until scorcher done
+			amk_anoms.generate_arts(lname)												--109976 now per level
 		end
 	end
 	art_hit.net_spawn()
-    bind_det_arts.start_update()															--110000, moved here to prevent phantom arts
-	TB3D_Services.clear_targets()			--109994
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn6b")
-	end
+    bind_det_arts.start_update()														--110000, moved here to prevent phantom arts
+	TB3D_Services.clear_targets()														--109994
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn6b")
+	--end
 	TB3D_Dyn_spawn.spawn_vehicles()
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn6c")
-	end
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn6c")
+	--end
 	TB3D_Dyn_spawn.spawn_fix_props()
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn7")
-	end
-	if TB3D_bstalk_spawn then TB3D_bstalk_spawn.init() end			--if exists then load and execute, for moving actor
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn7")
+	--end
+	if TB3D_bstalk_spawn then TB3D_bstalk_spawn.init() end								--if exists then load and execute, for moving actor
 	TB3D_spots.set_spots()
-	if TB3D_Modders.Global_Debug then
-		TB3D_Services.packet_alert("BSTALK: actor net spawn8")
-	end
-	TB3D_Services.check_goodwill()												--109974, reports the style and author (plug-ins)
+	--if TB3D_Modders.Global_Debug then
+		--TB3D_Services.packet_alert("BSTALK: actor net spawn8")
+	--end
+	TB3D_Services.check_goodwill()														--109974, reports the style and author (plug-ins)
 	if TB3D_Modders.check_smart_terrain then TB3D_Smart_Checker.check_smart_terrains(true) end
 	xr_sound.stop_all_sound_object()
 	xr_sound.clear_all_sound_object()
-	TB3D_Services.update()														--110002, TB3D start task update timer
+	TB3D_Services.update()																--110002, TB3D start task update timer
 	amk.start_timer("pause_menu_timer", 0.6)
-	if TB3D_Modders.force_garbage_collect then collectgarbage("collect") end							-- force memory cleanup
+	if TB3D_Modders.force_garbage_collect then collectgarbage("collect") end			-- force memory cleanup
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("BSTALK:  net_spawn DONE pda["..utils.to_str(netpacket_pda_id).."]")
 	end
@@ -832,7 +844,6 @@ function actor_binder:update(delta)
 		upd_timeFSS = upd_time_FSS+time_now		
 		upd_timeGMS = upd_time_GMS										--force to init on start	
 		upd_timeCMP = upd_time_CMP	--109950							--force to init on start
-		upd_timeRST = upd_time_RST										--force to init on start
 		upd_timeNET = upd_time_NET										--force to init on start
 		upd_timeKEY = upd_time_KEY+time_now	
 		upd_timeFTL = upd_time_FTL+time_now
@@ -908,6 +919,17 @@ function actor_binder:update(delta)
 	amk.oau_watchdog=891 														-----------------891 
 	local is_collector = TB3D_Services.is_collector(29)
 	--TB3D_Services.packet_alert("BSTALK: actor_update3")
+	if self.next_restrictors_update_time < time_now then
+		amk.oau_watchdog=886												-----------------886, 887, 888
+		--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("restrictors: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]") end
+		if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - RST["..utils.to_str(self.next_restrictors_update_time).."]") end
+		bind_restrictor.actor_update(delta)
+		amk.oau_watchdog=885
+		self.next_restrictors_update_time = time_now + upd_time_RST			--109983
+		amk.oau_watchdog=880						-- Update restrictors		-----------------880
+		bind_mteleport.actor_update(delta)								-- Update our teleport (Kostya_level)
+		--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("restrictors: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done") end
+	end
 	--========================================== slice based actions ===============================================
 	--============================ least important: skip if slice base > 1 =========================================
 	if upd_timeFTL < time_now then
@@ -1168,24 +1190,6 @@ function actor_binder:update(delta)
 		if slice_base < 4 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - TSK["..utils.to_str(upd_timeTSK).."]") end
 			task_manager.actor_update()
-		end
-	end
-	if self.next_restrictors_update_time < time_now then
-		--if slice_base < 4 then
-			amk.oau_watchdog=886												-----------------886, 887, 888
-			bind_restrictor.actor_update(delta)
-			amk.oau_watchdog=885
-		--end
-		self.next_restrictors_update_time = time_now + upd_time_RST			--109983
-	end
-	if upd_timeRST < time_now then											--109986
-		--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("restrictors: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]") end
-		amk.oau_watchdog=880						-- Update restrictors		-----------------880
-		upd_timeRST = time_now + upd_time_RST
-		if slice_base < 4 then
-			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - RST["..utils.to_str(self.next_restrictors_update_time).."]") end
-			bind_mteleport.actor_update(delta)								-- Update our teleport (Kostya_level)
-			--if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("restrictors: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."] done") end
 		end
 	end
 	--TB3D_Services.packet_alert("BSTALK: actor_update4")

@@ -1,4 +1,4 @@
-<!-- ***** TB3D 1.0.9.9.9.8 updated to 135, fixed soul cube, removed "�" aleks1970 ***** -->
+<!-- ***** TB3D 1.1.0.0.0.3 updated to 135, fixed soul cube, removed "�" aleks1970, sharav storm ***** -->
 <game_dialogs>
 	<!-- ***************RyLiosha spawn - modified-by-phobos2077*************** -->
 	<dialog id="rul_sidor_cars">
@@ -321,6 +321,33 @@
 			<phrase id="12">
 				<text>shadows_cube_no</text>
 				<give_info>syslov_shadows_cube_off</give_info>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<!-- ***************Dialogue with Suslov about storm, 110003*************** -->
+	<dialog id="tb3d_yan_saharov_storm">
+		<has_info>tb3d_sms_storm_areas</has_info>
+		<dont_has_info>tb3d_syslov_dialog_storm</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>syslov_storm1</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>syslov_storm2</text>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>syslov_storm3</text>
+				<next>3</next>
+			</phrase>
+			<phrase id="3">
+				<text>syslov_storm4</text>
+				<give_info>tb3d_syslov_dialog_storm</give_info>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
+				<text>syslov_storm5</text>
 			</phrase>
 		</phrase_list>
 	</dialog>

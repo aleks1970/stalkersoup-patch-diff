@@ -1,9 +1,9 @@
---<!-- TB3D 1.1.0.0.0.2 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.1.0.0.0.3 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
 --item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals,
 --lukash brains, agro knockdown, jupu, x16, check_dead, math_random
-function my_ver() return "1.1.0.0.0.2" end
+function my_ver() return "1.1.0.0.0.3" end
 
 local translate = game.translate_string
 local math_random = math.random
@@ -671,10 +671,10 @@ function on_use_object(obj, sect)
 	dmx_cars.car_repair(obj) 
 end
 
-function process_levels(lname, sname)
+function process_levels(lname, sname, blow)
 	local obj
 	if lname ~= sname then																--109955
-		TB3D_Services.remove_info("informer_out")								--109980, bar_bar_osvedomitel (snitch) in the bar
+		TB3D_Services.remove_info("informer_out")										--109980, bar_bar_osvedomitel (snitch) in the bar
 		braad_test.false_info()
 		if lname=="l01_escape" then
 			if has_alife_info("escape_lager_spawn_killers") then						--109951  keep corpses on reloads
@@ -873,6 +873,10 @@ function process_levels(lname, sname)
 				TB3D_Services.delayed_action(1, "tb3d_bad_torch", 10)
 				amk.save_variable("torch_state", 3)
 			end
+		end
+		if not blow and has_alife_info("bar_deactivate_radar_done") then							--110003, added
+			amk_anoms.pre_blow_off()
+			amk_anoms.generate_anoms()
 		end
 	end
 end

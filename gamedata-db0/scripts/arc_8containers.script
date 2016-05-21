@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.1
-function my_ver() return "1.0.9.9.1" end
+-- TB3D 1.1.0.0.0.3, update
+function my_ver() return "1.1.0.0.0.3" end
 
 local cfg_containers = {}
 local inv_containers = {}
@@ -148,39 +148,41 @@ function on_lose_container(cont_id)
 end
 
 function on_actor_update()
-  if lost_cont_id > 0 then
-    local n = get_inv_index(lost_cont_id)
-    if alife():object(lost_cont_id)==nil then
-      -- Container used. Show Menu
-      arc_ui_8container_menu.show_menu(get_inv_index(lost_cont_id))
-    else
-      -- Container discarded. Remove the container and the arts in it from the list
-      local arts = inv_containers[n].arts
-		local ini = system_ini()
-		local inv_rad
-        local art_section
-        local belt_rad
-      for i = 1, table.getn(arts) do
-        if arts[i]>0 then
-          arc_arts.register_artefact(arc_arts.get_art_section(arts[i]), -1, true)
-		--Skunk start
-        art_section = arc_arts.get_art_section(arts[i])
-        belt_rad = ini:r_float(art_section, "radiation_restore_speed")
-        if ini:line_exist(art_section, "inventory_radiation") then
-          inv_rad = ini:r_float(art_section, "inventory_radiation")
-        else
-          inv_rad = math.max(belt_rad,0)
-        end
-		if inv_rad >= 0.0003 then
-			arc_radiation.change_inv_arts_radiation(-(inv_rad-0.0003))
+	if lost_cont_id > 0 then
+		local n = get_inv_index(lost_cont_id)
+		if alife():object(lost_cont_id)==nil then
+			-- Container used. Show Menu
+			arc_ui_8container_menu.show_menu(get_inv_index(lost_cont_id))
+		elseif inv_containers[n] then														--110002
+			-- Container discarded. Remove the container and the arts in it from the list
+			local arts = inv_containers[n].arts
+			if arts then																	--110002
+				local ini = system_ini()
+				local inv_rad
+				local art_section
+				local belt_rad
+				for i = 1, table.getn(arts) do
+					if arts[i]>0 then
+						arc_arts.register_artefact(arc_arts.get_art_section(arts[i]), -1, true)
+						--Skunk start
+						art_section = arc_arts.get_art_section(arts[i])
+						belt_rad = ini:r_float(art_section, "radiation_restore_speed")
+						if ini:line_exist(art_section, "inventory_radiation") then
+							inv_rad = ini:r_float(art_section, "inventory_radiation")
+						else
+							inv_rad = math.max(belt_rad,0)
+						end
+						if inv_rad >= 0.0003 then
+							arc_radiation.change_inv_arts_radiation(-(inv_rad-0.0003))
+						end
+						-- Skunk finish
+					end
+				end
+			end
+			table.remove(inv_containers, n)
 		end
-		-- Skunk finish
-		  end
-      end
-      table.remove(inv_containers, n)
-    end
-    lost_cont_id = -1
-  end
+		lost_cont_id = -1
+	end
 end
 
 function set_menu_showed(f)

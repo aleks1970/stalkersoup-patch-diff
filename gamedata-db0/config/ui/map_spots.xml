@@ -21,6 +21,12 @@
 	<combat_pointer x="0" y="0" width="11" height="24" heading="1" alignment="c">
 		<texture x="607" y="65" width="11" height="24" r="250" g="0" b="0">ui\ui_hud</texture>
 	</combat_pointer>
+	<crlc_biggest>
+		<level_map spot="crlc_bigr_spot" pointer="quest_pointer"/>
+	</crlc_biggest>
+	<crlc_bigr_spot x="0" y="0" width="40" height="50" alignment="c" scale="1" scale_min="1" scale_max="3" stretch="1">
+		<texture x="730" y="456" width="115" height="115">ui\ui_common</texture>
+	</crlc_bigr_spot>
 	<crlc_big>
 		<level_map spot="crlc_big_spot" pointer="quest_pointer"/>
 	</crlc_big>

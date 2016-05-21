@@ -1,12 +1,12 @@
----TB3D 1.1.0.0.0.2 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.1.0.0.0.3 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
 -- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
--- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs
-function my_ver() return "1.1.0.0.0.2" end
+-- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs, jup and jupu random
+function my_ver() return "1.1.0.0.0.3" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random = math.random
 local math_floor = math.floor
@@ -1995,4 +1995,102 @@ function spawn_jupu_tough_006()
 	spawn_alife_rand("ldk4_master",47.996,1.916,-0.061,34451,3808,2) -- main buiding gnd floor main room
 	spawn_alife_rand("ldk4_master",14.597,0.561,-53.598,21811,3797,1) -- main hall small door to east Prip
 	spawn_alife_rand("ldk9_master",38.569,4.492,-173.135,31823,3810,1) -- Tunnel to east Prip room inv box
+end
+
+function jup_spawn_random_enemy()
+	local grp = math_random(10)
+	if grp == 10 then
+		spawn_jup_001()
+		spawn_jup_010()
+	elseif grp == 9 then
+		spawn_jup_002()
+		spawn_jup_009()
+	elseif grp == 8 then
+		spawn_jup_003()
+		spawn_jup_008()
+	elseif grp == 7 then
+		spawn_jup_004()
+		spawn_jup_007()
+	elseif grp == 6 then
+		spawn_jup_005()
+		spawn_jup_009()
+		spawn_jup_006()
+	elseif grp == 5 then
+		spawn_jup_001()
+		spawn_jup_006()
+	elseif grp == 4 then
+		spawn_jup_002()
+		spawn_jup_007()
+		spawn_jup_009()
+	elseif grp == 3 then
+		spawn_jup_003()
+		spawn_jup_002()
+		spawn_jup_008()
+	elseif grp == 2 then
+		spawn_jup_004()
+		spawn_jup_004()
+		spawn_jup_009()
+	elseif grp == 1 then
+		spawn_jup_005()
+		spawn_jup_003()
+		spawn_jup_010()
+	else
+		spawn_jup_001()
+		spawn_jup_005()
+		spawn_jup_010()
+	end
+end
+
+function jupu_spawn_random_enemy()
+	local group = math_random(10)
+	if group == 10 then
+		spawn_jupu_easy_001()
+		spawn_jupu_tough_001()
+		spawn_jupu_easy_006()
+	elseif group == 9 then
+		spawn_jupu_easy_002()
+		spawn_jupu_tough_002()
+		spawn_jupu_easy_005()
+	elseif group == 8 then
+		spawn_jupu_easy_003()
+		spawn_jupu_tough_003()
+		spawn_jupu_easy_004()
+	elseif group == 7 then
+		spawn_jupu_easy_004()
+		spawn_jupu_tough_004()
+		spawn_jupu_easy_003()
+	elseif group == 6 then
+		spawn_jupu_easy_005()
+		spawn_jupu_tough_005()
+		spawn_jupu_easy_002()
+	elseif group == 5 then
+		spawn_jupu_easy_006()
+		spawn_jupu_tough_006()
+		spawn_jupu_easy_001()
+	elseif group == 4 then
+		spawn_jupu_easy_001()
+		spawn_jupu_easy_004()
+		spawn_jupu_tough_002()
+		spawn_jupu_easy_006()
+	elseif group == 3 then
+		spawn_jupu_easy_002()
+		spawn_jupu_tough_003()
+		spawn_jupu_easy_004()
+		spawn_jupu_easy_006()
+	elseif group == 2 then
+		spawn_jupu_easy_001()
+		spawn_jupu_easy_003()
+		spawn_jupu_tough_004()
+		spawn_jupu_easy_005()
+	elseif group == 1 then
+		spawn_jupu_easy_001()
+		spawn_jupu_easy_003()
+		spawn_jupu_tough_005()
+		spawn_jupu_easy_006()
+	else
+		spawn_jupu_easy_001()
+		spawn_jupu_tough_001()
+		spawn_jupu_tough_006()
+		spawn_jupu_easy_006()
+	end
 end

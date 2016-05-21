@@ -1,6 +1,7 @@
---TB3D 1.1.0.0.0.0 moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
---bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom, tb3d_gbars_chp2, deathclaw
-function my_ver() return "1.1.0.0.0.0" end
+--TB3D 1.1.0.0.0.3 moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+--bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom,
+--tb3d_gbars_chp2, deathclaw, pripyat_art_take
+function my_ver() return "1.1.0.0.0.3" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -60,7 +61,7 @@ function found_zep_document(doc_nmbr)
 	elseif doc_nmbr == 10 then
 		if TB3D_Services.give_info("zep10_have") then
 			gen_spawns()							--spawn next doc and resistance in generators
-			spawn_warlab_found()
+			--spawn_warlab_found()
 			do_save = true
 		end
 	elseif doc_nmbr == 11 then
@@ -480,9 +481,11 @@ function create_zep_document(idx)					--110000
 		return
 	end
 	local nobj = alife():create(zep_doc, vector():set(vx,vy,vz),lv,gv)
-	if nobj and TB3D_Modders.zep_spots then
-		TB3D_Services.packet_alert("tb3d dialog: spawn zep doc["..utils.to_str(vx)..","..utils.to_str(vy)..","..utils.to_str(vz).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."] doc["..zep_doc.."]")
-		level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", zep_doc)
+	if nobj then
+		if TB3D_Modders.use_info_message then
+			TB3D_Services.packet_alert("tb3d dialog: spawn zep doc["..utils.to_str(vx)..","..utils.to_str(vy)..","..utils.to_str(vz).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."] doc["..zep_doc.."]")
+		end
+		level.map_add_object_spot_ser(nobj.id, "crlc_biggest", zep_doc.."_hint")		--110003, show area and add hint
 	end
 end
 
@@ -665,6 +668,7 @@ function eprip_spawns()		--killers
 	create_zep_document(7)				--110000
 	alife():create("zep_note_dist1", vector():set(43.799,1.790,-54.469),52514,5247)		--extra note in store
 	alife():create("zep_note_dist2", vector():set(147.939,7.230,5.424),86370,5271)		--extra note in checkpoint
+	alife():create("art_acumm", vector():set(5.300,0.788,258.005),205062,3760)			--110003, art accum in hidden room
 end
 
 ---------------------------- ZEP Dist. Center -----------------------------------
@@ -722,7 +726,7 @@ end
 ---------------------------- ZEP Research Station -----------------------------------
 function research_spawns()
 	dmx_mod.create_research_level_changers()		--98007,98030,98031
-	create_zep_document(13)				--110000
+	--create_zep_document(13)						--110003
 	news_manager.amk_send_tip_id("zep_sms_from_bar2","sms_barman",10,40,"barman")
 	dmx_mod.create_level_changer_res_ros()		--98032,98033
 end
@@ -1372,7 +1376,10 @@ function npp2_mushroom_take()
 	else
 		TB3D_Services.move_actor(444.933,10.101,177.676, true)		--),148554,2599)		--suspended platform
 	end
-	if amk.load_variable("tb3d_storm_started", nil) == nil then amk.save_variable("tb3d_storm_started", level.get_time_days()) end
+	if not has_alife_info("tb3d_storm_over") then
+		TB3D_Services.give_info("tb3d_found_in_npp2")							--set for barman
+		if amk.load_variable("tb3d_storm_started", nil) == nil then amk.save_variable("tb3d_storm_started", level.get_time_days()) end
+	end
 end
 
 function spawn_f1_mushart()
@@ -1387,6 +1394,26 @@ function research_mushroom_take()
 	TB3D_Triggers.spawn_alife_rand("dav_ldk_veteran_respawn1",208.612,8.846,-48.534,518804,4377,1)				--110000, near exit to rostok
 	TB3D_Mobs.spawn_killer_squad(208.612,8.846,-48.534,518804,4377,7,4,true)
 	TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",209.123,13.750,-20.542,519626,4384,1)				--on roof
-	if amk.load_variable("tb3d_storm_started", nil) == nil then amk.save_variable("tb3d_storm_started", level.get_time_days()) end
+	if not has_alife_info("tb3d_storm_over") then
+		TB3D_Services.give_info("tb3d_found_in_npp2")							--110000, set for lanky suit
+		if amk.load_variable("tb3d_storm_started", nil) == nil then amk.save_variable("tb3d_storm_started", level.get_time_days()) end
+	end
 	TB3D_Services.move_actor(96.377,20.699,-12.149, true)									--watch tower accross from rostok exit
+end
+
+function pripyat_art_take()			--110003, art_acumm in hidden room building south of theater, has light on
+	TB3D_Mobs.spawn_killer_squad(33.485,-0.535,238.027,242599,3757,7,4,true)						--south of building
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_veteran_respawn1",4.058,4.493,280.512,203256,3760,1)	--building
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_veteran_respawn2",23.790,4.494,287.545,229298,3760,1)
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_veteran_respawn1",-8.900,4.494,263.660,185749,3760,1)
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_veteran_respawn2",-5.076,0.631,263.199,190892,3760,1)
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",13.091,4.904,353.688,222572,3760,1)	--theater
+	TB3D_Mobs.spawn_killer_squad(66.158,0.122,368.658,285580,3760,7,4,false)
+	TB3D_Mobs.spawn_killer_squad(104.101,0.769,389.566,329037,3760,7,4,false)
+	TB3D_Triggers.spawn_alife_rand("dav_ldk_master11",17.854,4.906,365.052,221607,3760,1)
+	alife():create("grenade_rgd6", vector():set(5.247,4.547,270.913),204176,3760)					--pripyat hidden room s. of theater
+	alife():create("grenade_rgd11", vector():set(5.247,4.547,270.913),204176,3760)
+	alife():create("grenade_rgd12", vector():set(5.247,4.547,270.913),204176,3760)
+	alife():create("grenade_rgd6", vector():set(19.054,1.534,260.135),222413,3760)					--pripyat desk in building
+	alife():create("grenade_rgd6", vector():set(18.640,2.591,259.766),222413,3760)					--pripyat shelf above desk
 end

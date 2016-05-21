@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.2 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.1.0.0.0.3 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
@@ -7,8 +7,8 @@
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
 -- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
 -- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin, missing scientist in pripyat, yan_specnaz_dead,
--- deathclaw, x16, check_dyn_spawns, F1 arts, radar
-function my_ver() return "1.1.0.0.0.2" end
+-- deathclaw, x16, check_dyn_spawns, F1 arts, radar, yantar
+function my_ver() return "1.1.0.0.0.3" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -906,9 +906,8 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 			else
 				is_skip = true
 			end
-		--elseif string_find(obj_name,"yan_helicopter_2")
-		  --or string_find(obj_name, "yan_helicopter_1") then				--for testing
-			--is_fixed = true
+		elseif string_find(obj_name,"yan_helicopter_") then					--110003, remove after storm starts
+			if has_alife_info("tb3d_sms_storm_areas") then is_fixed = true end
 		elseif string_find(obj_name,"x16_m_controller_e") then
 			is_fixed = true
 		elseif string_find(obj_name,"_na_yantare")
