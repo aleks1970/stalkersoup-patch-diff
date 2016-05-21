@@ -1,8 +1,8 @@
---TB3D 1.1.0.0.0.0 zaton spawns, dv spawns, killer squads, signal_green,
+--TB3D 1.1.0.0.0.2 zaton spawns, dv spawns, killer squads, signal_green,
 -- more content, reduced zat spawns, more adj, check_mil_spawns, math_fmod, hardcore_mobs_mult, more creatures,
 -- use_rat_infests, moved hardcore_mobs, more spawns, check_npp2_spawns, changed npc spawns, spawn quest bandits,
 -- spawn_mob, spawn_tushkanos, promzone, 906 -harsh, spawn_deathclaws
-function my_ver() return "1.1.0.0.0.0" end
+function my_ver() return "1.1.0.0.0.2" end
 local math_random = math.random
 local math_fmod = math.fmod
 local math_floor = math.floor
@@ -440,8 +440,45 @@ function check_pripyat_spawns()
 	TB3D_Triggers.spawn_alife_rand("tb3dm_snork_jumper",-37.983,8.458,423.394,61294,2266,4)			--factory snorks
 end
 
+function check_jup_spawns(sname, level_up)																--110002, moved from collector
+	local spawns = amk.load_variable("tb3d_jup_spawns", 0)
+	if spawns == 0 then
+		TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -59.286,4.354,214.718,622759,3719,8)			--shack in barrel
+		TB3D_Triggers.spawn_suit(6,-59.286,4.354,214.718,622759,3719)									--trader's back room
+		amk.save_variable("tb3d_jup_spawns", 1)
+	elseif spawns == 1 then
+		--TB3D_Triggers.spawn_suit(8,9.980,9.556,275.074,18758,3799)
+		--amk.save_variable("tb3d_jup_spawns", 2)
+	elseif spawns == 2 then
+		--TB3D_Triggers.spawn_suit(11,19.211,9.570,194.655,25281,3804)
+		--amk.save_variable("tb3d_jup_spawns", 3)
+	end
+	TB3D_Mobs.check_jupiter_spawns()
+	if level_up == 2 then													--109978
+		local rand2 = 10
+		if sname == "jupiter_underground" then rand2 = 7 end				--skip elevator spawns
+		dav_ldk.spawn_rand_jup_ldk(math_random(1,rand2))
+	elseif level_up > 2 then												--109978
+		dav_ldk.spawn_rand_jup_ldk(math_random(1,5))
+		dav_ldk.spawn_rand_jup_ldk(math_random(6,10))
+	end
+end
+
 function check_jupu_spawns(level_up)											--109993
 	if level_up == 1 then
+		local spawns = amk.load_variable("tb3d_jupu_spawns", 0)					--110002, moved from collector
+		if spawns == 0 then		--tech packs are NOT dynamic and should only spawn once
+			if not has_alife_info("tb3d_x14_done") then
+				TB3D_Triggers.spawn_x14_guard()
+			end
+			amk.save_variable("tb3d_jupu_spawns", 1)
+		elseif spawns == 1 then																				--second pass
+			TB3D_Triggers.spawn_suit(8,9.980,9.556,275.074,18758,3799)										--truck
+			amk.save_variable("tb3d_jupu_spawns", 2)
+		elseif spawns == 2 then																				--3rd pass
+			TB3D_Triggers.spawn_suit(11,19.211,9.570,194.655,25281,3804)									--cannister
+			amk.save_variable("tb3d_jupu_spawns", 3)
+		end
 		if rats < 10 then
 			spawn_rats(19.211,9.570,194.655,25281,3804,3)						--cannister
 			spawn_rats(19.211,9.570,194.655,25281,3804,3)
@@ -521,9 +558,9 @@ function check_limansk_spawns()
 	spawn_npcs(63.980,7.343,271.605,56253,3022,6,2)		--porch facing pond
 	spawn_npcs(88.412,7.343,243.973,59897,3021,6,4)		--in the house
 	spawn_npcs(70.145,7.340,245.540,57824,3021,6,2)		--front porch
-	spawn_npcs(32.660,28.541,191.092,44018,3003,6,8)	--const top floor
-	spawn_npcs(32.944,13.703,190.411,44011,3010,6,6)	--const back room
-	spawn_npcs(-30.016,12.971,207.660,10597,3010,6,8)	--const behind crane
+	spawn_npcs(32.660,28.541,191.092,44018,3003,6,6)	--const top floor
+	spawn_npcs(32.944,13.703,190.411,44011,3010,6,4)	--const back room
+	spawn_npcs(-30.016,12.971,207.660,10597,3010,6,6)	--const behind crane
 end
 
 function check_kras_spawns()
@@ -618,6 +655,12 @@ function spawn_deadm_mobs()
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",57.684,1.987,-218.343,1271346,4395,5)
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",70.508,3.286,-152.059,1300749,4387,5)
 		TB3D_Triggers.spawn_alife_rand("tb3dm_dog_habaruch",-12.965,2.526,-35.148,1115629,4391,5)
+	end
+	if has_alife_info("zep20_have") then															--110002, snipers in towers
+		TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",264.686,19.416,81.212,1723450,4399,1)			--dead city lc
+		TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",91.956,19.256,57.769,1347207,4388,1)
+		TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",-63.176,20.111,79.783,1006408,4386,1)
+		TB3D_Triggers.spawn_alife_rand("dav_ldk_master_respawn1",-136.159,21.531,54.759,851558,4399,1)			--before bridge
 	end
 end
 
@@ -897,8 +940,19 @@ function spawn_agrou_bandits()						--109997
 end
 
 --============================ HARSH LEVEL SPAWNS ==============================================
-function check_eprip_spawns()
+function check_eprip_spawns(level_up)
 	local typ, qty
+	local spawns = amk.load_variable("eprip_spawns", 0)
+	if TB3D_Triggers.eprip_spawns(spawns) then												--109978, consolidated to triggers
+		amk.save_varible("eprip_spawns", spawns+1)
+	end
+	if level_up == 1 then																--Collector = ZEP, Gold Bars and treasure hunt
+		if sname == "jupiter_underground" then
+			eprip_exit_jupu()
+		elseif sname == "labx8" then
+			eprip_exit_labx8()													--109998, gold bars
+		end
+	end
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6		--harsh
 		qty = 10
@@ -1024,8 +1078,12 @@ function check_radar_spawns()
 	end
 end
 
-function check_mil_spawns(spawns)				--109984
+function check_mil_spawns(sname)				--109984
 	local typ, qty = 5,3			--monolith
+	local spawns = amk.load_variable("mil_spawns", 0)
+	if sname == "l06_rostok" and not has_alife_info("tb3d_note_03") then		--109988
+		TB3D_Dialog.killers_in_camp()
+	end
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 3
@@ -1059,8 +1117,20 @@ function check_mil_spawns(spawns)				--109984
 	amk.save_variable("mil_spawns", spawns)
 end
 
-function check_npp1_spawns()
+function check_npp1_spawns(sname, level_up)
 	local typ, qty = 5,4			--monolith
+	if level_up == 1 then																				--Collector = ZEP, Gold Bars and treasure hunt
+		if sname == "yantar_old" then
+			TB3D_Dialog.npp2_killers_rs()
+		end
+		if has_alife_info("tb3d_goldbar_10") and not has_alife_info("tb3d_goldbar_15") then
+			if sname == "pripyat" then
+				TB3D_Triggers.signal_green(55.859,-0.001,-306.080,386473,2400)
+				alife():create("tb3dm_gigant_strong", vector():set(55.859,-0.001,-306.080),386473,2400,expendable_object)	--pipe bend
+			end
+		end
+		if has_alife_info("tb3d_start_x14") then TB3D_Services.give_info("tb3d_glavney_help") end
+	end
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 10
@@ -1090,8 +1160,18 @@ function check_npp1_spawns()
 	end
 end
 
-function check_npp2_spawns()
+function check_npp2_spawns(level_up)
 	local typ, qty = 5,4			--monolith
+	if level_up == 1 then																				--Collector = ZEP, Gold Bars and treasure hunt
+		if has_alife_info("tb3d_start_x14") and not has_alife_info("tb3d_glavney_help") then
+			TB3D_Dialog.npp2_killers_npp1()
+			TB3D_Services.give_info("tb3d_glavney_help")
+		end
+	elseif level_up == 2 then
+		if has_alife_info("tb3d_sms_storm") and not has_alife_info("tb3d_storm_over") then
+			TB3D_Dialog.spawn_mushroom_arts_npp2()
+		end
+	end
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 10
@@ -1120,8 +1200,9 @@ function check_npp2_spawns()
 	end
 end
 
-function check_dcity_spawns(spawns)
+function check_dcity_spawns()
 	local typ, qty = 2,8			--woods
+	--local spawns = amk.load_variable("tb3d_dcity_spawns", 0)
 	if has_alife_info("tb3d_harsh_environment") then
 		typ = 6				--harsh
 		qty = 16

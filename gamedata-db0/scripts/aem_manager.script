@@ -1,6 +1,6 @@
--- TB3D 1.0.9.9.8.7    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem,
+-- TB3D 1.1.0.0.0.2    restored xr_zone cleaner, added autosave to arena, fixed actor ref, optimized, fixed box, db.spawn_aem/destroy_aem,
 -- fast saves, community, improvements, translate and text color - aleks1970
-function my_ver() return "1.0.9.9.8.7" end
+function my_ver() return "1.1.0.0.0.2" end
 local time_open = TB3D_Modders.time_open
 local time_close = TB3D_Modders.time_close
 local stake1 = TB3D_Modders.stake1
@@ -281,7 +281,7 @@ function CArenaext:__init()
 	else
 		if TB3D_Modders.use_abort_message == true then TB3D_Services.abort_alert("AEM arena init 3: no section [groups] in aem_manager.ltx") end
 	end
-	aem_lights.shield_on()
+	if lname == "l05_bar" then aem_lights.shield_on() end
 end
 
 -------
@@ -772,7 +772,7 @@ end
 -------
 -- called from "bind_stalker.script" <actor_binder:update(delta)>
 -------
-function CArenaext:update()
+function CArenaext:update(lname)
 	--if TB3D_Modders.Global_Debug then TB3D_Services.info_alert("aem mgr: update["..utils.to_str(time_global()).."]") end
 	local curr = time_get_curr()
 	local id, npc, ctm, rt, ct
@@ -871,7 +871,7 @@ function CArenaext:update()
 			end
 			TB3D_Services.give_info("aem_go_bar")
 			db.storage[db.actor:id()].pstor["aem_ct"] = nil
-			aem_lights.shield_off()
+			if lname == "l05_bar" then aem_lights.shield_off() end
 		end
 	end
 	if has_alife_info("aem_startup") then
@@ -889,7 +889,7 @@ function CArenaext:update()
 				end
 				-- Off megaphone and lighting shield "Arena"
 				TB3D_Services.remove_info("aem_megafone")
-				aem_lights.shield_off()
+				if lname == "l05_bar" then aem_lights.shield_off() end
 				-- remember during the closing scene
 				local ct = level.get_time_minutes()
 				amk.save_variable("aem_ct", ct)
@@ -907,7 +907,7 @@ function CArenaext:update()
 				end
 				-- Off megaphone and lighting shield "Arena"
 				TB3D_Services.remove_info("aem_megafone")
-				aem_lights.shield_off()
+				if lname == "l05_bar" then aem_lights.shield_off() end
 				-- remember during the closing scene
 				local ct = level.get_time_minutes()
 				amk.save_variable("aem_ct", ct)
@@ -921,7 +921,7 @@ function CArenaext:update()
 			elseif (curr + 3 >= self.nt) and (self.lt + 3 < self.nt) then
 				-- the inclusion of a megaphone and lighting shield "Arena"
 				TB3D_Services.give_info("aem_megafone")
-				aem_lights.shield_on()
+				if lname == "l05_bar" then aem_lights.shield_on() end
 				TB3D_Services.remove_info("aem_go_bar")
 			end
 			if has_alife_info("aem_spam") then

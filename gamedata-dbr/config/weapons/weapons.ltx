@@ -1,4 +1,4 @@
-;;;; TB3D 1.0.9.9.9.9 - TB3D style weapons
+;;;; TB3D 1.1.0.0.0.2 - TB3D style weapons
 ;; fixed missing includes for wep, 12x70 k_hit = 0.25 vice 0.07, disp adj(TB3D10983),
 ;; "Empty" desc for vog(no_ammo), 9x18_pbp names, added some short desc, icons by aleks1970, ald weapons, hit_probability_max_dist,
 ;; excluded empty "discovery_dependency" aleks1970 and add fake_grenade_name = wpn_fake_drob aleks1970, buck_shot, tweaks, 7.62x25,
@@ -1404,17 +1404,17 @@ inv_grid_height		= 1
 inv_grid_x			= 13
 inv_grid_y			= 10
 
-k_dist			= 2.5
-k_disp			= 3
-k_hit			= 1 ;1.5	;tB3D 10983
-k_impulse		= 1.4
-;k_pierce		= 0.76
-impair			= 1.2
+k_dist			= 1.85	;2.5
+k_disp			= 0.80	;3	; - aleks1970
+k_hit			= 2.80	; - stronger than "11.43x23_hydro" - aleks1970	;1 ;1.5	;tB3D 10983
+k_impulse		= 3.60	;1.4	; - stronger than "11.43x23_hydro" - aleks1970
+k_pierce		= 0.60	;0.76	; Steel shell - aleks1970
+impair			= 1.8	;1.2
 ;buck_shot		= 1
-;tracer			= off ;on
-wm_size         = 0.05
+wm_size         = 0.10	;0.05
 ;explosive		= off
-;tracer_color_ID		= 3
+tracer			= on ;off	; - test aleks1970
+tracer_color_ID		= 3
 
 fake_grenade_name = wpn_fake_drob
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1451,18 +1451,18 @@ inv_grid_height		= 1
 inv_grid_x			= 11
 inv_grid_y			= 10
 
-k_dist			= 1.5
-k_disp			= 3
-k_hit			= 2
-k_impulse		= 1.5
-k_pierce		= 0.16
-impair			= 1.15
-wm_size         = 0.05
+k_dist			= 1.25	;1.5	;big  - aleks1970
+k_disp			= 1.20	;3	; - aleks1970
+k_hit			= 3.20	; - stronger than "11.43x23_hydro" and "12x76-dart" - aleks1970	;2
+k_impulse		= 4.10	; - stronger than "11.43x23_hydro" and "12x76-dart" - aleks1970	;1.5
+k_pierce		= 0.36	;0.16
+impair			= 2.2
+wm_size         = 0.12	;0.05	;the one big bullet - aleks1970
 fake_grenade_name = wpn_fake_drob
 ;buck_shot		= 1
-;tracer			= off ;on
+tracer			= on ;off	; - test aleks1970
 ;explosive		= off 
-;tracer_color_ID		= 2
+tracer_color_ID		= 2
 
 
 [ammo_12x76_zhekan_heli]:ammo_12x76_zhekan
@@ -1494,8 +1494,8 @@ inv_grid_y			= 50
 k_dist			= 3.0
 k_disp			= 2.5
 
-k_hit			= 2.5
-k_pierce		= 0.26
+k_hit			= 3.80	;2.5	; - aleks1970
+k_pierce		= 0.38	;0.26	; - aleks1970
 
 k_impulse		     = 6.5
 explosive		     = on
@@ -1537,15 +1537,38 @@ inv_grid_height		= 1
 inv_grid_x			= 13
 inv_grid_y			= 9
 
-k_dist			= 0.6
-k_disp			= 10
+;;;;;;;;;;;;;;;;;;;;;-test-aleks1970-;;;;;;;;;;;;;;;;;;;;;
+;;k_dist	= distance multiplier
+;;k_disp	= dispersion multiplier; values > 1 make the weapon less accurate
+;;k_hit		= damage multiplier
+;;k_impulse	= force multiplier for dead bodies and inanimate objects
+;;k_pierce	= armor/metal penetration multiplier
+;;impair	= weapon deterioration multiplier
+;;buck_shot	= number of pellets (usually one for bullets)
+;;tracer	= when on, gives the projectile a tracer
+;;wm_size	= size of the wall mark left by the impact. For explosives, the size of the black mark.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+k_dist			= 0.70	;0.60
+k_disp			= 28.0	;10.0	;;;better dispersion effect - aleks1970
 k_hit			= 0.7		;0.85		109989
-k_impulse		= 0.5		;0.7		109989
+k_impulse		= 0.4		;0.7		109989
+k_pierce		= 0.05
+impair			= 2
+buck_shot		= 12	;;;;TB3D 109930 buck has 8 pellets
+wm_size         = 0.05
+tracer			= on ;off	; - test aleks1970
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;k_dist			= 0.6
+;k_disp			= 10
+;k_hit			= 0.7		;0.85		109989
+;k_impulse		= 0.5		;0.7		109989
 ;k_pierce		= 0.15
-impair			= 1
-buck_shot		= 8	;;;;TB3D 109930 buck has 8 pellets
-wm_size         = 0.02
-fake_grenade_name = wpn_fake_drob	; -missing- Aleks1970
+;impair			= 1
+;buck_shot		= 8	;;;;TB3D 109930 buck has 8 pellets
+;wm_size         = 0.02
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-END-;;;;;;;;;;;;;;;;;;;;;;;;;
+fake_grenade_name = wpn_fake_drob
 ;tracer			= off ;on
 ;tracer_color_ID		= 3
 
@@ -1573,16 +1596,16 @@ inv_grid_height		= 1
 inv_grid_x         	= 79
 inv_grid_y         	= 13
 
-k_dist			= 0.75
-k_disp			= 8		;;;;TB3D 10991
+k_dist			= 0.85	;0.75 ; - aleks1970
+k_disp			= 17.0	;8.0	;;;better dispersion effect - aleks1970		;;;;TB3D 10991
 k_hit			= 0.85	;1.25		;;;;TB3D 109989
-k_impulse		= 0.5	;0.7		;;;;TB3D 109989
-k_pierce		= 0.05		;;;;has slight armor piercing quality
-impair			= 1.2
-buck_shot		= 8		;;;;TB3D 109930  8 pellets tungsten alloy
-wm_size			= 0.09
+k_impulse		= 0.6	;0.7		;;;;TB3D 109989
+k_pierce		= 0.12	;0.05		;;;;has slight armor piercing quality
+impair			= 2	;1.2	;aleks1970
+buck_shot		= 9	;8	; - aleks1970	;;;;TB3D 109930  8 pellets tungsten alloy
+wm_size			= 0.08
 fake_grenade_name = wpn_fake_drob
-;tracer			= off ;on
+tracer			= on ;off	; - test aleks1970
 ;explosive		= off
 
 ;;;;;;;;;;;;;;;;;;;;;;;  Боеприпасы для семейства АК серий 47 ;;;;;;;;;;;;;;;;;;;;;;;

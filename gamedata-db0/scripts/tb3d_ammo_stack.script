@@ -1,5 +1,5 @@
--- TB3D 1.0.9.9.7.6 added to SS
--- GlowWorm 1.0.9.9.7.5 created; Inspired by on dunin_ammo.script
+-- TB3D 1.1.0.0.0.2 added to SS, bad debug messages in update
+-- GlowWorm 1.1.0.0.0.2 created; Inspired by on dunin_ammo.script
 
 -- Limitations:
 --   Ideally this script would handle cases where box_size for an item was REDUCED
@@ -60,7 +60,7 @@ function get_box_size(section)
 			db.add_dont_probe(section)
 		end
 	end
-	if TB3D_Modders.use_scheme_message == true then TB3D_Services.packet_alert("ammo_stack.get_box_size: ["..utils.to_str(section).."] cached box_size = "..utils.to_str(box_size)) end
+	if TB3D_Modders.use_scheme_message == true then TB3D_Services.packet_alert("ammo_stack get_box_size: ["..utils.to_str(section).."] cached box_size = "..utils.to_str(box_size)) end
 	return box_size
 end
 
@@ -71,7 +71,7 @@ function on_item_take(obj)
   end
   local section = nil
   if obj ~= nil then
-    section = obj:section()
+    section = get_section(obj)
   end
   if section == nil then                                              -- (error)
     return false
@@ -85,7 +85,7 @@ function on_item_take(obj)
   if box_size > 1 then                                                -- box_size will be 0 if the item isn't ammo
     bullet_count = belt_ammo.get_ammo_size(obj)
   end
-  if TB3D_Modders.use_scheme_message == true then TB3D_Services.packet_alert("ammo_stack.on_item_take: ["..utils.to_str(obj:id()).."] ["..utils.to_str(section).."], box_size "..utils.to_str(box_size)..", item's bullet count is "..utils.to_str(bullet_count)) end
+  if TB3D_Modders.use_scheme_message == true then TB3D_Services.packet_alert("ammo_stack on_item_take: ["..utils.to_str(obj:id()).."] ["..utils.to_str(section).."], box_size "..utils.to_str(box_size)..", item's bullet count is "..utils.to_str(bullet_count)) end
   if box_size <= 1 or bullet_count <= 0 or bullet_count >= box_size then
     -- nothing to do, either...
     --   some kind of error (box_size or bullet_count is less than 1, or bullet_count is greater than box_size)
@@ -104,7 +104,7 @@ function on_update()
   local section = nil
   local v = false
   for section, v in pairs(to_stack) do
-    if TB3D_Modders.use_scheme_message then TB3D_Services.packet_alert("ammo_stack.on_update: ["..utils.to_str(section).."] = "..utils.to_str(v)) end
+    if TB3D_Modders.use_scheme_message then TB3D_Services.packet_alert("ammo_stack on_update: ["..utils.to_str(section).."] = "..utils.to_str(v)) end
     ammo_types_needing_stack = nil                                    -- suppress on_item_take during stacking
     if v then
       result = stack_ammo(nil, section) or result
@@ -150,7 +150,7 @@ function stack_ammo(act, section)
     if inv_section ~= nil and inv_section == section then
       inv_bullet_count = belt_ammo.get_ammo_size(inv_obj)
     end
-    if TB3D_Modders.use_scheme_message == true then TB3D_Services.packet_alert("ammo_stack.stack_ammo: inspecting ["..utils.to_str(inv_obj:id()).."] ["..utils.to_str(inv_section).."], inv_bullet_count "..utils.to_str(inv_bullet_count)..", section match "..utils.to_str(inv_section ~= nil and inv_section == section)) end
+    if TB3D_Modders.use_scheme_message == true then TB3D_Services.packet_alert("ammo_stack stack_ammo: inspecting ["..utils.to_str(inv_obj:id()).."] ["..utils.to_str(inv_section).."], inv_bullet_count "..utils.to_str(inv_bullet_count)..", section match "..utils.to_str(inv_section ~= nil and inv_section == section)) end
     if inv_bullet_count == box_size then
       full_boxes = full_boxes + 1
     end
@@ -161,22 +161,22 @@ function stack_ammo(act, section)
     end
   end
   if inv_partial_count * box_size < bullet_count + box_size then      -- if stacking won't result in fewer items, don't stack
-    if TB3D_Modders.use_inventory_message then TB3D_Services.packet_alert("ammo_stack.stack_ammo: stacking suppressed for ["..section.."], box_size "..utils.to_str(box_size)..", "..utils.to_str(inv_partial_count).." total partial ammo objects found, totalling "..utils.to_str(bullet_count).." bullets, "..utils.to_str(full_boxes).." full boxes found, totalling "..utils.to_str(full_boxes*box_size).." bullets, total discovered bullet count "..utils.to_str(full_boxes*box_size+bullet_count)) end
+    --if TB3D_Modders.use_inventory_message then TB3D_Services.packet_alert("ammo_stack stack_ammo: stacking suppressed for ["..section.."], box_size ["..utils.to_str(box_size).."], ["..utils.to_str(inv_partial_count).."] total partial ammo objects found, totalling ["..utils.to_str(bullet_count).."] bullets, ["..utils.to_str(full_boxes).."] full boxes found, totalling ["..utils.to_str(full_boxes*box_size).."] bullets, total discovered bullet count ["..utils.to_str(full_boxes*box_size+bullet_count).."]") end
     return false
   end
-  if TB3D_Modders.use_inventory_message then TB3D_Services.packet_alert("ammo_stack.stack_ammo: performing stack for ["..section.."], box_size "..utils.to_str(box_size)..", "..utils.to_str(inv_partial_count).." total partial ammo objects found, totalling "..utils.to_str(bullet_count).." bullets, "..utils.to_str(full_boxes).." full boxes found, totalling "..utils.to_str(full_boxes*box_size).." bullets, total discovered bullet count "..utils.to_str(full_boxes*box_size+bullet_count)..", starting inventory count is "..utils.to_str(actor:object_count())) end
+  --if TB3D_Modders.use_inventory_message then TB3D_Services.packet_alert("ammo_stack stack_ammo: performing stack for ["..section.."], box_size ["..utils.to_str(box_size).."], ["..utils.to_str(inv_partial_count).."] total partial ammo objects found, totalling ["..utils.to_str(bullet_count).."] bullets, ["..utils.to_str(full_boxes).."] full boxes found, totalling ["..utils.to_str(full_boxes*box_size).."] bullets, total discovered bullet count ["..utils.to_str(full_boxes*box_size+bullet_count).."], starting inventory count is ["..utils.to_str(actor:object_count()).."]") end
   idx = 0
   for inv_obj, inv_bullet_count in pairs(inv_partials) do             -- remove all of the partials
     inv_id = inv_obj:id()
     amk.remove_item(inv_obj)
     inv_obj = alife():object(inv_id)                                  -- some objects apparently fail to delete
     if inv_obj ~= nil then                                            -- for those objects, remove them from the bullet_count, so we don't increase the total ammo count
-      if TB3D_Modders.use_abort_message then TB3D_Services.packet_alert("ammo_stack.stack_ammo: failed to delete ["..utils.to_str(inv_id).."] ["..utils.to_str(section).."] inv_bullet_count "..utils.to_str(inv_bullet_count)) end
+      if TB3D_Modders.use_abort_message then TB3D_Services.packet_alert("ammo_stack stack_ammo: failed to delete ["..utils.to_str(inv_id).."] ["..utils.to_str(section).."] inv_bullet_count "..utils.to_str(inv_bullet_count)) end
       bullet_count = bullet_count + inv_bullet_count
       idx = idx + 1
     end
   end
   amk.spawn_ammo_in_inv(section, bullet_count, actor)                 -- create new ammo items in inventory, of the total bullet count we accumulated
-  if TB3D_Modders.use_inventory_message then TB3D_Services.packet_alert("ammo_stack.stack_ammo: stacking complete, "..utils.to_str(idx).." items of ["..utils.to_str(section).."] failed to delete, final stacked bullet_count was "..utils.to_str(bullet_count)..", ending inventory count is "..utils.to_str(actor:object_count())) end
+  if TB3D_Modders.use_inventory_message then TB3D_Services.packet_alert("ammo_stack stack_ammo: stacking complete, "..utils.to_str(idx).." items of ["..utils.to_str(section).."] failed to delete, final stacked bullet_count was "..utils.to_str(bullet_count)..", ending inventory count is "..utils.to_str(actor:object_count())) end
   return true                                                         -- we stacked
 end

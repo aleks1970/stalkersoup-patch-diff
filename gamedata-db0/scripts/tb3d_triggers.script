@@ -1,4 +1,4 @@
----TB3D 1.0.9.9.9.9 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.1.0.0.0.2 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
@@ -6,7 +6,7 @@
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
 -- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
 -- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs
-function my_ver() return "1.0.9.9.9.9" end
+function my_ver() return "1.1.0.0.0.2" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random = math.random
 local math_floor = math.floor
@@ -965,7 +965,7 @@ function actor_idle()							--109999 called from timers, levelup 1 and up
 				end
 			elseif ln == "l02_garbage" then
 				if has_alife_info("zep00_have") then
-					TB3D_Triggers.spawn_gar_bandits()	--hangar and swamps
+					spawn_gar_bandits()	--hangar and swamps
 					TB3D_Mobs.spawn_dogs(192.357,-1.344,57.052,338382,384, math_random(6,12))				--big tree
 				end
 			elseif lname == "l05_bar" then
@@ -977,19 +977,19 @@ function actor_idle()							--109999 called from timers, levelup 1 and up
 			elseif lname == "l04_darkvalley" then
 				TB3D_Mobs.check_dv_spawns()
 			elseif lname == "l03_agroprom" then
-				TB3D_Triggers.spawn_agro_dogs()
+				spawn_agro_dogs()
 			elseif lname == "l03u_agr_underground" then
 				TB3D_Mobs.spawn_agrou_bandits()
 			elseif lname == "l08_yantar" then
 				TB3D_Mobs.check_yantar_spawns()
 			elseif lname == "l12u_sarcofag" then
-				TB3D_Triggers.sarc_spawns(1)
+				sarc_spawns(1)
 			elseif lname == "l12u_control_monolith" then
 				--future
 			elseif lname == "marsh" then
 				TB3D_Mobs.check_swamp_spawns()
 			elseif lname == "l10u_bunker" then
-				TB3D_Triggers.bunker_spawns(1)
+				bunker_spawns(1)
 			elseif lname == "l10_radar" then
 				if not has_alife_info("tb3d_harsh_environment") then
 					TB3D_Mobs.check_radar_spawns()
@@ -1004,7 +1004,7 @@ function actor_idle()							--109999 called from timers, levelup 1 and up
 				end
 			elseif lname == "zaton" then
 				if not has_alife_info("collector_ready_for_zaton") or has_alife_info("collector_done_with_zaton") then
-					TB3D_Triggers.zat_spawns(1)
+					zat_spawns(1)
 				end
 			elseif lname == "l11_pripyat" then
 				TB3D_Mobs.check_pripyat_spawns()
@@ -1028,27 +1028,27 @@ function actor_idle()							--109999 called from timers, levelup 1 and up
 				end
 			elseif lname == "l12_stancia" then
 				if not has_alife_info("tb3d_harsh_environment") then
-					TB3D_Triggers.npp_spawns(1)
+					npp_spawns(1)
 					TB3D_Mobs.check_npp1_spawns()
 				end
 			elseif lname == "l01_poligon" then
 				--TODO
 			elseif lname == "k01_darkscape" then
 				TB3D_Mobs.check_ds_spawns()
-				TB3D_Triggers.ds_spawns(1)
+				ds_spawns(1)
 			elseif lname == "l04_pogost" then
 				if not has_alife_info("tb3d_harsh_environment") then
 					TB3D_Mobs.check_cemetery_spawns()
 				end
 			elseif lname == "dark_forest" then
 				TB3D_Mobs.check_wasted_spawns()
-				TB3D_Triggers.spawn_df_killers()
+				spawn_df_killers()
 			elseif lname == "l01_krasivay" then
 				TB3D_Mobs.check_kras_spawns()
 			elseif lname == "l02_dd" then
 				--future use
 			elseif lname == "hiding_road" then
-				TB3D_Triggers.hr_spawns(1)
+				hr_spawns(1)
 			elseif lname == "predbannik" then
 				--TODO
 			elseif lname == "level_f-1" then
@@ -1058,7 +1058,7 @@ function actor_idle()							--109999 called from timers, levelup 1 and up
 			elseif lname == "generators" then
 				if not has_alife_info("tb3d_harsh_environment") then
 					TB3D_Mobs.spawn_gen_skelets()
-					TB3D_Triggers.warlab_spawns(1)
+					warlab_spawns(1)
 					TB3D_Mobs.spawn_gen_north(1)
 					TB3D_Mobs.check_gen_spawns(1)
 				end
@@ -1482,7 +1482,7 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 		TB3D_Mobs.spawn_bandits(-60.105,-2.433,-215.753,136069,268,qty)					--graveyard camp
 		TB3D_Mobs.spawn_bandits(-58.560,0.421,-11.850,136967,324,qty)					--hangar yard
 	elseif stash_num == 5 then		--agro
-		TB3D_Triggers.spawn_agro_dogs()
+		spawn_agro_dogs()
 	elseif stash_num == 6 then		--garbage
 		TB3D_dialog.spawn_gar_found()		--snorks and spetnaz
 	elseif stash_num == 7 then		--dv
@@ -1720,7 +1720,7 @@ function old_research_send()				--109993, from basements without ladders
 end
 
 function spawn_sewer_stuff()	--109995, start collector
-	TB3D_Services.packet_alert("spawned sewer stuff")
+	--TB3D_Services.packet_alert("spawned sewer stuff")
 	alife():create("bioradar", vector():set(-117.921,-1.824,5.525),224007,3615)
 	alife():create("wpn_fn2000_sniper", vector():set(-117.921,-1.824,5.525),224007,3615)
 	alife():create("outfit_specnaz_m1", vector():set(-117.921,-1.824,5.525),224007,3615)
@@ -1742,4 +1742,257 @@ function spawn_agro_dogs()
 	TB3D_Mobs.spawn_dogs(-140.965,7.594,-101.493,98014,602, 8)		--N hill above base
 	TB3D_Mobs.spawn_dogs(-114.171,10.455,27.215,126000,527, 8)		--hill above swamp
 	TB3D_Mobs.spawn_dogs(-15.992,7.149,140.283,224351,515, 12)		--N powerlines
+end
+
+function spawn_jup_001()
+	spawn_alife_rand("ldk4_master",412.0438,3.693,-74.9348,1366967,3744,1) -- outside area
+	spawn_alife_rand("ldk1_troop",412.9438,3.693,-74.0348,1366967,3744,1) -- outside area
+	spawn_alife_rand("ldk1_troop",412.438,3.693,-73.7348,1366967,3744,1) -- outside area
+	spawn_alife_rand("dav_ldk_veteran_respawn1",413.438,3.693,-75.348,1366967,3744,1) -- outside area
+	spawn_alife_rand("dav_ldk_master_respawn1",419.645,9.955,-70.047,1379513,3744,3)  -- 3rd level room window
+end
+
+function spawn_jup_002()
+	spawn_alife_rand("dav_ldk_master_respawn1",420.191,9.953,-79.437,1379488,3744,2)  -- 3rd level room
+	spawn_alife_rand("dav_ldk_master_respawn1",423.690,4.454,-72.995,1384992,3744,2)  -- entrance 1st level room
+	spawn_alife_rand("sim_nano_master",420.191,9.953,-79.437,1379488,3744,1)  -- 3rd level room
+end
+
+function spawn_jup_003()
+	spawn_alife_rand("dav_ldk_master_respawn2",420.191,9.953,-79.437,1379488,3744,2)  -- 3rd level room
+	spawn_alife_rand("ldk7_master",400.012,4.279,-129.0600,1345632,3744,1)  -- Main inside area
+	spawn_alife_rand("dav_ldk_master_respawn1",402.012,4.279,-130.600,1345632,3744,1)  -- Main inside area
+	spawn_alife_rand("sim_nano_master",399.012,4.279,-131.600,1345632,3744,1)  -- Main inside area
+	spawn_alife_rand("ldk4_master",398.012,4.279,-129.600,1345632,3744,1)  -- Main inside area
+	spawn_alife_rand("dav_ldk_veteran_respawn2",397.012,4.279,-127.600,1345632,3744,2)  -- Main inside area
+	spawn_alife_rand("ldk1_troop",400.012,4.279,-129.600,1345632,3744,1)  -- Main inside area
+	spawn_alife_rand("ldk9_master",403.012,4.279,-128.600,1345632,3744,1)  -- Main inside area
+end
+
+function spawn_jup_004()
+	spawn_alife_rand("dav_ldk_master_respawn1",-324.238,4.231,394.971,167652,3703,1)
+	spawn_alife_rand("ldk7_master",-368.178,3.567,404.037,93580,3703,1)
+	spawn_alife_rand("sim_troop_master",-368.431,3.566,411.702,93592,3703,1)
+	spawn_alife_rand("dav_ldk_veteran_respawn1",-340.702,3.612,415.413,138901,3703,2)
+	spawn_alife_rand("ldk1_troop",-368.0431,3.566,411.0702,93592,3703,1)
+	spawn_alife_rand("sim_troop_master",-340.0702,3.612,415.413,138901,3703,1)
+end
+
+function spawn_jup_005()
+	spawn_alife_rand("ldk7_master",-422.055,-0.002,-350.327,15494,3702,1)
+	spawn_alife_rand("dav_ldk_veteran_respawn2",-450.261,0.101,-380.495,372,3702,1)
+	spawn_alife_rand("sim_troop_master",-407.745,-0.002,-368.701,33875,3702,1)
+	spawn_alife_rand("dav_ldk_master_respawn1",-411.362,0.005,-357.825,28123,3702,1)
+	spawn_alife_rand("ldk8_master",-419.725,-0.014,-333.137,17849,3702,1)
+	spawn_alife_rand("sim_troop_master",-434.794,0.018,-349.348,5545,3702,1)
+	spawn_alife_rand("dav_ldk_veteran_respawn1",-407.003,0.026,-378.496,34855,3702,1)
+end
+
+function spawn_jup_006()
+	spawn_alife_rand("ldk1_master",20.119,24.615,-193.569,747268,3727,1)
+	spawn_alife_rand("ldk2_master",55.023,27.961,-178.965,808998,3727,1)
+	spawn_alife_rand("ldk1_troop",56.055,24.162,-180.240,810226,3727,1)
+	spawn_alife_rand("ldk3_nano",21.092,24.368,-203.153,748458,3727,1)
+	spawn_alife_rand("sim_troop_master",20.119,24.615,-193.569,747268,3727,1)
+	spawn_alife_rand("dav_ldk_veteran_respawn2",55.023,27.961,-178.965,808998,3727,1)
+	spawn_alife_rand("sim_troop_master",56.055,24.162,-180.240,810226,3727,1)
+	spawn_alife_rand("dav_ldk_master_respawn1",21.092,24.368,-203.153,748458,3727,1)
+end
+
+function spawn_jup_007()
+	spawn_alife_rand("ldk1_master",20.119,24.615,-193.569,747268,3727,1)
+	spawn_alife_rand("ldk8_master",55.023,27.961,-178.965,808998,3727,1)
+	spawn_alife_rand("ldk1_troop",56.055,24.162,-180.240,810226,3727,1)
+	spawn_alife_rand("ldk4_nano",21.092,24.368,-203.153,748458,3727,1)
+	spawn_alife_rand("sim_troop_master",20.119,24.615,-193.569,747268,3727,1)
+	spawn_alife_rand("dav_ldk_master_respawn2",55.023,27.961,-178.965,808998,3727,1)
+	spawn_alife_rand("sim_troop_master",56.055,24.162,-180.240,810226,3727,1)
+	spawn_alife_rand("dav_ldk_master_respawn1",21.092,24.368,-203.153,748458,3727,1)
+end
+
+function spawn_jup_008()
+	spawn_alife_rand("sim_troop_master",398.69,27.542,-382.278,1344104,3745,2)
+	spawn_alife_rand("dav_ldk_veteran_respawn1",410.020,27.543,-366.803,1362984,3745,2)
+	spawn_alife_rand("dav_ldk_master_respawn1",421.893,27.1,-369.037,1382563,3745,2)
+	spawn_alife_rand("dav_ldk_master_respawn1",357.684,27.544,-375.026,1284547,3745,2)	-- Main area
+	spawn_alife_rand("ldk8_master",312.166,21.928,-320.185,1219192,3745,1)				-- Main area
+end
+
+function spawn_jup_009()
+	spawn_alife_rand("sim_troop_master",404.934,24.221,-381.337,1353675,3745,3)
+	spawn_alife_rand("dav_ldk_veteran_respawn1",400.406,24.222,-364.394,1346588,3745,3)
+	spawn_alife_rand("dav_ldk_master_respawn1",394.220,22.892,-368.966,1336811,3745,3)
+	spawn_alife_rand("sim_troop_master",322.241,27.541,-358.657,1235490,3745,3)			-- Main area
+	spawn_alife_rand("ldk5_master",313.166,21.928,-320.85,1219192,3745,1)					-- Main area
+end
+
+function spawn_jup_010()
+	spawn_alife_rand("dav_ldk_veteran_respawn1",351.711,20.540,-305.920,1275706,3745,2)
+	spawn_alife_rand("ldk1_troop",331.389,27.544,-300.995,1245489,3745,2)
+	spawn_alife_rand("sim_nano_master",356.443,27.544,-342.409,1282612,3745,2)
+	spawn_alife_rand("dav_ldk_veteran_respawn2",343.170,20.54,-304.34,1263284,3745,2)		-- Elevator level containers
+	spawn_alife_rand("dav_ldk_master_respawn2",310.963,21.928,-326.663,1217363,3727,2)	-- Elevator level first ramp
+end
+
+function spawn_jupu_easy_001()
+	-- news_manager.send_tip(db.actor, "LDK random spawn 1", nil, nil, 12000)
+	spawn_alife_rand("dav_ldk_master_respawn1",64.9131,3.093,2.0625,39312,3808,3) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("dav_ldk_veteran_respawn2",13.0597,0.561,-53.0598,21811,3797,2) -- main hall small door to east Prip
+	spawn_alife_rand("ldk1_nano",13.597,0.561,-53.598,21811,3797,2) -- main hall small door to east Prip
+end
+
+function spawn_jupu_easy_002()
+	-- news_manager.send_tip(db.actor, "LDK random spawn 2", nil, nil, 12000)
+	spawn_alife_rand("ldk1_nano",66.131,3.093,3.625,39312,3808,1) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("ldk3_nano",45.996,1.916,-0.061,34451,3808,1) -- main buiding gnd floor main room 
+	spawn_alife_rand("ldk4_nano",14.597,0.561,-52.598,21811,3797,1) -- main hall small door to east Prip
+	spawn_alife_rand("dav_ldk_master_respawn1",1.0881,8.064,406.0,14999,3787,2)    -- entrance first corner
+	spawn_alife_rand("dav_ldk_master_respawn2",4.0671,8.066,236.85,16423,3796,2)  --    entrance first tunnel
+	spawn_alife_rand("dav_ldk_veteran_respawn2",53.69,0.0,182.037,36477,3818,5)   --  entrance first stairs
+	spawn_alife_rand("dav_ldk_master_respawn1",22.584,0.0,74.25,27484,3805,5)   --  2nd tunnel from entrance
+end
+
+function spawn_jupu_easy_003()
+	-- news_manager.send_tip(db.actor, "LDK random spawn 3", nil, nil, 12000)
+	spawn_alife_rand("ldk1_troop",37.569,4.492,-175.135,31823,3810,1) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("ldk1_troop",58.947,4.232,-150.617,38016,3821,3) -- Tunnel to east Prip
+	spawn_alife_rand("ldk1_troop",52.789,4.703,-194.866,36774,3820,2) -- Tunnel to east Prip 2
+	spawn_alife_rand("ldk1_troop",-50.551,3.210,1.134,729,3775,2) -- Main hall room behind containers
+	spawn_alife_rand("dav_ldk_master_respawn1",-51.551,3.210,-1.134,729,3775,2) -- Main hall room behind containers
+	spawn_alife_rand("dav_ldk_master_respawn2",46.996,1.916,-1.061,34451,3808,2) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk1_troop",47.996,1.916,-0.061,34451,3808,2) -- main buiding gnd floor main room
+	spawn_alife_rand("dav_ldk_master_respawn1",65.131,3.093,3.625,39312,3808,2) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("dav_ldk_master_respawn2",14.597,0.561,-53.598,21811,3797,2) -- main hall small door to east Prip
+	spawn_alife_rand("dav_ldk_master_respawn1",38.569,4.492,-173.135,31823,3810,2) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("dav_ldk_master_respawn2",56.947,4.232,-151.617,38016,3821,2) -- Tunnel to east Prip 
+	spawn_alife_rand("dav_ldk_master_respawn1",52.789,4.703,-193.866,36774,3820,2) -- Tunnel to east Prip 2
+end
+
+function spawn_jupu_easy_004()
+	-- news_manager.send_tip(db.actor, "LDK random spawn 4", nil, nil, 12000)
+	spawn_alife_rand("ldk2_nano",37.569,4.492,-174.135,31823,3810,1) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("ldk1_troop",57.947,4.232,-150.617,38016,3821,2) -- Tunnel to east Prip
+	spawn_alife_rand("ldk1_nano",53.789,4.703,-194.866,36774,3820,1) -- Tunnel to east Prip 2
+	spawn_alife_rand("ldk4_nano",-50.551,3.210,0.134,729,3775,1) -- Main hall room behind containers	
+	spawn_alife_rand("ldk1_troop",8.464,23.757,11.45,8933,3776,3)   -- main hall sniper 2 mid rail
+	spawn_alife_rand("ldk1_troop",-51.551,3.210,-1.134,729,3775,2) -- Main hall room behind containers
+	spawn_alife_rand("ldk2_nano",46.996,1.916,-1.061,34451,3808,1) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk1_troop",47.996,1.916,-0.061,34451,3808,2) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk1_nano",66.131,3.093,2.625,39312,3808,1) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("ldk4_nano",65.131,3.093,3.625,39312,3808,2) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("ldk3_nano",14.597,0.561,-53.598,21811,3797,2) -- main hall small door to east Prip
+	spawn_alife_rand("ldk1_troop",13.597,0.561,-52.598,21811,3797,1) -- main hall small door to east Prip
+	spawn_alife_rand("ldk1_troop",38.569,4.492,-173.135,31823,3810,2) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("ldk1_nano",56.947,4.232,-151.617,38016,3821,1) -- Tunnel to east Prip 
+	spawn_alife_rand("ldk3_nano",52.789,4.703,-193.866,36774,3820,1) -- Tunnel to east Prip 2
+end
+
+function spawn_jupu_easy_005()
+	-- news_manager.send_tip(db.actor, "LDK random spawn 5", nil, nil, 12000)
+	spawn_alife_rand("dav_ldk_master_respawn1",38.569,4.492,-173.135,31823,3810,2) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("dav_ldk_master_respawn2",56.947,4.232,-151.617,38016,3821,2) -- Tunnel to east Prip 
+	spawn_alife_rand("dav_ldk_veteran_respawn1",52.789,4.703,-193.866,36774,3820,1) -- Tunnel to east Prip 2
+	spawn_alife_rand("dav_ldk_master_respawn1",-51.551,3.210,-1.134,729,3775,2) -- Main hall room behind containers
+	spawn_alife_rand("dav_ldk_master_respawn2",66.131,3.093,2.625,39312,3808,1) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("dav_ldk_veteran_respawn2",46.996,1.916,-1.061,34451,3808,1) -- main buiding gnd floor main room
+	spawn_alife_rand("dav_ldk_master_respawn1",14.597,0.561,-53.598,21811,3797,2) -- main hall small door to east Prip
+	spawn_alife_rand("dav_ldk_master_respawn1",65.131,3.093,3.625,39312,3808,1) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("dav_ldk_master_respawn2",47.996,1.916,-0.061,34451,3808,2) -- main buiding gnd floor main room
+	spawn_alife_rand("dav_ldk_master_respawn1",13.597,0.561,-52.598,21811,3797,3) -- main hall small door to east Prip
+	spawn_alife_rand("ldk1_troop",1.881,8.064,406.0,14999,3787,1)    -- entrance first corner
+	spawn_alife_rand("ldk1_troop",4.671,8.066,236.85,16423,3796,2)   -- entrance first tunnel
+	spawn_alife_rand("ldk1_troop",52.69,0.0,182.037,36477,3818,1)   --  entrance first stairs
+	spawn_alife_rand("ldk1_troop",22.584,0.0,73.25,27484,3805,2)   --  2nd tunnel from entrance
+	spawn_alife_rand("dav_ldk_master_respawn1",0.0,26.6,-43.0,13286,3797,2)  -- main hall sniper 1 east
+	spawn_alife_rand("dav_ldk_veteran_respawn2",0.35,26.47,-38.0,13585,3797,1)  -- main hall sniper 1 ledge east
+	spawn_alife_rand("dav_ldk_master_respawn1",8.464,23.757,11.45,8933,3776,3)   -- main hall sniper 2 mid rail
+	spawn_alife_rand("dav_ldk_master_respawn2",-51.551,3.210,-1.134,729,3775,2) -- Main hall room behind containers
+	spawn_alife_rand("dav_ldk_master_respawn1",47.996,1.916,-0.061,34451,3808,2) -- main buiding gnd floor main room
+	spawn_alife_rand("dav_ldk_veteran_respawn2",65.131,3.093,3.625,39312,3808,2) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("dav_ldk_master_respawn1",14.597,0.561,-53.598,21811,3797,3) -- main hall small door to east Prip
+	spawn_alife_rand("ldk1_troop",38.569,4.492,-173.135,31823,3810,1) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("ldk1_troop",56.947,4.232,-151.617,38016,3821,2) -- Tunnel to east Prip 
+	spawn_alife_rand("ldk1_troop",52.789,4.703,-193.866,36774,3820,3) -- Tunnel to east Prip 2
+end
+
+function spawn_jupu_easy_006()
+	-- news_manager.send_tip(db.actor,"LDK random spawn 6", nil, nil, 12000)
+	spawn_alife_rand("dav_ldk_master_respawn1",-52.551,3.210,-1.134,729,3775,2) -- Main hall room behind containers
+	spawn_alife_rand("dav_ldk_veteran_respawn1",1.881,8.064,406.0,14999,3787,1)    -- entrance first corner
+	spawn_alife_rand("dav_ldk_master_respawn1",4.671,8.066,236.85,16423,3796,2)   -- entrance first tunnel
+	spawn_alife_rand("dav_ldk_veteran_respawn2",52.69,0.0,182.037,36477,3818,1)   --  entrance first stairs
+	spawn_alife_rand("dav_ldk_master_respawn1",22.584,0.0,73.25,27484,3805,2)   --  2nd tunnel from entrance
+	spawn_alife_rand("dav_ldk_master_respawn2",38.569,4.492,-173.9135,31823,3810,3) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("dav_ldk_master_respawn1",56.0947,4.232,-151.617,38016,3821,2) -- Tunnel to east Prip 
+	spawn_alife_rand("dav_ldk_master_respawn1",52.789,4.703,-193.0866,36774,3820,2) -- Tunnel to east Prip 2
+end
+
+function spawn_jupu_tough_001()
+	-- news_manager.send_tip(db.actor, "Tough LDK random spawn 1", nil, nil, 12000)
+	spawn_alife_rand("ldk6_master",4.671,8.066,236.85,16423,3796,2)   -- entrance first tunnel
+	spawn_alife_rand("ldk4_master",22.584,0.0,73.25,27484,3805,1)   --  2nd tunnel from entrance
+	spawn_alife_rand("ldk5_master",0.35,26.47,-38.0,13585,3797,1)  -- main hall sniper 1 ledge (east,1)
+	spawn_alife_rand("ldk9_master",-51.551,3.210,-1.134,729,3775,1) -- Main hall room behind containers
+	spawn_alife_rand("ldk2_master",47.996,1.916,-0.061,34451,3808,1) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk4_master",65.131,3.093,3.625,39312,3808,1) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("ldk1_master",13.597,0.561,-52.598,21811,3797,2) -- main hall small door to east Prip
+	spawn_alife_rand("ldk8_master",56.947,4.232,-151.617,38016,3821,1) -- Tunnel to east Prip 
+end
+
+function spawn_jupu_tough_002()
+	-- news_manager.send_tip(db.actor, "Tough LDK random spawn 2", nil, nil, 12000)
+	spawn_alife_rand("ldk5_master",1.881,8.064,406.0,14999,3787,2)    -- entrance first corner
+	spawn_alife_rand("ldk7_master",52.69,0.0,182.037,36477,3818,1)   --  entrance first stairs
+	spawn_alife_rand("ldk1_master",0.0,26.6,-43.0,13286,3797,1)  -- main hall sniper 1 (east,1)
+	spawn_alife_rand("ldk3_master",8.464,23.757,11.45,8933,3776,1)   -- main hall sniper 2 mid rail
+	spawn_alife_rand("ldk2_nano",46.996,1.916,-1.061,34451,3808,1) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk1_nano",66.131,3.093,2.625,39312,3808,1) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("ldk3_nano",14.597,0.561,-53.598,21811,3797,1) -- main hall small door to east Prip
+	spawn_alife_rand("ldk2_master",38.569,4.492,-173.135,31823,3810,1) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("ldk4_master",52.789,4.703,-193.866,36774,3820,2) -- Tunnel to east Prip 2
+end
+
+function spawn_jupu_tough_003()
+	-- news_manager.send_tip(db.actor, "Tough LDK random spawn 3", nil, nil, 12000)
+	spawn_alife_rand("ldk9_master",4.671,8.066,236.85,16423,3796,1)   -- entrance first tunnel
+	spawn_alife_rand("ldk1_master",52.69,0.0,182.037,36477,3818,3)   --  entrance first stairs
+	spawn_alife_rand("ldk1_master",22.584,0.0,73.25,27484,3805,1)   --  2nd tunnel from entrance
+	spawn_alife_rand("ldk5_master",8.464,23.757,11.45,8933,3776,1)   -- main hall sniper 2 mid rail
+	spawn_alife_rand("ldk9_master",-51.551,3.210,-1.134,729,3775,1) -- Main hall room behind containers
+	spawn_alife_rand("ldk2_nano",46.996,1.916,-1.061,34451,3808,3) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk1_troop",13.597,0.561,-52.598,21811,3797,1) -- main hall small door to east Prip
+	spawn_alife_rand("ldk8_master",56.947,4.232,-151.617,38016,3821,1) -- Tunnel to east Prip 
+end
+
+function spawn_jupu_tough_004()
+	-- news_manager.send_tip(db.actor, "Tough LDK random spawn 4", nil, nil, 12000)
+	spawn_alife_rand("ldk1_master",0.0,26.6,-43.0,13286,3797,1)  -- main hall sniper 1 (east,1)
+	spawn_alife_rand("ldk9_master",-51.551,3.210,-1.134,729,3775,1) -- Main hall room behind containers
+	spawn_alife_rand("ldk3_master",47.996,1.916,-0.061,34451,3808,1) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk6_master",66.131,3.093,2.625,39312,3808,1) -- main buiding gnd floor inner room 2
+	spawn_alife_rand("ldk2_master",14.597,0.561,-53.598,21811,3797,1) -- main hall small door to east Prip
+end
+
+function spawn_jupu_tough_005()
+	-- news_manager.send_tip(db.actor, "Tough LDK random spawn 5", nil, nil, 12000)
+	spawn_alife_rand("ldk2_master",-47.0,8.007,459.0,1244,3772,1)    -- lift entrance
+	spawn_alife_rand("ldk6_master",1.881,8.064,406.0,14999,3787,2)    -- entrance first corner
+	spawn_alife_rand("ldk4_master",4.671,8.066,236.85,16423,3796,1)   -- entrance first tunnel
+	spawn_alife_rand("ldk7_master",52.69,0.0,182.037,36477,3818,1)   --  entrance first stairs
+	spawn_alife_rand("ldk3_master",22.584,0.0,73.25,27484,3805,1)   --  2nd tunnel from entrance
+	spawn_alife_rand("ldk1_master",38.569,4.492,-173.135,31823,3810,2) -- Tunnel to east Prip room inv box
+	spawn_alife_rand("ldk8_master",56.947,4.232,-151.617,38016,3821,1) -- Tunnel to east Prip 
+	spawn_alife_rand("ldk4_master",52.789,4.703,-193.866,36774,3820,1) -- Tunnel to east Prip 2
+end
+
+function spawn_jupu_tough_006()
+	-- news_manager.send_tip(db.actor, "Tough LDK random spawn 6", nil, nil, 12000)
+	spawn_alife_rand("ldk7_master",-47.0,8.007,459.0,1244,3772,1)    -- lift entrance
+	spawn_alife_rand("ldk6_master",52.69,0.0,182.037,36477,3818,2)   --  entrance first stairs
+	spawn_alife_rand("ldk8_master",22.584,0.0,73.25,27484,3805,1)   --  2nd tunnel from entrance
+	spawn_alife_rand("ldk9_master",-51.551,3.210,-1.134,729,3775,1) -- Main hall room behind containers
+	spawn_alife_rand("ldk2_master",46.996,1.916,-1.061,34451,3808,1) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk4_master",47.996,1.916,-0.061,34451,3808,2) -- main buiding gnd floor main room
+	spawn_alife_rand("ldk4_master",14.597,0.561,-53.598,21811,3797,1) -- main hall small door to east Prip
+	spawn_alife_rand("ldk9_master",38.569,4.492,-173.135,31823,3810,1) -- Tunnel to east Prip room inv box
 end

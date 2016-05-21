@@ -1,6 +1,6 @@
---TB3D 1.1.0.0.0.1 chgd horror spawns: 50% chance collector, 20% novice to 50% master, spawn check for bad phantoms,
+--TB3D 1.1.0.0.0.2 chgd horror spawns: 50% chance collector, 20% novice to 50% master, spawn check for bad phantoms,
 -- rewrote hellhour, level_info, agro and agro_u, actor and kruglov in ignore list, get_level_up, harsh env, have_info
-function my_ver() return "1.1.0.0.0.1" end
+function my_ver() return "1.1.0.0.0.2" end
 --------------------------------------------------------------------------------------------------
 --*Module "Time of Terror" .. Spot (Shooter)
 --podrihtovano by sapsan
@@ -495,29 +495,36 @@ local horror_time_2 = {h = 23, m = 6}
 local horror_end_time = {h = 23, m = 14}
 local game_reloaded = true -- during the CHU after restarting the game special effects will continue
 local panic_minute
-local level_info
+--local level_info
 local hit_once = false
 
-function horrortime()
-	local lname = level.name()		--109996
+function horrortime(lname)
+	local level_info = tabl_horror_by_level[lname]		--110002
 	if TB3D_Services.is_instorm(lname) == true or		--109996
-	(not tabl_horror_by_level[level.name()]) or
+	(level_info == nil) or
 	((lname == "l03_agroprom" or lname == "l03u_agr_underground")			--109975
 	  and not has_alife_info("agroprom_military_case_done")) then
 		return
 	end
 	local timeh =level.get_time_hours()
 	local timem =level.get_time_minutes()
+	--TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."]")
 	local rad, shock
 	if not has_alife_info("horror_time_begin") and not has_alife_info("horror_fail") then		--not in a hell hour now
 		if timeh == horror_begin_time.h and timem < horror_end_time.m then						--time to start a hell hour?
-			--TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."]")
-			level_info = tabl_horror_by_level[lname]
 			local diff_range = TB3D_Services.get_level_up() + 1									--109978, insure between 1 and 11
-			diff_range = diff_range + TB3D_Services.get_difficulty_num()	--110001, level.get_game_difficulty()								--2 to 5, so novice = 20% chance, master = 50% chance
-			diff_range = math.random(1,diff_range)
-			--TB3D_Services.packet_alert("mec in hell: diff_range["..utils.to_str(diff_range).."]")
-			if level_info and diff_range == 3 or diff_range == 5 or diff_range == 7 or diff_range == 9 or diff_range == 11 then										-- 3 or 5 then start hell hour
+			diff_range = diff_range + TB3D_Services.get_difficulty_num()	--110001, novice = 2, master = 5
+			if diff_range == 5 then
+				diff_range = math.random(20)				--50% chance
+			elseif diff_range == 4 then
+				diff_range = math.random(30)				--40% chance
+			elseif diff_range == 3 then
+				diff_range = math.random(40)				--30% chance
+			else
+				diff_range = math.random(50)				--20% chance
+			end
+			TB3D_Services.packet_alert("mec in hell: diff_range["..utils.to_str(diff_range).."]")
+			if diff_range < 10 then																				-- start hell hour
 				TB3D_Services.time_resync()		--restore normal speed incase it's excellerated time
 				game_reloaded = false
 				panic_minute = 0
@@ -530,7 +537,7 @@ function horrortime()
 			else
 				TB3D_Services.give_info("horror_fail")
 			end
-			--TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."] done")
+			TB3D_Services.packet_alert("mec in hell: start minute["..utils.to_str(timem).."] done")
 		end
 	elseif has_alife_info("horror_time_begin") then
 		if not has_alife_info("horror_time_end") and not has_alife_info("horror_fail") then																					--in hell hour

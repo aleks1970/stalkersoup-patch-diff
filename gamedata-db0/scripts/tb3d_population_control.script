@@ -1,9 +1,10 @@
--- TB3D 1.1.0.0.0.0 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.1.0.0.0.2 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized,
--- pri_monolith_10, vampire, specnaz_dead, generators, esc2_ respawns, is_spawner, sepaerate can_go_online for monsters and stalkers
-function my_ver() return "1.1.0.0.0.0" end
+-- pri_monolith_10, vampire, specnaz_dead, generators, esc2_ respawns, is_spawner, sepaerate can_go_online for monsters and stalkers,
+-- radar
+function my_ver() return "1.1.0.0.0.2" end
 -----over population control----
 local string_find = string.find
 local string_sub = string.sub
@@ -1330,7 +1331,7 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 			elseif lname == "l10_radar" then
 				if hdr4 == "rad_"			--short circuit known spawns
 				  or hdr4 == "new_"
-				  or hdr6 == "radar_"			--radar_
+				  or hdr6 == "radar_"
 				  or hdr4 == "sak_" then
 					if string_find(obj_name, "radar_vitamin")
 					  or string_find(obj_name, "radar_svoboda_") then
@@ -1350,10 +1351,10 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 					  or string_find(obj_name, "road_guard") then
 						if extended_levels then
 							dont_spawn_online = true
+						elseif not has_alife_info("rad_task_aes") and (obj.alive and obj:alive()) then					--TODO: notanumber needs define
+							result = true
 						else
-							if not has_alife_info("rad_task_aes") then					--TODO: notanumber needs define
-								result = true
-							end
+							dont_spawn_online = true
 						end
 					elseif string_find(obj_name, "antenna_")
 					  --or string_find(obj_name, "antenna_sniper4")						--crashes if spawn before radar done
@@ -1361,10 +1362,10 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 					  or string_find(obj_name, "ambush_") then
 						if extended_levels then
 							dont_spawn_online = true
+						elseif not has_alife_info("bar_deactivate_radar_done") and (obj.alive and obj:alive()) then
+							result = true
 						else
-							if not has_alife_info("bar_deactivate_radar_done") then
-								result = true
-							end
+							dont_spawn_online = true
 						end
 					elseif string_find(obj_name, "new_prizrak") then					--ghost, 109954
 						if extended_levels then
@@ -1376,6 +1377,22 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 						end
 					else
 						result = true
+					end
+				elseif hdr5 == "rad2_" then
+						--rad2_stalker_zombied
+						--rad2_stalker_zombied_0000
+						--rad2_stalker_zombied_0001
+						--rad2_military
+						--rad2_stalker
+						--rad2_stalker_0000
+						--rad2_stalker_0001
+						--rad2_stalker_0002
+						--rad2_stalker_0003
+						--rad2_stalker_0004
+					if has_alife_info("bar_deactivate_radar_done") and (obj.alive and obj:alive()) then		--110002, need reduce npc after lab
+						result = true
+					else
+						dont_spawn_online = true
 					end
 				else
 					result = true

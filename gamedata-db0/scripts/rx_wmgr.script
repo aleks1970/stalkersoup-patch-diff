@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.8   added new reporting 12/07/11, removed empty calls to utils, game news, npc checks, protection, rain factor, output, debug, get_dmg
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.1.0.0.0.2   added new reporting 12/07/11, removed empty calls to utils, game news, npc checks, protection, rain factor, output, debug, get_dmg
+function my_ver() return "1.1.0.0.0.2" end
 ---- Rulix aka Bak --- 1.7.2009
 
 local table_sort = table.sort
@@ -1171,8 +1171,8 @@ function get_disp(section)
 	else
 		k_disp = read_if_exist_float(ammo_list, "k_disp",1)
 	end
-	if disp_base < 0.2 then
-		disp_base = 0.2
+	if disp_base < 0.01 then	--0.2 then	-- weapons test - aleks1970
+		disp_base = 0.01	--0.2	-- weapons test - aleks1970
 	end
 	return disp_base*k_disp*10
 end

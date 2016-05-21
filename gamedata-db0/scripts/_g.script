@@ -3,7 +3,7 @@ prefetch("TB3D_Modders")
 function my_ver() return "1.1.0.0.0.0" end
 
 if (jit == nil) then
-  profiler.setup_hook ()
+  profiler.setup_hook()
 end
 
 winx = 1024			--109976 from bind_stalker
@@ -31,6 +31,7 @@ huddle_up = 3
 can_leave = 6
 is_spawner = false									--109998, bypass pop control if from spawn menu
 time_changed = true									--110000, used to reset weather in bind_stalker.update
+delta_100 = 0
 
 -- Loads the schema from a file on the disk and activates a motivator.
 -- Here:

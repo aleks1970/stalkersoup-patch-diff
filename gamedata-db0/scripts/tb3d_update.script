@@ -1,7 +1,7 @@
--- TB3D 1.0.9.9.9.8 re-written for speed and better task management, added monolit tele, shortened disp time,
+-- TB3D 1.1.0.0.0.2 re-written for speed and better task management, added monolit tele, shortened disp time,
 -- update, petruha toz, new levels, \\n, mil_volk_resiver_done, translate and text color - aleks1970, zat lost,
 -- yakut_treasure_done, dan_flash_done
-function my_ver() return "1.0.9.9.9.8" end
+function my_ver() return "1.1.0.0.0.2" end
 --[[ --------------------------------------------------------------------------------------------
  File        : TB3D_Update:  adapted from max.script
  Description : Quick-Use Slots in the fashion of Call of Pripyat
@@ -18,7 +18,7 @@ function update_start()
 	ini = ini_file("misc\\TB3D_tasks.ltx") 
 	if TB3D_Modders.Global_Debug then TB3D_Services.packet_alert("tb3d update: update["..game.get_game_time():timeToString(game.CTime.TimeToMilisecs).."]") end
 	result_shown = false
-	is_coll = tb3d_services.is_collector(0)
+	local is_coll = tb3d_services.is_collector(0)		--110002
 	if ini:section_exist("tasks") then
 		if lvln=="l01_escape" then -----------------------------------------------------------ESCAPE
 			show_result(0)

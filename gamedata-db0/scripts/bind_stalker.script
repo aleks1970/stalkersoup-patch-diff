@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.0  added hide weapon option, The Collector, restored keylogger, abort_alert added,
+-- TB3D 1.1.0.0.0.2  added hide weapon option, The Collector, restored keylogger, abort_alert added,
 -- fov nvision fixed, added Meltac DDOF option, toggle dig NV, adjusted slices, re-wrote hiding weapons
 -- re-wrote on item take to add short-circuiting of section tests, dmx135, added art det, chgd modders interface
 -- removed vkluchit_generator_done as it has flaw in all.spawn, fixed save/load amkII error, chgd fixer, fixed ara_pda,
@@ -11,7 +11,7 @@
 -- informer_out, blow(), on_item_take, removed blowout_wave, run_hide, active community, removed unused timers, restrictor slice,
 -- mteleport updates, memory check on save, deactivated modders calls, slice levels, removed amk_utils cache, meceniy_outfit-net_destroy,
 --  translate, moved dx11 check, slices, moved braad_test.update to tb3d_stalker
-function my_ver() return "1.1.0.0.0.0" end
+function my_ver() return "1.1.0.0.0.2" end
 -- TB3D re-written 08/15/2011
 -- file from the mod "People Salsola 2009" from 14.06.
 -- Adapted to the Manager of weapons. Rulix aka Bak on 02/07/2009
@@ -307,6 +307,7 @@ function actor_binder:net_spawn(data)
 	if TB3D_Modders.check_smart_terrain then TB3D_Smart_Checker.check_smart_terrains(true) end
 	xr_sound.stop_all_sound_object()
 	xr_sound.clear_all_sound_object()
+	TB3D_Services.update()														--110002, TB3D start task update timer
 	amk.start_timer("pause_menu_timer", 0.6)
 	if TB3D_Modders.force_garbage_collect then collectgarbage("collect") end							-- force memory cleanup
 	if TB3D_Modders.Global_Debug then
@@ -783,22 +784,35 @@ function actor_binder:update(delta)
 	-- less important services start getting skipped if delta is greater than 20,30,40,50
 	----------------------------------------------------------------------------------------
 	if time_now == 0 then
-		delta = 0
+		slice_base = 1
+		delta_100 = 0
+	else
+		if TB3D_Modders.Global_Debug then
+			slice_base = 1
+				delta_100 = 0
+		elseif delta < delta_lowest then
+			slice_base = 1
+				delta_100 = 0
+		elseif delta < delta_low then
+			slice_base = 2
+				delta_100 = 0
+		elseif delta < delta_moderate then
+			slice_base = 3
+				delta_100 = 0
+		elseif delta < delta_high then
+			slice_base = 4
+				delta_100 = 0
+		else	--delta critical
+			slice_base = 5
+			delta_100 = delta_100 + 1
+			if delta_100 > 100 then										--110002, occurs often so force update all
+				delta_100 = 0
+				slice_base = 0
+				--TB3D_Services.packet_alert("<<<< Bind STALKER: update forced delta >>>>")
+			end
+		end
 	end
 	time_now = time_global()
-	if TB3D_Modders.Global_Debug then
-		slice_base = 1
-	elseif delta < delta_lowest then
-		slice_base = 1
-	elseif delta < delta_low then
-		slice_base = 2
-	elseif delta < delta_moderate then
-		slice_base = 3
-	elseif delta < delta_high then
-		slice_base = 4
-	else	--delta critical
-		slice_base = 5
-	end
 	if not last_time then												--init vars
 		scopeUsed = false
 		upd_timeSCP = upd_time_SCP+time_now
@@ -941,7 +955,7 @@ function actor_binder:update(delta)
 		upd_timeHEL = time_now + upd_time_HEL
 		if slice_base < 2 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - HEL["..utils.to_str(upd_timeHEL).."]") end
-			if TB3D_Modders.hell == true then meceniy_in_hell.horrortime() end
+			if TB3D_Modders.hell then meceniy_in_hell.horrortime(lname) end
 		end
 	end
 	if upd_timeSAK < time_now then
@@ -1098,7 +1112,7 @@ function actor_binder:update(delta)
 		upd_timeAEM = time_now + upd_time_AEM
 		if slice_base < 3 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - AEM["..utils.to_str(upd_timeAEM).."]") end
-			aem_manager.get_aem():update()
+			aem_manager.get_aem():update(lname)
 			--if TB3D_bsu_aem then TB3D_bsu_aem.update(delta, self.object, time_now) end				-- modders interface	
 		end
 	end
@@ -1157,11 +1171,11 @@ function actor_binder:update(delta)
 		end
 	end
 	if self.next_restrictors_update_time < time_now then
-		if slice_base < 4 then
+		--if slice_base < 4 then
 			amk.oau_watchdog=886												-----------------886, 887, 888
 			bind_restrictor.actor_update(delta)
 			amk.oau_watchdog=885
-		end
+		--end
 		self.next_restrictors_update_time = time_now + upd_time_RST			--109983
 	end
 	if upd_timeRST < time_now then											--109986
@@ -1175,10 +1189,11 @@ function actor_binder:update(delta)
 		end
 	end
 	--TB3D_Services.packet_alert("BSTALK: actor_update4")
+	--============================ most important: skip if slice base > 4 =========================================
 	if upd_timeSCP < time_now then
 		amk.oau_watchdog=870													-----------------870  
 		upd_timeSCP = time_now + upd_time_SCP
-		if slice_base < 4 then
+		if slice_base < 5 then
 			if TB3D_Modders.use_slice_message then TB3D_Services.packet_alert("BSTALK: actor_update - SCP["..utils.to_str(upd_timeSCP).."]") end
 			if TB3D_Modders.use_ammo_stack and self.object:is_talking() == false then
 				-- if stacking is enabled and no dialog is open, give ammo_stack.on_update a chance to stack ammo
@@ -1190,7 +1205,6 @@ function actor_binder:update(delta)
 			--if TB3D_bsu_updS then TB3D_bsu_updS.update(delta, self.object, time_now, scopeUsed) end			-- modders interface		
 		end
 	end
-	--============================ most important: skip if slice base > 4 =========================================
 	if upd_timeWEP < time_now then
 		amk.oau_watchdog=860													-----------------860
 		upd_timeWEP = time_now + upd_time_WEP
@@ -1218,7 +1232,8 @@ function actor_binder:update(delta)
 			if TB3D_Modders.invisible then meceniy_work.set_invisible() end
 		end
 	end
-	if slice_base < 5 then
+	--============================ end slice based actions ===============================================
+	--if slice_base < 5 then
 		self.actor_detector:update()											-- update circuit detector
 		if TB3D_Modders.amk_style_hit == false then								--109970 moved here, amk hit already does this
 			amk.oau_watchdog=570												-----------------570  
@@ -1228,9 +1243,8 @@ function actor_binder:update(delta)
 		if TB3D_Modders.CopKeys == true then keylogger.update() end				-- New buttons
 		amk.oau_watchdog=600													-----------------600
 		if TB3D_Modders.use_xtrm_ai and xrs_ai then xrs_ai.actor_update(delta) end	--grenade and armor
-	end
+	--end
 	--TB3D_Services.info_alert("Bind_Stalker actor_update slices done")
-	--============================ end slice based actions ===============================================
 	if is_collector == true then
 		amk.oau_watchdog=680													-----------------680  
 		TB3D_Collector.update(time_now, slice_base)

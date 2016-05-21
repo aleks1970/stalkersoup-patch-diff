@@ -1,11 +1,12 @@
---' TB3D 1.1.0.0.0.0 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.1.0.0.0.2 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
 -- naemn_shturm_poluch, fake_wpn_knif2, arahara to arhara, debug, sv_chern_peregovor_sms2, radar_udalyem_art, sms_pilot, debug, set_community
 -- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, repair_kit
--- text color, give repair_kit and spare_parts Revamped - aleks1970, 186 char size limit to sms messages!!!!, new weapon for/from Fox - aleks1970
-function my_ver() return "1.1.0.0.0.0" end
+-- text color, give repair_kit and spare_parts Revamped - aleks1970, 186 char size limit to sms messages!!!!, new weapon for/from Fox - aleks1970,
+-- kukla
+function my_ver() return "1.1.0.0.0.2" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -6847,19 +6848,26 @@ end
 
 --' spawn zombies on the radar
 function spawn_zombi_padar()
+	--TB3D_Services.packet_alert("arh dialog: spawn_zombi_padar")
 	alife():create("zombie_strong",vector():set(-10.776,0.198,-48.988),7089,1960)
-	--	alife():create("zombie_strong",vector():set(-8.273,0.198,-40.049),7773,1960)
-	--	alife():create("zombie_trup",vector():set(-4.506,4.923,-41.786),7975,1960)
+	alife():create("zombie_trup",vector():set(-17.045,0.199,-43.179),5227,1960)			--110002, added zombies in rooms
+	alife():create("zombie_strong",vector():set(-9.691,0.199,-59.395),7078,1960)
+	alife():create("zombie_strong",vector():set(-16.700,0.368,-62.037),5206,1960)
+	alife():create("zombie_trup",vector():set(-16.584,0.199,-67.217),5201,1960)
 end
 
 --' remove all.spawn doll in flasks on the radar
 function dell_radar_kukla()
 	if TB3D_Services.is_collector(4000) == false then
-	local se_obj = alife():object("radar_kukla")
-  if se_obj then
-    alife():release(se_obj, true)
-  end
-  end
+		local se_obj = alife():object("radar_kukla")
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+		se_obj = alife():object("padar_spawn_zombi_kukla_restrictor")				--110002, stops runaway zombies
+		if se_obj then
+			alife():release(se_obj, true)
+		end
+	end
 end
 
 --' spawn doll in the radar and take her photo

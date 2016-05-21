@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.8 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
--- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list dcity doc, glavny
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.1.0.0.0.2 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
+-- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list dcity doc, glavny, radar
+function my_ver() return "1.1.0.0.0.2" end
 -- Red75 (c) 2008
 -- Marauder scheme v 1.1
 -- Part of AMK MOD
@@ -659,5 +659,6 @@ function npc_no_looting(npc)
 		or string_find(name, "esc_bridge_soldier")
 		or string_find(name, "amk_embankment_soldat")
 		or string_find(name, "gar_bandit_stroyka")
+		or string_find(name, "rad_stalker")							-- 110002, interferes with assault on pripyat exit
 		)
 end

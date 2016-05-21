@@ -1,11 +1,12 @@
---<!-- TB3D 1.1.0.0.0.0 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.1.0.0.0.2 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
 --item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals,
---lukash brains, agro knockdown, jupu, x16, check_dead
-function my_ver() return "1.1.0.0.0.0" end
+--lukash brains, agro knockdown, jupu, x16, check_dead, math_random
+function my_ver() return "1.1.0.0.0.2" end
 
 local translate = game.translate_string
+local math_random = math.random
 local text_color_tip = TB3D_Services.get_text_color("tip")
 
 local upd_pos = 0

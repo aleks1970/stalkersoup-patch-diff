@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.0 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.1.0.0.0.2 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
@@ -7,8 +7,8 @@
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
 -- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
 -- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin, missing scientist in pripyat, yan_specnaz_dead,
--- deathclaw, x16
-function my_ver() return "1.1.0.0.0.0" end
+-- deathclaw, x16, check_dyn_spawns, F1 arts, radar
+function my_ver() return "1.1.0.0.0.2" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -306,7 +306,11 @@ function check_object(obj, obj_name, sect, is_collector, lnum)
 		end
 	elseif sect == "respawn"
 	  or string_find(obj_name, "respawn") then
-		is_skip = true
+		if string_find(obj_name, "^dav_ldk_master_respawn") then	--110002, LDK Dynamic Mobs
+			is_fixed = true
+		else
+			is_skip = true
+		end
 	elseif (string_find(obj_name, "deathclaw") or string_find(sect, "deathclaw")) then					--109999, always remove them as very rare
 		is_fixed = true
 	elseif (string_find(obj_name, "werewolf") or string_find(sect, "werewolf"))
@@ -634,6 +638,7 @@ end
 
 function check_dyn_spawns(obj, obj_name, sect, obj_level)
 	local is_skip, is_fixed = false, false
+	local level_name = alife():level_name(obj_level)
 	if string_sub(obj_name, 1, 6) == "tb3dm_" then				-- TB3D Dynamic Mobs
 		if level_name == level.name() then						--remove all but same level
 			if string_find(obj_name, "zombied_") then			--keep count of those on this level
@@ -998,10 +1003,15 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 		  or string_find(obj_name, "road_guard")
 		  or string_find(obj_name, "_monolith")
 		  or string_find(obj_name, "rad_curve_")
-		  or string_find(obj_name, "_antenna_")
 		  --or string_find(obj_name, "boev_")							--110000
 		  or string_find(obj_name, "_dead") then
 			if is_collector then
+				is_fixed = true
+			else
+				is_skip = true
+			end
+		elseif string_find(obj_name, "antenna") then					--110002, need reduce npc after lab
+			if has_alife_info("bar_deactivate_radar_done") then
 				is_fixed = true
 			else
 				is_skip = true
@@ -1361,6 +1371,13 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 	elseif obj_level == 43 then												--darkscape
 	elseif obj_level == 44 then												--dark forest
 	elseif obj_level == 45 then												--f-1
+		if string_find(obj_name, "^af_") then
+			if not has_alife_info("zep23_have") then						--110002, remove excess arts
+				is_fixed = true
+			else
+				is_skip = true
+			end
+		end
 	elseif obj_level == 46 then												--promzone
 	--elseif obj_level == 47 then											--deadcity			--109940 dead_city used instead
 	elseif obj_level == 48 then												--krasivay
