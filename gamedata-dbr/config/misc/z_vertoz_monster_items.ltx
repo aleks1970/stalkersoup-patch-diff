@@ -168,31 +168,6 @@ inv_grid_y			= 22
 belt				= true
 cost				= 35000
 
-;;; Venom Claw(Raptor)
-[mutant_raptor_kogot]:identity_immunities
-GroupControlSection	= spawn_group
-discovery_dependency = 
-$spawn 				= "devices\monster_items\chimera_kogott"
-;$prefetch 			= 32
-class				= II_ATTCH
-cform				= skeleton
-visual				= monster_items\chimera_kogot.ogf
-radius				= 1
-
-inv_name			= mutant_raptor_kogot
-inv_name_short		= mutant_raptor_kogot
-description			= enc_mutant_raptor_kogot_description
-
-inv_weight			= 0.1
-can_trade			= on
-
-inv_grid_width		= 1
-inv_grid_height		= 1
-inv_grid_x			= 20
-inv_grid_y			= 66
-belt				= true
-cost				= 12000
-
 ;<!-- IZLOM'S HAND -->
 [mutant_fracture_hand]:identity_immunities
 GroupControlSection	= spawn_group
@@ -366,26 +341,4 @@ inv_grid_y         = 14	;19
 cost				= 40000
 belt				= true
 
-[mutant_deathclaw_antler]:identity_immunities
-GroupControlSection	= spawn_group
-discovery_dependency = 
-$spawn 				= "devices\monster_items\mutant_deathclaw_antler"
-;$prefetch 			= 32
-class				= II_ATTCH
-cform				= skeleton
-visual				= monster_items\deathclaw_antler.ogf
-radius				= 1
 
-inv_name			= mutant_deathclaw_antler
-inv_name_short		= mutant_deathclaw_antler
-description			= enc_mutant_deathclaw_antler_description
-
-inv_weight			= 0.6
-can_trade			= on
-
-inv_grid_width		= 1
-inv_grid_height		= 1
-inv_grid_x			= 62
-inv_grid_y			= 57
-belt				= true
-cost				= 18000

@@ -1,0 +1,433 @@
+--- TB3D 1.0.9.9.5.0 BETA relrease of the Modders Mega Mod, changed dyn suit options,
+-- bio radar pulse option, logic debug option, dmx135, death_hit, expanded hit styles,
+-- added cave_no_big_electros, pump_it_up to ingame menu, alife tweaks, cleaner, dist coef,
+-- population control, max_phantoms, radiation_factor, adjusted populations, start_alife_option,
+-- loot_option, radiation_factor to 1.0, effector_spawn back off, alife_option from in game menu,
+-- adjusted sniper aim, added state messages, random tanks, use_hits, check_bad_weapons,
+-- removed dyn_rad and added use_rad_fields, dynamic sounds, death_hit, use_without_npc/creatures options,
+-- max burers 2, use_binder_message, use_tb3d_wmgr, use_wmgr_messages, 8 burers, added respawner_max_per_slice, dog_rush, dmx_cars
+function my_ver() return "1.0.9.9.5.0" end
+---Modders resource central for script options
+---certain function calls from script files in the gamedata\scripts dir redirected here
+---for mod testing and gameplay options, not compatible with non-TB3D mods
+---those options that can reduce memory/cpu load when off are indicated with --!M!...  in comment
+
+--!!!!!!!!!!!!!!-Game Start Options-!!!!!!!-REQUIRES NEW GAME IF CHANGED-!!!!!!!!!!!!!!!!--
+
+--turns on all safe level changers when false, STALKER starts only, will cause broken quests when used
+--without proper info portions from normal playthrough
+default_portal_spawn = true		-- (true)
+
+--true = raincoat, then medkit, knife, gun and ammo
+--false = The Collector start or user customized in TB3D_Triggers.script
+default_items = true			-- (true)
+
+--if true, you will have to load ammo onto your belt (vest)
+--!M! not done for all ammo so default is not to use
+use_ammo_belt = false			-- (false)
+
+--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!--
+-----------------Game Play Options----------DOES NOT REQUIRE NEW GAME IF CHANGED-----------
+
+--================================OFFLINE ALIFE================================================
+--// allows respawning of alife in all levels instead of waiting for free play. This means that 
+--// npc and creatures will respawn and migrate more often, can effect vanilla quests.
+--// Default is ramping of random alife spawning, balanced to protect gameplay progression.
+--start of game
+--  "l03_agroprom", "l06_rostok", "l07_military", "l08_yantar", "red_forest", "l10_radar"
+--after radar deactivated
+--  "l04_darkvalley", "l02_garbage", "l03u_agr_underground", "labx8", "l04u_labx18", "marsh" 
+--after npp1 
+--  "l01_escape", "l12_stancia", "warlab", "l10u_bunker", "l08u_brainlab", "atp_for_test22"
+--after generators activated 
+--  "generators", "lost_village", "aver", "puzir", "av_peshera", "peshera"
+--after backwater
+--  "zaton", "l11_pripyat", "l12_stancia_2", "pripyat", "l12u_control_monolith", "l12u_sarcofag"
+--collector freeplay
+--  "dead_city", "jupiter_underground", "limansk", "hospital", "109_dead_city", "jupiter"
+--open_alife_in_SOC, still in development, bar gets attacked constantly as highly populated
+--  "l05_bar", "k01_darkscape", "123_final_battle"
+
+open_alife_in_SOC = false		-- (false)!M! all levels open, NS default = false
+
+------------------------alife respawn system--------------------------------------------------
+-- default progresses automatically in game based on game play, rank and level-up values,
+-- moderate and hardcore respawns kick in AFTER Radar is deactivated to not interfere with main
+-- quests to that point but if used at start then exiting x10 and beyond will be intense and may
+-- cause a crash on weaker systems. Minimum spawn distance from player also affected.
+-- Respawn rates and distances will start immediately and are:
+--   default: random 12hrs to 24hrs - default distance with a 50m min distance cap
+--   moderate: random 6hrs to 12hrs - 80m min distance to player
+--   hardcore: random 1hr to 6hrs - 50m min distance to player
+-- Caution should be used with hardcore as creature packs like dogs and bloodsuckers can be
+-- overwhelming at first.
+
+start_alife_option = 0			-- (0)!M! 0 (default), 1 (moderate) and 2 (hardcore)
+
+----------------------------------------------------------------------------------------------
+alife_slice_mult=15				-- (15) slice update in binder, multiplier * (1 game minute), default: every 15 game minutes
+look_radius=120					-- (120) maximum obj search distance, should be <= alife.ltx switch_distance (TB3D = 120)
+look_radius_box = 100			-- (100) distance to search for inventory boxes
+search_intensivity=20			-- (20)!M! search intensity, number of alife objects to search for each table update
+to_actor = look_radius-20		-- (look_radius-20) distance from actor checks, obj must be: ( < look_radius and > to_actor ) to be spawned, range: 1 to to_actor-1 (look_radius-20)
+max_rounds = 10					-- (10) duration of attacks, keep spawning up to 10 times per assault
+health_wound = 0.20				-- (0.20) At what level of health is considered to be wounded NPCs
+health_wound_set = 0.02			-- (0.02) first wound start
+----- actual code: fp = math_ceil((priority * 1000) + (GetAccuracy * TB3D_Modders.accuracy_mult) + (GetRPM * 3) + (GetDamage * TB3D_Modders.damage_mult)) - 5000
+base_fp = 1400					-- (1400) Standard firepower\distance at distance = 1 to remove 100% health [defender.health - (attack_info.fp / TB3D_Modders.base_fp)]
+dist_coeff = 8					-- (8) The coefficient for the distance [firepower / (dist / dist_coeff)]
+accuracy_mult = 100				-- (100) percent of weapon accuracy (in config) to apply, lower = less accurate
+damage_mult = 8					-- (8) damage value in weapon config multiplied by this value, lower = less damage
+sell_limit = 3000				-- (3000) Vendor sale limit
+rate_kill_base = 100			-- (100) Rating for murder. By killing the weaker - 0.5 * rate_kill_base, stronger - 2 * rate_kill_base
+rate_art_found = 20				-- (20) rank change for victims with artifacts
+
+--smart terrain spawn/respawn params, quick,medium,long in npc.customdata or default
+--base value: quick=1,2  medium=3,4   long=5,6    default=1000,10001
+--algo: base value * smt_stay_time_mult       limited to range 1,10001 internaly
+smt_stay_time_mult = 10					-- (10) !M! stay time multiplier, 1 to 100, smaller the number the faster the respawns (default 10 = 12hr min)
+smt_spawn_radius_min = look_radius-20	-- (look_radius-20) minimum distance in meters to actor allowed for respawn, just inside look_radius best
+smt_spawn_rank_min = 90					-- (90) default minimum rank, used when not in npc.customdata
+smt_spawn_rank_max = 1000				-- (1000) default maximum rank, used when not in npc.customdata
+
+--cleaning level at spawn will reduce memory usage, items are also purged during npc looting/pickup
+--does not remove quest items/npc, does not effect artifacts, default = true
+use_level_cleaner = false				-- (false) integrated cleaner, removes excess bodies and items when changing levels
+
+--maximum allowed creatures on the level you spawn, caution: too small a number may break some quests
+--does not include some 'specific' quest creatures or dynamic spawns
+max_bibliotekar = 2				--2 min for marsh
+max_bloodsuckers = 20			--20
+max_boars = 16					--16 for esc and pripyat
+max_burers = 8					--8   lab x18
+max_cats = 10					--10
+max_chimera = 4					--4
+max_controllers = 4				--4
+max_crows = 28					--28 works best, normal is 56
+max_dogs = 60					--60 dog swarms
+max_flesh = 12					--12
+max_fractures = 10				--10
+max_ghouls = 4					--4
+max_gigants = 4					--4
+max_phantoms = 8				--8
+max_poltergeist = 8				--8 min for labs
+max_pseudodogs = 12				--12
+max_rats = 20					--20
+max_scelets = 6					--6 min for labrynth
+max_snorks = 36					--36 min for yantar and pripyat
+max_tarakans = 20				--20 roaches
+max_tushkanos = 26				--26
+max_werewolves = 6				--6 Red Forrest
+max_zombies = 20				--20 min for yantar
+--------------------------------------OFFLINE ALIFE end------------------------------------------------
+
+--!M! use the new DMX cars, false will cause them to not spawn but quests are not changed
+--you can turn it on anytime and will spawn on next level change
+use_DMX_cars = true				-- (true)
+
+--spawns the items contained in func actor_net_spawn(), will happen every time you enter
+--a new level, great for re-loading	
+give_items_on_spawn = false		-- (false)
+
+--true = unlimited bolts (just spawns a new one each throw), false = DMX style disposable
+--it may deplete your inventory but should still keep one in slot.
+unlimited_bolts = true			-- (true)
+
+--hide weapon during conversation and item usage, default is true
+--NOTE: cars and some gameplay require hiding the weapon, these will NOT be effected by this setting
+hide_weapon			= false		-- (false) does not stop npc from complaining and even reacting to it
+
+--ADVANCED AI
+use_tb3d_wmgr		= true		-- (true) advanced characteristics and handling, some advanced weapons require this
+use_xtrm_ai			= true		-- (true) causes more looting and more agressive combat
+sniper_aim_ratio	= 30		-- (30)=10:1 ratio, if (distance_to_object * sniper_aim_ratio) <= sniper_aim_min then shoot else target
+sniper_aim_min		= 3000		-- (3000) equal to 300m in game, further than this is targeting or not seen, tested with Rostok and Agro snipers
+ai_anomoly_evade	= false		-- (false) !M! npc will try to evade anomolies, uses more memory (presently causes npc to throw all their bolts)
+
+---------presently the AMK news system is being tested, it may cause CTDs in game, important news is still shown
+show_death_news 	= false		-- (false) turns death news on/off, random deaths, not key characters
+show_spawn_news 	= false		-- (false) turns spawn news on/off, random spawns, not key characters
+show_abuse_news		= false		-- (false) turns abuse news on/off, random acts by ficticous characters
+show_hero_news 		= false		-- (false) !M! news about your exploits in the zone, also causes bandits to travel
+show_blowout_news 	= false		-- (false) only effects predictions after a blowout
+show_info_news 		= false		-- (false) !M! also spawns surprise creatures, some of which can spawn improperly and cause CTDs
+offline_alife_trade = false		-- (false) !M! news on items for trade, off for better performance
+
+--Hit styles 
+use_hits			= true		-- (true) allows any of the following hit styles, false deactivates ALL of them
+--------------------------------------------------------------
+default_hit			= use_hits and true		-- (true) hit effects like bullets, explosions and anomolies
+amk_style_hit		= use_hits and false	-- (false) when health decreases a certain amount then added pain, real hardcore!
+blowout_crows		= use_hits and false	-- (false) !M! the killing of crows during blowouts, randomly causes hung birds
+blowout_npc			= use_hits and false	-- (false) !M! hit npc not in hideout during blowouts, causes many dead npc
+blowout_rad_val		= 1.0					-- (1.0) hit radiation level during blowout when actor unprotected, 0 = no blowout hit
+horror_hit			= use_hits and true		-- (true) hits actor during hellhour
+meet_hit			= use_hits and true		-- (true) hits actor on meeting npc with bad reputation
+sleep_hit			= use_hits and true		-- (true) hits actor on waking up
+wound_hit			= use_hits and true		-- (true) hits npc/creatures after getting wounded
+death_hit			= use_hits and true		-- (true) hits npc/creatures after death to lift the pelvis slightly
+animation_hit		= use_hits and true		-- (true) hits npc/creatures rotate/bend when wounded
+alcohol_hit			= use_hits and true		-- (true) hits actor when drunk
+artefact_hit		= use_hits and true		-- (true) hits actor when picking up hot artifacts
+art_hit_multiplier	= 1						-- (1) intensity of hit from artefacts when artefact_hit = true, 1 to 100
+teleport_hit		= use_hits and false	-- (false) actor rotates when teleported
+mutator_hit			= use_hits and true		-- (true) hits actor on transmutator effect
+radiation_hit		= use_hits and true		-- (true) hits actor when rad level high
+zavis_hit			= use_hits and false	-- (false) hits npc on final removal
+----------------------------------------------------------------
+--gameplay difficulty
+cave_no_big_electros = false	-- (false) removes the 4 big elctro anomolies in the cave
+cave_hard			= true		-- (true) !M! if true then more and stronger creatures but extra artifacts will spawn as a reward, easy reduces number and strength of creatures
+heli_attack			= false		-- (false) Hellicopter attacks on player
+default_sleep		= false		-- (false) SLEEPING BAG (MATRAS) and beds use default sleep or sleep anytime except hell and blowouts
+die_in_sleep		= false		-- (false) you can die in your sleep from starvation, bleeding and radiation when true
+guns_can_explode	= true		-- (true) they will just malfunction instead
+head_bob			= true		-- (true) initial setting, can be changed ingame in advanced options
+head_sway_power		= 0.4		-- (0.4)  amount of camera inertia to apply for sway and bob
+loadout_rand_cond	= true		-- (true) randomly set the npc load out weapons/suit conditions between 80 and 100%
+radiation_factor	= 1.0		-- (1.0) multiplier for radiation delta, 0.0 same as god mode, higher the number, faster the rise
+zombie				= true		-- (true)  Player can be Zombied (true - on, false - off)
+invisible			= true		-- (true)  Use of Invisible Suits (true - on, false - off)
+teleporter_use		= true 		-- (true)  Using Smart Hand Escape (true - on, false - off)
+effector_spawn		= false		-- (false) !M!  Spawn "Elector bloodsuckers" in obtaining infoportion about the presence of quest items (true - on, false - off)
+night_creatures		= true		-- (true) turns random 'Creatures of the Night' on/off, only spawn around midnite if you are present
+hits_to_kill_invuln	= 20		-- (20) hit threshold to kill invulnerable if he becomes mortal by quest conditions
+hits_to_head_invuln	= 1			-- (1) hits_to_kill_invuln/hits_to_head_invuln = number of hits awarded for a head shot, (5/1=5) = 1 to 2 head shots
+check_bad_weapons	= true		-- (true) check quest weapons for condition before npc accepts it
+hardcore_mobs		= false		-- (false) Doubles the number of creatures in a dynamic mob of creatures
+
+--Money options for decoder and loot items on corpses
+money_decoder		= true		-- (true) finds money on NPCs, default true = on
+money_scarce		= true		-- (true) scarce on NPCs when true, gets scarcer with rank/level increases
+loot_option			= 1			-- (1) !M! Mode for random stuff on corpses (weapons/ammo in loadouts), 0 = no loot, 5 = max loot rand(1-6), 1 = default rand(1-2)
+
+--Dynamic spawns, these are created on level entry and removed on level change, this reuses same memory allocs
+use_fog				= true		-- (true) poisonous fog
+use_swamp_mist		= true		-- (true) swamp mist
+use_smoke			= true		-- (true) smoke, cigs, bar
+use_campfire_smoke	= true		-- (true) smoke around outdoor campfires
+use_heat_vapors		= true		-- (true) small vapors rising
+use_heat_distorts	= true		-- (true) large heat waves
+use_emi_fields		= true		-- (true) large static areas
+use_rad_fields		= true		-- (true) radiation zones
+use_insect_infests	= true		-- (true) small roaches and other insects
+use_random_tanks	= true		-- (true) TB3D randomly occuring live tanks
+use_rat_infests		= true		-- (true) TB3D randomly occuring smart rats
+use_roach_infests	= true		-- (true) TB3D randomly occuring smart roaches
+use_tarakan_infests	= true		-- (true) TB3D randomly occuring smart tarakans
+use_random_packs	= true		-- (true) TB3D randomly occuring packs of dogs and cats
+use_random_herds	= true		-- (true) TB3D randomly occuring herds of boars, fleshes, etc. 
+use_random_mutants	= true		-- (true) TB3D randomly occuring wolves, zombies, chims, etc.
+use_dyn_cars		= true		-- (true) TB3D quad atvs and dune buggies in some areas
+
+--Dynamic ambient sounds
+swamp_sounds		= true		-- (true) frogs and crickets in marshes
+cooling_sounds		= true		-- (true) ambient ventillator system in indoor levels
+
+--24hr clock, day_start and day_end dictate when environment changes occur like campfires
+day_start			= 6			--(6)am - day starts at this hour
+day_end				= 18		--(18)pm - day ends after this hour
+
+--anoms are now spawned based on player freeplay level/rank, not difficulty.
+least_anomolies		= false		-- (false) minimal anomolies spawned (skips random anoms), overrides hardcore anomolies
+hardcore_anomolies	= false		-- (false) starts at level 3,ignored when least anomolies = true
+easy_anomolies		= false		-- (false) spawn only easy to detect anomolies when true, ignored when least anomolies = true
+Cadet_level_anomolies = false	-- (false) spawn at cadet rank only, less spawned
+
+--!M! Artefact spawning
+arts_total			= 500		-- (500) Total allowable artifacts in the whole Zone, stops respawning when reached
+arts_max			= 100		-- (100) Anomoly Zone re-spawn limit, range: 1 to 100
+less_arts			= false		-- (false) AMK random arts, reduces them by half when true
+
+--BLOWOUT OPTIONS
+run_blowout_pp		= true		-- (true) !M!  regular emmissions occur, false will stop emmisions
+zombie_team			= false		-- (false) !M!  transform NPC to zombies, trup, causes CTDs, leave false
+surge_day_effect	= true		-- (true) !M!  COP style blowout effect, causes errors in low memory situations
+phantom_spawn 		= true		-- (true) !M!  Spawn phantoms on the level during blowouts and horror (true - on, false - off), they sometimes spawn with bad gv.
+------time and phase
+blow_time_basis		= 720		-- (720) basic time before following default release - in short game
+blow_time_shift		= 960		-- (960) number is used to adjust blow_time_basis, if the value is 0, the emissions would be through time = blow_time_basis
+blow_phase_basis	= 2			-- (2) The base duration of one phase output (only during the release of five phases) in the short game
+blow_phase_shift	= 3			-- (3) maximum-phase output (only during the release of five phases) in the short game
+blow_phase_max		= 3			-- (3) number is used to adjust blow_phase_basis, if equal to 0, while one phase is = blow_phase_basis
+--HELL HOUR, 20% chance novice to 50% chance master, 50% chance collector
+hell = true						-- (true)  Time of Terror (true - on, false - off)
+hell_spawn = true				-- (true) !M!  Spawn monsters on the level during the horror (true - on, false - off)
+hell_hour_alarm = true			-- (true) Siren or distortion (default) at start of hell hour, false = off
+
+--!M! fires always on instead of just at night, does not effect indoor/cave as they are always on
+fires_always_on		= false		-- (false) !M! fires burn from 7pm to 6am - should use 'true' for static lighting
+
+--ARENA OPTIONS
+--Arena lights: 1 = center row 3 lamps, 2 = center staggered 8 lamps, 3 = both 1&2 11 lamps, 4 = emergency lighting 3 dim rotating lamps
+aem_light_style		= 3			-- (3) not presently usable, causes actor freeze on restoring default lamps
+
+--MUSIC OPTIONS
+--bar music default, 0 = retro, 1 = rock, 2 = rockn, 3 = modern
+bar_music			= 1			-- (1)
+
+--MINIMAP OPTIONS
+display_compass		= true		-- (true) heading displayed in minimap
+
+--!M! COP Quick Keys
+--NOTE: NOT FUNCTIONING IN BETA,   numpad +/- will still turn HUD on/off
+CopKeys				= false		-- (false)
+
+-----------------------------------------------------------------------------------
+------------------------------ MENU DISPLAY ---------------------------------------
+-----------------------------------------------------------------------------------
+menu_char_height	= 20		-- (20) for file list spacing
+menu_date_start		= 330		-- (330) start column for file date listing
+menu_show_keys		= false		-- (false) displays modders keys on menu screen
+
+-----------------------------------------------------------------------------------
+--------------------------- ADVANCED SYSTEMS --------------------------------------
+-----------------------------------------------------------------------------------
+------ when night vision kicks in on binoculars and some weapons  (DMX default 35)
+--use 'ESC N' to toggle between night time only and anytime NV
+fov_nv				= 35		-- (35) start of night vision in digatal binocs/weapons (max 35, min 10)
+advanced_nightvision = false	-- (false) !M! Not active yet, colored reticles in shaders still WIP
+
+-----------DDOF and MBLUR, initial mode set here, now an option in game menu -----------
+ddof_mode			= 0		-- (0) [startup] dynamic depth of field: 0=off, 1=Motion Blur, 2=classic, 3=gausian
+ddof_kernel_C		= 0.5	-- (0.5) density of the blur samples, classic, range = 0.3 to 0.6
+ddof_kernel_G		= 0.7	-- (0.7) density of the blur samples, gaussian, range = 0.7 to 1.0
+motion_blur			= 0.4	-- (0.4) replaces setting in user.ltx, 0=off. Also in-game advanced graphics menu: range = 0.0 to 1.0
+
+--HUD elements
+bio_map_pulse		= true	-- (true) screen goes in and out or fixed on
+biodetect_all		= true	-- (true) detect all creatures without parts on belt
+bioradar_max_count	= 60	-- (60) maximum number of objects to display, limited to 100 internally
+
+auto_levels			= 0		-- (0) if set to 1 then the render settings will be automaticaly
+							--adjusted for the level you are spawning on
+level_set_max		= 100	--(100) if auto_levels = 1 then do not set any level past this amount
+							--options are in %		120,  100,   70,   50,   30 
+								--lighting_val	=	2.0,  1.5,  1.2,  1.0,  0.7
+								--dist_val		=	1.5,  1.5,  1.2,  1.0,  0.7
+								--lod_a			=	 96,   96,   64,   64,   48
+								--lod_b			=	 64,   64,   48,   48,   32
+								--shadow_qlty 	=	1.0,  1.0,  0.7,  0.7,  0.5
+
+--DELTA time slice thresholds, below delta_lowest = slice 1, each slice level causes more
+--non crucial services to be skipped until it lowers
+delta_critical		= 60	--(60) slice = 5
+delta_moderate		= 50	--(50) slice = 4
+delta_low			= 40	--(40) slice = 3
+delta_lowest		= 30	--(30) slice = 2
+
+respawner_max_per_slice		= 8		--(8) maximum objects created per slice
+
+-----------------------------------------------------------------------------------
+-----------------------Game Start Functions----------------------------------------
+-----------------------------------------------------------------------------------
+-- seperate sections for STALKER starts and The Collector start
+
+-----------------------------------------------------------------------------------
+-------------------------------STALKER SECTION ------------------------------------
+-----------------------------------------------------------------------------------
+
+function stalker_start()
+	if give_items_on_spawn then
+		--given on new game only
+
+	end	
+end --stalker net spawn
+
+function stalker_spawn()
+	if give_items_on_spawn then
+		-- given every level spawn
+		amk.spawn_in_inv("ammo_5.56x45_ap", 4)
+		amk.spawn_in_inv("ammo_zhekan_izomorf", 4)
+		amk.spawn_in_inv("ammo_5.7x28_ss190", 4)
+		amk.spawn_in_inv("ammo_m209", 2)
+	end	
+end --stalker spawn
+
+-----------------------------------------------------------------------------------
+-------------------------------- COLLECTOR SECTION --------------------------------
+-----------------------------------------------------------------------------------
+
+function collector_spawn()	-- given each time spawn on a level
+	--amk.spawn_in_inv("razgruzka",1)  --ammo vest, was given by fox, not usefull so off by default
+	--amk.spawn_in_inv("fake_wpn_coujaf",1)	--Exotic Knife, StarGate?
+	--amk.spawn_in_inv("wpn_fs",1)	--the default start handgun
+end
+
+--==================================================================================================--
+----------DEBUG SECTION should stay off in normal play -----------------------------------------------
+Global_Debug = false		--turns on upper level debug info, can be toggled in-game with 'ESC 0'
+-----------------------------------------------------------------------------------------
+local use_all = false		--turns on all messages below
+--in game messages for minor errors, useful for modders who work with schemes
+use_abort_message		= use_all or true	--errors that should terminate gameplay
+use_task_message		= use_all or false	--info on tasks, trade and treasure, in log
+use_scheme_message		= use_all or false	--errors and general messages, in log 'massive'
+use_packet_message		= use_all or false	--shows the load and save packets for the player, in log
+use_spawn_message		= use_all or false	--info on spawned items in news
+use_respawn_message		= use_all or false	--info on items added to the respawner
+use_alife_message		= use_all or false	--info on reputation, rank and some NPC data
+use_environment_message	= use_all or false	--info on day/night changes and actions
+use_lc_message			= use_all or false	--info on level changers, in log
+use_sak_message			= use_all or false	--info on sak inventory actions, in log
+use_logic_message		= use_all or false	--info on xr logic actions, in log
+use_smh1_message		= use_all or false	--info on smart_terrain general actions, in log, keep off
+use_smh2_message		= use_all or false	--info on xr_gulag detailed actions, in log, keep off
+use_smh3_message		= use_all or false	--info on se_stalker detailed actions and extra checks, in log, keep off
+use_combat_message		= use_all or false	--info on hit/death callbacks, good for tweaking weapons, damages...
+use_rxai_message		= use_all or false	--info on extended ai functions, in log
+use_news_message		= use_all or false	--info on news related functions, in log
+use_counter_message		= use_all or false	--shows the total, increments and decrements to creature counts
+use_conditions_message	= use_all or false	--shows actions executed from conditions list
+use_arena_message		= use_all or false	--shows the progress through an event
+use_inventory_message	= use_all or false	--dmx inventory actions, protected items
+use_weapon_message		= use_all or false	--arsenal related actions
+use_fastcall_message	= use_all or false	--AMK fast mod calls
+use_perception_message	= use_all or false	--Sound detection of actor by creatures and npc, causes crash on exit
+use_sound_message		= use_all or false	--Play sound calls
+----------------------------------------------------------------------------------------------
+show_tables				= false		--(false) prints tables to log, very intensive, keep off
+show_smart_packets		= false		--(false) prints smart terrain read/write packets to log, very intensive, keep off
+use_slice_message		= false		--(false) actor update timming, should be used alone
+show_news_spots			= false		--(false) show red spot where news occured, may not get removed once shown
+use_fast_news_debug		= false		--(false) speeds up news, adds more info for testing
+log_game_stats			= false		--(false) logs actor condition at intervals, also task and money transactions
+show_hit_actions		= false		--(false) logs hits made in hit_styles
+show_hit_invulnerable	= false		--(false) logs hits on invulnerable (only actor kills) and immortal (no one kills) npc
+use_cleaner_message		= false		--(false) logs the results of the cleaner and the fixer
+use_population_report	= false		--(false) logs the population totals and some ingame events
+use_loadout_message		= false		--(false) logs npc dynamic load outs if given
+use_info_message		= false		--(false) logs the info portion callback for the actor and on_use callback
+display_delta			= false		--(false) displays the actor slice multiplier on the minimap (1 thru 5, 5 = critical)
+--===============TESTING ONLY == USE WITH EXTREME CAUTION==================================--
+--State messgaes are from the motivator, npc_to_log must be a valid name or part of a name,
+--i.e. bar_ambush_killer_03 will log states for that npc only, bar_ambush_killer_ will log all of them.
+use_state_message		= false		--(false) logs the transition states of the state manager, super excessive data to log
+use_setup_message		= false		--(false) logs the initial setup logic on spawn
+
+npc_to_log				= "bar_ecolog_professor"
+
+--following are for future 'walk and spawn' system but work now, great for testing objects, physics and restrictors
+test_without_npc		= false		--(false) npc will not go on line except for key traders and vehicles
+test_without_creatures	= false		--(false) creatures will not go on line, except crows and some mobs
+
+use_mob_messages		= false		--(false) creature/npc chosen and quantity spawned
+
+use_binder_message		= false		--(false) raw bindings bind and destroy
+use_wmgr_messages		= false		--(false) initialization and damage settings
+
+use_destroy_message		= false		--(false) On net destroy messages
+pop_spawn_message		= false		--(false) when on will show net_spawn, remove_dead and dont_spawn_online messages
+
+use_offline_alife		= false		--(true) use offline alife updates of ficticous events
+spawn_esc_dog_rush		= false		--(false) causes ctd on going offline, solution pending
+
+autosave_wait_time		= 14		--(14) game seconds to wait before saving, set to not break audio dialogs
+check_news_rate			= 40		--(40) game seconds between news checks, start of a random 40 game second window
+
+verify_script_versions	= false		--(false) special script version verifier used by support
+use_server_messages		= false		--(false) sv and cl debug messages
+
+show_zoom_fov			= false		--(false) displays fov and distance in zoom
+
+------------END FILE
