@@ -1,6 +1,6 @@
--- TB3D 1.1.0.0.0.4  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init, get_art_type, net destroy, leave bar alone,
+-- TB3D 1.1.0.0.0.5  easy anoms options, get_obj_level, puzir, quest arts, removed acumm, arts, pre blow, get_level_up, debug, anoms, init, get_art_type, net destroy, leave bar alone,
 -- generate_anoms, net_spawn, generate_arts
-function my_ver() return "1.1.0.0.0.4" end
+function my_ver() return "1.1.0.0.0.5" end
 
 --[[-------------------------- variable and table --------------------------]]
 local table_sort=table.sort
@@ -935,12 +935,12 @@ function anom_binder:net_destroy()
 	local sobj = self.object
 	if sobj and sobj.id then
 		if TB3D_Modders.use_destroy_message then
-			TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(sobj:name()).."] section["..get_section(sobj).."]")
+			TB3D_Services.info_alert("anom binder: net destroy["..utils.to_str(sobj:name()).."] section["..get_section(sobj).."]", true)
 		end
 		remove_anomaly(sobj:id())
 		object_binder.net_destroy(self)
 		if TB3D_Modders.use_destroy_message then
-			TB3D_Services.packet_alert("anom binder: net destroy["..utils.to_str(sobj:name()).."] done")
+			TB3D_Services.info_alert("anom binder: net destroy["..utils.to_str(sobj:name()).."] done", true)
 		end
 	end
 end

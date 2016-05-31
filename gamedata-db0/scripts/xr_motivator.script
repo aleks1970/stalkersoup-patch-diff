@@ -1,10 +1,10 @@
---TB3D 1.1.0.0.0.4 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
+--TB3D 1.1.0.0.0.5 cleanup, added story id protection in net_spawn, new hit actions, dmx135, dav updates, death_hit,
 -- db.clearobj location, dmx blood vice amk, death hit to victim not actor, chg particles, added anomoly evasion,
 -- object checks, drop weapon tweaks (dAVROs) and removal of gut shot, blowout_scheme.hit_callback, invulnerables, zombie team,
 -- immortals, net spawn, isolate shustry hit amount, stall hits, ogse companions, radar_monolit_dead, generic_m_story_id,
 -- hit_table, companion message, db.check_corpse_looted, db, cleanup, fotoman, debug, companions, spawn_enemy_at, update,
 -- agro soldiers health, krysuk, death callback, "NIL" to "nil", optimized can_remove_dead, motivator_delta, dead_character_use
-function my_ver() return "1.1.0.0.0.4" end
+function my_ver() return "1.1.0.0.0.5" end
 --[[------------------------------------------------------------------------------------------------------------------
 Author: Ruslan Didenko (Stohe)
 how to call methods of Binder:
@@ -96,6 +96,7 @@ function motivator_binder:net_spawn(sobject)
 				TB3D_Services.packet_alert("xr motivator: net spawn["..npc_name.."]["..sobj_name.."] id["..utils.to_str(npc_id).."] is alive["..utils.to_str(is_alive).."] level["..utils.to_str(lname).."]")
 			end
 			if not is_alive then
+				TB3D_Services.check_the_dead(npc_name)									--110005, make sure task spot is removed
 				if lname ~= TB3D_Services.level_on_save() then
 					if TB3D_Services.can_remove_dead(lname, npc_name) then				--109996, interactive corpse cleaner
 						if not db.check_corpse_looted(npc) and protected_items.obj_has_protected_item(npc) == false then             

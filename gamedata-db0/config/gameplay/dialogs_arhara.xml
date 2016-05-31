@@ -1,6 +1,6 @@
-<!-- ************ TB3D 1.1.0.0.0.4 chgd line 2072 to _Services, contains calls to TB3D_modders.script, kalinin_otvet,
+<!-- ************ TB3D 1.1.0.0.0.5 chgd line 2072 to _Services, contains calls to TB3D_modders.script, kalinin_otvet,
   land_oxot_prines_3, final_agro_arhara_ok_start, chernomor_stalk, pantera_fone_nayti_done, humpback, can_start_arhara
-  chaes_perexod_start, shaxter_fonar_dost, ugrum_perexod  *************** -->
+  chaes_perexod_start, shaxter_fonar_dost, ugrum_perexod, dok_arh_say, parf_shtab_say  *************** -->
 <game_dialogs>
 	<dialog id="bland_say_norma">
 		<has_info>dospawn_bland_naemnik</has_info>
@@ -7760,18 +7760,14 @@
 		<dont_has_info>dok_arh_say_start</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
-				<text>dok_arh_say_00</text>
+				<text>dok_arh_say_0</text>
 				<next>1</next>
 			</phrase>
 			<phrase id="1">
-				<text>dok_arh_say_0</text>
+				<text>dok_arh_say_1</text>
 				<next>2</next>
 			</phrase>
 			<phrase id="2">
-				<text>dok_arh_say_1</text>
-				<next>3</next>
-			</phrase>
-			<phrase id="3">
 				<text>dok_arh_say_2</text>
 				<action>arhara_dialog.spawn_tele_dok_prip_vxod</action>
 				<give_info>dok_arh_say_start</give_info>
@@ -10970,18 +10966,22 @@
 		<dont_has_info>parf_shtab_say_start</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
-				<text>parf_shtab_say_0</text>
+				<text></text>
 				<next>1</next>
 			</phrase>
 			<phrase id="1">
-				<text>parf_shtab_say_1</text>
+				<text>parf_shtab_say_0</text>
 				<next>2</next>
 			</phrase>
 			<phrase id="2">
-				<text>parf_shtab_say_2</text>
+				<text>parf_shtab_say_1</text>
 				<next>3</next>
 			</phrase>
 			<phrase id="3">
+				<text>parf_shtab_say_2</text>
+				<next>4</next>
+			</phrase>
+			<phrase id="4">
 				<text>parf_shtab_say_3</text>
 				<give_info>parf_shtab_say_start</give_info>
 			</phrase>

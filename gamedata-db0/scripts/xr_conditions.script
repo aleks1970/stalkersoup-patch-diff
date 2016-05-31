@@ -1,6 +1,6 @@
---TB3D 1.0.9.9.9.8  optimized gulag checks, heli see actor fix, killed by actor fix for atp, val_sacrifice sids, killed by actor,
--- killed by actor eagle, db storage, gulag_population_ge, exclusives, killed_by_eagle, killed_by_actor, esc2_st_fabric, killed by actor
-function my_ver() return "1.0.9.9.9.8" end
+--TB3D 1.1.0.0.0.5  optimized gulag checks, heli see actor fix, killed by actor fix for atp, val_sacrifice sids, killed by actor,
+-- killed by actor eagle, db storage, gulag_population_ge, exclusives, killed_by_eagle, killed_by_actor, esc2_st_fabric, killed by actor, after wish granter
+function my_ver() return "1.1.0.0.0.5" end
 -- Each function in this file is used as a condition xr_logic: {= function "function"}
 -- If the function needs to pass parameters, then: {= function (param1: param2 :...)! Function (param1: param2 :...)}
 -- Format: function f (actor, npc). In the case of passing parameters: function f (actor, npc, p).
@@ -1377,7 +1377,7 @@ end
 -- Special for Sarcofag
 -------------------------------------------------------------------------------------
 function actor_has_decoder(actor, npc)
-	return actor:object("decoder") ~= nil
+	return has_alife_info("tb3d_wish_granted") and actor:object("decoder") ~= nil				--110005, after wish granter
 end
 
 -------------------------------------------------------------------------------------

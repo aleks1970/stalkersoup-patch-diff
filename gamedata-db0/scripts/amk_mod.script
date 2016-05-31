@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.4 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
+-- TB3D 1.1.0.0.0.5 fixed rucksack, added sleep anytime option, The Collector, changed versioning in first run, optimized,
 -- added debug messages, added forced GC, fixed hud options, added blowout type 5, collector start, dmx135, chgd respawner messeges, news,
 -- protected respawner, removed amk blood splatter, hit styles, removed kill actor from radar fix and added health-0.01,
 -- moved connect news, labx8 door, chgd beacon drop, added auto vis dist, removed weather types,
@@ -9,8 +9,8 @@
 -- moved force_fixes, lc fixes, tb3d_harsh_environment, send_tip_id optimization, transmutator sms, check_prior_version, yantar_zombied,
 -- force_garbage_collect, hdr off indoors, corpse checked, is_harsh_blowout(), level_up, optimized blowouts, set_player_relations, blowout phases, hdr,
 -- indoor/outdoor spots, stages of storm, meceniy_outfit_new and meceniy_outfit_strelok Hud - aleks1970, startup, generate anoms, Run_Blowout_pp,
--- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over, debug, fixer, sv/cl logs
-function my_ver() return "1.1.0.0.0.4" end
+-- test_for_need_sleep_matras, translate aleks1970, zep_note_gen_grimwald, check_storm_over, debug, fixer, sv/cl logs, trans uses anom pos now
+function my_ver() return "1.1.0.0.0.5" end
 --[[
 File:  amk_mod .script
 original authors: copyright © AMK TEAM 2007-2008
@@ -154,7 +154,7 @@ function check_spawn()
 		get_console():execute("cam_inert 0")											--head sway and bob OFF
 	end
 	if amk.load_variable("temp_intro",0) > 0 then										--new game
-		local gdiff = TB3D_Services.get_difficulty_num()		--level.get_game_difficulty()											--starting rank
+		local gdiff = TB3D_Services.get_difficulty_num()								--starting rank
 		if gdiff == 4 then
 			db.actor:set_character_rank(900)
 		elseif gdiff == 3 then
@@ -167,7 +167,7 @@ function check_spawn()
 			db.actor:set_character_rank(10)
 		end
 		TB3D_Services.packet_alert("AMK MOD: new game starting rank["..utils.to_str(db.actor:character_rank()).."] diff["..utils.to_str(gdiff).."]")
-		TB3D_Triggers.spawn_sleep_places()													--spawned once for all.sav
+		TB3D_Triggers.spawn_sleep_places()												--spawned once for all.sav
 		-----------------------------------------------------------------------------------------------------------------------
 		TB3D_Services.remove_dynrad_info()												--to be used in modders info group (my1-my11)
 		obj = alife():story_object(830)													--pripyat stadium space_restrictor
@@ -259,6 +259,10 @@ function check_spawn()
 	end
 	if TB3D_Modders.Global_Debug then
 		TB3D_Services.packet_alert("AMK MOD: check spawn 4")
+	end
+	if TB3D_Modders.alias_name and TB3D_Modders.alias_name ~= "" and TB3D_Modders.alias_name ~= " " then
+		TB3D_Services.packet_alert("AMK MOD: Username set to["..TB3D_Modders.alias_name.."]")
+		get_console():execute("name "..TB3D_Modders.alias_name)						--110005
 	end
 	local startup = amk.load_variable("temp_intro",0)								--109972
 	-------------------------------------------------------------------------------------------
@@ -1479,7 +1483,9 @@ function check_af_transform(af, af_sect, obj_pos, anom_id, anom_sect, anom_pos, 
 										else
 											get_console():execute("load ~#I#: info_portion: nil")
 										end]]
-										as_start_universal_transform_timer(komp, result, obj_pos, vremya, gv, lv, info_portion, remove_anomaly, remove_anomaly_id)
+										--as_start_universal_transform_timer(komp, result, obj_pos, vremya, gv, lv, info_portion, remove_anomaly, remove_anomaly_id)
+										anom_pos.y = anom_pos.y+1				--110005, make sure above ground				
+										as_start_universal_transform_timer(komp, result, anom_pos, vremya, gv, lv, info_portion, remove_anomaly, remove_anomaly_id)			--110005
 										-- remove from igrv komponentv recipe
 										for k,v in pairs(komp) do
 											alife():release(alife():object(v))

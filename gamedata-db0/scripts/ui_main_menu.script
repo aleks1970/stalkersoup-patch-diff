@@ -1,7 +1,7 @@
---<!-- TB3D 1.1.0.0.0.4   more options, The Collector, dmx135, removed peudoquicksave, connect message, ddof moved,
+--<!-- TB3D 1.1.0.0.0.5   more options, The Collector, dmx135, removed peudoquicksave, connect message, ddof moved,
 -- removed duplicate cheat_spawner, cleanup, auto levels, added red forest, level_intro, disconnecting, db report,
--- load_pause Mini texture init aleks1970, pause menu volume, mp
-function my_ver() return "1.1.0.0.0.4" end
+-- load_pause Mini texture init aleks1970, pause menu volume, mp, alias_name
+function my_ver() return "1.1.0.0.0.5" end
 --TB3D re-written 08/15/2011
 -- File:        UI_MAIN_MENU.SCRIPT
 -- Description: Load Dialog for STALKER
@@ -410,8 +410,14 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 				s_date = AddTextDigit(s_date, level.get_time_hours())
 				s_date = s_date.."-"
 				s_date = AddTextDigit(s_date, level.get_time_minutes())
+				local user_name
+				if TB3D_Modders.alias_name then									--110005
+					user_name = TB3D_Modders.alias_name
+				else
+					user_name = user_name()
+				end
 				console:execute("main_menu off")
-				console:execute("save tb3d -fp lvl"..utils.to_str(TB3D_Services.get_level_up()).."- "..level.name()..s_date)
+				console:execute("save "..user_name.." -fp lvl"..utils.to_str(TB3D_Services.get_level_up()).."- "..level.name()..s_date)
 			end
 		elseif dik == DIK_keys.DIK_Q then
 			self:OnMessageQuitWin()

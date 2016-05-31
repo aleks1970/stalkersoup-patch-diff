@@ -1,9 +1,10 @@
---TB3D 1.1.0.0.0 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
+--TB3D 1.1.0.0.0.5 03/30/2013 replaced with new version, expanded death items, prevent loadouts for captives,
 --bad_psy_helmet, pri_followers_leader, fotoman, lastday, tractorist, fotoman, lastday in dead marshes and research,
 --lastday, missing end tag, obj_is_protected, debug, removed levels from loadouts, min_cond, lastday added to inventory,
 --has_ammo, reorganized, optimized loot ammo, check dead items, ldk, esc_shustryi, simplified loadouts, last_day,
---reduced vog-25 ammo, _umer from nepis_umer, optimized death info
-function my_ver() return "1.1.0.0.0.0" end
+--reduced vog-25 ammo, _umer from nepis_umer, optimized death info, gar_wounded_bandit
+
+function my_ver() return "1.1.0.0.0.5" end
 
 local math_random = math.random
 --local math_ceil = math.ceil
@@ -160,6 +161,7 @@ function drop_manager:check_dead_items()		--109989, just deal with simple qty an
 	local npc_name = protected_items.get_obj_name(self.npc)		--strips off the id
 	local community = self.npc:character_community()		--109990
 	if community == nil then community = "zombied" end
+	if npc_name == "gar_wounded_bandit" then return end
 	--TB3D_Services.packet_alert("death mgr: check dead items["..utils.to_str(npc_name).."] community["..utils.to_str(community).."]")
 	if community == "lastday" then
 		if string_find(npc_name, "charactercommander") then return end
@@ -285,6 +287,7 @@ function drop_manager:check_npc_loadout()							--dynamic random loadouts (weapo
 	local lname = level:name()
 	local npc_name = self.npc:name()
 	local commun = self.npc:character_community()
+	if npc_name == "gar_wounded_bandit" then return end
 	if TB3D_Modders.use_loadout_message == true then
 		TB3D_Services.packet_alert("death mgr: check_npc_loadout["..utils.to_str(npc_name).."] commun["..utils.to_str(commun).."]")
 	end

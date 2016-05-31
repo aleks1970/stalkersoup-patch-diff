@@ -1,5 +1,5 @@
--- TB3D 1.1.0.0.0.4   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn, hit_car
-function my_ver() return "1.1.0.0.0.4" end
+-- TB3D 1.1.0.0.0.5   use_DMX_cars, db calls, use_binder_message, clear callbacks, net spawn, hit_car
+function my_ver() return "1.1.0.0.0.5" end
 ----------------------------------------------------------------------------------------------------
 -- Physic objects binding
 ----------------------------------------------------------------------------------------------------
@@ -27,7 +27,8 @@ ds_m_car_0030 = true,
 ds_m_car_0040 = true,
 ds_m_car_0070 = true,
 ds_m_car_0090 = true,
-vehicle_laz4202 = true					--truch in agro
+vehicle_laz4202 = true,					--truck in agro
+vehicle_zil130_truck = true				--truck in radar
 }
 function init(obj)
 	--TB3D_Services.packet_alert("bind physic object: bind["..utils.to_str(obj:name()).."] section["..get_section(obj).."]")
@@ -163,7 +164,7 @@ function generic_physics_binder:net_spawn(data)
 end
 
 function generic_physics_binder:net_destroy()
-	--if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy") end
+	--if TB3D_Modders.use_destroy_message then TB3D_Services.info_alert("bind physic object: net destroy", true) end
 	local sobj = self.object
 	local obj_name, obj_sect
 	if self.particle ~= nil then
@@ -191,8 +192,8 @@ function generic_physics_binder:net_destroy()
 		else
 			TB3D_Services.packet_alert("bind physic object: net destroy["..obj_name.."] no id!!!!")
 		end
+		if TB3D_Modders.use_destroy_message then TB3D_Services.info_alert("bind physic object: net destroy done", true) end
 	end
-	--if TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("bind physic object: net destroy done") end
 end
 
 function generic_physics_binder:net_save_relevant()

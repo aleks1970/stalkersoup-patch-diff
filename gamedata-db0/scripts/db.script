@@ -1,6 +1,6 @@
---TB3D 1.1.0.0.0.4 added my_ver, counts, spawn and destroy, removed creatures and added corpses, reporting,
+--TB3D 1.1.0.0.0.5 added my_ver, counts, spawn and destroy, removed creatures and added corpses, reporting,
 -- car fix, optimized, state_mgr, trade, removed fix car
-function my_ver() return "1.1.0.0.0.4" end
+function my_ver() return "1.1.0.0.0.5" end
 --[[------------------------------------------------------------------------------------------------
 Database live online sites, zones, and actor restrictor
 Chugai Alexander
@@ -27,7 +27,7 @@ monster		    	= {}		-- bind_soul_cube  DMX MOD
 corpses				= {}		-- ui_cheat_spawner (dead man to life)
 communities			= {}		-- meceniy_work (zombied community) filled straight from ini
 sl_by_name        	= {}		-- bind_physic_object (clsid.projector)
-cars_to_fix			= {}		-- bind_physic_object cars to hit on updates
+--cars_to_fix			= {}		-- bind_physic_object cars to hit on updates
 ammo_box_sizes		= {}		-- TB3D_ammo_stacker ammo box sizes
 dont_probe			= {}		-- TB3D_ammo_stacker items probed that are not ammo
 smart_terrains		= {}		-- smart_terrain
@@ -782,7 +782,7 @@ function clear_database()
 	clear_table(smart_terrains)
 	clear_table(dont_probe)
 	clear_table(ammo_box_sizes)
-	clear_table(cars_to_fix)
+	--clear_table(cars_to_fix)
 	clear_table(sl_by_name)
 	clear_table(communities)
 	clear_table(corpses)
@@ -809,7 +809,7 @@ function clear_database()
 	smart_terrains		= {}
 	dont_probe			= {}
 	ammo_box_sizes		= {}
-	cars_to_fix			= {}
+	--cars_to_fix			= {}
 	sl_by_name        	= {}
 	communities			= {}
 	corpses				= {}

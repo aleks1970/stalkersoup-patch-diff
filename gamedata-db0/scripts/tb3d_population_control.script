@@ -1,10 +1,10 @@
--- TB3D 1.1.0.0.0.4 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
+-- TB3D 1.1.0.0.0.5 population controller and respawn services, gar_dolg and x18_ chgd, cleanup, has item, atp, val_krovosos,
 -- atp_brigada5, military_neytral_respawn, clsids, new levels, labx8, dead city, labx8, village respawns in cordon, dog_rush,
 -- false spawns, factory snorks, gar_se, scope, rostok dogs, esc_ respawns, agro final, cleanup, dont_spawn_online, predbannik,
 -- l02_dd, yantar cleanup, pol_ respawns, pred, controller2_1, harsh environment, warehouses after storm, av_peshera, optimized,
 -- pri_monolith_10, vampire, specnaz_dead, generators, esc2_ respawns, is_spawner, sepaerate can_go_online for monsters and stalkers,
--- radar, get_level_index
-function my_ver() return "1.1.0.0.0.4" end
+-- radar, get_level_index, dead city
+function my_ver() return "1.1.0.0.0.5" end
 -----over population control----
 local string_find = string.find
 local string_sub = string.sub
@@ -547,6 +547,8 @@ function check_specific(lnum)				--110000
 	if hdr5 == "agr_r" and lnum ~= 3 then			--road_patrol
 		dont_spawn_online = true
 	elseif hdr4 == "red_" and lnum ~= 28 then		--snork
+		dont_spawn_online = true
+	elseif hdr4 == "atp_" and lnum ~= 19 then		--110005
 		dont_spawn_online = true
 	elseif hdr5 == "aver_" and lnum ~= 22 then		--snork, dog
 		dont_spawn_online = true
@@ -1957,14 +1959,18 @@ function stalker_can_go_online(obj)		--110000, called by se_stalker
 				elseif hdr6 == "dcity_" then
 					if extended_levels then
 						dont_spawn_online = true
+					elseif string_find(obj_name, "kontr") then							--110005
+						--if has_alife_info("portal_na_mg_done") then
+							--dont_spawn_online = true
+						--else
+							result = true
+						--end
+					elseif (string_find(obj_name, "last") or string_find(obj_name, "parfumer")) then			--110004, final
+						result = true
+					elseif has_alife_info("portal_na_mg_done") then
+						dont_spawn_online = true
 					else
-						if (string_find(obj_name, "last") or string_find(obj_name, "parfumer")) then			--110004, final
-							result = true
-						elseif has_alife_info("portal_na_mg_done") then
-							dont_spawn_online = true
-						else
-							result = true
-						end
+						result = true
 					end
 				elseif hdr4 == "sak_"
 				  or hdr5 == "stab_"

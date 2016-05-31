@@ -1,12 +1,13 @@
----TB3D 1.1.0.0.0.4 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
+---TB3D 1.1.0.0.0.5 key game trigger points for expanding the Collector 11/10/11, missing backwater_anoms(),
 -- added monolith_over, added game ending alternatives for free play, night creatures,
 -- removed fake_ from relocate and spawn item in inv, sid door spawns,radzones, hogg, bar radzones, fanat_laptop_have,
 -- tunnel_rat, dynamic spawns, random tanks, din_rad deactivated until fixed, spawn_sak_trader, sak_book4,
 -- localized strings, delayed_action, delayed action give info, gold bars, send_tip_id optimization, zaton_lost,
 -- NPP1, sleep place, creatures of the night, bar portals, clinic bed, mon over, suits, more spawn functions, get_level_up
 -- spawn_enemy_at, random koef, reduced some spawns, tunnel rat, spawn_npcs, check_bar_drop, portals, make_camp_friends(),
--- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs, jup and jupu random, lim_remove_electros
-function my_ver() return "1.1.0.0.0.4" end
+-- old_research_send, spawn_sewer_stuff, zat lost, night creatures, collector mobs, jup and jupu random, lim_remove_electros,
+-- rsrch_stash
+function my_ver() return "1.1.0.0.0.5" end
 ---these trigger points are being re-used for the Collector gameplay
 local math_random = math.random
 local math_floor = math.floor
@@ -1466,7 +1467,7 @@ function treasure_hunt_spawn(stash_num, rnd)												--109982, spawn alife in
 	local qty = 1
 	local rand = amk.load_variable("hunt_last_rnd", 1)
 	amk.save_variable("hunt_last_rnd", rnd)
-	TB3D_Services.packet_alert("tb3d triggers: treasure hunt spawn["..utils.to_str(stash_num).."] rand["..utils.to_str(rand).."]")
+	--TB3D_Services.packet_alert("tb3d triggers: treasure hunt spawn["..utils.to_str(stash_num).."] rand["..utils.to_str(rand).."]")
 	if stash_num == 1 then			--109999, cordon, house/start
 		TB3D_Mobs.spawn_bandits(113.044,-7.495,8.628,414741,118,qty)					--carpark
 		TB3D_Mobs.spawn_bandits(216.924,12.865,66.787,509099,154,qty)					--tree on hill
@@ -2127,6 +2128,13 @@ end
 function collector_found_esc_stash()
 	TB3D_Mobs.spawn_bandits(313.630,3.548,120.234,572044,143,8)					--wolf's group campfire
 	TB3D_Mobs.spawn_bandits(210.544,2.129,319.883,504984,238,8)					--large rocks near house
+end
+
+function collector_found_rsrch_stash()											--110005, zombied npc around cellar
+	TB3D_Mobs.spawn_npcs(27.467,8.859,-166.709,314832,4359,2,5)					--gate
+	TB3D_Mobs.spawn_npcs(13.966,1.831,-130.210,300796,4355,2,5)					--under swamp hut
+	TB3D_Mobs.spawn_npcs(168.657,7.922,-161.753,473260,4376,2,5)				--fenced in tanks
+	TB3D_Mobs.spawn_npcs(130.260,3.723,-263.876,429292,4373,2,5)				--road near gen lc
 end
 
 function spawn_backwater_stash()												--110004, stash under gas station after talking to Arnie

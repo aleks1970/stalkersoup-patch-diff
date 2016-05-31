@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.8.0 set <good_cond to <0.94 to include 0.95 in tests, fixed <good_threshold to >good_threshold, check_bad_weapons, good_eagle_m1_have, optimized
-function my_ver() return "1.0.9.9.8.0" end
+--TB3D 1.1.0.0.0.5 set <good_cond to <0.94 to include 0.95 in tests, fixed <good_threshold to >good_threshold, check_bad_weapons, good_eagle_m1_have, optimized, fixed locals
+function my_ver() return "1.1.0.0.0.5" end
 
 local nagrad = {
   level_1 = {
@@ -80,10 +80,10 @@ function na_hunters_toz(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local hunters_toz = 0
+	local hunter_toz = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="hunters_toz" then
-		hunters_toz=hunters_toz+1 end end, nil)
-    if hunters_toz>=1 then
+		hunter_toz=hunter_toz+1 end end, nil)
+    if hunter_toz>=1 then
         return true
 	else
         return false
@@ -113,10 +113,10 @@ function na_xm8_para_sk2(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_xm8_para_sk2 = 0
+	local xm8_para_sk2 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_xm8_para_sk2" then         
-        wpn_xm8_para_sk2 = wpn_xm8_para_sk2+1 end end, nil)
-    if wpn_xm8_para_sk2>=1 then
+        xm8_para_sk2 = xm8_para_sk2+1 end end, nil)
+    if xm8_para_sk2>=1 then
         return true
 	else
         return false
@@ -148,10 +148,10 @@ function na_ppsh(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_ppsh41_sk2 = 0
+	local ppsh41_sk2 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_ppsh41_sk2" then         
-        wpn_ppsh41_sk2 = wpn_ppsh41_sk2+1 end end, nil)
-    if wpn_ppsh41_sk2>=1 then
+        ppsh41_sk2 = ppsh41_sk2+1 end end, nil)
+    if ppsh41_sk2>=1 then
         return true
 	else
         return false
@@ -183,10 +183,10 @@ function na_hk417_sk1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_hk417_sk1 = 0
+	local hk417_sk1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_hk417_sk1" then         
-        wpn_hk417_sk1 = wpn_hk417_sk1+1 end end, nil)
-    if wpn_hk417_sk1>=1 then
+        hk417_sk1 = hk417_sk1+1 end end, nil)
+    if hk417_sk1>=1 then
         return true
 	else
         return false
@@ -218,10 +218,10 @@ function na_mosinka_optika(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_m1891_30_scope = 0
+	local m1891_30_scope = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_m1891_30_scope" then
-		wpn_m1891_30_scope=wpn_m1891_30_scope+1 end end, nil)
-    if wpn_m1891_30_scope>=1 then
+		m1891_30_scope=m1891_30_scope+1 end end, nil)
+    if m1891_30_scope>=1 then
         return true
 	else
         return false
@@ -253,10 +253,10 @@ function na_ak74_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_ak74_m1 = 0
+	local ak74_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_ak74_m1" then
-		wpn_ak74_m1=wpn_ak74_m1+1 end end, nil)
-    if wpn_ak74_m1>=1 then
+		ak74_m1=ak74_m1+1 end end, nil)
+    if ak74_m1>=1 then
         return true
 	else
         return false
@@ -287,10 +287,10 @@ function na_abakan_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_abakan_m1 = 0
+	local abakan_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_abakan_m1" then
-		wpn_abakan_m1=wpn_abakan_m1+1 end end, nil)
-    if wpn_abakan_m1>=1 then
+		abakan_m1=abakan_m1+1 end end, nil)
+    if abakan_m1>=1 then
         return true
 	else
         return false
@@ -321,10 +321,10 @@ function na_fort_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_fort_m1 = 0
+	local fort_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_fort_m1" then
-		wpn_fort_m1=wpn_fort_m1+1 end end, nil)
-    if wpn_fort_m1>=1 then
+		fort_m1=fort_m1+1 end end, nil)
+    if fort_m1>=1 then
         return true
 	else
         return false
@@ -355,10 +355,10 @@ function na_mp5_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_mp5_m1 = 0
+	local mp5_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_mp5_m1" then
-		wpn_mp5_m1=wpn_mp5_m1+1 end end, nil)
-    if wpn_mp5_m1>=1 then
+		mp5_m1=mp5_m1+1 end end, nil)
+    if mp5_m1>=1 then
         return true
 	else
         return false
@@ -389,10 +389,10 @@ function na_groza_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_groza_m1 = 0
+	local groza_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_groza_m1" then
-		wpn_groza_m1=wpn_groza_m1+1 end end, nil)
-    if wpn_groza_m1>=1 then
+		groza_m1=groza_m1+1 end end, nil)
+    if groza_m1>=1 then
         return true
 	else
         return false
@@ -423,10 +423,10 @@ function na_spas12_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_spas12_m1 = 0
+	local spas12_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_spas12_m1" then
-		wpn_spas12_m1=wpn_spas12_m1+1 end end, nil)
-    if wpn_spas12_m1>=1 then
+		spas12_m1=spas12_m1+1 end end, nil)
+    if spas12_m1>=1 then
         return true
 	else
         return false
@@ -457,10 +457,10 @@ function na_winchester_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_winchester_m1 = 0
+	local winchester_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_winchester_m1" then
-		wpn_winchester_m1=wpn_winchester_m1+1 end end, nil)
-    if wpn_winchester_m1>=1 then
+		winchester_m1=winchester_m1+1 end end, nil)
+    if winchester_m1>=1 then
         return true
 	else
         return false
@@ -491,10 +491,10 @@ function na_l85_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_l85_m1 = 0
+	local l85_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_l85_m1" then
-		wpn_l85_m1=wpn_l85_m1+1 end end, nil)
-    if wpn_l85_m1>=1 then
+		l85_m1=l85_m1+1 end end, nil)
+    if l85_m1>=1 then
         return true
 	else
         return false
@@ -525,10 +525,10 @@ function na_lr300_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_lr300_m1 = 0
+	local lr300_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_lr300_m1" then
-		wpn_lr300_m1=wpn_lr300_m1+1 end end, nil)
-    if wpn_lr300_m1>=1 then
+		lr300_m1=lr300_m1+1 end end, nil)
+    if lr300_m1>=1 then
         return true
 	else
         return false
@@ -559,10 +559,10 @@ function na_svd_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_svd_m1 = 0
+	local svd_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_svd_m1" then
-		wpn_svd_m1=wpn_svd_m1+1 end end, nil)
-    if wpn_svd_m1>=1 then
+		svd_m1=svd_m1+1 end end, nil)
+    if svd_m1>=1 then
         return true
 	else
         return false
@@ -593,10 +593,10 @@ function na_sig_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_sig_m1 = 0
+	local wpn_sig_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_sig_m1" then
-		wpn_sig_m1=wpn_sig_m1+1 end end, nil)
-    if wpn_sig_m1>=1 then
+		sig_m1=sig_m1+1 end end, nil)
+    if sig_m1>=1 then
         return true
 	else
         return false
@@ -627,10 +627,10 @@ function na_eagle_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_eagle_m1 = 0
+	local wpn_eagle_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_eagle_m1" then
-		wpn_eagle_m1=wpn_eagle_m1+1 end end, nil)
-    if wpn_eagle_m1>=1 then
+		eagle_m1=eagle_m1+1 end end, nil)
+    if eagle_m1>=1 then
         return true
 	else
         return false
@@ -661,10 +661,10 @@ function na_colt_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_colt_m1 = 0
+	local colt_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_colt_m1" then
-		wpn_colt_m1=wpn_colt_m1+1 end end, nil)
-    if wpn_colt_m1>=1 then
+		colt_m1=colt_m1+1 end end, nil)
+    if colt_m1>=1 then
         return true
 	else
         return false
@@ -695,10 +695,10 @@ function na_val_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_val_m1 = 0
+	local val_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_val_m1" then
-		wpn_val_m1=wpn_val_m1+1 end end, nil)
-    if wpn_val_m1>=1 then
+		val_m1=val_m1+1 end end, nil)
+    if val_m1>=1 then
         return true
 	else
         return false
@@ -729,10 +729,10 @@ function na_mp5_m2(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_mp5_m2 = 0
+	local mp5_m2 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_mp5_m2" then
-		wpn_mp5_m2=wpn_mp5_m2+1 end end, nil)
-    if wpn_mp5_m2>=1 then
+		mp5_m2=mp5_m2+1 end end, nil)
+    if mp5_m2>=1 then
         return true
 	else
         return false
@@ -763,10 +763,10 @@ function na_abakan_m2(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_abakan_m2 = 0
+	local abakan_m2 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_abakan_m2" then
-		wpn_abakan_m2=wpn_abakan_m2+1 end end, nil)
-    if wpn_abakan_m2>=1 then
+		abakan_m2=abakan_m2+1 end end, nil)
+    if abakan_m2>=1 then
         return true
 	else
         return false
@@ -796,10 +796,10 @@ function na_l85_m2(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_l85_m2 = 0
+	local l85_m2 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_l85_m2" then
-		wpn_l85_m2=wpn_l85_m2+1 end end, nil)
-    if wpn_l85_m2>=1 then
+		l85_m2=l85_m2+1 end end, nil)
+    if l85_m2>=1 then
         return true
 	else
         return false
@@ -828,10 +828,10 @@ function na_ak74u_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_ak74u_m1 = 0
+	local ak74u_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_ak74u_m1" then
-		wpn_ak74u_m1=wpn_ak74u_m1+1 end end, nil)
-    if wpn_ak74u_m1>=1 then
+		ak74u_m1=ak74u_m1+1 end end, nil)
+    if ak74u_m1>=1 then
         return true
 	else
         return false
@@ -860,10 +860,10 @@ function na_sig_m2(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_sig_m2 = 0
+	local sig_m2 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_sig_m2" then
-		wpn_sig_m2=wpn_sig_m2+1 end end, nil)
-    if wpn_sig_m2>=1 then
+		sig_m2=sig_m2+1 end end, nil)
+    if sig_m2>=1 then
         return true
 	else
         return false
@@ -892,10 +892,10 @@ function na_g36_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_g36_m1 = 0
+	local g36_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_g36_m1" then
-		wpn_g36_m1=wpn_g36_m1+1 end end, nil)
-    if wpn_g36_m1>=1 then
+		g36_m1=g36_m1+1 end end, nil)
+    if g36_m1>=1 then
         return true
 	else
         return false
@@ -924,10 +924,10 @@ function na_svu_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_svu_m1 = 0
+	local svu_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_svu_m1" then
-		wpn_svu_m1=wpn_svu_m1+1 end end, nil)
-    if wpn_svu_m1>=1 then
+		svu_m1=svu_m1+1 end end, nil)
+    if svu_m1>=1 then
         return true
 	else
         return false
@@ -956,10 +956,10 @@ function na_beretta_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_beretta_m1 = 0
+	local beretta_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_beretta_m1" then
-		wpn_beretta_m1=wpn_beretta_m1+1 end end, nil)
-    if wpn_beretta_m1>=1 then
+		beretta_m1=beretta_m1+1 end end, nil)
+    if beretta_m1>=1 then
         return true
 	else
         return false
@@ -988,10 +988,10 @@ function na_vintorez_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_vintorez_m1 = 0
+	local vintorez_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_vintorez_m1" then
-		wpn_vintorez_m1=wpn_vintorez_m1+1 end end, nil)
-    if wpn_vintorez_m1>=1 then
+		vintorez_m1=vintorez_m1+1 end end, nil)
+    if vintorez_m1>=1 then
         return true
 	else
         return false
@@ -1020,10 +1020,10 @@ function na_groza_m2(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_groza_m2 = 0
+	local groza_m2 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_groza_m2" then
-		wpn_groza_m2=wpn_groza_m2+1 end end, nil)
-    if wpn_groza_m2>=1 then
+		groza_m2=groza_m2+1 end end, nil)
+    if groza_m2>=1 then
         return true
 	else
         return false
@@ -1052,10 +1052,10 @@ function na_rg6_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_rg6_m1 = 0
+	local rg6_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_rg6_m1" then
-		wpn_rg6_m1=wpn_rg6_m1+1 end end, nil)
-    if wpn_rg6_m1>=1 then
+		rg6_m1=rg6_m1+1 end end, nil)
+    if rg6_m1>=1 then
         return true
 	else
         return false
@@ -1084,10 +1084,10 @@ function na_walter_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_walther_m1 = 0
+	local walther_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_walther_m1" then
-		wpn_walther_m1=wpn_walther_m1+1 end end, nil)
-    if wpn_walther_m1>=1 then
+		walther_m1=walther_m1+1 end end, nil)
+    if walther_m1>=1 then
         return true
 	else
         return false
@@ -1116,10 +1116,10 @@ function na_pm_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_pm_m1 = 0
+	local pm_m1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_pm_m1" then
-		wpn_pm_m1=wpn_pm_m1+1 end end, nil)
-    if wpn_pm_m1>=1 then
+		pm_m1=pm_m1+1 end end, nil)
+    if pm_m1>=1 then
         return true
 	else
         return false
@@ -1148,10 +1148,10 @@ function na_rpg7(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_rpg7 = 0
+	local rpg7 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_rpg7" then
-		wpn_rpg7=wpn_rpg7+1 end end, nil)
-    if wpn_rpg7>=1 then
+		rpg7=rpg7+1 end end, nil)
+    if rpg7>=1 then
         return true
 	else
         return false
@@ -1180,10 +1180,10 @@ function na_sr25_mk11_mod0_sk1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_sr25_mk11_mod0_sk1 = 0
+	local sr25_mk11_mod0_sk1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_sr25_mk11_mod0_sk1" then
-		wpn_sr25_mk11_mod0_sk1=wpn_sr25_mk11_mod0_sk1+1 end end, nil)
-    if wpn_sr25_mk11_mod0_sk1>=1 then
+		sr25_mk11_mod0_sk1=sr25_mk11_mod0_sk1+1 end end, nil)
+    if sr25_mk11_mod0_sk1>=1 then
         return true
 	else
         return false
@@ -1212,10 +1212,10 @@ function na_famas_p3_sk1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_famas_p3_sk1 = 0
+	local famas_p3_sk1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_famas_p3_sk1" then
-		wpn_famas_p3_sk1=wpn_famas_p3_sk1+1 end end, nil)
-    if wpn_famas_p3_sk1>=1 then
+		famas_p3_sk1=famas_p3_sk1+1 end end, nil)
+    if famas_p3_sk1>=1 then
         return true
 	else
         return false
@@ -1244,10 +1244,10 @@ function na_darkgauss(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_dark_gauss = 0
+	local dark_gauss = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_dark_gauss" then
-		wpn_dark_gauss=wpn_dark_gauss+1 end end, nil)
-    if wpn_dark_gauss>=1 then
+		dark_gauss=dark_gauss+1 end end, nil)
+    if dark_gauss>=1 then
         return true
 	else
         return false
@@ -1276,10 +1276,10 @@ function na_aps_sk1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_aps_sk1 = 0
+	local aps_sk1 = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_aps_sk1" then
-		wpn_aps_sk1=wpn_aps_sk1+1 end end, nil)
-    if wpn_aps_sk1>=1 then
+		aps_sk1=aps_sk1+1 end end, nil)
+    if aps_sk1>=1 then
         return true
 	else
         return false
@@ -1308,10 +1308,10 @@ function na_fn2000_sniper(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_fn2000_sniper = 0
+	local fn2000_sniper = 0			--110005
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_fn2000_sniper" then
-		wwpn_fn2000_sniper=wpn_fn2000_sniper+1 end end, nil)
-    if wpn_fn2000_sniper>=1 then
+		fn2000_sniper=fn2000_sniper+1 end end, nil)
+    if fn2000_sniper>=1 then
         return true
 	else
         return false

@@ -1,9 +1,9 @@
---TB3D 1.1.0.0.0.4 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.1.0.0.0.5 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 --dav update 16Apr14, TB3D_dav_hunt, level_up, gbar teleports, send_tip_id optimization, zaton spawns, signal_green, krasivay, ds_spawns,
 --zep_broke1, more content, is_instorm(), on_item_take, level_up 4-10, more content, storm autosave, tb3d_harsh_spawns, tb3d_storm_started,
 --ldk trigger, old_research_send, generators, spawn_mushroom_arts_npp2, level up 3, cleanup, agro knockdown, jupu, update, mobs, level_up > 3,
---update optimized, level number optimization
-function my_ver() return "1.1.0.0.0.4" end
+--update optimized, level number optimization, tb3d_rsrch_cellar_stash
+function my_ver() return "1.1.0.0.0.5" end
 local string_sub = string.sub
 local string_find = string.find
 local translate = game.translate_string
@@ -17,7 +17,7 @@ local lname
 local sname
 local ln = 0
 local sn = 0
-function set_level_num(lvlnum)									--110004, another optimization
+function set_level_num(lvlnum)														--110004, another optimization
 	ln = lvlnum
 	lname = level.name()
 	sname = amk.load_variable("level_on_save","start")
@@ -30,7 +30,7 @@ local upd_time_LDK = 750
 local upd_timeLDK
 local upd_time_TB3D = 850
 local upd_timeTB3D
-function update(blow_phase, time_now, slice_base)												--only called if is_collector() = true
+function update(blow_phase, time_now, slice_base)									--only called if is_collector() = true
 	if has_alife_info("tb3d_collector_done") then									--setup complete, let's rock
 		amk.oau_watchdog=679
 		if upd_timeTB3D == nil then
@@ -202,7 +202,7 @@ function update(blow_phase, time_now, slice_base)												--only called if is
 							TB3D_Triggers.signal_green(520.281,18.204,268.394,162080,2617)
 						end
 					end
-					if has_alife_info("tb3d_start_x14") and not skip_TB3D then								--picked up black energy in firing range
+					if has_alife_info("tb3d_start_x14") and not skip_TB3D then									--picked up black energy in firing range
 						local spawns = amk.load_variable("npp2_spawns", 0)
 						if spawns == 0 then
 							if actor_in_range(vector():set(206.838,-0.100,377.046), 20000) then					--2km
@@ -424,9 +424,9 @@ function update(blow_phase, time_now, slice_base)												--only called if is
 				elseif ln == 39 then
 					--TODO
 				elseif ln == 40 then					--109993  ==============================================================
-					if actor_in_range(vector():set(-151.652,1.866,-181.755), 10) then									--basement no ladder
+					if actor_in_range(vector():set(-151.652,1.866,-181.755), 10) then					--basement no ladder
 						TB3D_Triggers.old_research_send()
-					elseif actor_in_range(vector():set(-167.746,2.116,-214.804), 10) then								--basement no ladder
+					elseif actor_in_range(vector():set(-167.746,2.116,-214.804), 10) then				--basement no ladder
 						TB3D_Triggers.old_research_send()
 					end
 				elseif ln == 41 then						--  ==============================================================
@@ -471,10 +471,10 @@ function update(blow_phase, time_now, slice_base)												--only called if is
 						amk.oau_watchdog=668
 						local spawns = amk.load_variable("dist_spawns", 0)
 						if spawns == 0 then
-							if pos.y > 17 then															--on stairs or (climbing crain -12.932,24.026,122.353)
-								if pos.x < -6 and pos.x > -44 then										--in construction area
-									if pos.z < 174 and pos.z > 125 then									--109995, adjusted for crane
-										TB3D_Triggers.dist_center_ambush()								--construcion site top level ambush
+							if pos.y > 17 then														--on stairs or (climbing crain -12.932,24.026,122.353)
+								if pos.x < -6 and pos.x > -44 then									--in construction area
+									if pos.z < 174 and pos.z > 125 then								--109995, adjusted for crane
+										TB3D_Triggers.dist_center_ambush()							--construcion site top level ambush
 										amk.save_variable("dist_spawns", 1)
 									end
 								end
@@ -484,13 +484,13 @@ function update(blow_phase, time_now, slice_base)												--only called if is
 						end
 					end
 				end
-			end																											-- slice base < 4
-		end																												--update time
+			end																						-- slice base < 4
+		end																							--update time
 	elseif has_alife_info("tb3d_collector_start") then
 		TB3D_Services.give_info("tb3d_collector_done")
 		db.actor.health = 2
 	else
-		TB3D_Services.get_all_quests()																					-- gives tb3d_collector_start
+		TB3D_Services.get_all_quests()																-- gives tb3d_collector_start
 	end
 end
 
@@ -542,7 +542,8 @@ function on_item_take(obj)
 			if TB3D_Services.give_info("tweed_book_have") then
 				TB3D_Dialog.tweed_book_found()
 			end
-		elseif sect == "swamp_samopisez" and ln == 41 then
+		elseif sect == "swamp_samopisez" and ln == 41 then								--110005
+			if level.map_has_object_spot(obj:id(), "crlc_biggest") == 1 then level.map_remove_object_spot(obj:id(), "crlc_biggest") end
 			if TB3D_Services.give_info("tb3d_dm_samp_has") then
 				if amk.load_variable("option_autosave",1) ~= 0 then
 					amk.start_timer("autosave",10,"take recorder to Rostok")
@@ -739,6 +740,8 @@ function on_info(info_id)
 			news_manager.amk_send_tip_id("tb3d_glavney_distress","sms_incomming",10,40,"common_channel")	--send sms from x14 scientist
 		elseif info_id == "esc_tutorial_secret_place_found" then											--110004, started as collector
 			TB3D_Triggers.collector_found_esc_stash()
+		elseif info_id == "tb3d_rsrch_cellar_stash" then													--110005, spawn zombies
+			TB3D_Triggers.collector_found_rsrch_stash()
 		end
 		if amk.load_variable("option_autosave",1) ~= 0 then		--automatic saves for collector levels (1-3)
 			local save_str = ""
@@ -804,6 +807,8 @@ function from_box(box, item)
 				TB3D_Services.give_info("tb3d_hunt_note2")												--109980, gives article in journal
 			end
 			TB3D_dav_hunt.spawn_next(num)
+		elseif lname == "yantar_old" and string_find(box:name(), "yan_old_inventory_box_0001") then		--110005
+			TB3D_Services.give_info("tb3d_rsrch_cellar_stash")
 		end
 		return do_transfer
 	else

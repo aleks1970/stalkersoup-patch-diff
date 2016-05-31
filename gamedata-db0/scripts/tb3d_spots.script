@@ -1,5 +1,5 @@
--- TB3D 1.1.0.0.0.4 for new levels, 11502, 11503, 11521, 98977-98996, 98975-6, set_spots, 4500, test_list, optimized, peshera, npp1w, atp, 6000, 97092
-function my_ver() return "1.1.0.0.0.4" end
+-- TB3D 1.1.0.0.0.5 for new levels, 11502, 11503, 11521, 98977-98996, 98975-6, set_spots, 4500, test_list, optimized, peshera, npp1w, atp, 6000, 97092, 31410
+function my_ver() return "1.1.0.0.0.5" end
 
 --level changers: sid = destination
 --if sid exists than create spot, does not include underground spots
@@ -165,7 +165,6 @@ local lc_table = {
 [18113] = "to_deadcity",
 [18114] = "to_atp",
 [21410] = "to_sarcofag",
-[31410] = "to_labx10",
 [31510] = "to_labx10",			--"to_sarcofag",
 [31610] = "to_north_aes",
 [31710] = "to_sarcofag",
@@ -430,6 +429,7 @@ local under_spots = {
 [11510]="av_peshera",						--[11510] = "to_maze",
 [11511]="av_peshera",						--[11511] = "to_aver",
 [11512]="av_peshera",						--[11512] = "to_yantar",
+[31410] = "to_labx10",
 [97021]="peshera",
 [97115]="jupiter_underground",				--[97115] = "to_eprip",
 [97119]="labx8",							--[97119] = "to_eprip",

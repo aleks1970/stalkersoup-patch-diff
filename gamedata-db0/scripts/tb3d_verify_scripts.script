@@ -1,8 +1,8 @@
----TB3D 1.1.0.0.0.0 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
+---TB3D 1.1.0.0.0.5 automatically verifies the script files on new game start, random tanks, check_bad_weapons,
 -- removed din_rad and added use_rad_fields, TB3D_net_manager, added items, tb3d_dav_hunt, debug, gulag_deadcity,
 -- gulag_generators, gulag_aver, new vars and reorg, loadout_min_cond, loadout_ammo_count, loadout_ammo_loot, hdr,
 -- hardcore_mobs_mult, repair, bind_mashalat
-local vers = "1.1.0.0.0.0"
+local vers = "1.1.0.0.0.5"
 -- following removed from the mod ------------------------------------------------------------------------------------------------------------------------
 	--if valerich_dialog then TB3D_Services.packet_alert("valerich_dialog ok") else TB3D_Services.packet_alert("valerich_dialog failed!!!!") is_failed = true end
 	--if valerich_treasures then TB3D_Services.packet_alert("valerich_treasures ok") else TB3D_Services.packet_alert("valerich_treasures failed!!!!") is_failed = true end
@@ -730,25 +730,12 @@ function verify_files()
 	if ui_main_multi_tab then TB3D_Services.packet_alert("ui_main_multi_tab: "..ui_main_multi_tab.my_ver()) else TB3D_Services.packet_alert("ui_main_multi_tab failed!!!!") is_failed = true end
 	if ui_main_new_tab then TB3D_Services.packet_alert("ui_main_new_tab: "..ui_main_new_tab.my_ver()) else TB3D_Services.packet_alert("ui_main_new_tab failed!!!!") is_failed = true end
 
-	if ui_mm_mp_join then TB3D_Services.packet_alert("ui_mm_mp_join: "..ui_mm_mp_join.my_ver()) else TB3D_Services.packet_alert("ui_mm_mp_join failed!!!!") is_failed = true end
-	if ui_mm_mp_options then TB3D_Services.packet_alert("ui_mm_mp_options: "..ui_mm_mp_options.my_ver()) else TB3D_Services.packet_alert("ui_mm_mp_options failed!!!!") is_failed = true end
-	if ui_mm_mp_server then TB3D_Services.packet_alert("ui_mm_mp_server: "..ui_mm_mp_server.my_ver()) else TB3D_Services.packet_alert("ui_mm_mp_server failed!!!!") is_failed = true end
 	if ui_mm_opt_controls then TB3D_Services.packet_alert("ui_mm_opt_controls: "..ui_mm_opt_controls.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_controls failed!!!!") is_failed = true end
 	if ui_mm_opt_gameplay then TB3D_Services.packet_alert("ui_mm_opt_gameplay: "..ui_mm_opt_gameplay.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_gameplay failed!!!!") is_failed = true end
 	if ui_mm_opt_main then TB3D_Services.packet_alert("ui_mm_opt_main: "..ui_mm_opt_main.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_main failed!!!!") is_failed = true end
 	if ui_mm_opt_sound then TB3D_Services.packet_alert("ui_mm_opt_sound: "..ui_mm_opt_sound.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_sound failed!!!!") is_failed = true end
 	if ui_mm_opt_video then TB3D_Services.packet_alert("ui_mm_opt_video: "..ui_mm_opt_video.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_video failed!!!!") is_failed = true end
 	if ui_mm_opt_video_adv then TB3D_Services.packet_alert("ui_mm_opt_video_adv: "..ui_mm_opt_video_adv.my_ver()) else TB3D_Services.packet_alert("ui_mm_opt_video_adv failed!!!!") is_failed = true end
-	if ui_mp_main then TB3D_Services.packet_alert("ui_mp_main: "..ui_mp_main.my_ver()) else TB3D_Services.packet_alert("ui_mp_main failed!!!!") is_failed = true end
-	if ui_multiplayer_base then TB3D_Services.packet_alert("ui_multiplayer_base: "..ui_multiplayer_base.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_base failed!!!!") is_failed = true end
-	if ui_multiplayer_base_tab then TB3D_Services.packet_alert("ui_multiplayer_base_tab: "..ui_multiplayer_base_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_base_tab failed!!!!") is_failed = true end
-	if ui_multiplayer_create then TB3D_Services.packet_alert("ui_multiplayer_create: "..ui_multiplayer_create.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_create failed!!!!") is_failed = true end
-	if ui_multiplayer_create_map_tab then TB3D_Services.packet_alert("ui_multiplayer_create_map_tab: "..ui_multiplayer_create_map_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_create_map_tab failed!!!!") is_failed = true end
-	if ui_multiplayer_dialog then TB3D_Services.packet_alert("ui_multiplayer_dialog: "..ui_multiplayer_dialog.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_dialog failed!!!!") is_failed = true end
-	if ui_multiplayer_find then TB3D_Services.packet_alert("ui_multiplayer_find: "..ui_multiplayer_find.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_find failed!!!!") is_failed = true end
-	if ui_multiplayer_gametype_tab then TB3D_Services.packet_alert("ui_multiplayer_gametype_tab: "..ui_multiplayer_gametype_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_gametype_tab failed!!!!") is_failed = true end
-	if ui_multiplayer_map_tab then TB3D_Services.packet_alert("ui_multiplayer_map_tab: "..ui_multiplayer_map_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_map_tab failed!!!!") is_failed = true end
-	if ui_multiplayer_options_tab then TB3D_Services.packet_alert("ui_multiplayer_options_tab: "..ui_multiplayer_options_tab.my_ver()) else TB3D_Services.packet_alert("ui_multiplayer_options_tab failed!!!!") is_failed = true end
 
 	if ui_numpad then TB3D_Services.packet_alert("ui_numpad: "..ui_numpad.my_ver()) else TB3D_Services.packet_alert("ui_numpad failed!!!!") is_failed = true end
 	if ui_options_base_tab then TB3D_Services.packet_alert("ui_options_base_tab: "..ui_options_base_tab.my_ver()) else TB3D_Services.packet_alert("ui_options_base_tab failed!!!!") is_failed = true end

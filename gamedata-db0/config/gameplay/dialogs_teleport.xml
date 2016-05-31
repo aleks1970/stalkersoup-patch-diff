@@ -1,8 +1,9 @@
-<!-- ************ TB3D 1.0.9.9.8.0 tb3d_collector -->
+<!-- ************ TB3D 1.1.0.0.0.5 tb3d_collector, tb3d_wish_granted -->
 <game_dialogs>
 
 	<dialog id="teleport_yantar_dialog"> 
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>yan_scientist_teleport_01_done</has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -189,6 +190,7 @@
     </dialog>
 	
 	<dialog id="teleport_escape_dialog"> 
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>tb3d_collector</dont_has_info>
 		<has_info>fanat_teleport_04_done</has_info>
 		<phrase_list>
@@ -709,6 +711,7 @@
     </dialog>
 	
 	<dialog id="teleport_povar_dialog"> 
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>tb3d_collector</dont_has_info>
 		<has_info>mil_cook_teleport_09_done</has_info>
 		<phrase_list>
@@ -719,7 +722,7 @@
 			<phrase id="1">
                 <text>teleport_povar_dialog_1</text>
 				<next>2</next>
-				<!--<next>3</next>
+				<!--<next>3</next> -->
 				<!--<next>4</next> -->
             </phrase>
 			<phrase id="3">
@@ -957,6 +960,7 @@
 	
 	<dialog id="teleport_05_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>fanat_teleport_04_done</has_info>
 		<dont_has_info>fanat_teleport_05_start</dont_has_info>
 		<dont_has_info>fanat_teleport_05_have</dont_has_info>
@@ -1020,6 +1024,7 @@
 	
 		<dialog id="teleport_06_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>fanat_teleport_05_done</has_info>
 		<dont_has_info>fanat_teleport_06_start</dont_has_info>
 		<dont_has_info>fanat_teleport_06_have</dont_has_info>
@@ -1305,6 +1310,7 @@
     </dialog>
 	
 	<dialog id="doctor_teleport">
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>tb3d_collector</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -1441,6 +1447,7 @@
 	
 	<dialog id="teleport_10_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<!--<has_info>doctor_drug_done</has_info>-->
 		<dont_has_info>doktor_teleport_10_start</dont_has_info>
 		<dont_has_info>doktor_teleport_10_have</dont_has_info>
@@ -1492,6 +1499,7 @@
 	
 	<dialog id="teleport_102_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<precondition>sak_dialog.dummy_spring_red_have</precondition>
 		<dont_has_info>doktor_teleport_10_done</dont_has_info>
 		<has_info>doktor_teleport_10_have</has_info>
@@ -1518,6 +1526,7 @@
     </dialog>
 	
 	<dialog id="teleport_103_dialog">
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>doktor_teleport_10_start</has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -1541,6 +1550,7 @@
     </dialog>
 	
 	<dialog id="teleport_11_dialog">
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>doktor_teleport_10_done</has_info>
 		<dont_has_info>doktor_teleport_11_start</dont_has_info>
 		<dont_has_info>doktor_teleport_11_have</dont_has_info>
@@ -1593,6 +1603,7 @@
 	<dialog id="teleport_112_dialog">
 		<precondition>sak_dialog.dummy_battery_red_have</precondition>
 		<dont_has_info>doktor_teleport_11_done</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>doktor_teleport_11_have</has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -1617,6 +1628,7 @@
     </dialog>
 	
 	<dialog id="teleport_113_dialog">
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>doktor_teleport_11_start</has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -1653,6 +1665,7 @@
     </dialog>
 	
 	<dialog id="teleport_12_dialog">
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>doktor_teleport_11_done</has_info>
 		<dont_has_info>doktor_teleport_12_start</dont_has_info>
 		<dont_has_info>doktor_teleport_12_have</dont_has_info>
@@ -1705,6 +1718,7 @@
 	<dialog id="teleport_122_dialog">
 	    <precondition>sak_dialog.dummy_pellicle_red_have</precondition>
 		<dont_has_info>doktor_teleport_12_done</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>doktor_teleport_12_have</has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -1730,6 +1744,7 @@
 	
 	<dialog id="teleport_123_dialog">
         <dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>doktor_teleport_12_start</has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -1773,6 +1788,7 @@
     </dialog>
 	<dialog id="about_life_heart_11_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>strelok_pda_done</has_info>
 		<dont_has_info>about_life_heart_start</dont_has_info>
 		<dont_has_info>about_life_heart_done</dont_has_info>		
@@ -1818,6 +1834,7 @@
     </dialog>
 	<dialog id="about_life_heart_51_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>about_life_heart_done</has_info>
 		<dont_has_info>life_heart_final</dont_has_info>
 		<phrase_list>
@@ -1862,6 +1879,7 @@
     </dialog>
 	<dialog id="about_life_heart_21_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>about_life_heart_start</has_info>
 		<dont_has_info>about_life_heart_barman</dont_has_info>
 		<dont_has_info>life_heart_barman_start</dont_has_info>
@@ -1930,6 +1948,7 @@
     </dialog>
 	<dialog id="about_life_heart_31_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>about_life_heart_start</has_info>
 		<dont_has_info>about_life_heart_sahar</dont_has_info>
 		<dont_has_info>life_heart_sahar_start</dont_has_info>
@@ -1998,6 +2017,7 @@
     </dialog>
 	<dialog id="about_life_heart_41_dialog">
 		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>about_life_heart_start</has_info>
 		<dont_has_info>about_life_heart_sidor</dont_has_info>
 		<dont_has_info>life_heart_sidor_start</dont_has_info>
@@ -2065,6 +2085,7 @@
         </phrase_list>
     </dialog>
 	<dialog id="about_life_heart_42_dialog">
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>tb3d_collector</dont_has_info>
 		<precondition>sak_dialog.rad_kontainer_have</precondition>
 		<has_info>life_heart_sidor_have</has_info>
@@ -2096,6 +2117,7 @@
         </phrase_list>
     </dialog>
 	<dialog id="about_life_heart_32_dialog">
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>tb3d_collector</dont_has_info>
 		<has_info>life_heart_sahar_have</has_info>
 		<dont_has_info>life_heart_sahar_done</dont_has_info>
@@ -2125,6 +2147,7 @@
         </phrase_list>
     </dialog>
 	<dialog id="about_life_heart_22_dialog">
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>tb3d_collector</dont_has_info>
 		<precondition>sak_dialog.scintist_pda_have</precondition>
 		<has_info>life_heart_barman_have</has_info>

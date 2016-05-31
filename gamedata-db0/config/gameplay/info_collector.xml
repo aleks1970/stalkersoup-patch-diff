@@ -1,6 +1,6 @@
-<!-- TB3D 1.0.9.9.8.0 Collector, new triggers, force weather, respawn toggle, respawn block, -->
+<!-- TB3D 1.1.0.0.0.5 Collector, new triggers, force weather, respawn toggle, respawn block, -->
 <!-- bioradar, dyn info, collector done, tb3d_bar_zones, zaparo_doc, reorganized and articles added,
- group1b, moved new levels infos, zep_start_info -->
+ group1b, moved new levels infos, zep_start_info, rsrch_stash, sahar_sumka_spawned -->
 <game_information_portions>
 
 	<info_portion id="tb3d_collector"/>				<!-- level-up 1 - The Collector -->
@@ -88,6 +88,8 @@
 	<info_portion id="tb3d_portal_wt1"/>	<!-- portal to allow return from treasure hunt stash -->
 	<info_portion id="tb3d_portals_x10"/>	<!-- portals in x10 after jupunder -->
 	
+	<info_portion id="tb3d_rsrch_cellar_stash"/>	<!-- 110005, spawn hoard of zombies -->
+	
 	<!--   treasure hunt -->
 	<info_portion id="tb3d_collector_hunt">				<!-- has started the treasure hunt (part 1) -->
 		<article>tb3d_treasure_hunt_info</article>
@@ -165,5 +167,7 @@
 	<info_portion id="collector_done_with_jupiter"/>
 	<info_portion id="collector_done_with_jupund"/>
 	<info_portion id="collector_done_with_eastprip"/>
+	
+	<info_portion id="sahar_sumka_spawned"/>
 	
 </game_information_portions>

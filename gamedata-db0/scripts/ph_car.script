@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.9.9 car.update ctds w/nil ref at line 932, loop = nil fix
-function my_ver() return "1.0.9.9.9.9" end
+--TB3D 1.1.0.0.0.5 car.update ctds w/nil ref at line 932, loop = nil fix
+function my_ver() return "1.1.0.0.0.5" end
 ----------------------------------------------------------------------------------------------------
 -- Physic vehicle control
 ----------------------------------------------------------------------------------------------------
@@ -295,7 +295,7 @@ function action_car:reset_scheme(loading)
 end
 
 function action_car:save()
-    --TB3D_Services.info_alert("car <state>: saving")
+    --TB3D_Services.info_alert("car <state>: saving", true)
     if self.usable == nil then
 	    xr_logic.pstor_store(self.object, "speed", self.speed)
 	    xr_logic.pstor_store(self.object, "loop", self.loop)
@@ -305,6 +305,7 @@ function action_car:save()
 	    xr_logic.pstor_store(self.object, "target_walk_pt", self.target_walk_pt) -- or -2)
 	    --TB3D_Services.info_alert("ph car: save target_walk_pt["..utils.to_str(self.target_walk_pt).."]")
 	end
+    --TB3D_Services.info_alert("car <state>: saving done", true)
 end
 
 --++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
@@ -1118,7 +1119,7 @@ function action_car:car_explode()
 end
 
 function action_car:net_destroy()
-	--TB3D_Services.packet_alert("ph car: net destroy")
+	--TB3D_Services.info_alert("ph car: net destroy", true)
 	if TB3D_Modders.use_vehicle_message or TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("ph car: net destroy["..utils.to_str(self.object:name()).."] section["..self.object:section().."]") end
 	--self:destroy_car()
 	if self.object and xr_logic.mob_captured(self.object) then
@@ -1129,7 +1130,7 @@ function action_car:net_destroy()
 	    end
 	end
 	if TB3D_Modders.use_vehicle_message or TB3D_Modders.use_destroy_message then TB3D_Services.packet_alert("ph car: net destroy["..utils.to_str(self.object:name()).."] done") end
-	--TB3D_Services.packet_alert("ph car: net destroy done")
+	--TB3D_Services.info_alert("ph car: net destroy done", true)
 end
 
 function action_car:check_friends_on_fire_line()

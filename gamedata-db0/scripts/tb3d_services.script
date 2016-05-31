@@ -1,4 +1,4 @@
----TB3D 1.1.0.0.0.4 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
+---TB3D 1.1.0.0.0.5 items, info, teleports in .ltx files vice local data, new rep system, removed tb3d_freeplay, maj rev update,
 --added monolit tele, full health on join oc and also collector tp, chgd save file, added services, major release, transfer item,
 --population correction from 109924 saves, rewrote fixer/pop control and remove old save fixer, new pop control, added infos,
 -- isIsolatedLevel, env arts, Chimaera, added can_remove_dead, dynamic sounds, new levels, get_obj_level, delayed_action, skip groups,
@@ -6,13 +6,13 @@
 -- change_rank, complete_group(), is_instorm(), level_up, blow_phase, set_player_relations, check_prior_version, game_mode, additional plugins,
 -- removed lastrepreward, rain_factor, storm stages, horror spawns, player relations, koef, hardcore_mobs, fell thru level, coef, targets_killed,
 -- set_daytime, translate - aleks1970, can_remove_dead, check_storm_over, zat lost, grib_respawn, tb3d_storm_started, killed by actor,
--- yan_specnaz_dead, difficulty_num, check old save, rotate_actor
-function my_ver() return "1.1.0.0.0.4" end	--modders append with initials and rev.
+-- yan_specnaz_dead, difficulty_num, check old save, rotate_actor, check_the_dead
+function my_ver() return "1.1.0.0.0.5" end	--modders append with initials and rev.
 
 --title version will display network info in future
 local difficulty_ver = ""									--set by bind_stalker load or amk_mod new game start
 local difficulty_num = 0
-local rev_number = "0.0.0.4"
+local rev_number = "0.0.0.5"
 local translate = game.translate_string
 function title_ver()
 	local game_dif = amk.load_variable("game_diff", 0)
@@ -47,7 +47,7 @@ function get_difficulty_num()
 	return difficulty_num
 end
 
-major_version = 110004							--used in saves
+major_version = 110005							--used in saves
 --default string type flag, must match current_server_entity_version in script_engine.ltx
 dm_flag_version = 6								--less than 7 = 'flag = tostring(reader:r_s16())', else 'flag = reader:r_stringZ()'
 gulag_cnt = 0									--counts the number of gulags with states loaded
@@ -297,6 +297,7 @@ function inc_gulags(cnt)
 	end
 end
 function report_gulags()
+	--alife():switch_distance(swtch_dist)					--110005, does not work yet
 	packet_alert("TB3D: Gulags loaded["..utils.to_str(gulag_cnt).."] switch distance["..utils.to_str(alife():switch_distance()).."]")
 end
 
@@ -630,11 +631,17 @@ end
 function savegame(save_name)
 	if isGameOn() and save_name ~= nil then
 		--packet_alert("TB3D: save name["..utils.to_str(save_name).."]")
+		local save_alias
+		if TB3D_Modders.alias_name then						--110005, for using member callsign
+			save_alias = TB3D_Modders.alias_name
+		else
+			save_alias = user_name()
+		end
 		local save_param
 		if is_collector(1) == true then
-			save_param = user_name().." -FP LVL"..utils.to_str(get_level_up()).."- "..save_name
+			save_param = save_alias.." -FP LVL"..utils.to_str(get_level_up()).."- "..save_name
 		else
-			save_param = user_name().." -stalker- "..save_name
+			save_param = save_alias.." -stalker- "..save_name
 		end
 		--packet_alert("TB3D: save param["..utils.to_str(save_param).."]")
 		get_console():execute("save "..save_param)
@@ -2559,6 +2566,17 @@ function jump_to_npc(npc)
 	end
 end
 
+function check_the_dead(npc_name)
+	--packet_alert("TB3D: check the dead["..npc_name.."]")
+	if string_find(npc_name, "mil_ara") then														--110005, kill informant
+		TB3D_Services.give_info("mil_courier_dead")
+		TB3D_Services.give_info("sar2_death_20")
+		if TB3D_Services.give_info("mil_ara_dead") then
+			arhara_dialog.delete_khutor_zone2_restrictor()
+		end
+	end
+end
+
 function can_remove_dead(lname, npc_name)
 	local result = false
 	--packet_alert("TB3D: can remove dead["..npc_name.."] level["..lname.."]")
@@ -2955,18 +2973,21 @@ function jump_to_safe_spot()
 	move_actor(x,y,z,true)
 end
 
+--local swtch_dist												-- 120 - 300	set in report_gulags()				
 function adjust_for_level(lname)
 	local dist_val = 1.5										-- most levels use max settings
 	local lighting_val = 1.5									-- vision and lighting best when equal
 	local lod_a = 96											-- 16 - 96
 	local lod_b = 64											-- 32 - 64
 	local shadow_qlty = 1.0										-- 0.5 - 1.0
+	--swtch_dist = 200
 	if TB3D_Modders.level_set_max < 50 then						--fixed at 30%
 		dist_val = 1.0
 		lighting_val = dist_val
 		lod_a = 48
 		lod_b = 32
 		shadow_qlty = 0.5
+		--swtch_dist = 120
 	else
 		if lname == "marsh" or lname == "swamp_old" then			--30%
 			dist_val = 1.1
@@ -2974,41 +2995,56 @@ function adjust_for_level(lname)
 			lod_a = 48
 			lod_b = 32
 			shadow_qlty = 0.5
+			--swtch_dist = 200
 		elseif lname == "pripyat" or lname == "l11_Pripyat" then	--50%
 			dist_val = 1.2
 			lighting_val = dist_val
 			lod_a = 64
 			lod_b = 48
 			shadow_qlty = 0.7
+			--swtch_dist = 140
 		elseif lname == "aver" then									--30%
 			dist_val = 1.0
 			lighting_val = dist_val
 			lod_a = 48
 			lod_b = 32
 			shadow_qlty = 0.5
+			--swtch_dist = 140
 		elseif lname == "peshera" or lname == "av_peshera" then		--50%
 			dist_val = 1.0
 			lighting_val = dist_val
 			lod_a = 64
 			lod_b = 48
 			shadow_qlty = 0.7
+			--swtch_dist = 140
 		elseif lname == "red_forest" or lname == "yantar_old" then	--30%
 			dist_val = 1.0
 			lighting_val = dist_val
 			lod_a = 48
 			lod_b = 32
 			shadow_qlty = 0.5
+			--swtch_dist = 140
+		elseif lname == "generators" then							--30%
+			dist_val = 1.0
+			lighting_val = dist_val
+			lod_a = 48
+			lod_b = 32
+			shadow_qlty = 0.5
+			--swtch_dist = 300										--for doc spawn after heli
 		elseif TB3D_Modders.level_set_max < 70 then					--50%
 			dist_val = 1.0
 			lighting_val = dist_val
 			lod_a = 64
 			lod_b = 48
 			shadow_qlty = 0.7
+			--swtch_dist = 140
 		elseif TB3D_Modders.level_set_max < 100 then				--70%
 			dist_val = 1.2
 			lighting_val = dist_val
+			--swtch_dist = 180
 		elseif TB3D_Modders.level_set_max > 100 then				--120%
 			lighting_val = 2.0
+			--swtch_dist = 300
 		end
 	end		--set here before renderer starts to build scene
 	get_console():execute("r2_slight_fade "..utils.to_str(lighting_val))			--lighting distance (2.0 = max), but
@@ -3016,6 +3052,7 @@ function adjust_for_level(lname)
 	get_console():execute("r2_ssa_lod_a "..utils.to_str(lod_a))						--ssa
 	get_console():execute("r2_ssa_lod_b "..utils.to_str(lod_b))						--ssa
 	get_console():execute("r2_ls_squality "..utils.to_str(shadow_qlty))				--shadows
+	packet_alert("TB3D: auto set level for["..lname.."] light dist["..lighting_val.."] vis dist["..dist_val.."] lod a["..lod_a.."] lod b["..lod_b.."] shadows["..shadow_qlty.."]")
 end
 
 function check_prior_version(tb3d_ver)											--109972
@@ -3346,6 +3383,8 @@ function check_lc_rotate(lname, sname)										--110004
 		if sname == "hiding_road" then rotate_actor(-90) end
 	elseif lname == "jupiter_underground" then
 		if sname == "pripyat" then rotate_actor(-90) end
+	elseif lname == "lost_village" then
+		if sname == "dark_forest" then rotate_actor(180) end
 	end
 end
 -- ----------------------------------------------------------------------------------------------------------------

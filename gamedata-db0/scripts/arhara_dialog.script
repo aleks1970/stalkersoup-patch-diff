@@ -1,4 +1,4 @@
---' TB3D 1.1.0.0.0.4 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
+--' TB3D 1.1.0.0.0.5 added collector start, dead city fix, wrong spawn_item call, cave chgs, optimized, fixed hide weapon
 -- added  kalinin_zadan_have() which did not exist (need research), dmx135, removed fake_ from item section,
 -- chgd kluk_sms_pili_lovushka, dcity hit, fake_wpn_knife_n, pilot_muhi_sms, Argali to Arhara, dell_torgov_restr, pantera_dinamit_nevid,
 -- del_blok_tele, spawn_arts now spawn_cntrlrs, localized, dark_sidor, girl3_nachalo, skip groups, send_tip_id optimization, klenov,
@@ -6,7 +6,7 @@
 -- oruzhie_delet, starshoy_say_one_check, have_doc_tvar_check, optimized func calls, chaes_perexod_have, spawn_sewer_stuff, repair_kit
 -- text color, give repair_kit and spare_parts Revamped - aleks1970, 186 char size limit to sms messages!!!!, new weapon for/from Fox - aleks1970,
 -- kukla, agro_torgash_sms
-function my_ver() return "1.1.0.0.0.4" end
+function my_ver() return "1.1.0.0.0.5" end
 
 local math_random = math.random
 local translate = game.translate_string
@@ -6488,17 +6488,17 @@ end
 
 function village_kap_pda()
 	if TB3D_Services.is_collector(4000) == false then
-		news_manager.amk_send_tip_id("sms_village_kap_pda_2_4","sms_incomming",1,60,"default")
-		news_manager.amk_send_tip_id("sms_village_kap_pda_2_3","sms_incomming",1,60,"default")
-		news_manager.amk_send_tip_id("sms_village_kap_pda_2_2","sms_incomming",1,60,"default")
-		news_manager.amk_send_tip_id("sms_village_kap_pda_2","sms_incomming",1,60,"default")
-		news_manager.amk_send_tip_id("sms_village_kap_pda","sms_incomming",1,60,"default")
+		--news_manager.amk_send_tip_id("sms_village_kap_pda_2_4","sms_incomming",1,60,"default")							--110005, need investigate why these are here
+		--news_manager.amk_send_tip_id("sms_village_kap_pda_2_3","sms_incomming",1,60,"default")
+		--news_manager.amk_send_tip_id("sms_village_kap_pda_2_2","sms_incomming",1,60,"default")
+		news_manager.amk_send_tip_id("sms_village_kap_pda_2","sms_incomming",1,60,"default")								--good
+		news_manager.amk_send_tip_id("sms_village_kap_pda","sms_incomming",1,60,"default")									--good
 		local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_132]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-		news_manager.amk_send_tip_id("sms_village_kap_pda2","sms_incomming",1,60,"default")
+		news_manager.amk_send_tip_id("sms_village_kap_pda2","sms_incomming",1,60,"default")						--good
 		snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_03\stalker\talk\leave\leave_133]])
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-		news_manager.amk_send_tip_id("sms_village_kap_pda3","sms_incomming",1,60,"default")
+		news_manager.amk_send_tip_id("sms_village_kap_pda3","sms_incomming",1,60,"default")						--good
    end
 end
 

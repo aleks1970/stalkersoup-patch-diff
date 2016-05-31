@@ -1,4 +1,4 @@
--- TB3D 1.1.0.0.0.4 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
+-- TB3D 1.1.0.0.0.5 new 01/05/11, forces fixes to database, now searches for bad object lv and gv, "",
 -- empty object names and reports free object and story object counts, stage1 fix, stage4 fix,
 -- expanded name = "" with section name, added no witches option for cave, moroz_restrictor, moroz removed
 -- specnaz near embankment way too soon in game, consolidated fixes and overpopulation control, removed old save fixes
@@ -7,8 +7,8 @@
 -- skip groups, radar_t, added dyn levels, second_door_marker, segnemted force_fixes, rad_zone logic fix, get_level_up,
 -- zep_doc, arts_count, event_horizont, fixed arts, check order, check story object, warlab_sekret_generator, child_count,
 -- dyn spawns, cleanup, destroyable objects to binders, remove sea-urchin, missing scientist in pripyat, yan_specnaz_dead,
--- deathclaw, x16, check_dyn_spawns, F1 arts, radar, yantar
-function my_ver() return "1.1.0.0.0.4" end
+-- deathclaw, x16, check_dyn_spawns, F1 arts, radar, yantar, swamp_samopisez, aes2_space_restrictor_timer
+function my_ver() return "1.1.0.0.0.5" end
 -- be careful to remove items only after they are no longer needed.
 -- af_rusty_kristall in old village bad spawn vertex in all.spawn, need wait for new one to fix
 
@@ -394,7 +394,7 @@ function check_restrictors(obj_name, sect, is_collector)
 			  or string_find(obj_name, "aes_space_restrictor_actor_ready")
 			  or string_find(obj_name, "aes_explosive_dinamit") then
 				if is_collector or has_alife_info("tb3d_skip_group2")
-				  or has_alife_info("tb3d_chaes_done") then				--see if made it to sarc and completed monolith or oc
+				  or has_alife_info("tb3d_wish_granted") then								--110005, see if made it to sarc and wish granter
 					is_fixed = true
 				else
 					is_skip = true
@@ -1372,6 +1372,9 @@ function check_level(obj, obj_name, sect, obj_level, is_collector)
 	--elseif obj_level == 39 then											--old garbage same as promzone
 	elseif obj_level == 40 then												--old yantar
 	elseif obj_level == 41 then												--old swamp
+		if sect == "swamp_samopisez" then
+			amk.save_variable("swamp_recorder", obj.id)						--110005
+		end
 	elseif obj_level == 42 then												--hiding road
 	elseif obj_level == 43 then												--darkscape
 	elseif obj_level == 44 then												--dark forest

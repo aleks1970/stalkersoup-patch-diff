@@ -1,7 +1,7 @@
---TB3D 1.1.0.0.0.4 moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
+--TB3D 1.1.0.0.0.5 moved ww note01 spawn, gold bars, send_tip_id optimization, station spawns, suicide1,
 --bridge_pass_on, eprip_to_prip, more content, reduced station spawns, mush_art, storm timer starts on first npp2 mushroom,
---tb3d_gbars_chp2, deathclaw, pripyat_art_take
-function my_ver() return "1.1.0.0.0.4" end
+--tb3d_gbars_chp2, deathclaw, pripyat_art_take, dist spawns
+function my_ver() return "1.1.0.0.0.5" end
 
 local math_random = math.random
 local math_fmod = math.fmod
@@ -686,6 +686,13 @@ function dist_spawns()		--killers
 	TB3D_Triggers.spawn_item_rand("ammo_7.62x54_ap", -12.817,4.270,-116.514,17421,5335,6)			--stash in blocked room with stairs to roof
 	create_zep_document(8)				--110000
 	news_manager.amk_send_tip_id("zep_sms_from_geek","sms_associate",10,40,"saharov")
+	local sobj = amk.load_variable("swamp_recorder", nil)
+	if sobj then
+		if level.map_has_object_spot(sobj, "crlc_biggest") == 0 then
+			level.map_add_object_spot_ser(sobj, "crlc_biggest", "dead_marsh_recorder_hint")			--110005, mark area of chopper
+		end
+		amk.del_variable("swamp_recorder")
+	end
 	TB3D_Services.delayed_action(1,"zep_sms_from_cemetery", 20)										--distress call
 end
 

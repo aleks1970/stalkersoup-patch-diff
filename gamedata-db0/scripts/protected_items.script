@@ -1,9 +1,9 @@
---TB3D 1.1.0.0.0.4 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
+--TB3D 1.1.0.0.0.5 added ALD weapons: ["wpn_vepr12","wpn_vss_tk1","wpn_ump45_m1","wpn_fn2000_paratrooper, kat_"],
 -- bandranen_pda, get protected item, _fss, merged death_generic keep items, tb3d_gspot, zep, redone for exact only,
 -- ckts and flasks, pushka_fotik, m_car, explosive_barrel, wpn_gungauss, optimized using tags, debug, has_protected_item,
 -- playboy10, get_section
 
-function my_ver() return "1.1.0.0.0.4" end
+function my_ver() return "1.1.0.0.0.5" end
 local string_find = string.find
 local string_sub = string.sub
 
@@ -68,7 +68,9 @@ local tag7_prot = {
 	["kuvalda"] = true,						--109975, sledgehammer
 	["und_pda"] = true,
 	["rad_pda"] = true,
-	["new_doc"] = true						--110000, new_document_sniper (beast)
+	["new_doc"] = true,						--110000, new_document_sniper (beast)
+	["car_key"] = true,						--110005
+	["btr_key"] = true
 }
 local tag8_prot = {
 	["fraer_pd"] = true,
@@ -87,7 +89,8 @@ local tag8_prot = {
 	["wpn_flam"] = true,
 	["wpn_mp5_"] = true,
 	["wpn_rpg7"] = true,					--TB3D 109940
-	["gold_art"] = true						--110004
+	["gold_art"] = true,					--110004
+	["mushroom"] = true						--110005
 }
 local tag9_prot = {
 	["playboy10"] = true
@@ -143,7 +146,10 @@ local tag11_prot = {
 	["wpn_sg552_f"] = true,			--TB3D 109931
 	["wpn_sledgeh"] = true,			--109975, sledgehammer
 	["wpn_gungaus"] = true,			--109991, in DV
-	["esc_outfit_"] = true			--110000, perfected suit
+	["esc_outfit_"] = true,			--110000, perfected suit
+	["explosive_b"] = true,			--110005, barrels
+	["explosive_t"] = true,			--110005, nat gas tank
+	["explosive_f"] = true			--110005, fuel can
 }
 
 -- 109993 use only exact matches, now uses tags

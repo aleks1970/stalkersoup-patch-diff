@@ -1,9 +1,9 @@
---<!-- TB3D 1.1.0.0.0.4 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
+--<!-- TB3D 1.1.0.0.0.5 point_drop, delayed_action, esc_killers, kalmyak, dv lc, agro ending
 --moved here to allow future changes without changing bind_stalker.script, agro zapiska, bad torch,
 --cube, sak_resiver, complete_group(), autosaves, update, amk_zapiska, make_camp_friends(), brat_luis_start,
 --item take, chaes_perexod_start, translate and text color - aleks1970, doktor_teleport_, x10 portals,
---lukash brains, agro knockdown, jupu, x16, check_dead, math_random, tb3d_chaes_done, level number optimization
-function my_ver() return "1.1.0.0.0.4" end
+--lukash brains, agro knockdown, jupu, x16, check_dead, math_random, tb3d_chaes_done, level number optimization, kalmyak ruk
+function my_ver() return "1.1.0.0.0.5" end
 
 local translate = game.translate_string
 local math_random = math.random
@@ -842,7 +842,7 @@ function process_levels(blow)
 				end
 			end
 		elseif lname=="marsh" then
-			if TB3D_Services.give_info("marsh_band_spawn") then								--Kalmyak and rucksack
+			if TB3D_Services.give_info("marsh_band_spawn") then								--110005, at cs entrance
 				braad_test.spawn_marsh_band()
 			end
 			if has_alife_info("kot_need_doc_start") and (not has_alife_info("kot_need_doc_have")
@@ -851,7 +851,7 @@ function process_levels(blow)
 			end
 			if has_alife_info("brat_luis_spawn") then										--109992, Brother Luis
 				TB3D_Services.give_info("brat_luis_start")
-			elseif has_alife_info("brat_luis_start") then										--109999, Brother Luis
+			elseif has_alife_info("brat_luis_start") then									--109999, Brother Luis
 				TB3D_Services.give_info("brat_luis_spawn")
 			end
 		elseif lname=="l10_radar" then
@@ -887,8 +887,15 @@ function process_levels(blow)
 		elseif lname=="zaton" then
 			TB3D_Mobs.check_zaton_spawns2()
 		elseif lname == "l12_stancia" then
-			if has_alife_info("tb3d_wish_granted") then			--109989, empty after chaes
+			if has_alife_info("tb3d_wish_granted") then																		--109989, empty after chaes
 				TB3D_Mobs.check_npp1_spawns()
+				if has_alife_info("sahar_sumka_start") then
+					if not has_alife_info("sahar_sumka_have") and not has_alife_info("sahar_sumka_done") then				--110005, sahkarov's bag
+						if TB3D_Services.give_info("sahar_sumka_spawned") == true then
+							amk.spawn_item("sumka_arhara",vector():set(346.023,-0.002,-223.896),2348,146929)				--110005, was amk_sumka
+						end
+					end
+				end
 			end
 		elseif lname == "atp_for_test22" then					--109992, make sure they are there
 			if has_alife_info("petr_sidor_vzyt_start") and not has_alife_info("petr_sidor_vzyt_have") then

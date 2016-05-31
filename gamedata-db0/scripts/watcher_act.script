@@ -1,6 +1,6 @@
---TB3D 1.1.0.0.0.4 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
+--TB3D 1.1.0.0.0.5 fixed correct_position as it caused tearing from bad lvids, dist_limit, iterate inventory, generic_m_story_id,
 -- better cleaner and evaluate, obj_is_protected, checkcorpse, zombie list dcity doc, glavny, radar, petruha
-function my_ver() return "1.1.0.0.0.4" end
+function my_ver() return "1.1.0.0.0.5" end
 -- Red75 (c) 2008
 -- Marauder scheme v 1.1
 -- Part of AMK MOD
@@ -222,7 +222,8 @@ function ev_see_stuff:evaluate()
 			return false
 		end 
 		if res and self.st.block_search then return true end
-		timed( self.st,"tm1",5000+math_random()*10000,
+		local skip_all = false
+		timed( self.st,"tm1",TB3D_Modders.search_min_time+(math_random()*TB3D_Modders.search_rand_time),
 			function()
 				local function check_item(o)
 					local obj=o:object()
@@ -231,32 +232,52 @@ function ev_see_stuff:evaluate()
 					if obj_owner[obj_id] and (level.object_by_id(obj_owner[obj_id])==nil or level.object_by_id(obj_owner[obj_id]):alive()==false) then
 						obj_owner[obj_id]=nil
 					end
-					local min_dist = TB3D_Modders.search_actor_dist or 6
-					if obj:section() ~= "m_trader" and obj:name() ~= "single_player" then
-						if db.actor and db.actor:alive() and db.actor:position():distance_to_sqr(obj:position()) > min_dist then
-							if (not self.st.disabled_objects[obj_id])
-							  and (obj:parent()==nil or (not IAmAStalker[obj:parent():clsid()] or not IAmAMonster[obj:parent():clsid()]))
-							  and (obj_owner[obj_id]==nil or obj_owner[obj_id]==npc_id)
-							  and npc:accessible(obj:level_vertex_id()) then
-								if isValuable(obj) then
-									if TB3D_Modders.use_looting_message then TB3D_Services.packet_alert("watcher act: see stuff eval["..npc:name().."] object["..obj:name().."] valuable[true]") end
-									local max_dist
-									if string_find(act_sec,"^camper") or string_find(act_sec,"^danger") then
-										max_dist = TB3D_Modders.search_dusy_dist or 5
-									else
-										max_dist = TB3D_Modders.search_max_dist or 60
-									end
-									if level.vertex_position(obj:level_vertex_id()):distance_to(npc:position()) < max_dist then
-										if TB3D_Modders.use_looting_message then TB3D_Services.packet_alert("watcher act: see stuff eval["..npc:name().."] object["..obj:name().."] go claim") end
-										claimGObject(npc,self.st,obj)
-										res=true
+					if IAmAStalker[obj:clsid()] then
+						local gi_comm
+						local res_comm
+						if obj.character_community then
+							res_comm = obj:character_community()
+						else
+							res_comm = ""
+						end
+						if npc.character_community then
+							gi_comm = npc:character_community()
+						else
+							gi_comm = "_"
+						end
+						--TB3D_Services.packet_alert("watcher act: see stuff eval["..gi_comm.."] object["..res_comm.."]")
+						if not TB3D_Modders.npc_loot_own_community and gi_comm == res_comm then											--110005, don't loot same community
+							skip_all = true
+						end
+					end
+					if not skip_all then
+						local min_dist = TB3D_Modders.search_actor_dist or 6
+						if obj:section() ~= "m_trader" and obj:name() ~= "single_player" then
+							if db.actor and db.actor:alive() and db.actor:position():distance_to_sqr(obj:position()) > min_dist then
+								if (not self.st.disabled_objects[obj_id])
+								  and (obj:parent()==nil or (not IAmAStalker[obj:parent():clsid()] or not IAmAMonster[obj:parent():clsid()]))
+								  and (obj_owner[obj_id]==nil or obj_owner[obj_id]==npc_id)
+								  and npc:accessible(obj:level_vertex_id()) then
+									if isValuable(obj) then
+										if TB3D_Modders.use_looting_message then TB3D_Services.packet_alert("watcher act: see stuff eval["..npc:name().."] object["..obj:name().."] valuable[true]") end
+										local max_dist
+										if string_find(act_sec,"^camper") or string_find(act_sec,"^danger") then
+											max_dist = TB3D_Modders.search_dusy_dist or 5
+										else
+											max_dist = TB3D_Modders.search_max_dist or 60
+										end
+										if level.vertex_position(obj:level_vertex_id()):distance_to(npc:position()) < max_dist then
+											if TB3D_Modders.use_looting_message then TB3D_Services.packet_alert("watcher act: see stuff eval["..npc:name().."] object["..obj:name().."] go claim") end
+											claimGObject(npc,self.st,obj)
+											res=true
+										end
 									end
 								end
 							end
 						end
 					end
 				end															-- end local function - check_item
-				for o in npc:memory_visible_objects() do check_item(o) end
+				for o in npc:memory_visible_objects() do check_item(o) if skip_all then break end end
 				for o in npc:memory_sound_objects() do check_item(o) end
 			end																-- end timed function
 		)
@@ -292,9 +313,17 @@ end
 
 function ev_see_body:evaluate()
 	local npc=self.object
-	local gi=getGObject(self.st)
-	if gi and db.check_corpse_looted(gi) == nil then
-		return IAmAStalker[gi:clsid()] or IAmAMonster[gi:clsid()]
+	if npc then
+		local npc_comm
+		if npc.character_community then npc_comm = npc:character_community() else npc_comm "" end
+		local gi=getGObject(self.st)
+		if gi and db.check_corpse_looted(gi) == nil then
+			if IAmAStalker[gi:clsid()] then
+				return true
+			elseif IAmAMonster[gi:clsid()] then
+				return true
+			end
+		end
 	end
 	return false
 end
@@ -651,20 +680,21 @@ function npc_no_looting(npc)
 		or name =="dcity_parfumer"									-- 110004, need stay in position
 		or name =="andersen"
 		or name =="zemlyk"
-		or name == "glavny"											-- 109998, lab x14
-		or string_find(name,"marsh_nebo_")							-- 109989, tend to pick up everything in swamp
-		or string_find(name,"agr_factory_")							-- 109989, messes with battle
-		or string_find(name,"bar_stalker_")							-- 109989, get too far away from buildings
-		or string_find(name,"rad_ambush")							-- 109989, loot dead scientists
-		or string_find(name,"mil_freedom_barier_respawn_")			-- 109989, wander into battle area before attack
-		or string_find(name,"nebo_exit")							-- 109989
-		or string_find(name, "esc_blokpost")						-- 109989, moved from evaluator
-		or string_find(name, "esc_bridge_soldier")
-		or string_find(name, "amk_embankment_soldat")
-		or string_find(name, "gar_bandit_stroyka")
-		or string_find(name, "rad_stalker")							-- 110002, interferes with assault on pripyat exit
-		or string_find(name, "generators_")							-- 110003, village and lab areas
-		or string_find(name, "pred_baza_")							-- 110004, makes base attack too easy
-		or string_find(name, "predbannik_")							-- 110004
+		or name =="glavny"											-- 109998, lab x14
+		or string_find(name, "^marsh_nebo_")						-- 109989, tend to pick up everything in swamp
+		or string_find(name, "^agr_factory_")						-- 109989, messes with battle
+		or string_find(name, "^bar_stalker_")						-- 109989, get too far away from buildings
+		or string_find(name, "^rad_ambush")							-- 109989, loot dead scientists
+		or string_find(name, "^mil_freedom_barier_respawn_")		-- 109989, wander into battle area before attack
+		or string_find(name, "^nebo_exit")							-- 109989
+		or string_find(name, "^esc_blokpost")						-- 109989, moved from evaluator
+		or string_find(name, "^esc_bridge_soldier")
+		or string_find(name, "^amk_embankment_soldat")
+		or string_find(name, "^gar_bandit_stroyka")
+		or string_find(name, "^rad_stalker")						-- 110002, interferes with assault on pripyat exit
+		or string_find(name, "^generators_")						-- 110003, village and lab areas
+		or string_find(name, "^pred_baza_")							-- 110004, makes base attack too easy
+		or string_find(name, "^predbannik_")						-- 110004
+		or string_find(name, "^stalker_bandit_")					-- 110005, error in visual
 		)
 end

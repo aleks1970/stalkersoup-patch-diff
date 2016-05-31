@@ -1,5 +1,6 @@
-<!-- ************ TB3D 1.1.0.0.0.4 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
-  can_start_dan, treasure_ecolog_have, ghost diary, preds after info checks, zahar_ask_help *************** -->
+<!-- ************ TB3D 1.1.0.0.0.5 yakut_help_have, marsh_remont_upgreid_91 thru 99 now uses 81 thru 89, prizrak_gold_art, kalmyac tiran_pda,
+  can_start_dan, treasure_ecolog_have, ghost diary, preds after info checks, zahar_ask_help, tb3d_wish_granted
+ *************** -->
 <game_dialogs>
 	<dialog id="prinesi_hvost">
 		<has_info>zahar_vstrecha_start</has_info>
@@ -2003,6 +2004,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="freeman_tainiy_hod">
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>prizrak_tainiy_start</has_info>
 		<dont_has_info>prizrak_tainiy_begin</dont_has_info>
 		<phrase_list>
@@ -2030,6 +2032,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="freeman_tainiy_hod_done">
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>prizrak_tainiy_done</dont_has_info>
 		<has_info>prizrak_tainiy_have</has_info>
 		<phrase_list>
@@ -2051,6 +2054,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="prizrak_gold_art">
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>gold_art_start</dont_has_info>
 		<has_info>prizrak_tainiy_done</has_info>
 		<phrase_list>
@@ -2072,6 +2076,7 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="prizrak_gold_art_done">
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>gold_art_have</has_info>
 		<dont_has_info>gold_art_done</dont_has_info>
 		<precondition>new_dialog.gold_art_have</precondition>

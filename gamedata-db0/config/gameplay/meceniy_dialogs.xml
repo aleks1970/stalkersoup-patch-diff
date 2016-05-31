@@ -1,4 +1,4 @@
-<!-- ************ TB3D 1.0.9.9.7.0 Akim monster parts *************** -->
+<!-- ************ TB3D 1.1.0.0.0.5 Akim monster parts *************** -->
 <game_dialogs>
 	<dialog id="escape_meceniy_start">
 		<dont_has_info>tb3d_collector</dont_has_info>
@@ -567,7 +567,6 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="qeast_q">
-		<dont_has_info>tb3d_collector</dont_has_info>
 		<dont_has_info>have_art1</dont_has_info>
 		<dont_has_info>p_started_q</dont_has_info>
 		<dont_has_info>otdan_q</dont_has_info>
@@ -609,7 +608,6 @@
 	</dialog>
 	<dialog id="qeast_q1">
 		<precondition>arhara_dialog.have_art1</precondition>
-		<dont_has_info>tb3d_collector</dont_has_info>
 		<dont_has_info>otdan_q</dont_has_info>
 		<has_info>have_art1</has_info>
 		<phrase_list>
@@ -634,7 +632,6 @@
 	</dialog>
 	<dialog id="m_qeast">
 		<has_info>otdan_q</has_info>
-		<dont_has_info>tb3d_collector</dont_has_info>
 		<dont_has_info>have_bizon</dont_has_info>
 		<dont_has_info>started_q</dont_has_info>
 		<dont_has_info>otda</dont_has_info>
@@ -676,7 +673,6 @@
 	</dialog>
 	<dialog id="m_qeast1">
 		<precondition>arhara_dialog.have_bizon</precondition>
-		<dont_has_info>tb3d_collector</dont_has_info>
 		<dont_has_info>otda</dont_has_info>
 		<has_info>have_bizon</has_info>
 		<phrase_list>
@@ -700,8 +696,8 @@
 		</phrase_list>
 	</dialog>
 	<dialog id="s_qeast">
+		<has_info>tb3d_wish_granted</has_info>
 		<has_info>otda</has_info>
-		<dont_has_info>tb3d_collector</dont_has_info>
 		<dont_has_info>have_true</dont_has_info>
 		<dont_has_info>starte_q</dont_has_info>
 		<dont_has_info>otan_aq</dont_has_info>
@@ -743,7 +739,7 @@
 	</dialog>
 	<dialog id="s_qeast1">
 		<precondition>arhara_dialog.have_true</precondition>
-		<dont_has_info>tb3d_collector</dont_has_info>
+		<has_info>tb3d_wish_granted</has_info>
 		<dont_has_info>otan_aq</dont_has_info>
 		<has_info>have_true</has_info>
 		<phrase_list>

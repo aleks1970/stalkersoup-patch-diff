@@ -1,7 +1,6 @@
-;;;TB3D 1.1.0.0.0.2 fixed svd_m1, aleks1970; "fov for zoom mode" ??
-;-----------Броня-----------
+;;;TB3D 1.1.0.0.0.4 fixed svd_m1, aleks1970; "fov for zoom mode" ??, can_trade, wpn_eagle_m2, wpn_eagle_m3
 
-[outfit_novice_m1]:novice_outfit			;Аномальная куртка новичка
+[outfit_novice_m1]:novice_outfit
 $spawn              				= "outfit\uniq\outfit_novice_m1"
 inv_name					= novice_outfit_name_m
 inv_name_short					= novice_outfit_name_m
@@ -1566,13 +1565,13 @@ inv_name		    = wpn_eagle_m2
 inv_name_short		= wpn_eagle_m2
 cost			    = 10000
 ammo_class		    = ammo_foto
-;hit_power           = 1.98
-;hit_impulse		 	= 1
+hit_power           = 0
+hit_impulse		 	= 0
 inv_grid_width          = 2
 inv_grid_height         = 2
 inv_grid_x              = 42
 inv_grid_y              = 45
-ammo_mag_size	    = 4
+ammo_mag_size	    = 1
 cam_relax_speed     = 0.00001
 cam_dispersion      = 0.00001
 cam_dispersion_inc	= 0.0
@@ -1616,9 +1615,9 @@ zoom_rotate_x		= -0.021800
 zoom_rotate_y		= 0.000500
 
 [wpn_eagle_m3]:wpn_eagle_m2
-ammo_class		     = ammo_9x39_sp5, ammo_9x39_ap, ammo_9x39_pab9, ammo_9x39_izomorf
-hit_power            = 1.97
-ammo_mag_size		 = 8
+;ammo_class		     = ammo_9x39_sp5, ammo_9x39_ap, ammo_9x39_pab9, ammo_9x39_izomorf
+;hit_power            = 1.97
+;ammo_mag_size		 = 1
 description		    = enc_wpn_eagle_m3_descr
 inv_name		    = wpn_eagle_m3
 inv_name_short		= wpn_eagle_m3
@@ -1778,7 +1777,7 @@ shell_point     	= 0.00, 0.00, -0.6
 shell_dir			= 0.0, 1.0, 0.0
 fire_point			= 0,0,-0.5
 fire_point2         = 0,0,-0.5
-fire_bone               = muzzle	;wpn_body  ; - aleks1970
+fire_bone               = wpn_body  ;muzzle
 orientation             	= 0, 0, 0		
 position                	= 0.15,-0.06,-0.05
 zoom_offset			= -0.15,0.06,-0.05
@@ -1984,37 +1983,48 @@ snd_shoot3			= weapons\ak47\ak47_shot_sil
 ;-----------Arena-----------
 [wpn_pm_arena]:wpn_pm;
 $spawn             		= "weapons\arena\wpn_pm_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_mp5_arena]:wpn_mp5;
 $spawn             		= "weapons\arena\wpn_mp5_arena"
 slot	=	2
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_toz34_arena]:wpn_bm16;
 $spawn             		= "weapons\arena\wpn_toz34_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_spas12_arena]:wpn_spas12;
 $spawn             		= "weapons\arena\wpn_spas12_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_ak74_arena]:wpn_ak74;
 $spawn             		= "weapons\arena\wpn_ak74_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_bm16_arena]:wpn_bm16;
 $spawn             		= "weapons\arena\wpn_bm16_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_ak74u_arena]:wpn_ak74u;
 $spawn             		= "weapons\arena\wpn_ak74u_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_val_arena]:wpn_val;
 $spawn             		= "weapons\arena\wpn_val_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_groza_arena]:wpn_groza;
 $spawn             		= "weapons\arena\wpn_groza_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_fn2000_arena]:wpn_fn2000;
 $spawn             		= "weapons\arena\wpn_fn2000_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 [wpn_g36_arena]:wpn_g36;
 $spawn             		= "weapons\arena\wpn_g36_arena"
+can_trade			= off	;; - new disabled - aleks1970
 
 
 ;------------------------------ Апгрейд оружия Ray -----------------------------

@@ -1,7 +1,7 @@
---TB3D 1.0.9.9.9.9 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
+--TB3D 1.1.0.0.0.5 STALKERSOUP The Collector, new added 12/05/11, removed coll autosave, dav updates, fixer, bomba_dav, item_take,
 -- dav update 16Apr14, item 17, send_tip_id optimization, fixed send_tip_id to amk_send_tip_id, debug, save now, moved triggers and added debug,
 -- af gold on roof in eprip, stash 14 lc to npp1, spawn_tel, text color - aleks1970, spawn_next, spawn_mobs
-function my_ver() return "1.0.9.9.9.9" end
+function my_ver() return "1.1.0.0.0.5" end
 -- randomly caches Collector treasures and provides base for bind_stalker services
 
 local string_sub = string.sub
@@ -89,7 +89,7 @@ function spawn_next(n)		--n = found doc, not next one
 				local nobj = alife():create("val_taynik_"..tostring(n), vector():set(x,y,z),lv,gv)
 				if nobj and TB3D_Modders.coll_spots then
 					level.map_add_object_spot_ser(nobj.id, "alife_presentation_monstr", "val_taynik_"..tostring(n))
-					TB3D_Services.packet_alert("Collector: spawn stash["..utils.to_str(x)..","..utils.to_str(y)..","..utils.to_str(z).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."] desc["..desc.."]")
+					--TB3D_Services.packet_alert("Collector: spawn stash["..utils.to_str(x)..","..utils.to_str(y)..","..utils.to_str(z).."] lv["..utils.to_str(lv).."] gv["..utils.to_str(gv).."] desc["..desc.."]")
 				end
 				if TB3D_Modders.use_spawn_message then 
 					news_manager.send_tip(db.actor,"Collector Hunt Spawned: ["..desc.."]") 

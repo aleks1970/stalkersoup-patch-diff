@@ -1,5 +1,5 @@
--- TB3D 1.1.0.0.0.4 db calls, use_binder_message
-function my_ver() return "1.1.0.0.0.4" end
+-- TB3D 1.1.0.0.0.5 db calls, use_binder_message
+function my_ver() return "1.1.0.0.0.5" end
 --[[------------------------------------------------------------------------------------------------
 Space restrictor binder
 Chugai Alexander
@@ -89,7 +89,7 @@ function restrictor_binder:net_destroy()
 		--end
 		sect = get_section(s_obj)
 		if TB3D_Modders.use_destroy_message or (TB3D_Modders.use_state_message and string_find(sname, TB3D_Modders.npc_to_log)) then is_report = true end
-		if is_report then TB3D_Services.packet_alert("bind restrictor: net destroy["..sname.."] section["..sect.."]") end
+		if is_report then TB3D_Services.info_alert("bind restrictor: net destroy["..sname.."] section["..sect.."]", true) end
 		if (s_obj.id) then
 			local id = s_obj:id()
 			local st = db.storage[id]

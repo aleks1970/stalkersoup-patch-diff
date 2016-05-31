@@ -1,5 +1,5 @@
---TB3D 1.0.9.9.4.4, translate and text color - aleks1970
-function my_ver() return "1.0.9.9.4.4" end
+--TB3D 1.1.0.0.0.5, translate and text color - aleks1970, L03u_agr_underground
+function my_ver() return "1.1.0.0.0.5" end
 -- Module Smart Handheld Teleport ... Spot (Shooter)
 -- Features: 1) Not sovseh locations can teleport, 2) If you can not teleport to this location, you will receive a message from the List Sakharov location where you can teleport, and 3) to Use the teleport only when HS had already done some story assignments, 4) If you can not to Use it also will get a message ..
 -- otrihtovano by sapsan
@@ -24,7 +24,7 @@ local tabl_changers_by_level = {-- flew! complement! no level - no teleport ther
 		p_dest_dir = {0.0, 0.0, 0.0},	-- napravrenie view player
 		p_silent = 1	-- should be set to 1 to suppress the issue of changing the level (automatic transfer)
 	},
-	["L03u_agr_underground"] = {
+	["l03u_agr_underground"] = {
 		p_story_id = 99997,	-- STORY_ID new level_changer (We shall need later)
 		p_dest_lv = 4451,	-- level_vertex_id   - identify the level at which to throw the player will level_changer 
 		p_dest_gv = 736,	-- game_vertex_id

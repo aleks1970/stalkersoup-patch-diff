@@ -1,8 +1,8 @@
---TB3D 1.1.0.0.0.0 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
+--TB3D 1.1.0.0.0.5 fixed kot, speech_test, optimized, fixed checking used item, added actor update, optimized db.actor,
 -- hit styles, kalmyak, protected items, freeman bloodsucker, check_info, forest_update, added items to lehavre transfer,
 -- changed lehavre to take money instead, dc/atp level chgr infos, object level, obj_is_protected, debug, new_info,
--- translate and text color - aleks1970, grib_respawn
-function my_ver() return "1.1.0.0.0.0" end
+-- translate and text color - aleks1970, grib_respawn, set kalmyak
+function my_ver() return "1.1.0.0.0.5" end
 
 local string_find = string.find
 local math_random = math.random
@@ -109,7 +109,7 @@ end]]--
 -- local nepis={9613,9622}
 -- local nepis_id={9850,9851}
 
-function spawn_marsh_band()
+function spawn_marsh_band()					--110005, removed rucksak
 	local v = vector()
 	alife():create("agr_bandit_respawn_1",v:set(299.289,0.59365,-122.695),331636,3531)
 	TB3D_Triggers.spawn_alife("agr_bandit_respawn_2", 299.289,0.59365,-122.695, 331636, 3531, 2)
@@ -120,6 +120,10 @@ function spawn_marsh_band()
 	alife():create("marsh_nebo_ambush2",v:set(37.800182342,1.1534446,-201.8684),158865,3442)
 	alife():create("marsh_nebo_ambush3",v:set(37.800182342,1.1534446,-201.8684),158865,3442)
 	alife():create("marsh_nebo_ambush4",v:set(37.800182342,1.1534446,-201.8684),158865,3442)
+end
+
+function spawn_kalmyak_ruksack()					--110005
+	local v = vector()
 	alife():create("prov_ruk",v:set(-3.481797,3.3647267818451,12.3242),137219,3418)
 end
 
@@ -653,16 +657,15 @@ end
 
 function transfer_object_item(item)
 	out_object:transfer_item(item, in_object)
-	--dbg.log("transfer item=%s from %s to %s", item:name(), out_object:name(), in_object:name())
 end 
------------------------------- NOT USED!!!!!!!!!!
+
 function kalmyak_vrag(actor, npc)
     xr_gulag.setGulagEnemy ("kalmyak_marsh", db.actor)
 end
 
 function kalmyak_spawn()
 	if TB3D_Services.is_collector(3000) == false then
-		TB3D_Services.packet_alert("braad test: kalmyak_spawn")
+		--TB3D_Services.packet_alert("braad test: kalmyak_spawn")
 		alife():create("kalmyak_ruk",vector():set(-199.24903869629,0.60609865188599,130.58129),38203,3383)
 	   create_kalmyak_restr()
 	   set_kalmyak_ruk()
@@ -729,6 +732,7 @@ end
 
 function set_kalmyak()
 	if TB3D_Services.is_collector(3000) == false then
+		spawn_kalmyak_ruksack()												--110005
 		local sim = alife()
 		local obj
 		for a=first_object,last_object do

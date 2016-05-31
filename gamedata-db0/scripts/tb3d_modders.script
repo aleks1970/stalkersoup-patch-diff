@@ -1,4 +1,4 @@
---- TB3D 1.1.0.0.0.4 PRE-release of the Modders' Mega Mod, changed dyn suit options,
+--- TB3D 1.1.0.0.0.5 PRE-release of the Modders' Mega Mod, changed dyn suit options,
 -- bioradar pulse option, logic debug option, DMX135, death_hit, expanded hit styles,
 -- added cave_no_big_electros, pump_it_up to in-game menu, alife tweaks, cleaner, dist coef,
 -- population control, max_phantoms, radiation_factor, adjusted populations, start_alife_option,
@@ -12,13 +12,17 @@
 -- advanced graphics, chgd daytime, volume_on_pause, blowout_rad_val from 1.0 to 0.05, arena lights,
 -- turn info message back off, adjusted loot ammo, force_r2_hw, coefficient_factor, show_story_ids, slice thresholds,
 -- show_removed_items, coef, DX11, DX11 graphics settings, packet_limit, repair kit, actor_idle_, give_art_on_death,
--- restrict_stock, edited comments, max_inventory_items
+-- restrict_stock, edited comments, max_inventory_items, alias name, search time
 
-function my_ver() return "1.1.0.0.0.4" end
+function my_ver() return "1.1.0.0.0.5" end
 --// Modders' Resource Central for script options. Defaults are shown in () and should not be changed.
 --// Certain function calls from script files in the gamedata\scripts dir redirected here.
 --// For STALKERSOUP mod testing and gameplay options - NOT compatible with non-TB3D mods
 --// Options capable of reducing memory/CPU load when OFF are indicated with !M! in comment
+
+-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Player Alias <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+--// Use this to override the user name in the saves, should use member callsign
+alias_name = ""			-- leave commented out if want to use your computer user name  --110005
 
 -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DirectX 11 Support<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 --// If you want DX11, but are not using the Launcher, then set this to 'true', and also remove // from #define DX11 in the shadersettings.txt
@@ -81,27 +85,30 @@ respawner_max_per_slice	= 8		-- (8)  Maximum objects created per slice
 ------------------------------- OFFLINE ALIFE --------------------------------------------
 use_offline_alife = false		-- (false)!M!(extreme usage) Use offline alife updates of fictitious events
 look_radius_box = 100			-- (100)  Distance to search for inventory boxes
-search_intensivity=20			-- (20)   !M! Search intensity - number of alife objects to search for each table update
+search_intensivity = 20			-- (20)   !M! Search intensity - number of alife objects to search for each table update
 offline_alife_trade = false		-- (false)!M! News on items for trade. Use 'false' for better performance
 
 ------------------------------- ONLINE ALIFE ---------------------------------------------------------------
-search_actor_dist=6				-- (6)    If actor is within this distance of the item/corpse, then NPC skips it
-search_busy_dist=5				-- (5)    Only if right under foot when in danger, camper or walker
-search_max_dist=40				-- (40)   Maximum distance for NPC to search for loot
-look_radius=120					-- (120)  Maximum object search distance. Should be <= alife.ltx switch_distance (TB3D = 120)
+search_actor_dist = 6			-- (6)		If actor is within this distance of the item/corpse, then NPC skips it
+search_busy_dist = 5			-- (5)		Only if right under foot when in danger, camper or walker
+search_max_dist = 40			-- (40)		Maximum distance for NPC to search for loot
+search_min_time = 5000			-- (5000)	Minimum time npc wil search for lootable objects and corpses per scheme							--110005
+search_rand_time = 5000			-- (10000)	Multiplied against random(0.0 to 1.0) so total time can be from min_time to min_time+rand_time	--110005
+loot_own_community = false		-- (false)	NPC will loot their own dead if true, better combat if left false.		--110005
+look_radius = 120				-- (120)	Maximum object search distance. Should be <= alife.ltx switch_distance (TB3D = 120)
 to_actor = look_radius-20		-- (look_radius-20) Distance from actor checks. Object must be: ( < look_radius and > to_actor ) to be spawned, range: 1 to to_actor-1 (look_radius-20)
-max_rounds = 10					-- (10)   Duration of attacks, keep spawning up to 10 times per assault
-health_wound = 0.20				-- (0.20) At what level of health an NPC is considered to be wounded 
-health_wound_set = 0.02			-- (0.02) First wound start
---// actual code: fp = math_ceil((priority * 1000) + (GetAccuracy * TB3D_Modders.accuracy_mult) + (GetRPM * 3) + (GetDamage * TB3D_Modders.damage_mult)) - 5000
-base_fp = 1400					-- (1400) Standard firepower/distance at distance = 1 to remove 100% health [defender.health - (attack_info.fp / TB3D_Modders.base_fp)]
-dist_coeff = 8					-- (8)    The coefficient for the distance [firepower / (dist / dist_coeff)]
-accuracy_mult = 100				-- (100)  Percentage of weapon accuracy (in config) to apply. Lower = less accurate
-damage_mult = 8					-- (8)    Damage value in weapon config multiplied by this value. Lower = less damage
-sell_limit = 3000				-- (3000) Vendor sale limit
-rate_kill_base = 100			-- (100)  Rating for murder. By killing the weaker - 0.5 * rate_kill_base, stronger - 2 * rate_kill_base
-rate_art_found = 20				-- (20)   Rank change for victims with artefacts
-condition_threshold = 0.9		-- (0.9)  DEFAULT threshold at which point an object is considered in good condition. Changes in-game, but resets to this
+max_rounds = 10					-- (10)		Duration of attacks, keep spawning up to 10 times per assault
+health_wound = 0.20				-- (0.20)	At what level of health an NPC is considered to be wounded 
+health_wound_set = 0.02			-- (0.02)	First wound start
+--// actual code: fp = math_ceil((priority * 1000) + (GetAccuracy * TB3D_Modders.accuracy_mult) + (GetRPM * 3) + (GetDamage * TB3D_Modders.damage_mult)) - 5000 //--
+base_fp = 1400					-- (1400)	Standard firepower/distance at distance = 1 to remove 100% health [defender.health - (attack_info.fp / TB3D_Modders.base_fp)]
+dist_coeff = 8					-- (8)		The coefficient for the distance [firepower / (dist / dist_coeff)]
+accuracy_mult = 100				-- (100)	Percentage of weapon accuracy (in config) to apply. Lower = less accurate
+damage_mult = 8					-- (8)		Damage value in weapon config multiplied by this value. Lower = less damage
+sell_limit = 3000				-- (3000)	Vendor sale limit
+rate_kill_base = 100			-- (100)	Rating for murder. By killing the weaker - 0.5 * rate_kill_base, stronger - 2 * rate_kill_base
+rate_art_found = 20				-- (20)		Rank change for victims with artefacts
+condition_threshold = 0.9		-- (0.9)	DEFAULT threshold at which point an object is considered in good condition. Changes in-game, but resets to this
 
 --------------------------------SMART TERRAIN--------------------------------------------------------
 ------- spawn/respawn params, Quick, Medium, Long in npc.customdata or default
@@ -153,7 +160,7 @@ join_factions		= false		-- (false) Allows joining factions at any time. Can caus
 
 reduce_bar_visitors = true		-- (true)  !M! Will reduce number of visitors around campfires by half				--109989
 restrict_stock		= false		-- (false) !M! AMK inventory stock restriction
-max_inventory_items = 1000		-- (1000)  !M! Will force item to drop if inventory is above this amount.			--110004
+max_inventory_items = 2000		-- (2000)  !M! Will force item to drop if inventory is above this amount.			--110004
 
 ---------------------------------HIDE WEAPON-----------------------------------------------------
 --// Cars and some gameplay require holstering your weapon. These will NOT be affected by this setting.
@@ -411,7 +418,6 @@ level_set_max		= 100	-- (100) If auto_levels = 1 then do not set any level past 
 								--lod_a			=	 96,   96,   64,   64,   48
 								--lod_b			=	 64,   64,   48,   48,   32
 								--shadow_qlty 	=	1.0,  1.0,  0.7,  0.7,  0.5
-
 -----------------------------GRAPHICS DEFAULT SETTINGS-------------------------------------------
 --// 109981 Called from PDA to reset advanced settings to engine defaults
 --// PDA Commands: reset Sun, reset HDR, reset Gloss, reset Parallax, reset Bloom, reset ALL
