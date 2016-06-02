@@ -1,5 +1,5 @@
---TB3D 1.1.0.0.0.5 set <good_cond to <0.94 to include 0.95 in tests, fixed <good_threshold to >good_threshold, check_bad_weapons, good_eagle_m1_have, optimized, fixed locals
-function my_ver() return "1.1.0.0.0.5" end
+--TB3D 1.1.0.0.0.6 set <good_cond to <0.94 to include 0.95 in tests, fixed <good_threshold to >good_threshold, check_bad_weapons, good_eagle_m1_have, optimized, fixed locals, sig_m1
+function my_ver() return "1.1.0.0.0.6" end
 
 local nagrad = {
   level_1 = {
@@ -593,7 +593,7 @@ function na_sig_m1(first_speaker, second_speaker)
 		actor = second_speaker
 		trader = first_speaker
 	end
-	local wpn_sig_m1 = 0			--110005
+	local sig_m1 = 0			--110006, was wpn_sig_m1
 	actor:iterate_inventory(function (dummy, item) if item:section()=="wpn_sig_m1" then
 		sig_m1=sig_m1+1 end end, nil)
     if sig_m1>=1 then
